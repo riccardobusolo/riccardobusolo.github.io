@@ -1,8 +1,425 @@
 <!DOCTYPE html>
-<html>
-<head><title>Test</title></head>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Riccardo Busolo — Consulente AI | Intelligenza Artificiale, Automazione e Formazione">
+  <title>Riccardo Busolo — AI Consultant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#08080e;--bg-card:#0e0e1a;--bg-card-hover:#141425;--border:rgba(100,220,255,.06);--border-hover:rgba(100,220,255,.18);--text:#e4e4f0;--text-dim:#8585a8;--text-muted:#4e4e6a;--cyan:#00e0d0;--cyan-glow:rgba(0,224,208,.3);--cyan-subtle:rgba(0,224,208,.06);--blue:#4facfe;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.7;-webkit-font-smoothing:antialiased}
+    .tri-panel{position:fixed;top:0;width:min(38vw, 480px);height:100%;z-index:1;pointer-events:auto}
+    .tri-panel--left{left:0}.tri-panel--right{right:0}
+    .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;padding:20px 40px;transition:background .4s,backdrop-filter .4s}
+    .nav--scrolled{background:rgba(8,8,14,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+    .nav__inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:900px}
+    .nav__logo{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none}
+    .nav__logo span{color:var(--cyan)}
+    .nav__links{display:flex;gap:32px;list-style:none}
+    .nav__links a{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-decoration:none;transition:color .3s}
+    .nav__links a:hover{color:var(--cyan)}
+    .main{position:relative;z-index:10;max-width:860px;margin:0 auto;padding:0 40px}
+    .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 0 80px}
+    .hero__badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.75rem;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase;margin-bottom:28px;opacity:0;animation:fadeUp .8s var(--ease) .2s forwards}
+    .hero__badge::before{content:'';width:32px;height:1px;background:var(--cyan)}
+    .hero__name{font-size:clamp(2.6rem,6.5vw,4.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-bottom:10px;opacity:0;animation:fadeUp .8s var(--ease) .35s forwards}
+    .hero__role{font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:300;letter-spacing:-.02em;line-height:1.15;margin-bottom:28px;opacity:0;animation:fadeUp .8s var(--ease) .5s forwards}
+    .hero__role strong{font-weight:700;background:linear-gradient(135deg,var(--cyan),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero__desc{font-size:1.1rem;color:var(--text-dim);max-width:560px;font-weight:300;line-height:1.8;margin-bottom:40px;opacity:0;animation:fadeUp .8s var(--ease) .65s forwards}
+    .hero__cta{display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:fadeUp .8s var(--ease) .8s forwards}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;font-family:var(--mono);font-size:.78rem;font-weight:500;letter-spacing:.03em;border-radius:6px;cursor:pointer;border:none;transition:all .35s var(--ease);text-decoration:none}
+    .btn--primary{background:var(--cyan);color:var(--bg)}
+    .btn--primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--cyan-glow)}
+    .btn--ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border-hover)}
+    .btn--ghost:hover{color:var(--cyan);border-color:var(--cyan);background:var(--cyan-subtle)}
+    .section{padding:100px 0}
+    .section__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:12px}
+    .section__title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;letter-spacing:-.03em;margin-bottom:48px}
+    .services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
+    .service-card{padding:32px 28px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;transition:all .4s var(--ease);position:relative;overflow:hidden}
+    .service-card:hover{transform:translateY(-3px);border-color:var(--border-hover);background:var(--bg-card-hover)}
+    .service-card__glow{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity .4s}
+    .service-card:hover .service-card__glow{opacity:1}
+    .service-card__icon{font-size:1.8rem;margin-bottom:16px;display:block}
+    .service-card__title{font-size:1.1rem;font-weight:600;margin-bottom:10px}
+    .service-card__desc{font-size:.88rem;color:var(--text-dim);font-weight:300;line-height:1.7}
+    .project-list{display:flex;flex-direction:column;gap:12px}
+    .project-item{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);transition:all .35s var(--ease)}
+    .project-item:hover{border-color:var(--border-hover);background:var(--bg-card-hover);padding-left:34px}
+    .project-item__info{flex:1}
+    .project-item__title{font-size:1.05rem;font-weight:600;margin-bottom:4px}
+    .project-item__desc{font-size:.82rem;color:var(--text-muted);font-weight:300}
+    .project-item__tags{display:flex;gap:6px;margin-right:24px}
+    .project-item__tag{font-family:var(--mono);font-size:.65rem;padding:3px 10px;background:var(--cyan-subtle);color:var(--cyan);border-radius:4px}
+    .project-item__arrow{color:var(--text-muted);transition:color .3s,transform .3s var(--ease);flex-shrink:0}
+    .project-item:hover .project-item__arrow{color:var(--cyan);transform:translateX(4px)}
+    .resources-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+    .resource-card{display:flex;align-items:center;gap:16px;padding:20px 24px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);transition:all .35s var(--ease)}
+    .resource-card:hover{border-color:var(--border-hover);background:var(--bg-card-hover)}
+    .resource-card__icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--cyan-subtle);border-radius:8px;flex-shrink:0}
+    .resource-card__icon svg{width:20px;height:20px;color:var(--cyan)}
+    .resource-card__title{font-size:.92rem;font-weight:500}
+    .resource-card__meta{font-size:.72rem;color:var(--text-muted);font-family:var(--mono);margin-top:2px}
+    .contact__lead{font-size:clamp(1.4rem,3vw,2rem);font-weight:600;margin-bottom:40px}
+    .contact-links{display:flex;flex-direction:column}
+    .contact-link{display:flex;justify-content:space-between;align-items:center;padding:24px 0;border-top:1px solid var(--border);text-decoration:none;color:var(--text);transition:padding-left .4s var(--ease)}
+    .contact-link:last-child{border-bottom:1px solid var(--border)}
+    .contact-link:hover{padding-left:14px}
+    .contact-link__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted)}
+    .contact-link__value{font-size:.95rem;color:var(--text-dim);transition:color .3s}
+    .contact-link:hover .contact-link__value{color:var(--cyan)}
+    .footer{position:relative;z-index:10;padding:36px 0;text-align:center;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border)}
+    .reveal{opacity:0;transform:translateY(36px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+    .reveal--visible{opacity:1;transform:translateY(0)}
+    @media(max-width:1100px){.tri-panel{width:min(30vw,350px)}}
+    @media(max-width:900px){.tri-panel{width:min(22vw,250px)}}
+    @media(max-width:700px){.tri-panel{display:none}.main{padding:0 24px}.nav{padding:16px 24px}.nav__links{gap:20px}.nav__links a{font-size:.68rem}.project-item{flex-direction:column;align-items:flex-start;gap:12px}.project-item__tags{margin-right:0}}
+  </style>
+</head>
 <body>
-  <h1>Funziona!</h1>
-  <p>Il sito è online.</p>
+  <canvas class="tri-panel tri-panel--left" id="tri-left"></canvas>
+  <canvas class="tri-panel tri-panel--right" id="tri-right"></canvas>
+
+  <nav class="nav" id="nav"><div class="nav__inner"><a href="#hero" class="nav__logo">RB<span>.</span></a><ul class="nav__links"><li><a href="#servizi">Servizi</a></li><li><a href="#progetti">Progetti</a></li><li><a href="#risorse">Risorse</a></li><li><a href="#contatti">Contatti</a></li></ul></div></nav>
+
+  <div class="main">
+    <section class="hero" id="hero">
+      <div class="hero__badge">AI Consultant</div>
+      <h1 class="hero__name">Riccardo Busolo</h1>
+      <p class="hero__role">Consulente di <strong>Intelligenza Artificiale</strong></p>
+      <p class="hero__desc">Aiuto aziende e professionisti a integrare soluzioni AI nei loro processi: dall'automazione intelligente alla formazione su misura, dalla strategia all'implementazione.</p>
+      <div class="hero__cta"><a href="#servizi" class="btn btn--primary">Scopri i servizi</a><a href="#contatti" class="btn btn--ghost">Parliamone</a></div>
+    </section>
+    <section class="section" id="servizi">
+      <div class="reveal"><p class="section__label">01 — Servizi</p><h2 class="section__title">Cosa posso fare per te</h2></div>
+      <div class="services-grid">
+        <div class="service-card reveal"><div class="service-card__glow"></div><span class="service-card__icon">&#9672;</span><h3 class="service-card__title">Consulenza Strategica AI</h3><p class="service-card__desc">Analisi dei processi aziendali e individuazione delle opportunità di automazione e ottimizzazione tramite AI.</p></div>
+        <div class="service-card reveal"><div class="service-card__glow"></div><span class="service-card__icon">&#9881;</span><h3 class="service-card__title">Sviluppo Soluzioni Custom</h3><p class="service-card__desc">Progettazione e sviluppo di modelli di machine learning e sistemi AI su misura per le tue esigenze specifiche.</p></div>
+        <div class="service-card reveal"><div class="service-card__glow"></div><span class="service-card__icon">&#128218;</span><h3 class="service-card__title">Formazione AI</h3><p class="service-card__desc">Corsi pratici e workshop su prompt engineering, strumenti AI, automazione e integrazione nei flussi di lavoro.</p></div>
+        <div class="service-card reveal"><div class="service-card__glow"></div><span class="service-card__icon">&#9889;</span><h3 class="service-card__title">Automazione Processi</h3><p class="service-card__desc">Implementazione di workflow automatizzati con AI per ridurre tempi, costi e errori nelle operazioni quotidiane.</p></div>
+      </div>
+    </section>
+    <section class="section" id="progetti">
+      <div class="reveal"><p class="section__label">02 — Progetti</p><h2 class="section__title">Progetti AI</h2></div>
+      <div class="project-list">
+        <a href="projects/neural-style.html" class="project-item reveal"><div class="project-item__info"><h3 class="project-item__title">Neural Style Transfer</h3><p class="project-item__desc">Trasferimento stilistico in tempo reale con CNN</p></div><div class="project-item__tags"><span class="project-item__tag">PyTorch</span><span class="project-item__tag">CNN</span></div><svg class="project-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        <a href="projects/sentiment.html" class="project-item reveal"><div class="project-item__info"><h3 class="project-item__title">Sentiment Analysis Engine</h3><p class="project-item__desc">Analisi del sentiment multi-lingua con Transformer</p></div><div class="project-item__tags"><span class="project-item__tag">BERT</span><span class="project-item__tag">NLP</span></div><svg class="project-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        <a href="projects/object-detection.html" class="project-item reveal"><div class="project-item__info"><h3 class="project-item__title">Real-Time Object Detection</h3><p class="project-item__desc">Rilevamento oggetti con YOLOv8 su edge devices</p></div><div class="project-item__tags"><span class="project-item__tag">YOLO</span><span class="project-item__tag">Vision</span></div><svg class="project-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        <a href="projects/rag-system.html" class="project-item reveal"><div class="project-item__info"><h3 class="project-item__title">Knowledge Base AI (RAG)</h3><p class="project-item__desc">Sistema RAG con vector DB per risposte accurate</p></div><div class="project-item__tags"><span class="project-item__tag">LangChain</span><span class="project-item__tag">RAG</span></div><svg class="project-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </section>
+    <section class="section" id="risorse">
+      <div class="reveal"><p class="section__label">03 — Risorse</p><h2 class="section__title">Materiali di Formazione</h2></div>
+      <div class="resources-grid">
+        <a href="risorse/guida-prompt-engineering.pdf" class="resource-card reveal"><div class="resource-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="resource-card__title">Guida al Prompt Engineering</div><div class="resource-card__meta">PDF — 2.4 MB</div></div></a>
+        <a href="risorse/introduzione-ml.pdf" class="resource-card reveal"><div class="resource-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="resource-card__title">Introduzione al Machine Learning</div><div class="resource-card__meta">PDF — 5.1 MB</div></div></a>
+        <a href="risorse/ai-per-aziende.pdf" class="resource-card reveal"><div class="resource-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="resource-card__title">AI per Aziende — Guida Pratica</div><div class="resource-card__meta">PDF — 3.8 MB</div></div></a>
+        <a href="risorse/automazione-workflow.pdf" class="resource-card reveal"><div class="resource-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="resource-card__title">Automazione Workflow con AI</div><div class="resource-card__meta">PDF — 1.9 MB</div></div></a>
+      </div>
+    </section>
+    <section class="section" id="contatti">
+      <div class="reveal"><p class="section__label">04 — Contatti</p><h2 class="section__title">Parliamo del tuo progetto</h2></div>
+      <div class="reveal">
+        <p class="contact__lead">Vuoi integrare l'AI nella tua azienda?<br>Scrivimi e troviamo la soluzione giusta.</p>
+        <div class="contact-links"><a href="/cdn-cgi/l/email-protection#d4a6bdb7b7b5a6b0bbfab6a1a7bbb8bbe594b3b9b5bdb8fab7bbb9" class="contact-link"><span class="contact-link__label">Email</span><span class="contact-link__value"><span class="__cf_email__" data-cfemail="54263d37373526303b7a3621273b383b65143339353d387a373b39">[email&#160;protected]</span></span></a></div>
+      </div>
+    </section>
+  </div>
+  <footer class="footer"><div>&copy; 2026 Riccardo Busolo — AI Consultant</div></footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  (function(){
+    'use strict';
+
+    class TriPanel {
+      constructor(canvas, side) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.side = side; // 'left' or 'right'
+        this.tris = [];
+        this.mouse = { x: -9999, y: -9999 };
+        this.hovIdx = -1;
+        this.bursts = [];
+        this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+        this.time = 0;
+        this.raf = null;
+
+        this.S = 50;
+        this.halfS = this.S / 2;
+        this.H = this.S * Math.sqrt(3) / 2;
+        this.BASE_SCALE = 0.89;
+
+        this.resize();
+        this.build();
+        this.bind();
+        this.loop();
+      }
+
+      resize() {
+        const r = this.canvas.getBoundingClientRect();
+        this.w = r.width;
+        this.h = r.height;
+        this.canvas.width = this.w * this.dpr;
+        this.canvas.height = this.h * this.dpr;
+        this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      }
+
+      build() {
+        this.tris = [];
+        const { halfS, H, w, h, side } = this;
+        const rows = Math.ceil(h / H) + 4;
+        const cols = Math.ceil(w / halfS) + 4;
+
+        // Fade zone = 70% of panel width (very gradual)
+        const fadeZone = w * 0.7;
+
+        for (let row = -2; row < rows; row++) {
+          for (let col = -2; col < cols; col++) {
+            const isUp = (row + col) % 2 === 0;
+            const y = row * H;
+            let v;
+
+            if (isUp) {
+              v = [
+                [col * halfS, y + H],
+                [(col + 2) * halfS, y + H],
+                [(col + 1) * halfS, y]
+              ];
+            } else {
+              v = [
+                [col * halfS, y],
+                [(col + 2) * halfS, y],
+                [(col + 1) * halfS, y + H]
+              ];
+            }
+
+            const cx = (v[0][0] + v[1][0] + v[2][0]) / 3;
+            const cy = (v[0][1] + v[1][1] + v[2][1]) / 3;
+
+            // Fade ONLY on the inner edge
+            // Left panel: fade near right edge (cx close to w)
+            // Right panel: fade near left edge (cx close to 0)
+            let edgeFactor = 1;
+            if (side === 'left') {
+              const distFromInner = w - cx;
+              if (distFromInner < fadeZone) {
+                edgeFactor = Math.max(0, distFromInner / fadeZone);
+                // Ease the curve for smoother falloff
+                edgeFactor = edgeFactor * edgeFactor;
+              }
+            } else {
+              const distFromInner = cx;
+              if (distFromInner < fadeZone) {
+                edgeFactor = Math.max(0, distFromInner / fadeZone);
+                edgeFactor = edgeFactor * edgeFactor;
+              }
+            }
+
+            if (edgeFactor < 0.03) continue;
+
+            this.tris.push({
+              v, cx, cy,
+              edgeFactor,
+              scale: this.BASE_SCALE * edgeFactor,
+              tScale: this.BASE_SCALE * edgeFactor,
+              maxScale: edgeFactor,
+              edgeGlow: 0,
+              tEdgeGlow: 0,
+              shade: 15 + Math.random() * 5
+            });
+          }
+        }
+      }
+
+      _verts(t) {
+        const s = t.scale;
+        return t.v.map(p => [
+          t.cx + (p[0] - t.cx) * s,
+          t.cy + (p[1] - t.cy) * s
+        ]);
+      }
+
+      _hit(px, py, t) {
+        const [a, b, c] = t.v;
+        const d1 = (px - b[0]) * (a[1] - b[1]) - (a[0] - b[0]) * (py - b[1]);
+        const d2 = (px - c[0]) * (b[1] - c[1]) - (b[0] - c[0]) * (py - c[1]);
+        const d3 = (px - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (py - a[1]);
+        return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
+      }
+
+      bind() {
+        const pos = e => {
+          const r = this.canvas.getBoundingClientRect();
+          return {
+            x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left,
+            y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top
+          };
+        };
+        this.canvas.addEventListener('mousemove', e => { this.mouse = pos(e); });
+        this.canvas.addEventListener('mouseleave', () => { this.mouse = { x: -9999, y: -9999 }; this.hovIdx = -1; });
+        this.canvas.addEventListener('click', e => {
+          const p = pos(e);
+          this.bursts.push({ x: p.x, y: p.y, r: 0, max: 450, speed: 5 });
+        });
+        this.canvas.addEventListener('touchstart', e => {
+          const p = pos(e); this.mouse = p;
+          this.bursts.push({ x: p.x, y: p.y, r: 0, max: 450, speed: 5 });
+        }, { passive: true });
+      }
+
+      update() {
+        this.time += 0.005;
+        const mx = this.mouse.x, my = this.mouse.y;
+
+        this.hovIdx = -1;
+        for (let i = 0; i < this.tris.length; i++) {
+          if (this._hit(mx, my, this.tris[i])) { this.hovIdx = i; break; }
+        }
+
+        for (let i = 0; i < this.tris.length; i++) {
+          const t = this.tris[i];
+          const baseS = this.BASE_SCALE * t.edgeFactor;
+          t.tScale = baseS;
+          t.tEdgeGlow = 0;
+
+          // Proximity shrink: triangles near cursor gently shrink
+          const proDist = Math.hypot(t.cx - mx, t.cy - my);
+          const proRadius = 130;
+          if (proDist < proRadius && proDist > 0) {
+            const proIntensity = 1 - proDist / proRadius;
+            // Gentle shrink — about 1/3 the strength of click wave
+            const proShrink = proIntensity * 0.12 * t.edgeFactor;
+            t.tScale = baseS - proShrink;
+            t.tEdgeGlow = Math.max(t.tEdgeGlow, proIntensity * 0.25);
+          }
+
+          // Direct hover: the one triangle under cursor grows slightly
+          if (i === this.hovIdx) {
+            t.tScale = Math.min(0.98, t.maxScale * 1.1);
+            t.tEdgeGlow = 0.7;
+          }
+
+          for (const b of this.bursts) {
+            const d = Math.hypot(t.cx - b.x, t.cy - b.y);
+            const waveDist = Math.abs(d - b.r);
+            const waveW = 80;
+            if (waveDist < waveW) {
+              const intensity = 1 - waveDist / waveW;
+              const life = 1 - b.r / b.max;
+              const shrink = intensity * life * 0.35;
+              t.tScale = Math.min(t.tScale, baseS - shrink * t.edgeFactor);
+              t.tEdgeGlow = Math.max(t.tEdgeGlow, intensity * life);
+            }
+          }
+
+          t.tScale = Math.max(0, t.tScale);
+          t.scale += (t.tScale - t.scale) * 0.1;
+          t.edgeGlow += (t.tEdgeGlow - t.edgeGlow) * 0.08;
+        }
+
+        for (let i = this.bursts.length - 1; i >= 0; i--) {
+          this.bursts[i].r += this.bursts[i].speed;
+          if (this.bursts[i].r > this.bursts[i].max) this.bursts.splice(i, 1);
+        }
+      }
+
+      draw() {
+        const ctx = this.ctx;
+        ctx.clearRect(0, 0, this.w, this.h);
+
+        const time = this.time;
+
+        for (let i = 0; i < this.tris.length; i++) {
+          const t = this.tris[i];
+          if (t.scale < 0.02) continue;
+
+          const v = this._verts(t);
+
+          ctx.beginPath();
+          ctx.moveTo(v[0][0], v[0][1]);
+          ctx.lineTo(v[1][0], v[1][1]);
+          ctx.lineTo(v[2][0], v[2][1]);
+          ctx.closePath();
+
+          const sh = t.shade + (i === this.hovIdx ? 14 : 0);
+          ctx.fillStyle = `rgb(${sh},${sh},${Math.round(sh * 1.08)})`;
+          ctx.fill();
+
+          const flow = Math.sin(time * 2.5 + t.cx * 0.018 + t.cy * 0.014) * 0.5 + 0.5;
+          const ambient = 0.025 + flow * 0.06;
+          const total = Math.min(ambient + t.edgeGlow * 0.8, 1);
+
+          if (total > 0.02) {
+            ctx.beginPath();
+            ctx.moveTo(v[0][0], v[0][1]);
+            ctx.lineTo(v[1][0], v[1][1]);
+            ctx.lineTo(v[2][0], v[2][1]);
+            ctx.closePath();
+            ctx.strokeStyle = `rgba(0,224,210,${total})`;
+            ctx.lineWidth = 0.8 + t.edgeGlow * 2;
+            ctx.stroke();
+
+            if (t.edgeGlow > 0.15) {
+              ctx.beginPath();
+              ctx.moveTo(v[0][0], v[0][1]);
+              ctx.lineTo(v[1][0], v[1][1]);
+              ctx.lineTo(v[2][0], v[2][1]);
+              ctx.closePath();
+              ctx.strokeStyle = `rgba(0,224,210,${t.edgeGlow * 0.12})`;
+              ctx.lineWidth = 5 + t.edgeGlow * 5;
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      loop() {
+        this.update();
+        this.draw();
+        this.raf = requestAnimationFrame(() => this.loop());
+      }
+
+      destroy() { cancelAnimationFrame(this.raf); }
+    }
+
+    let pL, pR;
+    const cL = document.getElementById('tri-left');
+    const cR = document.getElementById('tri-right');
+    function init() {
+      if (pL) pL.destroy();
+      if (pR) pR.destroy();
+      if (cL) pL = new TriPanel(cL, 'left');
+      if (cR) pR = new TriPanel(cR, 'right');
+    }
+    init();
+
+    let rT;
+    window.addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(init, 250); });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { if (pL) pL.destroy(); if (pR) pR.destroy(); } else init();
+    });
+
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => { nav.classList.toggle('nav--scrolled', window.scrollY > 60); }, { passive: true });
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('reveal--visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+      });
+    });
+  })();
+  </script>
 </body>
 </html>
