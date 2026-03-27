@@ -97,12 +97,11 @@
     .hex-orbit__track{position:absolute;top:50%;left:50%;width:320px;height:320px;margin:-160px 0 0 -160px;border:1px solid rgba(0,224,208,.06);border-radius:50%;pointer-events:none}
     .hex-orbit__ring{position:absolute;top:0;left:0;width:100%;height:100%;animation:hexSpin 80s linear infinite}
     @keyframes hexSpin{to{transform:rotate(360deg)}}
-    .hex-card{position:absolute;top:50%;left:50%;width:170px;height:192px;margin:-96px 0 0 -85px;text-decoration:none;color:var(--text);cursor:pointer;transition:filter .4s}
-    .hex-card:hover{filter:brightness(1.25)}
-    .hex-card__shape{width:100%;height:100%;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);background:var(--bg-card);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:background .4s;animation:hexCounterSpin 80s linear infinite}
+    .hex-card{position:absolute;top:50%;left:50%;width:170px;height:192px;margin:-96px 0 0 -85px;text-decoration:none;color:var(--text);cursor:pointer;transition:filter .4s var(--ease),scale .4s var(--ease)}
+    .hex-card:hover{filter:brightness(1.25);scale:1.1}
+    .hex-card__shape{width:100%;height:100%;clip-path:url(#hex-rounded);background:var(--bg-card);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:background .4s;animation:hexCounterSpin 80s linear infinite}
     .hex-card:hover .hex-card__shape{background:var(--bg-card-hover)}
-    .hex-card__border{position:absolute;inset:-2px;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);background:linear-gradient(135deg,rgba(0,224,208,.18),rgba(79,172,254,.08));z-index:-1;transition:opacity .4s;animation:hexCounterSpin 80s linear infinite}
-    .hex-card:hover .hex-card__border{opacity:1;background:linear-gradient(135deg,rgba(0,224,208,.35),rgba(79,172,254,.18))}
+    .hex-card__border{position:absolute;inset:-3px;clip-path:url(#hex-rounded);background:radial-gradient(circle 130px at var(--hx,50%) var(--hy,50%),rgba(0,224,208,.55),rgba(0,224,208,.12) 40%,transparent 70%);z-index:-1;opacity:0;animation:hexCounterSpin 80s linear infinite}
     .hex-card__img{width:64px;height:64px;border-radius:8px;background:rgba(0,224,208,.04);border:1px dashed rgba(0,224,208,.15);display:flex;align-items:center;justify-content:center;margin-bottom:10px;overflow:hidden;transition:border-color .3s}
     .hex-card:hover .hex-card__img{border-color:rgba(0,224,208,.35)}
     .hex-card__img svg{width:22px;height:22px;stroke:var(--text-muted);fill:none;stroke-width:1.5}
@@ -173,6 +172,12 @@
   </style>
 </head>
 <body>
+  <!-- Rounded hexagon clip-path definition -->
+  <svg width="0" height="0" style="position:absolute"><defs>
+    <clipPath id="hex-rounded" clipPathUnits="objectBoundingBox">
+      <path d="M0.446,0.027 Q0.5,0,0.554,0.027 L0.946,0.223 Q1,0.25,1,0.31 L1,0.69 Q1,0.75,0.946,0.777 L0.554,0.973 Q0.5,1,0.446,0.973 L0.054,0.777 Q0,0.75,0,0.69 L0,0.31 Q0,0.25,0.054,0.223 Z"/>
+    </clipPath>
+  </defs></svg>
   <canvas class="tri-panel tri-panel--left" id="tri-left"></canvas>
   <canvas class="tri-panel tri-panel--right" id="tri-right"></canvas>
 
@@ -655,6 +660,59 @@
         el.style.setProperty('--my',(e.clientY-r.top)+'px');
       });
     });
+  })();
+  </script>
+
+  <!-- Hex card proximity glow -->
+  <script>
+  (function(){
+    'use strict';
+    const hexCards = document.querySelectorAll('.hex-card');
+    if (!hexCards.length) return;
+    const GLOW_RADIUS = 220;
+    const hexStates = [];
+    let hMx = -9999, hMy = -9999;
+
+    hexCards.forEach(card => {
+      const border = card.querySelector('.hex-card__border');
+      hexStates.push({ card, border, alpha: 0, targetAlpha: 0 });
+    });
+
+    window.addEventListener('mousemove', e => {
+      hMx = e.clientX;
+      hMy = e.clientY;
+    }, { passive: true });
+
+    let lastHexTs = 0;
+    function hexGlowRAF(ts) {
+      const dt = Math.min((ts - lastHexTs) / 1000, 0.1);
+      lastHexTs = ts;
+
+      hexStates.forEach(state => {
+        const rect = state.card.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dist = Math.hypot(hMx - cx, hMy - cy);
+
+        state.targetAlpha = dist < GLOW_RADIUS
+          ? Math.pow(Math.max(0, 1 - dist / GLOW_RADIUS), 1.4)
+          : 0;
+
+        const lerpA = 1 - Math.pow(0.82, dt * 60);
+        state.alpha += (state.targetAlpha - state.alpha) * lerpA;
+
+        state.border.style.opacity = state.alpha;
+
+        // Position the radial gradient on the mouse
+        const mx = hMx - rect.left;
+        const my = hMy - rect.top;
+        state.border.style.setProperty('--hx', mx + 'px');
+        state.border.style.setProperty('--hy', my + 'px');
+      });
+
+      requestAnimationFrame(hexGlowRAF);
+    }
+    requestAnimationFrame(hexGlowRAF);
   })();
   </script>
 
