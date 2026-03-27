@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Riccardo Busolo — Consulente AI | Intelligenza Artificiale, Automazione e Formazione">
   <title>Riccardo Busolo — AI Consultant</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     :root{--bg:#08080e;--bg-card:#151518;--bg-card-hover:#1c1c20;--border:rgba(180,180,190,.08);--border-hover:rgba(180,180,190,.2);--text:#e6e6ea;--text-dim:#9a9a9e;--text-muted:#7a7a8e;--cyan:#00e0d0;--cyan-glow:rgba(0,224,208,.3);--cyan-subtle:rgba(0,224,208,.06);--blue:#4facfe;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
@@ -325,6 +327,11 @@
           <div class="form-group"><label for="cf-msg">Messaggio</label><textarea id="cf-msg" name="message" placeholder="Descrivi brevemente il tuo progetto o la tua richiesta..." required></textarea></div>
           <button type="submit" class="btn btn--primary" id="cf-submit">Invia messaggio</button>
         </form>
+      </div>
+      <div class="reveal" style="margin-top:48px">
+        <p class="section__label">Area di copertura</p>
+        <p style="color:var(--text-dim);font-weight:300;font-size:.95rem;margin-bottom:20px">Disponibile per consulenze in presenza entro circa 30 minuti di auto da Padova centro.</p>
+        <div id="coverage-map" style="width:100%;height:400px;border-radius:12px;border:1px solid var(--border);overflow:hidden"></div>
       </div>
     </section>
   </div>
@@ -856,6 +863,62 @@
     const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('reveal--visible');obs.unobserve(e.target);}});},{threshold:.12,rootMargin:'0px 0px -30px 0px'});
     document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
     document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}});});
+  })();
+  </script>
+
+  <!-- Leaflet map: coverage area -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+  (function(){
+    'use strict';
+    const mapEl = document.getElementById('coverage-map');
+    if (!mapEl) return;
+
+    const padova = [45.4105, 11.8782];
+    const radiusKm = 27; // ~30 min drive
+
+    const map = L.map(mapEl, {
+      center: padova,
+      zoom: 11,
+      scrollWheelZoom: false,
+      attributionControl: false
+    });
+
+    // Dark tile layer
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 18
+    }).addTo(map);
+
+    // Attribution in bottom-right (compact)
+    L.control.attribution({ position: 'bottomright', prefix: false })
+      .addAttribution('&copy; <a href="https://www.openstreetmap.org/copyright" style="color:#7a7a8e">OSM</a> &copy; <a href="https://carto.com/" style="color:#7a7a8e">CARTO</a>')
+      .addTo(map);
+
+    // Coverage circle
+    L.circle(padova, {
+      radius: radiusKm * 1000,
+      color: '#00e0d0',
+      weight: 1.5,
+      opacity: 0.6,
+      fillColor: '#00e0d0',
+      fillOpacity: 0.08,
+      dashArray: '6 4'
+    }).addTo(map);
+
+    // Center marker
+    const svgIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:14px;height:14px;background:#00e0d0;border-radius:50%;box-shadow:0 0 12px rgba(0,224,208,.5),0 0 30px rgba(0,224,208,.2);border:2px solid rgba(0,224,208,.8)"></div>',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+    L.marker(padova, { icon: svgIcon })
+      .addTo(map)
+      .bindPopup('<div style="font-family:Outfit,sans-serif;font-size:.85rem;color:#222"><strong>Padova Centro</strong><br>Base operativa</div>');
+
+    // Enable scroll zoom only after click
+    mapEl.addEventListener('click', () => { map.scrollWheelZoom.enable(); });
+    mapEl.addEventListener('mouseleave', () => { map.scrollWheelZoom.disable(); });
   })();
   </script>
 </body>
