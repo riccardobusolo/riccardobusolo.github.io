@@ -24,13 +24,14 @@
     .nav__links a{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-decoration:none;transition:color .3s}
     .nav__links a:hover{color:var(--cyan)}
     .main{position:relative;z-index:10;max-width:860px;margin:0 auto;padding:0 40px}
-    .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 0 80px}
-    .hero__badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.75rem;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase;margin-bottom:28px;opacity:0;animation:fadeUp .8s var(--ease) .2s forwards}
+    /* 1) More top padding so header and badge don't feel cramped */
+    .hero{min-height:auto;display:flex;flex-direction:column;justify-content:center;padding:130px 0 40px}
+    .hero__badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.75rem;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px;opacity:0;animation:fadeUp .8s var(--ease) .2s forwards}
     .hero__badge::before{content:'';width:32px;height:1px;background:var(--cyan)}
     .hero__name{font-size:clamp(2.6rem,6.5vw,4.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-bottom:10px;opacity:0;animation:fadeUp .8s var(--ease) .35s forwards}
-    .hero__role{font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:300;letter-spacing:-.02em;line-height:1.15;margin-bottom:28px;opacity:0;animation:fadeUp .8s var(--ease) .5s forwards}
+    .hero__role{font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:300;letter-spacing:-.02em;line-height:1.15;margin-bottom:20px;opacity:0;animation:fadeUp .8s var(--ease) .5s forwards}
     .hero__role strong{font-weight:700;background:linear-gradient(135deg,var(--cyan),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .hero__desc{font-size:1.1rem;color:var(--text-dim);max-width:560px;font-weight:300;line-height:1.8;margin-bottom:40px;opacity:0;animation:fadeUp .8s var(--ease) .65s forwards}
+    .hero__desc{font-size:1.1rem;color:var(--text-dim);max-width:560px;font-weight:300;line-height:1.8;margin-bottom:28px;opacity:0;animation:fadeUp .8s var(--ease) .65s forwards}
     .hero__cta{display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:fadeUp .8s var(--ease) .8s forwards}
     @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
     .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;font-family:var(--mono);font-size:.78rem;font-weight:500;letter-spacing:.03em;border-radius:6px;cursor:pointer;border:none;transition:all .35s var(--ease);text-decoration:none}
@@ -38,48 +39,123 @@
     .btn--primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--cyan-glow)}
     .btn--ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border-hover)}
     .btn--ghost:hover{color:var(--cyan);border-color:var(--cyan);background:var(--cyan-subtle)}
+
+    /* Neural network */
+    .nn-wrap{position:relative;width:100%;height:clamp(280px,42vh,600px);overflow:hidden;cursor:grab;z-index:0}
+    .nn-wrap:active{cursor:grabbing}
+    .nn-wrap canvas{display:block;width:100%;height:100%}
+    .nn-fade-top,.nn-fade-bot{position:absolute;left:0;right:0;pointer-events:none;z-index:2}
+    .nn-fade-top{top:0;height:120px;background:linear-gradient(to bottom,var(--bg) 0%,rgba(8,8,14,.7) 40%,transparent 100%)}
+    .nn-fade-bot{bottom:0;height:120px;background:linear-gradient(to top,var(--bg) 0%,rgba(8,8,14,.7) 40%,transparent 100%)}
+    .nn-fade-left,.nn-fade-right{position:absolute;top:0;bottom:0;width:15%;pointer-events:none;z-index:2}
+    .nn-fade-left{left:0;background:linear-gradient(to right,var(--bg) 0%,rgba(8,8,14,.5) 40%,transparent 100%)}
+    .nn-fade-right{right:0;background:linear-gradient(to left,var(--bg) 0%,rgba(8,8,14,.5) 40%,transparent 100%)}
+
+    /* Sections */
     .section{padding:100px 0}
     .section__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:12px}
     .section__title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;letter-spacing:-.03em;margin-bottom:48px}
+
+    /* 2) Services with SVG icons */
     .services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
     .service-card{padding:32px 28px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;transition:all .4s var(--ease);position:relative;overflow:hidden}
     .service-card:hover{transform:translateY(-3px);border-color:var(--border-hover);background:var(--bg-card-hover)}
     .service-card__glow{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity .4s}
     .service-card:hover .service-card__glow{opacity:1}
-    .service-card__icon{font-size:1.8rem;margin-bottom:16px;display:block}
+    .service-card__icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--cyan-subtle);border-radius:10px;transition:background .3s}
+    .service-card:hover .service-card__icon{background:rgba(0,224,208,.12)}
+    .service-card__icon svg{width:22px;height:22px;stroke:var(--cyan);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .service-card__title{font-size:1.1rem;font-weight:600;margin-bottom:10px}
     .service-card__desc{font-size:.88rem;color:var(--text-dim);font-weight:300;line-height:1.7}
-    .project-list{display:flex;flex-direction:column;gap:12px}
-    .project-item{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);transition:all .35s var(--ease)}
-    .project-item:hover{border-color:var(--border-hover);background:var(--bg-card-hover);padding-left:34px}
-    .project-item__info{flex:1}
-    .project-item__title{font-size:1.05rem;font-weight:600;margin-bottom:4px}
-    .project-item__desc{font-size:.82rem;color:var(--text-muted);font-weight:300}
-    .project-item__tags{display:flex;gap:6px;margin-right:24px}
-    .project-item__tag{font-family:var(--mono);font-size:.65rem;padding:3px 10px;background:var(--cyan-subtle);color:var(--cyan);border-radius:4px}
-    .project-item__arrow{color:var(--text-muted);transition:color .3s,transform .3s var(--ease);flex-shrink:0}
-    .project-item:hover .project-item__arrow{color:var(--cyan);transform:translateX(4px)}
-    .resources-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-    .resource-card{display:flex;align-items:center;gap:16px;padding:20px 24px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);transition:all .35s var(--ease)}
-    .resource-card:hover{border-color:var(--border-hover);background:var(--bg-card-hover)}
-    .resource-card__icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--cyan-subtle);border-radius:8px;flex-shrink:0}
-    .resource-card__icon svg{width:20px;height:20px;color:var(--cyan)}
-    .resource-card__title{font-size:.92rem;font-weight:500}
-    .resource-card__meta{font-size:.72rem;color:var(--text-muted);font-family:var(--mono);margin-top:2px}
+
+    /* 3) Hexagon orbit */
+    .hex-orbit{position:relative;width:100%;max-width:600px;height:440px;margin:0 auto}
+    .hex-orbit__center{position:absolute;top:50%;left:50%;width:6px;height:6px;margin:-3px 0 0 -3px;background:var(--cyan);border-radius:50%;box-shadow:0 0 20px var(--cyan-glow),0 0 60px rgba(0,224,208,.12)}
+    .hex-orbit__track{position:absolute;top:50%;left:50%;width:320px;height:320px;margin:-160px 0 0 -160px;border:1px solid rgba(0,224,208,.06);border-radius:50%;pointer-events:none}
+    .hex-orbit__ring{position:absolute;top:0;left:0;width:100%;height:100%;animation:hexSpin 80s linear infinite}
+    @keyframes hexSpin{to{transform:rotate(360deg)}}
+    .hex-card{position:absolute;top:50%;left:50%;width:170px;height:192px;margin:-96px 0 0 -85px;text-decoration:none;color:var(--text);cursor:pointer;transition:filter .4s}
+    .hex-card:hover{filter:brightness(1.25)}
+    .hex-card__shape{width:100%;height:100%;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);background:var(--bg-card);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:background .4s}
+    .hex-card:hover .hex-card__shape{background:var(--bg-card-hover)}
+    .hex-card__border{position:absolute;inset:-2px;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);background:linear-gradient(135deg,rgba(0,224,208,.18),rgba(79,172,254,.08));z-index:-1;transition:opacity .4s}
+    .hex-card:hover .hex-card__border{opacity:1;background:linear-gradient(135deg,rgba(0,224,208,.35),rgba(79,172,254,.18))}
+    .hex-card__img{width:64px;height:64px;border-radius:8px;background:rgba(0,224,208,.04);border:1px dashed rgba(0,224,208,.15);display:flex;align-items:center;justify-content:center;margin-bottom:10px;overflow:hidden;transition:border-color .3s}
+    .hex-card:hover .hex-card__img{border-color:rgba(0,224,208,.35)}
+    .hex-card__img svg{width:22px;height:22px;stroke:var(--text-muted);fill:none;stroke-width:1.5}
+    .hex-card__img img{width:100%;height:100%;object-fit:cover}
+    .hex-card__title{font-size:.78rem;font-weight:600;text-align:center;padding:0 16px;line-height:1.3}
+    .hex-card__inner{display:flex;flex-direction:column;align-items:center;justify-content:center;animation:hexCounterSpin 80s linear infinite}
+    @keyframes hexCounterSpin{to{transform:rotate(-360deg)}}
+    .hex-card:nth-child(1){transform:translate(160px, 0)}
+    .hex-card:nth-child(2){transform:translate(-80px, -138px)}
+    .hex-card:nth-child(3){transform:translate(-80px, 138px)}
+
+    /* 4) Resources stacked */
+    .res-stack{display:flex;flex-direction:column;gap:16px}
+    .res-item{display:flex;gap:20px;padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all .4s var(--ease);overflow:hidden;position:relative;cursor:pointer}
+    .res-item::after{content:'';position:absolute;inset:0;opacity:0;background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(0,224,208,.06),transparent 40%);transition:opacity .3s;pointer-events:none}
+    .res-item:hover::after{opacity:1}
+    .res-item:hover{border-color:var(--border-hover);background:var(--bg-card-hover);transform:translateY(-2px)}
+    .res-item:active{transform:translateY(0) scale(.995);transition-duration:.1s}
+    .res-item__img{width:110px;height:80px;border-radius:8px;background:rgba(0,224,208,.03);border:1px dashed rgba(0,224,208,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;transition:border-color .3s}
+    .res-item:hover .res-item__img{border-color:rgba(0,224,208,.3)}
+    .res-item__img svg{width:28px;height:28px;stroke:var(--text-muted);fill:none;stroke-width:1.5}
+    .res-item__img img{width:100%;height:100%;object-fit:cover}
+    .res-item__body{flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0}
+    .res-item__title{font-size:1rem;font-weight:600;margin-bottom:4px}
+    .res-item__meta{font-size:.72rem;color:var(--text-muted);font-family:var(--mono)}
+    .res-item__arrow{align-self:center;flex-shrink:0;color:var(--text-muted);transition:color .3s,transform .3s var(--ease)}
+    .res-item:hover .res-item__arrow{color:var(--cyan);transform:translateX(4px)}
+
+    /* 5) Contact form */
     .contact__lead{font-size:clamp(1.4rem,3vw,2rem);font-weight:600;margin-bottom:40px}
-    .contact-links{display:flex;flex-direction:column}
-    .contact-link{display:flex;justify-content:space-between;align-items:center;padding:24px 0;border-top:1px solid var(--border);text-decoration:none;color:var(--text);transition:padding-left .4s var(--ease)}
-    .contact-link:last-child{border-bottom:1px solid var(--border)}
-    .contact-link:hover{padding-left:14px}
-    .contact-link__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted)}
-    .contact-link__value{font-size:.95rem;color:var(--text-dim);transition:color .3s}
-    .contact-link:hover .contact-link__value{color:var(--cyan)}
-    .footer{position:relative;z-index:10;padding:36px 0;text-align:center;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border)}
+    .contact-form{display:flex;flex-direction:column;gap:16px;max-width:520px}
+    .form-group{display:flex;flex-direction:column;gap:6px}
+    .form-group label{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)}
+    .form-group input,.form-group textarea{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;color:var(--text);font-family:var(--font);font-size:.92rem;outline:none;transition:border-color .3s,box-shadow .3s;resize:vertical}
+    .form-group input:focus,.form-group textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,224,208,.08)}
+    .form-group input::placeholder,.form-group textarea::placeholder{color:var(--text-muted)}
+    .form-group textarea{min-height:120px}
+    .form-msg{font-size:.85rem;padding:12px 16px;border-radius:8px;display:none}
+    .form-msg--ok{display:block;background:rgba(0,224,208,.08);color:var(--cyan);border:1px solid rgba(0,224,208,.2)}
+    .form-msg--err{display:block;background:rgba(216,90,48,.08);color:#D85A30;border:1px solid rgba(216,90,48,.2)}
+    .form-msg--wait{display:block;background:rgba(79,172,254,.08);color:var(--blue);border:1px solid rgba(79,172,254,.2)}
+
+    /* 6) Cookie banner */
+    .cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(14,14,26,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:20px 40px;display:none;align-items:center;gap:20px;flex-wrap:wrap}
+    .cookie-banner--show{display:flex}
+    .cookie-banner__text{flex:1;font-size:.85rem;color:var(--text-dim);min-width:220px;line-height:1.6}
+    .cookie-banner__text a{color:var(--cyan);text-decoration:underline;text-underline-offset:2px}
+    .cookie-banner__btns{display:flex;gap:10px;flex-shrink:0}
+    .cookie-btn{padding:10px 22px;font-family:var(--mono);font-size:.72rem;border-radius:6px;cursor:pointer;border:none;letter-spacing:.03em;transition:all .3s var(--ease)}
+    .cookie-btn--accept{background:var(--cyan);color:var(--bg)}
+    .cookie-btn--accept:hover{box-shadow:0 4px 20px var(--cyan-glow)}
+    .cookie-btn--reject{background:transparent;color:var(--text-dim);border:1px solid var(--border-hover)}
+    .cookie-btn--reject:hover{color:var(--text);border-color:var(--text-muted)}
+
+    /* 7) Footer with policy links */
+    .footer{position:relative;z-index:10;padding:36px 40px;text-align:center;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border)}
+    .footer__links{display:flex;justify-content:center;gap:24px;margin-top:10px}
+    .footer__links a{color:var(--text-muted);text-decoration:none;font-size:.72rem;font-family:var(--mono);transition:color .3s}
+    .footer__links a:hover{color:var(--cyan)}
+
     .reveal{opacity:0;transform:translateY(36px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
     .reveal--visible{opacity:1;transform:translateY(0)}
     @media(max-width:1100px){.tri-panel{width:min(30vw,350px)}}
     @media(max-width:900px){.tri-panel{width:min(22vw,250px)}}
-    @media(max-width:700px){.tri-panel{display:none}.main{padding:0 24px}.nav{padding:16px 24px}.nav__links{gap:20px}.nav__links a{font-size:.68rem}.project-item{flex-direction:column;align-items:flex-start;gap:12px}.project-item__tags{margin-right:0}}
+    @media(max-width:700px){
+      .tri-panel{display:none}.main{padding:0 24px}.nav{padding:16px 24px}.nav__links{gap:20px}.nav__links a{font-size:.68rem}
+      .hex-orbit{height:500px}
+      .hex-orbit__track{width:260px;height:260px;margin:-130px 0 0 -130px}
+      .hex-card{width:150px;height:170px;margin:-85px 0 0 -75px}
+      .hex-card:nth-child(1){transform:translate(130px, 0)}
+      .hex-card:nth-child(2){transform:translate(-65px, -112px)}
+      .hex-card:nth-child(3){transform:translate(-65px, 112px)}
+      .res-item{flex-direction:column}
+      .res-item__img{width:100%;height:140px}
+      .cookie-banner{padding:16px 24px}
+    }
   </style>
 </head>
 <body>
@@ -88,7 +164,7 @@
 
   <nav class="nav" id="nav"><div class="nav__inner">
 
-    <a href="#hero" class="nav__logo" style="display:flex;align-items:center">
+<a href="#hero" class="nav__logo" style="display:flex;align-items:center">
   <svg height="32" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
     <path fill="#fff" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
     <path fill="#fff" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
@@ -107,329 +183,311 @@
       <p class="hero__desc">Aiuto aziende e professionisti a integrare soluzioni AI nei loro processi: dall'automazione intelligente alla formazione su misura, dalla strategia all'implementazione.</p>
       <div class="hero__cta"><a href="#servizi" class="btn btn--primary">Scopri i servizi</a><a href="#contatti" class="btn btn--ghost">Parliamone</a></div>
     </section>
+  </div>
+
+  <div class="nn-wrap" id="nn-wrap">
+    <div class="nn-fade-top"></div>
+    <div class="nn-fade-bot"></div>
+    <div class="nn-fade-left"></div>
+    <div class="nn-fade-right"></div>
+    <canvas id="nn-canvas"></canvas>
+  </div>
+
+  <div class="main">
+
+    <!-- SERVIZI -->
     <section class="section" id="servizi">
       <div class="reveal"><p class="section__label">01 — Servizi</p><h2 class="section__title">Cosa posso fare per te</h2></div>
       <div class="services-grid">
-        <div class="service-card reveal"><div class="service-card__glow"></div><span class="service-card__icon">&#9672;</span><h3 class="service-card__title">Consulenza Strategica AI</h3><p class="service-card__desc">Analisi dei processi aziendali e individuazione delle opportunità di automazione e ottimizzazione tramite AI.</p></div>
-        <div class="service-card reveal"><div class="service-card__glow"></div><span class="service-card__icon">&#9881;</span><h3 class="service-card__title">Sviluppo Soluzioni Custom</h3><p class="service-card__desc">Progettazione e sviluppo di modelli di machine learning e sistemi AI su misura per le tue esigenze specifiche.</p></div>
-        <div class="service-card reveal"><div class="service-card__glow"></div><span class="service-card__icon">&#128218;</span><h3 class="service-card__title">Formazione AI</h3><p class="service-card__desc">Corsi pratici e workshop su prompt engineering, strumenti AI, automazione e integrazione nei flussi di lavoro.</p></div>
-        <div class="service-card reveal"><div class="service-card__glow"></div><span class="service-card__icon">&#9889;</span><h3 class="service-card__title">Automazione Processi</h3><p class="service-card__desc">Implementazione di workflow automatizzati con AI per ridurre tempi, costi e errori nelle operazioni quotidiane.</p></div>
+
+        <div class="service-card reveal">
+          <div class="service-card__glow"></div>
+          <div class="service-card__icon">
+            <!-- Graduation cap / teaching -->
+            <svg viewBox="0 0 24 24"><path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5c0 0 2.5 3 6 3s6-3 6-3v-5"/><line x1="22" y1="10" x2="22" y2="16"/></svg>
+          </div>
+          <h3 class="service-card__title">Formazione AI</h3>
+          <p class="service-card__desc">Insegno ai tuoi team a usare concretamente l'Intelligenza Artificiale. Attraverso lezioni pratiche, trasferisco le competenze per sfruttare i migliori tool sul mercato e velocizzare il lavoro di tutti i giorni.</p>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-card__glow"></div>
+          <div class="service-card__icon">
+            <!-- Settings/gear = custom solutions -->
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          </div>
+          <h3 class="service-card__title">Soluzioni su Misura</h3>
+          <p class="service-card__desc">Affianco la tua azienda nella creazione di strumenti AI personalizzati. Partendo dai vostri processi, costruisco soluzioni specifiche per risolvere i colli di bottiglia e ottimizzare le operazioni interne.</p>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-card__glow"></div>
+          <div class="service-card__icon">
+            <!-- Code brackets = vibe coding -->
+            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+          </div>
+          <h3 class="service-card__title">Vibe Coding</h3>
+          <p class="service-card__desc">Rendo i tuoi collaboratori autonomi nello sviluppo di microservizi. Insegno loro a creare piccoli software funzionanti usando esclusivamente il linguaggio naturale, senza alcun bisogno di saper programmare.</p>
+        </div>
+
       </div>
     </section>
+
+    <!-- PROGETTI — 3 rotating hexagons -->
     <section class="section" id="progetti">
       <div class="reveal"><p class="section__label">02 — Progetti</p><h2 class="section__title">Progetti AI</h2></div>
-      <div class="project-list">
-        <a href="projects/neural-style.html" class="project-item reveal"><div class="project-item__info"><h3 class="project-item__title">Neural Style Transfer</h3><p class="project-item__desc">Trasferimento stilistico in tempo reale con CNN</p></div><div class="project-item__tags"><span class="project-item__tag">PyTorch</span><span class="project-item__tag">CNN</span></div><svg class="project-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-        <a href="projects/sentiment.html" class="project-item reveal"><div class="project-item__info"><h3 class="project-item__title">Sentiment Analysis Engine</h3><p class="project-item__desc">Analisi del sentiment multi-lingua con Transformer</p></div><div class="project-item__tags"><span class="project-item__tag">BERT</span><span class="project-item__tag">NLP</span></div><svg class="project-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-        <a href="projects/object-detection.html" class="project-item reveal"><div class="project-item__info"><h3 class="project-item__title">Real-Time Object Detection</h3><p class="project-item__desc">Rilevamento oggetti con YOLOv8 su edge devices</p></div><div class="project-item__tags"><span class="project-item__tag">YOLO</span><span class="project-item__tag">Vision</span></div><svg class="project-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-        <a href="projects/rag-system.html" class="project-item reveal"><div class="project-item__info"><h3 class="project-item__title">Knowledge Base AI (RAG)</h3><p class="project-item__desc">Sistema RAG con vector DB per risposte accurate</p></div><div class="project-item__tags"><span class="project-item__tag">LangChain</span><span class="project-item__tag">RAG</span></div><svg class="project-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <div class="hex-orbit reveal" id="hex-orbit">
+        <div class="hex-orbit__center"></div>
+        <div class="hex-orbit__track"></div>
+        <div class="hex-orbit__ring" id="hex-ring">
+
+          <a href="#" class="hex-card" data-project="formazione">
+            <div class="hex-card__border"></div>
+            <div class="hex-card__shape">
+              <div class="hex-card__inner">
+                <div class="hex-card__img">
+                  <!-- Replace svg with: <img src="img/formazione.jpg" alt="Formazione"> -->
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+                <div class="hex-card__title">Progetti di Formazione</div>
+              </div>
+            </div>
+          </a>
+
+          <a href="#" class="hex-card" data-project="altri">
+            <div class="hex-card__border"></div>
+            <div class="hex-card__shape">
+              <div class="hex-card__inner">
+                <div class="hex-card__img">
+                  <!-- Replace svg with: <img src="img/altri.jpg" alt="Altri Progetti"> -->
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+                <div class="hex-card__title">Altri Progetti</div>
+              </div>
+            </div>
+          </a>
+
+          <a href="#" class="hex-card" data-project="blog">
+            <div class="hex-card__border"></div>
+            <div class="hex-card__shape">
+              <div class="hex-card__inner">
+                <div class="hex-card__img">
+                  <!-- Replace svg with: <img src="img/blog.jpg" alt="Blog"> -->
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+                <div class="hex-card__title">Blog</div>
+              </div>
+            </div>
+          </a>
+
+        </div>
       </div>
     </section>
+
+    <!-- RISORSE — stacked cards with image slots -->
     <section class="section" id="risorse">
       <div class="reveal"><p class="section__label">03 — Risorse</p><h2 class="section__title">Materiali di Formazione</h2></div>
-      <div class="resources-grid">
-        <a href="risorse/guida-prompt-engineering.pdf" class="resource-card reveal"><div class="resource-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="resource-card__title">Guida al Prompt Engineering</div><div class="resource-card__meta">PDF — 2.4 MB</div></div></a>
-        <a href="risorse/introduzione-ml.pdf" class="resource-card reveal"><div class="resource-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="resource-card__title">Introduzione al Machine Learning</div><div class="resource-card__meta">PDF — 5.1 MB</div></div></a>
-        <a href="risorse/ai-per-aziende.pdf" class="resource-card reveal"><div class="resource-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="resource-card__title">AI per Aziende — Guida Pratica</div><div class="resource-card__meta">PDF — 3.8 MB</div></div></a>
-        <a href="risorse/automazione-workflow.pdf" class="resource-card reveal"><div class="resource-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="resource-card__title">Automazione Workflow con AI</div><div class="resource-card__meta">PDF — 1.9 MB</div></div></a>
+      <div class="res-stack">
+
+        <a href="risorse/guida-prompt-engineering.pdf" class="res-item reveal">
+          <div class="res-item__img">
+            <!-- Replace svg with: <img src="img/cover-prompt.jpg" alt=""> -->
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="res-item__body">
+            <div class="res-item__title">Guida al Prompt Engineering</div>
+            <div class="res-item__meta">PDF — 2.4 MB</div>
+          </div>
+          <svg class="res-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+
+        <a href="risorse/introduzione-ml.pdf" class="res-item reveal">
+          <div class="res-item__img">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="res-item__body">
+            <div class="res-item__title">Introduzione al Machine Learning</div>
+            <div class="res-item__meta">PDF — 5.1 MB</div>
+          </div>
+          <svg class="res-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+
+        <a href="risorse/ai-per-aziende.pdf" class="res-item reveal">
+          <div class="res-item__img">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="res-item__body">
+            <div class="res-item__title">AI per Aziende — Guida Pratica</div>
+            <div class="res-item__meta">PDF — 3.8 MB</div>
+          </div>
+          <svg class="res-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+
+        <a href="risorse/automazione-workflow.pdf" class="res-item reveal">
+          <div class="res-item__img">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="res-item__body">
+            <div class="res-item__title">Automazione Workflow con AI</div>
+            <div class="res-item__meta">PDF — 1.9 MB</div>
+          </div>
+          <svg class="res-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+
       </div>
     </section>
+
+    <!-- CONTATTI — Formspree form -->
     <section class="section" id="contatti">
       <div class="reveal"><p class="section__label">04 — Contatti</p><h2 class="section__title">Parliamo del tuo progetto</h2></div>
       <div class="reveal">
         <p class="contact__lead">Vuoi integrare l'AI nella tua azienda?<br>Scrivimi e troviamo la soluzione giusta.</p>
-        <div class="contact-links"><a href="/cdn-cgi/l/email-protection#d4a6bdb7b7b5a6b0bbfab6a1a7bbb8bbe594b3b9b5bdb8fab7bbb9" class="contact-link"><span class="contact-link__label">Email</span><span class="contact-link__value"><span class="__cf_email__" data-cfemail="54263d37373526303b7a3621273b383b65143339353d387a373b39">[email&#160;protected]</span></span></a></div>
+        <div id="form-msg" class="form-msg"></div>
+        <form class="contact-form" id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+          <div class="form-group">
+            <label for="cf-name">Nome</label>
+            <input type="text" id="cf-name" name="name" placeholder="Il tuo nome" required>
+          </div>
+          <div class="form-group">
+            <label for="cf-email">Email</label>
+            <input type="email" id="cf-email" name="email" placeholder="La tua email" required>
+          </div>
+          <div class="form-group">
+            <label for="cf-msg">Messaggio</label>
+            <textarea id="cf-msg" name="message" placeholder="Descrivi brevemente il tuo progetto o la tua richiesta..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary" id="cf-submit">Invia messaggio</button>
+        </form>
       </div>
     </section>
   </div>
-  <footer class="footer"><div>&copy; 2026 Riccardo Busolo — AI Consultant</div></footer>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <!-- Footer with policy links -->
+  <footer class="footer">
+    <div>&copy; 2026 Riccardo Busolo — AI Consultant</div>
+    <div class="footer__links">
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="cookie-policy.html">Cookie Policy</a>
+    </div>
+  </footer>
+
+  <!-- Cookie consent banner -->
+  <div class="cookie-banner" id="cookie-banner">
+    <p class="cookie-banner__text">Questo sito utilizza cookie tecnici e, previo tuo consenso, cookie di profilazione per migliorare la tua esperienza. Puoi leggere la nostra <a href="cookie-policy.html">Cookie Policy</a> e la <a href="privacy-policy.html">Privacy Policy</a>.</p>
+    <div class="cookie-banner__btns">
+      <button class="cookie-btn cookie-btn--reject" id="cookie-reject">Rifiuta</button>
+      <button class="cookie-btn cookie-btn--accept" id="cookie-accept">Accetta</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SCRIPTS ═══════════════ -->
+
+  <!-- Three.js + Neural Network -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
   (function(){
-    'use strict';
+    "use strict";
+    const wrap=document.getElementById('nn-wrap'),nnCanvas=document.getElementById('nn-canvas');
+    if(!wrap||!nnCanvas) return;
+    const LAYERS=[[5,5],[7,7],[8,8],[10,10],[12,12],[14,14],[16,16],[16,16],[16,16],[14,14],[12,12],[10,10],[8,8],[6,6],[4,4]];
+    const LZS=5,NXY=1.1,CK=5,WS=0.12,NR=0.16;
+    const ren=new THREE.WebGLRenderer({canvas:nnCanvas,antialias:true,powerPreference:"high-performance",alpha:false});
+    function nnSz(){const r=wrap.getBoundingClientRect();ren.setSize(r.width,r.height);ren.setPixelRatio(Math.min(devicePixelRatio,2));cam.aspect=r.width/r.height;cam.updateProjectionMatrix();}
+    ren.setClearColor(0x08080e);
+    const sc=new THREE.Scene();sc.fog=new THREE.FogExp2(0x08080e,0.012);
+    const cam=new THREE.PerspectiveCamera(50,1,0.1,600);
+    const tZ=(LAYERS.length-1)*LZS,nP=[],nD=[],lG=[];let nC=0;
+    LAYERS.forEach(([c,r],li)=>{const z=-tZ/2+li*LZS,ox=-(c-1)*NXY/2,oy=-(r-1)*NXY/2;const g=[];for(let rr=0;rr<r;rr++)for(let cc=0;cc<c;cc++){const x=ox+cc*NXY,y=oy+rr*NXY;nP.push(x,y,z);nD.push(li/(LAYERS.length-1));g.push({x,y,z,idx:nC++});}lG.push(g);});
+    const nVS=`attribute float aDepth;varying float vD;varying vec3 vN;varying float vFogD;void main(){vD=aDepth;vec4 wp=instanceMatrix*vec4(position,1.0);vN=normalize(mat3(modelViewMatrix)*mat3(instanceMatrix)*normal);vec4 mv=modelViewMatrix*wp;vFogD=length(mv.xyz);gl_Position=projectionMatrix*mv;}`;
+    const nFS=`uniform float uWave;uniform vec3 uFogColor;uniform float uFogDensity;varying float vD,vFogD;varying vec3 vN;vec3 lc(float d){vec3 a=vec3(.498,.467,.867);vec3 b=vec3(.114,.62,.459);vec3 c=vec3(.847,.353,.188);return d<.5?mix(a,b,d*2.):mix(b,c,(d-.5)*2.);}void main(){float pulse=0.;for(int i=0;i<3;i++){float w=fract(uWave+float(i)*.333);float d=vD-w;if(d>.5)d-=1.;if(d<-.5)d+=1.;float g=exp(-d*d*110.);float trail=d<0.?exp(d*5.)*.25:0.;pulse=max(pulse,g+trail);}pulse=clamp(pulse,0.,1.);vec3 base=lc(vD);float diff=dot(vN,normalize(vec3(.4,.8,.5)))*.4+.6;vec3 lit=base*diff;vec3 bright=mix(lit,vec3(1.),.35);vec3 col=mix(lit*.06,bright,pulse);float alpha=.15+pulse*.85;float fogF=1.-exp(-uFogDensity*uFogDensity*vFogD*vFogD);col=mix(col,uFogColor,fogF);alpha*=1.-fogF*.7;gl_FragColor=vec4(col,alpha);}`;
+    const nMat=new THREE.ShaderMaterial({uniforms:{uWave:{value:0},uFogColor:{value:new THREE.Color(0x08080e)},uFogDensity:{value:.012}},vertexShader:nVS,fragmentShader:nFS,transparent:true,depthWrite:false});
+    const sG=new THREE.SphereGeometry(NR,10,8);sG.setAttribute('aDepth',new THREE.InstancedBufferAttribute(new Float32Array(nD),1));
+    const nM=new THREE.InstancedMesh(sG,nMat,nC);const dm=new THREE.Object3D();
+    for(let i=0;i<nC;i++){dm.position.set(nP[i*3],nP[i*3+1],nP[i*3+2]);dm.updateMatrix();nM.setMatrixAt(i,dm.matrix);}nM.instanceMatrix.needsUpdate=true;sc.add(nM);
+    const cV=[],cDD=[];
+    for(let li=0;li<lG.length-1;li++){const from=lG[li],to=lG[li+1],dF=li/(LAYERS.length-1),dT=(li+1)/(LAYERS.length-1);from.forEach(fn=>{const scored=to.map(tn=>({tn,d:(tn.x-fn.x)**2+(tn.y-fn.y)**2}));scored.sort((a,b)=>a.d-b.d);const k=Math.min(CK,scored.length);for(let j=0;j<k;j++){const tn=scored[j].tn;cV.push(fn.x,fn.y,fn.z,tn.x,tn.y,tn.z);cDD.push(dF,dT);}});}
+    const cVS=`attribute float aDepth;varying float vD;varying float vFogD;void main(){vD=aDepth;vec4 mv=modelViewMatrix*vec4(position,1.0);vFogD=length(mv.xyz);gl_Position=projectionMatrix*mv;}`;
+    const cFS=`uniform float uWave;uniform vec3 uFogColor;uniform float uFogDensity;varying float vD,vFogD;vec3 lc(float d){vec3 a=vec3(.498,.467,.867);vec3 b=vec3(.114,.62,.459);vec3 c=vec3(.847,.353,.188);return d<.5?mix(a,b,d*2.):mix(b,c,(d-.5)*2.);}void main(){float pulse=0.;for(int i=0;i<3;i++){float w=fract(uWave+float(i)*.333);float d=vD-w;if(d>.5)d-=1.;if(d<-.5)d+=1.;float g=exp(-d*d*90.);float trail=d<0.?exp(d*4.5)*.2:0.;pulse=max(pulse,g+trail);}pulse=clamp(pulse,0.,1.);vec3 base=lc(vD);vec3 col=mix(base*.015,base*.9,pulse);float alpha=.018+pulse*.38;float fogF=1.-exp(-uFogDensity*uFogDensity*vFogD*vFogD);col=mix(col,uFogColor,fogF);alpha*=1.-fogF*.6;gl_FragColor=vec4(col,alpha);}`;
+    const cG=new THREE.BufferGeometry();cG.setAttribute('position',new THREE.Float32BufferAttribute(cV,3));cG.setAttribute('aDepth',new THREE.Float32BufferAttribute(cDD,1));
+    const cMat=new THREE.ShaderMaterial({uniforms:{uWave:{value:0},uFogColor:{value:new THREE.Color(0x08080e)},uFogDensity:{value:.012}},vertexShader:cVS,fragmentShader:cFS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+    sc.add(new THREE.LineSegments(cG,cMat));
+    let isDrag=false,pX=0,pY=0,oT=.35,oP=.25,oD=52,tT=oT,tP=oP,tD=oD,autoR=true,autoTm=0;const DAMP=.06;
+    nnCanvas.addEventListener('pointerdown',e=>{isDrag=true;pX=e.clientX;pY=e.clientY;nnCanvas.setPointerCapture(e.pointerId);autoR=false;autoTm=0;});
+    nnCanvas.addEventListener('pointermove',e=>{if(!isDrag)return;tT-=(e.clientX-pX)*.004;tP+=(e.clientY-pY)*.004;tP=Math.max(-1.3,Math.min(1.3,tP));pX=e.clientX;pY=e.clientY;});
+    nnCanvas.addEventListener('pointerup',()=>{isDrag=false;});
+    let time=0;function fract(x){return x-Math.floor(x);}
+    let nnVis=false;const nnObs=new IntersectionObserver(en=>{nnVis=en[0].isIntersecting;},{threshold:.05});nnObs.observe(wrap);
+    function nnLoop(){requestAnimationFrame(nnLoop);if(!nnVis)return;const dt=1/60;time+=WS*dt;if(!isDrag&&!autoR){autoTm+=dt;if(autoTm>3)autoR=true;}if(autoR)tT-=.0015;oT+=(tT-oT)*DAMP;oP+=(tP-oP)*DAMP;oD+=(tD-oD)*DAMP;cam.position.set(Math.sin(oT)*Math.cos(oP)*oD,Math.sin(oP)*oD*.6+2,Math.cos(oT)*Math.cos(oP)*oD);cam.lookAt(0,0,0);const w=fract(time);nMat.uniforms.uWave.value=w;cMat.uniforms.uWave.value=w;ren.render(sc,cam);}
+    nnSz();window.addEventListener('resize',nnSz);nnLoop();
+  })();
+  </script>
 
-    class TriPanel {
-      constructor(canvas, side) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.side = side; // 'left' or 'right'
-        this.tris = [];
-        this.mouse = { x: -9999, y: -9999 };
-        this.hovIdx = -1;
-        this.bursts = [];
-        this.dpr = Math.min(window.devicePixelRatio || 1, 2);
-        this.time = 0;
-        this.raf = null;
-
-        this.S = 50;
-        this.halfS = this.S / 2;
-        this.H = this.S * Math.sqrt(3) / 2;
-        this.BASE_SCALE = 0.89;
-
-        this.resize();
-        this.build();
-        this.bind();
-        this.loop();
-      }
-
-      resize() {
-        const r = this.canvas.getBoundingClientRect();
-        this.w = r.width;
-        this.h = r.height;
-        this.canvas.width = this.w * this.dpr;
-        this.canvas.height = this.h * this.dpr;
-        this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-      }
-
-      build() {
-        this.tris = [];
-        const { halfS, H, w, h, side } = this;
-        const rows = Math.ceil(h / H) + 4;
-        const cols = Math.ceil(w / halfS) + 4;
-
-        // Fade zone = 70% of panel width (very gradual)
-        const fadeZone = w * 0.7;
-
-        for (let row = -2; row < rows; row++) {
-          for (let col = -2; col < cols; col++) {
-            const isUp = (row + col) % 2 === 0;
-            const y = row * H;
-            let v;
-
-            if (isUp) {
-              v = [
-                [col * halfS, y + H],
-                [(col + 2) * halfS, y + H],
-                [(col + 1) * halfS, y]
-              ];
-            } else {
-              v = [
-                [col * halfS, y],
-                [(col + 2) * halfS, y],
-                [(col + 1) * halfS, y + H]
-              ];
-            }
-
-            const cx = (v[0][0] + v[1][0] + v[2][0]) / 3;
-            const cy = (v[0][1] + v[1][1] + v[2][1]) / 3;
-
-            // Fade ONLY on the inner edge
-            // Left panel: fade near right edge (cx close to w)
-            // Right panel: fade near left edge (cx close to 0)
-            let edgeFactor = 1;
-            if (side === 'left') {
-              const distFromInner = w - cx;
-              if (distFromInner < fadeZone) {
-                edgeFactor = Math.max(0, distFromInner / fadeZone);
-                // Ease the curve for smoother falloff
-                edgeFactor = edgeFactor * edgeFactor;
-              }
-            } else {
-              const distFromInner = cx;
-              if (distFromInner < fadeZone) {
-                edgeFactor = Math.max(0, distFromInner / fadeZone);
-                edgeFactor = edgeFactor * edgeFactor;
-              }
-            }
-
-            if (edgeFactor < 0.03) continue;
-
-            this.tris.push({
-              v, cx, cy,
-              edgeFactor,
-              scale: this.BASE_SCALE * edgeFactor,
-              tScale: this.BASE_SCALE * edgeFactor,
-              maxScale: edgeFactor,
-              edgeGlow: 0,
-              tEdgeGlow: 0,
-              shade: 15 + Math.random() * 5
-            });
-          }
-        }
-      }
-
-      _verts(t) {
-        const s = t.scale;
-        return t.v.map(p => [
-          t.cx + (p[0] - t.cx) * s,
-          t.cy + (p[1] - t.cy) * s
-        ]);
-      }
-
-      _hit(px, py, t) {
-        const [a, b, c] = t.v;
-        const d1 = (px - b[0]) * (a[1] - b[1]) - (a[0] - b[0]) * (py - b[1]);
-        const d2 = (px - c[0]) * (b[1] - c[1]) - (b[0] - c[0]) * (py - c[1]);
-        const d3 = (px - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (py - a[1]);
-        return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
-      }
-
-      bind() {
-        const pos = e => {
-          const r = this.canvas.getBoundingClientRect();
-          return {
-            x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left,
-            y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top
-          };
-        };
-        this.canvas.addEventListener('mousemove', e => { this.mouse = pos(e); });
-        this.canvas.addEventListener('mouseleave', () => { this.mouse = { x: -9999, y: -9999 }; this.hovIdx = -1; });
-        this.canvas.addEventListener('click', e => {
-          const p = pos(e);
-          this.bursts.push({ x: p.x, y: p.y, r: 0, max: 450, speed: 5 });
-        });
-        this.canvas.addEventListener('touchstart', e => {
-          const p = pos(e); this.mouse = p;
-          this.bursts.push({ x: p.x, y: p.y, r: 0, max: 450, speed: 5 });
-        }, { passive: true });
-      }
-
-      update() {
-        this.time += 0.005;
-        const mx = this.mouse.x, my = this.mouse.y;
-
-        this.hovIdx = -1;
-        for (let i = 0; i < this.tris.length; i++) {
-          if (this._hit(mx, my, this.tris[i])) { this.hovIdx = i; break; }
-        }
-
-        for (let i = 0; i < this.tris.length; i++) {
-          const t = this.tris[i];
-          const baseS = this.BASE_SCALE * t.edgeFactor;
-          t.tScale = baseS;
-          t.tEdgeGlow = 0;
-
-          // Proximity shrink: triangles near cursor gently shrink
-          const proDist = Math.hypot(t.cx - mx, t.cy - my);
-          const proRadius = 130;
-          if (proDist < proRadius && proDist > 0) {
-            const proIntensity = 1 - proDist / proRadius;
-            // Gentle shrink — about 1/3 the strength of click wave
-            const proShrink = proIntensity * 0.12 * t.edgeFactor;
-            t.tScale = baseS - proShrink;
-            t.tEdgeGlow = Math.max(t.tEdgeGlow, proIntensity * 0.25);
-          }
-
-          // Direct hover: the one triangle under cursor grows slightly
-          if (i === this.hovIdx) {
-            t.tScale = Math.min(0.98, t.maxScale * 1.1);
-            t.tEdgeGlow = 0.7;
-          }
-
-          for (const b of this.bursts) {
-            const d = Math.hypot(t.cx - b.x, t.cy - b.y);
-            const waveDist = Math.abs(d - b.r);
-            const waveW = 80;
-            if (waveDist < waveW) {
-              const intensity = 1 - waveDist / waveW;
-              const life = 1 - b.r / b.max;
-              const shrink = intensity * life * 0.35;
-              t.tScale = Math.min(t.tScale, baseS - shrink * t.edgeFactor);
-              t.tEdgeGlow = Math.max(t.tEdgeGlow, intensity * life);
-            }
-          }
-
-          t.tScale = Math.max(0, t.tScale);
-          t.scale += (t.tScale - t.scale) * 0.1;
-          t.edgeGlow += (t.tEdgeGlow - t.edgeGlow) * 0.08;
-        }
-
-        for (let i = this.bursts.length - 1; i >= 0; i--) {
-          this.bursts[i].r += this.bursts[i].speed;
-          if (this.bursts[i].r > this.bursts[i].max) this.bursts.splice(i, 1);
-        }
-      }
-
-      draw() {
-        const ctx = this.ctx;
-        ctx.clearRect(0, 0, this.w, this.h);
-
-        const time = this.time;
-
-        for (let i = 0; i < this.tris.length; i++) {
-          const t = this.tris[i];
-          if (t.scale < 0.02) continue;
-
-          const v = this._verts(t);
-
-          ctx.beginPath();
-          ctx.moveTo(v[0][0], v[0][1]);
-          ctx.lineTo(v[1][0], v[1][1]);
-          ctx.lineTo(v[2][0], v[2][1]);
-          ctx.closePath();
-
-          const sh = t.shade + (i === this.hovIdx ? 14 : 0);
-          ctx.fillStyle = `rgb(${sh},${sh},${Math.round(sh * 1.08)})`;
-          ctx.fill();
-
-          const flow = Math.sin(time * 2.5 + t.cx * 0.018 + t.cy * 0.014) * 0.5 + 0.5;
-          const ambient = 0.025 + flow * 0.06;
-          const total = Math.min(ambient + t.edgeGlow * 0.8, 1);
-
-          if (total > 0.02) {
-            ctx.beginPath();
-            ctx.moveTo(v[0][0], v[0][1]);
-            ctx.lineTo(v[1][0], v[1][1]);
-            ctx.lineTo(v[2][0], v[2][1]);
-            ctx.closePath();
-            ctx.strokeStyle = `rgba(0,224,210,${total})`;
-            ctx.lineWidth = 0.8 + t.edgeGlow * 2;
-            ctx.stroke();
-
-            if (t.edgeGlow > 0.15) {
-              ctx.beginPath();
-              ctx.moveTo(v[0][0], v[0][1]);
-              ctx.lineTo(v[1][0], v[1][1]);
-              ctx.lineTo(v[2][0], v[2][1]);
-              ctx.closePath();
-              ctx.strokeStyle = `rgba(0,224,210,${t.edgeGlow * 0.12})`;
-              ctx.lineWidth = 5 + t.edgeGlow * 5;
-              ctx.stroke();
-            }
-          }
-        }
-      }
-
-      loop() {
-        this.update();
-        this.draw();
-        this.raf = requestAnimationFrame(() => this.loop());
-      }
-
-      destroy() { cancelAnimationFrame(this.raf); }
-    }
-
-    let pL, pR;
-    const cL = document.getElementById('tri-left');
-    const cR = document.getElementById('tri-right');
-    function init() {
-      if (pL) pL.destroy();
-      if (pR) pR.destroy();
-      if (cL) pL = new TriPanel(cL, 'left');
-      if (cR) pR = new TriPanel(cR, 'right');
-    }
-    init();
-
-    let rT;
-    window.addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(init, 250); });
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) { if (pL) pL.destroy(); if (pR) pR.destroy(); } else init();
-    });
-
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => { nav.classList.toggle('nav--scrolled', window.scrollY > 60); }, { passive: true });
-
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('reveal--visible'); obs.unobserve(e.target); } });
-    }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', e => {
-        const t = document.querySelector(a.getAttribute('href'));
-        if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+  <!-- Resource card spotlight -->
+  <script>
+  (function(){
+    document.querySelectorAll('.res-item').forEach(el=>{
+      el.addEventListener('mousemove',e=>{
+        const r=el.getBoundingClientRect();
+        el.style.setProperty('--mx',(e.clientX-r.left)+'px');
+        el.style.setProperty('--my',(e.clientY-r.top)+'px');
       });
     });
+  })();
+  </script>
+
+  <!-- Contact form — Formspree + 1h rate limit -->
+  <script>
+  (function(){
+    const form=document.getElementById('contact-form'),msgEl=document.getElementById('form-msg'),btn=document.getElementById('cf-submit');
+    const CD=3600000,KEY='rb_contact_ts';
+    function showMsg(t,c){msgEl.textContent=t;msgEl.className='form-msg form-msg--'+c;}
+    function chk(){const l=localStorage.getItem(KEY);if(!l)return false;const e=Date.now()-parseInt(l,10);if(e<CD){const m=Math.ceil((CD-e)/60000);showMsg('Hai già inviato un messaggio di recente. Puoi riprovare tra '+m+' minuti.','wait');btn.disabled=true;btn.style.opacity='.4';btn.style.cursor='not-allowed';return true;}return false;}
+    chk();
+    form.addEventListener('submit',async function(ev){
+      ev.preventDefault();if(chk())return;btn.disabled=true;btn.textContent='Invio in corso...';
+      try{const r=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
+        if(r.ok){showMsg('Messaggio inviato con successo! Ti risponderò il prima possibile.','ok');form.reset();localStorage.setItem(KEY,Date.now().toString());btn.style.opacity='.4';btn.style.cursor='not-allowed';btn.textContent='Invia messaggio';}
+        else throw 0;
+      }catch(e){showMsg('Si è verificato un errore. Riprova più tardi.','err');btn.disabled=false;btn.textContent='Invia messaggio';}
+    });
+  })();
+  </script>
+
+  <!-- Cookie consent -->
+  <script>
+  (function(){
+    const b=document.getElementById('cookie-banner'),c=localStorage.getItem('rb_cookie_consent');
+    if(!c)b.classList.add('cookie-banner--show');
+    document.getElementById('cookie-accept').addEventListener('click',()=>{localStorage.setItem('rb_cookie_consent','accepted');b.classList.remove('cookie-banner--show');});
+    document.getElementById('cookie-reject').addEventListener('click',()=>{localStorage.setItem('rb_cookie_consent','rejected');b.classList.remove('cookie-banner--show');});
+  })();
+  </script>
+
+  <!-- TriPanel + Reveal + Nav -->
+  <script>
+  (function(){
+    'use strict';
+    class TriPanel{
+      constructor(canvas,side){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.side=side;this.tris=[];this.mouse={x:-9999,y:-9999};this.hovIdx=-1;this.bursts=[];this.dpr=Math.min(window.devicePixelRatio||1,2);this.time=0;this.raf=null;this.S=50;this.halfS=this.S/2;this.H=this.S*Math.sqrt(3)/2;this.BASE_SCALE=.89;this.resize();this.build();this.bind();this.loop();}
+      resize(){const r=this.canvas.getBoundingClientRect();this.w=r.width;this.h=r.height;this.canvas.width=this.w*this.dpr;this.canvas.height=this.h*this.dpr;this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0);}
+      build(){this.tris=[];const{halfS,H,w,h,side}=this;const rows=Math.ceil(h/H)+4,cols=Math.ceil(w/halfS)+4,fz=w*.7;for(let row=-2;row<rows;row++){for(let col=-2;col<cols;col++){const isUp=(row+col)%2===0;const y=row*H;let v;if(isUp)v=[[col*halfS,y+H],[(col+2)*halfS,y+H],[(col+1)*halfS,y]];else v=[[col*halfS,y],[(col+2)*halfS,y],[(col+1)*halfS,y+H]];const cx=(v[0][0]+v[1][0]+v[2][0])/3,cy=(v[0][1]+v[1][1]+v[2][1])/3;let ef=1;if(side==='left'){const d=w-cx;if(d<fz){ef=Math.max(0,d/fz);ef*=ef;}}else{const d=cx;if(d<fz){ef=Math.max(0,d/fz);ef*=ef;}}if(ef<.03)continue;this.tris.push({v,cx,cy,edgeFactor:ef,scale:this.BASE_SCALE*ef,tScale:this.BASE_SCALE*ef,maxScale:ef,edgeGlow:0,tEdgeGlow:0,shade:15+Math.random()*5});}}}
+      _verts(t){const s=t.scale;return t.v.map(p=>[t.cx+(p[0]-t.cx)*s,t.cy+(p[1]-t.cy)*s]);}
+      _hit(px,py,t){const[a,b,c]=t.v;const d1=(px-b[0])*(a[1]-b[1])-(a[0]-b[0])*(py-b[1]),d2=(px-c[0])*(b[1]-c[1])-(b[0]-c[0])*(py-c[1]),d3=(px-a[0])*(c[1]-a[1])-(c[0]-a[0])*(py-a[1]);return!((d1<0||d2<0||d3<0)&&(d1>0||d2>0||d3>0));}
+      bind(){const pos=e=>{const r=this.canvas.getBoundingClientRect();return{x:(e.touches?e.touches[0].clientX:e.clientX)-r.left,y:(e.touches?e.touches[0].clientY:e.clientY)-r.top};};this.canvas.addEventListener('mousemove',e=>{this.mouse=pos(e);});this.canvas.addEventListener('mouseleave',()=>{this.mouse={x:-9999,y:-9999};this.hovIdx=-1;});this.canvas.addEventListener('click',e=>{const p=pos(e);this.bursts.push({x:p.x,y:p.y,r:0,max:450,speed:5});});this.canvas.addEventListener('touchstart',e=>{const p=pos(e);this.mouse=p;this.bursts.push({x:p.x,y:p.y,r:0,max:450,speed:5});},{passive:true});}
+      update(){this.time+=.005;const mx=this.mouse.x,my=this.mouse.y;this.hovIdx=-1;for(let i=0;i<this.tris.length;i++){if(this._hit(mx,my,this.tris[i])){this.hovIdx=i;break;}}for(let i=0;i<this.tris.length;i++){const t=this.tris[i],baseS=this.BASE_SCALE*t.edgeFactor;t.tScale=baseS;t.tEdgeGlow=0;const pd=Math.hypot(t.cx-mx,t.cy-my),pr=130;if(pd<pr&&pd>0){const pi=1-pd/pr;t.tScale=baseS-pi*.12*t.edgeFactor;t.tEdgeGlow=Math.max(t.tEdgeGlow,pi*.25);}if(i===this.hovIdx){t.tScale=Math.min(.98,t.maxScale*1.1);t.tEdgeGlow=.7;}for(const b of this.bursts){const d=Math.hypot(t.cx-b.x,t.cy-b.y),wd=Math.abs(d-b.r),wW=80;if(wd<wW){const inten=1-wd/wW,life=1-b.r/b.max;t.tScale=Math.min(t.tScale,baseS-inten*life*.35*t.edgeFactor);t.tEdgeGlow=Math.max(t.tEdgeGlow,inten*life);}}t.tScale=Math.max(0,t.tScale);t.scale+=(t.tScale-t.scale)*.1;t.edgeGlow+=(t.tEdgeGlow-t.edgeGlow)*.08;}for(let i=this.bursts.length-1;i>=0;i--){this.bursts[i].r+=this.bursts[i].speed;if(this.bursts[i].r>this.bursts[i].max)this.bursts.splice(i,1);}}
+      draw(){const ctx=this.ctx;ctx.clearRect(0,0,this.w,this.h);const time=this.time;for(let i=0;i<this.tris.length;i++){const t=this.tris[i];if(t.scale<.02)continue;const v=this._verts(t);ctx.beginPath();ctx.moveTo(v[0][0],v[0][1]);ctx.lineTo(v[1][0],v[1][1]);ctx.lineTo(v[2][0],v[2][1]);ctx.closePath();const sh=t.shade+(i===this.hovIdx?14:0);ctx.fillStyle=`rgb(${sh},${sh},${Math.round(sh*1.08)})`;ctx.fill();const flow=Math.sin(time*2.5+t.cx*.018+t.cy*.014)*.5+.5,ambient=.025+flow*.06,total=Math.min(ambient+t.edgeGlow*.8,1);if(total>.02){ctx.beginPath();ctx.moveTo(v[0][0],v[0][1]);ctx.lineTo(v[1][0],v[1][1]);ctx.lineTo(v[2][0],v[2][1]);ctx.closePath();ctx.strokeStyle=`rgba(0,224,210,${total})`;ctx.lineWidth=.8+t.edgeGlow*2;ctx.stroke();if(t.edgeGlow>.15){ctx.beginPath();ctx.moveTo(v[0][0],v[0][1]);ctx.lineTo(v[1][0],v[1][1]);ctx.lineTo(v[2][0],v[2][1]);ctx.closePath();ctx.strokeStyle=`rgba(0,224,210,${t.edgeGlow*.12})`;ctx.lineWidth=5+t.edgeGlow*5;ctx.stroke();}}}}
+      loop(){this.update();this.draw();this.raf=requestAnimationFrame(()=>this.loop());}
+      destroy(){cancelAnimationFrame(this.raf);}
+    }
+    let pL,pR;const cL=document.getElementById('tri-left'),cR=document.getElementById('tri-right');
+    function init(){if(pL)pL.destroy();if(pR)pR.destroy();if(cL)pL=new TriPanel(cL,'left');if(cR)pR=new TriPanel(cR,'right');}init();
+    let rT;window.addEventListener('resize',()=>{clearTimeout(rT);rT=setTimeout(init,250);});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden){if(pL)pL.destroy();if(pR)pR.destroy();}else init();});
+    const nav=document.getElementById('nav');
+    window.addEventListener('scroll',()=>{nav.classList.toggle('nav--scrolled',window.scrollY>60);},{passive:true});
+    const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('reveal--visible');obs.unobserve(e.target);}});},{threshold:.12,rootMargin:'0px 0px -30px 0px'});
+    document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}});});
   })();
   </script>
 </body>
