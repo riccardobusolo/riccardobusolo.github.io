@@ -24,7 +24,6 @@
     .nav__links a{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-decoration:none;transition:color .3s}
     .nav__links a:hover{color:var(--cyan)}
     .main{position:relative;z-index:10;max-width:860px;margin:0 auto;padding:0 40px}
-    /* 1) More top padding so header and badge don't feel cramped */
     .hero{min-height:auto;display:flex;flex-direction:column;justify-content:center;padding:130px 0 40px}
     .hero__badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.75rem;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px;opacity:0;animation:fadeUp .8s var(--ease) .2s forwards}
     .hero__badge::before{content:'';width:32px;height:1px;background:var(--cyan)}
@@ -39,8 +38,6 @@
     .btn--primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--cyan-glow)}
     .btn--ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border-hover)}
     .btn--ghost:hover{color:var(--cyan);border-color:var(--cyan);background:var(--cyan-subtle)}
-
-    /* Neural network */
     .nn-wrap{position:relative;width:100%;height:clamp(280px,42vh,600px);overflow:hidden;cursor:grab;z-index:0}
     .nn-wrap:active{cursor:grabbing}
     .nn-wrap canvas{display:block;width:100%;height:100%}
@@ -50,13 +47,9 @@
     .nn-fade-left,.nn-fade-right{position:absolute;top:0;bottom:0;width:15%;pointer-events:none;z-index:2}
     .nn-fade-left{left:0;background:linear-gradient(to right,var(--bg) 0%,rgba(8,8,14,.5) 40%,transparent 100%)}
     .nn-fade-right{right:0;background:linear-gradient(to left,var(--bg) 0%,rgba(8,8,14,.5) 40%,transparent 100%)}
-
-    /* Sections */
     .section{padding:100px 0}
     .section__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:12px}
     .section__title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;letter-spacing:-.03em;margin-bottom:48px}
-
-    /* 2) Services with SVG icons */
     .services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
     .service-card{padding:32px 28px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;transition:all .4s var(--ease);position:relative;overflow:hidden}
     .service-card:hover{transform:translateY(-3px);border-color:var(--border-hover);background:var(--bg-card-hover)}
@@ -67,8 +60,6 @@
     .service-card__icon svg{width:22px;height:22px;stroke:var(--cyan);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .service-card__title{font-size:1.1rem;font-weight:600;margin-bottom:10px}
     .service-card__desc{font-size:.88rem;color:var(--text-dim);font-weight:300;line-height:1.7}
-
-    /* 3) Hexagon orbit */
     .hex-orbit{position:relative;width:100%;max-width:600px;height:440px;margin:0 auto}
     .hex-orbit__center{position:absolute;top:50%;left:50%;width:6px;height:6px;margin:-3px 0 0 -3px;background:var(--cyan);border-radius:50%;box-shadow:0 0 20px var(--cyan-glow),0 0 60px rgba(0,224,208,.12)}
     .hex-orbit__track{position:absolute;top:50%;left:50%;width:320px;height:320px;margin:-160px 0 0 -160px;border:1px solid rgba(0,224,208,.06);border-radius:50%;pointer-events:none}
@@ -90,8 +81,6 @@
     .hex-card:nth-child(1){transform:translate(160px, 0)}
     .hex-card:nth-child(2){transform:translate(-80px, -138px)}
     .hex-card:nth-child(3){transform:translate(-80px, 138px)}
-
-    /* 4) Resources stacked */
     .res-stack{display:flex;flex-direction:column;gap:16px}
     .res-item{display:flex;gap:20px;padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all .4s var(--ease);overflow:hidden;position:relative;cursor:pointer}
     .res-item::after{content:'';position:absolute;inset:0;opacity:0;background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(0,224,208,.06),transparent 40%);transition:opacity .3s;pointer-events:none}
@@ -107,8 +96,6 @@
     .res-item__meta{font-size:.72rem;color:var(--text-muted);font-family:var(--mono)}
     .res-item__arrow{align-self:center;flex-shrink:0;color:var(--text-muted);transition:color .3s,transform .3s var(--ease)}
     .res-item:hover .res-item__arrow{color:var(--cyan);transform:translateX(4px)}
-
-    /* 5) Contact form */
     .contact__lead{font-size:clamp(1.4rem,3vw,2rem);font-weight:600;margin-bottom:40px}
     .contact-form{display:flex;flex-direction:column;gap:16px;max-width:520px}
     .form-group{display:flex;flex-direction:column;gap:6px}
@@ -121,8 +108,6 @@
     .form-msg--ok{display:block;background:rgba(0,224,208,.08);color:var(--cyan);border:1px solid rgba(0,224,208,.2)}
     .form-msg--err{display:block;background:rgba(216,90,48,.08);color:#D85A30;border:1px solid rgba(216,90,48,.2)}
     .form-msg--wait{display:block;background:rgba(79,172,254,.08);color:var(--blue);border:1px solid rgba(79,172,254,.2)}
-
-    /* 6) Cookie banner */
     .cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(14,14,26,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:20px 40px;display:none;align-items:center;gap:20px;flex-wrap:wrap}
     .cookie-banner--show{display:flex}
     .cookie-banner__text{flex:1;font-size:.85rem;color:var(--text-dim);min-width:220px;line-height:1.6}
@@ -133,13 +118,10 @@
     .cookie-btn--accept:hover{box-shadow:0 4px 20px var(--cyan-glow)}
     .cookie-btn--reject{background:transparent;color:var(--text-dim);border:1px solid var(--border-hover)}
     .cookie-btn--reject:hover{color:var(--text);border-color:var(--text-muted)}
-
-    /* 7) Footer with policy links */
     .footer{position:relative;z-index:10;padding:36px 40px;text-align:center;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border)}
     .footer__links{display:flex;justify-content:center;gap:24px;margin-top:10px}
     .footer__links a{color:var(--text-muted);text-decoration:none;font-size:.72rem;font-family:var(--mono);transition:color .3s}
     .footer__links a:hover{color:var(--cyan)}
-
     .reveal{opacity:0;transform:translateY(36px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
     .reveal--visible{opacity:1;transform:translateY(0)}
     @media(max-width:1100px){.tri-panel{width:min(30vw,350px)}}
@@ -163,17 +145,16 @@
   <canvas class="tri-panel tri-panel--right" id="tri-right"></canvas>
 
   <nav class="nav" id="nav"><div class="nav__inner">
-
-<a href="#hero" class="nav__logo" style="display:flex;align-items:center">
-  <svg height="32" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#fff" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
-    <path fill="#fff" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
-    <path fill="#fff" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
-    <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
-  </svg>
-</a>
-    
-    <ul class="nav__links"><li><a href="#servizi">Servizi</a></li><li><a href="#progetti">Progetti</a></li><li><a href="#risorse">Risorse</a></li><li><a href="#contatti">Contatti</a></li></ul></div></nav>
+    <a href="#hero" class="nav__logo" style="display:flex;align-items:center">
+      <svg height="32" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#fff" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#fff" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#fff" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
+      </svg>
+    </a>
+    <ul class="nav__links"><li><a href="#servizi">Servizi</a></li><li><a href="#progetti">Progetti</a></li><li><a href="#risorse">Risorse</a></li><li><a href="#contatti">Contatti</a></li></ul>
+  </div></nav>
 
   <div class="main">
     <section class="hero" id="hero">
@@ -195,174 +176,120 @@
 
   <div class="main">
 
-    <!-- SERVIZI -->
     <section class="section" id="servizi">
       <div class="reveal"><p class="section__label">01 — Servizi</p><h2 class="section__title">Cosa posso fare per te</h2></div>
       <div class="services-grid">
-
         <div class="service-card reveal">
           <div class="service-card__glow"></div>
           <div class="service-card__icon">
-            <!-- Graduation cap / teaching -->
             <svg viewBox="0 0 24 24"><path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5c0 0 2.5 3 6 3s6-3 6-3v-5"/><line x1="22" y1="10" x2="22" y2="16"/></svg>
           </div>
           <h3 class="service-card__title">Formazione AI</h3>
           <p class="service-card__desc">Insegno ai tuoi team a usare concretamente l'Intelligenza Artificiale. Attraverso lezioni pratiche, trasferisco le competenze per sfruttare i migliori tool sul mercato e velocizzare il lavoro di tutti i giorni.</p>
         </div>
-
         <div class="service-card reveal">
           <div class="service-card__glow"></div>
           <div class="service-card__icon">
-            <!-- Settings/gear = custom solutions -->
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
           </div>
           <h3 class="service-card__title">Soluzioni su Misura</h3>
           <p class="service-card__desc">Affianco la tua azienda nella creazione di strumenti AI personalizzati. Partendo dai vostri processi, costruisco soluzioni specifiche per risolvere i colli di bottiglia e ottimizzare le operazioni interne.</p>
         </div>
-
         <div class="service-card reveal">
           <div class="service-card__glow"></div>
           <div class="service-card__icon">
-            <!-- Code brackets = vibe coding -->
             <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
           </div>
           <h3 class="service-card__title">Vibe Coding</h3>
           <p class="service-card__desc">Rendo i tuoi collaboratori autonomi nello sviluppo di microservizi. Insegno loro a creare piccoli software funzionanti usando esclusivamente il linguaggio naturale, senza alcun bisogno di saper programmare.</p>
         </div>
-
       </div>
     </section>
 
-    <!-- PROGETTI — 3 rotating hexagons -->
     <section class="section" id="progetti">
       <div class="reveal"><p class="section__label">02 — Progetti</p><h2 class="section__title">Progetti AI</h2></div>
       <div class="hex-orbit reveal" id="hex-orbit">
         <div class="hex-orbit__center"></div>
         <div class="hex-orbit__track"></div>
         <div class="hex-orbit__ring" id="hex-ring">
-
           <a href="#" class="hex-card" data-project="formazione">
             <div class="hex-card__border"></div>
             <div class="hex-card__shape">
               <div class="hex-card__inner">
                 <div class="hex-card__img">
-                  <!-- Replace svg with: <img src="img/formazione.jpg" alt="Formazione"> -->
                   <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 </div>
                 <div class="hex-card__title">Progetti di Formazione</div>
               </div>
             </div>
           </a>
-
           <a href="#" class="hex-card" data-project="altri">
             <div class="hex-card__border"></div>
             <div class="hex-card__shape">
               <div class="hex-card__inner">
                 <div class="hex-card__img">
-                  <!-- Replace svg with: <img src="img/altri.jpg" alt="Altri Progetti"> -->
                   <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 </div>
                 <div class="hex-card__title">Altri Progetti</div>
               </div>
             </div>
           </a>
-
           <a href="#" class="hex-card" data-project="blog">
             <div class="hex-card__border"></div>
             <div class="hex-card__shape">
               <div class="hex-card__inner">
                 <div class="hex-card__img">
-                  <!-- Replace svg with: <img src="img/blog.jpg" alt="Blog"> -->
                   <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 </div>
                 <div class="hex-card__title">Blog</div>
               </div>
             </div>
           </a>
-
         </div>
       </div>
     </section>
 
-    <!-- RISORSE — stacked cards with image slots -->
     <section class="section" id="risorse">
       <div class="reveal"><p class="section__label">03 — Risorse</p><h2 class="section__title">Materiali di Formazione</h2></div>
       <div class="res-stack">
-
         <a href="risorse/guida-prompt-engineering.pdf" class="res-item reveal">
-          <div class="res-item__img">
-            <!-- Replace svg with: <img src="img/cover-prompt.jpg" alt=""> -->
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          </div>
-          <div class="res-item__body">
-            <div class="res-item__title">Guida al Prompt Engineering</div>
-            <div class="res-item__meta">PDF — 2.4 MB</div>
-          </div>
+          <div class="res-item__img"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          <div class="res-item__body"><div class="res-item__title">Guida al Prompt Engineering</div><div class="res-item__meta">PDF — 2.4 MB</div></div>
           <svg class="res-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-
         <a href="risorse/introduzione-ml.pdf" class="res-item reveal">
-          <div class="res-item__img">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          </div>
-          <div class="res-item__body">
-            <div class="res-item__title">Introduzione al Machine Learning</div>
-            <div class="res-item__meta">PDF — 5.1 MB</div>
-          </div>
+          <div class="res-item__img"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          <div class="res-item__body"><div class="res-item__title">Introduzione al Machine Learning</div><div class="res-item__meta">PDF — 5.1 MB</div></div>
           <svg class="res-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-
         <a href="risorse/ai-per-aziende.pdf" class="res-item reveal">
-          <div class="res-item__img">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          </div>
-          <div class="res-item__body">
-            <div class="res-item__title">AI per Aziende — Guida Pratica</div>
-            <div class="res-item__meta">PDF — 3.8 MB</div>
-          </div>
+          <div class="res-item__img"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          <div class="res-item__body"><div class="res-item__title">AI per Aziende — Guida Pratica</div><div class="res-item__meta">PDF — 3.8 MB</div></div>
           <svg class="res-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-
         <a href="risorse/automazione-workflow.pdf" class="res-item reveal">
-          <div class="res-item__img">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          </div>
-          <div class="res-item__body">
-            <div class="res-item__title">Automazione Workflow con AI</div>
-            <div class="res-item__meta">PDF — 1.9 MB</div>
-          </div>
+          <div class="res-item__img"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          <div class="res-item__body"><div class="res-item__title">Automazione Workflow con AI</div><div class="res-item__meta">PDF — 1.9 MB</div></div>
           <svg class="res-item__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-
       </div>
     </section>
 
-    <!-- CONTATTI — Formspree form -->
     <section class="section" id="contatti">
       <div class="reveal"><p class="section__label">04 — Contatti</p><h2 class="section__title">Parliamo del tuo progetto</h2></div>
       <div class="reveal">
         <p class="contact__lead">Vuoi integrare l'AI nella tua azienda?<br>Scrivimi e troviamo la soluzione giusta.</p>
         <div id="form-msg" class="form-msg"></div>
         <form class="contact-form" id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-          <div class="form-group">
-            <label for="cf-name">Nome</label>
-            <input type="text" id="cf-name" name="name" placeholder="Il tuo nome" required>
-          </div>
-          <div class="form-group">
-            <label for="cf-email">Email</label>
-            <input type="email" id="cf-email" name="email" placeholder="La tua email" required>
-          </div>
-          <div class="form-group">
-            <label for="cf-msg">Messaggio</label>
-            <textarea id="cf-msg" name="message" placeholder="Descrivi brevemente il tuo progetto o la tua richiesta..." required></textarea>
-          </div>
+          <div class="form-group"><label for="cf-name">Nome</label><input type="text" id="cf-name" name="name" placeholder="Il tuo nome" required></div>
+          <div class="form-group"><label for="cf-email">Email</label><input type="email" id="cf-email" name="email" placeholder="La tua email" required></div>
+          <div class="form-group"><label for="cf-msg">Messaggio</label><textarea id="cf-msg" name="message" placeholder="Descrivi brevemente il tuo progetto o la tua richiesta..." required></textarea></div>
           <button type="submit" class="btn btn--primary" id="cf-submit">Invia messaggio</button>
         </form>
       </div>
     </section>
   </div>
 
-  <!-- Footer with policy links -->
   <footer class="footer">
     <div>&copy; 2026 Riccardo Busolo — AI Consultant</div>
     <div class="footer__links">
@@ -371,7 +298,6 @@
     </div>
   </footer>
 
-  <!-- Cookie consent banner -->
   <div class="cookie-banner" id="cookie-banner">
     <p class="cookie-banner__text">Questo sito utilizza cookie tecnici e, previo tuo consenso, cookie di profilazione per migliorare la tua esperienza. Puoi leggere la nostra <a href="cookie-policy.html">Cookie Policy</a> e la <a href="privacy-policy.html">Privacy Policy</a>.</p>
     <div class="cookie-banner__btns">
@@ -380,9 +306,7 @@
     </div>
   </div>
 
-  <!-- ═══════════════ SCRIPTS ═══════════════ -->
-
-  <!-- Three.js + Neural Network -->
+  <!-- Three.js + Neural Network — DELTA TIME FIX -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
   (function(){
@@ -415,9 +339,30 @@
     nnCanvas.addEventListener('pointerdown',e=>{isDrag=true;pX=e.clientX;pY=e.clientY;nnCanvas.setPointerCapture(e.pointerId);autoR=false;autoTm=0;});
     nnCanvas.addEventListener('pointermove',e=>{if(!isDrag)return;tT-=(e.clientX-pX)*.004;tP+=(e.clientY-pY)*.004;tP=Math.max(-1.3,Math.min(1.3,tP));pX=e.clientX;pY=e.clientY;});
     nnCanvas.addEventListener('pointerup',()=>{isDrag=false;});
-    let time=0;function fract(x){return x-Math.floor(x);}
+    let time=0;
+    function fract(x){return x-Math.floor(x);}
+    // DELTA TIME: timestamp dell'ultimo frame
+    let lastTs=0;
     let nnVis=false;const nnObs=new IntersectionObserver(en=>{nnVis=en[0].isIntersecting;},{threshold:.05});nnObs.observe(wrap);
-    function nnLoop(){requestAnimationFrame(nnLoop);if(!nnVis)return;const dt=1/60;time+=WS*dt;if(!isDrag&&!autoR){autoTm+=dt;if(autoTm>3)autoR=true;}if(autoR)tT-=.0015;oT+=(tT-oT)*DAMP;oP+=(tP-oP)*DAMP;oD+=(tD-oD)*DAMP;cam.position.set(Math.sin(oT)*Math.cos(oP)*oD,Math.sin(oP)*oD*.6+2,Math.cos(oT)*Math.cos(oP)*oD);cam.lookAt(0,0,0);const w=fract(time);nMat.uniforms.uWave.value=w;cMat.uniforms.uWave.value=w;ren.render(sc,cam);}
+    function nnLoop(ts=0){
+      requestAnimationFrame(nnLoop);
+      if(!nnVis)return;
+      // Delta time normalizzato a 60fps, con cap a 100ms per evitare salti dopo tab-switch
+      const dt=Math.min((ts-lastTs)/1000,.1);
+      lastTs=ts;
+      time+=WS*dt;
+      if(!isDrag&&!autoR){autoTm+=dt;if(autoTm>3)autoR=true;}
+      if(autoR)tT-=.0015*dt*60;
+      oT+=(tT-oT)*Math.min(1,DAMP*dt*60);
+      oP+=(tP-oP)*Math.min(1,DAMP*dt*60);
+      oD+=(tD-oD)*Math.min(1,DAMP*dt*60);
+      cam.position.set(Math.sin(oT)*Math.cos(oP)*oD,Math.sin(oP)*oD*.6+2,Math.cos(oT)*Math.cos(oP)*oD);
+      cam.lookAt(0,0,0);
+      const w=fract(time);
+      nMat.uniforms.uWave.value=w;
+      cMat.uniforms.uWave.value=w;
+      ren.render(sc,cam);
+    }
     nnSz();window.addEventListener('resize',nnSz);nnLoop();
   })();
   </script>
@@ -435,7 +380,7 @@
   })();
   </script>
 
-  <!-- Contact form — Formspree + 1h rate limit -->
+  <!-- Contact form -->
   <script>
   (function(){
     const form=document.getElementById('contact-form'),msgEl=document.getElementById('form-msg'),btn=document.getElementById('cf-submit');
@@ -463,20 +408,62 @@
   })();
   </script>
 
-  <!-- TriPanel + Reveal + Nav -->
+  <!-- TriPanel + Reveal + Nav — DELTA TIME FIX -->
   <script>
   (function(){
     'use strict';
     class TriPanel{
-      constructor(canvas,side){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.side=side;this.tris=[];this.mouse={x:-9999,y:-9999};this.hovIdx=-1;this.bursts=[];this.dpr=Math.min(window.devicePixelRatio||1,2);this.time=0;this.raf=null;this.S=50;this.halfS=this.S/2;this.H=this.S*Math.sqrt(3)/2;this.BASE_SCALE=.89;this.resize();this.build();this.bind();this.loop();}
+      constructor(canvas,side){
+        this.canvas=canvas;this.ctx=canvas.getContext('2d');this.side=side;
+        this.tris=[];this.mouse={x:-9999,y:-9999};this.hovIdx=-1;this.bursts=[];
+        this.dpr=Math.min(window.devicePixelRatio||1,2);this.time=0;
+        this._lastTs=0; // DELTA TIME
+        this.raf=null;this.S=50;this.halfS=this.S/2;this.H=this.S*Math.sqrt(3)/2;
+        this.BASE_SCALE=.89;this.resize();this.build();this.bind();this.loop();
+      }
       resize(){const r=this.canvas.getBoundingClientRect();this.w=r.width;this.h=r.height;this.canvas.width=this.w*this.dpr;this.canvas.height=this.h*this.dpr;this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0);}
       build(){this.tris=[];const{halfS,H,w,h,side}=this;const rows=Math.ceil(h/H)+4,cols=Math.ceil(w/halfS)+4,fz=w*.7;for(let row=-2;row<rows;row++){for(let col=-2;col<cols;col++){const isUp=(row+col)%2===0;const y=row*H;let v;if(isUp)v=[[col*halfS,y+H],[(col+2)*halfS,y+H],[(col+1)*halfS,y]];else v=[[col*halfS,y],[(col+2)*halfS,y],[(col+1)*halfS,y+H]];const cx=(v[0][0]+v[1][0]+v[2][0])/3,cy=(v[0][1]+v[1][1]+v[2][1])/3;let ef=1;if(side==='left'){const d=w-cx;if(d<fz){ef=Math.max(0,d/fz);ef*=ef;}}else{const d=cx;if(d<fz){ef=Math.max(0,d/fz);ef*=ef;}}if(ef<.03)continue;this.tris.push({v,cx,cy,edgeFactor:ef,scale:this.BASE_SCALE*ef,tScale:this.BASE_SCALE*ef,maxScale:ef,edgeGlow:0,tEdgeGlow:0,shade:15+Math.random()*5});}}}
       _verts(t){const s=t.scale;return t.v.map(p=>[t.cx+(p[0]-t.cx)*s,t.cy+(p[1]-t.cy)*s]);}
       _hit(px,py,t){const[a,b,c]=t.v;const d1=(px-b[0])*(a[1]-b[1])-(a[0]-b[0])*(py-b[1]),d2=(px-c[0])*(b[1]-c[1])-(b[0]-c[0])*(py-c[1]),d3=(px-a[0])*(c[1]-a[1])-(c[0]-a[0])*(py-a[1]);return!((d1<0||d2<0||d3<0)&&(d1>0||d2>0||d3>0));}
       bind(){const pos=e=>{const r=this.canvas.getBoundingClientRect();return{x:(e.touches?e.touches[0].clientX:e.clientX)-r.left,y:(e.touches?e.touches[0].clientY:e.clientY)-r.top};};this.canvas.addEventListener('mousemove',e=>{this.mouse=pos(e);});this.canvas.addEventListener('mouseleave',()=>{this.mouse={x:-9999,y:-9999};this.hovIdx=-1;});this.canvas.addEventListener('click',e=>{const p=pos(e);this.bursts.push({x:p.x,y:p.y,r:0,max:450,speed:5});});this.canvas.addEventListener('touchstart',e=>{const p=pos(e);this.mouse=p;this.bursts.push({x:p.x,y:p.y,r:0,max:450,speed:5});},{passive:true});}
-      update(){this.time+=.005;const mx=this.mouse.x,my=this.mouse.y;this.hovIdx=-1;for(let i=0;i<this.tris.length;i++){if(this._hit(mx,my,this.tris[i])){this.hovIdx=i;break;}}for(let i=0;i<this.tris.length;i++){const t=this.tris[i],baseS=this.BASE_SCALE*t.edgeFactor;t.tScale=baseS;t.tEdgeGlow=0;const pd=Math.hypot(t.cx-mx,t.cy-my),pr=130;if(pd<pr&&pd>0){const pi=1-pd/pr;t.tScale=baseS-pi*.12*t.edgeFactor;t.tEdgeGlow=Math.max(t.tEdgeGlow,pi*.25);}if(i===this.hovIdx){t.tScale=Math.min(.98,t.maxScale*1.1);t.tEdgeGlow=.7;}for(const b of this.bursts){const d=Math.hypot(t.cx-b.x,t.cy-b.y),wd=Math.abs(d-b.r),wW=80;if(wd<wW){const inten=1-wd/wW,life=1-b.r/b.max;t.tScale=Math.min(t.tScale,baseS-inten*life*.35*t.edgeFactor);t.tEdgeGlow=Math.max(t.tEdgeGlow,inten*life);}}t.tScale=Math.max(0,t.tScale);t.scale+=(t.tScale-t.scale)*.1;t.edgeGlow+=(t.tEdgeGlow-t.edgeGlow)*.08;}for(let i=this.bursts.length-1;i>=0;i--){this.bursts[i].r+=this.bursts[i].speed;if(this.bursts[i].r>this.bursts[i].max)this.bursts.splice(i,1);}}
+      update(dt){
+        // time avanza a velocità costante indipendente dal frame rate
+        this.time+=.005*dt*60;
+        const mx=this.mouse.x,my=this.mouse.y;
+        this.hovIdx=-1;
+        for(let i=0;i<this.tris.length;i++){if(this._hit(mx,my,this.tris[i])){this.hovIdx=i;break;}}
+        for(let i=0;i<this.tris.length;i++){
+          const t=this.tris[i],baseS=this.BASE_SCALE*t.edgeFactor;
+          t.tScale=baseS;t.tEdgeGlow=0;
+          const pd=Math.hypot(t.cx-mx,t.cy-my),pr=130;
+          if(pd<pr&&pd>0){const pi=1-pd/pr;t.tScale=baseS-pi*.12*t.edgeFactor;t.tEdgeGlow=Math.max(t.tEdgeGlow,pi*.25);}
+          if(i===this.hovIdx){t.tScale=Math.min(.98,t.maxScale*1.1);t.tEdgeGlow=.7;}
+          for(const b of this.bursts){
+            const d=Math.hypot(t.cx-b.x,t.cy-b.y),wd=Math.abs(d-b.r),wW=80;
+            if(wd<wW){const inten=1-wd/wW,life=1-b.r/b.max;t.tScale=Math.min(t.tScale,baseS-inten*life*.35*t.edgeFactor);t.tEdgeGlow=Math.max(t.tEdgeGlow,inten*life);}
+          }
+          t.tScale=Math.max(0,t.tScale);
+          // lerp frame-rate independent: alpha = 1-(1-0.1)^(dt*60)
+          const la=1-Math.pow(.9,dt*60);
+          t.scale+=( t.tScale-t.scale)*la;
+          const la2=1-Math.pow(.92,dt*60);
+          t.edgeGlow+=(t.tEdgeGlow-t.edgeGlow)*la2;
+        }
+        for(let i=this.bursts.length-1;i>=0;i--){
+          // burst speed normalizzata a 60fps
+          this.bursts[i].r+=this.bursts[i].speed*dt*60;
+          if(this.bursts[i].r>this.bursts[i].max)this.bursts.splice(i,1);
+        }
+      }
       draw(){const ctx=this.ctx;ctx.clearRect(0,0,this.w,this.h);const time=this.time;for(let i=0;i<this.tris.length;i++){const t=this.tris[i];if(t.scale<.02)continue;const v=this._verts(t);ctx.beginPath();ctx.moveTo(v[0][0],v[0][1]);ctx.lineTo(v[1][0],v[1][1]);ctx.lineTo(v[2][0],v[2][1]);ctx.closePath();const sh=t.shade+(i===this.hovIdx?14:0);ctx.fillStyle=`rgb(${sh},${sh},${Math.round(sh*1.08)})`;ctx.fill();const flow=Math.sin(time*2.5+t.cx*.018+t.cy*.014)*.5+.5,ambient=.025+flow*.06,total=Math.min(ambient+t.edgeGlow*.8,1);if(total>.02){ctx.beginPath();ctx.moveTo(v[0][0],v[0][1]);ctx.lineTo(v[1][0],v[1][1]);ctx.lineTo(v[2][0],v[2][1]);ctx.closePath();ctx.strokeStyle=`rgba(0,224,210,${total})`;ctx.lineWidth=.8+t.edgeGlow*2;ctx.stroke();if(t.edgeGlow>.15){ctx.beginPath();ctx.moveTo(v[0][0],v[0][1]);ctx.lineTo(v[1][0],v[1][1]);ctx.lineTo(v[2][0],v[2][1]);ctx.closePath();ctx.strokeStyle=`rgba(0,224,210,${t.edgeGlow*.12})`;ctx.lineWidth=5+t.edgeGlow*5;ctx.stroke();}}}}
-      loop(){this.update();this.draw();this.raf=requestAnimationFrame(()=>this.loop());}
+      loop(ts=0){
+        // DELTA TIME: calcola dt in secondi, cap a 100ms
+        const dt=Math.min((ts-this._lastTs)/1000,.1);
+        this._lastTs=ts;
+        this.update(dt);
+        this.draw();
+        this.raf=requestAnimationFrame(ts=>this.loop(ts));
+      }
       destroy(){cancelAnimationFrame(this.raf);}
     }
     let pL,pR;const cL=document.getElementById('tri-left'),cR=document.getElementById('tri-right');
