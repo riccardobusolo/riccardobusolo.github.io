@@ -51,15 +51,47 @@
     .section__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:12px}
     .section__title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;letter-spacing:-.03em;margin-bottom:48px}
     .services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
-    .service-card{padding:32px 28px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;transition:all .4s var(--ease);position:relative;overflow:hidden}
+    /* ── Service cards ── */
+    .service-card{padding:32px 28px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;transition:transform .4s var(--ease),background .4s var(--ease),border-color .4s var(--ease);position:relative;overflow:hidden;cursor:pointer;user-select:none}
     .service-card:hover{transform:translateY(-3px);border-color:var(--border-hover);background:var(--bg-card-hover)}
-    .service-card__glow{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity .4s}
-    .service-card:hover .service-card__glow{opacity:1}
+    /* proximity border glow – canvas overlay */
+    .service-card__glow-canvas{position:absolute;pointer-events:none;border-radius:14px;z-index:0;left:-6px;top:-6px}
+    /* tutti gli elementi interni sopra il canvas */
+    .service-card > *:not(.service-card__glow-canvas){position:relative;z-index:1}
+    .service-card__glow{display:none}
+    /* scale-bounce click */
+    .service-card.bounce{animation:cardBounce .45s var(--ease)}
+    @keyframes cardBounce{0%{transform:translateY(-3px) scale(1)}20%{transform:translateY(-3px) scale(.93)}55%{transform:translateY(-3px) scale(1.04)}75%{transform:translateY(-3px) scale(.98)}100%{transform:translateY(-3px) scale(1)}}
     .service-card__icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--cyan-subtle);border-radius:10px;transition:background .3s}
     .service-card:hover .service-card__icon{background:rgba(0,224,208,.12)}
     .service-card__icon svg{width:22px;height:22px;stroke:var(--cyan);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .service-card__title{font-size:1.1rem;font-weight:600;margin-bottom:10px}
     .service-card__desc{font-size:.88rem;color:var(--text-dim);font-weight:300;line-height:1.7}
+    .service-card__cta{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-family:var(--mono);font-size:.7rem;color:var(--cyan);letter-spacing:.06em;text-transform:uppercase;opacity:.7;transition:opacity .3s}
+    .service-card:hover .service-card__cta{opacity:1}
+
+    /* ── Modal overlay ── */
+    .svc-modal-bg{position:fixed;inset:0;z-index:300;background:rgba(4,4,10,.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
+    .svc-modal-bg.open{opacity:1;pointer-events:all}
+    .svc-modal{position:relative;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;background:var(--bg-card);border:1px solid var(--border-hover);border-radius:18px;padding:48px 44px;transform:translateY(28px) scale(.97);transition:transform .4s var(--ease);scrollbar-width:thin;scrollbar-color:rgba(0,224,208,.2) transparent}
+    .svc-modal-bg.open .svc-modal{transform:translateY(0) scale(1)}
+    .svc-modal__close{position:absolute;top:20px;right:20px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text-muted);transition:all .3s}
+    .svc-modal__close:hover{border-color:var(--cyan);color:var(--cyan)}
+    .svc-modal__icon{width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:var(--cyan-subtle);border-radius:12px;margin-bottom:20px}
+    .svc-modal__icon svg{width:26px;height:26px;stroke:var(--cyan);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .svc-modal__title{font-size:1.6rem;font-weight:700;letter-spacing:-.03em;margin-bottom:8px}
+    .svc-modal__lead{font-size:.95rem;color:var(--text-dim);line-height:1.75;margin-bottom:28px;font-weight:300}
+    .svc-modal__section{margin-bottom:24px}
+    .svc-modal__section-title{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:12px}
+    .svc-modal__bullets{display:flex;flex-direction:column;gap:10px;list-style:none}
+    .svc-modal__bullets li{display:flex;align-items:flex-start;gap:12px;font-size:.9rem;color:var(--text-dim);line-height:1.65;font-weight:300}
+    .svc-modal__bullets li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0;margin-top:.55em}
+    .svc-modal__targets{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+    .svc-modal__tag{font-family:var(--mono);font-size:.65rem;padding:4px 12px;background:var(--cyan-subtle);color:var(--cyan);border-radius:20px;border:1px solid rgba(0,224,208,.15)}
+    .svc-modal__divider{height:1px;background:var(--border);margin:28px 0}
+    .svc-modal__footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+    .svc-modal__outcome{font-size:.82rem;color:var(--text-muted);font-style:italic;margin-top:4px}
+    @media(max-width:600px){.svc-modal{padding:32px 24px}}
     .hex-orbit{position:relative;width:100%;max-width:600px;height:440px;margin:0 auto}
     .hex-orbit__center{position:absolute;top:50%;left:50%;width:6px;height:6px;margin:-3px 0 0 -3px;background:var(--cyan);border-radius:50%;box-shadow:0 0 20px var(--cyan-glow),0 0 60px rgba(0,224,208,.12)}
     .hex-orbit__track{position:absolute;top:50%;left:50%;width:320px;height:320px;margin:-160px 0 0 -160px;border:1px solid rgba(0,224,208,.06);border-radius:50%;pointer-events:none}
@@ -179,29 +211,32 @@
     <section class="section" id="servizi">
       <div class="reveal"><p class="section__label">01 — Servizi</p><h2 class="section__title">Cosa posso fare per te</h2></div>
       <div class="services-grid">
-        <div class="service-card reveal">
+        <div class="service-card reveal" data-service="formazione">
           <div class="service-card__glow"></div>
           <div class="service-card__icon">
             <svg viewBox="0 0 24 24"><path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5c0 0 2.5 3 6 3s6-3 6-3v-5"/><line x1="22" y1="10" x2="22" y2="16"/></svg>
           </div>
           <h3 class="service-card__title">Formazione AI</h3>
-          <p class="service-card__desc">Insegno ai tuoi team a usare concretamente l'Intelligenza Artificiale. Attraverso lezioni pratiche, trasferisco le competenze per sfruttare i migliori tool sul mercato e velocizzare il lavoro di tutti i giorni.</p>
+          <p class="service-card__desc">Insegno ai tuoi team a usare concretamente l'Intelligenza Artificiale. Dalle funzionalità avanzate degli LLM alla creazione di agenti semi-autonomi, per ogni ruolo e settore.</p>
+          <div class="service-card__cta">Scopri di più <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
         </div>
-        <div class="service-card reveal">
+        <div class="service-card reveal" data-service="affiancamento">
           <div class="service-card__glow"></div>
           <div class="service-card__icon">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
           </div>
-          <h3 class="service-card__title">Soluzioni su Misura</h3>
-          <p class="service-card__desc">Affianco la tua azienda nella creazione di strumenti AI personalizzati. Partendo dai vostri processi, costruisco soluzioni specifiche per risolvere i colli di bottiglia e ottimizzare le operazioni interne.</p>
+          <h3 class="service-card__title">Affiancamento Personalizzato</h3>
+          <p class="service-card__desc">Analizzo i processi reali della tua azienda e individuo le task critiche automatizzabili con l'AI, costruendo insieme un percorso su misura per il tuo contesto specifico.</p>
+          <div class="service-card__cta">Scopri di più <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
         </div>
-        <div class="service-card reveal">
+        <div class="service-card reveal" data-service="vibecoding">
           <div class="service-card__glow"></div>
           <div class="service-card__icon">
             <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
           </div>
           <h3 class="service-card__title">Vibe Coding</h3>
-          <p class="service-card__desc">Rendo i tuoi collaboratori autonomi nello sviluppo di microservizi. Insegno loro a creare piccoli software funzionanti usando esclusivamente il linguaggio naturale, senza alcun bisogno di saper programmare.</p>
+          <p class="service-card__desc">Rendo i tuoi collaboratori autonomi nella creazione di microservizi software usando solo il linguaggio naturale. Zero conoscenze di programmazione richieste.</p>
+          <div class="service-card__cta">Scopri di più <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
         </div>
       </div>
     </section>
@@ -290,6 +325,16 @@
     </section>
   </div>
 
+  <!-- Service Modal -->
+  <div class="svc-modal-bg" id="svc-modal-bg" role="dialog" aria-modal="true">
+    <div class="svc-modal" id="svc-modal">
+      <button class="svc-modal__close" id="svc-modal-close" aria-label="Chiudi">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div id="svc-modal-content"></div>
+    </div>
+  </div>
+
   <footer class="footer">
     <div>&copy; 2026 Riccardo Busolo — AI Consultant</div>
     <div class="footer__links">
@@ -364,6 +409,268 @@
       ren.render(sc,cam);
     }
     nnSz();window.addEventListener('resize',nnSz);nnLoop();
+  })();
+  </script>
+
+  <!-- Service cards: proximity border glow (canvas) + bounce + modal -->
+  <script>
+  (function(){
+    'use strict';
+
+    /* ── Dati modal ── */
+    const DATA = {
+      formazione: {
+        icon: `<svg viewBox="0 0 24 24"><path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5c0 0 2.5 3 6 3s6-3 6-3v-5"/><line x1="22" y1="10" x2="22" y2="16"/></svg>`,
+        title: 'Formazione AI',
+        lead: 'Un percorso pratico e progressivo per trasformare ogni membro del team in un utilizzatore consapevole e autonomo dell\'Intelligenza Artificiale, indipendentemente dal ruolo o dal livello tecnico di partenza.',
+        sections: [
+          { title: 'Cosa impari', bullets: [
+            'Funzionalità avanzate degli LLM: prompt engineering, ragionamento multi-step, contesto esteso',
+            'AI applicata al marketing e alla grafica: generazione di contenuti, immagini, campagne',
+            'Creazione di agenti AI semi-autonomi capaci di automatizzare flussi di lavoro ripetitivi',
+            'Collaborazione uomo-AI per processi di lavoro AI-augmented ad alta efficienza',
+            'Come restare autonomi e aggiornati di fronte alla continua evoluzione del settore',
+          ]},
+          { title: 'A chi è rivolto', tags: ['Amministrazione','Commerciale','Marketing','Grafica','HR','Contabilità','Area Tecnica'] }
+        ],
+        outcome: 'Al termine del percorso gli studenti sono in grado di creare agenti AI, automatizzare processi e aumentare notevolmente la propria efficienza lavorativa.'
+      },
+      affiancamento: {
+        icon: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`,
+        title: 'Affiancamento Personalizzato',
+        lead: 'Non esiste una soluzione universale. Ogni azienda ha processi, tempi e colli di bottiglia diversi. L\'affiancamento parte sempre da un\'analisi concreta del tuo contesto per costruire un percorso che abbia impatto reale.',
+        sections: [
+          { title: 'Come funziona', bullets: [
+            'Analisi approfondita dei flussi di lavoro esistenti e delle attività ad alto costo di tempo',
+            'Identificazione delle task critiche con il maggiore potenziale di automazione tramite AI',
+            'Definizione di un piano d\'azione prioritizzato e adatto alle risorse disponibili',
+            'Sessioni di lavoro operative fianco a fianco con il team coinvolto',
+            'Trasferimento delle competenze per mantenere e far evolvere le soluzioni in autonomia',
+          ]},
+          { title: 'Ideale per', tags: ['PMI','Team di lavoro','Liberi professionisti','Startup','Manager e responsabili'] }
+        ],
+        outcome: 'L\'obiettivo è che alla fine del percorso tu non abbia bisogno di me: il team è autonomo, formato e capace di continuare a evolvere.'
+      },
+      vibecoding: {
+        icon: `<svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>`,
+        title: 'Vibe Coding',
+        lead: 'Programmare non è più un privilegio riservato agli sviluppatori. Con il Vibe Coding chiunque può descrivere a parole ciò che vuole costruire e ottenere un microservizio funzionante — senza scrivere una riga di codice.',
+        sections: [
+          { title: 'Cosa impari a costruire', bullets: [
+            'Strumenti di automazione interni su misura per le proprie necessità quotidiane',
+            'Script e microservizi per elaborare dati, generare report e semplificare task ripetitive',
+            'Piccole applicazioni web per uso personale o del proprio team',
+            'Connettori tra strumenti già in uso (CRM, fogli di calcolo, email, calendar...)',
+            'Agenti AI personalizzati integrati nei propri flussi di lavoro',
+          ]},
+          { title: 'Requisiti', tags: ['Nessuna conoscenza di programmazione','Solo linguaggio naturale','Qualsiasi ruolo aziendale'] }
+        ],
+        outcome: 'Al termine del corso ogni partecipante è in grado di creare e modificare i propri strumenti software in totale autonomia, senza dipendere da un reparto IT.'
+      }
+    };
+
+    /* ── Modal: fix scrollbar shift ── */
+    const bg = document.getElementById('svc-modal-bg');
+    const contentEl = document.getElementById('svc-modal-content');
+    const closeBtn = document.getElementById('svc-modal-close');
+
+    function getScrollbarW() {
+      return window.innerWidth - document.documentElement.clientWidth;
+    }
+
+    function buildContent(key) {
+      const d = DATA[key];
+      if (!d) return '';
+      let html = `<div class="svc-modal__icon">${d.icon}</div>
+        <div class="svc-modal__title">${d.title}</div>
+        <p class="svc-modal__lead">${d.lead}</p>`;
+      d.sections.forEach(s => {
+        html += `<div class="svc-modal__section"><p class="svc-modal__section-title">${s.title}</p>`;
+        if (s.bullets) {
+          html += `<ul class="svc-modal__bullets">`;
+          s.bullets.forEach(b => { html += `<li>${b}</li>`; });
+          html += `</ul>`;
+        }
+        if (s.tags) {
+          html += `<div class="svc-modal__targets">`;
+          s.tags.forEach(t => { html += `<span class="svc-modal__tag">${t}</span>`; });
+          html += `</div>`;
+        }
+        html += `</div>`;
+      });
+      html += `<p class="svc-modal__outcome">${d.outcome}</p>`;
+      return html;
+    }
+
+    function openModal(key) {
+      contentEl.innerHTML = buildContent(key);
+      // Compensa la scrollbar prima di nasconderla così la pagina non salta
+      const sbW = getScrollbarW();
+      document.body.style.paddingRight = sbW + 'px';
+      document.body.style.overflow = 'hidden';
+      bg.classList.add('open');
+    }
+
+    function closeModal() {
+      bg.classList.remove('open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    bg.addEventListener('click', e => { if (e.target === bg) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    /* ── Proximity border glow via canvas ── */
+    // Per ogni card: inietta un <canvas> e disegna un bordo luminoso
+    // che si concentra sul lato/angolo più vicino al mouse su tutti i 4 lati.
+    const GLOW_COLOR = [0, 224, 208]; // rgb del cyan
+    const GLOW_RADIUS = 220;          // px di distanza massima per attivazione
+    const BORDER_R = 12;              // border-radius card
+
+    const cards = document.querySelectorAll('.service-card[data-service]');
+    const cardStates = [];
+
+    cards.forEach((card, idx) => {
+      // Inietta canvas
+      const cvs = document.createElement('canvas');
+      cvs.className = 'service-card__glow-canvas';
+      card.insertBefore(cvs, card.firstChild);
+      const ctx = cvs.getContext('2d');
+
+      cardStates.push({ card, cvs, ctx, alpha: 0, targetAlpha: 0, mx: -9999, my: -9999 });
+    });
+
+    // Mouse globale
+    let globalMx = -9999, globalMy = -9999;
+    window.addEventListener('mousemove', e => {
+      globalMx = e.clientX;
+      globalMy = e.clientY;
+    }, { passive: true });
+
+    function drawBorderGlow(state) {
+      const { card, cvs, ctx } = state;
+      const rect = card.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      const PAD = 6; // padding extra per il glow diffuso
+      const cw = rect.width  + PAD * 2;
+      const ch = rect.height + PAD * 2;
+
+      if (cvs.width !== Math.round(cw * dpr) || cvs.height !== Math.round(ch * dpr)) {
+        cvs.width  = Math.round(cw * dpr);
+        cvs.height = Math.round(ch * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        // aggiorna CSS per allineamento corretto
+        cvs.style.left   = -PAD + 'px';
+        cvs.style.top    = -PAD + 'px';
+        cvs.style.width  = cw + 'px';
+        cvs.style.height = ch + 'px';
+      }
+
+      ctx.clearRect(0, 0, cw, ch);
+      if (state.alpha < 0.003) return;
+
+      // Posizione mouse relativa al canvas (con offset PAD)
+      const mx = globalMx - rect.left + PAD;
+      const my = globalMy - rect.top  + PAD;
+
+      const r   = BORDER_R + 1;
+      const x   = PAD, y = PAD;
+      const w   = rect.width, h = rect.height;
+      const [R, G, B] = GLOW_COLOR;
+
+      // ── Tecnica: disegna il rounded-rect path due volte ──
+      // 1. Stroke sottile nitido
+      // 2. Stroke largo e morbido per il glow diffuso
+      // L'intensità di ciascuno è modulata da un gradiente radiale
+      // centrato sul mouse che funge da "maschera" luminosa.
+
+      function roundRect(px, py, pw, ph, pr) {
+        ctx.beginPath();
+        ctx.moveTo(px + pr, py);
+        ctx.lineTo(px + pw - pr, py);
+        ctx.arcTo(px + pw, py,      px + pw, py + pr,      pr);
+        ctx.lineTo(px + pw, py + ph - pr);
+        ctx.arcTo(px + pw, py + ph, px + pw - pr, py + ph, pr);
+        ctx.lineTo(px + pr, py + ph);
+        ctx.arcTo(px,       py + ph, px,          py + ph - pr, pr);
+        ctx.lineTo(px, py + pr);
+        ctx.arcTo(px, py,           px + pr,      py,           pr);
+        ctx.closePath();
+      }
+
+      // Gradiente radiale centrato sul mouse — raggio ampio per effetto "luce di prossimità"
+      const glowRadius = GLOW_RADIUS * 1.1;
+      const grad = ctx.createRadialGradient(mx, my, 0, mx, my, glowRadius);
+      grad.addColorStop(0,    `rgba(${R},${G},${B},${state.alpha})`);
+      grad.addColorStop(0.35, `rgba(${R},${G},${B},${state.alpha * 0.65})`);
+      grad.addColorStop(0.7,  `rgba(${R},${G},${B},${state.alpha * 0.18})`);
+      grad.addColorStop(1,    `rgba(${R},${G},${B},0)`);
+
+      ctx.save();
+
+      // Pass 1 — glow diffuso esterno (stroke largo, morbido)
+      roundRect(x, y, w, h, r);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = 14;
+      ctx.globalAlpha = 0.45;
+      ctx.stroke();
+
+      // Pass 2 — bordo nitido (stroke sottile)
+      roundRect(x, y, w, h, r);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = 1.5;
+      ctx.globalAlpha = 1;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function glowLoop(dt) {
+      cardStates.forEach(state => {
+        const rect = state.card.getBoundingClientRect();
+        const mx   = globalMx - rect.left;
+        const my   = globalMy - rect.top;
+
+        // Distanza del mouse dal punto più vicino sul rettangolo della card
+        const clampedX = Math.max(0, Math.min(rect.width,  mx));
+        const clampedY = Math.max(0, Math.min(rect.height, my));
+        const dist = Math.hypot(mx - clampedX, my - clampedY);
+
+        state.targetAlpha = dist < GLOW_RADIUS
+          ? Math.pow(Math.max(0, 1 - dist / GLOW_RADIUS), 1.4)
+          : 0;
+
+        const lerpA = 1 - Math.pow(0.82, dt * 60);
+        state.alpha += (state.targetAlpha - state.alpha) * lerpA;
+
+        drawBorderGlow(state);
+      });
+    }
+
+    /* ── Scale bounce + open modal ── */
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        card.classList.remove('bounce');
+        void card.offsetWidth;
+        card.classList.add('bounce');
+        card.addEventListener('animationend', () => card.classList.remove('bounce'), { once: true });
+        openModal(card.dataset.service);
+      });
+    });
+
+    /* ── Main RAF integrato con delta time ── */
+    // Aggancia il glow loop al RAF globale della pagina
+    let lastGlowTs = 0;
+    function glowRAF(ts) {
+      const dt = Math.min((ts - lastGlowTs) / 1000, 0.1);
+      lastGlowTs = ts;
+      glowLoop(dt);
+      requestAnimationFrame(glowRAF);
+    }
+    requestAnimationFrame(glowRAF);
+
   })();
   </script>
 
