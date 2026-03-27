@@ -54,14 +54,12 @@
     /* ── Service cards ── */
     .service-card{padding:32px 28px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;transition:transform .4s var(--ease),background .4s var(--ease),border-color .4s var(--ease);position:relative;overflow:hidden;cursor:pointer;user-select:none}
     .service-card:hover{transform:translateY(-3px);border-color:var(--border-hover);background:var(--bg-card-hover)}
+    .service-card:active{transform:translateY(-3px) scale(.96);transition-duration:.1s}
     /* proximity border glow – canvas overlay */
     .service-card__glow-canvas{position:absolute;pointer-events:none;border-radius:14px;z-index:0;left:-6px;top:-6px}
     /* tutti gli elementi interni sopra il canvas */
     .service-card > *:not(.service-card__glow-canvas){position:relative;z-index:1}
     .service-card__glow{display:none}
-    /* scale-bounce click */
-    .service-card.bounce{animation:cardBounce .45s var(--ease)}
-    @keyframes cardBounce{0%{transform:translateY(-3px) scale(1)}20%{transform:translateY(-3px) scale(.93)}55%{transform:translateY(-3px) scale(1.04)}75%{transform:translateY(-3px) scale(.98)}100%{transform:translateY(-3px) scale(1)}}
     .service-card__icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--cyan-subtle);border-radius:10px;transition:background .3s}
     .service-card:hover .service-card__icon{background:rgba(0,224,208,.12)}
     .service-card__icon svg{width:22px;height:22px;stroke:var(--cyan);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -92,26 +90,26 @@
     .svc-modal__footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
     .svc-modal__outcome{font-size:.82rem;color:var(--text-muted);font-style:italic;margin-top:4px}
     @media(max-width:600px){.svc-modal{padding:32px 24px}}
-    .hex-orbit{position:relative;width:100%;max-width:600px;height:440px;margin:0 auto}
+    .hex-orbit{position:relative;width:100%;max-width:750px;height:560px;margin:0 auto}
 
-    .hex-orbit__track{position:absolute;top:50%;left:50%;width:320px;height:320px;margin:-160px 0 0 -160px;border:1px solid rgba(0,224,208,.06);border-radius:50%;pointer-events:none}
+    .hex-orbit__track{position:absolute;top:50%;left:50%;width:420px;height:420px;margin:-210px 0 0 -210px;border:1px solid rgba(0,224,208,.06);border-radius:50%;pointer-events:none}
     .hex-orbit__ring{position:absolute;top:0;left:0;width:100%;height:100%;animation:hexSpin 80s linear infinite}
     @keyframes hexSpin{to{transform:rotate(360deg)}}
-    .hex-card{position:absolute;top:50%;left:50%;width:170px;height:192px;margin:-96px 0 0 -85px;text-decoration:none;color:var(--text);cursor:pointer;transition:filter .4s var(--ease),scale .4s var(--ease)}
+    .hex-card{position:absolute;top:50%;left:50%;width:200px;height:226px;margin:-113px 0 0 -100px;text-decoration:none;color:var(--text);cursor:pointer;transition:filter .4s var(--ease),scale .4s var(--ease)}
     .hex-card:hover{filter:brightness(1.25);scale:1.05}
     .hex-card__shape{width:100%;height:100%;clip-path:url(#hex-rounded);background:var(--bg-card);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:background .4s;animation:hexCounterSpin 80s linear infinite}
     .hex-card:hover .hex-card__shape{background:var(--bg-card-hover)}
-    .hex-card__border{position:absolute;inset:-3px;clip-path:url(#hex-rounded);background:radial-gradient(circle 130px at var(--hx,50%) var(--hy,50%),rgba(0,224,208,.55),rgba(0,224,208,.12) 40%,transparent 70%);z-index:-1;opacity:0;animation:hexCounterSpin 80s linear infinite}
-    .hex-card__img{width:64px;height:64px;border-radius:8px;background:rgba(0,224,208,.04);border:1px dashed rgba(0,224,208,.15);display:flex;align-items:center;justify-content:center;margin-bottom:10px;overflow:hidden;transition:border-color .3s}
+    .hex-card__border{position:absolute;inset:-3px;clip-path:url(#hex-rounded);background:radial-gradient(circle 160px at var(--hx,50%) var(--hy,50%),rgba(0,224,208,.55),rgba(0,224,208,.12) 40%,transparent 70%);z-index:-1;opacity:0;animation:hexCounterSpin 80s linear infinite}
+    .hex-card__img{width:72px;height:72px;border-radius:10px;background:rgba(0,224,208,.04);border:1px dashed rgba(0,224,208,.15);display:flex;align-items:center;justify-content:center;margin-bottom:12px;overflow:hidden;transition:border-color .3s}
     .hex-card:hover .hex-card__img{border-color:rgba(0,224,208,.35)}
-    .hex-card__img svg{width:22px;height:22px;stroke:var(--text-muted);fill:none;stroke-width:1.5}
+    .hex-card__img svg{width:26px;height:26px;stroke:var(--text-muted);fill:none;stroke-width:1.5}
     .hex-card__img img{width:100%;height:100%;object-fit:cover}
-    .hex-card__title{font-size:.78rem;font-weight:600;text-align:center;padding:0 16px;line-height:1.3}
+    .hex-card__title{font-size:.88rem;font-weight:600;text-align:center;padding:0 18px;line-height:1.3}
     .hex-card__inner{display:flex;flex-direction:column;align-items:center;justify-content:center}
     @keyframes hexCounterSpin{to{transform:rotate(-360deg)}}
-    .hex-card:nth-child(1){transform:translate(160px, 0)}
-    .hex-card:nth-child(2){transform:translate(-80px, -138px)}
-    .hex-card:nth-child(3){transform:translate(-80px, 138px)}
+    .hex-card:nth-child(1){transform:translate(210px, 0)}
+    .hex-card:nth-child(2){transform:translate(-105px, -182px)}
+    .hex-card:nth-child(3){transform:translate(-105px, 182px)}
     .res-stack{display:flex;flex-direction:column;gap:16px}
     .res-item{display:flex;gap:20px;padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all .4s var(--ease);overflow:hidden;position:relative;cursor:pointer}
     .res-item::after{content:'';position:absolute;inset:0;opacity:0;background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(0,224,208,.06),transparent 40%);transition:opacity .3s;pointer-events:none}
@@ -159,12 +157,12 @@
     @media(max-width:900px){.tri-panel{width:min(22vw,250px)}}
     @media(max-width:700px){
       .tri-panel{display:none}.main{padding:0 24px}.nav{padding:16px 24px}.nav__links{gap:20px}.nav__links a{font-size:.68rem}
-      .hex-orbit{height:500px}
-      .hex-orbit__track{width:260px;height:260px;margin:-130px 0 0 -130px}
-      .hex-card{width:150px;height:170px;margin:-85px 0 0 -75px}
-      .hex-card:nth-child(1){transform:translate(130px, 0)}
-      .hex-card:nth-child(2){transform:translate(-65px, -112px)}
-      .hex-card:nth-child(3){transform:translate(-65px, 112px)}
+      .hex-orbit{height:560px}
+      .hex-orbit__track{width:320px;height:320px;margin:-160px 0 0 -160px}
+      .hex-card{width:170px;height:192px;margin:-96px 0 0 -85px}
+      .hex-card:nth-child(1){transform:translate(160px, 0)}
+      .hex-card:nth-child(2){transform:translate(-80px, -138px)}
+      .hex-card:nth-child(3){transform:translate(-80px, 138px)}
       .res-item{flex-direction:column}
       .res-item__img{width:100%;height:140px}
       .cookie-banner{padding:16px 24px}
@@ -538,11 +536,14 @@
     function drawBorderGlow(state) {
       const { card, cvs, ctx } = state;
       const rect = card.getBoundingClientRect();
+      // Use layout dimensions (unaffected by CSS transform) to avoid double-scaling
+      const layoutW = card.offsetWidth;
+      const layoutH = card.offsetHeight;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
       const PAD = 6;
-      const cw = rect.width  + PAD * 2;
-      const ch = rect.height + PAD * 2;
+      const cw = layoutW  + PAD * 2;
+      const ch = layoutH + PAD * 2;
 
       if (cvs.width !== Math.round(cw * dpr) || cvs.height !== Math.round(ch * dpr)) {
         cvs.width  = Math.round(cw * dpr);
@@ -557,12 +558,15 @@
       ctx.clearRect(0, 0, cw, ch);
       if (state.alpha < 0.003) return;
 
-      const mx = globalMx - rect.left + PAD;
-      const my = globalMy - rect.top  + PAD;
+      // Remap mouse from visual to layout coords
+      const scaleX = rect.width > 0 ? layoutW / rect.width : 1;
+      const scaleY = rect.height > 0 ? layoutH / rect.height : 1;
+      const mx = (globalMx - rect.left) * scaleX + PAD;
+      const my = (globalMy - rect.top)  * scaleY + PAD;
 
       const r   = BORDER_R + 1;
       const x   = PAD, y = PAD;
-      const w   = rect.width, h = rect.height;
+      const w   = layoutW, h = layoutH;
       const [R, G, B] = GLOW_COLOR;
 
       function roundRect(px, py, pw, ph, pr) {
@@ -626,13 +630,9 @@
       });
     }
 
-    /* ── Scale bounce + open modal ── */
+    /* ── Open modal on click ── */
     cards.forEach(card => {
       card.addEventListener('click', () => {
-        card.classList.remove('bounce');
-        void card.offsetWidth;
-        card.classList.add('bounce');
-        card.addEventListener('animationend', () => card.classList.remove('bounce'), { once: true });
         openModal(card.dataset.service);
       });
     });
@@ -751,7 +751,7 @@
     class TriPanel{
       constructor(canvas,side){
         this.canvas=canvas;this.ctx=canvas.getContext('2d');this.side=side;
-        this.tris=[];this.mouse={x:-9999,y:-9999};this.hovIdx=-1;this.bursts=[];
+        this.tris=[];this.mouse={x:-9999,y:-9999};this.hovIdx=-1;this.pressing=false;this.bursts=[];
         this.dpr=Math.min(window.devicePixelRatio||1,2);this.time=0;
         this._lastTs=0;
         this.raf=null;this.S=50;this.halfS=this.S/2;this.H=this.S*Math.sqrt(3)/2;
@@ -761,7 +761,7 @@
       build(){this.tris=[];const{halfS,H,w,h,side}=this;const rows=Math.ceil(h/H)+4,cols=Math.ceil(w/halfS)+4,fz=w*.7;for(let row=-2;row<rows;row++){for(let col=-2;col<cols;col++){const isUp=(row+col)%2===0;const y=row*H;let v;if(isUp)v=[[col*halfS,y+H],[(col+2)*halfS,y+H],[(col+1)*halfS,y]];else v=[[col*halfS,y],[(col+2)*halfS,y],[(col+1)*halfS,y+H]];const cx=(v[0][0]+v[1][0]+v[2][0])/3,cy=(v[0][1]+v[1][1]+v[2][1])/3;let ef=1;if(side==='left'){const d=w-cx;if(d<fz){ef=Math.max(0,d/fz);ef*=ef;}}else{const d=cx;if(d<fz){ef=Math.max(0,d/fz);ef*=ef;}}if(ef<.03)continue;this.tris.push({v,cx,cy,edgeFactor:ef,scale:this.BASE_SCALE*ef,tScale:this.BASE_SCALE*ef,maxScale:ef,edgeGlow:0,tEdgeGlow:0,shade:15+Math.random()*5});}}}
       _verts(t){const s=t.scale;return t.v.map(p=>[t.cx+(p[0]-t.cx)*s,t.cy+(p[1]-t.cy)*s]);}
       _hit(px,py,t){const[a,b,c]=t.v;const d1=(px-b[0])*(a[1]-b[1])-(a[0]-b[0])*(py-b[1]),d2=(px-c[0])*(b[1]-c[1])-(b[0]-c[0])*(py-c[1]),d3=(px-a[0])*(c[1]-a[1])-(c[0]-a[0])*(py-a[1]);return!((d1<0||d2<0||d3<0)&&(d1>0||d2>0||d3>0));}
-      bind(){const pos=e=>{const r=this.canvas.getBoundingClientRect();return{x:(e.touches?e.touches[0].clientX:e.clientX)-r.left,y:(e.touches?e.touches[0].clientY:e.clientY)-r.top};};this.canvas.addEventListener('mousemove',e=>{this.mouse=pos(e);});this.canvas.addEventListener('mouseleave',()=>{this.mouse={x:-9999,y:-9999};this.hovIdx=-1;});this.canvas.addEventListener('click',e=>{const p=pos(e);this.bursts.push({x:p.x,y:p.y,r:0,max:450,speed:5});});this.canvas.addEventListener('touchstart',e=>{const p=pos(e);this.mouse=p;this.bursts.push({x:p.x,y:p.y,r:0,max:450,speed:5});},{passive:true});}
+      bind(){const pos=e=>{const r=this.canvas.getBoundingClientRect();return{x:(e.touches?e.touches[0].clientX:e.clientX)-r.left,y:(e.touches?e.touches[0].clientY:e.clientY)-r.top};};this.canvas.addEventListener('mousemove',e=>{this.mouse=pos(e);});this.canvas.addEventListener('mouseleave',()=>{this.mouse={x:-9999,y:-9999};this.hovIdx=-1;this.pressing=false;});this.canvas.addEventListener('mousedown',()=>{this.pressing=true;});this.canvas.addEventListener('mouseup',()=>{this.pressing=false;});this.canvas.addEventListener('click',e=>{const p=pos(e);this.bursts.push({x:p.x,y:p.y,r:0,max:450,speed:5});});this.canvas.addEventListener('touchstart',e=>{const p=pos(e);this.mouse=p;this.pressing=true;this.bursts.push({x:p.x,y:p.y,r:0,max:450,speed:5});},{passive:true});this.canvas.addEventListener('touchend',()=>{this.pressing=false;},{passive:true});}
       update(dt){
         this.time+=.005*dt*60;
         const mx=this.mouse.x,my=this.mouse.y;
@@ -772,13 +772,13 @@
           t.tScale=baseS;t.tEdgeGlow=0;
           const pd=Math.hypot(t.cx-mx,t.cy-my),pr=130;
           if(pd<pr&&pd>0){const pi=1-pd/pr;t.tScale=baseS-pi*.12*t.edgeFactor;t.tEdgeGlow=Math.max(t.tEdgeGlow,pi*.25);}
-          if(i===this.hovIdx){t.tScale=Math.min(.98,t.maxScale*1.1);t.tEdgeGlow=.7;}
+          if(i===this.hovIdx){t.tScale=Math.min(.98,t.maxScale*1.1);t.tEdgeGlow=.7;if(this.pressing){t.tScale=Math.max(.05,baseS*.82);}}
           for(const b of this.bursts){
             const d=Math.hypot(t.cx-b.x,t.cy-b.y),wd=Math.abs(d-b.r),wW=80;
             if(wd<wW){const inten=1-wd/wW,life=1-b.r/b.max;t.tScale=Math.min(t.tScale,baseS-inten*life*.35*t.edgeFactor);t.tEdgeGlow=Math.max(t.tEdgeGlow,inten*life);}
           }
           t.tScale=Math.max(0,t.tScale);
-          const la=1-Math.pow(.9,dt*60);
+          const la=1-Math.pow(.75,dt*60);
           t.scale+=( t.tScale-t.scale)*la;
           const la2=1-Math.pow(.92,dt*60);
           t.edgeGlow+=(t.tEdgeGlow-t.edgeGlow)*la2;
