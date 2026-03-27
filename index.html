@@ -10,13 +10,13 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    :root{--bg:#08080e;--bg-card:#151518;--bg-card-hover:#1c1c20;--border:rgba(100,220,255,.06);--border-hover:rgba(100,220,255,.18);--text:#e4e4f0;--text-dim:#8585a8;--text-muted:#4e4e6a;--cyan:#00e0d0;--cyan-glow:rgba(0,224,208,.3);--cyan-subtle:rgba(0,224,208,.06);--blue:#4facfe;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+    :root{--bg:#08080e;--bg-card:#151518;--bg-card-hover:#1c1c20;--border:rgba(180,180,190,.08);--border-hover:rgba(180,180,190,.2);--text:#e6e6ea;--text-dim:#9a9a9e;--text-muted:#7a7a8e;--cyan:#00e0d0;--cyan-glow:rgba(0,224,208,.3);--cyan-subtle:rgba(0,224,208,.06);--blue:#4facfe;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
     html{scroll-behavior:smooth}
     body{font-family:var(--font);background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.7;-webkit-font-smoothing:antialiased}
     .tri-panel{position:fixed;top:0;width:min(38vw, 480px);height:100%;z-index:1;pointer-events:auto}
     .tri-panel--left{left:0}.tri-panel--right{right:0}
     .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;padding:20px 40px;transition:background .4s,backdrop-filter .4s}
-    .nav--scrolled{background:rgba(8,8,14,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+    .nav--scrolled{background:rgba(10,10,14,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
     .nav__inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:900px}
     .nav__logo{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none}
     .nav__logo span{color:var(--cyan)}
@@ -71,7 +71,7 @@
     .service-card:hover .service-card__cta{opacity:1}
 
     /* ── Modal overlay ── */
-    .svc-modal-bg{position:fixed;inset:0;z-index:300;background:rgba(4,4,10,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
+    .svc-modal-bg{position:fixed;inset:0;z-index:300;background:rgba(6,6,8,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
     .svc-modal-bg.open{opacity:1;pointer-events:all}
     .svc-modal{position:relative;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;background:var(--bg-card);border:1px solid var(--border-hover);border-radius:18px;padding:48px 44px;transform:translateY(28px) scale(.97);transition:transform .4s var(--ease);scrollbar-width:thin;scrollbar-color:rgba(0,224,208,.2) transparent}
     .svc-modal-bg.open .svc-modal{transform:translateY(0) scale(1)}
@@ -139,7 +139,7 @@
     .form-msg--ok{display:block;background:rgba(0,224,208,.08);color:var(--cyan);border:1px solid rgba(0,224,208,.2)}
     .form-msg--err{display:block;background:rgba(216,90,48,.08);color:#D85A30;border:1px solid rgba(216,90,48,.2)}
     .form-msg--wait{display:block;background:rgba(79,172,254,.08);color:var(--blue);border:1px solid rgba(79,172,254,.2)}
-    .cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(14,14,26,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:20px 40px;display:none;align-items:center;gap:20px;flex-wrap:wrap}
+    .cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(21,21,24,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:20px 40px;display:none;align-items:center;gap:20px;flex-wrap:wrap}
     .cookie-banner--show{display:flex}
     .cookie-banner__text{flex:1;font-size:.85rem;color:var(--text-dim);min-width:220px;line-height:1.6}
     .cookie-banner__text a{color:var(--cyan);text-decoration:underline;text-underline-offset:2px}
