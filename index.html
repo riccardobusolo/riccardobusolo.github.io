@@ -16,9 +16,11 @@
     .tri-panel{position:fixed;top:0;width:min(38vw, 480px);height:100%;z-index:1;pointer-events:auto}
     .tri-panel--left{left:0}.tri-panel--right{right:0}
     .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;padding:20px 40px;transition:background .4s,backdrop-filter .4s}
-    .nav--scrolled{background:rgba(10,10,14,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+    .nav--scrolled{background:rgba(10,10,14,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
     .nav__inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:900px}
-    .nav__logo{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none}
+    .nav__logo{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none;transition:scale .3s var(--ease)}
+    .nav__logo:hover{scale:1.08}
+    .nav__logo:active{scale:.94;transition-duration:.1s}
     .nav__logo span{color:var(--cyan)}
     .nav__links{display:flex;gap:32px;list-style:none}
     .nav__links a{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-decoration:none;transition:color .3s}
@@ -96,7 +98,8 @@
     .hex-orbit__ring{position:absolute;top:0;left:0;width:100%;height:100%;animation:hexSpin 80s linear infinite}
     @keyframes hexSpin{to{transform:rotate(360deg)}}
     .hex-card{position:absolute;top:50%;left:50%;width:200px;height:226px;margin:-113px 0 0 -100px;text-decoration:none;color:var(--text);cursor:pointer;transition:filter .4s var(--ease),scale .4s var(--ease)}
-    .hex-card:hover{filter:brightness(1.25);scale:1.05}
+    .hex-card:hover{filter:brightness(1.25);scale:1.03}
+    .hex-card:active{scale:.97;transition-duration:.1s}
     .hex-card__shape{width:100%;height:100%;clip-path:url(#hex-rounded);background:var(--bg-card);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:background .4s;animation:hexCounterSpin 80s linear infinite}
     .hex-card:hover .hex-card__shape{background:var(--bg-card-hover)}
     .hex-card__border{position:absolute;inset:-3px;clip-path:url(#hex-rounded);background:radial-gradient(circle 160px at var(--hx,50%) var(--hy,50%),rgba(0,224,208,.55),rgba(0,224,208,.12) 40%,transparent 70%);z-index:-1;opacity:0;animation:hexCounterSpin 80s linear infinite}
