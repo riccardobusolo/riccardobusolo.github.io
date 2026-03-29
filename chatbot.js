@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    RB Assistant — Chatbot interattivo per riccardobusolo.com
-   v2.0 — Expanded tree, responsive, premium animations
+   v3.0 — Draggable + Resizable + Expanded tree
    ═══════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -18,8 +18,6 @@
         { label: '🔍 Naviga il sito', next: 'navigazione' },
       ],
     },
-
-    /* ═══════════ SERVIZI ═══════════ */
     servizi: {
       msg: 'Offro tre tipologie di servizio, ognuna pensata per esigenze diverse. Quale ti interessa?',
       options: [
@@ -103,46 +101,24 @@
     },
     srv_quale_formazione: {
       msg: 'Ti consiglio il percorso di <strong>Formazione AI</strong>. È pensato esattamente per portare il tuo team da zero a operativo con l\'Intelligenza Artificiale, indipendentemente dal livello tecnico di partenza.',
-      options: [
-        { label: '🎓 Approfondisci la Formazione', next: 'srv_formazione' },
-        { label: '✉️ Contattami', next: 'contatti' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '🎓 Approfondisci la Formazione', next: 'srv_formazione' },{ label: '✉️ Contattami', next: 'contatti' },{ label: '← Menu principale', next: 'root' }],
     },
     srv_quale_affiancamento: {
       msg: 'Il servizio che fa per te è l\'<strong>Affiancamento Personalizzato</strong>. Parto analizzando i tuoi processi reali, identifico i colli di bottiglia e costruisco insieme a te un percorso per automatizzarli con l\'AI.',
-      options: [
-        { label: '⚙️ Approfondisci l\'Affiancamento', next: 'srv_affiancamento' },
-        { label: '✉️ Contattami', next: 'contatti' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '⚙️ Approfondisci l\'Affiancamento', next: 'srv_affiancamento' },{ label: '✉️ Contattami', next: 'contatti' },{ label: '← Menu principale', next: 'root' }],
     },
     srv_quale_vibecoding: {
       msg: 'Il <strong>Vibe Coding</strong> è perfetto per te. Ti insegno a creare i tuoi strumenti software usando solo il linguaggio naturale, senza dipendere da sviluppatori o dall\'IT.',
-      options: [
-        { label: '💻 Approfondisci il Vibe Coding', next: 'srv_vibecoding' },
-        { label: '✉️ Contattami', next: 'contatti' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '💻 Approfondisci il Vibe Coding', next: 'srv_vibecoding' },{ label: '✉️ Contattami', next: 'contatti' },{ label: '← Menu principale', next: 'root' }],
     },
     srv_quale_tutto: {
       msg: 'In quel caso il mio suggerimento è partire con un <strong>Affiancamento Personalizzato</strong> per mappare le priorità, e poi integrare formazione e vibe coding dove servono di più.\n\nScrivimi e ne parliamo — ogni azienda ha esigenze diverse e preferisco costruire un percorso su misura.',
-      options: [
-        { label: '✉️ Contattami', next: 'contatti' },
-        { label: '← Torna ai servizi', next: 'servizi' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '✉️ Contattami', next: 'contatti' },{ label: '← Torna ai servizi', next: 'servizi' },{ label: '← Menu principale', next: 'root' }],
     },
     preventivo: {
       msg: 'Ogni progetto è diverso, per questo preferisco valutare le esigenze specifiche prima di proporre un preventivo.\n\nCompila il <strong>modulo di contatto</strong> descrivendo brevemente:\n• Il tuo ruolo e settore aziendale\n• L\'obiettivo che vuoi raggiungere\n• Il numero di persone coinvolte (se applicabile)\n\nTi risponderò con una proposta personalizzata.',
-      options: [
-        { label: '✉️ Vai al modulo contatti', action: 'scroll', target: 'contatti' },
-        { label: '← Torna ai servizi', next: 'servizi' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '✉️ Vai al modulo contatti', action: 'scroll', target: 'contatti' },{ label: '← Torna ai servizi', next: 'servizi' },{ label: '← Menu principale', next: 'root' }],
     },
-
-    /* ═══════════ RISORSE ═══════════ */
     risorse: {
       msg: 'Nella sezione <strong>Materiali di Formazione</strong> trovi i PDF dei miei corsi teorici, consultabili e scaricabili gratuitamente. Quale ti interessa?',
       options: [
@@ -155,30 +131,16 @@
     },
     res_storia: {
       msg: '<strong>Storia dell\'Intelligenza Artificiale</strong> (PDF — 1.9 MB)\n\nUn viaggio dalle origini ai giorni nostri: dal Perceptron di Rosenblatt negli anni \'50 alle reti neurali profonde e ai Large Language Model. Perfetto per capire da dove arriva tutto ciò che usiamo oggi.',
-      options: [
-        { label: '📥 Apri il PDF', action: 'link', target: 'pdf/Storia dell%27Intelligenza Artificiale - Riccardo Busolo.pdf' },
-        { label: '← Altre risorse', next: 'risorse' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '📥 Apri il PDF', action: 'link', target: 'pdf/Storia dell%27Intelligenza Artificiale - Riccardo Busolo.pdf' },{ label: '← Altre risorse', next: 'risorse' },{ label: '← Menu principale', next: 'root' }],
     },
     res_fondamenti: {
       msg: '<strong>Fondamenti di Intelligenza Artificiale</strong> (PDF — 778 KB)\n\nI concetti chiave spiegati in modo accessibile: machine learning, deep learning, reti neurali, elaborazione del linguaggio naturale. Le basi teoriche che ogni professionista dovrebbe conoscere.',
-      options: [
-        { label: '📥 Apri il PDF', action: 'link', target: 'pdf/Fondamenti di Intelligenza Artificiale - Riccardo Busolo.pdf' },
-        { label: '← Altre risorse', next: 'risorse' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '📥 Apri il PDF', action: 'link', target: 'pdf/Fondamenti di Intelligenza Artificiale - Riccardo Busolo.pdf' },{ label: '← Altre risorse', next: 'risorse' },{ label: '← Menu principale', next: 'root' }],
     },
     res_prompt: {
       msg: '<strong>Tecniche di Prompt Engineering</strong> (PDF — 827 KB)\n\nCome comunicare efficacemente con i modelli AI: strutturazione dei prompt, chain-of-thought, few-shot learning, gestione del contesto. Tecniche pratiche che puoi applicare immediatamente.',
-      options: [
-        { label: '📥 Apri il PDF', action: 'link', target: 'pdf/Tecniche di Prompt Engineering - Riccardo Busolo.pdf' },
-        { label: '← Altre risorse', next: 'risorse' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '📥 Apri il PDF', action: 'link', target: 'pdf/Tecniche di Prompt Engineering - Riccardo Busolo.pdf' },{ label: '← Altre risorse', next: 'risorse' },{ label: '← Menu principale', next: 'root' }],
     },
-
-    /* ═══════════ AI PER AZIENDA ═══════════ */
     azienda: {
       msg: 'L\'AI può trasformare praticamente ogni area della tua azienda. In che settore operi?',
       options: [
@@ -192,50 +154,24 @@
     },
     az_commercio: {
       msg: 'Nel <strong>commercio e retail</strong>, l\'AI può essere un grande alleato:\n\n• <strong>Gestione inventario</strong> — previsione della domanda e riordino automatico\n• <strong>Customer service</strong> — chatbot e risposte automatiche\n• <strong>Marketing</strong> — campagne personalizzate, contenuti generati, analisi dei trend\n• <strong>Pricing dinamico</strong> — adattamento automatico dei prezzi\n• <strong>Analisi vendite</strong> — report automatici e insight sui pattern di acquisto',
-      options: [
-        { label: '✉️ Parliamone', next: 'contatti' },
-        { label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },
-        { label: '← Altri settori', next: 'azienda' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '✉️ Parliamone', next: 'contatti' },{ label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },{ label: '← Altri settori', next: 'azienda' },{ label: '← Menu principale', next: 'root' }],
     },
     az_manifattura: {
       msg: 'Nella <strong>manifattura e produzione</strong>, l\'AI può intervenire su:\n\n• <strong>Ottimizzazione processi</strong> — identificare inefficienze e colli di bottiglia\n• <strong>Manutenzione predittiva</strong> — anticipare guasti e ridurre i fermi macchina\n• <strong>Controllo qualità</strong> — ispezione visiva automatizzata\n• <strong>Pianificazione produzione</strong> — schedulazione intelligente\n• <strong>Documentazione</strong> — generazione automatica di report e procedure',
-      options: [
-        { label: '✉️ Parliamone', next: 'contatti' },
-        { label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },
-        { label: '← Altri settori', next: 'azienda' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '✉️ Parliamone', next: 'contatti' },{ label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },{ label: '← Altri settori', next: 'azienda' },{ label: '← Menu principale', next: 'root' }],
     },
     az_servizi: {
       msg: 'Nei <strong>servizi professionali</strong> (consulenza, studi, agenzie), l\'AI può potenziare:\n\n• <strong>Automazione documenti</strong> — contratti, report, proposte generate in automatico\n• <strong>Gestione email</strong> — classificazione, bozze di risposta, follow-up\n• <strong>Ricerca e analisi</strong> — sintesi di documenti, normative, trend di mercato\n• <strong>Project management</strong> — task assignment e tracking automatizzato\n• <strong>CRM</strong> — aggiornamento automatico dei contatti e pipeline',
-      options: [
-        { label: '✉️ Parliamone', next: 'contatti' },
-        { label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },
-        { label: '← Altri settori', next: 'azienda' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '✉️ Parliamone', next: 'contatti' },{ label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },{ label: '← Altri settori', next: 'azienda' },{ label: '← Menu principale', next: 'root' }],
     },
     az_sanita: {
       msg: 'Nella <strong>sanità e nel benessere</strong>, l\'AI può supportare:\n\n• <strong>Gestione appuntamenti</strong> — scheduling intelligente e reminder automatici\n• <strong>Documentazione clinica</strong> — trascrizione e sintesi dei referti\n• <strong>Comunicazione pazienti</strong> — risposte automatiche a domande frequenti\n• <strong>Amministrazione</strong> — fatturazione, gestione pratiche, archiviazione\n• <strong>Formazione interna</strong> — aggiornamento continuo del personale',
-      options: [
-        { label: '✉️ Parliamone', next: 'contatti' },
-        { label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },
-        { label: '← Altri settori', next: 'azienda' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '✉️ Parliamone', next: 'contatti' },{ label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },{ label: '← Altri settori', next: 'azienda' },{ label: '← Menu principale', next: 'root' }],
     },
     az_altro: {
-      msg: 'Qualunque sia il tuo settore, l\'AI può quasi certamente migliorare i tuoi processi. Le aree di intervento più comuni sono:\n\n• Automazione delle attività ripetitive\n• Generazione e gestione di contenuti\n• Analisi dei dati e reportistica\n• Comunicazione interna ed esterna\n• Formazione del personale\n\nIl modo migliore per capire dove intervenire è una consulenza iniziale, dove analizzo insieme a te il tuo contesto specifico.',
-      options: [
-        { label: '✉️ Richiedi una consulenza', next: 'contatti' },
-        { label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      msg: 'Qualunque sia il tuo settore, l\'AI può quasi certamente migliorare i tuoi processi. Le aree di intervento più comuni sono:\n\n• Automazione delle attività ripetitive\n• Generazione e gestione di contenuti\n• Analisi dei dati e reportistica\n• Comunicazione interna ed esterna\n• Formazione del personale\n\nIl modo migliore per capire dove intervenire è una consulenza iniziale.',
+      options: [{ label: '✉️ Richiedi una consulenza', next: 'contatti' },{ label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },{ label: '← Menu principale', next: 'root' }],
     },
-
-    /* ═══════════ FAQ AI ═══════════ */
     faq_ai: {
       msg: 'Ecco le domande più frequenti sull\'Intelligenza Artificiale. Quale ti interessa?',
       options: [
@@ -250,55 +186,28 @@
     },
     faq_cosai: {
       msg: 'L\'<strong>Intelligenza Artificiale</strong> è un insieme di tecnologie che permettono ai computer di svolgere compiti che normalmente richiedono intelligenza umana: comprendere il linguaggio, riconoscere immagini, prendere decisioni, generare contenuti.\n\nNon è un\'entità singola ma un campo vastissimo che include machine learning, deep learning, reti neurali, elaborazione del linguaggio naturale e molto altro.',
-      options: [
-        { label: '📚 Scarica il PDF sui Fondamenti', action: 'link', target: 'pdf/Fondamenti di Intelligenza Artificiale - Riccardo Busolo.pdf' },
-        { label: '← Altre domande', next: 'faq_ai' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      options: [{ label: '📚 Scarica il PDF sui Fondamenti', action: 'link', target: 'pdf/Fondamenti di Intelligenza Artificiale - Riccardo Busolo.pdf' },{ label: '← Altre domande', next: 'faq_ai' },{ label: '← Menu principale', next: 'root' }],
     },
     faq_llm: {
-      msg: 'I <strong>Large Language Model (LLM)</strong> sono modelli di AI addestrati su enormi quantità di testo per comprendere e generare linguaggio naturale.\n\nEsempi noti: ChatGPT, Claude, Gemini, LLaMA. Funzionano prevedendo la parola più probabile successiva in una sequenza, ma la scala dei dati e dei parametri li rende capaci di ragionamento, sintesi, traduzione e molto altro.\n\nSono lo strumento principale che insegno a utilizzare nei miei corsi.',
-      options: [
-        { label: '🎓 Scopri la formazione AI', next: 'srv_formazione' },
-        { label: '← Altre domande', next: 'faq_ai' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      msg: 'I <strong>Large Language Model (LLM)</strong> sono modelli di AI addestrati su enormi quantità di testo per comprendere e generare linguaggio naturale.\n\nEsempi noti: ChatGPT, Claude, Gemini, LLaMA. Funzionano prevedendo la parola più probabile successiva in una sequenza, ma la scala dei dati e dei parametri li rende capaci di ragionamento, sintesi, traduzione e molto altro.',
+      options: [{ label: '🎓 Scopri la formazione AI', next: 'srv_formazione' },{ label: '← Altre domande', next: 'faq_ai' },{ label: '← Menu principale', next: 'root' }],
     },
     faq_prompt: {
-      msg: 'Il <strong>Prompt Engineering</strong> è l\'arte di comunicare in modo efficace con i modelli AI. Un buon prompt può fare la differenza tra una risposta generica e un risultato preciso e utile.\n\nNei miei corsi insegno tecniche avanzate come:\n• Strutturazione dei prompt con ruoli e contesto\n• Ragionamento multi-step (chain-of-thought)\n• Few-shot learning con esempi\n• Gestione del contesto e della memoria',
-      options: [
-        { label: '📚 Scarica il PDF sul Prompt Engineering', action: 'link', target: 'pdf/Tecniche di Prompt Engineering - Riccardo Busolo.pdf' },
-        { label: '🎓 Scopri la formazione', next: 'srv_formazione' },
-        { label: '← Altre domande', next: 'faq_ai' },
-      ],
+      msg: 'Il <strong>Prompt Engineering</strong> è l\'arte di comunicare in modo efficace con i modelli AI. Un buon prompt può fare la differenza tra una risposta generica e un risultato preciso e utile.\n\nTecniche avanzate:\n• Strutturazione con ruoli e contesto\n• Ragionamento multi-step (chain-of-thought)\n• Few-shot learning con esempi\n• Gestione del contesto e della memoria',
+      options: [{ label: '📚 Scarica il PDF', action: 'link', target: 'pdf/Tecniche di Prompt Engineering - Riccardo Busolo.pdf' },{ label: '🎓 Scopri la formazione', next: 'srv_formazione' },{ label: '← Altre domande', next: 'faq_ai' }],
     },
     faq_lavoro: {
-      msg: 'L\'AI non è qui per sostituire le persone, ma per <strong>potenziare le loro capacità</strong>. I ruoli più a rischio sono quelli ripetitivi e prevedibili, mentre i lavori che richiedono creatività, empatia e giudizio critico diventano ancora più preziosi.\n\nLa chiave è imparare a usare l\'AI come strumento: chi sa collaborare con l\'AI sarà più competitivo di chi la ignora. È esattamente questo che insegno nei miei percorsi.',
-      options: [
-        { label: '🎓 Scopri la formazione', next: 'srv_formazione' },
-        { label: '← Altre domande', next: 'faq_ai' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      msg: 'L\'AI non è qui per sostituire le persone, ma per <strong>potenziare le loro capacità</strong>. I ruoli più a rischio sono quelli ripetitivi e prevedibili, mentre i lavori che richiedono creatività, empatia e giudizio critico diventano ancora più preziosi.\n\nChi sa collaborare con l\'AI sarà più competitivo di chi la ignora.',
+      options: [{ label: '🎓 Scopri la formazione', next: 'srv_formazione' },{ label: '← Altre domande', next: 'faq_ai' },{ label: '← Menu principale', next: 'root' }],
     },
     faq_difficile: {
-      msg: 'Assolutamente <strong>no</strong>. Uno dei miti più diffusi è che serva un background tecnico per usare l\'AI — non è così.\n\nI moderni strumenti AI sono progettati per interagire in linguaggio naturale: parli con loro come parleresti con un collega. Nei miei corsi, persone senza alcuna esperienza tecnica riescono a creare agenti AI funzionanti già dalla prima settimana.\n\nIl segreto è avere un metodo e sapere cosa chiedere — ed è esattamente ciò che insegno.',
-      options: [
-        { label: '🎓 Scopri la formazione', next: 'srv_formazione' },
-        { label: '💻 Scopri il Vibe Coding', next: 'srv_vibecoding' },
-        { label: '← Altre domande', next: 'faq_ai' },
-      ],
+      msg: 'Assolutamente <strong>no</strong>. I moderni strumenti AI sono progettati per interagire in linguaggio naturale: parli con loro come parleresti con un collega.\n\nNei miei corsi, persone senza alcuna esperienza tecnica riescono a creare agenti AI funzionanti già dalla prima settimana. Il segreto è avere un metodo e sapere cosa chiedere.',
+      options: [{ label: '🎓 Scopri la formazione', next: 'srv_formazione' },{ label: '💻 Scopri il Vibe Coding', next: 'srv_vibecoding' },{ label: '← Altre domande', next: 'faq_ai' }],
     },
     faq_sicurezza: {
-      msg: 'La sicurezza è un tema fondamentale. Ecco i punti chiave:\n\n• <strong>Dati sensibili</strong> — È importante non condividere dati riservati con AI pubbliche senza le dovute precauzioni\n• <strong>Allucinazioni</strong> — I modelli AI possono generare informazioni errate con sicurezza: serve sempre una verifica umana\n• <strong>Privacy</strong> — Esistono configurazioni e strumenti enterprise che garantiscono che i dati restino in azienda\n\nNei miei percorsi di formazione dedico sempre una sezione alla sicurezza e alle best practice per un utilizzo responsabile dell\'AI.',
-      options: [
-        { label: '🎓 Scopri la formazione', next: 'srv_formazione' },
-        { label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },
-        { label: '← Altre domande', next: 'faq_ai' },
-        { label: '← Menu principale', next: 'root' },
-      ],
+      msg: 'La sicurezza è un tema fondamentale:\n\n• <strong>Dati sensibili</strong> — Non condividere dati riservati con AI pubbliche senza precauzioni\n• <strong>Allucinazioni</strong> — I modelli possono generare info errate: serve sempre verifica umana\n• <strong>Privacy</strong> — Esistono configurazioni enterprise che garantiscono la riservatezza\n\nNei miei percorsi dedico sempre una sezione alla sicurezza e alle best practice.',
+      options: [{ label: '🎓 Scopri la formazione', next: 'srv_formazione' },{ label: '⚙️ Scopri l\'affiancamento', next: 'srv_affiancamento' },{ label: '← Altre domande', next: 'faq_ai' },{ label: '← Menu principale', next: 'root' }],
     },
-
-    /* ═══════════ CONTATTI ═══════════ */
     contatti: {
       msg: 'Puoi contattarmi compilando il <strong>modulo nella sezione Contatti</strong> del sito. Descrivi brevemente il tuo progetto o la tua richiesta e ti risponderò il prima possibile.\n\nSono disponibile per consulenze in presenza nell\'area di Padova e dintorni, e da remoto ovunque.',
       options: [
@@ -308,8 +217,6 @@
         { label: '← Menu principale', next: 'root' },
       ],
     },
-
-    /* ═══════════ NAVIGAZIONE ═══════════ */
     navigazione: {
       msg: 'Posso portarti direttamente alla sezione che ti interessa. Dove vuoi andare?',
       options: [
@@ -324,10 +231,12 @@
     },
   };
 
+  const IS_DESKTOP = window.matchMedia('(min-width:521px)').matches;
+  const MIN_W = 360, MIN_H = 400;
+
   /* ── CSS ── */
-  const STYLE = document.createElement('style');
-  STYLE.textContent = `
-    /* ── Toggle button ── */
+  const S = document.createElement('style');
+  S.textContent = `
     .rb-chat-btn{position:fixed;bottom:28px;right:28px;z-index:100;width:60px;height:60px;border-radius:50%;border:none;background:var(--cyan,#00e0d0);color:#08080e;cursor:pointer;box-shadow:0 4px 24px rgba(0,224,208,.35);transition:all .4s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;justify-content:center;overflow:hidden}
     .rb-chat-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,224,208,.45)}
     .rb-chat-btn:active{transform:translateY(0) scale(.94);transition-duration:.1s}
@@ -337,12 +246,13 @@
     .rb-chat-btn.open .rb-icon-chat{opacity:0;transform:scale(.5) rotate(90deg)}
     .rb-chat-btn.open .rb-icon-close{opacity:1;transform:scale(1) rotate(0deg)}
 
-    /* ── Chat panel ── */
-    .rb-chat{position:fixed;bottom:100px;right:28px;z-index:100;width:440px;height:600px;max-height:calc(100vh - 140px);background:#131316;border:1px solid rgba(180,180,190,.1);border-radius:20px;display:flex;flex-direction:column;opacity:0;transform:translateY(20px) scale(.94);pointer-events:none;transition:all .4s cubic-bezier(.16,1,.3,1);box-shadow:0 24px 64px rgba(0,0,0,.5),0 0 0 1px rgba(0,224,208,.04);overflow:hidden}
+    .rb-chat{position:fixed;z-index:100;background:#131316;border:1px solid rgba(180,180,190,.1);border-radius:20px;display:flex;flex-direction:column;opacity:0;transform:translateY(20px) scale(.94);pointer-events:none;transition:opacity .4s cubic-bezier(.16,1,.3,1),transform .4s cubic-bezier(.16,1,.3,1);box-shadow:0 24px 64px rgba(0,0,0,.5),0 0 0 1px rgba(0,224,208,.04);overflow:visible}
     .rb-chat.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all}
+    .rb-chat.dragging,.rb-chat.resizing{transition:none!important}
 
-    /* ── Header ── */
-    .rb-chat__header{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid rgba(180,180,190,.06);flex-shrink:0;background:rgba(21,21,24,.6)}
+    .rb-chat__header{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid rgba(180,180,190,.06);flex-shrink:0;background:rgba(21,21,24,.6);border-radius:20px 20px 0 0;user-select:none}
+    .rb-chat__drag{cursor:grab;flex:1;display:flex;align-items:center;gap:12px}
+    .rb-chat__drag:active{cursor:grabbing}
     .rb-chat__avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--cyan,#00e0d0),#4facfe);display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .rb-chat__avatar svg{width:18px;height:18px;stroke:#08080e;fill:none;stroke-width:2.2}
     .rb-chat__htext{flex:1}
@@ -352,60 +262,82 @@
     .rb-chat__restart:hover{border-color:rgba(0,224,208,.3);color:#00e0d0}
     .rb-chat__restart svg{width:14px;height:14px}
 
-    /* ── Body ── */
     .rb-chat__body{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:rgba(0,224,208,.12) transparent}
 
-    /* ── Messages ── */
     .rb-chat__msg{max-width:90%;padding:14px 18px;border-radius:16px 16px 16px 4px;background:#1a1a1e;font-family:'Outfit',sans-serif;font-size:.86rem;color:#9a9a9e;line-height:1.7;font-weight:300;animation:rbIn .3s cubic-bezier(.16,1,.3,1) both}
     .rb-chat__msg strong{color:#e6e6ea;font-weight:600}
     .rb-chat__msg--user{align-self:flex-end;border-radius:16px 16px 4px 16px;background:rgba(0,224,208,.07);border:1px solid rgba(0,224,208,.1);color:#e6e6ea;font-weight:400}
     @keyframes rbIn{from{opacity:0;transform:translateY(10px)}}
 
-    /* ── Options ── */
     .rb-chat__opts{display:flex;flex-direction:column;gap:5px;animation:rbIn .3s cubic-bezier(.16,1,.3,1) .08s both}
     .rb-chat__opt{background:transparent;border:1px solid rgba(180,180,190,.1);border-radius:10px;padding:11px 16px;color:#e6e6ea;font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:400;cursor:pointer;text-align:left;transition:all .25s cubic-bezier(.16,1,.3,1);line-height:1.4}
     .rb-chat__opt:hover{background:rgba(0,224,208,.06);border-color:rgba(0,224,208,.2);color:#00e0d0}
     .rb-chat__opt:active{transform:scale(.97);transition-duration:.08s}
 
-    /* ── Typing ── */
     .rb-chat__typing{display:flex;gap:5px;padding:14px 18px;max-width:75px;background:#1a1a1e;border-radius:16px 16px 16px 4px}
     .rb-chat__dot{width:6px;height:6px;border-radius:50%;background:#7a7a8e;animation:rbDot 1.2s ease-in-out infinite}
     .rb-chat__dot:nth-child(2){animation-delay:.15s}
     .rb-chat__dot:nth-child(3){animation-delay:.3s}
     @keyframes rbDot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-5px)}}
 
-    /* ── Responsive ── */
+    /* ── Resize handles (desktop only) ── */
+    .rb-resize{position:absolute;z-index:2}
+    .rb-resize--n{top:-4px;left:12px;right:12px;height:8px;cursor:ns-resize}
+    .rb-resize--s{bottom:-4px;left:12px;right:12px;height:8px;cursor:ns-resize}
+    .rb-resize--e{right:-4px;top:12px;bottom:12px;width:8px;cursor:ew-resize}
+    .rb-resize--w{left:-4px;top:12px;bottom:12px;width:8px;cursor:ew-resize}
+    .rb-resize--ne{top:-4px;right:-4px;width:14px;height:14px;cursor:nesw-resize}
+    .rb-resize--nw{top:-4px;left:-4px;width:14px;height:14px;cursor:nwse-resize}
+    .rb-resize--se{bottom:-4px;right:-4px;width:14px;height:14px;cursor:nwse-resize}
+    .rb-resize--sw{bottom:-4px;left:-4px;width:14px;height:14px;cursor:nesw-resize}
+
     @media(max-width:520px){
-      .rb-chat{right:0;left:0;bottom:0;width:100%;height:100vh;max-height:100vh;border-radius:0;border:none}
+      .rb-chat{right:0!important;left:0!important;bottom:0!important;top:0!important;width:100%!important;height:100%!important;border-radius:0;border:none}
       .rb-chat.open{transform:translateY(0) scale(1)}
       .rb-chat-btn{bottom:20px;right:20px;width:54px;height:54px}
-    }
-    @media(min-width:521px) and (max-width:800px){
-      .rb-chat{right:16px;width:calc(100vw - 32px);max-width:440px;bottom:92px;height:calc(100vh - 120px)}
+      .rb-resize{display:none}
+      .rb-chat__header{border-radius:0}
+      .rb-chat__drag{cursor:default}
     }
   `;
-  document.head.appendChild(STYLE);
+  document.head.appendChild(S);
 
-  /* ── HTML: Toggle button with morphing icons ── */
+  /* ── Button ── */
   const btn = document.createElement('button');
   btn.className = 'rb-chat-btn';
   btn.setAttribute('aria-label', 'Apri assistente');
   btn.innerHTML = `
     <svg class="rb-icon rb-icon-chat" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-    <svg class="rb-icon rb-icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-  `;
+    <svg class="rb-icon rb-icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
   document.body.appendChild(btn);
 
-  /* ── HTML: Chat panel ── */
+  /* ── Chat panel ── */
   const chat = document.createElement('div');
   chat.className = 'rb-chat';
+  // Default position/size
+  const defW = 440, defH = 600;
+  const defR = 28, defB = 100;
+  chat.style.cssText = `right:${defR}px;bottom:${defB}px;width:${defW}px;height:${defH}px;max-height:calc(100vh - 140px);`;
+
+  // Header with drag handle
   chat.innerHTML = `
     <div class="rb-chat__header">
-      <div class="rb-chat__avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
-      <div class="rb-chat__htext"><div class="rb-chat__name">RB Assistant</div><div class="rb-chat__status">● Online</div></div>
+      <div class="rb-chat__drag" id="rb-drag">
+        <div class="rb-chat__avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+        <div class="rb-chat__htext"><div class="rb-chat__name">RB Assistant</div><div class="rb-chat__status">● Online</div></div>
+      </div>
       <button class="rb-chat__restart" id="rb-restart" title="Ricomincia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
     </div>
     <div class="rb-chat__body" id="rb-chat-body"></div>
+    ${IS_DESKTOP ? `
+    <div class="rb-resize rb-resize--n" data-dir="n"></div>
+    <div class="rb-resize rb-resize--s" data-dir="s"></div>
+    <div class="rb-resize rb-resize--e" data-dir="e"></div>
+    <div class="rb-resize rb-resize--w" data-dir="w"></div>
+    <div class="rb-resize rb-resize--ne" data-dir="ne"></div>
+    <div class="rb-resize rb-resize--nw" data-dir="nw"></div>
+    <div class="rb-resize rb-resize--se" data-dir="se"></div>
+    <div class="rb-resize rb-resize--sw" data-dir="sw"></div>` : ''}
   `;
   document.body.appendChild(chat);
 
@@ -426,25 +358,114 @@
     showNode('root');
   });
 
+  /* ══════════════════════════════════
+     DRAG (desktop only)
+     ══════════════════════════════════ */
+  if (IS_DESKTOP) {
+    const drag = document.getElementById('rb-drag');
+    let dX, dY, posMode = 'br'; // 'br' = bottom-right, 'tl' = top-left
+
+    function switchToTL() {
+      if (posMode === 'tl') return;
+      const r = chat.getBoundingClientRect();
+      chat.style.top = r.top + 'px';
+      chat.style.left = r.left + 'px';
+      chat.style.bottom = 'auto';
+      chat.style.right = 'auto';
+      chat.style.maxHeight = 'none';
+      posMode = 'tl';
+    }
+
+    drag.addEventListener('pointerdown', e => {
+      if (e.target.closest('.rb-chat__restart')) return;
+      e.preventDefault();
+      switchToTL();
+      const r = chat.getBoundingClientRect();
+      dX = e.clientX - r.left;
+      dY = e.clientY - r.top;
+      chat.classList.add('dragging');
+      drag.setPointerCapture(e.pointerId);
+
+      function onMove(ev) {
+        let nx = ev.clientX - dX;
+        let ny = ev.clientY - dY;
+        nx = Math.max(0, Math.min(window.innerWidth - chat.offsetWidth, nx));
+        ny = Math.max(0, Math.min(window.innerHeight - chat.offsetHeight, ny));
+        chat.style.left = nx + 'px';
+        chat.style.top = ny + 'px';
+      }
+      function onUp() {
+        chat.classList.remove('dragging');
+        drag.removeEventListener('pointermove', onMove);
+        drag.removeEventListener('pointerup', onUp);
+      }
+      drag.addEventListener('pointermove', onMove);
+      drag.addEventListener('pointerup', onUp);
+    });
+
+    /* ══════════════════════════════════
+       RESIZE (desktop only)
+       ══════════════════════════════════ */
+    chat.querySelectorAll('.rb-resize').forEach(handle => {
+      handle.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        switchToTL();
+        const dir = handle.dataset.dir;
+        const startX = e.clientX, startY = e.clientY;
+        const rect = chat.getBoundingClientRect();
+        const startW = rect.width, startH = rect.height;
+        const startL = rect.left, startT = rect.top;
+        chat.classList.add('resizing');
+        handle.setPointerCapture(e.pointerId);
+
+        function onMove(ev) {
+          const dx = ev.clientX - startX;
+          const dy = ev.clientY - startY;
+          let w = startW, h = startH, l = startL, t = startT;
+
+          if (dir.includes('e')) w = Math.max(MIN_W, startW + dx);
+          if (dir.includes('w')) { w = Math.max(MIN_W, startW - dx); l = startL + startW - w; }
+          if (dir.includes('s')) h = Math.max(MIN_H, startH + dy);
+          if (dir.includes('n')) { h = Math.max(MIN_H, startH - dy); t = startT + startH - h; }
+
+          // Clamp to viewport
+          if (l < 0) { w += l; l = 0; }
+          if (t < 0) { h += t; t = 0; }
+          if (l + w > window.innerWidth) w = window.innerWidth - l;
+          if (t + h > window.innerHeight) h = window.innerHeight - t;
+
+          chat.style.width = w + 'px';
+          chat.style.height = h + 'px';
+          chat.style.left = l + 'px';
+          chat.style.top = t + 'px';
+        }
+        function onUp() {
+          chat.classList.remove('resizing');
+          handle.removeEventListener('pointermove', onMove);
+          handle.removeEventListener('pointerup', onUp);
+        }
+        handle.addEventListener('pointermove', onMove);
+        handle.addEventListener('pointerup', onUp);
+      });
+    });
+  }
+
   /* ── Render node ── */
   function showNode(key) {
     const node = TREE[key];
     if (!node) return;
-
     const typing = document.createElement('div');
     typing.className = 'rb-chat__typing';
     typing.innerHTML = '<div class="rb-chat__dot"></div><div class="rb-chat__dot"></div><div class="rb-chat__dot"></div>';
     body.appendChild(typing);
     scrollDown();
-
     setTimeout(() => {
       typing.remove();
-
       const msgEl = document.createElement('div');
       msgEl.className = 'rb-chat__msg';
       msgEl.innerHTML = node.msg.replace(/\n/g, '<br>');
       body.appendChild(msgEl);
-
       if (node.options && node.options.length) {
         const optsEl = document.createElement('div');
         optsEl.className = 'rb-chat__opts';
@@ -457,16 +478,13 @@
         });
         body.appendChild(optsEl);
       }
-
       scrollDown();
     }, 450 + Math.random() * 200);
   }
 
-  /* ── Handle option click ── */
+  /* ── Handle option ── */
   function handleOption(opt) {
-    const oldOpts = body.querySelectorAll('.rb-chat__opts');
-    oldOpts.forEach(el => el.remove());
-
+    body.querySelectorAll('.rb-chat__opts').forEach(el => el.remove());
     const echo = document.createElement('div');
     echo.className = 'rb-chat__msg rb-chat__msg--user';
     echo.textContent = opt.label.replace(/^[^\s]+\s/, '');
@@ -476,29 +494,19 @@
     if (opt.action === 'scroll') {
       setTimeout(() => {
         const el = document.getElementById(opt.target);
-        if (el) {
-          isOpen = false;
-          chat.classList.remove('open');
-          btn.classList.remove('open');
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
+        if (el) { isOpen = false; chat.classList.remove('open'); btn.classList.remove('open'); el.scrollIntoView({ behavior: 'smooth' }); }
       }, 300);
       setTimeout(() => showNode(opt.next || 'root'), 600);
       return;
     }
-
     if (opt.action === 'link') {
       setTimeout(() => { window.open(opt.target, '_blank'); }, 300);
       setTimeout(() => showNode(opt.next || 'root'), 600);
       return;
     }
-
-    if (opt.next) {
-      setTimeout(() => showNode(opt.next), 200);
-    }
+    if (opt.next) setTimeout(() => showNode(opt.next), 200);
   }
 
-  /* ── Scroll ── */
   function scrollDown() {
     requestAnimationFrame(() => { body.scrollTop = body.scrollHeight; });
   }
