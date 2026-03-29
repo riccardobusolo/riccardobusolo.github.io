@@ -212,6 +212,14 @@
     .form-group input:focus,.form-group textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,224,208,.08)}
     .form-group input::placeholder,.form-group textarea::placeholder{color:var(--text-muted)}
     .form-group textarea{min-height:120px}
+    .form-check{display:flex;align-items:flex-start;gap:10px}
+    .form-check input[type="checkbox"]{width:18px;height:18px;margin-top:2px;flex-shrink:0;appearance:none;-webkit-appearance:none;background:var(--bg-card);border:1px solid var(--border-hover);border-radius:4px;cursor:pointer;transition:all .3s;position:relative}
+    .form-check input[type="checkbox"]:checked{background:var(--cyan);border-color:var(--cyan)}
+    .form-check input[type="checkbox"]:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.7rem;color:var(--bg);font-weight:700}
+    .form-check input[type="checkbox"]:focus{box-shadow:0 0 0 3px rgba(0,224,208,.08)}
+    .form-check label{font-size:.82rem;color:var(--text-dim);font-weight:300;line-height:1.5;cursor:pointer;text-transform:none;letter-spacing:0}
+    .form-check label a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,224,208,.3);transition:border-color .3s}
+    .form-check label a:hover{border-color:var(--cyan)}
     .form-msg{font-size:.85rem;padding:12px 16px;border-radius:8px;display:none}
     .form-msg--ok{display:block;background:rgba(0,224,208,.08);color:var(--cyan);border:1px solid rgba(0,224,208,.2)}
     .form-msg--err{display:block;background:rgba(216,90,48,.08);color:#D85A30;border:1px solid rgba(216,90,48,.2)}
@@ -395,6 +403,7 @@
           <div class="form-group"><label for="cf-name">Nome</label><input type="text" id="cf-name" name="name" placeholder="Il tuo nome" required></div>
           <div class="form-group"><label for="cf-email">Email</label><input type="email" id="cf-email" name="email" placeholder="La tua email" required></div>
           <div class="form-group"><label for="cf-msg">Messaggio</label><textarea id="cf-msg" name="message" placeholder="Descrivi brevemente il tuo progetto o la tua richiesta..." required></textarea></div>
+          <div class="form-check"><input type="checkbox" id="cf-policy" required><label for="cf-policy">Ho letto e accetto la <a href="policy.html#privacy" target="_blank">Privacy Policy</a> e la <a href="policy.html#cookie" target="_blank">Cookie Policy</a></label></div>
           <button type="submit" class="btn btn--primary" id="cf-submit">Invia messaggio</button>
         </form>
       </div>
