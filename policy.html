@@ -37,8 +37,9 @@
     .policy-tab.active{background:rgba(0,224,208,.08);color:var(--cyan);box-shadow:0 2px 12px rgba(0,224,208,.08)}
 
     /* ── Policy sections ── */
-    .policy-section{display:none;opacity:0;transform:translateY(16px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
+    .policy-section{display:none;opacity:0;transform:translateY(10px)}
     .policy-section.visible{display:block;opacity:1;transform:translateY(0)}
+    .policy-section.animated{transition:opacity .25s var(--ease),transform .25s var(--ease)}
 
     .policy__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:12px}
     .policy__title{font-size:clamp(1.8rem,3.5vw,2.4rem);font-weight:700;letter-spacing:-.03em;margin-bottom:12px}
@@ -67,10 +68,6 @@
     .footer__links a{color:var(--text-muted);text-decoration:none;font-size:.72rem;font-family:var(--mono);transition:color .3s}
     .footer__links a:hover{color:var(--cyan)}
 
-    /* ── Reveal ── */
-    .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
-    .reveal.visible{opacity:1;transform:translateY(0)}
-
     @media(max-width:700px){
       .main{padding:100px 24px 60px}
       .nav{padding:16px 24px}
@@ -91,6 +88,8 @@
     </a>
     <ul class="nav__links">
       <li><a href="index.html#servizi">Servizi</a></li>
+      <li><a href="index.html#progetti">Progetti</a></li>
+      <li><a href="index.html#risorse">Risorse</a></li>
       <li><a href="index.html#contatti">Contatti</a></li>
     </ul>
   </div></nav>
@@ -98,7 +97,7 @@
   <div class="main">
 
     <!-- Tab switcher -->
-    <div class="policy-tabs reveal" id="policy-tabs">
+    <div class="policy-tabs" id="policy-tabs">
       <button class="policy-tab active" data-target="privacy">Privacy Policy</button>
       <button class="policy-tab" data-target="cookie">Cookie Policy</button>
     </div>
@@ -235,22 +234,29 @@
     const tabs = document.querySelectorAll('.policy-tab');
     const sections = document.querySelectorAll('.policy-section');
 
+    // Enable transitions only after initial render
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        sections.forEach(s => s.classList.add('animated'));
+      }, 50);
+    });
+
     function switchTo(target) {
       tabs.forEach(t => t.classList.toggle('active', t.dataset.target === target));
 
       sections.forEach(s => {
         if (s.id === target) {
+          s.classList.remove('visible');
           s.style.display = 'block';
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => { s.classList.add('visible'); });
-          });
+          // Force reflow then animate in
+          void s.offsetHeight;
+          s.classList.add('visible');
         } else {
           s.classList.remove('visible');
-          setTimeout(() => { if (!s.classList.contains('visible')) s.style.display = 'none'; }, 500);
+          s.style.display = 'none';
         }
       });
 
-      // Update URL hash without scrolling
       history.replaceState(null, '', '#' + target);
     }
 
@@ -263,14 +269,6 @@
     if (hash === 'cookie' || hash === 'privacy') {
       switchTo(hash);
     }
-
-    // ── Reveal animation ──
-    const revealEls = document.querySelectorAll('.reveal');
-    requestAnimationFrame(() => {
-      revealEls.forEach((el, i) => {
-        setTimeout(() => el.classList.add('visible'), 100 + i * 80);
-      });
-    });
 
   })();
   </script>
