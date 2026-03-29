@@ -96,6 +96,10 @@
 
   <div class="main">
 
+    <!-- Anchors at top for hash navigation -->
+    <span id="privacy" style="position:absolute;top:0"></span>
+    <span id="cookie" style="position:absolute;top:0"></span>
+
     <!-- Tab switcher -->
     <div class="policy-tabs" id="policy-tabs">
       <button class="policy-tab active" data-target="privacy">Privacy Policy</button>
@@ -103,7 +107,7 @@
     </div>
 
     <!-- ═══════════════════════════════════ PRIVACY POLICY ═══════════════════════════════════ -->
-    <div class="policy-section visible" id="privacy">
+    <div class="policy-section visible" data-section="privacy">
       <p class="policy__label">Informativa sulla Privacy</p>
       <h1 class="policy__title">Privacy Policy</h1>
       <p class="policy__updated">Ultimo aggiornamento: 29 marzo 2026</p>
@@ -168,7 +172,7 @@
     </div>
 
     <!-- ═══════════════════════════════════ COOKIE POLICY ═══════════════════════════════════ -->
-    <div class="policy-section" id="cookie">
+    <div class="policy-section" data-section="cookie">
       <p class="policy__label">Informativa sui Cookie</p>
       <h1 class="policy__title">Cookie Policy</h1>
       <p class="policy__updated">Ultimo aggiornamento: 29 marzo 2026</p>
@@ -245,10 +249,9 @@
       tabs.forEach(t => t.classList.toggle('active', t.dataset.target === target));
 
       sections.forEach(s => {
-        if (s.id === target) {
+        if (s.dataset.section === target) {
           s.classList.remove('visible');
           s.style.display = 'block';
-          // Force reflow then animate in
           void s.offsetHeight;
           s.classList.add('visible');
         } else {
