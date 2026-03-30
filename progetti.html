@@ -103,10 +103,20 @@
 
     @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:600px){
-      .main{padding:110px 24px 60px}.nav{padding:16px 24px}
-      .nav__links{gap:20px}.nav__links a{font-size:.68rem}
+      .main{padding:100px 20px 60px}.nav{padding:14px 20px}
+      .nav__links{gap:14px}.nav__links a{font-size:.62rem}
       .grid{grid-template-columns:1fr;gap:18px}
-      .tabs{flex-direction:column;max-width:100%}
+      .tabs{flex-direction:row;max-width:100%}
+      .tab{padding:10px 14px;font-size:.72rem}
+      .page__title{font-size:1.8rem}
+      .page__desc{font-size:.92rem}
+      .card__title{font-size:1rem}
+      .card__desc{font-size:.82rem}
+      .grid-toolbar{margin-bottom:12px}
+    }
+    @media(max-width:420px){
+      .nav__links{gap:10px}.nav__links a{font-size:.58rem}
+      .main{padding:95px 16px 50px}
     }
   </style>
 </head>
