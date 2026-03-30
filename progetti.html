@@ -14,57 +14,68 @@
     :root{--bg:#08080e;--bg-card:#151518;--bg-card-hover:#1c1c20;--border:rgba(180,180,190,.08);--border-hover:rgba(180,180,190,.2);--text:#e6e6ea;--text-dim:#9a9a9e;--text-muted:#7a7a8e;--cyan:#00e0d0;--cyan-glow:rgba(0,224,208,.3);--cyan-subtle:rgba(0,224,208,.06);--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
     body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
-    /* ── Nav ── */
     .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;padding:20px 40px;background:rgba(10,10,14,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
     .nav__inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:1100px}
     .nav__logo{text-decoration:none;display:flex;align-items:center;transition:scale .3s var(--ease)}
-    .nav__logo:hover{scale:1.08}
-    .nav__logo:active{scale:.94;transition-duration:.1s}
+    .nav__logo:hover{scale:1.08}.nav__logo:active{scale:.94;transition-duration:.1s}
     .nav__links{display:flex;gap:32px;list-style:none}
     .nav__links a{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-decoration:none;transition:color .3s}
     .nav__links a:hover{color:var(--cyan)}
 
-    /* ── Main ── */
     .main{max-width:1100px;margin:0 auto;padding:130px 40px 80px}
-
     .page__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:12px}
+
+    /* ── Animated title/desc ── */
     .page__title{font-size:clamp(2rem,4.5vw,3rem);font-weight:800;letter-spacing:-.04em;margin-bottom:16px}
     .page__desc{font-size:1.02rem;color:var(--text-dim);font-weight:300;max-width:520px;margin-bottom:40px}
+    .page__title.pop,.page__desc.pop{animation:textPop .3s var(--ease) both}
+    @keyframes textPop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-    /* ── Tabs (policy-style) ── */
+    /* ── Tabs ── */
     .tabs{display:flex;gap:4px;margin:0 auto 48px;background:var(--bg-card);border-radius:10px;padding:4px;border:1px solid var(--border);max-width:520px}
     .tab{flex:1;padding:12px 20px;font-family:var(--mono);font-size:.78rem;font-weight:500;letter-spacing:.03em;text-align:center;border-radius:7px;cursor:pointer;border:none;background:transparent;color:var(--text-muted);transition:all .3s var(--ease)}
     .tab:hover{color:var(--text)}
     .tab.active{background:rgba(0,224,208,.08);color:var(--cyan);box-shadow:0 2px 12px rgba(0,224,208,.06)}
 
-    /* ── Sections ── */
     .cat-section{display:none}
     .cat-section.active{display:block}
+
+    /* ── Grid toolbar ── */
+    .grid-toolbar{display:flex;justify-content:flex-end;margin-bottom:16px;min-height:32px}
+    .reset-btn{display:none;align-items:center;gap:6px;padding:6px 14px;font-family:var(--mono);font-size:.68rem;letter-spacing:.03em;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all .3s var(--ease)}
+    .reset-btn:hover{color:var(--cyan);border-color:rgba(0,224,208,.2)}
+    .reset-btn:active{scale:.96;transition-duration:.08s}
+    .reset-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+    .reset-btn.visible{display:inline-flex}
 
     /* ── Card grid ── */
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;grid-auto-rows:1fr}
 
     /* ── 3D Card ── */
     .card-wrap{perspective:800px;display:flex}
+    .card-wrap.sortable{cursor:grab}
+    /* Original card hidden during drag */
+    .card-wrap.drag-src{opacity:.15!important;pointer-events:none}
+    .card-wrap.drag-src .card{transform:none!important}
+    /* Floating clone */
+    .drag-clone{position:fixed;z-index:200;pointer-events:none;opacity:0;transition:opacity .15s}
+    .drag-clone.visible{opacity:1}
+    .drag-clone .card{transform:none!important;box-shadow:0 30px 70px rgba(0,0,0,.5),0 0 0 1px rgba(0,224,208,.08)!important}
+
     .card{position:relative;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:visible;cursor:pointer;text-decoration:none;color:var(--text);display:flex;flex-direction:column;width:100%;transform-style:preserve-3d;transition:transform .15s ease-out,box-shadow .3s}
     .card:hover{box-shadow:0 20px 60px rgba(0,0,0,.35)}
-    .card:active{transition-duration:.08s}
     .card__inner{position:relative;border-radius:14px;overflow:hidden;flex:1;display:flex;flex-direction:column}
 
-    /* Border glow — sits behind the card */
     .card__border{position:absolute;inset:-2px;border-radius:16px;opacity:0;transition:opacity .3s;background:radial-gradient(350px circle at var(--sx,50%) var(--sy,50%),rgba(0,224,208,.6),rgba(0,224,208,.15) 30%,transparent 60%);z-index:-1}
     .card:hover .card__border{opacity:1}
 
-    /* Specular highlight */
     .card__shine{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(350px circle at var(--sx,50%) var(--sy,50%),rgba(255,255,255,.1),rgba(255,255,255,.02) 35%,transparent 55%);mix-blend-mode:screen}
     .card:hover .card__shine{opacity:1}
 
-    /* Glossy surface reflection — light sweep */
     .card__reflect{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .4s;overflow:hidden;border-radius:14px}
     .card__reflect::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(var(--ref-angle,225deg),transparent 0%,transparent 35%,rgba(255,255,255,.01) 40%,rgba(255,255,255,.04) 43%,rgba(200,230,255,.08) 45%,rgba(255,255,255,.14) 47%,rgba(255,255,255,.08) 49%,rgba(200,240,255,.04) 51%,rgba(255,255,255,.01) 54%,transparent 58%,transparent 100%);transform:translateX(var(--ref-x,0%)) translateY(var(--ref-y,0%))}
     .card:hover .card__reflect{opacity:1}
 
-    /* Cyan edge glow */
     .card__glow{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(400px circle at var(--sx,50%) var(--sy,50%),rgba(0,224,208,.05),transparent 45%);border-radius:14px}
     .card:hover .card__glow{opacity:1}
 
@@ -72,7 +83,6 @@
     .card__img img{width:100%;height:100%;object-fit:cover;display:block}
     .card__img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#111114,#1a1a1e)}
     .card__img-ph svg{width:36px;height:36px;stroke:var(--text-muted);fill:none;stroke-width:1.2;opacity:.3}
-
     .card__badge{position:absolute;top:12px;right:12px;z-index:6;padding:4px 12px;font-family:var(--mono);font-size:.58rem;letter-spacing:.07em;text-transform:uppercase;background:rgba(8,8,14,.75);color:var(--cyan);border:1px solid rgba(0,224,208,.12);border-radius:20px;backdrop-filter:blur(10px)}
 
     .card__body{padding:22px 22px 20px;position:relative;z-index:1;flex:1;display:flex;flex-direction:column}
@@ -80,25 +90,20 @@
     .card__title{font-size:1.05rem;font-weight:600;letter-spacing:-.02em;margin-bottom:8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .card__desc{font-size:.84rem;color:var(--text-dim);font-weight:300;line-height:1.7;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 
-    /* ── Stagger ── */
     .card-wrap{opacity:0;transform:translateY(20px);animation:cardIn .5s var(--ease) both}
     @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
-    .card-wrap:nth-child(1){animation-delay:.05s}
-    .card-wrap:nth-child(2){animation-delay:.12s}
-    .card-wrap:nth-child(3){animation-delay:.19s}
-    .card-wrap:nth-child(4){animation-delay:.26s}
-    .card-wrap:nth-child(5){animation-delay:.33s}
-    .card-wrap:nth-child(6){animation-delay:.4s}
+    .card-wrap:nth-child(1){animation-delay:.05s}.card-wrap:nth-child(2){animation-delay:.12s}.card-wrap:nth-child(3){animation-delay:.19s}
+    .card-wrap:nth-child(4){animation-delay:.26s}.card-wrap:nth-child(5){animation-delay:.33s}.card-wrap:nth-child(6){animation-delay:.4s}
+    .grid.no-anim .card-wrap{animation:none!important;opacity:1!important;transform:none!important}
+    .grid.no-anim .card-wrap.drag-src{opacity:.15!important}
 
-    /* ── Footer ── */
     .footer{padding:36px 40px;text-align:center;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border)}
     .footer a{color:var(--text-muted);text-decoration:none;font-family:var(--mono);font-size:.72rem;transition:color .3s}
     .footer a:hover{color:var(--cyan)}
 
     @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:600px){
-      .main{padding:110px 24px 60px}
-      .nav{padding:16px 24px}
+      .main{padding:110px 24px 60px}.nav{padding:16px 24px}
       .nav__links{gap:20px}.nav__links a{font-size:.68rem}
       .grid{grid-template-columns:1fr;gap:18px}
       .tabs{flex-direction:column;max-width:100%}
@@ -126,8 +131,8 @@
 
   <div class="main">
     <p class="page__label">02 — Progetti</p>
-    <h1 class="page__title">Progetti AI</h1>
-    <p class="page__desc">Una selezione dei miei lavori: percorsi di formazione, strumenti costruiti con l'AI e articoli di approfondimento.</p>
+    <h1 class="page__title" id="page-title">Formazione AI</h1>
+    <p class="page__desc" id="page-desc">Corsi per aziende, workshop e materiali didattici per imparare a usare l'Intelligenza Artificiale in modo pratico e consapevole.</p>
 
     <div class="tabs">
       <button class="tab active" data-cat="formazione">Formazione</button>
@@ -137,85 +142,82 @@
 
     <!-- ═══════ FORMAZIONE ═══════ -->
     <div class="cat-section active" data-section="formazione">
-      <div class="grid" id="grid-formazione">
-
-        <div class="card-wrap"><a href="#" class="card">
+      <div class="grid-toolbar"><button class="reset-btn" data-grid="formazione"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Ordine predefinito</button></div>
+      <div class="grid" id="grid-formazione" data-sortable="true">
+        <div class="card-wrap" data-id="f1"><a href="#" class="card">
           <div class="card__border"></div>
           <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
           <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
           <div class="card__body"><div class="card__tag">Corso completo</div><div class="card__title">Dall'AI Generativa agli Agenti Autonomi</div><div class="card__desc">Un percorso che porta i partecipanti dalla comprensione degli LLM alla creazione di agenti AI semi-autonomi con esercitazioni pratiche.</div></div>
         </div></a></div>
 
-        <div class="card-wrap"><a href="#" class="card">
+        <div class="card-wrap" data-id="f2"><a href="#" class="card">
           <div class="card__border"></div>
           <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
           <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
           <div class="card__body"><div class="card__tag">Workshop</div><div class="card__title">Prompt Engineering Masterclass</div><div class="card__desc">Workshop intensivo sulle tecniche avanzate di prompt engineering: chain-of-thought, few-shot, context management.</div></div>
         </div></a></div>
 
-        <div class="card-wrap"><a href="#" class="card">
+        <div class="card-wrap" data-id="f3"><a href="#" class="card">
           <div class="card__border"></div>
           <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
           <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
           <div class="card__body"><div class="card__tag">Formazione aziendale</div><div class="card__title">AI per Team Non-Tecnici</div><div class="card__desc">Percorso su misura per team commerciali, HR e amministrativi che vogliono integrare l'AI nelle attività quotidiane.</div></div>
         </div></a></div>
-
       </div>
     </div>
 
     <!-- ═══════ STRUMENTI ═══════ -->
     <div class="cat-section" data-section="strumenti">
-      <div class="grid" id="grid-strumenti">
-
-        <div class="card-wrap"><a href="#" class="card">
+      <div class="grid-toolbar"><button class="reset-btn" data-grid="strumenti"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Ordine predefinito</button></div>
+      <div class="grid" id="grid-strumenti" data-sortable="true">
+        <div class="card-wrap" data-id="s1"><a href="#" class="card">
           <div class="card__border"></div>
           <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
           <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
           <div class="card__body"><div class="card__tag">Web App</div><div class="card__title">Dashboard Analytics con AI</div><div class="card__desc">Pannello di monitoraggio in tempo reale con analisi predittiva e generazione automatica di report.</div></div>
         </div></a></div>
 
-        <div class="card-wrap"><a href="#" class="card">
+        <div class="card-wrap" data-id="s2"><a href="#" class="card">
           <div class="card__border"></div>
           <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
           <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
           <div class="card__body"><div class="card__tag">Automazione</div><div class="card__title">Email Classifier AI</div><div class="card__desc">Sistema intelligente che classifica, prioritizza e pre-risponde alle email in arrivo basandosi sul contesto aziendale.</div></div>
         </div></a></div>
 
-        <div class="card-wrap"><a href="#" class="card">
+        <div class="card-wrap" data-id="s3"><a href="#" class="card">
           <div class="card__border"></div>
           <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
           <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
           <div class="card__body"><div class="card__tag">Esperimento</div><div class="card__title">Neural Network Trainer</div><div class="card__desc">Applicazione interattiva per addestrare una rete neurale a riconoscere cifre disegnate a mano — direttamente dal browser.</div></div>
         </div></a></div>
-
       </div>
     </div>
 
     <!-- ═══════ ARTICOLI ═══════ -->
     <div class="cat-section" data-section="articoli">
+      <div class="grid-toolbar"></div>
       <div class="grid" id="grid-articoli">
-
-        <div class="card-wrap"><a href="#" class="card">
+        <div class="card-wrap" data-id="a1"><a href="#" class="card">
           <div class="card__border"></div>
           <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
           <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
           <div class="card__body"><div class="card__tag">Guida</div><div class="card__title">AI nel 2026: Lo Stato dell'Arte</div><div class="card__desc">Un'analisi su dove si trova l'Intelligenza Artificiale oggi, cosa è cambiato e dove stiamo andando.</div></div>
         </div></a></div>
 
-        <div class="card-wrap"><a href="#" class="card">
+        <div class="card-wrap" data-id="a2"><a href="#" class="card">
           <div class="card__border"></div>
           <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
           <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
           <div class="card__body"><div class="card__tag">Articolo</div><div class="card__title">Perché Ogni Azienda Ha Bisogno di una Strategia AI</div><div class="card__desc">Non è questione di se, ma di quando. Come preparare la tua azienda alla trasformazione AI.</div></div>
         </div></a></div>
 
-        <div class="card-wrap"><a href="#" class="card">
+        <div class="card-wrap" data-id="a3"><a href="#" class="card">
           <div class="card__border"></div>
           <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
           <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
           <div class="card__body"><div class="card__tag">Tutorial</div><div class="card__title">Vibe Coding: Creare Software Senza Codice</div><div class="card__desc">Guida passo-passo per costruire i propri strumenti usando il linguaggio naturale.</div></div>
         </div></a></div>
-
       </div>
     </div>
 
@@ -230,33 +232,251 @@
   (function(){
     'use strict';
 
-    /* ── Tab switching ── */
+    /* ═══════════ Hero data ═══════════ */
+    const heroData = {
+      formazione: { title: 'Formazione AI', desc: 'Corsi per aziende, workshop e materiali didattici per imparare a usare l\'Intelligenza Artificiale in modo pratico e consapevole.' },
+      strumenti:  { title: 'Strumenti AI', desc: 'Dashboard, automazioni e demo tecniche costruite con l\'Intelligenza Artificiale. Soluzioni concrete per problemi reali.' },
+      articoli:   { title: 'Articoli', desc: 'Approfondimenti tecnici e guide divulgative sull\'Intelligenza Artificiale: trend, strategie, tutorial e riflessioni sul futuro.' }
+    };
+
+    const titleEl = document.getElementById('page-title');
+    const descEl = document.getElementById('page-desc');
     const tabs = document.querySelectorAll('.tab');
     const sections = document.querySelectorAll('.cat-section');
+    let activeCat = 'formazione';
 
-    function switchCat(cat) {
+    function animateText(el) {
+      el.classList.remove('pop');
+      void el.offsetHeight;
+      el.classList.add('pop');
+    }
+
+    function staggerReveal(section) {
+      const wraps = section.querySelectorAll('.card-wrap');
+      wraps.forEach((w, i) => {
+        w.style.opacity = '0';
+        w.style.transform = 'translateY(16px)';
+        w.style.transition = 'none';
+        void w.offsetHeight;
+        setTimeout(() => {
+          w.style.transition = 'opacity .4s var(--ease), transform .4s var(--ease)';
+          w.style.opacity = '1';
+          w.style.transform = 'translateY(0)';
+        }, 40 * i);
+      });
+    }
+
+    function switchCat(cat, instant) {
+      activeCat = cat;
       tabs.forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
       sections.forEach(s => {
         const isTarget = s.dataset.section === cat;
         s.classList.toggle('active', isTarget);
-        if (isTarget) {
-          s.querySelectorAll('.card-wrap').forEach(w => {
-            w.style.animation = 'none';
-            void w.offsetHeight;
-            w.style.animation = '';
-          });
-        }
+        if (isTarget && !instant) staggerReveal(s);
       });
+
+      const data = heroData[cat];
+      if (data) {
+        titleEl.textContent = data.title;
+        descEl.textContent = data.desc;
+        if (!instant) { animateText(titleEl); animateText(descEl); }
+      }
+
+      document.querySelectorAll('.reset-btn').forEach(b => {
+        const isReordered = localStorage.getItem('rb_order_' + b.dataset.grid);
+        b.classList.toggle('visible', b.dataset.grid === cat && !!isReordered);
+      });
+
       history.replaceState(null, '', '#' + cat);
     }
 
-    tabs.forEach(t => t.addEventListener('click', () => switchCat(t.dataset.cat)));
-
+    tabs.forEach(t => t.addEventListener('click', () => switchCat(t.dataset.cat, false)));
     const hash = window.location.hash.replace('#', '');
-    if (['formazione', 'strumenti', 'articoli'].includes(hash)) switchCat(hash);
+    if (['formazione', 'strumenti', 'articoli'].includes(hash)) switchCat(hash, true);
 
-    /* ── Steam-style 3D tilt + specular + reflection + border glow ── */
+    // After initial CSS animations complete, disable them permanently
+    setTimeout(() => {
+      document.querySelectorAll('.grid').forEach(g => g.classList.add('no-anim'));
+    }, 700);
+
+    /* ═══════════ Drag & Drop — Clone approach ═══════════ */
+    const sortableGrids = document.querySelectorAll('.grid[data-sortable]');
+    let isDragging = false;
+
+    function getOrder(grid) {
+      return [...grid.querySelectorAll('.card-wrap')].map(w => w.dataset.id);
+    }
+    function applyOrder(grid, order) {
+      order.forEach(id => {
+        const el = grid.querySelector(`[data-id="${id}"]`);
+        if (el) grid.appendChild(el);
+      });
+    }
+
+    // Restore saved order
+    sortableGrids.forEach(grid => {
+      const key = 'rb_order_' + grid.id.replace('grid-', '');
+      const saved = localStorage.getItem(key);
+      if (saved) { try { applyOrder(grid, JSON.parse(saved)); } catch(e) {} }
+    });
+    document.querySelectorAll('.reset-btn').forEach(b => {
+      if (localStorage.getItem('rb_order_' + b.dataset.grid) && b.dataset.grid === activeCat) b.classList.add('visible');
+    });
+
+    // FLIP animate grid children
+    function flipAnimate(grid) {
+      const items = [...grid.querySelectorAll('.card-wrap')];
+      const rects = new Map();
+      items.forEach(el => rects.set(el, el.getBoundingClientRect()));
+      return function play() {
+        items.forEach(el => {
+          const old = rects.get(el);
+          if (!old) return;
+          const cur = el.getBoundingClientRect();
+          const dx = old.left - cur.left, dy = old.top - cur.top;
+          if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+          el.style.transition = 'none';
+          el.style.transform = `translate(${dx}px,${dy}px)`;
+          void el.offsetHeight;
+          el.style.transition = 'transform .25s cubic-bezier(.16,1,.3,1)';
+          el.style.transform = '';
+          setTimeout(() => { el.style.transition = ''; }, 280);
+        });
+      };
+    }
+
+    sortableGrids.forEach(grid => {
+      const gridName = grid.id.replace('grid-', '');
+
+      grid.querySelectorAll('.card-wrap').forEach(wrap => {
+        wrap.classList.add('sortable');
+
+        wrap.addEventListener('pointerdown', e => {
+          if (e.button !== 0 || isDragging) return;
+          e.preventDefault(); // Critical: prevents browser link-drag
+
+          const startX = e.clientX, startY = e.clientY;
+          const rect = wrap.getBoundingClientRect();
+          const offX = e.clientX - rect.left, offY = e.clientY - rect.top;
+          let activated = false, clone = null;
+
+          function activate(ev) {
+            activated = true;
+            isDragging = true;
+
+            const card = wrap.querySelector('.card');
+            if (card) { card.style.transform = ''; card.style.transition = 'none'; }
+
+            clone = wrap.cloneNode(true);
+            clone.className = 'card-wrap drag-clone';
+            clone.style.width = rect.width + 'px';
+            clone.style.height = rect.height + 'px';
+            clone.style.perspective = '800px';
+            clone.style.left = (ev.clientX - offX) + 'px';
+            clone.style.top = (ev.clientY - offY) + 'px';
+            document.body.appendChild(clone);
+            requestAnimationFrame(() => clone.classList.add('visible'));
+            wrap.classList.add('drag-src');
+          }
+
+          function onMove(ev) {
+            if (!activated) {
+              if (Math.hypot(ev.clientX - startX, ev.clientY - startY) >= 6) activate(ev);
+              else return;
+            }
+
+            clone.style.left = (ev.clientX - offX) + 'px';
+            clone.style.top = (ev.clientY - offY) + 'px';
+
+            const siblings = [...grid.querySelectorAll('.card-wrap:not(.drag-src)')];
+            let target = null;
+            for (const sib of siblings) {
+              const r = sib.getBoundingClientRect();
+              if (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom) {
+                target = sib; break;
+              }
+            }
+
+            if (target) {
+              const items = [...grid.querySelectorAll('.card-wrap')];
+              const srcIdx = items.indexOf(wrap);
+              const tgtIdx = items.indexOf(target);
+              if (srcIdx !== tgtIdx) {
+                const anim = flipAnimate(grid);
+                if (srcIdx < tgtIdx) grid.insertBefore(wrap, target.nextSibling);
+                else grid.insertBefore(wrap, target);
+                anim();
+              }
+            }
+          }
+
+          function onUp() {
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+
+            if (!activated) {
+              isDragging = false;
+              // Simulate click — navigate to card link
+              const link = wrap.querySelector('a.card');
+              if (link && link.href && link.getAttribute('href') !== '#') {
+                window.location.href = link.href;
+              }
+              return;
+            }
+
+            const finalRect = wrap.getBoundingClientRect();
+            clone.style.transition = 'left .25s cubic-bezier(.16,1,.3,1), top .25s cubic-bezier(.16,1,.3,1), opacity .25s';
+            clone.style.left = finalRect.left + 'px';
+            clone.style.top = finalRect.top + 'px';
+
+            setTimeout(() => {
+              clone.classList.remove('visible');
+              setTimeout(() => {
+                if (clone.parentNode) clone.remove();
+                wrap.classList.remove('drag-src');
+                const card = wrap.querySelector('.card');
+                if (card) { card.style.transform = ''; card.style.transition = ''; }
+                localStorage.setItem('rb_order_' + gridName, JSON.stringify(getOrder(grid)));
+                const btn = document.querySelector(`.reset-btn[data-grid="${gridName}"]`);
+                if (btn) btn.classList.add('visible');
+                isDragging = false;
+              }, 180);
+            }, 250);
+          }
+
+          window.addEventListener('pointermove', onMove);
+          window.addEventListener('pointerup', onUp);
+        });
+      });
+    });
+
+    // Reset buttons
+    document.querySelectorAll('.reset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const gridName = btn.dataset.grid;
+        const grid = document.getElementById('grid-' + gridName);
+        localStorage.removeItem('rb_order_' + gridName);
+        btn.classList.remove('visible');
+
+        // Restore default order (sorted by data-id)
+        const wraps = [...grid.querySelectorAll('.card-wrap')];
+        wraps.sort((a, b) => a.dataset.id.localeCompare(b.dataset.id));
+        wraps.forEach(w => grid.appendChild(w));
+
+        // Re-trigger animations
+        wraps.forEach(w => {
+          w.style.animation = 'none'; void w.offsetHeight; w.style.animation = '';
+        });
+      });
+    });
+
+    /* ═══════════ 3D tilt ═══════════ */
     const MAX_TILT = 12;
+
+    // Prevent card link clicks during/after drag
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', e => { if (isDragging) e.preventDefault(); });
+    });
 
     document.querySelectorAll('.card').forEach(card => {
       const shine = card.querySelector('.card__shine');
@@ -265,41 +485,25 @@
       const border = card.querySelector('.card__border');
 
       card.addEventListener('mousemove', e => {
+        if (isDragging) return;
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        const w = rect.width;
-        const h = rect.height;
-        const cx = w / 2;
-        const cy = h / 2;
-
-        // Normalized -1 to 1
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
         const nx = (x - cx) / cx;
         const ny = (y - cy) / cy;
 
-        // 3D tilt
-        const rotY = nx * MAX_TILT;
-        const rotX = -ny * MAX_TILT;
-        card.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
+        card.style.transform = `rotateX(${-ny * MAX_TILT}deg) rotateY(${nx * MAX_TILT}deg) scale(1.02)`;
 
-        // Specular + glow follow mouse
-        const vars = [[shine,'--sx','--sy'],[glow,'--sx','--sy'],[border,'--sx','--sy']];
-        vars.forEach(([el,px,py]) => {
-          if (!el) return;
-          el.style.setProperty(px, x + 'px');
-          el.style.setProperty(py, y + 'px');
+        [shine, glow, border].forEach(el => {
+          if (el) { el.style.setProperty('--sx', x + 'px'); el.style.setProperty('--sy', y + 'px'); }
         });
 
-        // Glossy reflection — sweeps across based on mouse position
         if (reflect) {
-          // Reflection moves opposite to mouse (like real light on tilted surface)
-          const refX = -nx * 25;
-          const refY = -ny * 25;
-          // Angle follows mouse diagonal
-          const angle = 225 + nx * 15 + ny * 10;
-          reflect.style.setProperty('--ref-x', refX + '%');
-          reflect.style.setProperty('--ref-y', refY + '%');
-          reflect.style.setProperty('--ref-angle', angle + 'deg');
+          reflect.style.setProperty('--ref-x', (-nx * 25) + '%');
+          reflect.style.setProperty('--ref-y', (-ny * 25) + '%');
+          reflect.style.setProperty('--ref-angle', (225 + nx * 15 + ny * 10) + 'deg');
         }
       });
 
@@ -308,6 +512,7 @@
       });
 
       card.addEventListener('mousedown', () => {
+        if (isDragging) return;
         const t = card.style.transform;
         card.style.transition = 'transform .08s ease';
         card.style.transform = t.replace('scale(1.02)', 'scale(.98)');
