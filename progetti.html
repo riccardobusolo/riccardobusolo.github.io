@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progetti AI — Riccardo Busolo</title>
+  <meta name="description" content="Portfolio progetti AI di Riccardo Busolo: formazione, strumenti e articoli sull'Intelligenza Artificiale.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#08080e;--bg-card:#151518;--bg-card-hover:#1c1c20;--border:rgba(180,180,190,.08);--border-hover:rgba(180,180,190,.2);--text:#e6e6ea;--text-dim:#9a9a9e;--text-muted:#7a7a8e;--cyan:#00e0d0;--cyan-glow:rgba(0,224,208,.3);--cyan-subtle:rgba(0,224,208,.06);--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+    /* ── Nav ── */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;padding:20px 40px;background:rgba(10,10,14,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+    .nav__inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:1100px}
+    .nav__logo{text-decoration:none;display:flex;align-items:center;transition:scale .3s var(--ease)}
+    .nav__logo:hover{scale:1.08}
+    .nav__logo:active{scale:.94;transition-duration:.1s}
+    .nav__links{display:flex;gap:32px;list-style:none}
+    .nav__links a{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-decoration:none;transition:color .3s}
+    .nav__links a:hover{color:var(--cyan)}
+
+    /* ── Main ── */
+    .main{max-width:1100px;margin:0 auto;padding:130px 40px 80px}
+
+    .page__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:12px}
+    .page__title{font-size:clamp(2rem,4.5vw,3rem);font-weight:800;letter-spacing:-.04em;margin-bottom:16px}
+    .page__desc{font-size:1.02rem;color:var(--text-dim);font-weight:300;max-width:520px;margin-bottom:40px}
+
+    /* ── Tabs (policy-style) ── */
+    .tabs{display:flex;gap:4px;margin:0 auto 48px;background:var(--bg-card);border-radius:10px;padding:4px;border:1px solid var(--border);max-width:520px}
+    .tab{flex:1;padding:12px 20px;font-family:var(--mono);font-size:.78rem;font-weight:500;letter-spacing:.03em;text-align:center;border-radius:7px;cursor:pointer;border:none;background:transparent;color:var(--text-muted);transition:all .3s var(--ease)}
+    .tab:hover{color:var(--text)}
+    .tab.active{background:rgba(0,224,208,.08);color:var(--cyan);box-shadow:0 2px 12px rgba(0,224,208,.06)}
+
+    /* ── Sections ── */
+    .cat-section{display:none}
+    .cat-section.active{display:block}
+
+    /* ── Card grid ── */
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+
+    /* ── 3D Card ── */
+    .card-wrap{perspective:800px}
+    .card{position:relative;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:visible;cursor:pointer;text-decoration:none;color:var(--text);display:block;transform-style:preserve-3d;transition:transform .15s ease-out,box-shadow .3s}
+    .card:hover{box-shadow:0 20px 60px rgba(0,0,0,.35)}
+    .card:active{transition-duration:.08s}
+    .card__inner{position:relative;border-radius:14px;overflow:hidden}
+
+    /* Border glow — sits behind the card */
+    .card__border{position:absolute;inset:-2px;border-radius:16px;opacity:0;transition:opacity .3s;background:radial-gradient(350px circle at var(--sx,50%) var(--sy,50%),rgba(0,224,208,.6),rgba(0,224,208,.15) 30%,transparent 60%);z-index:-1}
+    .card:hover .card__border{opacity:1}
+
+    /* Specular highlight */
+    .card__shine{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(350px circle at var(--sx,50%) var(--sy,50%),rgba(255,255,255,.1),rgba(255,255,255,.02) 35%,transparent 55%);mix-blend-mode:screen}
+    .card:hover .card__shine{opacity:1}
+
+    /* Oblique reflection band */
+    .card__reflect{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .3s;overflow:hidden;border-radius:14px}
+    .card__reflect::before{content:'';position:absolute;width:200%;height:200%;top:var(--ry,-50%);left:var(--rx,-50%);background:linear-gradient(135deg,transparent 38%,rgba(255,255,255,.06) 42%,rgba(255,255,255,.1) 45%,rgba(255,255,255,.06) 48%,transparent 52%);transform:rotate(0deg)}
+    .card:hover .card__reflect{opacity:1}
+
+    /* Cyan edge glow */
+    .card__glow{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(400px circle at var(--sx,50%) var(--sy,50%),rgba(0,224,208,.05),transparent 45%);border-radius:14px}
+    .card:hover .card__glow{opacity:1}
+
+    .card__img{width:100%;aspect-ratio:16/10;overflow:hidden;background:#111114;position:relative;z-index:1}
+    .card__img img{width:100%;height:100%;object-fit:cover;display:block}
+    .card__img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#111114,#1a1a1e)}
+    .card__img-ph svg{width:36px;height:36px;stroke:var(--text-muted);fill:none;stroke-width:1.2;opacity:.3}
+
+    .card__badge{position:absolute;top:12px;right:12px;z-index:6;padding:4px 12px;font-family:var(--mono);font-size:.58rem;letter-spacing:.07em;text-transform:uppercase;background:rgba(8,8,14,.75);color:var(--cyan);border:1px solid rgba(0,224,208,.12);border-radius:20px;backdrop-filter:blur(10px)}
+
+    .card__body{padding:22px 22px 20px;position:relative;z-index:1}
+    .card__tag{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:8px;opacity:.7}
+    .card__title{font-size:1.05rem;font-weight:600;letter-spacing:-.02em;margin-bottom:8px;line-height:1.35}
+    .card__desc{font-size:.84rem;color:var(--text-dim);font-weight:300;line-height:1.7}
+
+    /* ── Stagger ── */
+    .card-wrap{opacity:0;transform:translateY(20px);animation:cardIn .5s var(--ease) both}
+    @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+    .card-wrap:nth-child(1){animation-delay:.05s}
+    .card-wrap:nth-child(2){animation-delay:.12s}
+    .card-wrap:nth-child(3){animation-delay:.19s}
+    .card-wrap:nth-child(4){animation-delay:.26s}
+    .card-wrap:nth-child(5){animation-delay:.33s}
+    .card-wrap:nth-child(6){animation-delay:.4s}
+
+    /* ── Footer ── */
+    .footer{padding:36px 40px;text-align:center;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border)}
+    .footer a{color:var(--text-muted);text-decoration:none;font-family:var(--mono);font-size:.72rem;transition:color .3s}
+    .footer a:hover{color:var(--cyan)}
+
+    @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){
+      .main{padding:110px 24px 60px}
+      .nav{padding:16px 24px}
+      .nav__links{gap:20px}.nav__links a{font-size:.68rem}
+      .grid{grid-template-columns:1fr;gap:18px}
+      .tabs{flex-direction:column;max-width:100%}
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav"><div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <svg height="32" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
+      </svg>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html#servizi">Servizi</a></li>
+      <li><a href="index.html#progetti">Progetti</a></li>
+      <li><a href="index.html#risorse">Risorse</a></li>
+      <li><a href="index.html#contatti">Contatti</a></li>
+    </ul>
+  </div></nav>
+
+  <div class="main">
+    <p class="page__label">02 — Progetti</p>
+    <h1 class="page__title">Progetti AI</h1>
+    <p class="page__desc">Una selezione dei miei lavori: percorsi di formazione, strumenti costruiti con l'AI e articoli di approfondimento.</p>
+
+    <div class="tabs">
+      <button class="tab active" data-cat="formazione">Formazione</button>
+      <button class="tab" data-cat="strumenti">Strumenti</button>
+      <button class="tab" data-cat="articoli">Articoli</button>
+    </div>
+
+    <!-- ═══════ FORMAZIONE ═══════ -->
+    <div class="cat-section active" data-section="formazione">
+      <div class="grid" id="grid-formazione">
+
+        <div class="card-wrap"><a href="#" class="card">
+          <div class="card__border"></div>
+          <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
+          <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
+          <div class="card__body"><div class="card__tag">Corso completo</div><div class="card__title">Dall'AI Generativa agli Agenti Autonomi</div><div class="card__desc">Un percorso che porta i partecipanti dalla comprensione degli LLM alla creazione di agenti AI semi-autonomi con esercitazioni pratiche.</div></div>
+        </div></a></div>
+
+        <div class="card-wrap"><a href="#" class="card">
+          <div class="card__border"></div>
+          <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
+          <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
+          <div class="card__body"><div class="card__tag">Workshop</div><div class="card__title">Prompt Engineering Masterclass</div><div class="card__desc">Workshop intensivo sulle tecniche avanzate di prompt engineering: chain-of-thought, few-shot, context management.</div></div>
+        </div></a></div>
+
+        <div class="card-wrap"><a href="#" class="card">
+          <div class="card__border"></div>
+          <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
+          <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
+          <div class="card__body"><div class="card__tag">Formazione aziendale</div><div class="card__title">AI per Team Non-Tecnici</div><div class="card__desc">Percorso su misura per team commerciali, HR e amministrativi che vogliono integrare l'AI nelle attività quotidiane.</div></div>
+        </div></a></div>
+
+      </div>
+    </div>
+
+    <!-- ═══════ STRUMENTI ═══════ -->
+    <div class="cat-section" data-section="strumenti">
+      <div class="grid" id="grid-strumenti">
+
+        <div class="card-wrap"><a href="#" class="card">
+          <div class="card__border"></div>
+          <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
+          <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
+          <div class="card__body"><div class="card__tag">Web App</div><div class="card__title">Dashboard Analytics con AI</div><div class="card__desc">Pannello di monitoraggio in tempo reale con analisi predittiva e generazione automatica di report.</div></div>
+        </div></a></div>
+
+        <div class="card-wrap"><a href="#" class="card">
+          <div class="card__border"></div>
+          <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
+          <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
+          <div class="card__body"><div class="card__tag">Automazione</div><div class="card__title">Email Classifier AI</div><div class="card__desc">Sistema intelligente che classifica, prioritizza e pre-risponde alle email in arrivo basandosi sul contesto aziendale.</div></div>
+        </div></a></div>
+
+        <div class="card-wrap"><a href="#" class="card">
+          <div class="card__border"></div>
+          <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
+          <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
+          <div class="card__body"><div class="card__tag">Esperimento</div><div class="card__title">Neural Network Trainer</div><div class="card__desc">Applicazione interattiva per addestrare una rete neurale a riconoscere cifre disegnate a mano — direttamente dal browser.</div></div>
+        </div></a></div>
+
+      </div>
+    </div>
+
+    <!-- ═══════ ARTICOLI ═══════ -->
+    <div class="cat-section" data-section="articoli">
+      <div class="grid" id="grid-articoli">
+
+        <div class="card-wrap"><a href="#" class="card">
+          <div class="card__border"></div>
+          <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
+          <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
+          <div class="card__body"><div class="card__tag">Guida</div><div class="card__title">AI nel 2026: Lo Stato dell'Arte</div><div class="card__desc">Un'analisi su dove si trova l'Intelligenza Artificiale oggi, cosa è cambiato e dove stiamo andando.</div></div>
+        </div></a></div>
+
+        <div class="card-wrap"><a href="#" class="card">
+          <div class="card__border"></div>
+          <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
+          <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
+          <div class="card__body"><div class="card__tag">Articolo</div><div class="card__title">Perché Ogni Azienda Ha Bisogno di una Strategia AI</div><div class="card__desc">Non è questione di se, ma di quando. Come preparare la tua azienda alla trasformazione AI.</div></div>
+        </div></a></div>
+
+        <div class="card-wrap"><a href="#" class="card">
+          <div class="card__border"></div>
+          <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
+          <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
+          <div class="card__body"><div class="card__tag">Tutorial</div><div class="card__title">Vibe Coding: Creare Software Senza Codice</div><div class="card__desc">Guida passo-passo per costruire i propri strumenti usando il linguaggio naturale.</div></div>
+        </div></a></div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div>&copy; 2026 Riccardo Busolo — AI Consultant</div>
+    <div style="margin-top:10px"><a href="index.html">Torna al sito</a></div>
+  </footer>
+
+  <script>
+  (function(){
+    'use strict';
+
+    /* ── Tab switching ── */
+    const tabs = document.querySelectorAll('.tab');
+    const sections = document.querySelectorAll('.cat-section');
+
+    function switchCat(cat) {
+      tabs.forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
+      sections.forEach(s => {
+        const isTarget = s.dataset.section === cat;
+        s.classList.toggle('active', isTarget);
+        if (isTarget) {
+          s.querySelectorAll('.card-wrap').forEach(w => {
+            w.style.animation = 'none';
+            void w.offsetHeight;
+            w.style.animation = '';
+          });
+        }
+      });
+      history.replaceState(null, '', '#' + cat);
+    }
+
+    tabs.forEach(t => t.addEventListener('click', () => switchCat(t.dataset.cat)));
+
+    const hash = window.location.hash.replace('#', '');
+    if (['formazione', 'strumenti', 'articoli'].includes(hash)) switchCat(hash);
+
+    /* ── Steam-style 3D tilt + specular + reflection + border glow ── */
+    const MAX_TILT = 12;
+
+    document.querySelectorAll('.card').forEach(card => {
+      const shine = card.querySelector('.card__shine');
+      const glow = card.querySelector('.card__glow');
+      const reflect = card.querySelector('.card__reflect');
+      const border = card.querySelector('.card__border');
+
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const w = rect.width;
+        const h = rect.height;
+        const cx = w / 2;
+        const cy = h / 2;
+
+        // Normalized -1 to 1
+        const nx = (x - cx) / cx;
+        const ny = (y - cy) / cy;
+
+        // 3D tilt
+        const rotY = nx * MAX_TILT;
+        const rotX = -ny * MAX_TILT;
+        card.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
+
+        // Specular + glow follow mouse
+        const vars = [[shine,'--sx','--sy'],[glow,'--sx','--sy'],[border,'--sx','--sy']];
+        vars.forEach(([el,px,py]) => {
+          if (!el) return;
+          el.style.setProperty(px, x + 'px');
+          el.style.setProperty(py, y + 'px');
+        });
+
+        // Oblique reflection band — moves opposite to tilt
+        if (reflect) {
+          const rx = -nx * 30 - 50;
+          const ry = -ny * 30 - 50;
+          reflect.style.setProperty('--rx', rx + '%');
+          reflect.style.setProperty('--ry', ry + '%');
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+      });
+
+      card.addEventListener('mousedown', () => {
+        const t = card.style.transform;
+        card.style.transition = 'transform .08s ease';
+        card.style.transform = t.replace('scale(1.02)', 'scale(.98)');
+      });
+      card.addEventListener('mouseup', () => {
+        card.style.transition = 'transform .15s ease-out';
+      });
+    });
+
+  })();
+  </script>
+</body>
+</html>
