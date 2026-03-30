@@ -1,1 +1,576 @@
 
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Come Ragiona un LLM — Riccardo Busolo</title>
+  <meta name="description" content="Come funziona un Large Language Model? Tokenizzazione, embeddings, attention e transformer spiegati visivamente con infografiche interattive.">
+  <link rel="canonical" href="https://riccardobusolo.com/articoli/come-ragiona-un-llm/">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#08080e;--bg-card:#12121a;--bg-raised:#191920;--border:rgba(180,180,190,.08);--text:#e0e0e6;--text-dim:#9a9a9e;--text-muted:#6a6a74;--cyan:#00e0d0;--cyan-dim:rgba(0,224,208,.08);--cyan-border:rgba(0,224,208,.15);--orange:#ff8844;--purple:#a78bfa;--pink:#f472b6;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1);--article-w:720px}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.85;-webkit-font-smoothing:antialiased;font-weight:300}
+
+    /* ── Nav ── */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;padding:20px 40px;background:rgba(10,10,14,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+    .nav__inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:900px}
+    .nav__logo{text-decoration:none;display:flex;align-items:center;transition:scale .3s var(--ease)}
+    .nav__logo:hover{scale:1.08}.nav__logo:active{scale:.94;transition-duration:.1s}
+    .nav__links{display:flex;gap:32px;list-style:none}
+    .nav__links a{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-decoration:none;transition:color .3s}
+    .nav__links a:hover{color:var(--cyan)}
+
+    /* ── Back button (sticky, left of content) ── */
+    .back{position:fixed;left:max(24px,calc((100vw - var(--article-w)) / 2 - 160px));top:120px;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.7rem;color:var(--text-muted);text-decoration:none!important;transition:all .3s var(--ease);letter-spacing:.03em;border:none!important;padding:10px 16px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border)!important;z-index:40;white-space:nowrap}
+    .back:hover{color:var(--cyan);border-color:var(--cyan-border)!important;background:rgba(0,224,208,.06)}
+    .back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .3s var(--ease);flex-shrink:0}
+    .back:hover svg{transform:translateX(-3px)}
+
+    /* ── Article layout ── */
+    .article{max-width:var(--article-w);margin:0 auto;padding:120px 32px 80px}
+    .article__tag{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:16px}
+    .article__title{font-size:clamp(2rem,5vw,2.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:20px}
+    .article__subtitle{font-size:1.05rem;color:var(--text-dim);font-weight:300;line-height:1.7;margin-bottom:20px}
+    .article__meta{display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:.7rem;color:var(--text-muted);margin-bottom:36px;flex-wrap:wrap}
+    .article__meta span{display:flex;align-items:center;gap:5px}
+    .article__meta svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+
+    /* ── Divider ── */
+    .divider{width:40px;height:2px;background:linear-gradient(90deg,var(--cyan),transparent);margin:48px 0 48px;border:none}
+
+    /* ── TLDR ── */
+    .tldr{background:var(--cyan-dim);border:1px solid var(--cyan-border);border-radius:12px;padding:24px 28px;margin-bottom:48px}
+    .tldr__label{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:10px;font-weight:600}
+    .tldr p{font-size:.92rem;color:var(--text-dim);line-height:1.8;margin:0}
+
+    /* ── TOC ── */
+    .toc{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:48px}
+    .toc__title{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:14px}
+    .toc__list{list-style:none;display:flex;flex-direction:column;gap:8px}
+    .toc__list a{font-size:.88rem;color:var(--text-dim);text-decoration:none;transition:color .3s;display:flex;align-items:center;gap:8px;border:none!important}
+    .toc__list a::before{content:'';width:6px;height:1px;background:var(--text-muted);transition:width .3s,background .3s;flex-shrink:0}
+    .toc__list a:hover{color:var(--cyan)}
+    .toc__list a:hover::before{width:16px;background:var(--cyan)}
+
+    /* ── Content ── */
+    .article h2{font-size:1.6rem;font-weight:700;letter-spacing:-.03em;margin:0 0 20px;padding-top:0}
+    .article h3{font-size:1.15rem;font-weight:600;margin:32px 0 12px}
+    .article p{margin-bottom:20px;font-size:1rem;color:var(--text-dim)}
+    .article strong{color:var(--text);font-weight:600}
+    .article a:not(.back):not(.toc__list a):not(.cta-box__btn){color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,224,208,.2);transition:border-color .3s}
+    .article a:not(.back):not(.toc__list a):not(.cta-box__btn):hover{border-color:var(--cyan)}
+
+    /* ── Infobox ── */
+    .infobox{background:var(--bg-card);border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;padding:20px 24px;margin:28px 0;font-size:.9rem}
+    .infobox__label{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:8px}
+    .infobox p{color:var(--text-dim);margin-bottom:0}
+
+    code{font-family:var(--mono);font-size:.82em;background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--orange)}
+
+    /* ══════════════════════════════════
+       INTERACTIVE INFOGRAPHICS
+       ══════════════════════════════════ */
+    .infographic{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:32px;margin:32px 0;overflow:hidden}
+    .infographic__title{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:20px;text-align:center}
+
+    /* ── 1. TOKENIZATION ── */
+    .tok{text-align:center}
+    .tok__sentence{font-size:1.1rem;color:var(--text-dim);margin-bottom:24px;font-style:italic}
+    .tok__arrow{color:var(--text-muted);margin-bottom:20px;font-size:1.4rem}
+    .tok__tokens{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+    .tok__t{padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:.82rem;font-weight:500;animation:tokPop .4s var(--ease) both;border:1px solid transparent}
+    .tok__t:nth-child(1){background:rgba(0,224,208,.1);color:#00e0d0;border-color:rgba(0,224,208,.15);animation-delay:.1s}
+    .tok__t:nth-child(2){background:rgba(167,139,250,.1);color:#a78bfa;border-color:rgba(167,139,250,.15);animation-delay:.2s}
+    .tok__t:nth-child(3){background:rgba(244,114,182,.1);color:#f472b6;border-color:rgba(244,114,182,.15);animation-delay:.3s}
+    .tok__t:nth-child(4){background:rgba(255,136,68,.1);color:#ff8844;border-color:rgba(255,136,68,.15);animation-delay:.4s}
+    .tok__t:nth-child(5){background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.15);animation-delay:.5s}
+    .tok__t:nth-child(6){background:rgba(52,211,153,.1);color:#34d399;border-color:rgba(52,211,153,.15);animation-delay:.6s}
+    .tok__t:nth-child(7){background:rgba(251,191,36,.1);color:#fbbf24;border-color:rgba(251,191,36,.15);animation-delay:.7s}
+    .tok__t:nth-child(8){background:rgba(167,139,250,.1);color:#a78bfa;border-color:rgba(167,139,250,.15);animation-delay:.8s}
+    .tok__ids{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px}
+    .tok__id{font-family:var(--mono);font-size:.68rem;color:var(--text-muted);padding:4px 10px;background:var(--bg-raised);border-radius:4px;animation:tokPop .4s var(--ease) both}
+    .tok__id:nth-child(1){animation-delay:.15s}.tok__id:nth-child(2){animation-delay:.25s}.tok__id:nth-child(3){animation-delay:.35s}
+    .tok__id:nth-child(4){animation-delay:.45s}.tok__id:nth-child(5){animation-delay:.55s}.tok__id:nth-child(6){animation-delay:.65s}
+    .tok__id:nth-child(7){animation-delay:.75s}.tok__id:nth-child(8){animation-delay:.85s}
+    @keyframes tokPop{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .tok__legend{margin-top:16px;font-size:.76rem;color:var(--text-muted);text-align:center}
+
+    /* ── 2. EMBEDDINGS ── */
+    .emb{position:relative;height:340px;border:1px solid var(--border);border-radius:10px;background:var(--bg-raised);overflow:hidden}
+    .emb__axis-x,.emb__axis-y{position:absolute;color:var(--text-muted);font-family:var(--mono);font-size:.58rem;letter-spacing:.05em;text-transform:uppercase}
+    .emb__axis-x{bottom:10px;left:50%;transform:translateX(-50%)}
+    .emb__axis-y{top:50%;left:10px;transform:translateY(-50%) rotate(-90deg)}
+    .emb__dot{position:absolute;display:flex;align-items:center;gap:6px;font-size:.72rem;font-family:var(--mono);transition:transform .3s var(--ease);cursor:default}
+    .emb__dot::before{content:'';width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .emb__dot:hover{transform:scale(1.15)!important}
+    .emb__dot--food::before{background:#34d399}.emb__dot--food{color:#34d399}
+    .emb__dot--animal::before{background:#60a5fa}.emb__dot--animal{color:#60a5fa}
+    .emb__dot--vehicle::before{background:#f472b6}.emb__dot--vehicle{color:#f472b6}
+    .emb__dot--emotion::before{background:#fbbf24}.emb__dot--emotion{color:#fbbf24}
+    .emb__cloud{position:absolute;border:1px dashed;border-radius:50%;opacity:.15}
+    .emb__cloud--food{border-color:#34d399}.emb__cloud--animal{border-color:#60a5fa}.emb__cloud--vehicle{border-color:#f472b6}
+    .emb__legend{position:absolute;bottom:10px;right:14px;display:flex;gap:12px}
+    .emb__legend span{font-family:var(--mono);font-size:.58rem;display:flex;align-items:center;gap:4px}
+    .emb__legend span::before{content:'';width:6px;height:6px;border-radius:50%}
+    .emb__legend .l-food::before{background:#34d399}.emb__legend .l-animal::before{background:#60a5fa}.emb__legend .l-vehicle::before{background:#f472b6}.emb__legend .l-emotion::before{background:#fbbf24}
+
+    /* ── 3. ATTENTION (redesigned: word bars) ── */
+    .att{display:flex;flex-direction:column;gap:20px}
+    .att__prompt{font-size:.82rem;color:var(--text-muted);text-align:center;margin-bottom:4px}
+    .att__source{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:8px}
+    .att__src{padding:10px 16px;font-family:var(--mono);font-size:.82rem;border-radius:8px;cursor:pointer;transition:all .3s var(--ease);border:1px solid var(--border);background:var(--bg-raised);color:var(--text-dim);user-select:none}
+    .att__src:hover{border-color:var(--cyan-border);color:var(--text)}
+    .att__src.active{background:rgba(0,224,208,.12);border-color:var(--cyan);color:var(--cyan);font-weight:600}
+    .att__result{display:flex;flex-direction:column;gap:6px;padding:20px;background:var(--bg-raised);border-radius:10px;border:1px solid var(--border)}
+    .att__row{display:flex;align-items:center;gap:12px}
+    .att__word{font-family:var(--mono);font-size:.78rem;color:var(--text-dim);min-width:80px;text-align:right}
+    .att__bar-wrap{flex:1;height:26px;background:rgba(180,180,190,.04);border-radius:4px;overflow:hidden;position:relative}
+    .att__bar{height:100%;border-radius:4px;transition:width .5s var(--ease);min-width:2px}
+    .att__pct{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:.62rem;color:var(--text-muted)}
+    .att__row.highlight .att__word{color:var(--cyan);font-weight:600}
+    .att__row.highlight .att__bar{background:var(--cyan)!important}
+
+    /* ── 4. TRANSFORMER DIAGRAM ── */
+    .tfm{display:flex;flex-direction:column;align-items:center;gap:12px}
+    .tfm__block{padding:14px 28px;border-radius:8px;font-family:var(--mono);font-size:.76rem;font-weight:500;text-align:center;border:1px solid;min-width:220px;transition:all .3s var(--ease);cursor:default}
+    .tfm__block:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+    .tfm__block--input{background:rgba(0,224,208,.06);border-color:var(--cyan-border);color:var(--cyan)}
+    .tfm__block--emb{background:rgba(167,139,250,.06);border-color:rgba(167,139,250,.15);color:#a78bfa}
+    .tfm__block--att{background:rgba(244,114,182,.06);border-color:rgba(244,114,182,.15);color:#f472b6}
+    .tfm__block--ff{background:rgba(255,136,68,.06);border-color:rgba(255,136,68,.15);color:#ff8844}
+    .tfm__block--out{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.15);color:#34d399}
+    .tfm__arrow{color:var(--text-muted);font-size:.9rem;opacity:.5}
+    .tfm__label{font-size:.65rem;color:var(--text-muted);max-width:280px;text-align:center;line-height:1.6;margin-top:-4px}
+    .tfm__repeat{font-family:var(--mono);font-size:.62rem;color:var(--purple);border:1px dashed rgba(167,139,250,.2);border-radius:8px;padding:5px 16px;margin:4px 0}
+
+    /* ── 5. GENERATION ANIMATION ── */
+    .gen{text-align:center}
+    .gen__display{font-size:1.1rem;color:var(--text);min-height:3.5em;display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-bottom:20px;align-items:center}
+    .gen__token{display:inline-block;padding:4px 8px;border-radius:4px;animation:genIn .3s var(--ease) both}
+    .gen__token--fixed{background:transparent;color:var(--text-dim)}
+    .gen__token--new{background:rgba(0,224,208,.1);color:var(--cyan);border:1px solid var(--cyan-border)}
+    @keyframes genIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .gen__btn{padding:10px 24px;font-family:var(--mono);font-size:.78rem;background:rgba(0,224,208,.08);border:1px solid var(--cyan-border);border-radius:8px;color:var(--cyan);cursor:pointer;transition:all .3s var(--ease)}
+    .gen__btn:hover{background:rgba(0,224,208,.15)}
+    .gen__btn:active{transform:scale(.97)}
+    .gen__probs{display:flex;justify-content:center;gap:6px;margin-top:14px;flex-wrap:wrap}
+    .gen__prob{font-family:var(--mono);font-size:.68rem;padding:4px 10px;border-radius:4px;background:var(--bg-raised);color:var(--text-muted)}
+    .gen__prob--top{background:rgba(0,224,208,.1);color:var(--cyan);border:1px solid var(--cyan-border)}
+
+    /* ── CTA ── */
+    .cta-box{background:linear-gradient(135deg,rgba(0,224,208,.04),rgba(167,139,250,.04));border:1px solid var(--cyan-border);border-radius:14px;padding:36px 32px;text-align:center;margin:56px 0 20px}
+    .cta-box__title{font-size:1.2rem;font-weight:700;margin-bottom:10px}
+    .cta-box__desc{font-size:.9rem;color:var(--text-dim);margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto}
+    .cta-box__btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;font-family:var(--mono);font-size:.8rem;font-weight:500;background:var(--cyan);color:var(--bg);border-radius:6px;text-decoration:none!important;border:none!important;transition:all .3s var(--ease)}
+    .cta-box__btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,208,.3);color:var(--bg)!important}
+    .cta-box__btn:active{transform:translateY(0) scale(.97)}
+
+    /* ── Footer ── */
+    .footer{padding:36px 32px;text-align:center;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border);max-width:var(--article-w);margin:0 auto}
+    .footer a{color:var(--text-muted);text-decoration:none;font-family:var(--mono);font-size:.72rem;transition:color .3s;border:none!important}
+    .footer a:hover{color:var(--cyan)}
+
+    /* ── Responsive ── */
+    @media(max-width:960px){
+      .back{left:20px;top:80px;padding:8px 14px;font-size:.66rem}
+    }
+    @media(max-width:600px){
+      .article{padding:100px 20px 60px}
+      .nav{padding:14px 20px}.nav__links{gap:16px}.nav__links a{font-size:.62rem}
+      .article__title{font-size:1.7rem}
+      .infographic{padding:20px 16px}
+      .att__word{min-width:60px;font-size:.7rem}
+      .emb{height:280px}
+      .tfm__block{min-width:160px;padding:10px 20px;font-size:.7rem}
+      .back{left:16px;top:74px;padding:7px 12px;font-size:.62rem}
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav"><div class="nav__inner">
+    <a href="/index.html" class="nav__logo" style="display:flex;align-items:center">
+      <svg height="32" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
+      </svg>
+    </a>
+    <ul class="nav__links">
+      <li><a href="/index.html#servizi">Servizi</a></li>
+      <li><a href="/progetti.html">Progetti</a></li>
+      <li><a href="/index.html#risorse">Risorse</a></li>
+      <li><a href="/index.html#contatti">Contatti</a></li>
+    </ul>
+  </div></nav>
+
+  <a href="/progetti.html#articoli" class="back"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>Articoli</a>
+
+  <article class="article">
+
+    <div class="article__tag">Articolo</div>
+    <h1 class="article__title">Come Ragiona un LLM</h1>
+    <p class="article__subtitle">Il funzionamento dell'Intelligenza Artificiale generativa spiegato visivamente — dalla scomposizione del testo alla generazione della risposta.</p>
+    <div class="article__meta">
+      <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 12 min</span>
+      <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 2026</span>
+      <span><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Riccardo Busolo</span>
+    </div>
+
+    <!-- ═══ TLDR ═══ -->
+    <div class="tldr">
+      <div class="tldr__label">In breve</div>
+      <p>Un Large Language Model non "pensa" come un essere umano. Scompone il testo in frammenti chiamati <strong>token</strong>, li trasforma in coordinate numeriche (<strong>embeddings</strong>), usa un meccanismo chiamato <strong>attention</strong> per capire le relazioni tra le parole, e genera la risposta prevedendo un token alla volta. In questo articolo ti mostro visivamente ogni passaggio.</p>
+    </div>
+
+    <!-- ═══ TOC ═══ -->
+    <div class="toc">
+      <div class="toc__title">In questo articolo</div>
+      <ol class="toc__list">
+        <li><a href="#intro">Parli con un'AI ogni giorno. Ma sai come funziona?</a></li>
+        <li><a href="#tokenizzazione">Tokenizzazione — Il testo diventa numeri</a></li>
+        <li><a href="#embeddings">Embeddings — Le parole nello spazio</a></li>
+        <li><a href="#attention">Attention — Il meccanismo che capisce il contesto</a></li>
+        <li><a href="#transformer">Il Transformer — L'architettura che ha cambiato tutto</a></li>
+        <li><a href="#generazione">Come genera il testo, token per token</a></li>
+        <li><a href="#limiti">Limiti, rischi e responsabilità</a></li>
+      </ol>
+    </div>
+
+    <!-- ═══ 1. INTRO ═══ -->
+    <h2 id="intro">Parli con un'AI ogni giorno. Ma sai come funziona?</h2>
+    <p>Ogni volta che chiedi a un modello AI di scriverti un'email, spiegarti un concetto o riassumere un documento, stai interagendo con un <strong>Large Language Model</strong> — un sistema addestrato su miliardi di testi che sembra comprendere e ragionare.</p>
+    <p>La parola chiave è <strong>sembra</strong>. Un LLM non capisce nel senso umano del termine. Non ha coscienza, non ha esperienze, non ha opinioni. Ciò che fa è matematicamente sofisticato, eppure il principio di base è sorprendentemente semplice: <strong>prevede il frammento di testo successivo più probabile</strong>.</p>
+    <p>Capire come funziona non è un esercizio accademico. È il primo passo per usare questi strumenti in modo efficace e responsabile — sapendo cosa possono fare, perché a volte sbagliano, e dove sta il confine tra la macchina e il tuo giudizio.</p>
+
+    <hr class="divider">
+
+    <!-- ═══ 2. TOKENIZZAZIONE ═══ -->
+    <h2 id="tokenizzazione">Tokenizzazione — Il testo diventa numeri</h2>
+    <p>Un computer non lavora con le parole. Lavora con numeri. Il primo passaggio è trasformare il tuo messaggio in una sequenza di frammenti numerici chiamati <strong>token</strong>.</p>
+    <p>Un token non corrisponde sempre a una parola intera. Può essere una parola, una sotto-parola, o anche un singolo carattere. Il modello usa un <strong>vocabolario</strong> di circa 50.000–100.000 frammenti, ognuno associato a un ID numerico univoco.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Infografica — Tokenizzazione in azione</div>
+      <div class="tok">
+        <div class="tok__sentence">"L'intelligenza artificiale sta cambiando il mondo"</div>
+        <div class="tok__arrow">↓</div>
+        <div class="tok__tokens">
+          <span class="tok__t">L'</span>
+          <span class="tok__t">intelli</span>
+          <span class="tok__t">genza</span>
+          <span class="tok__t">artific</span>
+          <span class="tok__t">iale</span>
+          <span class="tok__t">sta</span>
+          <span class="tok__t">cambiando</span>
+          <span class="tok__t">il mondo</span>
+        </div>
+        <div class="tok__ids">
+          <span class="tok__id">ID 445</span>
+          <span class="tok__id">ID 12847</span>
+          <span class="tok__id">ID 8923</span>
+          <span class="tok__id">ID 31205</span>
+          <span class="tok__id">ID 2190</span>
+          <span class="tok__id">ID 678</span>
+          <span class="tok__id">ID 44521</span>
+          <span class="tok__id">ID 9034</span>
+        </div>
+        <div class="tok__legend">Nota come "intelligenza" e "artificiale" vengono spezzati in sotto-parole. Gli ID sono indicativi.</div>
+      </div>
+    </div>
+
+    <div class="infobox">
+      <div class="infobox__label">Perché le sotto-parole?</div>
+      <p>Un vocabolario di parole intere sarebbe enorme e non coprirebbe mai tutti i termini possibili. Usando sotto-parole, il modello può gestire qualsiasi parola — anche quelle mai viste — combinando frammenti noti. È lo stesso principio per cui capisci "dis-organizzato" anche senza averlo mai letto prima.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ 3. EMBEDDINGS ═══ -->
+    <h2 id="embeddings">Embeddings — Le parole nello spazio</h2>
+    <p>Ogni token numerico viene ora trasformato in un <strong>vettore</strong> — una lista di centinaia di numeri che rappresenta il "significato" del token in uno spazio matematico multidimensionale.</p>
+    <p>La proprietà fondamentale: parole con significati simili finiscono <strong>vicine</strong> in questo spazio. Non perché qualcuno le abbia posizionate manualmente, ma perché il modello ha scoperto queste relazioni leggendo miliardi di testi durante l'addestramento.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Infografica — Spazio degli embeddings (semplificato in 2D)</div>
+      <div class="emb">
+        <div class="emb__axis-x">Dimensione 1</div>
+        <div class="emb__axis-y">Dimensione 2</div>
+        <div class="emb__cloud emb__cloud--food" style="width:140px;height:100px;top:35px;left:55px"></div>
+        <div class="emb__cloud emb__cloud--animal" style="width:130px;height:110px;top:140px;right:60px"></div>
+        <div class="emb__cloud emb__cloud--vehicle" style="width:120px;height:90px;bottom:40px;left:70px"></div>
+        <div class="emb__dot emb__dot--food" style="top:55px;left:80px">pizza</div>
+        <div class="emb__dot emb__dot--food" style="top:72px;left:130px">pasta</div>
+        <div class="emb__dot emb__dot--food" style="top:48px;left:155px">risotto</div>
+        <div class="emb__dot emb__dot--animal" style="top:165px;right:95px">gatto</div>
+        <div class="emb__dot emb__dot--animal" style="top:190px;right:120px">cane</div>
+        <div class="emb__dot emb__dot--animal" style="top:155px;right:55px">leone</div>
+        <div class="emb__dot emb__dot--vehicle" style="bottom:72px;left:100px">auto</div>
+        <div class="emb__dot emb__dot--vehicle" style="bottom:55px;left:155px">moto</div>
+        <div class="emb__dot emb__dot--vehicle" style="bottom:85px;left:130px">treno</div>
+        <div class="emb__dot emb__dot--emotion" style="top:100px;right:180px">felicità</div>
+        <div class="emb__dot emb__dot--emotion" style="top:130px;right:160px">tristezza</div>
+        <div class="emb__legend">
+          <span class="l-food">Cibo</span><span class="l-animal">Animali</span><span class="l-vehicle">Veicoli</span><span class="l-emotion">Emozioni</span>
+        </div>
+      </div>
+    </div>
+
+    <p>Nella realtà, ogni vettore ha <strong>migliaia</strong> di dimensioni — non due. Ogni dimensione cattura un aspetto diverso del significato: genere, tempo verbale, formalità, ambito semantico e centinaia di altre caratteristiche che il modello ha scoperto autonomamente.</p>
+
+    <div class="infobox">
+      <div class="infobox__label">L'aritmetica delle parole</div>
+      <p>Uno degli aspetti più sorprendenti: gli embeddings supportano operazioni matematiche. Il vettore di <code>re</code> meno <code>uomo</code> più <code>donna</code> produce un vettore vicinissimo a <code>regina</code>. Il modello ha codificato relazioni semantiche come operazioni geometriche.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ 4. ATTENTION ═══ -->
+    <h2 id="attention">Attention — Il meccanismo che capisce il contesto</h2>
+    <p>Ecco il cuore di un LLM. Il meccanismo di <strong>attention</strong> permette al modello di analizzare tutte le parole della frase contemporaneamente e calcolare quanto ogni parola sia <strong>rilevante</strong> per ogni altra.</p>
+    <p>Quando leggi "La mela è caduta dall'albero perché era <em>matura</em>", il tuo cervello capisce che "matura" si riferisce alla mela. L'attention fa qualcosa di analogo: assegna un <strong>peso</strong> a ogni coppia di parole nel contesto specifico.</p>
+    <p>Nell'infografica qui sotto, seleziona una parola per vedere a quali altre parole il modello presta attenzione quando la elabora. La lunghezza della barra indica l'intensità dell'attenzione.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Infografica interattiva — Mappa di Attention</div>
+      <div class="att" id="att-demo">
+        <div class="att__prompt">Seleziona una parola per vedere dove va la sua attenzione:</div>
+        <div class="att__source" id="att-source"></div>
+        <div class="att__result" id="att-result"></div>
+      </div>
+    </div>
+
+    <h3>Self-Attention e gli Attention Head</h3>
+    <p>Un LLM non ha un solo meccanismo di attention ma decine in parallelo, chiamati <strong>attention head</strong>. Ogni head impara a catturare un tipo diverso di relazione: grammaticale, semantica, di prossimità, di co-referimento.</p>
+    <p>Il calcolo avviene attraverso tre trasformazioni: <strong>Query</strong> ("cosa sto cercando?"), <strong>Key</strong> ("cosa ho da offrire?") e <strong>Value</strong> ("il mio contenuto informativo"). Il prodotto tra Query e Key determina i pesi di attention; il Value viene poi pesato di conseguenza.</p>
+
+    <hr class="divider">
+
+    <!-- ═══ 5. TRANSFORMER ═══ -->
+    <h2 id="transformer">Il Transformer — L'architettura che ha cambiato tutto</h2>
+    <p>Il <strong>Transformer</strong> è l'architettura pubblicata nel 2017 nel paper "Attention Is All You Need". È la struttura alla base di tutti i moderni LLM — GPT, Claude, Gemini, LLaMA, Mistral.</p>
+    <p>L'idea rivoluzionaria: eliminare le reti ricorrenti (che processavano le parole una alla volta) e usare solo il meccanismo di attention, permettendo di processare <strong>tutte le parole in parallelo</strong>. Questo ha reso possibile addestrare modelli enormi su quantità di dati impensabili prima.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Diagramma — Architettura semplificata del Transformer</div>
+      <div class="tfm">
+        <div class="tfm__block tfm__block--input">📝 Input: sequenza di token</div>
+        <div class="tfm__arrow">↓</div>
+        <div class="tfm__block tfm__block--emb">Embeddings + Positional Encoding</div>
+        <div class="tfm__label">Ogni token diventa un vettore. La posizione nella frase viene codificata.</div>
+        <div class="tfm__arrow">↓</div>
+        <div class="tfm__repeat">× N layer (es. 32–96 nei modelli più grandi)</div>
+        <div class="tfm__block tfm__block--att">Multi-Head Self-Attention</div>
+        <div class="tfm__label">Ogni token guarda tutti gli altri e calcola i pesi di rilevanza.</div>
+        <div class="tfm__arrow">↓</div>
+        <div class="tfm__block tfm__block--ff">Feed-Forward Network</div>
+        <div class="tfm__label">Elabora le informazioni raccolte. È qui che il modello "ragiona".</div>
+        <div class="tfm__arrow">↓</div>
+        <div class="tfm__repeat">↑ ripeti per ogni layer</div>
+        <div class="tfm__arrow">↓</div>
+        <div class="tfm__block tfm__block--out">🎯 Probabilità per ogni token del vocabolario</div>
+        <div class="tfm__label">Il modello assegna una probabilità a ciascuno dei ~100.000 token possibili.</div>
+      </div>
+    </div>
+
+    <div class="infobox">
+      <div class="infobox__label">La scala dei numeri</div>
+      <p>I "parametri" di un modello sono i pesi numerici nelle sue matrici. GPT-3 ne ha 175 miliardi. I modelli di frontiera attuali ne hanno centinaia di miliardi o più. Ogni singolo parametro è stato calibrato durante un addestramento che ha richiesto mesi su migliaia di GPU — con costi nell'ordine delle decine di milioni di dollari.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ 6. GENERAZIONE ═══ -->
+    <h2 id="generazione">Come genera il testo, token per token</h2>
+    <p>Quando un LLM scrive una risposta, non la produce tutta insieme. Genera <strong>un token alla volta</strong>. Ad ogni passo prende tutto il testo precedente, lo processa attraverso tutti i layer del Transformer, e produce una distribuzione di probabilità sul prossimo token.</p>
+    <p>Un parametro chiamato <strong>temperatura</strong> controlla la casualità della scelta. Temperatura bassa = risposte prevedibili e precise. Temperatura alta = risposte creative ma più rischiose.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Infografica interattiva — Generazione token per token</div>
+      <div class="gen" id="gen-demo">
+        <div class="gen__display" id="gen-display"></div>
+        <button class="gen__btn" id="gen-btn">▶ Genera il prossimo token</button>
+        <div class="gen__probs" id="gen-probs"></div>
+      </div>
+    </div>
+
+    <p>Questo si ripete centinaia o migliaia di volte per una risposta completa. Quando vedi il testo apparire in streaming, non è un effetto estetico — è il modello che decide letteralmente una parola alla volta.</p>
+
+    <hr class="divider">
+
+    <!-- ═══ 7. LIMITI ═══ -->
+    <h2 id="limiti">Limiti, rischi e responsabilità</h2>
+    <p>Comprendere come funziona un LLM è comprendere <strong>perché sbaglia</strong>. Non ha memoria persistente tra le conversazioni, non accede a internet autonomamente (a meno di strumenti specifici), non "sa" nel senso umano. Predice la sequenza più probabile.</p>
+
+    <div class="infobox">
+      <div class="infobox__label">Allucinazioni</div>
+      <p>Un LLM può generare informazioni false con assoluta sicurezza. Non "inventa" consapevolmente — produce la sequenza che statisticamente suona più plausibile, anche quando è sbagliata. Il termine tecnico è "allucinazione" ed è uno dei problemi aperti più importanti della ricerca AI.</p>
+    </div>
+
+    <div class="infobox">
+      <div class="infobox__label">Bias</div>
+      <p>I dati di addestramento sono testi scritti da esseri umani, con tutti i loro pregiudizi. Il modello li assorbe e li riproduce. Le aziende che sviluppano LLM investono enormi risorse per mitigarli, ma eliminarli completamente è una sfida aperta.</p>
+    </div>
+
+    <div class="infobox">
+      <div class="infobox__label">Ragionamento</div>
+      <p>Un LLM può simulare catene logiche impressionanti, ma non "comprende" la causa e l'effetto come noi. Può risolvere un problema matematico e fallire in uno simile con numeri diversi. Il ragionamento emerge dalle correlazioni statistiche, non da una comprensione profonda.</p>
+    </div>
+
+    <p>Niente di tutto questo rende gli LLM meno utili. Li rende strumenti che richiedono <strong>consapevolezza</strong>. Verificare, mantenere il pensiero critico, non delegare decisioni importanti senza supervisione umana: non è solo buona pratica, è responsabilità di chi usa la tecnologia.</p>
+
+    <!-- ═══ CTA ═══ -->
+    <div class="cta-box">
+      <div class="cta-box__title">Vuoi portare queste competenze nel tuo team?</div>
+      <div class="cta-box__desc">Nei miei percorsi di formazione insegno a usare l'AI in modo consapevole e strategico — dalla teoria alla pratica operativa quotidiana.</div>
+      <a href="/index.html#contatti" class="cta-box__btn">Parliamone →</a>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <div>&copy; 2026 Riccardo Busolo — AI Consultant</div>
+    <div style="margin-top:10px"><a href="/index.html">Torna al sito</a> · <a href="/progetti.html#articoli">Tutti gli articoli</a></div>
+  </footer>
+
+  <script>
+  (function(){
+    'use strict';
+
+    /* ═══════ ATTENTION — Redesigned as word bars ═══════ */
+    const attWords = ['Il','gatto','si','è','seduto','sul','tappeto'];
+    const attData = [
+      [.85,.04,.02,.02,.02,.02,.03],
+      [.08,.35,.02,.03,.30,.02,.20],
+      [.04,.40,.20,.06,.20,.04,.06],
+      [.03,.25,.15,.30,.15,.05,.07],
+      [.03,.45,.05,.10,.10,.05,.22],
+      [.02,.05,.02,.02,.04,.55,.30],
+      [.02,.10,.02,.02,.08,.32,.44],
+    ];
+    const attColors = ['rgba(0,224,208,','rgba(96,165,250,','rgba(244,114,182,','rgba(167,139,250,','rgba(52,211,153,','rgba(251,191,36,','rgba(255,136,68,'];
+
+    const attSource = document.getElementById('att-source');
+    const attResult = document.getElementById('att-result');
+
+    attWords.forEach((w, i) => {
+      const b = document.createElement('button');
+      b.className = 'att__src';
+      b.textContent = w;
+      b.addEventListener('click', () => showAttention(i));
+      attSource.appendChild(b);
+    });
+
+    function showAttention(srcIdx) {
+      // Highlight source
+      attSource.querySelectorAll('.att__src').forEach((b, i) => b.classList.toggle('active', i === srcIdx));
+
+      // Build bar chart
+      attResult.innerHTML = '';
+      const weights = attData[srcIdx];
+      const maxW = Math.max(...weights);
+
+      weights.forEach((w, i) => {
+        const row = document.createElement('div');
+        row.className = 'att__row' + (i === srcIdx ? ' highlight' : '');
+
+        const word = document.createElement('div');
+        word.className = 'att__word';
+        word.textContent = attWords[i];
+
+        const barWrap = document.createElement('div');
+        barWrap.className = 'att__bar-wrap';
+
+        const bar = document.createElement('div');
+        bar.className = 'att__bar';
+        const pct = Math.round(w * 100);
+        bar.style.width = '0%';
+        bar.style.background = attColors[i % attColors.length] + (i === srcIdx ? '0.8)' : '0.5)');
+
+        const pctLabel = document.createElement('div');
+        pctLabel.className = 'att__pct';
+        pctLabel.textContent = pct + '%';
+
+        barWrap.appendChild(bar);
+        barWrap.appendChild(pctLabel);
+        row.appendChild(word);
+        row.appendChild(barWrap);
+        attResult.appendChild(row);
+
+        // Animate
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            bar.style.width = (w / maxW * 85) + '%';
+          });
+        });
+      });
+    }
+    showAttention(1); // Default: "gatto"
+
+    /* ═══════ GENERATION DEMO ═══════ */
+    const genSteps = [
+      { fixed: [], next: 'L\'', prob: 42, alts: ['Un (22%)', 'La (18%)', 'Nel (8%)'] },
+      { fixed: ['L\''], next: 'intelligenza', prob: 38, alts: ['idea (15%)', 'uso (12%)', 'AI (10%)'] },
+      { fixed: ['L\'','intelligenza'], next: 'artificiale', prob: 89, alts: ['umana (6%)', 'emotiva (2%)', 'collettiva (1%)'] },
+      { fixed: ['L\'','intelligenza','artificiale'], next: 'può', prob: 31, alts: ['sta (18%)', 'non (12%)', 'è (8%)'] },
+      { fixed: ['L\'','intelligenza','artificiale','può'], next: 'aiutare', prob: 27, alts: ['cambiare (22%)', 'trasformare (14%)', 'essere (9%)'] },
+      { fixed: ['L\'','intelligenza','artificiale','può','aiutare'], next: 'le', prob: 24, alts: ['a (15%)', 'molte (11%)', 'ogni (8%)'] },
+      { fixed: ['L\'','intelligenza','artificiale','può','aiutare','le'], next: 'aziende', prob: 34, alts: ['persone (28%)', 'imprese (9%)', 'PMI (5%)'] },
+      { fixed: ['L\'','intelligenza','artificiale','può','aiutare','le','aziende'], next: 'a crescere.', prob: 26, alts: ['italiane (21%)', 'a innovare (15%)', 'nel (10%)'] },
+    ];
+    let genStep = 0;
+    const genDisplay = document.getElementById('gen-display');
+    const genBtn = document.getElementById('gen-btn');
+    const genProbs = document.getElementById('gen-probs');
+
+    function renderGen() {
+      genDisplay.innerHTML = '';
+      genProbs.innerHTML = '';
+      if (genStep === 0) {
+        genDisplay.innerHTML = '<span style="color:var(--text-muted);font-style:italic;font-size:.9rem">Premi il pulsante per iniziare la generazione...</span>';
+        genBtn.textContent = '▶ Genera il prossimo token';
+        return;
+      }
+      const data = genSteps[genStep - 1];
+      data.fixed.forEach(w => {
+        const s = document.createElement('span');
+        s.className = 'gen__token gen__token--fixed';
+        s.textContent = w;
+        genDisplay.appendChild(s);
+      });
+      const nw = document.createElement('span');
+      nw.className = 'gen__token gen__token--new';
+      nw.textContent = data.next;
+      genDisplay.appendChild(nw);
+
+      const top = document.createElement('span');
+      top.className = 'gen__prob gen__prob--top';
+      top.textContent = '✓ ' + data.next + ' (' + data.prob + '%)';
+      genProbs.appendChild(top);
+      data.alts.forEach(a => {
+        const s = document.createElement('span');
+        s.className = 'gen__prob';
+        s.textContent = a;
+        genProbs.appendChild(s);
+      });
+      genBtn.textContent = genStep >= genSteps.length ? '↺ Ricomincia' : '▶ Genera il prossimo token';
+    }
+
+    genBtn.addEventListener('click', () => {
+      genStep++;
+      if (genStep > genSteps.length) genStep = 0;
+      renderGen();
+    });
+    renderGen();
+
+  })();
+  </script>
+</body>
+</html>
