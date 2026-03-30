@@ -11,6 +11,7 @@
       msg: 'Ciao! Sono <strong>RB Assistant</strong>, il tuo assistente virtuale. Come posso aiutarti oggi?',
       options: [
         { label: '💼 Scopri i servizi', next: 'servizi' },
+        { label: '🔬 Esplora i progetti', next: 'progetti' },
         { label: '📚 Materiali di formazione', next: 'risorse' },
         { label: '🤖 Domande sull\'AI', next: 'faq_ai' },
         { label: '🏢 AI per la tua azienda', next: 'azienda' },
@@ -119,6 +120,56 @@
       msg: 'Ogni progetto è diverso, per questo preferisco valutare le esigenze specifiche prima di proporre un preventivo.\n\nCompila il <strong>modulo di contatto</strong> descrivendo brevemente:\n• Il tuo ruolo e settore aziendale\n• L\'obiettivo che vuoi raggiungere\n• Il numero di persone coinvolte (se applicabile)\n\nTi risponderò con una proposta personalizzata.',
       options: [{ label: '✉️ Vai al modulo contatti', action: 'scroll', target: 'contatti' },{ label: '← Torna ai servizi', next: 'servizi' },{ label: '← Menu principale', next: 'root' }],
     },
+
+    /* ═══════════ PROGETTI ═══════════ */
+    progetti: {
+      msg: 'I miei progetti sono organizzati in tre aree. Quale ti interessa esplorare?',
+      options: [
+        { label: '🎓 Progetti di Formazione', next: 'proj_formazione' },
+        { label: '🛠️ Strumenti', next: 'proj_strumenti' },
+        { label: '📝 Articoli', next: 'proj_articoli' },
+        { label: '🔬 Vai alla pagina Progetti', action: 'link', target: 'progetti.html' },
+        { label: '← Menu principale', next: 'root' },
+      ],
+    },
+    proj_formazione: {
+      msg: '<strong>Progetti di Formazione</strong>\n\nCorsi per aziende, workshop e materiali didattici per imparare a usare l\'AI in modo pratico e consapevole.\n\nI progetti in questa sezione includono:\n• <strong>Dall\'AI Generativa agli Agenti Autonomi</strong> — percorso completo dalla comprensione degli LLM alla creazione di agenti AI\n• <strong>Prompt Engineering Masterclass</strong> — workshop intensivo sulle tecniche avanzate\n• <strong>AI per Team Non-Tecnici</strong> — formazione su misura per ruoli non tecnici',
+      options: [
+        { label: '🔬 Vai alla sezione Formazione', action: 'link', target: 'progetti.html#formazione' },
+        { label: '💼 Info sui servizi di formazione', next: 'srv_formazione' },
+        { label: '✉️ Richiedi informazioni', next: 'contatti' },
+        { label: '← Torna ai progetti', next: 'progetti' },
+        { label: '← Menu principale', next: 'root' },
+      ],
+    },
+    proj_strumenti: {
+      msg: '<strong>Strumenti AI</strong>\n\nDashboard, automazioni e demo tecniche costruite con l\'Intelligenza Artificiale. Soluzioni concrete per problemi reali.\n\nStrumenti disponibili:\n• <strong>PixelForge — Image Converter</strong> — converti, ridimensiona e comprimi immagini direttamente nel browser\n\nIn arrivo:\n• Dashboard Analytics con AI\n• Neural Network Trainer',
+      options: [
+        { label: '🖼️ Prova PixelForge', next: 'proj_pixelforge' },
+        { label: '🔬 Vai alla sezione Strumenti', action: 'link', target: 'progetti.html#strumenti' },
+        { label: '← Torna ai progetti', next: 'progetti' },
+        { label: '← Menu principale', next: 'root' },
+      ],
+    },
+    proj_pixelforge: {
+      msg: '<strong>PixelForge — Image Converter</strong>\n\nUn convertitore di immagini gratuito che funziona interamente nel browser:\n\n• Converti tra <strong>PNG, JPG e WebP</strong>\n• <strong>Ridimensiona</strong> con larghezza e altezza personalizzate\n• <strong>Comprimi</strong> regolando la qualità dell\'output\n• Confronta dimensione prima e dopo la conversione\n• <strong>Zero upload</strong> — tutto avviene localmente, i tuoi file non lasciano mai il tuo dispositivo\n\nÈ stato costruito interamente con tecniche di Vibe Coding.',
+      options: [
+        { label: '🚀 Apri PixelForge', action: 'link', target: 'strumenti/pixelforge/' },
+        { label: '💻 Cos\'è il Vibe Coding?', next: 'srv_vibecoding' },
+        { label: '← Torna agli strumenti', next: 'proj_strumenti' },
+        { label: '← Menu principale', next: 'root' },
+      ],
+    },
+    proj_articoli: {
+      msg: '<strong>Articoli</strong>\n\nApprofondimenti tecnici e guide divulgative sull\'Intelligenza Artificiale: trend, strategie, tutorial e riflessioni sul futuro.\n\nIn arrivo:\n• <strong>AI nel 2026: Lo Stato dell\'Arte</strong> — analisi completa su dove si trova l\'AI oggi\n• <strong>Perché Ogni Azienda Ha Bisogno di una Strategia AI</strong> — guida pratica alla trasformazione\n• <strong>Vibe Coding: Creare Software Senza Codice</strong> — tutorial passo-passo',
+      options: [
+        { label: '📝 Vai alla sezione Articoli', action: 'link', target: 'progetti.html#articoli' },
+        { label: '📚 Scarica i PDF gratuiti', next: 'risorse' },
+        { label: '← Torna ai progetti', next: 'progetti' },
+        { label: '← Menu principale', next: 'root' },
+      ],
+    },
+
     risorse: {
       msg: 'Nella sezione <strong>Materiali di Formazione</strong> trovi i PDF dei miei corsi teorici, consultabili e scaricabili gratuitamente. Quale ti interessa?',
       options: [
@@ -223,6 +274,9 @@
         { label: '🏠 Torna in cima', action: 'scroll', target: 'hero' },
         { label: '💼 Servizi', action: 'scroll', target: 'servizi' },
         { label: '🔬 Progetti AI', action: 'scroll', target: 'progetti' },
+        { label: '🎓 Progetti Formazione', action: 'link', target: 'progetti.html#formazione' },
+        { label: '🛠️ Progetti Strumenti', action: 'link', target: 'progetti.html#strumenti' },
+        { label: '📝 Progetti Articoli', action: 'link', target: 'progetti.html#articoli' },
         { label: '📚 Materiali di formazione', action: 'scroll', target: 'risorse' },
         { label: '✉️ Contatti', action: 'scroll', target: 'contatti' },
         { label: '🔒 Privacy & Cookie Policy', action: 'link', target: 'policy.html#privacy' },
