@@ -317,6 +317,9 @@
     .rb-chat__restart{background:none;border:1px solid rgba(180,180,190,.1);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#7a7a8e;transition:all .3s;flex-shrink:0}
     .rb-chat__restart:hover{border-color:rgba(0,224,208,.3);color:#00e0d0}
     .rb-chat__restart svg{width:14px;height:14px}
+    .rb-chat__close{display:none;background:none;border:1px solid rgba(180,180,190,.1);border-radius:8px;width:32px;height:32px;align-items:center;justify-content:center;cursor:pointer;color:#7a7a8e;transition:all .3s;flex-shrink:0}
+    .rb-chat__close:hover{border-color:rgba(0,224,208,.3);color:#00e0d0}
+    .rb-chat__close svg{width:14px;height:14px}
 
     .rb-chat__body{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:rgba(0,224,208,.12) transparent}
 
@@ -355,6 +358,7 @@
       .rb-resize{display:none}
       .rb-chat__header{border-radius:0;padding:16px 20px;padding-top:max(16px,env(safe-area-inset-top))}
       .rb-chat__drag{cursor:default}
+      .rb-chat__close{display:flex}
       .rb-chat__body{padding:16px 18px;padding-bottom:max(16px,env(safe-area-inset-bottom))}
       .rb-chat__msg{font-size:.9rem;max-width:94%;padding:14px 16px}
       .rb-chat__opt{padding:13px 16px;font-size:.88rem}
@@ -390,6 +394,7 @@
         <div class="rb-chat__htext"><div class="rb-chat__name">RB Assistant</div><div class="rb-chat__status">● Online</div></div>
       </div>
       <button class="rb-chat__restart" id="rb-restart" title="Ricomincia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
+      <button class="rb-chat__close" id="rb-close" title="Chiudi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="rb-chat__body" id="rb-chat-body"></div>
     ${IS_DESKTOP ? `
@@ -420,6 +425,13 @@
   document.getElementById('rb-restart').addEventListener('click', () => {
     body.innerHTML = '';
     showNode('root');
+  });
+
+  /* ── Close (mobile) ── */
+  document.getElementById('rb-close').addEventListener('click', () => {
+    isOpen = false;
+    chat.classList.remove('open');
+    btn.classList.remove('open');
   });
 
   /* ══════════════════════════════════
