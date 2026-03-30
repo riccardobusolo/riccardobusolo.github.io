@@ -244,6 +244,7 @@
     @media(max-width:900px){.tri-panel{width:min(22vw,250px)}}
     @media(max-width:700px){
       .tri-panel{display:none}
+      .nn-wrap{display:none}
       .main{padding:0 20px}
       .nav{padding:14px 20px}
       .nav__links{gap:16px}
@@ -255,13 +256,18 @@
       .section{padding:60px 0}
       .section__label{font-size:.65rem}
       .section__title{font-size:clamp(1.6rem,5vw,2rem)}
-      .hex-orbit{height:520px}
-      .hex-orbit__track{width:300px;height:300px;margin:-150px 0 0 -150px}
-      .hex-card{width:160px;height:180px;margin:-90px 0 0 -80px}
-      .hex-card:nth-child(1){transform:translate(150px, 0)}
-      .hex-card:nth-child(2){transform:translate(-75px, -130px)}
-      .hex-card:nth-child(3){transform:translate(-75px, 130px)}
-      .hex-card__label{font-size:.78rem}
+      .hex-orbit{display:none}
+      .proj-mobile{display:flex!important;flex-direction:column;gap:12px}
+      .proj-mobile__link{display:flex;align-items:center;gap:14px;padding:18px 20px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all .3s var(--ease)}
+      .proj-mobile__link:hover{border-color:rgba(0,224,208,.2);background:var(--bg-card-hover)}
+      .proj-mobile__link:active{transform:scale(.98);transition-duration:.08s}
+      .proj-mobile__icon{width:40px;height:40px;border-radius:10px;background:rgba(0,224,208,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+      .proj-mobile__icon svg{width:18px;height:18px;stroke:var(--cyan);fill:none;stroke-width:2}
+      .proj-mobile__text{flex:1}
+      .proj-mobile__name{font-size:.92rem;font-weight:600;margin-bottom:2px}
+      .proj-mobile__sub{font-size:.75rem;color:var(--text-muted);font-weight:300}
+      .proj-mobile__arrow{color:var(--text-muted);transition:color .3s}
+      .proj-mobile__link:hover .proj-mobile__arrow{color:var(--cyan)}
       .services-grid{gap:16px}
       .res-item{flex-direction:column}
       .res-item__img{width:100%;height:140px}
@@ -276,14 +282,6 @@
       .hero__role{font-size:1.3rem}
       .hero__cta{flex-direction:column}
       .hero__cta .btn{width:100%;justify-content:center}
-      .hex-orbit{height:460px}
-      .hex-orbit__track{width:260px;height:260px;margin:-130px 0 0 -130px}
-      .hex-card{width:140px;height:158px;margin:-79px 0 0 -70px}
-      .hex-card:nth-child(1){transform:translate(130px, 0)}
-      .hex-card:nth-child(2){transform:translate(-65px, -112px)}
-      .hex-card:nth-child(3){transform:translate(-65px, 112px)}
-      .hex-card__label{font-size:.72rem}
-      .hex-card__img{width:70%;height:50%}
       .svc-modal{padding:28px 20px}
       .contact-form input,.contact-form textarea,.contact-form select{font-size:16px}
     }
@@ -403,6 +401,25 @@
             </div>
           </a>
         </div>
+      </div>
+
+      <!-- Mobile project links (hidden on desktop) -->
+      <div class="proj-mobile" style="display:none">
+        <a href="progetti.html#formazione" class="proj-mobile__link">
+          <div class="proj-mobile__icon"><svg viewBox="0 0 24 24"><path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5c0 0 2.5 3 6 3s6-3 6-3v-5"/></svg></div>
+          <div class="proj-mobile__text"><div class="proj-mobile__name">Progetti di Formazione</div><div class="proj-mobile__sub">Corsi, workshop e materiali didattici</div></div>
+          <svg class="proj-mobile__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+        <a href="progetti.html#strumenti" class="proj-mobile__link">
+          <div class="proj-mobile__icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg></div>
+          <div class="proj-mobile__text"><div class="proj-mobile__name">Strumenti</div><div class="proj-mobile__sub">Dashboard, automazioni e demo AI</div></div>
+          <svg class="proj-mobile__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+        <a href="progetti.html#articoli" class="proj-mobile__link">
+          <div class="proj-mobile__icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <div class="proj-mobile__text"><div class="proj-mobile__name">Articoli</div><div class="proj-mobile__sub">Approfondimenti tecnici e guide AI</div></div>
+          <svg class="proj-mobile__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
       </div>
     </section>
 
