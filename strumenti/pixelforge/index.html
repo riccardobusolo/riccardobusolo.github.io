@@ -1,1 +1,926 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PixelForge — Convertitore & Editor Immagini Online Gratuito</title>
+<meta name="description" content="Converti e ritaglia immagini online gratis. Supporta JPG, PNG, WEBP. Drag & drop, ritaglio personalizzabile, ridimensionamento preciso. Nessuna registrazione richiesta.">
+<meta name="keywords" content="convertitore immagini, image converter, crop, ritaglia, JPG, PNG, WEBP, ridimensiona immagini, online tool">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="PixelForge — Convertitore & Editor Immagini Online">
+<meta property="og:description" content="Converti e ritaglia immagini online. Supporta JPG, PNG, WEBP con ritaglio drag & drop.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="#">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-0:#06060a;
+  --bg-1:#0c0c12;
+  --bg-2:#111118;
+  --bg-3:#16161f;
+  --bg-4:#1c1c28;
+  --bg-glass:rgba(14,14,22,.75);
+  --border-1:#1e1e2e;
+  --border-2:#2a2a3d;
+  --border-3:#363650;
+  --text-1:#f0f0f8;
+  --text-2:#a0a0be;
+  --text-3:#6a6a88;
+  --text-4:#44445a;
+  --accent:#3bb8f0;
+  --accent-soft:#2d8fc0;
+  --accent-glow:rgba(59,184,240,.12);
+  --accent-glow-s:rgba(59,184,240,.25);
+  --accent-border:rgba(59,184,240,.3);
+  --green:#3dd68c;
+  --green-glow:rgba(61,214,140,.1);
+  --orange:#f0a030;
+  --red:#f06050;
+  --r:10px;
+  --r-lg:14px;
+  --r-xl:18px;
+  --font:'Manrope',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);background:var(--bg-0);
+  color:var(--text-1);min-height:100vh;overflow-x:hidden;line-height:1.6;
+}
 
+/* ── NOISE OVERLAY ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;
+  background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+}
+/* ── GLOW ── */
+body::after{
+  content:'';position:fixed;top:-30%;left:50%;transform:translateX(-50%);
+  width:700px;height:500px;
+  background:radial-gradient(ellipse,rgba(59,184,240,.06) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ── */
+header{position:relative;z-index:10;padding:48px 24px 0;text-align:center}
+.logo-mark{
+  display:inline-flex;align-items:center;gap:14px;margin-bottom:6px;
+}
+.logo-icon{width:38px;height:38px;opacity:.9}
+.logo-text{
+  font-size:clamp(26px,4.5vw,38px);font-weight:800;letter-spacing:-.5px;
+  background:linear-gradient(135deg,#f0f0f8 30%,var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.tagline{
+  font-family:var(--mono);font-size:12px;font-weight:400;
+  color:var(--text-3);letter-spacing:2.5px;text-transform:uppercase;
+  margin-top:2px;
+}
+header p.desc{
+  color:var(--text-2);max-width:480px;margin:18px auto 0;
+  font-size:14px;font-weight:400;line-height:1.7;
+}
+
+/* ── MAIN ── */
+main{position:relative;z-index:10;max-width:920px;margin:36px auto;padding:0 20px 80px}
+
+/* ── DROP ZONE ── */
+.drop-zone{
+  position:relative;
+  border:1.5px dashed var(--border-2);
+  border-radius:var(--r-xl);
+  padding:56px 32px;text-align:center;cursor:pointer;
+  transition:all .35s var(--ease);
+  background:var(--bg-1);overflow:hidden;
+}
+.drop-zone::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 40%,var(--accent-glow) 0%,transparent 60%);
+  opacity:0;transition:opacity .5s;pointer-events:none;
+}
+.drop-zone:hover,.drop-zone.drag-over{
+  border-color:var(--accent-border);
+  box-shadow:0 0 40px rgba(59,184,240,.06),inset 0 0 40px rgba(59,184,240,.03);
+}
+.drop-zone:hover::before,.drop-zone.drag-over::before{opacity:1}
+.drop-zone.has-image{padding:20px;cursor:default;border-style:solid;border-color:var(--border-1)}
+.drop-zone.has-image:hover{box-shadow:none}
+.drop-zone.has-image::before{display:none}
+
+.drop-graphic{
+  width:72px;height:72px;margin:0 auto 22px;
+  border-radius:16px;
+  background:linear-gradient(135deg,var(--bg-3),var(--bg-4));
+  border:1px solid var(--border-2);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
+.drop-graphic svg{width:32px;height:32px;stroke:var(--accent);fill:none}
+.drop-zone h2{font-size:18px;font-weight:600;margin-bottom:6px;color:var(--text-1)}
+.drop-zone p.sub{color:var(--text-3);font-size:13px;font-weight:400}
+.badge-row{display:inline-flex;gap:6px;margin-top:18px}
+.badge{
+  font-family:var(--mono);font-size:10px;font-weight:500;
+  padding:4px 10px;border-radius:20px;
+  background:var(--bg-3);color:var(--text-3);border:1px solid var(--border-1);
+  letter-spacing:.5px;
+}
+.drop-initial{transition:all .3s var(--ease)}
+.drop-zone.has-image .drop-initial{display:none}
+input[type="file"]{display:none}
+
+/* ── FILE INFO BAR ── */
+.file-bar{
+  display:none;
+  padding:14px 16px;margin-bottom:16px;
+  background:var(--bg-2);border-radius:var(--r);
+  border:1px solid var(--border-1);
+  gap:10px;align-items:center;
+}
+.file-bar.visible{display:flex;flex-wrap:wrap}
+.file-bar .fmt-badge{
+  font-family:var(--mono);padding:3px 9px;border-radius:6px;font-size:10px;font-weight:600;
+  background:var(--accent-glow);color:var(--accent);border:1px solid var(--accent-border);
+  letter-spacing:.5px;text-transform:uppercase;
+}
+.file-bar .fname{
+  flex:1;min-width:0;
+}
+.file-bar .fname-input{
+  background:none;border:none;color:var(--text-1);
+  font-family:var(--font);font-size:13px;font-weight:500;
+  outline:none;width:100%;padding:2px 0;
+  border-bottom:1px solid transparent;
+  transition:border-color .2s;
+}
+.file-bar .fname-input:hover{border-bottom-color:var(--border-2)}
+.file-bar .fname-input:focus{border-bottom-color:var(--accent)}
+.file-bar .fmeta{
+  font-family:var(--mono);font-size:11px;color:var(--text-3);
+  display:flex;gap:12px;align-items:center;
+}
+.file-bar .fmeta .sep{color:var(--border-2)}
+.btn-x{
+  background:none;border:1px solid var(--border-2);
+  color:var(--text-3);cursor:pointer;border-radius:6px;
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;font-size:14px;margin-left:6px;
+}
+.btn-x:hover{border-color:var(--red);color:var(--red);background:rgba(240,96,80,.08)}
+
+/* ── EDITOR ── */
+.editor{display:none}
+.editor.visible{display:block}
+.viewport{
+  position:relative;width:100%;border-radius:var(--r-lg);overflow:hidden;
+  background:var(--bg-0);border:1px solid var(--border-1);
+}
+.vp-inner{
+  position:relative;margin:0 auto;overflow:hidden;
+  cursor:grab;touch-action:none;
+  background:
+    repeating-conic-gradient(var(--bg-2) 0% 25%,var(--bg-1) 0% 50%) 0 0/14px 14px;
+}
+.vp-inner:active{cursor:grabbing}
+.vp-inner img{
+  position:absolute;top:0;left:0;display:block;
+  pointer-events:none;user-select:none;-webkit-user-select:none;
+  will-change:transform;
+}
+
+/* Frame */
+.frame{
+  position:absolute;
+  border:1.5px solid var(--accent);
+  box-shadow:0 0 0 9999px rgba(6,6,10,.6);
+  z-index:6;pointer-events:none;
+}
+.frame-corner{
+  position:absolute;width:12px;height:12px;z-index:7;pointer-events:none;
+}
+.frame-corner::before,.frame-corner::after{
+  content:'';position:absolute;background:var(--accent);border-radius:1px;
+}
+.frame-corner.tl{top:-1px;left:-1px}
+.frame-corner.tr{top:-1px;right:-1px}
+.frame-corner.bl{bottom:-1px;left:-1px}
+.frame-corner.br{bottom:-1px;right:-1px}
+.frame-corner.tl::before,.frame-corner.bl::before{width:12px;height:2px;top:0;left:0}
+.frame-corner.tl::after,.frame-corner.bl::after{width:2px;height:12px;top:0;left:0}
+.frame-corner.tr::before,.frame-corner.br::before{width:12px;height:2px;top:0;right:0}
+.frame-corner.tr::after,.frame-corner.br::after{width:2px;height:12px;top:0;right:0}
+.frame-corner.bl::before{bottom:0;top:auto}
+.frame-corner.bl::after{bottom:0;top:auto}
+.frame-corner.br::before{bottom:0;top:auto}
+.frame-corner.br::after{bottom:0;top:auto}
+
+/* Grid lines */
+.frame-g{position:absolute;inset:0;pointer-events:none}
+.frame-g i{position:absolute;background:rgba(255,255,255,.07)}
+.frame-g i.h{left:0;right:0;height:1px}
+.frame-g i.v{top:0;bottom:0;width:1px}
+.frame-g i.h:nth-child(1){top:33.33%}
+.frame-g i.h:nth-child(2){top:66.66%}
+.frame-g i.v:nth-child(3){left:33.33%}
+.frame-g i.v:nth-child(4){left:66.66%}
+
+/* HUD */
+.center-bar{
+  position:absolute;bottom:10px;left:10px;z-index:15;
+  display:flex;gap:3px;pointer-events:all;
+}
+.zb{
+  height:32px;border:1px solid rgba(255,255,255,.08);border-radius:8px;
+  background:rgba(6,6,10,.85);color:var(--text-2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all .2s;font-family:var(--font);font-size:12px;font-weight:500;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  padding:0 14px;letter-spacing:.3px;
+}
+.zb:hover{border-color:var(--accent-border);color:var(--accent)}
+.zb svg{opacity:.7}
+
+/* ── TUTORIAL ── */
+.tutorial{
+  grid-column:1/-1;
+  display:flex;gap:6px;flex-wrap:wrap;
+  padding:16px 18px;
+  background:var(--bg-1);border:1px solid var(--border-1);border-radius:var(--r-lg);
+  margin-bottom:2px;
+}
+.tut-step{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--text-3);
+  padding:4px 14px 4px 4px;
+  border-radius:20px;
+  background:var(--bg-2);
+  border:1px solid var(--border-1);
+}
+.tut-step strong{color:var(--accent);font-weight:600}
+.tut-n{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--accent-glow);color:var(--accent);
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--accent-border);flex-shrink:0;
+}
+
+/* ── CONTROLS ── */
+.controls{display:none;gap:14px;margin-top:24px}
+.controls.visible{display:grid;grid-template-columns:1fr 1fr}
+.panel{
+  background:var(--bg-1);border:1px solid var(--border-1);border-radius:var(--r-lg);
+  padding:20px;transition:all .25s var(--ease);
+}
+.panel:hover{border-color:var(--border-2)}
+.panel-title{
+  font-size:10px;text-transform:uppercase;letter-spacing:2px;
+  color:var(--text-4);margin-bottom:14px;font-weight:600;
+}
+
+/* Format selector */
+.fmt-row{display:flex;gap:6px}
+.fmt-opt{
+  flex:1;padding:10px 8px;border:1px solid var(--border-1);border-radius:var(--r);
+  background:var(--bg-2);color:var(--text-3);cursor:pointer;
+  font-family:var(--mono);font-size:12px;font-weight:600;
+  transition:all .2s var(--ease);text-align:center;letter-spacing:.5px;
+}
+.fmt-opt:hover{border-color:var(--border-3);color:var(--text-2)}
+.fmt-opt.on{
+  border-color:var(--accent);color:var(--accent);
+  background:var(--accent-glow);
+  box-shadow:0 0 16px rgba(59,184,240,.08);
+}
+
+/* Dimensions */
+.dim-row{display:flex;gap:8px;align-items:center}
+.dim-col{flex:1}
+.dim-col label{
+  display:block;font-size:10px;color:var(--text-4);
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:1.2px;font-weight:600;
+}
+.dim-col input{
+  width:100%;padding:9px 11px;background:var(--bg-2);border:1px solid var(--border-1);
+  border-radius:var(--r);color:var(--text-1);font-family:var(--mono);font-size:13px;
+  font-weight:500;transition:all .2s;outline:none;
+}
+.dim-col input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.dim-col input::placeholder{color:var(--text-4)}
+
+/* Link/unlink button */
+.link-toggle{
+  margin-top:20px;width:34px;height:34px;
+  border:1px solid var(--border-1);border-radius:var(--r);
+  background:var(--bg-2);color:var(--text-4);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.link-toggle:hover{border-color:var(--border-3)}
+.link-toggle.on{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+.link-toggle svg{width:16px;height:16px}
+
+/* ── SIZE STATS ── */
+.stats-bar{
+  display:none;grid-column:1/-1;
+  grid-template-columns:1fr 1fr;gap:14px;
+}
+.stats-bar.visible{display:grid}
+.stat-card{
+  background:var(--bg-1);border:1px solid var(--border-1);border-radius:var(--r-lg);
+  padding:16px 18px;display:flex;align-items:center;gap:14px;
+  transition:all .25s var(--ease);
+}
+.stat-card:hover{border-color:var(--border-2)}
+.stat-icon{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.stat-icon svg{width:18px;height:18px}
+.stat-icon.input-ic{background:var(--bg-3);border:1px solid var(--border-2)}
+.stat-icon.input-ic svg{stroke:var(--text-2)}
+.stat-icon.output-ic{background:var(--green-glow);border:1px solid rgba(61,214,140,.2)}
+.stat-icon.output-ic svg{stroke:var(--green)}
+.stat-data{flex:1;min-width:0}
+.stat-label{font-size:10px;color:var(--text-4);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.stat-val{font-family:var(--mono);font-size:15px;font-weight:600;margin-top:2px}
+.stat-val .unit{font-size:11px;color:var(--text-3);font-weight:400;margin-left:2px}
+.stat-sub{font-family:var(--mono);font-size:10px;color:var(--text-4);margin-top:1px}
+.stat-arrow{
+  font-size:14px;margin:0 2px;
+}
+.savings{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  padding:3px 8px;border-radius:6px;
+}
+.savings.good{background:var(--green-glow);color:var(--green)}
+.savings.neutral{background:var(--bg-3);color:var(--text-3)}
+.savings.bad{background:rgba(240,96,80,.1);color:var(--red)}
+
+/* ── DOWNLOAD ── */
+.dl-wrap{display:none;margin-top:20px;text-align:center;grid-column:1/-1}
+.dl-wrap.visible{display:block}
+.btn-dl{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 44px;border:none;border-radius:var(--r);
+  background:linear-gradient(135deg,var(--accent),#60d0f8);
+  color:var(--bg-0);font-family:var(--font);font-size:15px;font-weight:700;
+  letter-spacing:.2px;cursor:pointer;
+  transition:all .3s var(--ease);
+  box-shadow:0 4px 24px rgba(59,184,240,.2),0 0 0 0 rgba(59,184,240,.3);
+}
+.btn-dl:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 32px rgba(59,184,240,.3),0 0 0 4px rgba(59,184,240,.08);
+}
+.btn-dl:active{transform:translateY(0)}
+.btn-dl svg{width:18px;height:18px}
+
+/* ── FOOTER ── */
+footer{
+  text-align:center;padding:36px 20px 30px;
+  color:var(--text-4);font-size:11px;letter-spacing:.3px;
+  border-top:1px solid var(--border-1);
+  max-width:920px;margin:0 auto;position:relative;z-index:10;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .controls.visible{grid-template-columns:1fr}
+  .stats-bar.visible{grid-template-columns:1fr}
+  .drop-zone{padding:44px 20px}
+  header{padding-top:32px}
+  .btn-dl{width:100%;justify-content:center}
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 4px 24px rgba(59,184,240,.2)}50%{box-shadow:0 4px 32px rgba(59,184,240,.35)}}
+.drop-zone{animation:fadeUp .7s var(--ease) both}
+.controls{animation:fadeUp .7s var(--ease) .08s both}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">
+    <svg class="logo-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer frame -->
+      <rect x="4" y="4" width="24" height="24" rx="3" fill="#3bb8f0" opacity=".12"/>
+      <rect x="4" y="4" width="24" height="24" rx="3" stroke="#3bb8f0" stroke-width="1.5" fill="none"/>
+      <!-- Inner offset frame (crop/layer) -->
+      <rect x="12" y="12" width="22" height="22" rx="3" fill="#3bb8f0" opacity=".06"/>
+      <rect x="12" y="12" width="22" height="22" rx="3" stroke="#3bb8f0" stroke-width="1.5" fill="none"/>
+      <!-- Crop corner accents -->
+      <path d="M4 10V6.5A2.5 2.5 0 0 1 6.5 4H10" stroke="#80e0ff" stroke-width="2" stroke-linecap="round"/>
+      <path d="M34 28v3.5a2.5 2.5 0 0 1-2.5 2.5H28" stroke="#80e0ff" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="logo-text">PixelForge</span>
+  </div>
+  <div class="tagline">Converti · Ritaglia · Esporta</div>
+  <p class="desc">Converti, ridimensiona e ritaglia le tue immagini direttamente nel browser. Nessun dato viene caricato su server esterni: la tua privacy è garantita.</p>
+</header>
+
+<main>
+  <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Trascina o clicca per caricare">
+    <div class="drop-initial">
+      <div class="drop-graphic">
+        <svg viewBox="0 0 36 36" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <rect x="3" y="6" width="30" height="24" rx="3" stroke="currentColor" opacity=".35"/>
+          <circle cx="12" cy="14" r="2.5" stroke="currentColor" opacity=".5"/>
+          <path d="M6 27l6.5-8.5 4 5 4.5-6.5L28 27" stroke="currentColor"/>
+          <path d="M18 1v8" stroke="currentColor" opacity=".6"/>
+          <path d="M15 4.5l3-3.5 3 3.5" stroke="currentColor" opacity=".6"/>
+        </svg>
+      </div>
+      <h2>Trascina qui la tua immagine</h2>
+      <p class="sub">oppure clicca per selezionare un file dal dispositivo</p>
+      <div class="badge-row">
+        <span class="badge">JPG</span><span class="badge">PNG</span><span class="badge">WEBP</span>
+        <span class="badge">GIF</span><span class="badge">BMP</span><span class="badge">SVG</span>
+      </div>
+    </div>
+
+    <div class="file-bar" id="fileBar">
+      <span class="fmt-badge" id="fmtBadge">PNG</span>
+      <div class="fname">
+        <input type="text" class="fname-input" id="fnameInput" spellcheck="false" title="Clicca per rinominare il file">
+      </div>
+      <div class="fmeta">
+        <span id="metaDim">—</span>
+        <span class="sep">·</span>
+        <span id="metaSize">—</span>
+      </div>
+      <button class="btn-x" id="btnX" title="Rimuovi immagine">✕</button>
+    </div>
+
+    <div class="editor" id="editor">
+      <div class="viewport">
+        <div class="vp-inner" id="vp">
+          <img id="img" alt="Preview">
+          <div class="frame" id="frame">
+            <div class="frame-corner tl"></div>
+            <div class="frame-corner tr"></div>
+            <div class="frame-corner bl"></div>
+            <div class="frame-corner br"></div>
+            <div class="frame-g"><i class="h"></i><i class="h"></i><i class="v"></i><i class="v"></i></div>
+          </div>
+          <div class="center-bar">
+            <button class="zb" id="zFit">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M3 12h3m12 0h3M12 3v3m0 12v3"/></svg>
+              Centra
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <input type="file" id="fi" accept="image/*">
+  </div>
+
+  <div class="controls" id="ctrls">
+    <!-- Tutorial -->
+    <div class="tutorial" id="tutorial">
+      <div class="tut-step"><span class="tut-n">↔</span><span>Trascina l'immagine per posizionare l'inquadratura</span></div>
+      <div class="tut-step"><span class="tut-n">⟳</span><span>Usa la rotellina del mouse per ingrandire o ridurre</span></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Formato di esportazione</div>
+      <div class="fmt-row" id="fmtRow">
+        <button class="fmt-opt on" data-f="png">PNG</button>
+        <button class="fmt-opt" data-f="jpeg">JPG</button>
+        <button class="fmt-opt" data-f="webp">WEBP</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Dimensioni in pixel</div>
+      <div class="dim-row">
+        <div class="dim-col">
+          <label>Larghezza</label>
+          <input type="number" id="wIn" min="1" max="3000" placeholder="px">
+        </div>
+        <button class="link-toggle" id="linkBtn" title="Vincola le proporzioni">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8"/>
+            <path d="M6 16a6 6 0 0 0 12 0"/>
+            <line x1="12" y1="2" x2="12" y2="8"/>
+            <line x1="12" y1="16" x2="12" y2="22"/>
+          </svg>
+        </button>
+        <div class="dim-col">
+          <label>Altezza</label>
+          <input type="number" id="hIn" min="1" max="3000" placeholder="px">
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-card">
+        <div class="stat-icon input-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/>
+            <path d="M14 2v6h6"/>
+          </svg>
+        </div>
+        <div class="stat-data">
+          <div class="stat-label">Immagine originale</div>
+          <div class="stat-val" id="sizeIn">—</div>
+          <div class="stat-sub" id="sizeInDim">—</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon output-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </div>
+        <div class="stat-data">
+          <div class="stat-label">Peso stimato output</div>
+          <div class="stat-val" id="sizeOut">—</div>
+          <div class="stat-sub" id="sizeOutInfo">—</div>
+        </div>
+        <span class="savings neutral" id="savingsBadge">—</span>
+      </div>
+    </div>
+
+    <div class="dl-wrap" id="dlWrap">
+      <button class="btn-dl" id="btnDl">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Scarica immagine
+      </button>
+    </div>
+  </div>
+</main>
+
+<footer>PixelForge — Elaborazione interamente locale. Nessuna immagine viene inviata a server esterni: i tuoi file restano sul tuo dispositivo.</footer>
+
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+
+const dropZone=$('dropZone'),fi=$('fi'),editor=$('editor'),
+  vp=$('vp'),img=$('img'),frame=$('frame'),
+  fileBar=$('fileBar'),fnameInput=$('fnameInput'),
+  ctrls=$('ctrls'),wIn=$('wIn'),hIn=$('hIn'),
+  linkBtn=$('linkBtn'),dlWrap=$('dlWrap'),
+  btnDl=$('btnDl'),statsBar=$('statsBar'),btnX=$('btnX');
+
+/* ═══ STATE ═══ */
+let origImg=null, origBlob=null, natW=0, natH=0;
+let format='png', linked=false;
+let outW=800, outH=600;
+let imgScale=1, imgLeft=0, imgTop=0;
+let fX=0, fY=0, fW=0, fH=0;
+let vpW=0, vpH=0;
+let baseName='output';
+const PAD=36, MAX_H=460;
+let estimateTimer=null;
+
+/* ═══ PERSISTENCE ═══ */
+const STORAGE_KEY='pixelforge-prefs';
+let prefsApplied=false;
+async function savePrefs(){
+  const data=JSON.stringify({format,outW,outH,linked});
+  try{if(window.storage)await window.storage.set(STORAGE_KEY,data);} catch(e){}
+}
+async function loadPrefs(){
+  try{
+    if(!window.storage)return;
+    const r=await window.storage.get(STORAGE_KEY);
+    if(!r||!r.value)return;
+    const p=JSON.parse(r.value);
+    if(p.format&&['png','jpeg','webp'].includes(p.format)){
+      format=p.format;
+      document.querySelectorAll('.fmt-opt').forEach(b=>{
+        b.classList.toggle('on',b.dataset.f===format);
+      });
+    }
+    if(p.outW>0&&p.outH>0){outW=p.outW;outH=p.outH;wIn.value=outW;hIn.value=outH;prefsApplied=true}
+    if(typeof p.linked==='boolean'){
+      linked=p.linked;
+      linkBtn.classList.toggle('on',linked);
+      updateLinkIcon();
+    }
+  }catch(e){}
+}
+
+/* ═══ FORMAT DETECT ═══ */
+function detectFmt(f){
+  const e=(f.name||'').split('.').pop().toLowerCase();
+  return{jpg:'JPEG',jpeg:'JPEG',png:'PNG',webp:'WEBP',gif:'GIF',bmp:'BMP',svg:'SVG',tiff:'TIFF',avif:'AVIF'}[e]||'IMG';
+}
+
+function fmtSize(bytes){
+  if(bytes<1024)return bytes+' B';
+  if(bytes<1048576)return(bytes/1024).toFixed(1)+' KB';
+  return(bytes/1048576).toFixed(2)+' MB';
+}
+
+/* ═══ LOAD ═══ */
+function loadImage(file){
+  origBlob=file;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const i=new Image();
+    i.onload=()=>{
+      origImg=i; natW=i.naturalWidth; natH=i.naturalHeight;
+      img.src=i.src;
+
+      // Derive base name
+      const nm=file.name||'image';
+      baseName=nm.replace(/\.[^.]+$/,'');
+      fnameInput.value=baseName;
+
+      showUI();
+      $('fmtBadge').textContent=detectFmt(file);
+      $('metaDim').textContent=`${natW}×${natH}`;
+      $('metaSize').textContent=fmtSize(file.size);
+
+      // Stats
+      $('sizeIn').innerHTML=fmtSize(file.size);
+      $('sizeInDim').textContent=`${natW} × ${natH} · ${detectFmt(file)}`;
+
+      // Use saved prefs if available, else use image natural dimensions
+      if(!prefsApplied){outW=natW;outH=natH;wIn.value=natW;hIn.value=natH}
+      else{
+        // Prefs already set outW/outH, keep them
+        if(!wIn.value)wIn.value=outW;
+        if(!hIn.value)hIn.value=outH;
+      }
+
+      requestAnimationFrame(()=>{computeLayout();fitImage();estimateOutput()});
+    };
+    i.src=ev.target.result;
+  };
+  r.readAsDataURL(file);
+}
+
+function showUI(){
+  dropZone.classList.add('has-image');
+  [editor,fileBar,ctrls,dlWrap,statsBar].forEach(e=>e.classList.add('visible'));
+}
+function hideUI(){
+  origImg=null;origBlob=null;img.src='';
+  dropZone.classList.remove('has-image');
+  [editor,fileBar,ctrls,dlWrap,statsBar].forEach(e=>e.classList.remove('visible'));
+  fi.value='';
+}
+
+/* ═══ LAYOUT ═══ */
+function computeLayout(){
+  const cw=vp.parentElement.clientWidth;
+  const aW=cw-PAD*2, aH=MAX_H-PAD*2;
+  const s=Math.min(1,aW/outW,aH/outH);
+  fW=Math.round(outW*s); fH=Math.round(outH*s);
+  vpW=fW+PAD*2; vpH=fH+PAD*2;
+  vp.style.width=vpW+'px'; vp.style.height=vpH+'px';
+  fX=Math.round((vpW-fW)/2); fY=Math.round((vpH-fH)/2);
+  frame.style.left=fX+'px'; frame.style.top=fY+'px';
+  frame.style.width=fW+'px'; frame.style.height=fH+'px';
+}
+
+/* ═══ FIT IMAGE (cover frame) ═══ */
+function fitImage(){
+  if(!origImg)return;
+  imgScale=Math.max(fW/natW,fH/natH);
+  const iw=natW*imgScale, ih=natH*imgScale;
+  imgLeft=fX+(fW-iw)/2;
+  imgTop=fY+(fH-ih)/2;
+  applyImg();
+}
+
+function applyImg(){
+  img.style.width=(natW*imgScale)+'px';
+  img.style.height=(natH*imgScale)+'px';
+  img.style.transform=`translate(${imgLeft}px,${imgTop}px)`;
+}
+
+function minScale(){return Math.max(fW/natW,fH/natH)}
+
+function clamp(){
+  const ms=minScale();
+  if(imgScale<ms)imgScale=ms;
+  const iw=natW*imgScale,ih=natH*imgScale;
+  if(imgLeft>fX)imgLeft=fX;
+  if(imgTop>fY)imgTop=fY;
+  if(imgLeft+iw<fX+fW)imgLeft=fX+fW-iw;
+  if(imgTop+ih<fY+fH)imgTop=fY+fH-ih;
+}
+
+/* ═══ DRAG ═══ */
+let drag=false,dx0,dy0,ix0,iy0;
+vp.addEventListener('pointerdown',e=>{
+  if(e.button!==0||e.target.closest('.zb'))return;
+  e.preventDefault();drag=true;
+  dx0=e.clientX;dy0=e.clientY;ix0=imgLeft;iy0=imgTop;
+  vp.setPointerCapture(e.pointerId);
+});
+vp.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  imgLeft=ix0+(e.clientX-dx0);imgTop=iy0+(e.clientY-dy0);
+  clamp();applyImg();
+});
+vp.addEventListener('pointerup',()=>{drag=false;scheduleEstimate()});
+vp.addEventListener('pointercancel',()=>drag=false);
+
+/* ═══ ZOOM ═══ */
+vp.addEventListener('wheel',e=>{
+  e.preventDefault();
+  zoomAt(e.clientX,e.clientY,e.deltaY>0?-0.06:0.06);
+  scheduleEstimate();
+},{passive:false});
+
+function zoomAt(cx,cy,d){
+  const r=vp.getBoundingClientRect();
+  const mx=cx-r.left,my=cy-r.top,old=imgScale;
+  imgScale*=(1+d);
+  imgLeft=mx-(mx-imgLeft)*(imgScale/old);
+  imgTop=my-(my-imgTop)*(imgScale/old);
+  clamp();applyImg();
+}
+
+let pinch=0;
+vp.addEventListener('touchstart',e=>{
+  if(e.touches.length===2){e.preventDefault();
+    pinch=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                     e.touches[0].clientY-e.touches[1].clientY)}
+},{passive:false});
+vp.addEventListener('touchmove',e=>{
+  if(e.touches.length===2){e.preventDefault();
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                       e.touches[0].clientY-e.touches[1].clientY);
+    zoomAt((e.touches[0].clientX+e.touches[1].clientX)/2,
+           (e.touches[0].clientY+e.touches[1].clientY)/2,
+           (d-pinch)/pinch*.5);
+    pinch=d}
+},{passive:false});
+
+$('zFit').addEventListener('click',e=>{e.stopPropagation();fitImage();scheduleEstimate()});
+
+/* ═══ DIMS ═══ */
+let dt=null;
+function dimCh(src){
+  clearTimeout(dt);
+  dt=setTimeout(()=>{
+    let w=parseInt(wIn.value),h=parseInt(hIn.value);
+    if(!w&&!h)return;
+    if(linked){
+      const ratio=natW/natH;
+      if(src==='w'){h=Math.round((w||1)/ratio);hIn.value=h}
+      else{w=Math.round((h||1)*ratio);wIn.value=w}
+    }
+    outW=Math.min(3000,Math.max(1,w||1));outH=Math.min(3000,Math.max(1,h||1));
+    wIn.value=outW;hIn.value=outH;
+    computeLayout();fitImage();scheduleEstimate();savePrefs();
+  },300);
+}
+wIn.addEventListener('input',()=>dimCh('w'));
+hIn.addEventListener('input',()=>dimCh('h'));
+
+/* ═══ LINK ═══ */
+function updateLinkIcon(){
+  if(linked){
+    linkBtn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+    </svg>`;
+  } else {
+    linkBtn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8"/>
+      <path d="M6 16a6 6 0 0 0 12 0"/>
+      <line x1="12" y1="2" x2="12" y2="8"/>
+      <line x1="12" y1="16" x2="12" y2="22"/>
+    </svg>`;
+  }
+}
+linkBtn.addEventListener('click',()=>{
+  linked=!linked;
+  linkBtn.classList.toggle('on',linked);
+  updateLinkIcon();
+  savePrefs();
+});
+
+/* ═══ FORMAT ═══ */
+document.querySelectorAll('.fmt-opt').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.fmt-opt').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');format=b.dataset.f;
+  scheduleEstimate();savePrefs();
+}));
+
+/* ═══ DROP/FILE ═══ */
+dropZone.addEventListener('click',e=>{
+  if(!dropZone.classList.contains('has-image')
+    &&!e.target.closest('.btn-x')
+    &&!e.target.closest('.vp-inner')
+    &&!e.target.closest('.zb'))fi.click();
+});
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over')});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{
+  e.preventDefault();dropZone.classList.remove('drag-over');
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('image/'))loadImage(f);
+});
+fi.addEventListener('change',()=>{if(fi.files[0])loadImage(fi.files[0])});
+btnX.addEventListener('click',e=>{e.stopPropagation();hideUI()});
+
+/* ═══ ESTIMATE OUTPUT SIZE ═══ */
+function scheduleEstimate(){
+  clearTimeout(estimateTimer);
+  estimateTimer=setTimeout(estimateOutput,300);
+}
+
+function estimateOutput(){
+  if(!origImg)return;
+  const srcX=(fX-imgLeft)/imgScale;
+  const srcY=(fY-imgTop)/imgScale;
+  const srcW=fW/imgScale;
+  const srcH=fH/imgScale;
+
+  // Render at FULL output resolution for accurate size
+  const c=document.createElement('canvas');
+  c.width=outW; c.height=outH;
+  const ctx=c.getContext('2d');
+  if(format==='jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,outW,outH)}
+  ctx.drawImage(origImg,srcX,srcY,srcW,srcH,0,0,outW,outH);
+
+  const mime='image/'+format;
+  const q=format==='png'?undefined:0.92;
+  c.toBlob(blob=>{
+    if(!blob)return;
+    const est=blob.size;
+
+    $('sizeOut').innerHTML=fmtSize(est);
+    $('sizeOutInfo').textContent=`${outW} × ${outH} · ${format==='jpeg'?'JPG':format.toUpperCase()}`;
+
+    // Savings badge
+    const badge=$('savingsBadge');
+    if(origBlob){
+      const pct=Math.round((1-est/origBlob.size)*100);
+      if(pct>5){
+        badge.textContent=`−${pct}%`;
+        badge.className='savings good';
+      } else if(pct<-5){
+        badge.textContent=`+${Math.abs(pct)}%`;
+        badge.className='savings bad';
+      } else {
+        badge.textContent='≈';
+        badge.className='savings neutral';
+      }
+    }
+  },mime,q);
+}
+
+/* ═══ DOWNLOAD ═══ */
+btnDl.addEventListener('click',()=>{
+  if(!origImg)return;
+  const srcX=(fX-imgLeft)/imgScale;
+  const srcY=(fY-imgTop)/imgScale;
+  const srcW=fW/imgScale;
+  const srcH=fH/imgScale;
+  const c=document.createElement('canvas');
+  c.width=outW;c.height=outH;
+  const ctx=c.getContext('2d');
+  if(format==='jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,outW,outH)}
+  ctx.drawImage(origImg,srcX,srcY,srcW,srcH,0,0,outW,outH);
+  const mime='image/'+format;
+  const q=format==='png'?undefined:0.92;
+  c.toBlob(blob=>{
+    if(!blob)return;
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    const name=(fnameInput.value.trim()||'pixelforge');
+    a.download=name+'.'+(format==='jpeg'?'jpg':format);
+    a.click();URL.revokeObjectURL(a.href);
+  },mime,q);
+});
+
+/* ═══ RESIZE OBSERVER ═══ */
+let roT=null;
+new ResizeObserver(()=>{
+  if(!origImg)return;
+  clearTimeout(roT);roT=setTimeout(()=>{computeLayout();clamp();applyImg()},50);
+}).observe(dropZone);
+
+/* ═══ KEYBOARD ═══ */
+dropZone.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&!dropZone.classList.contains('has-image')){e.preventDefault();fi.click()}
+});
+
+/* ═══ INIT: load saved preferences ═══ */
+loadPrefs();
+
+})();
+</script>
+</body>
+</html>
