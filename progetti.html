@@ -112,12 +112,24 @@
       .page__desc{font-size:.92rem}
       .card__title{font-size:1rem}
       .card__desc{font-size:.82rem}
-      .grid-toolbar{margin-bottom:12px}
+      .grid-toolbar{display:none}
+      .card-wrap.sortable{cursor:pointer}
+      .mobile-banner{display:flex}
     }
     @media(max-width:420px){
       .nav__links{gap:10px}.nav__links a{font-size:.58rem}
       .main{padding:95px 16px 50px}
     }
+
+    /* ── Desktop recommendation banner ── */
+    .mobile-banner{display:none;align-items:center;gap:12px;padding:14px 18px;margin-bottom:24px;background:rgba(0,224,208,.04);border:1px solid rgba(0,224,208,.1);border-radius:10px}
+    .mobile-banner__icon{flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(0,224,208,.08);display:flex;align-items:center;justify-content:center}
+    .mobile-banner__icon svg{width:16px;height:16px;stroke:var(--cyan);fill:none;stroke-width:2}
+    .mobile-banner__text{font-size:.8rem;color:var(--text-dim);font-weight:300;line-height:1.5}
+    .mobile-banner__text strong{color:var(--text);font-weight:500}
+    .mobile-banner__close{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;flex-shrink:0;transition:color .3s}
+    .mobile-banner__close:hover{color:var(--text)}
+    .mobile-banner__close svg{width:14px;height:14px}
   </style>
 </head>
 <body>
@@ -148,6 +160,12 @@
       <button class="tab active" data-cat="formazione">Formazione</button>
       <button class="tab" data-cat="strumenti">Strumenti</button>
       <button class="tab" data-cat="articoli">Articoli</button>
+    </div>
+
+    <div class="mobile-banner" id="mobile-banner">
+      <div class="mobile-banner__icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></div>
+      <div class="mobile-banner__text">Per un'esperienza completa, ti consigliamo di visitare questa sezione da <strong>desktop</strong>. Potrai riordinare le card e interagire con gli effetti 3D.</div>
+      <button class="mobile-banner__close" id="mobile-banner-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
 
     <!-- ═══════ FORMAZIONE ═══════ -->
@@ -297,7 +315,26 @@
         b.classList.toggle('visible', b.dataset.grid === cat && !!isReordered);
       });
 
+      // Show mobile banner only for formazione/strumenti
+      const banner = document.getElementById('mobile-banner');
+      if (banner && !bannerDismissed) {
+        banner.style.display = (cat === 'formazione' || cat === 'strumenti') ? '' : 'none';
+      }
+
       history.replaceState(null, '', '#' + cat);
+    }
+
+    // Mobile banner dismiss
+    let bannerDismissed = !!sessionStorage.getItem('rb_banner_dismissed');
+    const bannerEl = document.getElementById('mobile-banner');
+    const bannerClose = document.getElementById('mobile-banner-close');
+    if (bannerDismissed && bannerEl) bannerEl.style.display = 'none';
+    if (bannerClose) {
+      bannerClose.addEventListener('click', () => {
+        bannerDismissed = true;
+        sessionStorage.setItem('rb_banner_dismissed', '1');
+        bannerEl.style.display = 'none';
+      });
     }
 
     tabs.forEach(t => t.addEventListener('click', () => switchCat(t.dataset.cat, false)));
@@ -355,6 +392,9 @@
       };
     }
 
+    const isDesktop = window.matchMedia('(min-width:601px)').matches;
+
+    if (isDesktop) {
     sortableGrids.forEach(grid => {
       const gridName = grid.id.replace('grid-', '');
 
@@ -459,8 +499,9 @@
         });
       });
     });
+    } // end isDesktop
 
-    // Reset buttons
+    // Reset buttons (keep on all devices for saved orders)
     document.querySelectorAll('.reset-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const gridName = btn.dataset.grid;
