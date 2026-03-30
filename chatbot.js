@@ -291,9 +291,9 @@
   /* ── CSS ── */
   const S = document.createElement('style');
   S.textContent = `
-    .rb-chat-btn{position:fixed;bottom:28px;right:28px;z-index:100;width:60px;height:60px;border-radius:50%;border:none;background:var(--cyan,#00e0d0);color:#08080e;cursor:pointer;box-shadow:0 4px 24px rgba(0,224,208,.35);transition:all .4s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;justify-content:center;overflow:hidden}
-    .rb-chat-btn.pulse{animation:rbPulse 2.5s ease-in-out infinite}
-    @keyframes rbPulse{0%,100%{box-shadow:0 4px 24px rgba(0,224,208,.35)}40%{box-shadow:0 0 0 0 rgba(0,224,208,.4),0 4px 24px rgba(0,224,208,.35)}70%{box-shadow:0 0 0 14px rgba(0,224,208,0),0 4px 32px rgba(0,224,208,.55)}}
+    .rb-chat-btn{position:fixed;bottom:32px;right:32px;z-index:100;width:64px;height:64px;border-radius:50%;border:none;background:var(--cyan,#00e0d0);color:#08080e;cursor:pointer;box-shadow:0 4px 24px rgba(0,224,208,.35);transition:all .4s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .rb-chat-btn.pulse{animation:rbPulse 2s ease-in-out infinite}
+    @keyframes rbPulse{0%,100%{box-shadow:0 4px 24px rgba(0,224,208,.35)}30%{box-shadow:0 0 0 0 rgba(0,224,208,.5),0 4px 28px rgba(0,224,208,.5)}60%{box-shadow:0 0 0 20px rgba(0,224,208,0),0 4px 36px rgba(0,224,208,.6)}}
     .rb-chat-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,224,208,.45)}
     .rb-chat-btn:active{transform:translateY(0) scale(.94);transition-duration:.1s}
     .rb-chat-btn .rb-icon{position:absolute;transition:all .4s cubic-bezier(.16,1,.3,1)}
@@ -348,12 +348,19 @@
     .rb-resize--sw{bottom:-4px;left:-4px;width:14px;height:14px;cursor:nesw-resize}
 
     @media(max-width:520px){
-      .rb-chat{right:0!important;left:0!important;bottom:0!important;top:0!important;width:100%!important;height:100%!important;border-radius:0;border:none}
-      .rb-chat.open{transform:translateY(0) scale(1)}
-      .rb-chat-btn{bottom:20px;right:20px;width:54px;height:54px}
+      .rb-chat{right:0!important;left:0!important;bottom:0!important;top:0!important;width:100%!important;height:100%!important;max-height:100%!important;border-radius:0;border:none;transform:translateY(100%);opacity:1;pointer-events:none}
+      .rb-chat.open{transform:translateY(0);pointer-events:all}
+      .rb-chat-btn{bottom:24px;right:24px;width:60px;height:60px}
+      .rb-chat-btn.open{opacity:0;pointer-events:none;transform:scale(.5)}
       .rb-resize{display:none}
-      .rb-chat__header{border-radius:0}
+      .rb-chat__header{border-radius:0;padding:16px 20px;padding-top:max(16px,env(safe-area-inset-top))}
       .rb-chat__drag{cursor:default}
+      .rb-chat__body{padding:16px 18px;padding-bottom:max(16px,env(safe-area-inset-bottom))}
+      .rb-chat__msg{font-size:.9rem;max-width:94%;padding:14px 16px}
+      .rb-chat__opt{padding:13px 16px;font-size:.88rem}
+    }
+    @media(min-width:521px) and (max-width:800px){
+      .rb-chat{right:16px;width:calc(100vw - 32px);max-width:440px;bottom:104px;height:calc(100vh - 120px)}
     }
   `;
   document.head.appendChild(S);
@@ -372,7 +379,7 @@
   chat.className = 'rb-chat';
   // Default position/size
   const defW = 440, defH = 600;
-  const defR = 28, defB = 100;
+  const defR = 32, defB = 108;
   chat.style.cssText = `right:${defR}px;bottom:${defB}px;width:${defW}px;height:${defH}px;max-height:calc(100vh - 140px);`;
 
   // Header with drag handle
