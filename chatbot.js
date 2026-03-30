@@ -292,6 +292,8 @@
   const S = document.createElement('style');
   S.textContent = `
     .rb-chat-btn{position:fixed;bottom:28px;right:28px;z-index:100;width:60px;height:60px;border-radius:50%;border:none;background:var(--cyan,#00e0d0);color:#08080e;cursor:pointer;box-shadow:0 4px 24px rgba(0,224,208,.35);transition:all .4s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .rb-chat-btn.pulse{animation:rbPulse 2.5s ease-in-out infinite}
+    @keyframes rbPulse{0%,100%{box-shadow:0 4px 24px rgba(0,224,208,.35)}40%{box-shadow:0 0 0 0 rgba(0,224,208,.4),0 4px 24px rgba(0,224,208,.35)}70%{box-shadow:0 0 0 14px rgba(0,224,208,0),0 4px 32px rgba(0,224,208,.55)}}
     .rb-chat-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,224,208,.45)}
     .rb-chat-btn:active{transform:translateY(0) scale(.94);transition-duration:.1s}
     .rb-chat-btn .rb-icon{position:absolute;transition:all .4s cubic-bezier(.16,1,.3,1)}
@@ -358,7 +360,7 @@
 
   /* ── Button ── */
   const btn = document.createElement('button');
-  btn.className = 'rb-chat-btn';
+  btn.className = 'rb-chat-btn pulse';
   btn.setAttribute('aria-label', 'Apri assistente');
   btn.innerHTML = `
     <svg class="rb-icon rb-icon-chat" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -400,6 +402,7 @@
 
   /* ── Toggle ── */
   btn.addEventListener('click', () => {
+    btn.classList.remove('pulse');
     isOpen = !isOpen;
     chat.classList.toggle('open', isOpen);
     btn.classList.toggle('open', isOpen);
