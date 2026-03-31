@@ -1,1 +1,476 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dal Perceptron al Transformer — Riccardo Busolo</title>
+  <meta name="description" content="60 anni di reti neurali raccontati visivamente: dal perceptron di Rosenblatt al Transformer, passando per backpropagation, CNN, RNN e il paper che ha cambiato tutto.">
+  <link rel="canonical" href="https://riccardobusolo.com/articoli/dal-perceptron-al-transformer/">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#08080e;--bg-card:#12121a;--bg-raised:#191920;--border:rgba(180,180,190,.08);--text:#e0e0e6;--text-dim:#9a9a9e;--text-muted:#6a6a74;--cyan:#00e0d0;--cyan-dim:rgba(0,224,208,.08);--cyan-border:rgba(0,224,208,.15);--orange:#ff8844;--purple:#a78bfa;--pink:#f472b6;--green:#34d399;--blue:#60a5fa;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1);--article-w:720px}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.85;-webkit-font-smoothing:antialiased;font-weight:300}
 
+    .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;padding:20px 40px;background:rgba(10,10,14,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+    .nav__inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:900px}
+    .nav__logo{text-decoration:none;display:flex;align-items:center;transition:scale .3s var(--ease)}
+    .nav__logo:hover{scale:1.08}.nav__logo:active{scale:.94;transition-duration:.1s}
+    .nav__links{display:flex;gap:32px;list-style:none}
+    .nav__links a{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-decoration:none;transition:color .3s}
+    .nav__links a:hover{color:var(--cyan)}
+
+    .back{position:fixed;left:max(24px,calc((100vw - var(--article-w)) / 2 - 160px));top:120px;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.7rem;color:var(--text-muted);text-decoration:none!important;transition:all .3s var(--ease);letter-spacing:.03em;border:none!important;padding:10px 16px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border)!important;z-index:40;white-space:nowrap}
+    .back:hover{color:var(--cyan);border-color:var(--cyan-border)!important;background:rgba(0,224,208,.06)}
+    .back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .3s var(--ease);flex-shrink:0}
+    .back:hover svg{transform:translateX(-3px)}
+
+    .article{max-width:var(--article-w);margin:0 auto;padding:120px 32px 80px}
+    .article__tag{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:16px}
+    .article__title{font-size:clamp(2rem,5vw,2.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:10px}
+    .article__subtitle{font-size:1.05rem;color:var(--text-dim);font-weight:300;line-height:1.7;margin-bottom:20px}
+    .article__meta{display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:.7rem;color:var(--text-muted);margin-bottom:36px;flex-wrap:wrap}
+    .article__meta span{display:flex;align-items:center;gap:5px}
+    .article__meta svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+
+    .divider{width:40px;height:2px;background:linear-gradient(90deg,var(--cyan),transparent);margin:48px 0;border:none}
+
+    .tldr{background:var(--cyan-dim);border:1px solid var(--cyan-border);border-radius:12px;padding:24px 28px;margin-bottom:48px}
+    .tldr__label{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:10px;font-weight:600}
+    .tldr p{font-size:.92rem;color:var(--text-dim);line-height:1.8;margin:0}
+
+    .toc{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:48px}
+    .toc__title{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:14px}
+    .toc__list{list-style:none;display:flex;flex-direction:column;gap:8px}
+    .toc__list a{font-size:.88rem;color:var(--text-dim);text-decoration:none;transition:color .3s;display:flex;align-items:center;gap:8px;border:none!important}
+    .toc__list a::before{content:'';width:6px;height:1px;background:var(--text-muted);transition:width .3s,background .3s;flex-shrink:0}
+    .toc__list a:hover{color:var(--cyan)}
+    .toc__list a:hover::before{width:16px;background:var(--cyan)}
+
+    .article h2{font-size:1.6rem;font-weight:700;letter-spacing:-.03em;margin:0 0 20px;padding-top:0}
+    .article h3{font-size:1.15rem;font-weight:600;margin:32px 0 12px}
+    .article p{margin-bottom:20px;font-size:1rem;color:var(--text-dim)}
+    .article strong{color:var(--text);font-weight:600}
+    .article a:not(.back):not(.toc__list a):not(.cta-box__btn){color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,224,208,.2);transition:border-color .3s}
+    .article a:not(.back):not(.toc__list a):not(.cta-box__btn):hover{border-color:var(--cyan)}
+
+    .infobox{background:var(--bg-card);border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;padding:20px 24px;margin:28px 0;font-size:.9rem}
+    .infobox__label{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:8px}
+    .infobox p{color:var(--text-dim);margin-bottom:0}
+    code{font-family:var(--mono);font-size:.82em;background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--orange)}
+
+    /* ── Year badge ── */
+    .year{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.72rem;color:var(--cyan);padding:4px 14px;background:var(--cyan-dim);border:1px solid var(--cyan-border);border-radius:20px;margin-bottom:16px}
+
+    /* ── Infographics ── */
+    .infographic{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:32px;margin:32px 0;overflow:hidden}
+    .infographic__title{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:20px;text-align:center}
+
+    /* XOR grid */
+    .xor{display:flex;flex-direction:column;align-items:center;gap:16px}
+    .xor__grid{position:relative;width:260px;height:260px;background:var(--bg-raised);border:1px solid var(--border);border-radius:10px}
+    .xor__dot{position:absolute;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;transform:translate(-50%,-50%);transition:all .3s var(--ease)}
+    .xor__dot--a{background:rgba(0,224,208,.15);color:var(--cyan);border:2px solid rgba(0,224,208,.3)}
+    .xor__dot--b{background:rgba(248,113,113,.12);color:#f87171;border:2px solid rgba(248,113,113,.25)}
+    .xor__line{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--orange);opacity:0;transition:opacity .4s}
+    .xor__line--show{opacity:.5}
+    .xor__line2{position:absolute;left:0;right:0;top:50%;height:2px;background:var(--purple);opacity:0;transition:opacity .4s}
+    .xor__line2--show{opacity:.5}
+    .xor__label{position:absolute;font-family:var(--mono);font-size:.52rem;color:var(--text-muted)}
+    .xor__label--x{bottom:8px;left:50%;transform:translateX(-50%)}
+    .xor__label--y{top:50%;left:8px;transform:translateY(-50%) rotate(-90deg)}
+    .xor__btns{display:flex;gap:8px}
+    .xor__btn{padding:8px 16px;font-family:var(--mono);font-size:.72rem;border-radius:8px;border:1px solid var(--border);background:var(--bg-raised);color:var(--text-dim);cursor:pointer;transition:all .3s var(--ease)}
+    .xor__btn:hover{border-color:var(--cyan-border);color:var(--cyan)}
+    .xor__btn.active{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan)}
+    .xor__caption{font-family:var(--mono);font-size:.68rem;color:var(--text-muted);text-align:center;max-width:320px}
+
+    /* Backprop flow */
+    .bp{display:flex;flex-direction:column;align-items:center;gap:16px}
+    .bp__layers{display:flex;align-items:center;gap:24px;justify-content:center;flex-wrap:wrap}
+    .bp__layer{display:flex;flex-direction:column;gap:8px;align-items:center}
+    .bp__node{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.6rem;font-weight:600;transition:all .5s var(--ease)}
+    .bp__node--input{background:rgba(0,224,208,.1);border:1.5px solid rgba(0,224,208,.25);color:var(--cyan)}
+    .bp__node--hidden{background:rgba(167,139,250,.1);border:1.5px solid rgba(167,139,250,.2);color:var(--purple)}
+    .bp__node--output{background:rgba(52,211,153,.1);border:1.5px solid rgba(52,211,153,.2);color:var(--green)}
+    .bp__node--error{background:rgba(248,113,113,.15)!important;border-color:rgba(248,113,113,.4)!important;color:#f87171!important;box-shadow:0 0 12px rgba(248,113,113,.2)}
+    .bp__arrow{font-size:1.2rem;color:var(--text-muted);transition:color .4s}
+    .bp__arrow--back{color:#f87171}
+    .bp__label{font-family:var(--mono);font-size:.52rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+    .bp__btn{padding:8px 20px;font-family:var(--mono);font-size:.72rem;border-radius:8px;border:1px solid var(--cyan-border);background:var(--cyan-dim);color:var(--cyan);cursor:pointer;transition:all .3s var(--ease)}
+    .bp__btn:hover{background:rgba(0,224,208,.12)}
+
+    /* RNN vs Transformer */
+    .vs{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .vs__col{padding:20px;background:var(--bg-raised);border:1px solid var(--border);border-radius:10px;text-align:center}
+    .vs__title{font-family:var(--mono);font-size:.72rem;font-weight:600;margin-bottom:14px}
+    .vs__title--rnn{color:var(--orange)}.vs__title--tfm{color:var(--cyan)}
+    .vs__blocks{display:flex;flex-direction:column;gap:6px;align-items:center}
+    .vs__step{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.62rem;color:var(--text-dim)}
+    .vs__box{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;transition:all .4s var(--ease)}
+    .vs__box--rnn{background:rgba(255,136,68,.1);border:1px solid rgba(255,136,68,.2);color:var(--orange)}
+    .vs__box--tfm{background:rgba(0,224,208,.1);border:1px solid rgba(0,224,208,.2);color:var(--cyan)}
+    .vs__box--lit{box-shadow:0 0 10px currentColor}
+    .vs__note{font-family:var(--mono);font-size:.58rem;color:var(--text-muted);margin-top:10px}
+
+    /* Timeline */
+    .timeline{display:flex;flex-direction:column;gap:0;position:relative;padding-left:24px}
+    .timeline::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--border)}
+    .tl-item{position:relative;padding:12px 0 12px 24px}
+    .tl-item::before{content:'';position:absolute;left:-20px;top:18px;width:10px;height:10px;border-radius:50%;background:var(--bg-raised);border:2px solid var(--cyan-border)}
+    .tl-item--highlight::before{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 8px rgba(0,224,208,.3)}
+    .tl-year{font-family:var(--mono);font-size:.68rem;color:var(--cyan);font-weight:600}
+    .tl-text{font-size:.85rem;color:var(--text-dim);margin-top:2px}
+    .tl-text strong{color:var(--text)}
+
+    /* CTA */
+    .cta-box{background:linear-gradient(135deg,rgba(0,224,208,.04),rgba(167,139,250,.04));border:1px solid var(--cyan-border);border-radius:14px;padding:36px 32px;text-align:center;margin:56px 0 20px}
+    .cta-box__title{font-size:1.2rem;font-weight:700;margin-bottom:10px}
+    .cta-box__desc{font-size:.9rem;color:var(--text-dim);margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto}
+    .cta-box__btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;font-family:var(--mono);font-size:.8rem;font-weight:500;background:var(--cyan);color:var(--bg);border-radius:6px;text-decoration:none!important;border:none!important;transition:all .3s var(--ease)}
+    .cta-box__btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,208,.3);color:var(--bg)!important}
+
+    .footer{padding:36px 32px;text-align:center;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border);max-width:var(--article-w);margin:0 auto}
+    .footer a{color:var(--text-muted);text-decoration:none;font-family:var(--mono);font-size:.72rem;transition:color .3s;border:none!important}
+    .footer a:hover{color:var(--cyan)}
+
+    @media(max-width:960px){.back{left:20px;top:80px;padding:8px 14px;font-size:.66rem}}
+    @media(max-width:600px){
+      .article{padding:100px 20px 60px}
+      .nav{padding:14px 20px}.nav__links{gap:16px}.nav__links a{font-size:.62rem}
+      .article__title{font-size:1.7rem}
+      .infographic{padding:20px 16px}
+      .vs{grid-template-columns:1fr}
+      .back{left:16px;top:74px;padding:7px 12px;font-size:.62rem}
+      .xor__grid{width:220px;height:220px}
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav"><div class="nav__inner">
+    <a href="/index.html" class="nav__logo" style="display:flex;align-items:center">
+      <svg height="32" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
+      </svg>
+    </a>
+    <ul class="nav__links">
+      <li><a href="/index.html#servizi">Servizi</a></li>
+      <li><a href="/progetti.html">Progetti</a></li>
+      <li><a href="/index.html#risorse">Risorse</a></li>
+      <li><a href="/index.html#contatti">Contatti</a></li>
+    </ul>
+  </div></nav>
+
+  <a href="/progetti.html#articoli" class="back"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>Articoli</a>
+
+  <article class="article">
+
+    <div class="article__tag">Articolo</div>
+    <h1 class="article__title">Dal Perceptron al Transformer</h1>
+    <p class="article__subtitle">60 anni di reti neurali — dalle schede perforate di Rosenblatt al paper che ha ridefinito l'Intelligenza Artificiale.</p>
+    <div class="article__meta">
+      <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14 min</span>
+      <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 2026</span>
+      <span><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Riccardo Busolo</span>
+    </div>
+
+    <div class="tldr">
+      <div class="tldr__label">In breve</div>
+      <p>Nel 1958, un computer da 5 tonnellate imparò a distinguere destra da sinistra. Nel 2017, un paper di Google dimostrò che l'<strong>attenzione</strong> è tutto ciò che serve. Tra queste due date: un inverno glaciale, una rinascita, e le idee che hanno costruito l'AI che usi oggi. Questa è la storia delle reti neurali.</p>
+    </div>
+
+    <div class="toc">
+      <div class="toc__title">In questo articolo</div>
+      <ol class="toc__list">
+        <li><a href="#perceptron">1958 — Il Perceptron di Rosenblatt</a></li>
+        <li><a href="#minsky">1969 — Il muro di Minsky e il problema XOR</a></li>
+        <li><a href="#inverno">L'Inverno dell'AI</a></li>
+        <li><a href="#backprop">1986 — Backpropagation: l'errore che viaggia all'indietro</a></li>
+        <li><a href="#cnn-rnn">CNN e RNN — Reti che vedono e reti che ricordano</a></li>
+        <li><a href="#transformer">2017 — Attention Is All You Need</a></li>
+        <li><a href="#esplosione">L'esplosione: da BERT a GPT a Claude</a></li>
+      </ol>
+    </div>
+
+    <!-- ═══ 1. PERCEPTRON ═══ -->
+    <div class="year">1958</div>
+    <h2 id="perceptron">Il Perceptron di Rosenblatt</h2>
+    <p>Luglio 1958. Un calcolatore IBM 704 — <strong>5 tonnellate di valvole e fili</strong> — viene alimentato con schede perforate. Su ogni scheda, un punto nero posizionato a destra o a sinistra. Dopo 50 tentativi, la macchina impara a distinguerli. Senza istruzioni esplicite. Solo esempi.</p>
+    <p>L'inventore è <strong>Frank Rosenblatt</strong>, psicologo e ingegnere alla Cornell University. La sua creazione si chiama <strong>Perceptron</strong>: un singolo neurone artificiale che moltiplica ogni input per un peso, somma tutto, e produce una risposta binaria. Se sbaglia, i pesi si aggiornano. Col tempo, converge.</p>
+    <p>Il principio è elegante: <strong>apprendimento per correzione degli errori</strong>. Non dici alla macchina le regole — le lasci scoprire attraverso l'esperienza. Il New York Times lo definì "il primo dispositivo capace di avere un'idea originale".</p>
+
+    <div class="infobox">
+      <div class="infobox__label">Prova tu stesso</div>
+      <p>Puoi sperimentare esattamente lo stesso meccanismo nel nostro <a href="/formazione/mark-i-perceptron/">laboratorio interattivo Mark I</a> — posiziona il segnale sulla scheda e osserva il perceptron imparare.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ 2. MINSKY ═══ -->
+    <div class="year">1969</div>
+    <h2 id="minsky">Il muro di Minsky e il problema XOR</h2>
+    <p>Per un decennio, il perceptron sembrò la chiave di tutto. Ma nel 1969, Marvin Minsky e Seymour Papert pubblicarono <strong>"Perceptrons"</strong>, un libro che ne dimostrò un limite fatale: il perceptron a singolo strato non può risolvere problemi che non siano <strong>linearmente separabili</strong>.</p>
+    <p>L'esempio più celebre: la funzione <strong>XOR</strong> (OR esclusivo). Date due variabili binarie, XOR restituisce 1 quando sono diverse e 0 quando sono uguali. Sembra banale. Ma provate a tracciare una singola linea retta che separi i punti — è impossibile.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Infografica interattiva — Il problema XOR</div>
+      <div class="xor" id="xor-demo">
+        <div class="xor__grid" id="xor-grid">
+          <div class="xor__label xor__label--x">X</div>
+          <div class="xor__label xor__label--y">Y</div>
+          <div class="xor__dot xor__dot--b" style="left:25%;top:25%">0</div>
+          <div class="xor__dot xor__dot--a" style="left:75%;top:25%">1</div>
+          <div class="xor__dot xor__dot--a" style="left:25%;top:75%">1</div>
+          <div class="xor__dot xor__dot--b" style="left:75%;top:75%">0</div>
+          <div class="xor__line" id="xor-line1"></div>
+          <div class="xor__line2" id="xor-line2"></div>
+        </div>
+        <div class="xor__btns">
+          <button class="xor__btn active" id="xor-btn0">Nessuna linea</button>
+          <button class="xor__btn" id="xor-btn1">1 linea</button>
+          <button class="xor__btn" id="xor-btn2">2 linee</button>
+        </div>
+        <div class="xor__caption" id="xor-caption">I punti <span style="color:var(--cyan)">cyan (1)</span> e <span style="color:#f87171">rossi (0)</span> non possono essere separati da una singola linea retta.</div>
+      </div>
+    </div>
+
+    <p>Il perceptron può tracciare solo una linea. Per XOR ne servono due — e questo richiede <strong>più strati</strong>. Minsky e Papert lo dimostrarono formalmente. Ma l'impatto fu sproporzionato: i finanziamenti crollarono, i ricercatori cambiarono campo. Il perceptron fu dichiarato morto.</p>
+
+    <hr class="divider">
+
+    <!-- ═══ 3. INVERNO ═══ -->
+    <h2 id="inverno">L'Inverno dell'AI</h2>
+    <p>Dal 1969 alla metà degli anni '80, le reti neurali entrarono in un periodo noto come <strong>"AI Winter"</strong>. I governi tagliarono i fondi. Le università spostarono le risorse verso altri approcci — sistemi esperti, logica simbolica, programmazione rule-based.</p>
+    <p>Rosenblatt morì nel 1971, a 43 anni, in un incidente in barca. Non vide mai la rivincita della sua intuizione. Ma sottotraccia, pochi ricercatori ostinati continuarono a lavorare. Sapevano che il perceptron non era il limite — era solo l'inizio.</p>
+
+    <div class="infobox">
+      <div class="infobox__label">La lezione dell'inverno</div>
+      <p>L'AI Winter ci insegna che l'entusiasmo eccessivo e le aspettative irrealistiche possono essere dannosi quanto lo scetticismo. È una lezione che vale ancora oggi, nell'era dei Large Language Model: strumenti potentissimi, ma non onniscienti.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ 4. BACKPROP ═══ -->
+    <div class="year">1986</div>
+    <h2 id="backprop">Backpropagation: l'errore che viaggia all'indietro</h2>
+    <p>La svolta arrivò nel 1986, quando <strong>Rumelhart, Hinton e Williams</strong> pubblicarono un metodo per addestrare reti neurali con <strong>più strati</strong>: la <strong>backpropagation</strong>.</p>
+    <p>L'idea: quando la rete sbaglia, l'errore non viene usato solo per aggiornare l'ultimo strato. Viene propagato <strong>all'indietro</strong>, strato dopo strato, fino all'input. Ogni connessione viene aggiornata in proporzione al suo contributo all'errore. È il calcolo differenziale applicato all'apprendimento.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Infografica interattiva — Backpropagation</div>
+      <div class="bp" id="bp-demo">
+        <div class="bp__layers">
+          <div class="bp__layer">
+            <div class="bp__node bp__node--input" id="bp-i1">x₁</div>
+            <div class="bp__node bp__node--input" id="bp-i2">x₂</div>
+            <div class="bp__label">Input</div>
+          </div>
+          <div class="bp__arrow" id="bp-a1">→</div>
+          <div class="bp__layer">
+            <div class="bp__node bp__node--hidden" id="bp-h1">h₁</div>
+            <div class="bp__node bp__node--hidden" id="bp-h2">h₂</div>
+            <div class="bp__node bp__node--hidden" id="bp-h3">h₃</div>
+            <div class="bp__label">Nascosto</div>
+          </div>
+          <div class="bp__arrow" id="bp-a2">→</div>
+          <div class="bp__layer">
+            <div class="bp__node bp__node--output" id="bp-o1">ŷ</div>
+            <div class="bp__label">Output</div>
+          </div>
+        </div>
+        <button class="bp__btn" id="bp-btn">▶ Simula backpropagation</button>
+      </div>
+    </div>
+
+    <p>Con la backpropagation, il problema XOR diventa banale: basta un singolo strato nascosto. Ma soprattutto, reti con molti strati possono imparare rappresentazioni <strong>gerarchiche</strong> — dal riconoscimento di bordi al riconoscimento di volti, dal suono delle lettere al significato delle frasi.</p>
+
+    <div class="infobox">
+      <div class="infobox__label">Geoffrey Hinton</div>
+      <p>Geoffrey Hinton, co-autore del paper sulla backpropagation, ha vinto il Premio Nobel per la Fisica nel 2024 per il suo lavoro sulle reti neurali. Ha dedicato 40 anni alla causa, attraversando ogni inverno e ogni estate dell'AI.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ 5. CNN & RNN ═══ -->
+    <h2 id="cnn-rnn">CNN e RNN — Reti che vedono e reti che ricordano</h2>
+    <p>Con la backpropagation come fondamenta, nacquero due architetture che dominarono l'AI per tre decenni.</p>
+
+    <h3>Le CNN: Reti Convoluzionali (1989)</h3>
+    <p><strong>Yann LeCun</strong> dimostrò che le reti neurali potevano riconoscere le cifre scritte a mano. La sua architettura — la <strong>CNN</strong> (Convolutional Neural Network) — imitava il sistema visivo: strati che riconoscono prima i bordi, poi le forme, poi gli oggetti completi. Ogni strato "vede" un pezzetto dell'immagine e costruisce una comprensione progressiva.</p>
+
+    <h3>Le RNN: Reti Ricorrenti (1990s)</h3>
+    <p>Per il linguaggio e le sequenze temporali serviva un'altra idea: la <strong>memoria</strong>. Le RNN (Recurrent Neural Networks) processano l'input un elemento alla volta, mantenendo uno "stato nascosto" che ricorda ciò che hanno visto prima. Come leggere una frase parola per parola, tenendo il filo del discorso.</p>
+    <p>Il problema delle RNN: la memoria si degrada. Le informazioni all'inizio della sequenza sbiadiscono man mano che la rete avanza. Per risolvere questo, nel 1997 nacquero le <strong>LSTM</strong> (Long Short-Term Memory) — reti con "cancelli" che decidono cosa ricordare e cosa dimenticare.</p>
+
+    <div class="infobox">
+      <div class="infobox__label">Il collo di bottiglia</div>
+      <p>Le RNN e le LSTM funzionavano, ma avevano un limite architetturale: processano le parole <strong>una alla volta</strong>, in sequenza. Non potevano essere parallelizzate. Questo significava addestramento lento su grandi quantità di dati. Serviva un cambio di paradigma.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ 6. TRANSFORMER ═══ -->
+    <div class="year">2017</div>
+    <h2 id="transformer">Attention Is All You Need</h2>
+    <p>Nel giugno 2017, un team di Google pubblicò un paper dal titolo provocatorio: <strong>"Attention Is All You Need"</strong>. Proponeva un'architettura completamente nuova — il <strong>Transformer</strong> — che eliminava le reti ricorrenti e le sostituiva con un unico meccanismo: l'<strong>attenzione</strong>.</p>
+    <p>L'idea chiave: invece di processare le parole in sequenza, il Transformer le guarda <strong>tutte contemporaneamente</strong>. Ogni parola può "prestare attenzione" a qualsiasi altra parola nella frase, indipendentemente dalla distanza. Niente più degradazione della memoria. Niente più collo di bottiglia sequenziale.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Confronto — RNN sequenziale vs Transformer parallelo</div>
+      <div class="vs" id="vs-demo">
+        <div class="vs__col">
+          <div class="vs__title vs__title--rnn">RNN (sequenziale)</div>
+          <div class="vs__blocks" id="vs-rnn"></div>
+          <div class="vs__note">Processa una parola alla volta →</div>
+        </div>
+        <div class="vs__col">
+          <div class="vs__title vs__title--tfm">Transformer (parallelo)</div>
+          <div class="vs__blocks" id="vs-tfm"></div>
+          <div class="vs__note">Processa tutte le parole insieme ⇉</div>
+        </div>
+      </div>
+    </div>
+
+    <p>Il risultato pratico fu devastante: i Transformer potevano essere addestrati su <strong>migliaia di GPU in parallelo</strong>, su quantità di testo impensabili prima. La parallelizzazione non era un dettaglio tecnico — era la chiave che ha reso possibile GPT, BERT, Claude e ogni LLM moderno.</p>
+
+    <hr class="divider">
+
+    <!-- ═══ 7. ESPLOSIONE ═══ -->
+    <h2 id="esplosione">L'esplosione: da BERT a GPT a Claude</h2>
+    <p>Dopo il 2017, il Transformer innescò una reazione a catena.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Timeline — L'era del Transformer</div>
+      <div class="timeline">
+        <div class="tl-item tl-item--highlight"><div class="tl-year">2017</div><div class="tl-text"><strong>Transformer</strong> — Google pubblica "Attention Is All You Need"</div></div>
+        <div class="tl-item"><div class="tl-year">2018</div><div class="tl-text"><strong>BERT</strong> (Google) — il primo modello a capire il contesto bidirezionale</div></div>
+        <div class="tl-item"><div class="tl-year">2018</div><div class="tl-text"><strong>GPT-1</strong> (OpenAI) — 117M parametri, generazione di testo</div></div>
+        <div class="tl-item"><div class="tl-year">2020</div><div class="tl-text"><strong>GPT-3</strong> — 175 miliardi di parametri. Il mondo si accorge dell'AI.</div></div>
+        <div class="tl-item"><div class="tl-year">2022</div><div class="tl-text"><strong>ChatGPT</strong> — l'AI entra nelle case. 100 milioni di utenti in 2 mesi.</div></div>
+        <div class="tl-item"><div class="tl-year">2023</div><div class="tl-text"><strong>GPT-4, Claude, Gemini, LLaMA</strong> — la competizione si accende.</div></div>
+        <div class="tl-item tl-item--highlight"><div class="tl-year">2024–25</div><div class="tl-text"><strong>Agenti AI, ragionamento, multimodalità</strong> — la frontiera si espande.</div></div>
+      </div>
+    </div>
+
+    <p>Ogni modello che usi oggi — quando chiedi a un'AI di scrivere un'email, tradurre un documento, analizzare dati o generare codice — è un discendente diretto di quel paper del 2017. Che a sua volta è un discendente del perceptron di Rosenblatt del 1958.</p>
+    <p>Sessant'anni di intuizioni, fallimenti, ostinazione e scoperte. Da un singolo neurone artificiale alimentato con schede perforate a reti con migliaia di miliardi di parametri che conversano in linguaggio naturale. La storia non è finita — è appena diventata interessante.</p>
+
+    <div class="cta-box">
+      <div class="cta-box__title">Vuoi capire come funzionano questi strumenti?</div>
+      <div class="cta-box__desc">Nei miei percorsi di formazione insegno a usare l'AI in modo consapevole — dalla teoria alla pratica operativa quotidiana.</div>
+      <a href="/index.html#contatti" class="cta-box__btn">Parliamone →</a>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <div>&copy; 2026 Riccardo Busolo — AI Consultant</div>
+    <div style="margin-top:10px"><a href="/index.html">Torna al sito</a> · <a href="/progetti.html#articoli">Tutti gli articoli</a></div>
+  </footer>
+
+  <script>
+  (function(){
+    'use strict';
+
+    /* ═══ XOR DEMO ═══ */
+    const xorBtn0=document.getElementById('xor-btn0');
+    const xorBtn1=document.getElementById('xor-btn1');
+    const xorBtn2=document.getElementById('xor-btn2');
+    const xorLine1=document.getElementById('xor-line1');
+    const xorLine2=document.getElementById('xor-line2');
+    const xorCaption=document.getElementById('xor-caption');
+    const xorBtns=[xorBtn0,xorBtn1,xorBtn2];
+
+    function setXor(n){
+      xorBtns.forEach((b,i)=>b.classList.toggle('active',i===n));
+      xorLine1.classList.toggle('xor__line--show',n>=1);
+      xorLine2.classList.toggle('xor__line2--show',n>=2);
+      if(n===0) xorCaption.textContent='I punti cyan (1) e rossi (0) non possono essere separati da una singola linea retta.';
+      else if(n===1) xorCaption.textContent='Una linea verticale separa correttamente sull\'asse X, ma sbaglia sui punti in diagonale.';
+      else xorCaption.textContent='Con due linee (= due strati) il problema è risolto! Questo richiede un hidden layer.';
+    }
+    xorBtn0.addEventListener('click',()=>setXor(0));
+    xorBtn1.addEventListener('click',()=>setXor(1));
+    xorBtn2.addEventListener('click',()=>setXor(2));
+
+    /* ═══ BACKPROP DEMO ═══ */
+    const bpBtn=document.getElementById('bp-btn');
+    const bpNodes=['bp-i1','bp-i2','bp-h1','bp-h2','bp-h3','bp-o1'].map(id=>document.getElementById(id));
+    const bpArrows=['bp-a1','bp-a2'].map(id=>document.getElementById(id));
+    let bpRunning=false;
+
+    bpBtn.addEventListener('click',()=>{
+      if(bpRunning)return;
+      bpRunning=true;
+      bpBtn.textContent='Propagazione in corso...';
+
+      // Forward pass (light up input → hidden → output)
+      setTimeout(()=>{bpNodes[0].style.boxShadow='0 0 12px rgba(0,224,208,.4)';bpNodes[1].style.boxShadow='0 0 12px rgba(0,224,208,.4)';},200);
+      setTimeout(()=>{bpArrows[0].textContent='→→';bpArrows[0].style.color='var(--cyan)';},500);
+      setTimeout(()=>{bpNodes[2].style.boxShadow='0 0 12px rgba(167,139,250,.4)';bpNodes[3].style.boxShadow='0 0 12px rgba(167,139,250,.4)';bpNodes[4].style.boxShadow='0 0 12px rgba(167,139,250,.4)';},700);
+      setTimeout(()=>{bpArrows[1].textContent='→→';bpArrows[1].style.color='var(--green)';},1000);
+      setTimeout(()=>{bpNodes[5].style.boxShadow='0 0 12px rgba(52,211,153,.4)';},1200);
+
+      // Error at output
+      setTimeout(()=>{bpNodes[5].classList.add('bp__node--error');bpBtn.textContent='Errore! Backpropagation ←';},1800);
+
+      // Backward pass
+      setTimeout(()=>{bpArrows[1].textContent='←←';bpArrows[1].style.color='#f87171';},2200);
+      setTimeout(()=>{bpNodes[2].classList.add('bp__node--error');bpNodes[3].classList.add('bp__node--error');bpNodes[4].classList.add('bp__node--error');},2500);
+      setTimeout(()=>{bpArrows[0].textContent='←←';bpArrows[0].style.color='#f87171';},2800);
+      setTimeout(()=>{bpNodes[0].classList.add('bp__node--error');bpNodes[1].classList.add('bp__node--error');},3100);
+
+      // Reset
+      setTimeout(()=>{
+        bpNodes.forEach(n=>{n.classList.remove('bp__node--error');n.style.boxShadow='';});
+        bpArrows.forEach(a=>{a.textContent='→';a.style.color='';});
+        bpBtn.textContent='▶ Simula backpropagation';
+        bpRunning=false;
+      },4200);
+    });
+
+    /* ═══ RNN vs TRANSFORMER DEMO ═══ */
+    const words=['Il','gatto','dorme','sul','divano'];
+    const rnnEl=document.getElementById('vs-rnn');
+    const tfmEl=document.getElementById('vs-tfm');
+
+    // Build boxes
+    words.forEach((w,i)=>{
+      const rRow=document.createElement('div');rRow.className='vs__step';
+      const rBox=document.createElement('div');rBox.className='vs__box vs__box--rnn';rBox.id='rnn-'+i;rBox.textContent=w.substring(0,2);
+      const rLabel=document.createElement('span');rLabel.textContent='t'+(i+1)+': '+w;
+      rRow.appendChild(rBox);rRow.appendChild(rLabel);rnnEl.appendChild(rRow);
+
+      const tBox=document.createElement('div');tBox.className='vs__box vs__box--tfm';tBox.id='tfm-'+i;tBox.textContent=w.substring(0,2);
+      tfmEl.appendChild(tBox);
+    });
+
+    // Animate
+    let vsStep=0;
+    function vsAnimate(){
+      // RNN: light one at a time
+      words.forEach((_,i)=>{
+        const el=document.getElementById('rnn-'+i);
+        el.classList.toggle('vs__box--lit',i===vsStep);
+      });
+      // TFM: all lit together
+      words.forEach((_,i)=>{
+        const el=document.getElementById('tfm-'+i);
+        el.classList.toggle('vs__box--lit',vsStep<words.length);
+      });
+      vsStep=(vsStep+1)%(words.length+2);
+    }
+    setInterval(vsAnimate,600);
+
+  })();
+  </script>
+</body>
+</html>
