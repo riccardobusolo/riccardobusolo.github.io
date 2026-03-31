@@ -50,6 +50,11 @@ body{
   color:var(--text-1);min-height:100vh;overflow-x:hidden;line-height:1.6;
 }
 
+/* ── SITE LOGO ── */
+.site-logo{position:fixed;top:20px;left:24px;z-index:50;text-decoration:none;display:flex;align-items:center;opacity:.7;transition:opacity .3s,scale .3s cubic-bezier(.4,0,.2,1)}
+.site-logo:hover{scale:1.08;opacity:1}
+.site-logo:active{scale:.94;transition-duration:.1s}
+
 /* ── NOISE OVERLAY ── */
 body::before{
   content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;
@@ -389,6 +394,8 @@ footer{
 
 /* ── RESPONSIVE ── */
 @media(max-width:640px){
+  .site-logo{top:16px;left:16px}
+  .site-logo svg{height:24px}
   .controls.visible{grid-template-columns:1fr}
   .stats-bar.visible{grid-template-columns:1fr}
   .drop-zone{padding:44px 20px}
@@ -404,6 +411,15 @@ footer{
 </style>
 </head>
 <body>
+
+<a href="/progetti.html#strumenti" class="site-logo">
+  <svg height="28" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+    <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+    <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+    <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
+  </svg>
+</a>
 
 <header>
   <div class="logo-mark">
