@@ -172,11 +172,11 @@
           <div class="card__body"><div class="card__tag">Laboratorio interattivo</div><div class="card__title">Mark I — Il Perceptron</div><div class="card__desc">Ricrea l'esperimento di Frank Rosenblatt del 1958: posiziona il segnale sulla scheda e osserva il perceptron imparare a distinguere destra da sinistra.</div></div>
         </div></a></div>
 
-        <div class="card-wrap" data-id="f2"><a href="#" class="card">
+        <div class="card-wrap" data-id="f2"><a href="/formazione/neuropong/" class="card">
           <div class="card__border"></div>
           <div class="card__inner"><div class="card__shine"></div><div class="card__glow"></div><div class="card__reflect"></div>
-          <div class="card__img"><div class="card__img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="card__badge">In arrivo</div></div>
-          <div class="card__body"><div class="card__tag">Corso completo</div><div class="card__title">Dall'AI Generativa agli Agenti Autonomi</div><div class="card__desc">Un percorso che porta i partecipanti dalla comprensione degli LLM alla creazione di agenti AI semi-autonomi con esercitazioni pratiche.</div></div>
+          <div class="card__img"><img src="img/neuropong-ai-pong-reinforcement-learning.webp" alt="NeuroPong — Due reti neurali che si sfidano a Pong"></div>
+          <div class="card__body"><div class="card__tag">Simulazione AI</div><div class="card__title">NeuroPong — AI Self-Play</div><div class="card__desc">Due reti neurali si sfidano a Pong e imparano dai propri errori con reinforcement learning. Osserva l'evoluzione generazione dopo generazione.</div></div>
         </div></a></div>
 
         <div class="card-wrap" data-id="f3"><a href="#" class="card">
@@ -309,6 +309,7 @@
         b.classList.toggle('visible', b.dataset.grid === cat && !!isReordered);
       });
 
+      // Show mobile banner only for formazione/strumenti
       const banner = document.getElementById('mobile-banner');
       if (banner && !bannerDismissed) {
         banner.style.display = (cat === 'formazione' || cat === 'strumenti') ? '' : 'none';
@@ -317,6 +318,7 @@
       history.replaceState(null, '', '#' + cat);
     }
 
+    // Mobile banner dismiss
     let bannerDismissed = !!sessionStorage.getItem('rb_banner_dismissed');
     const bannerEl = document.getElementById('mobile-banner');
     const bannerClose = document.getElementById('mobile-banner-close');
@@ -333,6 +335,7 @@
     const hash = window.location.hash.replace('#', '');
     if (['formazione', 'strumenti', 'articoli'].includes(hash)) switchCat(hash, true);
 
+    // After initial CSS animations complete, disable them permanently
     setTimeout(() => {
       document.querySelectorAll('.grid').forEach(g => g.classList.add('no-anim'));
     }, 700);
@@ -351,6 +354,7 @@
       });
     }
 
+    // Restore saved order
     sortableGrids.forEach(grid => {
       const key = 'rb_order_' + grid.id.replace('grid-', '');
       const saved = localStorage.getItem(key);
@@ -360,6 +364,7 @@
       if (localStorage.getItem('rb_order_' + b.dataset.grid) && b.dataset.grid === activeCat) b.classList.add('visible');
     });
 
+    // FLIP animate grid children
     function flipAnimate(grid) {
       const items = [...grid.querySelectorAll('.card-wrap')];
       const rects = new Map();
@@ -392,7 +397,7 @@
 
         wrap.addEventListener('pointerdown', e => {
           if (e.button !== 0 || isDragging) return;
-          e.preventDefault();
+          e.preventDefault(); // Critical: prevents browser link-drag
 
           const startX = e.clientX, startY = e.clientY;
           const rect = wrap.getBoundingClientRect();
@@ -455,6 +460,7 @@
 
             if (!activated) {
               isDragging = false;
+              // Simulate click — navigate to card link
               const link = wrap.querySelector('a.card');
               if (link && link.href && link.getAttribute('href') !== '#') {
                 window.location.href = link.href;
@@ -489,6 +495,7 @@
     });
     } // end isDesktop
 
+    // Reset buttons (keep on all devices for saved orders)
     document.querySelectorAll('.reset-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const gridName = btn.dataset.grid;
@@ -496,10 +503,12 @@
         localStorage.removeItem('rb_order_' + gridName);
         btn.classList.remove('visible');
 
+        // Restore default order (sorted by data-id)
         const wraps = [...grid.querySelectorAll('.card-wrap')];
         wraps.sort((a, b) => a.dataset.id.localeCompare(b.dataset.id));
         wraps.forEach(w => grid.appendChild(w));
 
+        // Re-trigger animations
         wraps.forEach(w => {
           w.style.animation = 'none'; void w.offsetHeight; w.style.animation = '';
         });
@@ -507,6 +516,7 @@
     });
 
     /* ═══════════ 3D tilt (desktop only) ═══════════ */
+    // Prevent card link clicks during/after drag
     document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('click', e => { if (isDragging) e.preventDefault(); });
     });
