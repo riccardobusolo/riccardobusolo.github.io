@@ -1,1 +1,514 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mark I — Il Perceptron | Riccardo Busolo</title>
+  <meta name="description" content="Ricrea l'esperimento di Frank Rosenblatt del 1958: clicca su un lato della scheda e osserva il perceptron imparare a distinguere destra da sinistra.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#08080e;--bg-card:#12121a;--bg-raised:#1a1a22;--bg-canvas:#0a0a12;--border:rgba(180,180,190,.08);--border-hover:rgba(180,180,190,.15);--text:#e0e0e6;--text-dim:#9a9a9e;--text-muted:#6a6a74;--cyan:#00e0d0;--cyan-dim:rgba(0,224,208,.06);--cyan-border:rgba(0,224,208,.15);--cyan-glow:rgba(0,224,208,.25);--green:#34d399;--red:#f87171;--orange:#fb923c;--blue:#60a5fa;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased;font-weight:300;overflow-x:hidden}
 
+    /* ── Logo ── */
+    .site-logo{position:fixed;top:20px;left:24px;z-index:50;text-decoration:none;display:flex;align-items:center;transition:scale .3s var(--ease);opacity:.7;transition:opacity .3s,scale .3s var(--ease)}
+    .site-logo:hover{scale:1.08;opacity:1}
+    .site-logo:active{scale:.94;transition-duration:.1s}
+
+    .page{max-width:1000px;margin:0 auto;padding:40px 32px 40px}
+
+    /* ── Header ── */
+    .header{text-align:center;margin-bottom:32px}
+    .header__tag{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:8px}
+    .header__title{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-.04em;margin-bottom:6px}
+    .header__sub{font-family:var(--mono);font-size:.74rem;color:var(--text-muted);font-weight:400}
+
+    /* ── App grid ── */
+    .app{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+
+    /* ── Canvas ── */
+    .canvas-area{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+    .canvas-wrap{position:relative;aspect-ratio:1;cursor:pointer;background:var(--bg-canvas);overflow:hidden}
+    .canvas-wrap canvas{display:block;width:100%;height:100%}
+    .canvas-side{position:absolute;bottom:14px;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;pointer-events:none;opacity:.4}
+    .canvas-side--left{left:16px;color:var(--orange)}
+    .canvas-side--right{right:16px;color:var(--blue)}
+    .feedback-overlay{position:absolute;top:0;bottom:0;width:50%;opacity:0;transition:opacity .4s;pointer-events:none}
+    #left-overlay{left:0;background:linear-gradient(90deg,rgba(251,146,60,.35),rgba(251,146,60,.08) 60%,transparent)}
+    #right-overlay{right:0;background:linear-gradient(-90deg,rgba(96,165,250,.35),rgba(96,165,250,.08) 60%,transparent)}
+    .feedback-overlay.pulsing{animation:overlayPulse 1s ease-in-out infinite}
+    @keyframes overlayPulse{0%,100%{opacity:.15}50%{opacity:.7}}
+    .canvas-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:.7rem;color:var(--text-muted);opacity:.4;pointer-events:none;text-align:center;line-height:1.6;transition:opacity .3s}
+
+    /* ── Panel ── */
+    .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+
+    /* ── Compact attempt + score row ── */
+    .toprow{display:flex;gap:10px}
+    .toprow__box{flex:1;text-align:center;padding:12px 8px;background:var(--bg-raised);border-radius:8px;border:1px solid var(--border)}
+    .toprow__num{font-family:var(--mono);font-size:1.6rem;font-weight:700;line-height:1}
+    .toprow__label{font-family:var(--mono);font-size:.52rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-top:3px}
+    .score--pos{color:var(--green)}.score--neg{color:var(--red)}.score--zero{color:var(--text-muted)}
+
+    /* ── Rate ── */
+    .rate{padding:10px 14px;background:var(--bg-raised);border-radius:8px;border:1px solid var(--border)}
+    .rate__top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .rate__label{font-family:var(--mono);font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)}
+    .rate__value{font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--text)}
+    .rate__bar-wrap{height:6px;background:rgba(180,180,190,.06);border-radius:3px;overflow:hidden}
+    .rate__bar{height:100%;border-radius:3px;background:var(--cyan);transition:width .5s var(--ease);width:0}
+    .rate__bar--perfect{background:linear-gradient(90deg,var(--cyan),var(--green))}
+    .rate__sub{font-family:var(--mono);font-size:.5rem;color:var(--text-muted);margin-top:4px;text-align:center}
+
+    /* ── Status message ── */
+    .status{text-align:center;font-size:.82rem;color:var(--text-dim);min-height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+    /* ── Prediction ── */
+    .prediction{text-align:center;padding:14px;background:var(--bg-raised);border-radius:8px;border:1px solid var(--border)}
+    .prediction__label{font-family:var(--mono);font-size:.52rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:4px}
+    .prediction__value{font-family:var(--mono);font-size:1.3rem;font-weight:700}
+    .prediction--left .prediction__value{color:var(--orange)}
+    .prediction--right .prediction__value{color:var(--blue)}
+
+    /* ── Slide sections ── */
+    .slide{max-height:0;opacity:0;overflow:hidden;transition:max-height .3s var(--ease),opacity .25s ease,margin-top .3s var(--ease);margin-top:0}
+    .slide.open{max-height:120px;opacity:1;margin-top:12px}
+
+    /* ── Feedback buttons ── */
+    .feedback-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .btn{padding:12px 16px;font-family:var(--mono);font-size:.74rem;font-weight:500;letter-spacing:.03em;border-radius:8px;border:none;cursor:pointer;transition:all .3s var(--ease);width:100%;text-align:center}
+    .btn:not(:disabled):hover{transform:translateY(-2px)}
+    .btn:not(:disabled):active{transform:translateY(0) scale(.98);transition-duration:.08s}
+    .btn--green{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+    .btn--green:hover{background:rgba(52,211,153,.2)}
+    .btn--red{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.18)}
+    .btn--red:hover{background:rgba(248,113,113,.18)}
+    .btn--ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border);font-size:.62rem;padding:8px}
+    .btn--ghost:hover{color:var(--text);border-color:var(--border-hover)}
+
+    /* ── Weights ── */
+    .weights{padding:10px 14px;background:var(--bg-raised);border-radius:8px;border:1px solid var(--border)}
+    .weights__title{font-family:var(--mono);font-size:.52rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:6px}
+    .weights__row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.68rem}
+    .weights__row+.weights__row{margin-top:4px}
+    .weights__name{color:var(--text-dim)}.weights__val{color:var(--cyan);font-weight:500}
+
+    .hidden{display:none!important}
+
+    /* ── History ── */
+    .history-bar{margin-top:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 18px}
+    .history__label{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;display:flex;justify-content:space-between}
+    .history__dots{display:flex;gap:4px;flex-wrap:wrap;min-height:20px;align-items:center}
+    .history__dot{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.5rem;font-weight:600}
+    .history__dot--correct{background:rgba(52,211,153,.15);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+    .history__dot--wrong{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.18)}
+    .history__dot--new{animation:dotIn .3s var(--ease) both}
+    @keyframes dotIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+    .history__empty{font-size:.68rem;color:var(--text-muted);opacity:.5;font-style:italic}
+
+    /* ── Story ── */
+    .story{margin-top:28px;padding:28px;background:var(--bg-card);border:1px solid var(--border);border-radius:16px}
+    .story__title{font-size:1.1rem;font-weight:700;margin-bottom:14px;letter-spacing:-.02em}
+    .story p{font-size:.88rem;color:var(--text-dim);margin-bottom:12px;line-height:1.85}
+    .story p:last-child{margin-bottom:0}
+    .story strong{color:var(--text);font-weight:600}
+    .story em{color:var(--cyan);font-style:normal}
+
+    /* ── Popup ── */
+    .popup-overlay{position:fixed;inset:0;z-index:200;background:rgba(8,8,14,.85);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+    .popup-overlay.show{opacity:1;pointer-events:all}
+    .popup{background:var(--bg-card);border:1px solid var(--cyan-border);border-radius:20px;padding:40px;max-width:480px;width:90%;text-align:center;transform:translateY(20px) scale(.95);transition:transform .4s var(--ease)}
+    .popup-overlay.show .popup{transform:translateY(0) scale(1)}
+    .popup__icon{font-size:3rem;margin-bottom:14px}
+    .popup__title{font-size:1.3rem;font-weight:800;letter-spacing:-.03em;margin-bottom:10px}
+    .popup__desc{font-size:.88rem;color:var(--text-dim);line-height:1.7;margin-bottom:22px}
+    .popup__btn{display:inline-flex;padding:12px 28px;font-family:var(--mono);font-size:.76rem;font-weight:500;background:var(--cyan);color:var(--bg);border-radius:8px;border:none;cursor:pointer;transition:all .3s var(--ease)}
+    .popup__btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,208,.25)}
+
+    @media(max-width:800px){
+      .app{grid-template-columns:1fr;gap:16px}
+      .panel{padding:16px}
+      .page{padding:24px 16px 30px}
+      .site-logo{top:16px;left:16px}
+      .site-logo svg{height:24px}
+    }
+  </style>
+</head>
+<body>
+
+  <a href="/progetti.html#formazione" class="site-logo">
+    <svg height="28" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+      <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+      <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+      <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
+    </svg>
+  </a>
+
+  <div class="page">
+    <div class="header">
+      <div class="header__tag">Formazione interattiva</div>
+      <h1 class="header__title">Mark I — Il Perceptron</h1>
+      <p class="header__sub">Ricrea l'esperimento di Frank Rosenblatt del 1958</p>
+    </div>
+
+    <div class="app" id="appGrid">
+      <div class="canvas-area">
+        <div class="canvas-wrap" id="canvas-container">
+          <canvas id="drawingCanvas"></canvas>
+          <div class="canvas-side canvas-side--left">← Sinistra</div>
+          <div class="canvas-side canvas-side--right">Destra →</div>
+          <div class="canvas-hint" id="canvasHint">Clicca su un lato della scheda</div>
+          <div class="feedback-overlay" id="left-overlay"></div>
+          <div class="feedback-overlay" id="right-overlay"></div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel">
+        <!-- Row: attempt + score -->
+        <div class="toprow">
+          <div class="toprow__box">
+            <div class="toprow__num" id="attemptCounter">1</div>
+            <div class="toprow__label">Tentativo</div>
+          </div>
+          <div class="toprow__box">
+            <div class="toprow__num" id="scoreDisplay" class="score--zero">0</div>
+            <div class="toprow__label">Punteggio</div>
+          </div>
+        </div>
+
+        <!-- Rate -->
+        <div class="rate">
+          <div class="rate__top">
+            <span class="rate__label">Precisione (ultimi 20)</span>
+            <span class="rate__value" id="rateValue">—</span>
+          </div>
+          <div class="rate__bar-wrap"><div class="rate__bar" id="rateBar"></div></div>
+          <div class="rate__sub" id="rateSub">Completa 20 tentativi al 100%</div>
+        </div>
+
+        <!-- Status: single line that changes -->
+        <div class="status" id="statusText">Clicca sulla scheda per iniziare.</div>
+
+        <!-- Prediction (appears after click) -->
+        <div id="predictionUI" class="slide">
+          <div class="prediction" id="predictionBox">
+            <div class="prediction__label">Predizione</div>
+            <div class="prediction__value" id="predictionText"></div>
+          </div>
+        </div>
+
+        <!-- Feedback buttons (appear after prediction) -->
+        <div id="feedbackUI" class="slide">
+          <div class="feedback-btns">
+            <button class="btn btn--green" id="correctBtn">✓ Corretto</button>
+            <button class="btn btn--red" id="wrongBtn">✗ Sbagliato</button>
+          </div>
+        </div>
+
+        <!-- Weights -->
+        <div class="weights">
+          <div class="weights__title">Pesi della rete</div>
+          <div class="weights__row"><span class="weights__name">Peso (x)</span><span class="weights__val" id="weightX">0.00</span></div>
+          <div class="weights__row"><span class="weights__name">Bias</span><span class="weights__val" id="weightBias">0.00</span></div>
+        </div>
+
+        <button class="btn btn--ghost" id="resetBtn">↺ Ricomincia</button>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="history-bar">
+      <div class="history__label">
+        <span>Cronologia</span>
+        <span id="historyCount"></span>
+      </div>
+      <div class="history__dots" id="historyDots">
+        <span class="history__empty">Nessun tentativo ancora</span>
+      </div>
+    </div>
+
+    <!-- Story -->
+    <div class="story">
+      <h2 class="story__title">La scheda perforata che cambiò tutto</h2>
+      <p>Luglio 1958. In una stanza del Weather Bureau di Washington, un calcolatore IBM 704 — <strong>5 tonnellate di valvole e cavi</strong> — viene alimentato con una serie di schede perforate. Su ogni scheda, un punto nero posizionato a destra o a sinistra. Nessuna istruzione su come distinguerli. Solo esempi.</p>
+      <p>Dopo <em>50 tentativi</em>, la macchina impara. Inizia a rispondere correttamente, anche davanti a schede che non ha mai visto. È la prima volta nella storia che un computer apprende dall'esperienza anziché seguire istruzioni esplicite.</p>
+      <p>L'artefice è <strong>Frank Rosenblatt</strong>, psicologo e ingegnere alla Cornell University. La sua creazione si chiama <em>Perceptron</em> — e il principio è disarmante nella sua semplicità: ogni input ha un peso, i pesi si aggiornano in base agli errori, e col tempo il sistema converge verso la risposta giusta. Un singolo neurone artificiale che impara.</p>
+      <p>Il New York Times lo definì <em>"il primo dispositivo capace di avere un'idea originale"</em>. Rosenblatt immaginava perceptron che leggessero, traducessero, pilotassero astronavi. L'entusiasmo era enorme — forse troppo. Le critiche di Minsky e Papert nel 1969 dimostrarono i limiti del perceptron a singolo strato, e il finanziamento si prosciugò. Iniziò il cosiddetto "inverno dell'AI".</p>
+      <p>Rosenblatt morì nel 1971, a soli 43 anni, senza vedere la rivincita della sua intuizione. Ma i principi del perceptron — pesi, apprendimento, generalizzazione — sono il DNA di ogni rete neurale moderna. Quando oggi parli con ChatGPT o Claude, stai interagendo con miliardi di discendenti di quel singolo neurone nato da una scheda perforata.</p>
+      <p>Quello che stai usando qui sopra è esattamente l'esperimento originale: clicca su un lato, lascia che la macchina provi a indovinare, e correggila quando sbaglia. <strong>Stai facendo ciò che Rosenblatt fece 68 anni fa</strong> — solo che il tuo IBM 704 pesa un po' meno di 5 tonnellate.</p>
+    </div>
+
+    <!-- Popup -->
+    <div class="popup-overlay" id="popupOverlay">
+      <div class="popup">
+        <div class="popup__icon">🧠</div>
+        <div class="popup__title">Addestramento completato!</div>
+        <div class="popup__desc">Il perceptron ha raggiunto il <strong>100% di precisione</strong> sugli ultimi 20 tentativi. Hai ricreato con successo l'esperimento di Frank Rosenblatt del 1958 — la prima dimostrazione al mondo di una macchina capace di apprendere dall'esperienza.</div>
+        <button class="popup__btn" id="popupClose">Continua a sperimentare</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    'use strict';
+
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    const correctBtn = document.getElementById('correctBtn');
+    const wrongBtn = document.getElementById('wrongBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const attemptCounter = document.getElementById('attemptCounter');
+    const statusText = document.getElementById('statusText');
+    const predictionText = document.getElementById('predictionText');
+    const predictionBox = document.getElementById('predictionBox');
+    const predictionUI = document.getElementById('predictionUI');
+    const feedbackUI = document.getElementById('feedbackUI');
+    const leftOverlay = document.getElementById('left-overlay');
+    const rightOverlay = document.getElementById('right-overlay');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const weightX = document.getElementById('weightX');
+    const weightBias = document.getElementById('weightBias');
+    const historyDots = document.getElementById('historyDots');
+    const historyCount = document.getElementById('historyCount');
+    const canvasHint = document.getElementById('canvasHint');
+    const rateBar = document.getElementById('rateBar');
+    const rateValue = document.getElementById('rateValue');
+    const rateSub = document.getElementById('rateSub');
+    const popupOverlay = document.getElementById('popupOverlay');
+    const popupClose = document.getElementById('popupClose');
+    const panel = document.getElementById('panel');
+
+    let state = 'ready';
+    let attempt = 1;
+    let score = 0;
+    let history = [];
+    let clickX = 0;
+    let circlePos = null;
+    let completionShown = false;
+
+    // ── Perceptron ──
+    const perceptron = {
+      weights: { x: Math.random() * 0.2 - 0.1, bias: Math.random() * 0.2 - 0.1 },
+      learningRate: 0.1,
+      lastPrediction: 0,
+      lastInput: 0,
+      predict(x) {
+        this.lastInput = x;
+        const sum = x * this.weights.x + this.weights.bias;
+        this.lastPrediction = sum >= 0 ? 1 : -1;
+        return this.lastPrediction;
+      },
+      train(target) {
+        const error = target - this.lastPrediction;
+        if (error !== 0) {
+          this.weights.x += error * this.lastInput * this.learningRate;
+          this.weights.bias += error * this.learningRate;
+        }
+      },
+      reset() {
+        this.weights.x = Math.random() * 0.2 - 0.1;
+        this.weights.bias = Math.random() * 0.2 - 0.1;
+      }
+    };
+
+    // ── Canvas ──
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = container.clientWidth * dpr;
+      canvas.height = container.clientHeight * dpr;
+      canvas.style.width = container.clientWidth + 'px';
+      canvas.style.height = container.clientHeight + 'px';
+      ctx.scale(dpr, dpr);
+      draw();
+      syncPanel();
+    }
+
+    function draw() {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(180,180,190,.1)';
+      ctx.setLineDash([4, 6]);
+      ctx.lineWidth = 1;
+      ctx.moveTo(w / 2, 0);
+      ctx.lineTo(w / 2, h);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      if (circlePos) {
+        const isRight = circlePos.x > canvas.clientWidth / 2;
+        const col = isRight ? '96,165,250' : '251,146,60';
+        const colHex = isRight ? '#60a5fa' : '#fb923c';
+        const g = ctx.createRadialGradient(circlePos.x, circlePos.y, 0, circlePos.x, circlePos.y, 40);
+        g.addColorStop(0, 'rgba(' + col + ',.18)');
+        g.addColorStop(1, 'transparent');
+        ctx.fillStyle = g;
+        ctx.fillRect(circlePos.x - 50, circlePos.y - 50, 100, 100);
+        ctx.beginPath();
+        ctx.arc(circlePos.x, circlePos.y, 16, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + col + ',.2)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(' + col + ',.6)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(circlePos.x, circlePos.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = colHex;
+        ctx.fill();
+      }
+    }
+
+    function syncPanel() {
+      if (window.innerWidth > 800) {
+        panel.style.height = document.getElementById('canvas-container').offsetHeight + 'px';
+      } else {
+        panel.style.height = 'auto';
+      }
+    }
+
+    // ── Click ──
+    function handleClick(e) {
+      if (state !== 'ready') return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      circlePos = { x: cx, y: cy };
+      clickX = cx;
+      canvasHint.style.opacity = '0';
+      draw();
+      setTimeout(() => analyze(), 250);
+    }
+
+    function analyze() {
+      state = 'waiting';
+      const w = canvas.clientWidth;
+      const prediction = perceptron.predict((clickX / w) * 2 - 1);
+
+      predictionText.textContent = prediction === 1 ? '→ DESTRA' : '← SINISTRA';
+      predictionBox.className = 'prediction ' + (prediction === 1 ? 'prediction--right' : 'prediction--left');
+
+      const overlay = prediction === 1 ? rightOverlay : leftOverlay;
+      overlay.classList.add('pulsing');
+      overlay.style.opacity = '1';
+
+      predictionUI.classList.add('open');
+      feedbackUI.classList.add('open');
+      statusText.textContent = 'Era corretto?';
+    }
+
+    // ── Feedback ──
+    function handleFeedback(wasCorrect) {
+      if (state !== 'waiting') return;
+      state = 'ready';
+
+      leftOverlay.classList.remove('pulsing');
+      rightOverlay.classList.remove('pulsing');
+      leftOverlay.style.opacity = '0';
+      rightOverlay.style.opacity = '0';
+
+      score += wasCorrect ? 1 : -1;
+      history.push(wasCorrect);
+
+      if (!wasCorrect) {
+        perceptron.train(clickX > canvas.clientWidth / 2 ? 1 : -1);
+      }
+
+      updateWeights();
+      updateScore();
+      updateHistory();
+      updateRate();
+
+      circlePos = null;
+      draw();
+
+      predictionUI.classList.remove('open');
+      feedbackUI.classList.remove('open');
+
+      statusText.innerHTML = wasCorrect
+        ? '<span style="color:var(--green)">✓ Corretto!</span>'
+        : '<span style="color:var(--red)">✗ Pesi aggiornati.</span>';
+
+      attempt++;
+      attemptCounter.textContent = attempt;
+
+      setTimeout(() => {
+        statusText.textContent = 'Clicca sulla scheda per iniziare.';
+        canvasHint.style.opacity = '.4';
+      }, 900);
+    }
+
+    // ── Updates ──
+    function updateHistory() {
+      historyDots.innerHTML = '';
+      history.forEach((ok, i) => {
+        const d = document.createElement('div');
+        d.className = 'history__dot ' + (ok ? 'history__dot--correct' : 'history__dot--wrong');
+        if (i === history.length - 1) d.classList.add('history__dot--new');
+        d.textContent = ok ? '✓' : '✗';
+        historyDots.appendChild(d);
+      });
+      const c = history.filter(h => h).length;
+      historyCount.textContent = c + '/' + history.length;
+    }
+
+    function updateScore() {
+      scoreDisplay.textContent = (score > 0 ? '+' : '') + score;
+      scoreDisplay.className = 'toprow__num ' + (score > 0 ? 'score--pos' : score < 0 ? 'score--neg' : 'score--zero');
+    }
+
+    function updateWeights() {
+      weightX.textContent = perceptron.weights.x.toFixed(4);
+      weightBias.textContent = perceptron.weights.bias.toFixed(4);
+    }
+
+    function updateRate() {
+      const last20 = history.slice(-20);
+      if (!last20.length) { rateBar.style.width = '0%'; rateValue.textContent = '—'; rateSub.textContent = 'Completa 20 tentativi al 100%'; return; }
+      const pct = Math.round((last20.filter(h => h).length / last20.length) * 100);
+      rateBar.style.width = pct + '%';
+      rateBar.className = 'rate__bar' + (pct === 100 && last20.length >= 20 ? ' rate__bar--perfect' : '');
+      rateValue.textContent = pct + '%';
+      rateSub.textContent = last20.length < 20 ? (last20.length + '/20 — continua!') : 'Ultimi 20 tentativi';
+      if (pct === 100 && last20.length >= 20 && !completionShown) {
+        completionShown = true;
+        setTimeout(() => popupOverlay.classList.add('show'), 500);
+      }
+    }
+
+    popupClose.addEventListener('click', () => popupOverlay.classList.remove('show'));
+
+    // ── Reset ──
+    function resetAll() {
+      perceptron.reset(); circlePos = null; attempt = 1; score = 0; history = []; state = 'ready'; completionShown = false;
+      attemptCounter.textContent = '1';
+      updateScore(); updateWeights(); updateRate();
+      historyDots.innerHTML = '<span class="history__empty">Nessun tentativo ancora</span>';
+      historyCount.textContent = '';
+      predictionUI.classList.remove('open'); feedbackUI.classList.remove('open');
+      leftOverlay.classList.remove('pulsing'); rightOverlay.classList.remove('pulsing');
+      leftOverlay.style.opacity = '0'; rightOverlay.style.opacity = '0';
+      statusText.textContent = 'Clicca sulla scheda per iniziare.';
+      canvasHint.style.opacity = '.4';
+      draw();
+    }
+
+    // ── Events ──
+    canvas.addEventListener('click', handleClick);
+    canvas.addEventListener('touchend', e => { e.preventDefault(); handleClick(e.changedTouches ? { touches: e.changedTouches, clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY, preventDefault(){} } : e); });
+    correctBtn.addEventListener('click', () => handleFeedback(true));
+    wrongBtn.addEventListener('click', () => handleFeedback(false));
+    resetBtn.addEventListener('click', resetAll);
+    window.addEventListener('resize', () => { resizeCanvas(); syncPanel(); });
+
+    resizeCanvas(); syncPanel(); updateWeights(); updateScore(); updateRate();
+  })();
+  </script>
+</body>
+</html>
