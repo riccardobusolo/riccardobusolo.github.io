@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuroPong — AI Self-Play | Riccardo Busolo</title>
+<meta name="description" content="Due reti neurali si sfidano a Pong e imparano dai propri errori tramite reinforcement learning. Osserva l'evoluzione in tempo reale.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#08080e;--bg-card:#12121a;--bg-raised:#1a1a22;--border:rgba(180,180,190,.08);--border-hover:rgba(180,180,190,.15);--text:#e0e0e6;--text-dim:#9a9a9e;--text-muted:#6a6a74;--cyan:#00e0d0;--cyan-dim:rgba(0,224,208,.06);--cyan-border:rgba(0,224,208,.15);--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;font-weight:300;overflow-x:hidden}
+
+.site-logo{position:fixed;top:20px;left:24px;z-index:50;text-decoration:none;display:flex;align-items:center;opacity:.7;transition:opacity .3s,scale .3s var(--ease)}
+.site-logo:hover{scale:1.08;opacity:1}.site-logo:active{scale:.94;transition-duration:.1s}
+
+.page{max-width:1000px;margin:0 auto;padding:40px 24px 40px}
+.header{text-align:center;margin-bottom:28px}
+.header__tag{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:8px}
+.header__title{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800;letter-spacing:-.04em;margin-bottom:6px}
+.header__desc{font-size:.88rem;color:var(--text-dim);font-weight:300;max-width:520px;margin:0 auto}
+
+/* ── HUD ── */
+.hud{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;align-items:center;justify-content:center}
+.hud__box{padding:8px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;font-family:var(--mono);font-size:.72rem;display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.hud__label{color:var(--text-muted);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em}
+.hud__val{font-weight:600;color:var(--text);min-width:3.5ch;text-align:right}
+.hud__score{font-size:1.3rem;font-weight:800;letter-spacing:.05em;min-width:10ch;text-align:center}
+.hud__gen{color:var(--cyan);font-weight:700}
+.hud__vel{min-width:5ch}
+
+/* ── Controls ── */
+.controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px}
+.btn{padding:8px 18px;font-family:var(--mono);font-size:.72rem;font-weight:500;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-dim);cursor:pointer;transition:all .2s var(--ease)}
+.btn:hover{color:var(--text);border-color:var(--border-hover)}
+.btn:active{transform:scale(.97);transition-duration:.05s}
+.btn.active{border-color:var(--cyan-border);color:var(--cyan);background:var(--cyan-dim)}
+.slider-wrap{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px}
+.slider-wrap label{font-family:var(--mono);font-size:.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.slider-wrap input[type=range]{width:140px;accent-color:var(--cyan)}
+.slider-wrap .val{font-family:var(--mono);font-size:.72rem;font-weight:600;min-width:44px;text-align:right;color:var(--text)}
+.slider-wrap input[type=number]{width:70px;padding:4px 8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:.72rem;outline:none}
+.slider-wrap input[type=number]:focus{border-color:var(--cyan)}
+
+/* ── Speed bar (full width) ── */
+.speed-bar{display:flex;align-items:center;gap:14px;padding:12px 18px;margin-top:10px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.speed-bar__label{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);white-space:nowrap;flex-shrink:0}
+.speed-bar__slider{flex:1;height:6px;-webkit-appearance:none;appearance:none;background:var(--bg-raised);border-radius:3px;outline:none;cursor:pointer;position:relative}
+.speed-bar__slider::-webkit-slider-container{height:6px}
+.speed-bar__slider::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:inherit}
+.speed-bar__slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--cyan);border:2px solid var(--bg);cursor:pointer;box-shadow:0 0 8px rgba(0,224,208,.3);margin-top:-6px}
+.speed-bar__slider::-moz-range-track{height:6px;border-radius:3px;background:var(--bg-raised);border:none}
+.speed-bar__slider::-moz-range-progress{height:6px;border-radius:3px;background:var(--cyan)}
+.speed-bar__slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--cyan);border:2px solid var(--bg);cursor:pointer;box-shadow:0 0 8px rgba(0,224,208,.3)}
+.speed-bar__val{font-family:var(--mono);font-size:.82rem;font-weight:700;min-width:60px;text-align:right;color:var(--cyan);flex-shrink:0;font-variant-numeric:tabular-nums}
+
+/* ── Canvas ── */
+.canvas-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:12px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;border-radius:10px}
+
+/* ── Debug ── */
+.debug{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.debug__item{font-family:var(--mono);font-size:.6rem;color:var(--text-muted);padding:4px 10px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px}
+.debug__item b{font-weight:600;color:var(--text-dim)}
+
+.caption{margin-top:12px;text-align:center;font-size:.72rem;color:var(--text-muted)}
+
+@media(max-width:640px){
+  .page{padding:24px 16px 30px}
+  .hud{gap:6px}.hud__box{padding:6px 10px;font-size:.65rem}
+  .hud__score{font-size:1rem}
+  .site-logo{top:16px;left:16px}
+  .site-logo svg{height:24px}
+}
+</style>
+</head>
+<body>
+
+<a href="/progetti.html#formazione" class="site-logo">
+  <svg height="28" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+    <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+    <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+    <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
+  </svg>
+</a>
+
+<div class="page">
+  <div class="header">
+    <div class="header__tag">Formazione interattiva</div>
+    <h1 class="header__title">NeuroPong</h1>
+    <p class="header__desc">Due reti neurali si sfidano a Pong e imparano dai propri errori. A ogni generazione, la perdente eredita i pesi della vincitrice con una mutazione — e la sfida ricomincia.</p>
+  </div>
+
+  <div class="hud">
+    <div class="hud__box"><span class="hud__label">Gen</span><span class="hud__val hud__gen" id="gen">1</span></div>
+    <div class="hud__box" id="scoreBox"><span class="hud__score" id="score">0 — 0</span></div>
+    <div class="hud__box"><span class="hud__label">Rally</span><span class="hud__val" id="rally">0</span></div>
+    <div class="hud__box"><span class="hud__label">Vel.</span><span class="hud__val hud__vel" id="ballspeed">0.00</span></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="pauseBtn">⏸ Pausa</button>
+    <button class="btn" id="resetBtn">↺ Reset</button>
+    <div class="slider-wrap">
+      <label>Soglia gen</label>
+      <input id="genThreshold" type="number" min="1" step="1" value="1000">
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="game" width="960" height="540"></canvas>
+  </div>
+
+  <div class="speed-bar">
+    <span class="speed-bar__label">Velocità simulazione</span>
+    <input id="speed" type="range" min="0" max="1000" step="1" value="0" class="speed-bar__slider">
+    <span class="speed-bar__val" id="speedLabel">1.0×</span>
+  </div>
+
+  <div class="debug">
+    <div class="debug__item">L · LR <b id="lrL">0.010</b> · ‖W‖ <b id="wnL">0.00</b></div>
+    <div class="debug__item">R · LR <b id="lrR">0.010</b> · ‖W‖ <b id="wnR">0.00</b></div>
+  </div>
+
+  <div class="caption">NeuroPong — Reinforcement learning a generazioni. Progetto didattico di Riccardo Busolo.</div>
+</div>
+
+<script>
+/* ============================================================
+   NEUROPONG — SELF-PLAY RL (REINFORCE, punishment-only)
+   Redesigned for riccardobusolo.com
+   ============================================================ */
+const CFG = {
+  canvas: { w: 960, h: 540 },
+  field:  { padMargin: 18, padW: 12, padH: 90, dashW: 6, dashGap: 12, borderRadius: 14 },
+  ball:   { r: 7, baseSpeed: 6, speedup: 1.03, maxSpeed: 15 },
+  paddle: { speed: 7, maxFactor: 1.4 },
+  rl:     { D:10, H:64, O:3, lr:0.010, gamma:0.99, tempInit:1.0, tempMin:0.2, tempDecay:0.9995, gradClip:5.0 },
+  sim:    { speed: 1.0 },
+  mutationRate: 0.03 // noise added to child weights
+};
+
+/* ── Palette for paddles ── */
+const PALETTE = [
+  '#00e0d0','#60a5fa','#f472b6','#fb923c','#a78bfa',
+  '#34d399','#fbbf24','#f87171','#818cf8','#2dd4bf'
+];
+let colorL = 0, colorR = 1;
+function nextColor(current){ return (current + 1 + Math.floor(Math.random()*(PALETTE.length-1))) % PALETTE.length; }
+
+/* ── Utility ── */
+function randf(a,b){ return a+Math.random()*(b-a); }
+function clamp(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); }
+function tanh(x){ return Math.tanh(x); }
+function softmaxScaled(logits,temp){
+  const invT=1/temp; let m=-Infinity;
+  for(let i=0;i<logits.length;i++){const z=logits[i]*invT;if(z>m)m=z;}
+  let sum=0,out=new Array(logits.length);
+  for(let i=0;i<logits.length;i++){out[i]=Math.exp(logits[i]*invT-m);sum+=out[i];}
+  for(let i=0;i<out.length;i++)out[i]/=sum;
+  return out;
+}
+function sampleFromProbs(p){const r=Math.random();let c=0;for(let i=0;i<p.length;i++){c+=p[i];if(r<=c)return i;}return p.length-1;}
+function l2norm(arr){let s=0;for(let i=0;i<arr.length;i++){const v=arr[i];s+=v*v;}return Math.sqrt(s);}
+function glorotUniform(fanIn,fanOut){const limit=Math.sqrt(6/(fanIn+fanOut));return()=>randf(-limit,limit);}
+
+/* ── Agent (10→64→3) ── */
+class Agent{
+  constructor(name){
+    this.name=name;this.D=CFG.rl.D;this.H=CFG.rl.H;this.O=CFG.rl.O;
+    this.lr=CFG.rl.lr;this.gamma=CFG.rl.gamma;
+    this.temperature=CFG.rl.tempInit;this.tempMin=CFG.rl.tempMin;this.tempDecay=CFG.rl.tempDecay;
+    this.gradClip=CFG.rl.gradClip;this.reinit();
+  }
+  reinit(){
+    const W1g=glorotUniform(this.D,this.H),W2g=glorotUniform(this.H,this.O);
+    this.W1=new Float64Array(this.H*this.D);this.b1=new Float64Array(this.H);
+    this.W2=new Float64Array(this.O*this.H);this.b2=new Float64Array(this.O);
+    for(let h=0;h<this.H;h++){for(let i=0;i<this.D;i++)this.W1[h*this.D+i]=W1g();this.b1[h]=0;}
+    for(let o=0;o<this.O;o++){for(let h=0;h<this.H;h++)this.W2[o*this.H+h]=W2g();this.b2[o]=0;}
+    this.temperature=CFG.rl.tempInit;this.episode=[];
+  }
+  clearEpisode(){this.episode.length=0;}
+  copyFrom(other){
+    this.D=other.D;this.H=other.H;this.O=other.O;this.lr=other.lr;this.gamma=other.gamma;
+    this.temperature=other.temperature;
+    this.W1=new Float64Array(other.W1);this.b1=new Float64Array(other.b1);
+    this.W2=new Float64Array(other.W2);this.b2=new Float64Array(other.b2);
+    this.clearEpisode();
+  }
+  mutate(rate){
+    for(const arr of [this.W1,this.b1,this.W2,this.b2]){
+      for(let i=0;i<arr.length;i++) arr[i]+=randf(-rate,rate);
+    }
+  }
+  weightNorm(){let s=0;for(const a of[this.W1,this.b1,this.W2,this.b2])for(let i=0;i<a.length;i++)s+=a[i]*a[i];return Math.sqrt(s);}
+  forward(x){
+    const h=new Float64Array(this.H);
+    for(let j=0;j<this.H;j++){let s=this.b1[j],base=j*this.D;for(let i=0;i<this.D;i++)s+=this.W1[base+i]*x[i];h[j]=tanh(s);}
+    const logits=new Float64Array(this.O);
+    for(let k=0;k<this.O;k++){let s=this.b2[k],base=k*this.H;for(let j=0;j<this.H;j++)s+=this.W2[base+j]*h[j];logits[k]=s;}
+    return{h,logits};
+  }
+  act(phi){
+    const{h,logits}=this.forward(phi);
+    const probs=softmaxScaled(logits,this.temperature);
+    const aIdx=sampleFromProbs(probs);
+    this.episode.push({x:phi.slice(0),h:Array.from(h),y:probs.slice(0),a:aIdx,temp:this.temperature});
+    return aIdx-1;
+  }
+  updateFromEpisode(punishment){
+    const T=this.episode.length;if(T===0)return;
+    const dW2=new Float64Array(this.O*this.H),db2=new Float64Array(this.O);
+    const dW1=new Float64Array(this.H*this.D),db1=new Float64Array(this.H);
+    for(let t=0;t<T;t++){
+      const step=this.episode[t],Gt=punishment*Math.pow(CFG.rl.gamma,(T-1-t));
+      const one=new Float64Array(this.O);one[step.a]=1.0;
+      const gradLogits=new Float64Array(this.O);const invT=1.0/step.temp;
+      for(let k=0;k<this.O;k++)gradLogits[k]=(one[k]-step.y[k])*invT;
+      for(let k=0;k<this.O;k++){const base=k*this.H,gk=Gt*gradLogits[k];db2[k]+=gk;for(let j=0;j<this.H;j++)dW2[base+j]+=gk*step.h[j];}
+      const g_h=new Float64Array(this.H);
+      for(let j=0;j<this.H;j++){let s=0;for(let k=0;k<this.O;k++)s+=this.W2[k*this.H+j]*gradLogits[k];g_h[j]=Gt*s*(1-step.h[j]*step.h[j]);}
+      for(let j=0;j<this.H;j++){db1[j]+=g_h[j];const base=j*this.D;for(let i=0;i<this.D;i++)dW1[base+i]+=g_h[j]*step.x[i];}
+    }
+    const nrm=Math.sqrt(l2norm(dW1)**2+l2norm(db1)**2+l2norm(dW2)**2+l2norm(db2)**2);
+    let scale=CFG.rl.lr;const clip=CFG.rl.gradClip;if(nrm>clip)scale*=clip/nrm;
+    for(let i=0;i<this.W2.length;i++)this.W2[i]+=scale*dW2[i];
+    for(let i=0;i<this.b2.length;i++)this.b2[i]+=scale*db2[i];
+    for(let i=0;i<this.W1.length;i++)this.W1[i]+=scale*dW1[i];
+    for(let i=0;i<this.b1.length;i++)this.b1[i]+=scale*db1[i];
+    this.temperature=Math.max(CFG.rl.tempMin,this.temperature*CFG.rl.tempDecay);
+  }
+}
+
+/* ── State & HUD ── */
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+const HUD={score:document.getElementById('score'),rally:document.getElementById('rally'),ballspeed:document.getElementById('ballspeed'),lrL:document.getElementById('lrL'),lrR:document.getElementById('lrR'),wnL:document.getElementById('wnL'),wnR:document.getElementById('wnR'),gen:document.getElementById('gen'),genThreshold:document.getElementById('genThreshold')};
+
+const game={w:CFG.canvas.w,h:CFG.canvas.h,ly:CFG.canvas.h/2,ry:CFG.canvas.h/2,padH:CFG.field.padH,padW:CFG.field.padW,padMargin:CFG.field.padMargin,bx:CFG.canvas.w/2,by:CFG.canvas.h/2,bvx:CFG.ball.baseSpeed,bvy:0,rally:0,scoreL:0,scoreR:0,paused:false,stepFrac:0,generation:1,genThreshold:1000};
+
+const left=new Agent('L'),right=new Agent('R');
+
+/* ── Features (10) — each agent sees the field from its own perspective ── */
+function featuresFor(side){
+  const nx=v=>(v/(game.w/2))-1, ny=v=>(v/(game.h/2))-1, nv=v=>clamp(v/CFG.ball.maxSpeed,-1,1);
+  const by=ny(game.by), bvy=nv(game.bvy);
+  if(side==='L'){
+    return[nx(game.bx), by, nv(game.bvx), bvy, ny(game.ly), ny(game.ry),
+           clamp((game.by-game.ly)/(game.h/2),-1,1), clamp((game.by-game.ry)/(game.h/2),-1,1), 1.0, 0.0];
+  } else {
+    // Mirror: right agent sees the field as if it were on the left
+    return[-nx(game.bx), by, -nv(game.bvx), bvy, ny(game.ry), ny(game.ly),
+           clamp((game.by-game.ry)/(game.h/2),-1,1), clamp((game.by-game.ly)/(game.h/2),-1,1), 1.0, 0.0];
+  }
+}
+
+/* ── Serve / Reset / Evolve ── */
+function serve(toRight){
+  game.bx=game.w/2;game.by=game.h/2;
+  game.bvx=(toRight?1:-1)*CFG.ball.baseSpeed;
+  game.bvy=randf(-CFG.ball.baseSpeed*0.6,CFG.ball.baseSpeed*0.6);
+  game.rally=0;game.ly=game.h/2;game.ry=game.h/2;
+  left.clearEpisode();right.clearEpisode();
+}
+function fullReset(){
+  left.reinit();right.reinit();
+  game.scoreL=0;game.scoreR=0;game.generation=1;
+  game.genThreshold=parseInt(HUD.genThreshold.value)||1000;
+  colorL=0;colorR=1;
+  serve(true);
+}
+
+/* ── IMPROVED GENERATION: loser copies winner + mutation ── */
+function evolveIfNeeded(){
+  if(game.scoreL>=game.genThreshold||game.scoreR>=game.genThreshold){
+    const winnerIsLeft=game.scoreL>=game.genThreshold;
+    const winner=winnerIsLeft?left:right;
+    const loser=winnerIsLeft?right:left;
+
+    // Loser copies winner's weights and gets mutated
+    loser.copyFrom(winner);
+    loser.mutate(CFG.mutationRate);
+
+    // Change the loser's paddle color
+    if(winnerIsLeft){ colorR=nextColor(colorR); }
+    else{ colorL=nextColor(colorL); }
+
+    // Swap sides: agents switch field
+    swapAgents();
+
+    game.scoreL=0;game.scoreR=0;
+    game.generation+=1;
+    serve(Math.random()<0.5);
+  }
+}
+
+function swapAgents(){
+  // Swap all weights between left and right
+  const tmp={W1:left.W1,b1:left.b1,W2:left.W2,b2:left.b2,temperature:left.temperature,lr:left.lr};
+  left.W1=right.W1;left.b1=right.b1;left.W2=right.W2;left.b2=right.b2;left.temperature=right.temperature;left.lr=right.lr;
+  right.W1=tmp.W1;right.b1=tmp.b1;right.W2=tmp.W2;right.b2=tmp.b2;right.temperature=tmp.temperature;right.lr=tmp.lr;
+  left.clearEpisode();right.clearEpisode();
+  // Swap colors
+  const tmpC=colorL;colorL=colorR;colorR=tmpC;
+}
+
+/* ── Step ── */
+function step(){
+  const phiL=featuresFor('L'), phiR=featuresFor('R');
+  const aL=left.act(phiL),aR=right.act(phiR);
+  const maxSp=CFG.paddle.speed*CFG.paddle.maxFactor;
+  game.ly=clamp(game.ly+aL*maxSp,CFG.field.padH/2,game.h-CFG.field.padH/2);
+  game.ry=clamp(game.ry+aR*maxSp,CFG.field.padH/2,game.h-CFG.field.padH/2);
+  game.bx+=game.bvx;game.by+=game.bvy;
+
+  if(game.by-CFG.ball.r<0){game.by=CFG.ball.r;game.bvy=Math.abs(game.bvy);}
+  else if(game.by+CFG.ball.r>game.h){game.by=game.h-CFG.ball.r;game.bvy=-Math.abs(game.bvy);}
+
+  const halfH=CFG.field.padH/2;
+  // Left paddle
+  const lpX=game.padMargin+game.padW;
+  if(game.bvx<0&&game.bx-CFG.ball.r<=lpX&&game.bx-CFG.ball.r>=game.padMargin-2){
+    if(game.by>=game.ly-halfH-CFG.ball.r&&game.by<=game.ly+halfH+CFG.ball.r){
+      game.bx=lpX+CFG.ball.r;game.bvx=Math.abs(game.bvx)*CFG.ball.speedup;
+      const off=(game.by-game.ly)/halfH;game.bvy=game.bvy*0.5+off*7;
+      let sp=Math.hypot(game.bvx,game.bvy);const ratio=Math.min(sp,CFG.ball.maxSpeed)/sp;
+      game.bvx*=ratio;game.bvy*=ratio;game.rally++;
+    }
+  }
+  // Right paddle
+  const rpX=game.w-game.padMargin-game.padW;
+  if(game.bvx>0&&game.bx+CFG.ball.r>=rpX&&game.bx+CFG.ball.r<=rpX+20){
+    if(game.by>=game.ry-halfH-CFG.ball.r&&game.by<=game.ry+halfH+CFG.ball.r){
+      game.bx=rpX-CFG.ball.r;game.bvx=-Math.abs(game.bvx)*CFG.ball.speedup;
+      const off=(game.by-game.ry)/halfH;game.bvy=game.bvy*0.5+off*7;
+      let sp=Math.hypot(game.bvx,game.bvy);const ratio=Math.min(sp,CFG.ball.maxSpeed)/sp;
+      game.bvx*=ratio;game.bvy*=ratio;game.rally++;
+    }
+  }
+
+  if(game.bx<-CFG.ball.r){
+    game.scoreR++;left.updateFromEpisode(-1);right.clearEpisode();
+    serve(Math.random()<0.5);evolveIfNeeded();
+  }else if(game.bx>game.w+CFG.ball.r){
+    game.scoreL++;right.updateFromEpisode(-1);left.clearEpisode();
+    serve(Math.random()<0.5);evolveIfNeeded();
+  }
+}
+
+/* ── Draw ── */
+function draw(){
+  const w=game.w,h=game.h;
+  ctx.clearRect(0,0,w,h);
+
+  // Dark field
+  ctx.fillStyle='#0a0a12';
+  ctx.beginPath();rrFill(ctx,0,0,w,h,CFG.field.borderRadius);
+
+  // Subtle border
+  ctx.strokeStyle='rgba(180,180,190,.06)';ctx.lineWidth=1;
+  ctx.beginPath();rrStroke(ctx,0.5,0.5,w-1,h-1,CFG.field.borderRadius);
+
+  // Center dash
+  ctx.strokeStyle='rgba(180,180,190,.08)';ctx.lineWidth=2;ctx.setLineDash([CFG.field.dashW,CFG.field.dashGap]);
+  ctx.beginPath();ctx.moveTo(w/2,12);ctx.lineTo(w/2,h-12);ctx.stroke();ctx.setLineDash([]);
+
+  // Paddles with colors
+  const hh=CFG.field.padH/2;
+  ctx.fillStyle=PALETTE[colorL];
+  rrFill(ctx,game.padMargin,game.ly-hh,game.padW,CFG.field.padH,5);
+  ctx.fillStyle=PALETTE[colorR];
+  rrFill(ctx,w-game.padMargin-game.padW,game.ry-hh,game.padW,CFG.field.padH,5);
+
+  // Ball (white)
+  ctx.fillStyle='#e0e0e6';
+  ctx.beginPath();ctx.arc(game.bx,game.by,CFG.ball.r,0,Math.PI*2);ctx.fill();
+
+  // Ball glow
+  const grad=ctx.createRadialGradient(game.bx,game.by,0,game.bx,game.by,20);
+  grad.addColorStop(0,'rgba(224,224,230,.15)');grad.addColorStop(1,'transparent');
+  ctx.fillStyle=grad;ctx.fillRect(game.bx-25,game.by-25,50,50);
+
+  // HUD update
+  HUD.score.textContent=`${game.scoreL} — ${game.scoreR}`;
+  HUD.rally.textContent=game.rally;
+  HUD.ballspeed.textContent=Math.hypot(game.bvx,game.bvy).toFixed(2);
+  HUD.lrL.textContent=left.lr.toFixed(3);HUD.lrR.textContent=right.lr.toFixed(3);
+  HUD.wnL.textContent=left.weightNorm().toFixed(2);HUD.wnR.textContent=right.weightNorm().toFixed(2);
+  HUD.gen.textContent=game.generation;
+
+  // Color the score border to match the leading paddle
+  const sBox=document.getElementById('scoreBox');
+  if(game.scoreL>game.scoreR) sBox.style.borderColor=PALETTE[colorL];
+  else if(game.scoreR>game.scoreL) sBox.style.borderColor=PALETTE[colorR];
+  else sBox.style.borderColor='rgba(180,180,190,.08)';
+}
+function rrFill(ctx,x,y,w,h,r){const rr=Math.min(r,h/2,w/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();ctx.fill();}
+function rrStroke(ctx,x,y,w,h,r){const rr=Math.min(r,h/2,w/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();ctx.stroke();}
+
+/* ── Loop ── */
+function loop(){
+  requestAnimationFrame(loop);
+  if(game.paused){draw();return;}
+  game.stepFrac+=CFG.sim.speed;
+  let steps=Math.floor(game.stepFrac);game.stepFrac-=steps;
+  if(steps>3000)steps=3000;
+  for(let i=0;i<steps;i++)step();
+  draw();
+}
+
+/* ── UI Events ── */
+document.getElementById('pauseBtn').addEventListener('click',function(){
+  game.paused=!game.paused;
+  this.textContent=game.paused?'▶ Riprendi':'⏸ Pausa';
+  this.classList.toggle('active',game.paused);
+});
+document.getElementById('resetBtn').addEventListener('click',fullReset);
+/* Log scale: slider 0-1000 → speed 0.1x-500x */
+function sliderToSpeed(v){return 0.1*Math.pow(5000,v/1000);}
+function speedToLabel(s){return s<10?s.toFixed(1)+'×':Math.round(s)+'×';}
+function updateSliderTrack(el){
+  const pct=(el.value-el.min)/(el.max-el.min)*100;
+  el.style.background=`linear-gradient(90deg,#00e0d0 ${pct}%,#1a1a22 ${pct}%)`;
+}
+const speedSlider=document.getElementById('speed');
+speedSlider.addEventListener('input',e=>{
+  CFG.sim.speed=sliderToSpeed(parseFloat(e.target.value));
+  document.getElementById('speedLabel').textContent=speedToLabel(CFG.sim.speed);
+  updateSliderTrack(speedSlider);
+});
+HUD.genThreshold.addEventListener('input',e=>{const v=parseInt(e.target.value);if(!isNaN(v)&&v>0)game.genThreshold=v;});
+
+/* ── Init ── */
+canvas.width=CFG.canvas.w;canvas.height=CFG.canvas.h;
+CFG.sim.speed=sliderToSpeed(parseFloat(speedSlider.value));
+document.getElementById('speedLabel').textContent=speedToLabel(CFG.sim.speed);
+updateSliderTrack(speedSlider);
+game.genThreshold=parseInt(HUD.genThreshold.value)||1000;
+fullReset();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
