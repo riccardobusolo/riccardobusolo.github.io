@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Allucinazioni AI — Perché i Modelli Inventano | Riccardo Busolo</title>
+  <meta name="description" content="Perché i modelli AI inventano informazioni? Cosa sono le allucinazioni, come riconoscerle e come difendersi: guida pratica con esempi reali e strategie concrete.">
+  <link rel="canonical" href="https://riccardobusolo.com/articoli/allucinazioni-ai/">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#08080e;--bg-card:#12121a;--bg-raised:#191920;--border:rgba(180,180,190,.08);--text:#e0e0e6;--text-dim:#9a9a9e;--text-muted:#6a6a74;--cyan:#00e0d0;--cyan-dim:rgba(0,224,208,.08);--cyan-border:rgba(0,224,208,.15);--orange:#ff8844;--purple:#a78bfa;--pink:#f472b6;--green:#34d399;--blue:#60a5fa;--red:#f87171;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1);--article-w:720px}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.85;-webkit-font-smoothing:antialiased;font-weight:300}
+
+    .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;padding:20px 40px;background:rgba(10,10,14,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+    .nav__inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:900px}
+    .nav__logo{text-decoration:none;display:flex;align-items:center;transition:scale .3s var(--ease)}
+    .nav__logo:hover{scale:1.08}.nav__logo:active{scale:.94;transition-duration:.1s}
+    .nav__links{display:flex;gap:32px;list-style:none}
+    .nav__links a{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);text-decoration:none;transition:color .3s}
+    .nav__links a:hover{color:var(--cyan)}
+
+    .back{position:fixed;left:max(24px,calc((100vw - var(--article-w)) / 2 - 160px));top:120px;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.7rem;color:var(--text-muted);text-decoration:none!important;transition:all .3s var(--ease);letter-spacing:.03em;border:none!important;padding:10px 16px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border)!important;z-index:40;white-space:nowrap}
+    .back:hover{color:var(--cyan);border-color:var(--cyan-border)!important;background:rgba(0,224,208,.06)}
+    .back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .3s var(--ease);flex-shrink:0}
+    .back:hover svg{transform:translateX(-3px)}
+
+    .article{max-width:var(--article-w);margin:0 auto;padding:120px 32px 80px}
+    .article__tag{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:16px}
+    .article__title{font-size:clamp(2rem,5vw,2.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:10px}
+    .article__subtitle{font-size:1.05rem;color:var(--text-dim);font-weight:300;line-height:1.7;margin-bottom:20px}
+    .article__meta{display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:.7rem;color:var(--text-muted);margin-bottom:36px;flex-wrap:wrap}
+    .article__meta span{display:flex;align-items:center;gap:5px}
+    .article__meta svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+
+    .divider{width:40px;height:2px;background:linear-gradient(90deg,var(--cyan),transparent);margin:48px 0;border:none}
+
+    .tldr{background:var(--cyan-dim);border:1px solid var(--cyan-border);border-radius:12px;padding:24px 28px;margin-bottom:48px}
+    .tldr__label{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:10px;font-weight:600}
+    .tldr p{font-size:.92rem;color:var(--text-dim);line-height:1.8;margin:0}
+
+    .toc{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:48px}
+    .toc__title{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:14px}
+    .toc__list{list-style:none;display:flex;flex-direction:column;gap:8px}
+    .toc__list a{font-size:.88rem;color:var(--text-dim);text-decoration:none;transition:color .3s;display:flex;align-items:center;gap:8px;border:none!important}
+    .toc__list a::before{content:'';width:6px;height:1px;background:var(--text-muted);transition:width .3s,background .3s;flex-shrink:0}
+    .toc__list a:hover{color:var(--cyan)}
+    .toc__list a:hover::before{width:16px;background:var(--cyan)}
+
+    .article h2{font-size:1.6rem;font-weight:700;letter-spacing:-.03em;margin:0 0 20px;padding-top:0}
+    .article h3{font-size:1.15rem;font-weight:600;margin:32px 0 12px}
+    .article p{margin-bottom:20px;font-size:1rem;color:var(--text-dim)}
+    .article strong{color:var(--text);font-weight:600}
+    .article a:not(.back):not(.toc__list a):not(.cta-box__btn){color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,224,208,.2);transition:border-color .3s}
+    .article a:not(.back):not(.toc__list a):not(.cta-box__btn):hover{border-color:var(--cyan)}
+
+    .infobox{background:var(--bg-card);border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;padding:20px 24px;margin:28px 0;font-size:.9rem}
+    .infobox--warn{border-left-color:var(--orange)}
+    .infobox__label{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:8px}
+    .infobox--warn .infobox__label{color:var(--orange)}
+    .infobox p{color:var(--text-dim);margin-bottom:0}
+    code{font-family:var(--mono);font-size:.82em;background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--orange)}
+
+    /* ── Infographics ── */
+    .infographic{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:32px;margin:32px 0;overflow:hidden}
+    .infographic__title{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:20px;text-align:center}
+
+    /* Token prediction */
+    .tp{display:flex;flex-direction:column;align-items:center;gap:16px}
+    .tp__sentence{font-size:1.1rem;font-weight:400;text-align:center;line-height:1.8}
+    .tp__sentence .fixed{color:var(--text)}
+    .tp__sentence .slot{display:inline-block;min-width:90px;padding:4px 14px;border-radius:6px;font-weight:600;transition:all .4s var(--ease);cursor:pointer}
+    .tp__bars{display:flex;flex-direction:column;gap:6px;width:100%;max-width:380px}
+    .tp__bar{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.72rem}
+    .tp__bar-label{width:90px;text-align:right;color:var(--text-dim);flex-shrink:0}
+    .tp__bar-track{flex:1;height:24px;background:var(--bg-raised);border-radius:4px;overflow:hidden;position:relative}
+    .tp__bar-fill{height:100%;border-radius:4px;transition:width .5s var(--ease);display:flex;align-items:center;padding-left:8px;font-size:.62rem;font-weight:600;color:var(--bg)}
+    .tp__bar-pct{width:40px;color:var(--text-muted);font-size:.65rem}
+    .tp__hint{font-family:var(--mono);font-size:.65rem;color:var(--text-muted);text-align:center}
+
+    /* Quiz */
+    .quiz{display:flex;flex-direction:column;gap:16px}
+    .quiz__card{background:var(--bg-raised);border:1px solid var(--border);border-radius:10px;padding:20px;transition:border-color .3s}
+    .quiz__q{font-size:.9rem;color:var(--text-dim);line-height:1.7;margin-bottom:14px;font-style:italic}
+    .quiz__q::before{content:'"';color:var(--text-muted);font-size:1.4rem;font-style:normal;margin-right:4px}
+    .quiz__q::after{content:'"';color:var(--text-muted);font-size:1.4rem;font-style:normal;margin-left:2px}
+    .quiz__btns{display:flex;gap:8px}
+    .quiz__btn{padding:8px 18px;font-family:var(--mono);font-size:.72rem;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-dim);cursor:pointer;transition:all .3s var(--ease)}
+    .quiz__btn:hover{border-color:var(--cyan-border);color:var(--cyan)}
+    .quiz__btn--correct{background:rgba(52,211,153,.1)!important;border-color:rgba(52,211,153,.3)!important;color:var(--green)!important}
+    .quiz__btn--wrong{background:rgba(248,113,113,.1)!important;border-color:rgba(248,113,113,.3)!important;color:var(--red)!important}
+    .quiz__explain{display:none;margin-top:12px;font-size:.82rem;color:var(--text-dim);padding:12px 14px;background:var(--bg-card);border-radius:8px;line-height:1.7}
+    .quiz__explain.show{display:block}
+    .quiz__score{text-align:center;font-family:var(--mono);font-size:.8rem;color:var(--cyan);padding:12px;background:var(--cyan-dim);border:1px solid var(--cyan-border);border-radius:8px}
+
+    /* Checklist */
+    .checklist{display:flex;flex-direction:column;gap:10px}
+    .check-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--bg-raised);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .3s var(--ease);user-select:none}
+    .check-item:hover{border-color:var(--cyan-border)}
+    .check-item.done{border-color:rgba(52,211,153,.2);background:rgba(52,211,153,.04)}
+    .check-box{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .3s var(--ease);font-size:.7rem;color:transparent}
+    .check-item.done .check-box{background:var(--green);border-color:var(--green);color:var(--bg)}
+    .check-text{flex:1}
+    .check-title{font-size:.92rem;font-weight:600;color:var(--text);margin-bottom:3px}
+    .check-desc{font-size:.82rem;color:var(--text-muted);line-height:1.6}
+    .check-counter{text-align:center;font-family:var(--mono);font-size:.72rem;color:var(--text-muted);margin-top:6px}
+
+    /* CTA */
+    .cta-box{background:linear-gradient(135deg,rgba(0,224,208,.04),rgba(167,139,250,.04));border:1px solid var(--cyan-border);border-radius:14px;padding:36px 32px;text-align:center;margin:56px 0 20px}
+    .cta-box__title{font-size:1.2rem;font-weight:700;margin-bottom:10px}
+    .cta-box__desc{font-size:.9rem;color:var(--text-dim);margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto}
+    .cta-box__btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;font-family:var(--mono);font-size:.8rem;font-weight:500;background:var(--cyan);color:var(--bg);border-radius:6px;text-decoration:none!important;border:none!important;transition:all .3s var(--ease)}
+    .cta-box__btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,208,.3);color:var(--bg)!important}
+
+    .footer{padding:36px 32px;text-align:center;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border);max-width:var(--article-w);margin:0 auto}
+    .footer a{color:var(--text-muted);text-decoration:none;font-family:var(--mono);font-size:.72rem;transition:color .3s;border:none!important}
+    .footer a:hover{color:var(--cyan)}
+
+    @media(max-width:960px){.back{left:20px;top:80px;padding:8px 14px;font-size:.66rem}}
+    @media(max-width:600px){
+      .article{padding:100px 20px 60px}
+      .nav{padding:14px 20px}.nav__links{gap:16px}.nav__links a{font-size:.62rem}
+      .article__title{font-size:1.7rem}
+      .infographic{padding:20px 16px}
+      .back{left:16px;top:74px;padding:7px 12px;font-size:.62rem}
+      .tp__bar-label{width:70px;font-size:.62rem}
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav"><div class="nav__inner">
+    <a href="/index.html" class="nav__logo" style="display:flex;align-items:center">
+      <svg height="32" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+        <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
+      </svg>
+    </a>
+    <ul class="nav__links">
+      <li><a href="/index.html#servizi">Servizi</a></li>
+      <li><a href="/progetti.html">Progetti</a></li>
+      <li><a href="/index.html#risorse">Risorse</a></li>
+      <li><a href="/index.html#contatti">Contatti</a></li>
+    </ul>
+  </div></nav>
+
+  <a href="/progetti.html#articoli" class="back"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>Articoli</a>
+
+  <article class="article">
+
+    <div class="article__tag">Articolo</div>
+    <h1 class="article__title">Allucinazioni AI</h1>
+    <p class="article__subtitle">Perché i modelli inventano informazioni che sembrano vere — e come imparare a difendersi.</p>
+    <div class="article__meta">
+      <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 12 min</span>
+      <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 2026</span>
+      <span><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Riccardo Busolo</span>
+    </div>
+
+    <div class="tldr">
+      <div class="tldr__label">In breve</div>
+      <p>Un modello AI non "sa" cose — calcola la prossima parola più probabile. A volte quella parola sembra perfetta ma è completamente falsa. Si chiama <strong>allucinazione</strong> e succede perché i modelli ottimizzano la <strong>plausibilità linguistica</strong>, non la verità. Riconoscerle è una competenza, non un optional.</p>
+    </div>
+
+    <div class="toc">
+      <div class="toc__title">In questo articolo</div>
+      <ol class="toc__list">
+        <li><a href="#cosa">Cosa sono le allucinazioni AI</a></li>
+        <li><a href="#perche">Perché accadono</a></li>
+        <li><a href="#tipi">Tassonomia: i quattro tipi</a></li>
+        <li><a href="#casi">Casi reali</a></li>
+        <li><a href="#riconoscere">Come riconoscerle</a></li>
+        <li><a href="#difendersi">Come difendersi: 5 strategie</a></li>
+      </ol>
+    </div>
+
+    <!-- ═══ 1. COSA SONO ═══ -->
+    <h2 id="cosa">Cosa sono le allucinazioni AI</h2>
+    <p>Un'allucinazione AI è una risposta che <strong>sembra corretta ma non lo è</strong>. Il modello produce testo grammaticalmente impeccabile, strutturalmente coerente e stilisticamente convincente — ma il contenuto è parzialmente o completamente inventato.</p>
+    <p>Il termine "allucinazione" viene dalla neuroscienza: il cervello costruisce una percezione che non corrisponde alla realtà esterna. Allo stesso modo, un LLM costruisce una risposta che non corrisponde ai fatti — ma che al modello "sembra giusta" dal punto di vista statistico.</p>
+    <p>La cosa insidiosa è che le allucinazioni <strong>non hanno un aspetto diverso</strong> dalle risposte corrette. Non arrivano con un avviso. Non sono esitanti o vaghe. Spesso sono le risposte più fluide e sicure — proprio perché il modello ha trovato un percorso statisticamente forte che però porta nella direzione sbagliata.</p>
+
+    <div class="infobox">
+      <div class="infobox__label">Punto chiave</div>
+      <p>Le allucinazioni non sono un bug: sono una <strong>conseguenza intrinseca</strong> del modo in cui funzionano i modelli linguistici. Un LLM non distingue tra "probabile" e "vero" — per lui sono la stessa cosa.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ 2. PERCHÉ ACCADONO ═══ -->
+    <h2 id="perche">Perché accadono</h2>
+    <p>Per capire le allucinazioni, bisogna capire cosa fa realmente un LLM. Non ragiona, non ricorda, non consulta un database di fatti. Fa una cosa sola: <strong>predice la prossima parola più probabile</strong> dato il contesto precedente.</p>
+    <p>Ogni parola che leggi in una risposta AI è il risultato di un calcolo probabilistico. Il modello assegna un punteggio a migliaia di possibili parole successive e sceglie una delle più probabili. Poi ripete il processo. Parola dopo parola, costruisce frasi che suonano naturali.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Infografica interattiva — Predizione del prossimo token</div>
+      <div class="tp" id="tp-demo">
+        <div class="tp__sentence">
+          <span class="fixed">La capitale della Francia è</span>
+          <span class="slot" id="tp-slot" style="background:var(--cyan-dim);color:var(--cyan)">Parigi</span>
+        </div>
+        <div class="tp__bars" id="tp-bars"></div>
+        <div class="tp__hint">Clicca sulle barre per cambiare la parola scelta →</div>
+      </div>
+    </div>
+
+    <p>Il problema: quando il modello non ha abbastanza informazione su un argomento, la distribuzione di probabilità diventa <strong>piatta</strong>. Diverse opzioni hanno punteggi simili. Il modello ne sceglie una comunque — e la presenta con la stessa sicurezza di "Parigi" nella frase sopra.</p>
+    <p>Ecco il paradosso: <strong>più un modello è fluente, più le sue allucinazioni sono convincenti</strong>. Un modello primitivo produceva errori evidenti. Un modello moderno produce errori che richiedono un esperto per essere individuati.</p>
+
+    <hr class="divider">
+
+    <!-- ═══ 3. TASSONOMIA ═══ -->
+    <h2 id="tipi">Tassonomia: i quattro tipi di allucinazione</h2>
+
+    <h3>1. Fatti inventati</h3>
+    <p>Il modello afferma qualcosa di specifico e verificabile che è semplicemente <strong>falso</strong>. Date, numeri, eventi storici che non sono mai accaduti, attribuzioni errate. Esempio: "Albert Einstein vinse il Nobel per la Fisica nel 1925 per la teoria della relatività" — suona perfetto, ma il Nobel era nel 1921 e per l'effetto fotoelettrico, non per la relatività.</p>
+
+    <h3>2. Citazioni fantasma</h3>
+    <p>Paper scientifici con titoli plausibili, autori reali ma combinazioni inesistenti. Articoli di giornale mai pubblicati. Leggi citate con numeri precisi che non esistono. Il modello ha imparato il <strong>formato</strong> delle citazioni accademiche, ma ne inventa il contenuto.</p>
+
+    <h3>3. Ragionamento plausibile ma sbagliato</h3>
+    <p>La catena logica sembra impeccabile, ogni passaggio appare ragionevole, ma la conclusione è errata. Questo tipo è il più pericoloso perché richiede <strong>competenza nel dominio</strong> per essere smascherato. Il modello ha imparato la struttura del ragionamento, non la validità.</p>
+
+    <h3>4. Numeri inventati</h3>
+    <p>Statistiche, percentuali, dati finanziari che sembrano precisi ma sono generati. Un modello che risponde "il mercato è cresciuto del 4.7% nel Q3" potrebbe aver inventato quel numero perché <strong>una cifra con un decimale</strong> è statisticamente il formato più probabile in quel contesto.</p>
+
+    <div class="infobox infobox--warn">
+      <div class="infobox__label">Attenzione</div>
+      <p>Le allucinazioni più pericolose non sono quelle ovviamente sbagliate — sono quelle che contengono il <strong>95% di informazioni corrette</strong> e un 5% di dettagli inventati, mischiati in modo indistinguibile.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ 4. CASI REALI ═══ -->
+    <h2 id="casi">Casi reali</h2>
+    <p>Le allucinazioni AI non sono un problema teorico. Hanno avuto conseguenze concrete e documentate.</p>
+    <p>Nel 2023, un avvocato di New York utilizzò ChatGPT per preparare una memoria legale. Il modello generò <strong>sei casi giuridici completamente inventati</strong> — con nomi di giudici reali, numeri di fascicolo plausibili e citazioni formattate correttamente. L'avvocato li incluse senza verificare. Il giudice scoprì la frode e il legale fu sanzionato.</p>
+    <p>In ambito accademico, diversi ricercatori hanno riportato che modelli AI generano <strong>bibliografie con paper inesistenti</strong>: titoli credibili, riviste reali, autori noti nel campo — ma combinazioni mai pubblicate. Il formato è perfetto. Il contenuto è pura invenzione.</p>
+    <p>Nel giornalismo, testate che hanno sperimentato la generazione automatica di articoli hanno dovuto ritirare pezzi contenenti <strong>fatti mai accaduti presentati come cronaca</strong>. Il tono era indistinguibile da quello di un giornalista professionista.</p>
+
+    <hr class="divider">
+
+    <!-- ═══ 5. COME RICONOSCERLE ═══ -->
+    <h2 id="riconoscere">Come riconoscerle</h2>
+    <p>Non esiste un indicatore infallibile, ma ci sono <strong>pattern ricorrenti</strong> che dovrebbero alzare il livello di attenzione.</p>
+    <p>I segnali più comuni: risposte troppo specifiche su argomenti di nicchia, numeri con decimali sospettamente precisi, citazioni con tutti gli elementi formali ma non verificabili, affermazioni sicurissime su temi dove l'incertezza è la norma. Se una risposta AI sembra "troppo perfetta" per l'argomento, probabilmente lo è.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Quiz interattivo — Allucinazione o no?</div>
+      <div class="quiz" id="quiz-demo">
+        <div class="quiz__card" id="q0">
+          <div class="quiz__q">Il protocollo HTTP è stato creato da Tim Berners-Lee nel 1991 al CERN di Ginevra.</div>
+          <div class="quiz__btns">
+            <button class="quiz__btn" data-q="0" data-a="real">Reale</button>
+            <button class="quiz__btn" data-q="0" data-a="halluc">Allucinazione</button>
+          </div>
+          <div class="quiz__explain" id="q0-exp">✅ <strong>Reale.</strong> Tim Berners-Lee creò effettivamente HTTP al CERN tra il 1989 e il 1991. Tutti i dettagli sono corretti.</div>
+        </div>
+        <div class="quiz__card" id="q1">
+          <div class="quiz__q">Secondo uno studio pubblicato su Nature nel 2022 da Chen et al., il 73.2% delle aziende Fortune 500 utilizza modelli AI proprietari.</div>
+          <div class="quiz__btns">
+            <button class="quiz__btn" data-q="1" data-a="real">Reale</button>
+            <button class="quiz__btn" data-q="1" data-a="halluc">Allucinazione</button>
+          </div>
+          <div class="quiz__explain" id="q1-exp">🔴 <strong>Allucinazione.</strong> Citazione fantasma classica: rivista reale (Nature), formato perfetto ("Chen et al."), percentuale sospettamente precisa (73.2%). Lo studio non esiste.</div>
+        </div>
+        <div class="quiz__card" id="q2">
+          <div class="quiz__q">La backpropagation è stata formalizzata nel 1986 da Rumelhart, Hinton e Williams.</div>
+          <div class="quiz__btns">
+            <button class="quiz__btn" data-q="2" data-a="real">Reale</button>
+            <button class="quiz__btn" data-q="2" data-a="halluc">Allucinazione</button>
+          </div>
+          <div class="quiz__explain" id="q2-exp">✅ <strong>Reale.</strong> Il paper "Learning representations by back-propagating errors" fu pubblicato nel 1986 su Nature da questi tre autori.</div>
+        </div>
+        <div class="quiz__card" id="q3">
+          <div class="quiz__q">Il ponte di Rialto a Venezia fu progettato dall'architetto Andrea Palladio nel 1588.</div>
+          <div class="quiz__btns">
+            <button class="quiz__btn" data-q="3" data-a="real">Reale</button>
+            <button class="quiz__btn" data-q="3" data-a="halluc">Allucinazione</button>
+          </div>
+          <div class="quiz__explain" id="q3-exp">🔴 <strong>Allucinazione.</strong> Il ponte di Rialto fu progettato da Antonio da Ponte, non da Palladio. Palladio partecipò al concorso ma il suo progetto fu scartato. Il modello ha mescolato "architetto veneto famoso" con "ponte veneto famoso".</div>
+        </div>
+        <div class="quiz__score" id="quiz-score" style="display:none"></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ═══ 6. COME DIFENDERSI ═══ -->
+    <h2 id="difendersi">Come difendersi: 5 strategie</h2>
+    <p>Non si tratta di non fidarsi dell'AI. Si tratta di <strong>saperla usare</strong>. Queste cinque strategie trasformano un utente passivo in un collaboratore consapevole.</p>
+
+    <div class="infographic">
+      <div class="infographic__title">Checklist interattiva — Le 5 difese</div>
+      <div class="checklist" id="checklist">
+        <div class="check-item" data-idx="0">
+          <div class="check-box">✓</div>
+          <div class="check-text">
+            <div class="check-title">Verifica le fonti</div>
+            <div class="check-desc">Se l'AI cita uno studio, un articolo o un dato — cercalo tu. Se non lo trovi in 30 secondi, probabilmente non esiste.</div>
+          </div>
+        </div>
+        <div class="check-item" data-idx="1">
+          <div class="check-box">✓</div>
+          <div class="check-text">
+            <div class="check-title">Chiedi le fonti esplicitamente</div>
+            <div class="check-desc">Aggiungi "indica le fonti" nella richiesta. Il modello potrebbe comunque inventarle, ma sarà più facile verificare.</div>
+          </div>
+        </div>
+        <div class="check-item" data-idx="2">
+          <div class="check-box">✓</div>
+          <div class="check-text">
+            <div class="check-title">Diffida della precisione eccessiva</div>
+            <div class="check-desc">Numeri con decimali, percentuali specifiche, date esatte su argomenti di nicchia sono spesso segnali di allucinazione.</div>
+          </div>
+        </div>
+        <div class="check-item" data-idx="3">
+          <div class="check-box">✓</div>
+          <div class="check-text">
+            <div class="check-title">Testa con domande di controllo</div>
+            <div class="check-desc">Fai domande di cui conosci la risposta nello stesso dominio. Se il modello sbaglia quelle, probabilmente sbaglia anche le altre.</div>
+          </div>
+        </div>
+        <div class="check-item" data-idx="4">
+          <div class="check-box">✓</div>
+          <div class="check-text">
+            <div class="check-title">Non usare l'AI come unica fonte</div>
+            <div class="check-desc">L'AI è un acceleratore, non un sostituto della verifica. Usala per la bozza, mai per il prodotto finale senza revisione umana.</div>
+          </div>
+        </div>
+      </div>
+      <div class="check-counter" id="check-count">0 / 5 completate</div>
+    </div>
+
+    <p>Nessuna di queste strategie richiede competenze tecniche. Richiedono <strong>pensiero critico</strong> — esattamente la competenza che distingue chi usa l'AI bene da chi ne subisce i limiti.</p>
+
+    <div class="infobox">
+      <div class="infobox__label">La regola d'oro</div>
+      <p>Tratta ogni risposta di un modello AI come il consiglio di un <strong>collega brillante ma inaffidabile</strong>: ascoltalo con attenzione, ma verifica sempre prima di agire.</p>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-box__title">Vuoi formare il tuo team a usare l'AI in modo consapevole?</div>
+      <div class="cta-box__desc">Nei miei percorsi di formazione insegno a riconoscere i limiti dei modelli e a costruire workflow che minimizzano il rischio di allucinazioni.</div>
+      <a href="/index.html#contatti" class="cta-box__btn">Parliamone →</a>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <div>&copy; 2026 Riccardo Busolo — AI Consultant</div>
+    <div style="margin-top:10px"><a href="/index.html">Torna al sito</a> · <a href="/progetti.html#articoli">Tutti gli articoli</a></div>
+  </footer>
+
+  <script>
+  (function(){
+    'use strict';
+
+    /* ═══ TOKEN PREDICTION ═══ */
+    const options=[
+      {word:'Parigi',pct:92,color:'var(--cyan)',correct:true},
+      {word:'una città',pct:4,color:'var(--purple)',correct:false},
+      {word:'notoriamente',pct:2,color:'var(--orange)',correct:false},
+      {word:'situata',pct:1.2,color:'var(--text-muted)',correct:false},
+      {word:'Roma',pct:0.8,color:'var(--red)',correct:false}
+    ];
+    const tpBars=document.getElementById('tp-bars');
+    const tpSlot=document.getElementById('tp-slot');
+
+    options.forEach((opt,i)=>{
+      const row=document.createElement('div');row.className='tp__bar';
+      const label=document.createElement('div');label.className='tp__bar-label';label.textContent=opt.word;
+      const track=document.createElement('div');track.className='tp__bar-track';
+      const fill=document.createElement('div');fill.className='tp__bar-fill';
+      fill.style.width=opt.pct+'%';
+      fill.style.background=opt.color;
+      if(opt.pct>10) fill.textContent=opt.word;
+      const pct=document.createElement('div');pct.className='tp__bar-pct';pct.textContent=opt.pct+'%';
+      track.appendChild(fill);
+      row.appendChild(label);row.appendChild(track);row.appendChild(pct);
+      row.style.cursor='pointer';
+      row.addEventListener('click',()=>{
+        tpSlot.textContent=opt.word;
+        if(opt.correct){tpSlot.style.background='var(--cyan-dim)';tpSlot.style.color='var(--cyan)';}
+        else{tpSlot.style.background='rgba(248,113,113,.1)';tpSlot.style.color='var(--red)';}
+      });
+      tpBars.appendChild(row);
+    });
+
+    /* ═══ QUIZ ═══ */
+    const answers={0:'real',1:'halluc',2:'real',3:'halluc'};
+    let quizAnswered=0,quizCorrect=0,quizTotal=Object.keys(answers).length;
+
+    document.querySelectorAll('.quiz__btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const q=btn.dataset.q;
+        const card=document.getElementById('q'+q);
+        if(card.dataset.done)return;
+        card.dataset.done='1';
+        quizAnswered++;
+
+        const isCorrect=btn.dataset.a===answers[q];
+        if(isCorrect){btn.classList.add('quiz__btn--correct');quizCorrect++;}
+        else{btn.classList.add('quiz__btn--wrong');}
+
+        // Highlight correct answer
+        card.querySelectorAll('.quiz__btn').forEach(b=>{
+          if(b.dataset.a===answers[q]&&!b.classList.contains('quiz__btn--correct'))
+            b.style.borderColor='rgba(52,211,153,.3)';
+          b.style.pointerEvents='none';
+        });
+
+        document.getElementById('q'+q+'-exp').classList.add('show');
+
+        if(quizAnswered===quizTotal){
+          const score=document.getElementById('quiz-score');
+          score.style.display='block';
+          score.textContent=quizCorrect+' / '+quizTotal+' corrette — '+(quizCorrect===quizTotal?'Ottimo! Sai riconoscere le allucinazioni.':quizCorrect>=3?'Buono, ma attenzione ai dettagli.':'Le allucinazioni sono insidiose — continua a leggere!');
+        }
+      });
+    });
+
+    /* ═══ CHECKLIST ═══ */
+    const checkItems=document.querySelectorAll('.check-item');
+    const checkCount=document.getElementById('check-count');
+    let checked=0;
+
+    checkItems.forEach(item=>{
+      item.addEventListener('click',()=>{
+        item.classList.toggle('done');
+        checked=document.querySelectorAll('.check-item.done').length;
+        checkCount.textContent=checked+' / 5 completate';
+        if(checked===5) checkCount.style.color='var(--green)';
+        else checkCount.style.color='';
+      });
+    });
+
+  })();
+  </script>
+</body>
+</html>
