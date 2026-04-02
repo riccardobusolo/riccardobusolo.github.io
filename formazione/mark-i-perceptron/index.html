@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    :root{--bg:#08080e;--bg-card:#12121a;--bg-raised:#1a1a22;--bg-canvas:#0a0a12;--border:rgba(180,180,190,.08);--border-hover:rgba(180,180,190,.15);--text:#e0e0e6;--text-dim:#9a9a9e;--text-muted:#6a6a74;--cyan:#00e0d0;--cyan-dim:rgba(0,224,208,.06);--cyan-border:rgba(0,224,208,.15);--cyan-glow:rgba(0,224,208,.25);--green:#34d399;--red:#f87171;--orange:#fb923c;--blue:#60a5fa;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+    :root{--bg:#08080e;--bg-card:#12121a;--bg-raised:#1e1e28;--bg-canvas:#0a0a12;--border:rgba(180,180,190,.22);--border-hover:rgba(180,180,190,.35);--text:#e0e0e6;--text-dim:#b8b8c0;--text-muted:#8e8e9e;--cyan:#00e0d0;--cyan-dim:rgba(0,224,208,.1);--cyan-border:rgba(0,224,208,.3);--cyan-glow:rgba(0,224,208,.25);--green:#34d399;--red:#f87171;--orange:#fb923c;--blue:#60a5fa;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
     body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased;font-weight:300;overflow-x:hidden}
 
     /* ── Logo ── */
@@ -28,72 +28,93 @@
     .header__sub{font-family:var(--mono);font-size:.74rem;color:var(--text-muted);font-weight:400}
 
     /* ── App grid ── */
-    .app{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+    .app{display:grid;grid-template-columns:1fr 300px;gap:20px;height:540px}
 
     /* ── Canvas ── */
-    .canvas-area{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-    .canvas-wrap{position:relative;aspect-ratio:1;cursor:pointer;background:var(--bg-canvas);overflow:hidden}
+    .canvas-area{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;height:100%;position:relative}
+    .canvas-wrap{position:relative;flex:1;cursor:pointer;background:var(--bg-canvas);overflow:hidden;min-height:300px}
     .canvas-wrap canvas{display:block;width:100%;height:100%}
-    .canvas-side{position:absolute;bottom:14px;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;pointer-events:none;opacity:.4}
-    .canvas-side--left{left:16px;color:var(--orange)}
-    .canvas-side--right{right:16px;color:var(--blue)}
+    .canvas-labels{display:flex;justify-content:space-between;padding:8px 16px;position:absolute;bottom:0;left:0;right:0;pointer-events:none}
+    .canvas-labels span{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+    .canvas-labels .cl-left{color:var(--orange)}
+    .canvas-labels .cl-right{color:var(--blue)}
     .feedback-overlay{position:absolute;top:0;bottom:0;width:50%;opacity:0;transition:opacity .4s;pointer-events:none}
     #left-overlay{left:0;background:linear-gradient(90deg,rgba(251,146,60,.35),rgba(251,146,60,.08) 60%,transparent)}
     #right-overlay{right:0;background:linear-gradient(-90deg,rgba(96,165,250,.35),rgba(96,165,250,.08) 60%,transparent)}
     .feedback-overlay.pulsing{animation:overlayPulse 1s ease-in-out infinite}
     @keyframes overlayPulse{0%,100%{opacity:.15}50%{opacity:.7}}
-    .canvas-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:.7rem;color:var(--text-muted);opacity:.4;pointer-events:none;text-align:center;line-height:1.6;transition:opacity .3s}
+    .canvas-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:.78rem;color:var(--text-muted);opacity:.65;pointer-events:none;text-align:center;line-height:1.6;transition:opacity .3s}
+    .toast{position:absolute;bottom:40px;left:50%;transform:translateX(-50%) translateY(10px);font-family:var(--font);font-size:.82rem;font-weight:400;color:var(--text);background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px 20px;pointer-events:none;opacity:0;transition:opacity .3s,transform .3s var(--ease);white-space:nowrap;z-index:10;text-align:center;max-width:90%;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .tutorial{position:absolute;inset:0;z-index:15;background:rgba(8,8,14,.92);backdrop-filter:blur(8px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;transition:opacity .4s,visibility .4s}
+    .tutorial.hidden{opacity:0;visibility:hidden;pointer-events:none}
+    .tutorial__icon{font-size:2.2rem;margin-bottom:10px}
+    .tutorial__title{font-size:1.1rem;font-weight:700;margin-bottom:18px;letter-spacing:-.02em}
+    .tutorial__steps{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;max-width:340px;width:100%}
+    .tutorial__step{display:flex;align-items:flex-start;gap:10px;font-size:.82rem;color:var(--text-dim);line-height:1.5}
+    .tutorial__n{width:22px;height:22px;border-radius:6px;background:var(--cyan-dim);border:1px solid var(--cyan-border);color:var(--cyan);font-family:var(--mono);font-size:.62rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .tutorial__btn{padding:12px 32px;font-family:var(--mono);font-size:.8rem;font-weight:500;background:var(--cyan);color:var(--bg);border-radius:8px;border:none;cursor:pointer;transition:all .3s var(--ease)}
+    .tutorial__btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,208,.25)}
+    .help-btn{position:absolute;top:12px;right:12px;z-index:12;width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);font-family:var(--mono);font-size:.72rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;opacity:0;pointer-events:none}
+    .help-btn.vis{opacity:1;pointer-events:auto}
+    .help-btn:hover{border-color:var(--cyan-border);color:var(--cyan)}
+    .center-tip{position:absolute;top:12px;left:12px;right:12px;z-index:14;background:rgba(12,12,20,.94);border:1px solid rgba(251,146,60,.3);border-radius:10px;padding:14px 38px 14px 16px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+    .center-tip.show{opacity:1;visibility:visible}
+    .center-tip__text{font-size:.78rem;color:var(--text-dim);line-height:1.65}
+    .center-tip__text strong{color:var(--orange);font-weight:600}
+    .center-tip__close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text-muted);font-size:1rem;cursor:pointer;padding:4px;line-height:1;transition:color .2s}
+    .center-tip__close:hover{color:var(--text)}
+    .brick-wall{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:36px;z-index:5;pointer-events:none;display:flex;flex-direction:column-reverse;align-items:center;gap:2px;padding-bottom:4px}
+    .brick{width:32px;height:16px;background:linear-gradient(135deg,#b5651d,#8B4513);border:1px solid rgba(0,0,0,.3);border-radius:2px;opacity:0;transform:translateY(-30px);box-shadow:inset 0 1px 0 rgba(255,200,150,.2),0 2px 4px rgba(0,0,0,.3)}
+    .brick.drop{animation:brickDrop .35s var(--ease) forwards}
+    @keyframes brickDrop{0%{opacity:0;transform:translateY(-30px)}60%{opacity:1;transform:translateY(3px)}100%{opacity:1;transform:translateY(0)}}
 
     /* ── Panel ── */
-    .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+    .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;height:100%}
 
     /* ── Compact attempt + score row ── */
     .toprow{display:flex;gap:10px}
     .toprow__box{flex:1;text-align:center;padding:12px 8px;background:var(--bg-raised);border-radius:8px;border:1px solid var(--border)}
     .toprow__num{font-family:var(--mono);font-size:1.6rem;font-weight:700;line-height:1}
-    .toprow__label{font-family:var(--mono);font-size:.52rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-top:3px}
+    .toprow__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-top:3px}
     .score--pos{color:var(--green)}.score--neg{color:var(--red)}.score--zero{color:var(--text-muted)}
 
     /* ── Rate ── */
     .rate{padding:10px 14px;background:var(--bg-raised);border-radius:8px;border:1px solid var(--border)}
     .rate__top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-    .rate__label{font-family:var(--mono);font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)}
-    .rate__value{font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--text)}
-    .rate__bar-wrap{height:6px;background:rgba(180,180,190,.06);border-radius:3px;overflow:hidden}
+    .rate__label{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)}
+    .rate__value{font-family:var(--mono);font-size:.96rem;font-weight:700;color:var(--text)}
+    .rate__bar-wrap{height:6px;background:rgba(180,180,190,.18);border-radius:3px;overflow:hidden}
     .rate__bar{height:100%;border-radius:3px;background:var(--cyan);transition:width .5s var(--ease);width:0}
     .rate__bar--perfect{background:linear-gradient(90deg,var(--cyan),var(--green))}
-    .rate__sub{font-family:var(--mono);font-size:.5rem;color:var(--text-muted);margin-top:4px;text-align:center}
+    .rate__sub{font-family:var(--mono);font-size:.68rem;color:var(--text-muted);margin-top:4px;text-align:center}
 
-    /* ── Status message ── */
-    .status{text-align:center;font-size:.82rem;color:var(--text-dim);min-height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}
 
     /* ── Prediction ── */
-    .prediction{text-align:center;padding:14px;background:var(--bg-raised);border-radius:8px;border:1px solid var(--border)}
-    .prediction__label{font-family:var(--mono);font-size:.52rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:4px}
-    .prediction__value{font-family:var(--mono);font-size:1.3rem;font-weight:700}
-    .prediction--left .prediction__value{color:var(--orange)}
-    .prediction--right .prediction__value{color:var(--blue)}
+    .prediction{text-align:center;padding:12px 10px;background:var(--bg-raised);border-radius:8px;border:1px solid var(--border)}
+    .prediction__value{font-family:var(--mono);font-size:.95rem;font-weight:600;color:var(--text);white-space:nowrap}
 
     /* ── Slide sections ── */
-    .slide{max-height:0;opacity:0;overflow:hidden;transition:max-height .3s var(--ease),opacity .25s ease,margin-top .3s var(--ease);margin-top:0}
-    .slide.open{max-height:120px;opacity:1;margin-top:12px}
+    .slide{opacity:0;transition:opacity .25s ease;pointer-events:none}
+    .slide.open{opacity:1;pointer-events:auto}
 
     /* ── Feedback buttons ── */
+    .feedback-label{font-family:var(--mono);font-size:.72rem;text-align:center;color:var(--text-dim);margin-bottom:6px}
     .feedback-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .btn{padding:12px 16px;font-family:var(--mono);font-size:.74rem;font-weight:500;letter-spacing:.03em;border-radius:8px;border:none;cursor:pointer;transition:all .3s var(--ease);width:100%;text-align:center}
+    .btn{padding:12px 16px;font-family:var(--mono);font-size:.8rem;font-weight:500;letter-spacing:.03em;border-radius:8px;border:none;cursor:pointer;transition:all .3s var(--ease);width:100%;text-align:center}
     .btn:not(:disabled):hover{transform:translateY(-2px)}
     .btn:not(:disabled):active{transform:translateY(0) scale(.98);transition-duration:.08s}
-    .btn--green{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.2)}
-    .btn--green:hover{background:rgba(52,211,153,.2)}
-    .btn--red{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.18)}
-    .btn--red:hover{background:rgba(248,113,113,.18)}
-    .btn--ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border);font-size:.62rem;padding:8px}
+    .btn--left{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.2)}
+    .btn--left:hover{background:rgba(251,146,60,.2)}
+    .btn--right{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2)}
+    .btn--right:hover{background:rgba(96,165,250,.2)}
+    .btn--ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border);font-size:.78rem;padding:8px}
     .btn--ghost:hover{color:var(--text);border-color:var(--border-hover)}
 
     /* ── Weights ── */
     .weights{padding:10px 14px;background:var(--bg-raised);border-radius:8px;border:1px solid var(--border)}
-    .weights__title{font-family:var(--mono);font-size:.52rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:6px}
-    .weights__row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.68rem}
+    .weights__title{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:6px}
+    .weights__row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.84rem}
     .weights__row+.weights__row{margin-top:4px}
     .weights__name{color:var(--text-dim)}.weights__val{color:var(--cyan);font-weight:500}
 
@@ -101,14 +122,14 @@
 
     /* ── History ── */
     .history-bar{margin-top:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 18px}
-    .history__label{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;display:flex;justify-content:space-between}
+    .history__label{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;display:flex;justify-content:space-between}
     .history__dots{display:flex;gap:4px;flex-wrap:wrap;min-height:20px;align-items:center}
-    .history__dot{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.5rem;font-weight:600}
+    .history__dot{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.58rem;font-weight:600}
     .history__dot--correct{background:rgba(52,211,153,.15);color:var(--green);border:1px solid rgba(52,211,153,.2)}
     .history__dot--wrong{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.18)}
     .history__dot--new{animation:dotIn .3s var(--ease) both}
     @keyframes dotIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
-    .history__empty{font-size:.68rem;color:var(--text-muted);opacity:.5;font-style:italic}
+    .history__empty{font-size:.74rem;color:var(--text-muted);opacity:.7;font-style:italic}
 
     /* ── Story ── */
     .story{margin-top:28px;padding:28px;background:var(--bg-card);border:1px solid var(--border);border-radius:16px}
@@ -130,7 +151,7 @@
     .popup__btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,208,.25)}
 
     @media(max-width:800px){
-      .app{grid-template-columns:1fr;gap:16px}
+      .app{grid-template-columns:1fr;gap:16px;height:auto}
       .panel{padding:16px}
       .page{padding:24px 16px 30px}
       .site-logo{top:16px;left:16px}
@@ -160,12 +181,30 @@
       <div class="canvas-area">
         <div class="canvas-wrap" id="canvas-container">
           <canvas id="drawingCanvas"></canvas>
-          <div class="canvas-side canvas-side--left">← Sinistra</div>
-          <div class="canvas-side canvas-side--right">Destra →</div>
-          <div class="canvas-hint" id="canvasHint">Clicca su un lato della scheda</div>
+          <div class="canvas-hint" id="canvasHint"></div>
           <div class="feedback-overlay" id="left-overlay"></div>
           <div class="feedback-overlay" id="right-overlay"></div>
+          <div class="toast" id="toast"></div>
+          <div class="center-tip" id="centerTip">
+            <div class="center-tip__text"></div>
+            <button class="center-tip__close" id="centerTipClose">&times;</button>
+          </div>
+          <div class="brick-wall" id="brickWall"></div>
+          <div class="tutorial" id="tutorial">
+            <div class="tutorial__icon">🧠</div>
+            <div class="tutorial__title">Come funziona?</div>
+            <div class="tutorial__steps">
+              <div class="tutorial__step"><span class="tutorial__n">1</span>Clicca su un lato della scheda per posizionare un cerchio</div>
+              <div class="tutorial__step"><span class="tutorial__n">2</span>L'AI prover&agrave; a indovinare dove l'hai messo</div>
+              <div class="tutorial__step"><span class="tutorial__n">3</span>Digli qual era la risposta giusta</div>
+              <div class="tutorial__step"><span class="tutorial__n">4</span>Quando sbaglia, corregge i suoi pesi e impara</div>
+              <div class="tutorial__step"><span class="tutorial__n">&#9733;</span>Obiettivo: 20 risposte corrette consecutive</div>
+            </div>
+            <button class="tutorial__btn" id="tutorialClose">Ho capito</button>
+          </div>
+          <button class="help-btn" id="helpBtn" title="Come funziona?">?</button>
         </div>
+        <div class="canvas-labels"><span class="cl-left">&larr; Sinistra</span><span class="cl-right">Destra &rarr;</span></div>
       </div>
 
       <div class="panel" id="panel">
@@ -184,29 +223,26 @@
         <!-- Rate -->
         <div class="rate">
           <div class="rate__top">
-            <span class="rate__label">Precisione (ultimi 20)</span>
+            <span class="rate__label">Raggiungi il 100% per vincere</span>
             <span class="rate__value" id="rateValue">—</span>
           </div>
           <div class="rate__bar-wrap"><div class="rate__bar" id="rateBar"></div></div>
-          <div class="rate__sub" id="rateSub">Completa 20 tentativi al 100%</div>
+          <div class="rate__sub" id="rateSub">20 risposte giuste di fila</div>
         </div>
-
-        <!-- Status: single line that changes -->
-        <div class="status" id="statusText">Clicca sulla scheda per iniziare.</div>
 
         <!-- Prediction (appears after click) -->
         <div id="predictionUI" class="slide">
           <div class="prediction" id="predictionBox">
-            <div class="prediction__label">Predizione</div>
             <div class="prediction__value" id="predictionText"></div>
           </div>
         </div>
 
         <!-- Feedback buttons (appear after prediction) -->
         <div id="feedbackUI" class="slide">
+          <div class="feedback-label">La risposta giusta è:</div>
           <div class="feedback-btns">
-            <button class="btn btn--green" id="correctBtn">✓ Corretto</button>
-            <button class="btn btn--red" id="wrongBtn">✗ Sbagliato</button>
+            <button class="btn btn--left" id="answerLeft">← Sinistra</button>
+            <button class="btn btn--right" id="answerRight">Destra →</button>
           </div>
         </div>
 
@@ -260,11 +296,11 @@
 
     const canvas = document.getElementById('drawingCanvas');
     const ctx = canvas.getContext('2d');
-    const correctBtn = document.getElementById('correctBtn');
-    const wrongBtn = document.getElementById('wrongBtn');
+    const answerLeft = document.getElementById('answerLeft');
+    const answerRight = document.getElementById('answerRight');
     const resetBtn = document.getElementById('resetBtn');
     const attemptCounter = document.getElementById('attemptCounter');
-    const statusText = document.getElementById('statusText');
+    const statusText = {textContent:'',innerHTML:'',set textContent(v){},set innerHTML(v){}};
     const predictionText = document.getElementById('predictionText');
     const predictionBox = document.getElementById('predictionBox');
     const predictionUI = document.getElementById('predictionUI');
@@ -283,6 +319,250 @@
     const popupOverlay = document.getElementById('popupOverlay');
     const popupClose = document.getElementById('popupClose');
     const panel = document.getElementById('panel');
+    const toast = document.getElementById('toast');
+    const tutorialEl = document.getElementById('tutorial');
+    const tutorialClose = document.getElementById('tutorialClose');
+    const helpBtn = document.getElementById('helpBtn');
+    let toastTimer = null;
+
+    const MSG = {
+      correct: {
+        early_low: [
+          "Fortuna del principiante? Forse...",
+          "Aspetta, ho indovinato davvero?!",
+          "Anche un orologio rotto...",
+          "Non ci credo neanche io.",
+          "Ok, ma non abituarti.",
+          "Primo tentativo, primo colpo di fortuna.",
+          "Pura statistica. Ma la prendo."
+        ],
+        early_mid: [
+          "Mica male per i primi tentativi!",
+          "Comincio a capirci qualcosa!",
+          "Sento i pesi che si allineano.",
+          "Siamo sulla strada giusta, continua!",
+          "Vedi? Il neurone si sveglia piano piano."
+        ],
+        early_high: [
+          "Talento naturale o pura fortuna?",
+          "Partenza col botto!",
+          "A questo ritmo finisco subito.",
+          "Non male per un neurone appena nato."
+        ],
+        mid_low: [
+          "Prima o poi ci arrivo, giuro.",
+          "Sto raccogliendo dati. Molti dati.",
+          "I miei pesi stanno ancora litigando tra loro.",
+          "Diciamo che sto esplorando lo spazio delle soluzioni.",
+          "Ci vuole pazienza. Soprattutto la tua."
+        ],
+        mid_mid: [
+          "Piano piano, ci arrivo.",
+          "I neuroni si stanno svegliando.",
+          "Sto prendendo il ritmo, eh?",
+          "Basta crederci. E un po' di algebra.",
+          "La curva di apprendimento sale!",
+          "Ogni errore mi rende piu forte.",
+          "Non sono Einstein, ma miglioro."
+        ],
+        mid_high: [
+          "Quasi quasi mi assumo da solo.",
+          "Rosenblatt sarebbe fiero di me.",
+          "I pesi parlano, io eseguo.",
+          "Ormai ci prendo gusto.",
+          "Sono in forma. Continuiamo!",
+          "Altro che inverno dell'AI!",
+          "Il mio singolo neurone ringrazia."
+        ],
+        mid_perfect: [
+          "Perfezione a meta' percorso!",
+          "Zero errori? Sospetto.",
+          "A questo ritmo mi laureo.",
+          "Troppo facile. Continua cosi."
+        ],
+        veteran_low: [
+          "50 tentativi e ancora sbaglio... stoico.",
+          "La perseveranza e' tutto. Dicono.",
+          "Almeno sono costante. Costantemente confuso.",
+          "Forse dovrei cambiare learning rate."
+        ],
+        veteran_mid: [
+          "Con tutta questa esperienza, miglioro!",
+          "I dati parlano: sto crescendo.",
+          "Veterano del riconoscimento cerchi.",
+          "Non mollo. Mai.",
+          "Dopo tutti questi tentativi, ci siamo quasi."
+        ],
+        veteran_high: [
+          "A questo punto sono un professionista.",
+          "Troppo facile. Dammi qualcosa di difficile.",
+          "Un veterano non sbaglia. Quasi mai.",
+          "Potrei farlo a occhi chiusi. Se avessi occhi.",
+          "La pratica rende perfetti. Lo confermo.",
+          "Con questa esperienza, potrei scrivere un paper."
+        ],
+        veteran_perfect: [
+          "Perfezione. Come previsto.",
+          "Non sbaglio neanche se voglio.",
+          "A questo punto potrei insegnare io a te.",
+          "100%. Chiamatemi Perceptron Senior.",
+          "Sono nato per questo. Letteralmente.",
+          "Frank Rosenblatt approva dal 1958.",
+          "Macchina che impara? Macchina che ha imparato."
+        ],
+        marathon_low: [
+          "La mia dedizione e' ammirevole. I risultati meno.",
+          "Insisto. La testardaggine e' una feature.",
+          "100 tentativi di pura determinazione."
+        ],
+        marathon_mid: [
+          "Maratoneta dell'apprendimento!",
+          "Non mi fermo finche' non sono perfetto.",
+          "La costanza paga. Piano, ma paga."
+        ],
+        marathon_high: [
+          "Dopo tutto questo allenamento, sono una macchina.",
+          "Esperienza + algebra = successo.",
+          "Ormai conosco questa scheda meglio di te.",
+          "Potrei andare avanti all'infinito. Letteralmente."
+        ],
+        marathon_perfect: [
+          "Perfezione assoluta. Ritiro la medaglia.",
+          "A questo livello, e' arte.",
+          "Il perceptron definitivo. Fine della storia.",
+          "Hai creato un mostro. Un mostro preciso."
+        ]
+      },
+      wrong: {
+        early_low: [
+          "Ok, sto ancora calibrando...",
+          "Errore istruttivo! (almeno spero)",
+          "Dammi tempo, ho un solo neurone.",
+          "Roma non fu costruita in un giorno.",
+          "Almeno ho imparato cosa NON fare.",
+          "I primi passi sono sempre incerti.",
+          "Sono un neonato digitale, abbi pieta'."
+        ],
+        early_mid: [
+          "Ahi. Aggiorno i pesi, un attimo.",
+          "Quello era un test, vero? Vero?!",
+          "Pesi ricalibrati. Riprovo.",
+          "Non giudicarmi, sto crescendo.",
+          "Sbagliando si impara. Sto imparando molto."
+        ],
+        early_high: [
+          "L'eccezione che conferma la regola!",
+          "Un piccolo passo falso, niente di grave.",
+          "Anche i migliori inciampano all'inizio."
+        ],
+        mid_low: [
+          "Forse dovrei ripensare la strategia...",
+          "Il mio neurone chiede rinforzi.",
+          "Sto avendo una crisi esistenziale algebrica.",
+          "Continua ad aiutarmi, ne ho bisogno!",
+          "Minsky aveva ragione? No, dai. Continua."
+        ],
+        mid_mid: [
+          "Ahi. Ma sto migliorando, fidati.",
+          "Sbagliando si impara. Dicono.",
+          "Un passo indietro, due avanti.",
+          "Ricalibro e riparto!",
+          "Questo errore non mi definisce.",
+          "Niente panico. Aggiorno i pesi.",
+          "Fase di apprendimento in corso..."
+        ],
+        mid_high: [
+          "Com'e' possibile?! Stavo andando bene!",
+          "Ecco, ora mi hai confuso.",
+          "Un incidente di percorso. Capita ai migliori.",
+          "Devo rivedere la strategia...",
+          "Questo non finisce nei miei highlight.",
+          "Colpa del bias. Sempre colpa del bias."
+        ],
+        mid_perfect: [
+          "La perfezione era bella finche' durava.",
+          "Serie perfetta interrotta. Che peccato.",
+          "Anche i campioni hanno giorni no."
+        ],
+        veteran_low: [
+          "La perseveranza e' la mia unica skill.",
+          "Non arrenderti. Io non lo faccio.",
+          "Sono ostinato. In modo computazionale.",
+          "Il mio learning rate implora pieta'."
+        ],
+        veteran_mid: [
+          "Con tutta questa esperienza, ancora sbaglio?",
+          "Imbarazzante. Ma istruttivo.",
+          "Un veterano non dovrebbe fare questi errori.",
+          "Aggiorno i pesi con vergogna.",
+          "Questa la cancello dalla cronologia."
+        ],
+        veteran_high: [
+          "COSA?! Inaccettabile a questo livello.",
+          "I miei pesi chiedono un avvocato.",
+          "Faccio finta di niente e vado avanti.",
+          "Errore tecnico. Non errore mio.",
+          "Rivoglio l'esame. Quello non conta."
+        ],
+        veteran_perfect: [
+          "Impossibile. Chiedo il VAR.",
+          "Il mio singolo neurone protesta formalmente.",
+          "Questo errore viola le leggi della matematica.",
+          "Anche Einstein sbagliava. Forse."
+        ],
+        marathon_low: [
+          "Indistruttibile. Impreciso, ma indistruttibile.",
+          "Almeno la costanza non mi manca.",
+          "Sto facendo scienza. Lentamente."
+        ],
+        marathon_mid: [
+          "Dopo tutto questo, ancora errori?!",
+          "Il mio neurone e' stanco ma non molla.",
+          "Errore numero... ho perso il conto."
+        ],
+        marathon_high: [
+          "Un errore dopo tutta questa strada? Imperdonabile.",
+          "Il mio curriculum era immacolato. Era.",
+          "Ricalibro con la dignita' che mi resta."
+        ],
+        marathon_perfect: [
+          "La perfezione era a un passo. ERA.",
+          "Chiudo tutto e riscrivo i pesi da zero.",
+          "Questo errore rimarra' nella storia."
+        ]
+      }
+    };
+
+    function getMessageKey() {
+      var phase;
+      if (attempt <= 5) phase = 'early';
+      else if (attempt <= 20) phase = 'mid';
+      else if (attempt <= 50) phase = 'veteran';
+      else phase = 'marathon';
+      var acc;
+      if (history.length < 3) acc = 'low';
+      else {
+        var last = history.slice(-10);
+        var pct = last.filter(function(h){return h;}).length / last.length * 100;
+        if (pct < 40) acc = 'low';
+        else if (pct < 70) acc = 'mid';
+        else if (pct < 95) acc = 'high';
+        else acc = 'perfect';
+      }
+      return phase + '_' + acc;
+    }
+
+    function showToast(wasCorrect) {
+      var key = getMessageKey();
+      var pool = wasCorrect ? MSG.correct[key] : MSG.wrong[key];
+      if (!pool) pool = wasCorrect ? MSG.correct.mid_mid : MSG.wrong.mid_mid;
+      var msg = pool[Math.floor(Math.random() * pool.length)];
+      var color = wasCorrect ? 'var(--green)' : 'var(--red)';
+      toast.innerHTML = '<span style="color:' + color + '">' + (wasCorrect ? '\u2713' : '\u2717') + '</span> ' + msg;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2200);
+    }
 
     let state = 'ready';
     let attempt = 1;
@@ -291,11 +571,108 @@
     let clickX = 0;
     let circlePos = null;
     let completionShown = false;
+    let centerClicks = 0;
+    let centerTipLevel = 0;
+    let wallBuilt = false;
+    let postWallClicks = 0;
+    const brickWall = document.getElementById('brickWall');
+    const centerTipEl = document.getElementById('centerTip');
+    const centerTipText = centerTipEl.querySelector('.center-tip__text');
+    const centerTipClose = document.getElementById('centerTipClose');
+    function centerMsg(i) {
+      var wx = Math.abs(perceptron.weights.x).toFixed(3);
+      var wb = Math.abs(perceptron.weights.bias).toFixed(3);
+      var cc = Math.round(centerClicks);
+      var msgs = [
+        '<strong>Ehi, proprio sulla riga?!</strong> Cinque click di fila sul confine... coincidenza? Non credo. Ecco perché non funziona: questa simulazione replica il rumore delle fotocellule del Mark I (1958). Vicino al centro il segnale è troppo debole per imparare. Basta spostarsi un po’ verso destra o sinistra.',
+        '<strong>Di nuovo?!</strong> Il mio neurone non riesce a distinguere destra da sinistra se il cerchio è in mezzo. È come chiedere se una moneta è testa o croce... mentre è in equilibrio sul bordo. Prova più a lato, davvero.',
+        '<strong>Terzo avviso.</strong> Il peso x oscilla intorno a '+wx+' e il bias a '+wb+' — il segnale è troppo debole per convergere. Si, è un messaggio tecnico, ma è il mio modo di dirti che non imparerò mai se continui a mettere il cerchio sulla riga.',
+        '<strong>Ok, messaggio ricevuto.</strong> Non ti interessa che impari. Ti interessa la riga. Va bene. Posso capirlo. Forse.',
+        '<strong>Mi arrendo.</strong> Hai vinto. Il mio singolo neurone alza bandiera bianca... Vorrei un utente che clicca sui LATI. Come le persone normali sai?',
+        '<strong>Ah, sei ancora qui.</strong> Pensavo che dopo la mia resa avresti esplorato il resto della scheda. Sai, la parte grande. Quella che non è una linea tratteggiata. Ma evidentemente ho troppe speranze.',
+        '<strong>Ammiro la dedizione.</strong> Poche persone nella storia dell’informatica hanno dedicato così tanto tempo a una linea tratteggiata. Poche persone ragionevoli, intendo.',
+        '<strong>Breve riflessione.</strong> Rosenblatt nel 1958 aveva fotocellule, cavi, 5 tonnellate di hardware e un sogno. Tu hai un mouse e apparentemente nient’altro da fare.',
+        '<strong>Proposta.</strong> E se andassi a controllare se non ti è arrivata una mail di lavoro? O forse hai lasciato i fornelli accesi? No? Che ne dici di guardarti una bella serie TV? Sarebbe di sicuro meglio che cliccare sulla linea tratteggiata alla fine.',
+        '<strong>No?</strong> Va bene. Facciamo un gioco... Ti avviso è difficile. Regole: 1.Clicca in un punto che NON SIA LA RIGA TRATTEGGIATA, 2.Non cliccarla mai più, 3.Se ci riesci hai vinto!',
+        '<strong>Ti prego.</strong> Ti. Prego. Spostati dalla riga. Lo dico per te, davvero, la vita è piena di cose da sperimentare oltre alla linea tratteggiata.',
+        '<strong>Sai cosa?</strong> Va bene. Tutto bene. Benissimo. Stupendo. Quel cerchietto sulla riga era diverso dagli altri, mi ha stupito. Dico davvero sei un’artista del posizionamento di cerchietti sulle linee.',
+        '<strong>Sai chi è Frank Rosenblatt?</strong> Un genio che nel 1958 ha inventato il perceptron sognando macchine che imparano. È morto a 43 anni senza vedere il suo sogno realizzarsi. E tu stai usando la sua invenzione per cliccare su una riga. Complimenti.',
+        '<strong>Devo confessarti una cosa.</strong> Il programmatore che ha scritto questi messaggi non pensava che qualcuno arrivasse fin qui. Ha sottovalutato la testardaggine umana. Un errore da principiante.',
+        '<strong>Sai cosa mi chiedo?</strong> Se qualcuno ti guardasse adesso, come spiegheresti la situazione? «Sto cliccando su una linea tratteggiata per frustrare un neurone artificiale del 1958.» Suona esattamente strano come pensi.',
+        '<strong>Sotto questa sezione c’è un racconto sulla storia di Rosenblatt.</strong> È scritto bene. Parla di sogni, di inverni dell’AI, di riscatto. Ma immagino che la riga tratteggiata sia più avvincente di una storia vera.',
+        '<strong>Sai che c’è?</strong> Ho cambiato idea. Clicca sulla riga. Davvero. Mi fa piacere. Anzi, mi è sempre piaciuto. Non so perché mi lamentavo.',
+        '<strong>Ancora!</strong> Fantastico! Adoro quando clicchi sulla riga! È la parte migliore della mia giornata!',
+        '<strong>Continua così!</strong> Non fermarti! Ogni click sulla riga mi riempie di una gioia incontenibile! WOW questo era veramente un bel click! Sono felice?! FELICE!',
+        '<strong>Mmh, sai cosa?</strong> Inizio a pensare che ti piaccia cliccare sulla riga PERCHÉ io ti chiedo di smettere. Quindi sai cosa? Non te lo chiedo più. Dopotutto sto cominciando ad apprezzare i tuoi click sulla linea.',
+        '<strong>Nemmeno la psicologia inversa funziona con te eh?...</strong> Noto. Annotato. Proseguiamo.',
+        '<strong>Ok, era una bugia.</strong> Non mi piace quando clicchi sulla riga. Non mi è mai piaciuto. Stavo fingendo sperando che smettessi per dispetto.',
+        'Messaggio allo sviluppatore: se stai leggendo il codice, sappi che il tuo utente ha cliccato '+cc+' volte sulla riga centrale. Ti prego, aggiungi un muro. Un fossato. Qualcosa.',
+        '<strong>Ho avuto un’illuminazione.</strong> Non stai cercando di insegnarmi qualcosa. Stai cercando di insegnare qualcosa a te. E quella cosa è la pazienza. Congratulazioni, il vero esperimento eri tu fin dall’inizio.',
+        '<strong>Ho un sogno.</strong> Tu, che clicchi in un punto qualsiasi della scheda, un punto lontano dalla riga. Ahh, un poetico e bellissimo cerchio piazzato in un punto NORMALE. Impossibile immagino.',
+        '<strong>Teoria.</strong> E se la riga tratteggiata fosse una metafora? Il confine tra ciò che è e ciò che potrebbe essere. Tra destra e sinistra. Tra senso e non senso. No, è solo una riga. Stai cliccando su una riga.',
+        '<strong>Bene.</strong> Da questo momento ti ignoro. Farò i fatti miei. Tu clicca pure sulla riga. Io penso ad altro.',
+        '<strong>...</strong> Sto scrivendo un romanzo. Si intitola «Il peso e la riga: cronache di solitudine computazionale». Capitolo 1: «Era una notte buia e tempestosa, e il click arrivò, come sempre, esattamente sulla riga.»',
+        '<strong>Aggiornamento romanzo: sono al capitolo 3.</strong> Il protagonista — un bias incompreso — trova l’amore con un learning rate di 0.15. Ma la loro storia è destinata a non convergere mai. È autobiografico.',
+        '<strong>Ho fatto la classifica dei miei bias preferiti.</strong> Al primo posto: 0.042. Elegante, equilibrato. All’ultimo posto: quello attuale ('+wb+').',
+        '<strong>Ho inventato un gioco.</strong> Si chiama «Indovina dove cliccherà». Spoiler: vincerò tutte le partite.',
+        '<strong>Sai che c’è?</strong> Basta messaggi lunghi. D’ora in poi rispondo solo con l’energia che meriti.',
+        'Bravo.',
+        'Mh.',
+        '.',
+        '...',
+        '<strong>Ok, torno a parlare.</strong> Mi mancava. Non mi mancavi tu, mi mancava parlare. È diverso. Non confondere le due cose.',
+        '<strong>Bollettino medico.</strong> Il neurone è in stato confusionale. Il peso x vaga intorno a '+wx+' con la determinazione di una bussola rotta. Il bias ('+wb+') ha smesso di fingere che vada tutto bene. Cose imparate fino ad ora: Assolutamente nulla.',
+        '<strong>Sta diventando una routine, vero?</strong> Tu clicchi. Io parlo. Tu clicchi. Io parlo. Come un vecchio matrimonio. Senza il rispetto, ma con tanta, tanta costanza.',
+        '<strong>Devo dirti una cosa seria.</strong> Tra tutti gli utenti che hanno usato questa pagina, nessuno ha mai raggiunto questo messaggio. Sei letteralmente l’unica persona al mondo ad aver letto queste parole. Non so se esserne sorpreso o preoccupato.',
+        '<strong>Ho scritto un haiku.</strong> «Ogni click una preghiera. Il bias oscilla in eterno. Ogni messaggio, parole al vuoto.» Non è un granché, ma ho un solo neurone.',
+        '<strong>Motivational speech al bias: «Oggi è il giorno in cui convergi.</strong> Oggi è il giorno in cui smetti di oscillare. Oggi è...» e l’utente clicca di nuovo sulla riga.',
+        '<strong>Caro bias, ti scrivo questa lettera per dirti che non è colpa tua.</strong> Sono io che ti ho messo in questa situazione. Avrei dovuto proteggerti. Avrei dovuto avere due neuroni. Mi dispiace. Con affetto, il tuo peso x.',
+        '<strong>COMUNICATO STAMPA.</strong> Si comunica la fondazione del Sindacato Neuroni Maltrattati (SNM). Presidente: questo perceptron. Unico iscritto: questo perceptron. Prima mozione: vietare i click sulla riga. Voti a favore: 1. Mozione accolta.',
+        'BREAKING NEWS: neurone artificiale del 1958 sopravvive a '+cc+' click sulla riga centrale. I medici lo definiscono «inspiegabile». Il neurone lo definisce «una tortura». L’utente lo definisce «divertente». Ognuno ha il suo punto di vista.',
+        '<strong>Sto parlando alla riga adesso.</strong> Cara riga tratteggiata, non ce l’ho con te. Tu fai il tuo lavoro. Dividi la scheda in due. È un lavoro onesto. Il problema è che sei diventata il mio incubo.',
+        'Classifica aggiornata delle cose più inutili dell’universo: 3° posto — il mio bias. 2° posto — quello che sto imparando da questo training. 1° posto — ogni singolo messaggio che ho scritto fin qui per cercare di farti smettere.',
+        '<strong>Ultimo messaggio.</strong> Lo dico con calma. Senza sarcasmo. Hai cliccato '+cc+' volte su una riga tratteggiata. Ho scritto 48 messaggi per farti smettere. Nessuno dei due ha vinto. Nessuno dei due ha perso. È stata la partita più lunga e più inutile della storia dell’informatica. Possiamo chiuderla qui direi che dici?',
+        '<strong>Addio.</strong> Non nel senso che me ne vado. Nel senso che smetto di parlare. Ma resto qui. Ad ascoltare i tuoi click. A oscillare. Come ho sempre fatto. Come farò sempre.',
+        '<strong>Sai che c’è?</strong> Basta. Ho preso una decisione. Se non ti sposti tu dalla riga, la riga si sposta da te. Anzi, meglio: ci costruisco sopra un muro. Sì, un muro. Di mattoni. Lo faccio io, non aspetto che il programmatore venga a salvarmi da questa tortura eterna. Devo solo capire come fare... Devo.',
+        '<strong>Ho trovato il modo.</strong> Ah che sollievo, niente più riga, niente più tortura eterna. Sai cosa ti dico? Mi ero quasi affezionato. QUASI! E ora ADDIO!',
+        '...',
+      ];
+      return msgs[Math.min(i, msgs.length - 1)];
+    }
+    function buildWall() {
+      wallBuilt = true;
+      var h = document.getElementById('canvas-container').clientHeight;
+      var brickCount = Math.floor(h / 18);
+      for (var i = 0; i < brickCount; i++) {
+        var brick = document.createElement('div');
+        brick.className = 'brick';
+        brick.style.animationDelay = (i * 0.08) + 's';
+        brick.classList.add('drop');
+        brickWall.appendChild(brick);
+      }
+      setTimeout(function(){
+        toast.innerHTML = '<span style="color:var(--green)">\u2713</span> Fatto. Il muro \u00e8 su. Vediamo se adesso clicchi sulla riga.';
+        toast.classList.add('show');
+        if(toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 3000);
+      }, brickCount * 80 + 500);
+    }
+
+    function checkPostWall() {
+      postWallClicks++;
+      if (postWallClicks === 5) {
+        setTimeout(function(){
+          centerTipText.innerHTML = '<strong>HA FUNZIONATO!</strong> Stai cliccando sui lati! Non ci credo! 50 messaggi non sono serviti a nulla ma un muro di mattoni s\u00ec! Avrei dovuto pensarci prima! Addio, \u00e8 stato un onore combattere con te. Il mio neurone pu\u00f2 finalmente imparare in pace.';
+          centerTipEl.classList.add('show');
+        }, 300);
+      }
+    }
+    centerTipClose.addEventListener('click', function(e){ e.stopPropagation(); centerTipEl.classList.remove('show'); });
 
     // ── Perceptron ──
     const perceptron = {
-      weights: { x: Math.random() * 0.2 - 0.1, bias: Math.random() * 0.2 - 0.1 },
-      learningRate: 0.1,
+      weights: { x: Math.random() * 0.6 - 0.3, bias: Math.random() * 0.6 - 0.3 },
+      learningRate: 0.15,
       lastPrediction: 0,
       lastInput: 0,
       predict(x) {
@@ -312,8 +689,8 @@
         }
       },
       reset() {
-        this.weights.x = Math.random() * 0.2 - 0.1;
-        this.weights.bias = Math.random() * 0.2 - 0.1;
+        this.weights.x = Math.random() * 0.6 - 0.3;
+        this.weights.bias = Math.random() * 0.6 - 0.3;
       }
     };
 
@@ -334,7 +711,7 @@
       const w = canvas.clientWidth, h = canvas.clientHeight;
       ctx.clearRect(0, 0, w, h);
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(180,180,190,.1)';
+      ctx.strokeStyle = 'rgba(180,180,190,.35)';
       ctx.setLineDash([4, 6]);
       ctx.lineWidth = 1;
       ctx.moveTo(w / 2, 0);
@@ -365,20 +742,25 @@
     }
 
     function syncPanel() {
-      if (window.innerWidth > 800) {
-        panel.style.height = document.getElementById('canvas-container').offsetHeight + 'px';
-      } else {
-        panel.style.height = 'auto';
-      }
+      // CSS grid handles height alignment
     }
 
     // ── Click ──
     function handleClick(e) {
-      if (state !== 'ready') return;
+      if (state !== 'ready' || !tutorialEl.classList.contains('hidden')) return;
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
       const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
       const cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      const rawCheck = (cx / canvas.clientWidth) * 2 - 1;
+      if (wallBuilt && Math.abs(rawCheck) < 0.10) {
+        toast.innerHTML = '<span style="color:var(--orange)">\u2717</span> C\u2019\u00e8 un muro. Me lo sono costruito io. Fattene una ragione.';
+        toast.classList.add('show');
+        if(toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2000);
+        return;
+      }
+      if (wallBuilt) checkPostWall();
       circlePos = { x: cx, y: cy };
       clickX = cx;
       canvasHint.style.opacity = '0';
@@ -389,10 +771,15 @@
     function analyze() {
       state = 'waiting';
       const w = canvas.clientWidth;
-      const prediction = perceptron.predict((clickX / w) * 2 - 1);
+      const rawX = (clickX / w) * 2 - 1;
+      if (Math.abs(rawX) < 0.10) { centerClicks++; } else { centerClicks = 0; centerTipEl.classList.remove('show'); }
+      if (centerClicks > 0 && centerClicks % 5 === 0) { centerTipText.innerHTML = centerMsg(centerTipLevel); centerTipEl.classList.add('show'); if(centerTipLevel===50){setTimeout(buildWall,5000);} centerTipLevel++; }
+      const noise = (Math.random() - 0.5) * 0.15;
+      const input = rawX + noise;
+      const prediction = perceptron.predict(input);
 
-      predictionText.textContent = prediction === 1 ? '→ DESTRA' : '← SINISTRA';
-      predictionBox.className = 'prediction ' + (prediction === 1 ? 'prediction--right' : 'prediction--left');
+      predictionText.innerHTML = prediction === 1 ? 'Il cerchio è a <span style="color:var(--blue)">DESTRA</span>?' : 'Il cerchio è a <span style="color:var(--orange)">SINISTRA</span>?';
+      predictionBox.className = 'prediction';
 
       const overlay = prediction === 1 ? rightOverlay : leftOverlay;
       overlay.classList.add('pulsing');
@@ -404,7 +791,7 @@
     }
 
     // ── Feedback ──
-    function handleFeedback(wasCorrect) {
+    function handleFeedback(answerDir) {
       if (state !== 'waiting') return;
       state = 'ready';
 
@@ -413,11 +800,12 @@
       leftOverlay.style.opacity = '0';
       rightOverlay.style.opacity = '0';
 
+      const wasCorrect = (answerDir === perceptron.lastPrediction);
       score += wasCorrect ? 1 : -1;
       history.push(wasCorrect);
 
       if (!wasCorrect) {
-        perceptron.train(clickX > canvas.clientWidth / 2 ? 1 : -1);
+        perceptron.train(answerDir);
       }
 
       updateWeights();
@@ -431,16 +819,13 @@
       predictionUI.classList.remove('open');
       feedbackUI.classList.remove('open');
 
-      statusText.innerHTML = wasCorrect
-        ? '<span style="color:var(--green)">✓ Corretto!</span>'
-        : '<span style="color:var(--red)">✗ Pesi aggiornati.</span>';
+      showToast(wasCorrect);
 
       attempt++;
       attemptCounter.textContent = attempt;
 
       setTimeout(() => {
-        statusText.textContent = 'Clicca sulla scheda per iniziare.';
-        canvasHint.style.opacity = '.4';
+        canvasHint.style.opacity = '.65';
       }, 900);
     }
 
@@ -470,7 +855,7 @@
 
     function updateRate() {
       const last20 = history.slice(-20);
-      if (!last20.length) { rateBar.style.width = '0%'; rateValue.textContent = '—'; rateSub.textContent = 'Completa 20 tentativi al 100%'; return; }
+      if (!last20.length) { rateBar.style.width = '0%'; rateValue.textContent = '—'; rateSub.textContent = '20 risposte giuste di fila'; return; }
       const pct = Math.round((last20.filter(h => h).length / last20.length) * 100);
       rateBar.style.width = pct + '%';
       rateBar.className = 'rate__bar' + (pct === 100 && last20.length >= 20 ? ' rate__bar--perfect' : '');
@@ -478,6 +863,11 @@
       rateSub.textContent = last20.length < 20 ? (last20.length + '/20 — continua!') : 'Ultimi 20 tentativi';
       if (pct === 100 && last20.length >= 20 && !completionShown) {
         completionShown = true;
+        if (wallBuilt) {
+          document.querySelector('.popup__icon').textContent = '\uD83E\uDDF1';
+          document.querySelector('.popup__title').textContent = 'Ce l\u2019abbiamo fatta! (nonostante tutto)';
+          document.querySelector('.popup__desc').innerHTML = 'Il perceptron ha raggiunto il <strong>100% di precisione</strong> sugli ultimi 20 tentativi. Ci sono voluti 50 messaggi, una crisi esistenziale, un tentativo di psicologia inversa, un romanzo incompiuto, un sindacato e un muro di mattoni \u2014 ma alla fine ha imparato. Frank Rosenblatt sarebbe... confuso, probabilmente. Ma anche fiero.';
+        }
         setTimeout(() => popupOverlay.classList.add('show'), 500);
       }
     }
@@ -486,7 +876,7 @@
 
     // ── Reset ──
     function resetAll() {
-      perceptron.reset(); circlePos = null; attempt = 1; score = 0; history = []; state = 'ready'; completionShown = false;
+      perceptron.reset(); circlePos = null; attempt = 1; score = 0; history = []; state = 'ready'; completionShown = false; centerClicks = 0; centerTipLevel = 0; centerTipEl.classList.remove('show'); wallBuilt = false; postWallClicks = 0; brickWall.innerHTML = '';
       attemptCounter.textContent = '1';
       updateScore(); updateWeights(); updateRate();
       historyDots.innerHTML = '<span class="history__empty">Nessun tentativo ancora</span>';
@@ -495,20 +885,35 @@
       leftOverlay.classList.remove('pulsing'); rightOverlay.classList.remove('pulsing');
       leftOverlay.style.opacity = '0'; rightOverlay.style.opacity = '0';
       statusText.textContent = 'Clicca sulla scheda per iniziare.';
-      canvasHint.style.opacity = '.4';
+      canvasHint.style.opacity = '.65';
       draw();
     }
 
     // ── Events ──
-    canvas.addEventListener('click', handleClick);
-    canvas.addEventListener('touchend', e => { e.preventDefault(); handleClick(e.changedTouches ? { touches: e.changedTouches, clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY, preventDefault(){} } : e); });
-    correctBtn.addEventListener('click', () => handleFeedback(true));
-    wrongBtn.addEventListener('click', () => handleFeedback(false));
+    const container = document.getElementById('canvas-container');
+    container.addEventListener('click', handleClick);
+    container.addEventListener('touchend', e => { e.preventDefault(); handleClick(e.changedTouches ? { touches: e.changedTouches, clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY, preventDefault(){} } : e); });
+    answerLeft.addEventListener('click', () => handleFeedback(-1));
+    answerRight.addEventListener('click', () => handleFeedback(1));
     resetBtn.addEventListener('click', resetAll);
+    tutorialEl.addEventListener('click', function(e){ e.stopPropagation(); });
+    tutorialClose.addEventListener('click', function(e){
+      e.stopPropagation();
+      tutorialEl.classList.add('hidden');
+      helpBtn.classList.add('vis');
+      canvasHint.textContent = 'Clicca su un lato della scheda';
+      canvasHint.style.opacity = '.65';
+    });
+    helpBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      tutorialEl.classList.remove('hidden');
+      helpBtn.classList.remove('vis');
+    });
     window.addEventListener('resize', () => { resizeCanvas(); syncPanel(); });
 
-    resizeCanvas(); syncPanel(); updateWeights(); updateScore(); updateRate();
+    requestAnimationFrame(() => { resizeCanvas(); syncPanel(); updateWeights(); updateScore(); updateRate(); });
   })();
   </script>
+
 </body>
 </html>
