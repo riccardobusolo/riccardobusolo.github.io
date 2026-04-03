@@ -38,20 +38,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .app.on{opacity:1;pointer-events:all}
 
 /* ── Sidebar ── */
-.sb{width:56px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;z-index:10;flex-shrink:0}
-.sb__logo{width:36px;height:auto;border-radius:6px;margin-bottom:12px;opacity:.8;cursor:pointer;transition:opacity .3s}.sb__logo:hover{opacity:1}
-.sb__sep{width:28px;height:1px;background:var(--border);margin:4px 0}
-.sb__btn{width:40px;height:40px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative}
+.sb{width:160px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:14px 10px;gap:4px;z-index:10;flex-shrink:0}
+.sb__logo{width:48px;height:auto;border-radius:6px;margin-bottom:14px;opacity:.8;cursor:pointer;transition:opacity .3s}.sb__logo:hover{opacity:1}
+.sb__sep{width:100%;height:1px;background:var(--border);margin:4px 0}
+.sb__btn{width:100%;padding:10px 12px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s}
 .sb__btn:hover{background:var(--rl);color:var(--dim);border-color:var(--border)}
 .sb__btn.on{background:var(--rl);color:var(--red);border-color:var(--rb)}
-.sb__btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.sb__tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:.58rem;color:var(--dim);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}.sb__btn:hover .sb__tip{opacity:1}
+.sb__btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sb__label{font-family:var(--mono);font-size:.58rem;letter-spacing:.02em}
 
 /* ── Main area ── */
-.main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;background:rgba(200,60,60,.03);padding:2px;overflow:hidden}
+.main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;background:var(--bg);padding:2px;overflow:hidden;position:relative}
+.main::before{content:'';position:absolute;inset:0;background:url('img/crest.png') center center / contain no-repeat;z-index:0;pointer-events:none}
 
 /* ── Window panels ── */
-.win{background:var(--bg2);border-radius:0;display:none;flex-direction:column;overflow:hidden;position:relative}
+.win{background:var(--bg2);border-radius:0;display:none;flex-direction:column;overflow:hidden;position:relative;z-index:1}
 .win.on{display:flex}
 .win__head{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0;user-select:none}
 .win__icon{color:var(--red);display:flex;align-items:center}
@@ -62,9 +63,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .win__body::-webkit-scrollbar{width:4px}.win__body::-webkit-scrollbar-thumb{background:rgba(196,30,30,.2);border-radius:2px}
 
 /* ── Empty state ── */
-.empty{grid-column:1/-1;grid-row:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;opacity:.3}
-.empty__img{width:80px;height:auto;border-radius:8px;opacity:.5}
-.empty__text{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.empty{grid-column:1/-1;grid-row:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:40px;gap:12px;z-index:0}
+.empty__text{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;background:rgba(10,10,15,.6);padding:6px 16px;border-radius:6px}
 
 /* ══ DICE ROLLER ══ */
 .dr-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;justify-content:center}
@@ -168,21 +168,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <div class="sb__sep"></div>
 <button class="sb__btn" data-tool="dice" id="btnDice">
 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/></svg>
-<span class="sb__tip">Dice Roller</span>
+<span class="sb__label">Dice Roller</span>
 </button>
 <button class="sb__btn" data-tool="init" id="btnInit">
 <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-<span class="sb__tip">Initiative &amp; HP</span>
+<span class="sb__label">Initiative &amp; HP</span>
 </button>
 <button class="sb__btn" data-tool="timer" id="btnTimer">
 <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="13" x2="15" y2="15"/><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="2" x2="12" y2="4"/></svg>
-<span class="sb__tip">Turn Timer</span>
+<span class="sb__label">Turn Timer</span>
 </button>
 </div>
 
 <!-- Main content -->
 <div class="main" id="main">
-<div class="empty" id="emptyState"><img src="img/crest.png" alt="" class="empty__img"><span class="empty__text">Select a tool</span></div>
+<div class="empty" id="emptyState"><span class="empty__text">Select a tool</span></div>
 
 <!-- Dice Roller -->
 <div class="win" id="winDice">
