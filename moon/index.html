@@ -109,8 +109,9 @@
   <script>
   (function(){
     var rm=document.getElementById('rm'),pb=document.getElementById('pb'),pi=document.getElementById('pi'),so=document.getElementById('so'),ok=false;
+    if(localStorage.getItem('cm_unlock')==='1'){ok=true;document.querySelector('.gh').style.display='none';so.style.transition='none';so.classList.add('on');}
     rm.addEventListener('click',function(){rm.classList.toggle('on');pb.classList.toggle('on');if(pb.classList.contains('on'))setTimeout(function(){pi.focus()},400)});
-    pi.addEventListener('input',function(){if(ok)return;if(pi.value.toLowerCase().trim()==='moon'){ok=true;pi.disabled=true;pi.style.color='#4078c0';setTimeout(function(){so.classList.add('on')},300)}});
+    pi.addEventListener('input',function(){if(ok)return;if(pi.value.toLowerCase().trim()==='moon'){ok=true;pi.disabled=true;pi.style.color='#4078c0';localStorage.setItem('cm_unlock','1');setTimeout(function(){so.classList.add('on')},300)}});
     pi.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=pi.value.toLowerCase().trim();if(v&&v!=='moon'){pi.parentElement.classList.add('pw');setTimeout(function(){pi.parentElement.classList.remove('pw')},350);pi.value=''}}});
   })();
   </script>
