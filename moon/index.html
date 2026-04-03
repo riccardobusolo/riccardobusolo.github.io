@@ -1,119 +1,386 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Site not found &middot; GitHub Pages</title>
-  <meta name="robots" content="noindex, nofollow">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background-color:#fafafa;color:#333;overflow-x:hidden}
-    .gh{max-width:620px;margin:0 auto;padding:80px 20px 40px;text-align:center}
-    .gh h1{font-size:72px;font-weight:600;color:#333;margin-bottom:16px;letter-spacing:-1px}
-    .gh h2{font-size:22px;font-weight:600;color:#666;margin-bottom:12px}
-    .gh p{font-size:16px;color:#666;line-height:1.6;margin-bottom:8px}
-    .gh p code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:14px;background:#f0f0f0;padding:2px 6px;border-radius:3px}
-    .gh a{color:#4078c0;text-decoration:none}.gh a:hover{text-decoration:underline}
-    .gh-ft{margin-top:28px;padding-top:16px;border-top:1px solid #eee;display:flex;justify-content:center;align-items:center;gap:16px;font-size:12px;color:#ccc}
-    .gh-ft a{color:#ccc;text-decoration:none}.gh-ft a:hover{color:#999}
-    .gh-ft span{color:#ddd}
-    .gh-logo{margin-top:20px;text-align:center}
-    .gh-logo svg{fill:#ccc;width:24px;height:24px}
-    .rm{margin-top:24px;font-size:12px;color:#ccc;cursor:pointer;user-select:none;transition:color .2s;display:inline-block}.rm:hover{color:#999}
-    .rm i{display:inline-block;transition:transform .3s;font-size:10px;margin-left:4px;font-style:normal}
-    .rm.on i{transform:rotate(180deg)}
-    .pb{max-height:0;overflow:hidden;transition:max-height .6s cubic-bezier(.16,1,.3,1),opacity .4s;opacity:0;margin-top:0}
-    .pb.on{max-height:300px;opacity:1;margin-top:16px}
-    .pm{max-width:300px;margin:0 auto;text-align:left;padding:16px 0}
-    .pl{font-family:'Crimson Pro',Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#999;line-height:2.1}
-    .pl--e{color:#777}
-    .pi-w{display:inline}
-    .pi-b{color:#bbb;font-family:'Crimson Pro',Georgia,serif;font-size:15px;font-style:italic}
-    .pi{background:none;border:none;outline:none;font-family:'Crimson Pro',Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#4078c0;width:4.5ch;border-bottom:1px solid #ccc;padding-bottom:0;caret-color:#4078c0}
-    .pi::placeholder{color:#ccc}
-    .pw{animation:sh .35s ease}
-    @keyframes sh{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
-    .so{position:fixed;inset:0;background:#08080e;z-index:100;opacity:0;pointer-events:none;transition:opacity .8s;overflow-y:auto}
-    .so.on{opacity:1;pointer-events:all}
-    :root{--bg:#08080e;--bg2:#12121a;--border:rgba(180,180,190,.12);--text:#e0e0e6;--dim:#8a8a9e;--muted:#5a5a6e;--cyan:#00e0d0;--purple:#a78bfa;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
-    .sb{position:fixed;inset:0;pointer-events:none;overflow:hidden}
-    .sbl{position:absolute;border-radius:50%;filter:blur(140px);animation:sd 25s ease-in-out infinite}
-    .sbl:nth-child(1){width:500px;height:400px;background:radial-gradient(circle,rgba(140,100,255,.06),transparent 70%);top:-5%;left:10%;animation-duration:22s}
-    .sbl:nth-child(2){width:400px;height:400px;background:radial-gradient(circle,rgba(0,200,180,.04),transparent 70%);bottom:10%;right:5%;animation-duration:28s;animation-delay:-8s}
-    @keyframes sd{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-20px) scale(1.1)}}
-    .sw{max-width:900px;margin:0 auto;padding:40px 32px 60px;position:relative;z-index:1}
-    .sh{text-align:center;margin-bottom:48px;padding-top:20px}
-    .sh__m{margin-bottom:16px;opacity:0;transform:scale(.5);animation:mi .8s var(--ease) .5s forwards}
-    @keyframes mi{to{opacity:1;transform:scale(1)}}
-    .sh__t{font-family:var(--font);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;letter-spacing:-.04em;color:var(--text);margin-bottom:6px}.sh__t span{background:linear-gradient(135deg,var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .sh__s{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
-    .tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-    .tc{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;transition:all .3s var(--ease);cursor:default;position:relative;overflow:hidden;font-family:var(--font)}
-    .tc:hover{border-color:rgba(167,139,250,.2);transform:translateY(-3px)}
-    .tc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.3),transparent);opacity:0;transition:opacity .3s}.tc:hover::before{opacity:1}
-    .tc__i{font-size:1.6rem;margin-bottom:12px}
-    .tc__n{font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:6px}
-    .tc__d{font-size:.76rem;color:var(--dim);line-height:1.6}
-    .tc__b{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:.48rem;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:4px;background:rgba(167,139,250,.08);color:var(--purple);border:1px solid rgba(167,139,250,.15)}
-    .sf{text-align:center;margin-top:48px;font-family:var(--mono);font-size:.56rem;color:var(--muted);letter-spacing:.06em}
-    @media(max-width:600px){.tg{grid-template-columns:1fr}.sw{padding:24px 16px 40px}.gh h1{font-size:48px}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Site not found &middot; GitHub Pages</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;1,300&family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+/* ══ GITHUB 404 ══ */
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:#fafafa;color:#333;overflow:hidden;height:100vh}
+.g4{max-width:620px;margin:0 auto;padding:80px 20px 40px;text-align:center}
+.g4 h1{font-size:72px;font-weight:600;color:#333;margin-bottom:16px;letter-spacing:-1px}
+.g4 h2{font-size:22px;font-weight:600;color:#666;margin-bottom:12px}
+.g4 p{font-size:16px;color:#666;line-height:1.6;margin-bottom:8px}
+.g4 code{font-family:"SFMono-Regular",Consolas,monospace;font-size:14px;background:#f0f0f0;padding:2px 6px;border-radius:3px}
+.g4 a{color:#4078c0;text-decoration:none}.g4 a:hover{text-decoration:underline}
+.g4f{margin-top:28px;padding-top:16px;border-top:1px solid #eee;display:flex;justify-content:center;gap:16px;font-size:12px;color:#ccc}
+.g4f a{color:#ccc;text-decoration:none}.g4f a:hover{color:#999}
+.g4l{margin-top:20px}.g4l svg{fill:#ccc;width:24px;height:24px}
+.rm{margin-top:24px;font-size:12px;color:#ccc;cursor:pointer;user-select:none;display:inline-block}.rm:hover{color:#999}
+.rm i{display:inline-block;transition:transform .3s;font-size:10px;margin-left:4px;font-style:normal}.rm.on i{transform:rotate(180deg)}
+.pb{max-height:0;overflow:hidden;transition:max-height .6s cubic-bezier(.16,1,.3,1),opacity .4s;opacity:0}.pb.on{max-height:300px;opacity:1;margin-top:16px}
+.pm{max-width:300px;margin:0 auto;text-align:left;padding:16px 0}
+.pl{font-family:'Crimson Pro',Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#999;line-height:2.1}
+.pl--e{color:#777}
+.pib{color:#bbb;font-family:'Crimson Pro',Georgia,serif;font-size:15px;font-style:italic}
+.pin{background:none;border:none;outline:none;font-family:'Crimson Pro',Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#4078c0;width:4.5ch;border-bottom:1px solid #ccc;caret-color:#4078c0}.pin::placeholder{color:#ccc}
+.pw{animation:sh .35s}@keyframes sh{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.g4-page{position:absolute;inset:0;z-index:2;transition:opacity .6s,filter .6s;overflow-y:auto}.g4-page.out{opacity:0;filter:blur(10px);pointer-events:none}
+
+/* ══ APP SHELL ══ */
+:root{--bg:#0a0a0f;--bg2:#111118;--bg3:#18181f;--bg4:#1e1e26;--border:rgba(200,60,60,.1);--bh:rgba(200,60,60,.18);--text:#e0e0e6;--dim:#9a9aa4;--muted:#5a5a68;--red:#c41e1e;--rl:rgba(196,30,30,.12);--rb:rgba(196,30,30,.2);--rg:rgba(196,30,30,.4);--gold:#d4a846;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+.app{position:fixed;inset:0;background:var(--bg);display:flex;opacity:0;pointer-events:none;transition:opacity .6s .2s;z-index:1;font-family:var(--font)}
+.app.on{opacity:1;pointer-events:all}
+
+/* ── Sidebar ── */
+.sb{width:56px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;z-index:10;flex-shrink:0}
+.sb__logo{width:36px;height:auto;border-radius:6px;margin-bottom:12px;opacity:.8;cursor:pointer;transition:opacity .3s}.sb__logo:hover{opacity:1}
+.sb__sep{width:28px;height:1px;background:var(--border);margin:4px 0}
+.sb__btn{width:40px;height:40px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative}
+.sb__btn:hover{background:var(--rl);color:var(--dim);border-color:var(--border)}
+.sb__btn.on{background:var(--rl);color:var(--red);border-color:var(--rb)}
+.sb__btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sb__tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:.58rem;color:var(--dim);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}.sb__btn:hover .sb__tip{opacity:1}
+
+/* ── Main area ── */
+.main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;background:rgba(200,60,60,.03);padding:2px;overflow:hidden}
+
+/* ── Window panels ── */
+.win{background:var(--bg2);border-radius:0;display:none;flex-direction:column;overflow:hidden;position:relative}
+.win.on{display:flex}
+.win__head{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0;user-select:none}
+.win__icon{color:var(--red);display:flex;align-items:center}
+.win__icon svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.win__title{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);flex:1}
+.win__close{width:22px;height:22px;border-radius:4px;border:none;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:all .15s}.win__close:hover{background:rgba(196,30,30,.15);color:var(--red)}
+.win__body{flex:1;overflow-y:auto;padding:16px;scrollbar-width:thin;scrollbar-color:rgba(196,30,30,.15) transparent}
+.win__body::-webkit-scrollbar{width:4px}.win__body::-webkit-scrollbar-thumb{background:rgba(196,30,30,.2);border-radius:2px}
+
+/* ── Empty state ── */
+.empty{grid-column:1/-1;grid-row:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;opacity:.3}
+.empty__img{width:80px;height:auto;border-radius:8px;opacity:.5}
+.empty__text{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+
+/* ══ DICE ROLLER ══ */
+.dr-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;justify-content:center}
+.die-btn{width:52px;height:52px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .2s var(--ease);position:relative;overflow:hidden}
+.die-btn:hover{border-color:var(--rb);background:var(--rl);transform:translateY(-2px)}
+.die-btn:active{transform:translateY(0) scale(.95)}
+.die-btn svg{width:24px;height:24px;stroke:var(--red);fill:none;stroke-width:1.5;transition:stroke .2s}
+.die-btn:hover svg{stroke:var(--text)}
+.die-btn span{font-family:var(--mono);font-size:.5rem;color:var(--muted);transition:color .2s}.die-btn:hover span{color:var(--dim)}
+.die-rolling{animation:dieShake .4s ease}
+@keyframes dieShake{0%{transform:rotate(0) scale(1)}20%{transform:rotate(-15deg) scale(1.1)}40%{transform:rotate(12deg) scale(1.05)}60%{transform:rotate(-8deg) scale(1.08)}80%{transform:rotate(5deg) scale(1.02)}100%{transform:rotate(0) scale(1)}}
+.dr-result{text-align:center;margin-bottom:16px;min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dr-result__num{font-family:var(--mono);font-size:2.8rem;font-weight:700;color:var(--red);line-height:1;text-shadow:0 0 30px rgba(196,30,30,.3)}
+.dr-result__die{font-family:var(--mono);font-size:.58rem;color:var(--muted);margin-top:4px}
+.dr-result__nat{font-family:var(--mono);font-size:.5rem;padding:2px 8px;border-radius:4px;margin-top:4px;letter-spacing:.06em}
+.dr-result__nat--crit{background:rgba(212,168,70,.12);color:var(--gold);border:1px solid rgba(212,168,70,.2)}
+.dr-result__nat--fail{background:rgba(196,30,30,.1);color:var(--red);border:1px solid var(--rb)}
+.dr-custom{display:flex;gap:6px;margin-bottom:16px}
+.dr-custom input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:.72rem;color:var(--text);outline:none;transition:border-color .2s}.dr-custom input:focus{border-color:var(--rb)}
+.dr-custom input::placeholder{color:var(--muted)}
+.dr-custom button{padding:8px 14px;background:var(--rl);border:1px solid var(--rb);border-radius:6px;color:var(--red);font-family:var(--mono);font-size:.62rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}.dr-custom button:hover{background:var(--rb);color:var(--text)}
+.dr-log{border-top:1px solid var(--border);padding-top:12px}
+.dr-log__title{font-family:var(--mono);font-size:.52rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.dr-log__clear{background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:.48rem;cursor:pointer;text-transform:uppercase;letter-spacing:.06em}.dr-log__clear:hover{color:var(--red)}
+.dr-log__list{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(196,30,30,.1) transparent}
+.dr-entry{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;background:var(--bg);font-family:var(--mono);font-size:.64rem}
+.dr-entry__val{color:var(--red);font-weight:600;min-width:28px}.dr-entry__desc{color:var(--dim);flex:1}.dr-entry__time{color:var(--muted);font-size:.5rem}
+.dr-entry--new{animation:entryIn .3s var(--ease)}
+@keyframes entryIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+
+/* ══ INITIATIVE / HP TRACKER ══ */
+.it-add{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.it-add input{flex:1;min-width:60px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 8px;font-family:var(--mono);font-size:.66rem;color:var(--text);outline:none}.it-add input:focus{border-color:var(--rb)}
+.it-add input::placeholder{color:var(--muted)}
+.it-add button{padding:7px 12px;background:var(--rl);border:1px solid var(--rb);border-radius:6px;color:var(--red);font-family:var(--mono);font-size:.58rem;font-weight:600;cursor:pointer;white-space:nowrap}.it-add button:hover{background:var(--rb);color:var(--text)}
+.it-list{display:flex;flex-direction:column;gap:4px}
+.it-row{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--bg);border-radius:6px;border:1px solid transparent;transition:all .15s}
+.it-row.active{border-color:var(--rb);background:var(--rl)}
+.it-row__init{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--gold);min-width:22px;text-align:center}
+.it-row__name{font-size:.78rem;font-weight:500;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.it-row__hp{display:flex;align-items:center;gap:4px}
+.it-row__hpbar{width:60px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.it-row__hpfill{height:100%;border-radius:3px;background:var(--red);transition:width .3s var(--ease)}
+.it-row__hptext{font-family:var(--mono);font-size:.56rem;color:var(--dim);min-width:40px}
+.it-row__btns{display:flex;gap:2px}
+.it-row__btn{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--mono);font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center}.it-row__btn:hover{background:var(--rl);color:var(--red);border-color:var(--rb)}
+.it-row__btn--del:hover{background:rgba(196,30,30,.2)}
+.it-controls{display:flex;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.it-controls button{flex:1;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--dim);font-family:var(--mono);font-size:.56rem;cursor:pointer;transition:all .2s}.it-controls button:hover{border-color:var(--rb);color:var(--red)}
+
+/* ══ TURN TIMER ══ */
+.tt-display{text-align:center;padding:20px 0}
+.tt-time{font-family:var(--mono);font-size:3.2rem;font-weight:700;color:var(--text);line-height:1;letter-spacing:-.04em}
+.tt-time.warn{color:var(--gold)}
+.tt-time.crit{color:var(--red);animation:pulse 1s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.tt-label{font-family:var(--mono);font-size:.56rem;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.08em}
+.tt-ring{width:140px;height:140px;margin:0 auto 16px;position:relative}
+.tt-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.tt-ring circle{fill:none;stroke-width:4}
+.tt-ring .tt-bg{stroke:var(--bg3)}
+.tt-ring .tt-fg{stroke:var(--red);stroke-linecap:round;transition:stroke-dashoffset .5s linear,stroke .3s}
+.tt-ring .tt-fg.warn{stroke:var(--gold)}
+.tt-ring .tt-fg.crit{stroke:var(--red)}
+.tt-ring__time{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.tt-btns{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
+.tt-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--dim);font-family:var(--mono);font-size:.66rem;font-weight:500;cursor:pointer;transition:all .2s}.tt-btn:hover{border-color:var(--rb);color:var(--red)}
+.tt-btn--start{background:var(--rl);border-color:var(--rb);color:var(--red)}.tt-btn--start:hover{background:var(--rb);color:var(--text)}
+.tt-set{display:flex;gap:6px;justify-content:center;align-items:center;margin-top:12px}
+.tt-set label{font-family:var(--mono);font-size:.52rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tt-set input{width:60px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-family:var(--mono);font-size:.7rem;color:var(--text);text-align:center;outline:none}.tt-set input:focus{border-color:var(--rb)}
+</style>
 </head>
 <body>
 
-  <div class="gh">
-    <h1>404</h1>
-    <h2>File not found</h2>
-    <p>The site configured at this address does not contain the requested file.</p>
-    <p>If this is your site, make sure that the filename case matches the URL as well as any file permissions.</p>
-    <p>For root URLs (like <code>http://example.com/</code>) you must provide an <code>index.html</code> file.</p>
-    <p><a href="https://docs.github.com/pages/">Read the full documentation</a> for more information about using <strong>GitHub Pages</strong>.</p>
-    <div class="gh-ft"><a href="#">GitHub Status</a><span>&mdash;</span><a href="#">@githubstatus</a></div>
-    <div class="gh-logo"><svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></div>
-    <div class="rm" id="rm">read more <i>&#9662;</i></div>
-    <div class="pb" id="pb">
-      <div class="pm">
-        <div class="pl">No soul returns from this dark quest,</div>
-        <div class="pl">the darkness comes too soon.</div>
-        <div class="pl">What sleeps beneath will never rest</div>
-        <div class="pl pl--e">beneath the crooked <span class="pi-w"><span class="pi-b">[</span><input class="pi" id="pi" type="text" maxlength="8" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="____"><span class="pi-b">]</span></span></div>
-      </div>
-    </div>
-  </div>
+<!-- ══ GITHUB 404 PAGE ══ -->
+<div class="g4-page" id="g4p">
+<div class="g4">
+<h1>404</h1><h2>File not found</h2>
+<p>The site configured at this address does not contain the requested file.</p>
+<p>If this is your site, make sure that the filename case matches the URL as well as any file permissions.</p>
+<p>For root URLs (like <code>http://example.com/</code>) you must provide an <code>index.html</code> file.</p>
+<p><a href="https://docs.github.com/pages/">Read the full documentation</a> for more information about using <strong>GitHub Pages</strong>.</p>
+<div class="g4f"><a href="#">GitHub Status</a><span>&mdash;</span><a href="#">@githubstatus</a></div>
+<div class="g4l"><svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></div>
+<div class="rm" id="rm">read more <i>&#9662;</i></div>
+<div class="pb" id="pb"><div class="pm">
+<div class="pl">No soul returns from this dark quest,</div>
+<div class="pl">the darkness comes too soon.</div>
+<div class="pl">What sleeps beneath will never rest</div>
+<div class="pl pl--e">beneath the crooked <span><span class="pib">[</span><input class="pin" id="pin" type="text" maxlength="8" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="____"><span class="pib">]</span></span></div>
+</div></div>
+</div>
+</div>
 
-  <div class="so" id="so">
-    <div class="sb"><div class="sbl"></div><div class="sbl"></div></div>
-    <div class="sw">
-      <div class="sh">
-        <div class="sh__m"><img src="img/crest.png" alt="" style="width:160px;height:auto;border-radius:12px"></div>
-        <h1 class="sh__t">The Crooked <span>Moon</span></h1>
-        <p class="sh__s">Campaign Toolbox</p>
-      </div>
-      <div class="tg">
-        <div class="tc"><div class="tc__b">Placeholder</div><div class="tc__i">&#127922;</div><div class="tc__n">Dice Roller</div><div class="tc__d">Tira qualsiasi dado: d4, d6, d8, d10, d12, d20, d100. Supporta tiri multipli e modificatori.</div></div>
-        <div class="tc"><div class="tc__b">Placeholder</div><div class="tc__i">&#9876;</div><div class="tc__n">Initiative Tracker</div><div class="tc__d">Gestisci l'ordine di iniziativa. Aggiungi PG e mostri, ordina automaticamente.</div></div>
-        <div class="tc"><div class="tc__b">Placeholder</div><div class="tc__i">&#10084;&#65039;</div><div class="tc__n">HP Tracker</div><div class="tc__d">Tieni traccia dei punti ferita del party e dei nemici. Danni, cure e condizioni.</div></div>
-        <div class="tc"><div class="tc__b">Placeholder</div><div class="tc__i">&#128220;</div><div class="tc__n">NPC Generator</div><div class="tc__d">Genera nomi, tratti, motivazioni e segreti per PNG improvvisati al volo.</div></div>
-        <div class="tc"><div class="tc__b">Placeholder</div><div class="tc__i">&#128506;</div><div class="tc__n">Random Encounter</div><div class="tc__d">Genera incontri casuali per ambiente: foresta, dungeon, montagna, palude.</div></div>
-        <div class="tc"><div class="tc__b">Placeholder</div><div class="tc__i">&#9201;</div><div class="tc__n">Turn Timer</div><div class="tc__d">Timer per turni di combattimento. Mantieni il ritmo alto e le sessioni serrate.</div></div>
-        <div class="tc"><div class="tc__b">Placeholder</div><div class="tc__i">&#128214;</div><div class="tc__n">Session Notes</div><div class="tc__d">Appunti di sessione condivisi. Scrivi, salva, rileggi. Tutto resta qui.</div></div>
-        <div class="tc"><div class="tc__b">Placeholder</div><div class="tc__i">&#127748;</div><div class="tc__n">Loot Table</div><div class="tc__d">Genera tesori casuali per livello e rarit&agrave;. Monete, gemme, oggetti magici.</div></div>
-      </div>
-      <div class="sf">The Crooked Moon &mdash; For those who found the way</div>
-    </div>
-  </div>
+<!-- ══ APP ══ -->
+<div class="app" id="app">
+<!-- Sidebar -->
+<div class="sb">
+<img src="img/crest.png" alt="" class="sb__logo" id="sbLogo">
+<div class="sb__sep"></div>
+<button class="sb__btn" data-tool="dice" id="btnDice">
+<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/></svg>
+<span class="sb__tip">Dice Roller</span>
+</button>
+<button class="sb__btn" data-tool="init" id="btnInit">
+<svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+<span class="sb__tip">Initiative &amp; HP</span>
+</button>
+<button class="sb__btn" data-tool="timer" id="btnTimer">
+<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="13" x2="15" y2="15"/><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="2" x2="12" y2="4"/></svg>
+<span class="sb__tip">Turn Timer</span>
+</button>
+</div>
 
-  <script>
-  (function(){
-    var rm=document.getElementById('rm'),pb=document.getElementById('pb'),pi=document.getElementById('pi'),so=document.getElementById('so'),ok=false;
-    if(localStorage.getItem('cm_unlock')==='1'){ok=true;document.querySelector('.gh').style.display='none';so.style.transition='none';so.classList.add('on');}
-    rm.addEventListener('click',function(){rm.classList.toggle('on');pb.classList.toggle('on');if(pb.classList.contains('on'))setTimeout(function(){pi.focus()},400)});
-    pi.addEventListener('input',function(){if(ok)return;if(pi.value.toLowerCase().trim()==='moon'){ok=true;pi.disabled=true;pi.style.color='#4078c0';localStorage.setItem('cm_unlock','1');setTimeout(function(){so.classList.add('on')},300)}});
-    pi.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=pi.value.toLowerCase().trim();if(v&&v!=='moon'){pi.parentElement.classList.add('pw');setTimeout(function(){pi.parentElement.classList.remove('pw')},350);pi.value=''}}});
-  })();
-  </script>
+<!-- Main content -->
+<div class="main" id="main">
+<div class="empty" id="emptyState"><img src="img/crest.png" alt="" class="empty__img"><span class="empty__text">Select a tool</span></div>
+
+<!-- Dice Roller -->
+<div class="win" id="winDice">
+<div class="win__head"><div class="win__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/></svg></div><div class="win__title">Dice Roller</div><button class="win__close" data-close="dice">&times;</button></div>
+<div class="win__body">
+<div class="dr-row" id="diceRow">
+<button class="die-btn" data-die="4"><svg viewBox="0 0 24 24"><polygon points="12,3 22,20 2,20"/></svg><span>d4</span></button>
+<button class="die-btn" data-die="6"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg><span>d6</span></button>
+<button class="die-btn" data-die="8"><svg viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12"/></svg><span>d8</span></button>
+<button class="die-btn" data-die="10"><svg viewBox="0 0 24 24"><polygon points="12,2 21,8 18,20 6,20 3,8"/></svg><span>d10</span></button>
+<button class="die-btn" data-die="12"><svg viewBox="0 0 24 24"><polygon points="12,2 20,6 22,14 16,21 8,21 2,14 4,6"/></svg><span>d12</span></button>
+<button class="die-btn" data-die="20"><svg viewBox="0 0 24 24"><polygon points="12,1 21,6 21,18 12,23 3,18 3,6"/></svg><span>d20</span></button>
+<button class="die-btn" data-die="100"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="21" opacity=".3"/></svg><span>d100</span></button>
+</div>
+<div class="dr-result" id="diceResult"><div class="dr-result__die" style="color:var(--muted)">Click a die to roll</div></div>
+<div class="dr-custom"><input type="text" id="diceCustom" placeholder="2d6+3, 4d8-1, d20+5"><button id="diceCustomBtn">Roll</button></div>
+<div class="dr-log"><div class="dr-log__title"><span>History</span><button class="dr-log__clear" id="diceClear">Clear</button></div><div class="dr-log__list" id="diceLog"></div></div>
+</div>
+</div>
+
+<!-- Initiative & HP -->
+<div class="win" id="winInit">
+<div class="win__head"><div class="win__icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div><div class="win__title">Initiative &amp; HP</div><button class="win__close" data-close="init">&times;</button></div>
+<div class="win__body">
+<div class="it-add">
+<input type="text" id="itName" placeholder="Name">
+<input type="number" id="itInit" placeholder="Init" style="max-width:50px">
+<input type="number" id="itHp" placeholder="HP" style="max-width:50px">
+<input type="number" id="itMaxHp" placeholder="Max" style="max-width:50px">
+<button id="itAddBtn">+Add</button>
+</div>
+<div class="it-list" id="itList"></div>
+<div class="it-controls">
+<button id="itSort">Sort by Init</button>
+<button id="itNext">Next Turn</button>
+<button id="itReset">Clear All</button>
+</div>
+</div>
+</div>
+
+<!-- Turn Timer -->
+<div class="win" id="winTimer">
+<div class="win__head"><div class="win__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div><div class="win__title">Turn Timer</div><button class="win__close" data-close="timer">&times;</button></div>
+<div class="win__body">
+<div class="tt-ring"><svg viewBox="0 0 140 140"><circle class="tt-bg" cx="70" cy="70" r="62"/><circle class="tt-fg" id="ttRing" cx="70" cy="70" r="62"/></svg><div class="tt-ring__time"><div class="tt-time" id="ttTime">1:30</div><div class="tt-label" id="ttLabel">Ready</div></div></div>
+<div class="tt-btns"><button class="tt-btn tt-btn--start" id="ttStart">Start</button><button class="tt-btn" id="ttPause">Pause</button><button class="tt-btn" id="ttReset">Reset</button></div>
+<div class="tt-set"><label>Seconds per turn:</label><input type="number" id="ttSec" value="90" min="10" max="600"></div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var rm=document.getElementById('rm'),pb=document.getElementById('pb'),pin=document.getElementById('pin'),g4p=document.getElementById('g4p'),app=document.getElementById('app');
+
+/* ── Gate ── */
+if(localStorage.getItem('cm_u')==='1'){g4p.style.display='none';app.style.transition='none';app.classList.add('on');document.body.style.background='var(--bg)';document.body.style.overflow='hidden';}
+rm.addEventListener('click',function(){rm.classList.toggle('on');pb.classList.toggle('on');if(pb.classList.contains('on'))setTimeout(function(){pin.focus()},400)});
+pin.addEventListener('input',function(){if(pin.value.toLowerCase().trim()==='moon'){pin.disabled=true;pin.style.color='#4078c0';localStorage.setItem('cm_u','1');setTimeout(function(){g4p.classList.add('out');document.body.style.background='var(--bg)';document.body.style.overflow='hidden';app.classList.add('on')},300)}});
+pin.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=pin.value.toLowerCase().trim();if(v&&v!=='moon'){pin.parentElement.classList.add('pw');setTimeout(function(){pin.parentElement.classList.remove('pw')},350);pin.value=''}}});
+
+/* ── Window Manager ── */
+var openTools=JSON.parse(localStorage.getItem('cm_open')||'[]');
+var toolMap={dice:'winDice',init:'winInit',timer:'winTimer'};
+var btnMap={dice:'btnDice',init:'btnInit',timer:'btnTimer'};
+
+function saveOpen(){localStorage.setItem('cm_open',JSON.stringify(openTools))}
+function renderWindows(){
+  var em=document.getElementById('emptyState');
+  Object.keys(toolMap).forEach(function(k){document.getElementById(toolMap[k]).classList.remove('on');document.getElementById(btnMap[k]).classList.remove('on')});
+  if(!openTools.length){em.style.display='flex';return}
+  em.style.display='none';
+  var m=document.getElementById('main');
+  var cols=openTools.length<=2?openTools.length:2;
+  var rows=openTools.length<=2?1:2;
+  m.style.gridTemplateColumns='repeat('+cols+',1fr)';
+  m.style.gridTemplateRows='repeat('+rows+',1fr)';
+  openTools.forEach(function(k){document.getElementById(toolMap[k]).classList.add('on');document.getElementById(btnMap[k]).classList.add('on')});
+}
+function toggleTool(k){
+  var idx=openTools.indexOf(k);
+  if(idx>=0)openTools.splice(idx,1);else if(openTools.length<4)openTools.push(k);
+  saveOpen();renderWindows();
+}
+document.querySelectorAll('.sb__btn[data-tool]').forEach(function(b){b.addEventListener('click',function(){toggleTool(b.dataset.tool)})});
+document.querySelectorAll('.win__close').forEach(function(b){b.addEventListener('click',function(){toggleTool(b.dataset.close)})});
+renderWindows();
+
+/* ══ DICE ROLLER ══ */
+var diceLog=JSON.parse(localStorage.getItem('cm_dice')||'[]');
+function rollDie(sides){return Math.floor(Math.random()*sides)+1}
+function parseRoll(expr){
+  expr=expr.replace(/\s/g,'').toLowerCase();
+  var m=expr.match(/^(\d*)d(\d+)([+-]\d+)?$/);
+  if(!m)return null;
+  var count=parseInt(m[1])||1,sides=parseInt(m[2]),mod=parseInt(m[3])||0;
+  if(sides<2||sides>100||count<1||count>20)return null;
+  var rolls=[],total=0;
+  for(var i=0;i<count;i++){var r=rollDie(sides);rolls.push(r);total+=r}
+  total+=mod;
+  return{expr:count+'d'+sides+(mod>0?'+'+mod:mod<0?''+mod:''),total:total,rolls:rolls,sides:sides,mod:mod}
+}
+function showResult(res){
+  var el=document.getElementById('diceResult');
+  var natHtml='';
+  if(res.rolls.length===1&&res.sides===20){
+    if(res.rolls[0]===20)natHtml='<div class="dr-result__nat dr-result__nat--crit">NAT 20!</div>';
+    else if(res.rolls[0]===1)natHtml='<div class="dr-result__nat dr-result__nat--fail">NAT 1</div>';
+  }
+  var detail=res.rolls.length>1?'['+res.rolls.join(', ')+']'+(res.mod?'  '+(res.mod>0?'+':'')+res.mod:''):'';
+  el.innerHTML='<div class="dr-result__num">'+res.total+'</div><div class="dr-result__die">'+res.expr+(detail?' &mdash; '+detail:'')+'</div>'+natHtml;
+}
+function addLog(res){
+  var now=new Date();var t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  diceLog.unshift({val:res.total,desc:res.expr,time:t});
+  if(diceLog.length>50)diceLog.length=50;
+  localStorage.setItem('cm_dice',JSON.stringify(diceLog));
+  renderLog();
+}
+function renderLog(){
+  var el=document.getElementById('diceLog');el.innerHTML='';
+  diceLog.forEach(function(e,i){
+    var d=document.createElement('div');d.className='dr-entry'+(i===0?' dr-entry--new':'');
+    d.innerHTML='<span class="dr-entry__val">'+e.val+'</span><span class="dr-entry__desc">'+e.desc+'</span><span class="dr-entry__time">'+e.time+'</span>';
+    el.appendChild(d);
+  });
+}
+document.getElementById('diceRow').addEventListener('click',function(e){
+  var btn=e.target.closest('.die-btn');if(!btn)return;
+  var sides=parseInt(btn.dataset.die);
+  btn.classList.add('die-rolling');setTimeout(function(){btn.classList.remove('die-rolling')},400);
+  var res=parseRoll('1d'+sides);if(res){showResult(res);addLog(res)}
+});
+document.getElementById('diceCustomBtn').addEventListener('click',function(){
+  var inp=document.getElementById('diceCustom');var res=parseRoll(inp.value);
+  if(res){showResult(res);addLog(res);inp.value=''}else{inp.style.borderColor='var(--red)';setTimeout(function(){inp.style.borderColor=''},600)}
+});
+document.getElementById('diceCustom').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('diceCustomBtn').click()});
+document.getElementById('diceClear').addEventListener('click',function(){diceLog=[];localStorage.removeItem('cm_dice');renderLog()});
+renderLog();
+
+/* ══ INITIATIVE & HP TRACKER ══ */
+var itData=JSON.parse(localStorage.getItem('cm_init')||'{"chars":[],"turn":-1}');
+function saveIt(){localStorage.setItem('cm_init',JSON.stringify(itData))}
+function renderIt(){
+  var el=document.getElementById('itList');el.innerHTML='';
+  itData.chars.forEach(function(c,i){
+    var pct=c.maxHp>0?Math.max(0,Math.round(c.hp/c.maxHp*100)):0;
+    var color=pct>50?'var(--red)':pct>25?'var(--gold)':'#666';
+    var d=document.createElement('div');d.className='it-row'+(i===itData.turn?' active':'');
+    d.innerHTML='<div class="it-row__init">'+c.init+'</div><div class="it-row__name">'+c.name+'</div><div class="it-row__hp"><div class="it-row__hpbar"><div class="it-row__hpfill" style="width:'+pct+'%;background:'+color+'"></div></div><div class="it-row__hptext">'+c.hp+'/'+c.maxHp+'</div></div><div class="it-row__btns"><button class="it-row__btn" data-i="'+i+'" data-act="dmg" title="Damage">-</button><button class="it-row__btn" data-i="'+i+'" data-act="heal" title="Heal">+</button><button class="it-row__btn it-row__btn--del" data-i="'+i+'" data-act="del" title="Remove">&times;</button></div>';
+    el.appendChild(d);
+  });
+}
+document.getElementById('itAddBtn').addEventListener('click',function(){
+  var n=document.getElementById('itName').value.trim(),ini=parseInt(document.getElementById('itInit').value)||0,hp=parseInt(document.getElementById('itHp').value)||10,mhp=parseInt(document.getElementById('itMaxHp').value)||hp;
+  if(!n)return;
+  itData.chars.push({name:n,init:ini,hp:hp,maxHp:mhp});saveIt();renderIt();
+  document.getElementById('itName').value='';document.getElementById('itInit').value='';document.getElementById('itHp').value='';document.getElementById('itMaxHp').value='';document.getElementById('itName').focus();
+});
+document.getElementById('itList').addEventListener('click',function(e){
+  var btn=e.target.closest('.it-row__btn');if(!btn)return;
+  var i=parseInt(btn.dataset.i),act=btn.dataset.act;
+  if(act==='del'){itData.chars.splice(i,1);if(itData.turn>=itData.chars.length)itData.turn=Math.max(0,itData.chars.length-1)}
+  else if(act==='dmg'){var v=prompt('Damage amount:');if(v)itData.chars[i].hp=Math.max(0,itData.chars[i].hp-Math.abs(parseInt(v)||0))}
+  else if(act==='heal'){var v=prompt('Heal amount:');if(v)itData.chars[i].hp=Math.min(itData.chars[i].maxHp,itData.chars[i].hp+Math.abs(parseInt(v)||0))}
+  saveIt();renderIt();
+});
+document.getElementById('itSort').addEventListener('click',function(){itData.chars.sort(function(a,b){return b.init-a.init});itData.turn=-1;saveIt();renderIt()});
+document.getElementById('itNext').addEventListener('click',function(){if(!itData.chars.length)return;itData.turn=(itData.turn+1)%itData.chars.length;saveIt();renderIt()});
+document.getElementById('itReset').addEventListener('click',function(){if(confirm('Clear all?')){itData={chars:[],turn:-1};saveIt();renderIt()}});
+renderIt();
+
+/* ══ TURN TIMER ══ */
+var ttTotal=parseInt(localStorage.getItem('cm_ttsec'))||90;
+var ttLeft=ttTotal,ttRunning=false,ttInterval=null;
+var ttRingEl=document.getElementById('ttRing'),ttTimeEl=document.getElementById('ttTime'),ttLabelEl=document.getElementById('ttLabel');
+var circ=2*Math.PI*62;
+ttRingEl.style.strokeDasharray=circ;
+function ttRender(){
+  var m=Math.floor(ttLeft/60),s=ttLeft%60;
+  ttTimeEl.textContent=m+':'+String(s).padStart(2,'0');
+  var pct=ttTotal>0?ttLeft/ttTotal:0;
+  ttRingEl.style.strokeDashoffset=circ*(1-pct);
+  ttTimeEl.className='tt-time'+(pct<.2?' crit':pct<.4?' warn':'');
+  ttRingEl.className='tt-fg'+(pct<.2?' crit':pct<.4?' warn':'');
+  ttLabelEl.textContent=ttRunning?'Running':ttLeft<ttTotal?'Paused':'Ready';
+}
+function ttTick(){ttLeft--;if(ttLeft<=0){ttLeft=0;ttRunning=false;clearInterval(ttInterval);ttLabelEl.textContent='Time!'}ttRender()}
+document.getElementById('ttStart').addEventListener('click',function(){if(ttRunning)return;if(ttLeft<=0)ttLeft=ttTotal;ttRunning=true;ttInterval=setInterval(ttTick,1000);ttRender()});
+document.getElementById('ttPause').addEventListener('click',function(){ttRunning=false;clearInterval(ttInterval);ttRender()});
+document.getElementById('ttReset').addEventListener('click',function(){ttRunning=false;clearInterval(ttInterval);ttLeft=ttTotal;ttRender()});
+document.getElementById('ttSec').value=ttTotal;
+document.getElementById('ttSec').addEventListener('change',function(){ttTotal=Math.max(10,parseInt(this.value)||90);localStorage.setItem('cm_ttsec',ttTotal);ttLeft=ttTotal;ttRunning=false;clearInterval(ttInterval);ttRender()});
+ttRender();
+})();
+</script>
 </body>
 </html>
