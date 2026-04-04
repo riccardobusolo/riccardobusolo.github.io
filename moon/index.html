@@ -28,7 +28,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .sb__btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .sb__label{font-family:var(--mono);font-size:.64rem;letter-spacing:.02em;white-space:nowrap}
 .main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px;background:var(--bg);padding:1px;overflow:hidden;position:relative}
-.main::before{content:'';position:absolute;inset:0;background:url('img/crest.png') center center / 45% auto no-repeat;opacity:.1;z-index:0;pointer-events:none}
+.main::before{content:'';position:absolute;inset:0;background:url('img/crest.webp') center center / 45% auto no-repeat;opacity:.1;z-index:0;pointer-events:none}
 .win{background:var(--bg2);display:none;flex-direction:column;overflow:hidden;position:relative;z-index:1}.win.on{display:flex}.win.win-over{outline:2px dashed var(--gold);outline-offset:-2px}
 .wh{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0;cursor:grab}.wh:active{cursor:grabbing}
 .wh__i{color:var(--red);display:flex}.wh__i svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
@@ -190,7 +190,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 
 <div class="app" id="app">
 <div class="sb">
-<img src="img/crest.png" alt="" class="sb__logo">
+<img src="img/crest.webp" alt="" class="sb__logo">
 <div class="sb__sep"></div>
 <button class="sb__btn" data-tool="dice" id="btnDice"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/></svg><span class="sb__label">Dadi</span></button>
 <button class="sb__btn" data-tool="chars" id="btnChars"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span class="sb__label">Personaggi</span></button>
