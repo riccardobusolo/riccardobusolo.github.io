@@ -28,7 +28,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .sb__btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .sb__label{font-family:var(--mono);font-size:.64rem;letter-spacing:.02em;white-space:nowrap}
 .main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px;background:var(--bg);padding:1px;overflow:hidden;position:relative}
-.main::before{content:'';position:absolute;inset:0;background:url('img/sigil.webp') center center / auto 50% no-repeat;opacity:.1;z-index:0;pointer-events:none}
+.main::before{content:'';position:absolute;inset:0;background:url('img/sigil.webp') center center / auto 50% no-repeat;opacity:.2;z-index:0;pointer-events:none}
 .win{background:var(--bg2);display:none;flex-direction:column;overflow:hidden;position:relative;z-index:1}.win.on{display:flex}.win.win-over{outline:2px dashed var(--gold);outline-offset:-2px}
 .wh{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0;cursor:grab}.wh:active{cursor:grabbing}
 .wh__i{color:var(--red);display:flex}.wh__i svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
@@ -230,6 +230,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 
 <div class="main" id="main">
 <div class="empty" id="emptyState"></div>
+<canvas id="maskCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0"></canvas>
 <canvas id="fireCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1"></canvas>
 
 <!-- DICE -->
@@ -410,13 +411,14 @@ document.getElementById('ttReset').onclick=function(){ttR=false;clearInterval(tt
 document.getElementById('ttSec').value=ttT;
 document.getElementById('ttSec').onchange=function(){ttT=Math.max(10,parseInt(this.value)||90);localStorage.setItem('cm_tt',ttT);ttL=ttT;ttR=false;clearInterval(ttI);ttRen()};ttRen();
 /* FIRE */
-(function(){var cv=document.getElementById('fireCanvas'),ctx=cv.getContext('2d'),particles=[],mx=0,my=0,active=false,raf=null;
-function resize(){cv.width=cv.offsetWidth;cv.height=cv.offsetHeight}resize();window.addEventListener('resize',resize);
+(function(){var cv=document.getElementById('fireCanvas'),ctx=cv.getContext('2d'),mcv=document.getElementById('maskCanvas'),mctx=mcv.getContext('2d'),particles=[],mx=0,my=0,active=false,raf=null;
+function resize(){cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;mcv.width=mcv.offsetWidth;mcv.height=mcv.offsetHeight;drawMask()}resize();window.addEventListener('resize',resize);
+function drawMask(){mctx.globalCompositeOperation='source-over';mctx.fillStyle='#08080c';mctx.fillRect(0,0,mcv.width,mcv.height);mctx.globalCompositeOperation='destination-out';for(var i=0;i<particles.length;i++){var p=particles[i];var r=p.size*8*p.life;if(r<1)continue;var g=mctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r);g.addColorStop(0,'rgba(0,0,0,'+(.7*p.life)+')');g.addColorStop(.5,'rgba(0,0,0,'+(.3*p.life)+')');g.addColorStop(1,'rgba(0,0,0,0)');mctx.fillStyle=g;mctx.beginPath();mctx.arc(p.x,p.y,r,0,Math.PI*2);mctx.fill()}if(active){var gr=mctx.createRadialGradient(mx,my,0,mx,my,120);gr.addColorStop(0,'rgba(0,0,0,.5)');gr.addColorStop(.5,'rgba(0,0,0,.2)');gr.addColorStop(1,'rgba(0,0,0,0)');mctx.fillStyle=gr;mctx.beginPath();mctx.arc(mx,my,120,0,Math.PI*2);mctx.fill()}}
 function Particle(x,y){this.x=x;this.y=y;this.vx=(Math.random()-.5)*2.5;this.vy=-Math.random()*4-2;this.life=1;this.decay=Math.random()*.02+.008;this.size=Math.random()*8+4;this.hue=15+Math.random()*25}
 function spawn(x,y,n){for(var i=0;i<n;i++){var p=new Particle(x+Math.random()*30-15,y+Math.random()*10-5);p.vx+=(Math.random()-.5)*1.5;p.vy-=Math.random()*1.5;particles.push(p)}}
-function draw(){ctx.clearRect(0,0,cv.width,cv.height);ctx.globalCompositeOperation='lighter';for(var i=particles.length-1;i>=0;i--){var p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy-=.04;p.vx*=.99;p.life-=p.decay;p.size*=.995;if(p.life<=0){particles.splice(i,1);continue}var a=p.life;var h=p.hue+(1-p.life)*20;var s=Math.max(2,p.size*a);ctx.beginPath();var g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,s*2);g.addColorStop(0,'hsla('+h+',100%,'+Math.round(60+a*30)+'%,'+a*.9+')');g.addColorStop(.4,'hsla('+Math.max(0,h-10)+',100%,'+Math.round(40+a*20)+'%,'+a*.5+')');g.addColorStop(1,'hsla('+Math.max(0,h-20)+',100%,15%,0)');ctx.fillStyle=g;ctx.arc(p.x,p.y,s*2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.fillStyle='hsla('+h+',100%,85%,'+a*.6+')';ctx.arc(p.x,p.y,s*.5,0,Math.PI*2);ctx.fill()}if(active)spawn(mx,my,4);if(particles.length>0||active){raf=requestAnimationFrame(draw)}else{ctx.clearRect(0,0,cv.width,cv.height);raf=null}}
+function draw(){ctx.clearRect(0,0,cv.width,cv.height);ctx.globalCompositeOperation='lighter';for(var i=particles.length-1;i>=0;i--){var p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy-=.04;p.vx*=.99;p.life-=p.decay;p.size*=.995;if(p.life<=0){particles.splice(i,1);continue}var a=p.life;var h=p.hue+(1-p.life)*20;var s=Math.max(2,p.size*a);ctx.beginPath();var g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,s*2);g.addColorStop(0,'hsla('+h+',100%,'+Math.round(60+a*30)+'%,'+a*.9+')');g.addColorStop(.4,'hsla('+Math.max(0,h-10)+',100%,'+Math.round(40+a*20)+'%,'+a*.5+')');g.addColorStop(1,'hsla('+Math.max(0,h-20)+',100%,15%,0)');ctx.fillStyle=g;ctx.arc(p.x,p.y,s*2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.fillStyle='hsla('+h+',100%,85%,'+a*.6+')';ctx.arc(p.x,p.y,s*.5,0,Math.PI*2);ctx.fill()}drawMask();if(active)spawn(mx,my,4);if(particles.length>0||active){raf=requestAnimationFrame(draw)}else{ctx.clearRect(0,0,cv.width,cv.height);drawMask();raf=null}}
 var mn=document.getElementById('main');
-mn.addEventListener('mousedown',function(e){if(e.target.closest('.win'))return;var r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;active=true;spawn(mx,my,12);if(!raf)raf=requestAnimationFrame(draw)});
+mn.addEventListener('mousedown',function(e){if(e.target!==mn&&e.target!==cv&&e.target!==mcv&&!e.target.closest('.empty'))return;e.preventDefault();var r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;active=true;spawn(mx,my,12);if(!raf)raf=requestAnimationFrame(draw)});
 document.addEventListener('mousemove',function(e){if(!active)return;var r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});
 document.addEventListener('mouseup',function(){active=false})})();
 })();
