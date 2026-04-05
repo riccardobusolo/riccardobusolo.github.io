@@ -251,7 +251,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 
 
 /* SPELLS */
-.spf{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap}
+.spf{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap;align-items:flex-start}
+.spf__ms{position:relative;flex-shrink:0}
+.spf__btn{font-family:var(--mono);font-size:.58rem;padding:6px 10px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--dim);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;transition:all .15s}.spf__btn:hover{border-color:var(--bh);color:var(--text)}.spf__btn--on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.06)}
+.spf__cnt{font-size:.5rem;background:var(--gold);color:var(--bg);border-radius:8px;padding:0 4px;min-width:14px;text-align:center;font-weight:700;display:none}.spf__cnt--on{display:inline}
+.spf__drop{display:none;position:absolute;top:100%;left:0;margin-top:4px;background:var(--bg2);border:1px solid var(--bh);border-radius:6px;padding:4px;min-width:140px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.4);max-height:220px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(140,30,30,.12) transparent}.spf__drop--on{display:block}
+.spf__opt{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:.58rem;color:var(--dim);transition:background .1s;white-space:nowrap}.spf__opt:hover{background:var(--rl)}
+.spf__chk{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;font-size:.5rem;color:transparent}.spf__opt--sel .spf__chk{border-color:var(--gold);background:rgba(196,154,50,.15);color:var(--gold)}
+.spf__fav{font-size:.9rem;padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:pointer;transition:all .15s;line-height:1}.spf__fav:hover{border-color:var(--gold);color:var(--gold)}.spf__fav--on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.1)}
+.spe__star{background:none;border:none;font-size:.72rem;cursor:pointer;color:var(--muted);padding:0 2px;transition:all .15s;line-height:1;flex-shrink:0;opacity:.4}.spe__star:hover{color:var(--gold);opacity:1;transform:scale(1.2)}.spe__star--on{color:var(--gold);opacity:1}
 .spcount{font-family:var(--mono);font-size:.54rem;color:var(--muted);margin-bottom:6px}
 .splist{display:flex;flex-direction:column;gap:3px}
 .spe{background:var(--bg);border:1px solid transparent;border-radius:6px;padding:8px 10px;cursor:pointer;transition:all .15s}.spe:hover{border-color:var(--border)}
@@ -422,8 +430,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 </div></div>
 
 <!-- SPELLS -->
-<div class="win" id="winSpells"><div class="wh"><div class="wh__i"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" fill="none" stroke-width="2"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" fill="none" stroke-width="2"/></svg></div><div class="wh__t">Incantesimi</div><button class="wh__x" data-close="spells">&times;</button></div><div class="wb">
-<div class="spf"><input class="fi" id="spSearch" placeholder="Cerca incantesimo..."><select class="fi" id="spClass" style="width:90px;flex:none"><option value="">Classe</option><option value="Bard">Bardo</option><option value="Cleric">Chierico</option><option value="Druid">Druido</option><option value="Wizard">Mago</option><option value="Paladin">Paladino</option><option value="Ranger">Ranger</option><option value="Sorcerer">Stregone</option><option value="Warlock">Warlock</option></select><select class="fi" id="spLevel" style="width:80px;flex:none"><option value="">Livello</option><option value="0">Trucchetto</option><option value="1">1°</option><option value="2">2°</option><option value="3">3°</option><option value="4">4°</option><option value="5">5°</option><option value="6">6°</option><option value="7">7°</option><option value="8">8°</option><option value="9">9°</option></select><select class="fi" id="spSource" style="width:80px;flex:none"><option value="">Sorgente</option><option value="Player's Handbook">PHB</option><option value="Tasha's Cauldron of Everything">Tasha's</option><option value="The Crooked Moon">Crooked Moon</option></select></div>
+<div class="win" id="winSpells"><div class="wh"><div class="wh__i"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div><div class="wh__t">Incantesimi</div><button class="wh__x" data-close="spells">&times;</button></div><div class="wb">
+<div class="spf">
+<input class="fi" id="spSearch" placeholder="Cerca incantesimo...">
+<div class="spf__ms" id="msClass"><button class="spf__btn">Classe <span class="spf__cnt"></span></button><div class="spf__drop"></div></div>
+<div class="spf__ms" id="msLevel"><button class="spf__btn">Livello <span class="spf__cnt"></span></button><div class="spf__drop"></div></div>
+<div class="spf__ms" id="msSource"><button class="spf__btn">Sorgente <span class="spf__cnt"></span></button><div class="spf__drop"></div></div>
+<button class="spf__fav" id="spFav" title="Mostra preferiti">★</button>
+</div>
 <div class="spcount" id="spCount"></div>
 <div class="splist" id="spList"></div>
 </div></div>
@@ -697,33 +711,55 @@ cRen();
 /* SPELLS */
 (function(){
 var SP=(typeof SPELLS!=='undefined')?SPELLS:[];
-var spSearch=document.getElementById('spSearch'),spClass=document.getElementById('spClass'),spLevel=document.getElementById('spLevel'),spSource=document.getElementById('spSource'),spList=document.getElementById('spList'),spCount=document.getElementById('spCount');
+var spSearch=document.getElementById('spSearch'),spList=document.getElementById('spList'),spCount=document.getElementById('spCount'),spFavBtn=document.getElementById('spFav');
+var favs=JSON.parse(localStorage.getItem('cm_spfav')||'[]');
+var favMode=false;
+/* Multi-select */
+var classOpts=[{v:'Bard',l:'Bardo'},{v:'Cleric',l:'Chierico'},{v:'Druid',l:'Druido'},{v:'Paladin',l:'Paladino'},{v:'Ranger',l:'Ranger'},{v:'Sorcerer',l:'Stregone'},{v:'Warlock',l:'Warlock'},{v:'Wizard',l:'Mago'}];
+var levelOpts=[{v:0,l:'Trucchetto'},{v:1,l:'1°'},{v:2,l:'2°'},{v:3,l:'3°'},{v:4,l:'4°'},{v:5,l:'5°'},{v:6,l:'6°'},{v:7,l:'7°'},{v:8,l:'8°'},{v:9,l:'9°'}];
+var srcSet={};SP.forEach(function(s){srcSet[s.source]=1});
+var sourceOpts=Object.keys(srcSet).sort().map(function(s){var l=s==="Player's Handbook"?'PHB':s==="Tasha's Cauldron of Everything"?"Tasha's":s;return{v:s,l:l}});
+var filters={cls:[],lvl:[],src:[]};
+function buildMS(id,opts,key){var ms=document.getElementById(id);var btn=ms.querySelector('.spf__btn');var drop=ms.querySelector('.spf__drop');var cnt=btn.querySelector('.spf__cnt');drop.innerHTML='';opts.forEach(function(o){var d=document.createElement('div');d.className='spf__opt';d.dataset.v=typeof o.v==='number'?o.v:o.v;d.innerHTML='<span class="spf__chk">\u2713</span><span>'+o.l+'</span>';drop.appendChild(d)});
+btn.addEventListener('click',function(e){e.stopPropagation();var wasOn=drop.classList.contains('spf__drop--on');closeAllMS();if(!wasOn)drop.classList.add('spf__drop--on')});
+drop.addEventListener('click',function(e){e.stopPropagation();var opt=e.target.closest('.spf__opt');if(!opt)return;opt.classList.toggle('spf__opt--sel');var sel=[];drop.querySelectorAll('.spf__opt--sel').forEach(function(o){var v=o.dataset.v;sel.push(key==='lvl'?parseInt(v):v)});filters[key]=sel;cnt.textContent=sel.length;cnt.classList.toggle('spf__cnt--on',sel.length>0);btn.classList.toggle('spf__btn--on',sel.length>0);renSp()})}
+function closeAllMS(){document.querySelectorAll('.spf__drop--on').forEach(function(d){d.classList.remove('spf__drop--on')})}
+document.addEventListener('click',closeAllMS);
+buildMS('msClass',classOpts,'cls');
+buildMS('msLevel',levelOpts,'lvl');
+buildMS('msSource',sourceOpts,'src');
+/* Favorites toggle */
+spFavBtn.addEventListener('click',function(){favMode=!favMode;spFavBtn.classList.toggle('spf__fav--on',favMode);renSp()});
+function isFav(name){return favs.indexOf(name)>=0}
+function togFav(name){var i=favs.indexOf(name);if(i>=0)favs.splice(i,1);else favs.push(name);localStorage.setItem('cm_spfav',JSON.stringify(favs));renSp()}
+/* Components string */
 function compStr(c){var p=[];if(c.verbal)p.push('V');if(c.somatic)p.push('S');if(c.material)p.push('M');var s=p.join(', ');if(c.material&&c.materialDesc)s+=' ('+c.materialDesc+')';return s}
-function renSp(){var q=(spSearch.value||'').toLowerCase(),cls=spClass.value,lvl=spLevel.value,src=spSource.value;
+/* Render */
+function renSp(){var q=(spSearch.value||'').toLowerCase(),fCls=filters.cls,fLvl=filters.lvl,fSrc=filters.src;
 var filtered=SP.filter(function(s){
+if(favMode&&!isFav(s.name))return false;
 if(q&&s.name.toLowerCase().indexOf(q)<0&&s.description.toLowerCase().indexOf(q)<0)return false;
-if(cls&&s.classes.indexOf(cls)<0)return false;
-if(lvl!==''&&s.level!==parseInt(lvl))return false;
-if(src&&s.source!==src)return false;
+if(fCls.length){var match=false;for(var i=0;i<fCls.length;i++){if(s.classes.indexOf(fCls[i])>=0){match=true;break}}if(!match)return false}
+if(fLvl.length&&fLvl.indexOf(s.level)<0)return false;
+if(fSrc.length&&fSrc.indexOf(s.source)<0)return false;
 return true});
 filtered.sort(function(a,b){return a.level-b.level||a.name.localeCompare(b.name)});
-spCount.textContent=filtered.length+' incantesim'+(filtered.length===1?'o':'i')+(SP.length?' / '+SP.length+' totali':'');
+var countTxt=filtered.length+' incantesim'+(filtered.length===1?'o':'i');if(SP.length)countTxt+=' / '+SP.length+' totali';if(favMode)countTxt+=' \u2605';
+spCount.textContent=countTxt;
 spList.innerHTML='';
 if(!SP.length){spList.innerHTML='<div style="text-align:center;padding:30px 10px;font-family:var(--mono);font-size:.62rem;color:var(--muted)">Database non trovato.<br>Assicurati che <b>spells.js</b> sia nella stessa cartella.</div>';return}
-if(!filtered.length){spList.innerHTML='<div style="text-align:center;padding:20px;font-family:var(--mono);font-size:.6rem;color:var(--muted)">Nessun risultato</div>';return}
+if(!filtered.length){spList.innerHTML='<div style="text-align:center;padding:20px;font-family:var(--mono);font-size:.6rem;color:var(--muted)">'+(favMode?'Nessun preferito':'Nessun risultato')+'</div>';return}
 filtered.forEach(function(s){var d=document.createElement('div');d.className='spe';
+var fav=isFav(s.name);
 var lvlTxt=s.level===0?'T':s.level+'\u00b0';
 var tags='';if(s.concentration)tags+='<span class="spe__tag spe__tag--c" title="Concentrazione">C</span>';if(s.ritual)tags+='<span class="spe__tag spe__tag--r" title="Rituale">R</span>';
 var clsH=s.classes.map(function(c){return'<span class="spe__cl">'+c+'</span>'}).join('');
 var srcLbl=s.source==="Player's Handbook"?'PHB':s.source==="Tasha's Cauldron of Everything"?"Tasha's":s.source;
 var higherH=s.higherLevels?'<div class="spe__higher"><b>Ai livelli superiori:</b> '+s.higherLevels+'</div>':'';
-d.innerHTML='<div class="spe__head"><span class="spe__lvl">'+lvlTxt+'</span><span class="spe__name">'+s.name+'</span><span class="spe__school">'+s.school+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>Lancio</b> <span>'+s.castingTime+'</span></span><span class="spe__prop"><b>Raggio</b> <span>'+s.range+'</span></span><span class="spe__prop"><b>Durata</b> <span>'+s.duration+'</span></span><span class="spe__prop"><b>Componenti</b> <span>'+compStr(s.components)+'</span></span></div><div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
+d.innerHTML='<div class="spe__head"><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+s.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+s.school+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>Lancio</b> <span>'+s.castingTime+'</span></span><span class="spe__prop"><b>Raggio</b> <span>'+s.range+'</span></span><span class="spe__prop"><b>Durata</b> <span>'+s.duration+'</span></span><span class="spe__prop"><b>Componenti</b> <span>'+compStr(s.components)+'</span></span></div><div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
 spList.appendChild(d)})}
-spList.addEventListener('click',function(e){var spe=e.target.closest('.spe');if(spe)spe.classList.toggle('spe--open')});
+spList.addEventListener('click',function(e){var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}var spe=e.target.closest('.spe');if(spe)spe.classList.toggle('spe--open')});
 spSearch.addEventListener('input',renSp);
-spClass.addEventListener('change',renSp);
-spLevel.addEventListener('change',renSp);
-spSource.addEventListener('change',renSp);
 renSp()})();
 /* FIRE */
 (function(){var cv=document.getElementById('fireCanvas'),ctx=cv.getContext('2d'),mcv=document.getElementById('maskCanvas'),mctx=mcv.getContext('2d'),particles=[],mx=0,my=0,active=false,raf=null;
