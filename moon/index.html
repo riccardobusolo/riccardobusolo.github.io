@@ -263,7 +263,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .spad__grip{cursor:grab;color:var(--muted);font-size:.7rem;padding:2px 4px;flex-shrink:0;opacity:.35;transition:opacity .15s;user-select:none;line-height:1}.spad__grip:hover{opacity:.8;color:var(--dim)}.spad__grip:active{cursor:grabbing}
 .spad__star{background:none;border:none;font-size:.7rem;cursor:pointer;color:var(--muted);padding:0 2px;transition:all .15s;line-height:1;flex-shrink:0;opacity:.35}.spad__star:hover{color:var(--gold);opacity:1;transform:scale(1.15)}.spad__star--on{color:var(--gold);opacity:1}
 .spad__emoji{font-size:1.2rem;min-width:22px;text-align:center}
-.spad__img{width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0}
+.spad__img{width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0}
 .spad__info{flex:1;min-width:0}
 .spad__title{font-family:var(--mono);font-size:.68rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .spad__desc{font-family:var(--mono);font-size:.5rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -919,7 +919,7 @@ function volFill(el){var p=el.value;el.style.background='linear-gradient(90deg,v
 function volFillAll(){board.querySelectorAll('.spad__vol').forEach(volFill)}
 /* Edit modal */
 var sedit=document.getElementById('sedit'),seditOv=document.getElementById('seditOv'),editId=null,editImg=null;
-var IMG_SIZE=50;
+var IMG_SIZE=150;
 function closeEdit(){seditOv.classList.remove('on');sedit.classList.remove('on');editId=null;editImg=null}
 function processImg(file,cb){var img=new Image();var url=URL.createObjectURL(file);img.onload=function(){var sz=Math.min(img.width,img.height);var sx=(img.width-sz)/2,sy=(img.height-sz)/2;var cv=document.createElement('canvas');cv.width=IMG_SIZE;cv.height=IMG_SIZE;var cx=cv.getContext('2d');cx.drawImage(img,sx,sy,sz,sz,0,0,IMG_SIZE,IMG_SIZE);URL.revokeObjectURL(url);var webp=cv.toDataURL('image/webp',0.82);if(webp.indexOf('image/webp')<0)webp=cv.toDataURL('image/png');cb(webp)};img.src=url}
 function buildImgRow(){var imgRow=document.getElementById('seditImgRow');imgRow.innerHTML='';if(editImg){document.getElementById('seditEmoji').style.display='none';var prev=document.createElement('img');prev.className='sedit__imgprev';prev.src=editImg;var btns=document.createElement('div');btns.style.cssText='display:flex;flex-direction:column;gap:4px';var bChange=document.createElement('button');bChange.className='sedit__imgbtn';bChange.textContent='\uD83D\uDCF7 Cambia';bChange.addEventListener('click',function(e){e.stopPropagation();document.getElementById('seditImgInput').click()});var bRm=document.createElement('button');bRm.className='sedit__imgbtn sedit__imgbtn--rm';bRm.textContent='\u2716 Rimuovi';bRm.addEventListener('click',function(e){e.stopPropagation();editImg=null;document.getElementById('seditEmoji').style.display='block';buildImgRow()});btns.appendChild(bChange);btns.appendChild(bRm);imgRow.appendChild(prev);imgRow.appendChild(btns)}else{document.getElementById('seditEmoji').style.display='block';var bUp=document.createElement('button');bUp.className='sedit__imgbtn';bUp.textContent='\uD83D\uDCF7 Carica immagine';bUp.addEventListener('click',function(e){e.stopPropagation();document.getElementById('seditImgInput').click()});imgRow.appendChild(bUp)}}
