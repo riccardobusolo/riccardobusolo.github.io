@@ -470,7 +470,7 @@
               // Simulate click — navigate to card link
               const link = wrap.querySelector('a.card');
               if (link && link.href && link.getAttribute('href') !== '#') {
-                window.location.href = link.href;
+                window.open(link.href, '_blank', 'noopener');
               }
               return;
             }
