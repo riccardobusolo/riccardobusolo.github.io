@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trainable Deep Network — Real-time Digit Recognition</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+body{background:#07080d;overflow:hidden;font-family:'IBM Plex Sans',system-ui,sans-serif;color:rgba(255,255,255,.65)}
+canvas#gl{display:block;width:100vw;height:100vh}
+
+#hud-top{position:fixed;top:0;left:0;right:0;padding:16px 22px 16px 64px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:10}
+#hud-left h1{font-size:14px;font-weight:500;color:rgba(255,255,255,.8);letter-spacing:.2px;margin-bottom:1px}
+#hud-left .sub{font-size:11px;color:rgba(255,255,255,.28);line-height:1.6}
+#hud-right{text-align:right;font-size:10px;color:rgba(255,255,255,.22);font-family:'IBM Plex Mono',monospace;line-height:1.7;margin-right:32px}
+
+#arch-panel{position:fixed;top:70px;right:18px;width:190px;pointer-events:none;z-index:10}
+#arch-panel .atitle{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:rgba(255,255,255,.2);margin-bottom:6px}
+.lr{display:flex;align-items:center;gap:5px;padding:2px 0 2px 8px;font-size:10.5px;color:rgba(255,255,255,.28);border-left:2px solid transparent;transition:all .15s}
+.lr.on{border-left-color:rgba(255,255,255,.4);color:rgba(255,255,255,.8)}
+.lr .dd{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.lr .nn{flex:1;white-space:nowrap}
+.lr .dm{font-family:'IBM Plex Mono',monospace;font-size:9px;opacity:.4}
+.lr .af{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(100,180,255,.4)}
+
+#left-panel{position:fixed;bottom:50px;left:20px;z-index:10;width:172px}
+#left-panel .ptitle{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.2);margin-bottom:5px;pointer-events:none}
+#draw-wrap{position:relative;width:100%;aspect-ratio:1;border-radius:5px;overflow:hidden;border:1px solid rgba(255,255,255,.1);cursor:crosshair}
+#draw-canvas{width:100%;height:100%;image-rendering:pixelated;display:block;background:#0a0b14}
+#draw-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:rgba(255,255,255,.18);pointer-events:none;text-align:center;line-height:1.5;transition:opacity .3s}
+#brush-row{display:flex;gap:4px;margin-top:5px}
+#brush-row button{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.35);font-size:9.5px;padding:3px 0;border-radius:3px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif}
+#brush-row button:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.6)}
+
+#pred-box{margin-top:10px;text-align:center;pointer-events:none}
+#pred-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.2);margin-bottom:2px}
+#pred-num{font-size:52px;font-weight:700;color:rgba(255,255,255,.15);transition:color .12s,transform .12s;line-height:1;font-family:'IBM Plex Mono',monospace}
+#pred-num.pop{transform:scale(1.08)}
+#pred-conf{font-size:10px;color:rgba(255,255,255,.2);font-family:'IBM Plex Mono',monospace;margin-top:2px}
+
+#keypad-box{margin-top:8px}
+#keypad-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.2);margin-bottom:5px;text-align:center;pointer-events:none}
+#keypad{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.kbtn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.45);font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;padding:8px 0;border-radius:4px;cursor:pointer;transition:all .15s;text-align:center;line-height:1}
+.kbtn:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.18)}
+.kbtn:active{transform:scale(.95)}
+.kbtn.flash-ok{background:rgba(30,180,100,.3)!important;border-color:rgba(30,180,100,.5)!important;color:#fff!important}
+.kbtn.flash-no{background:rgba(220,60,60,.3)!important;border-color:rgba(220,60,60,.5)!important;color:#fff!important}
+
+#right-panel{position:fixed;bottom:50px;right:18px;width:165px;pointer-events:none;z-index:10}
+#right-panel .ptitle{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.2);margin-bottom:5px}
+.obar-row{display:flex;align-items:center;gap:5px;padding:1.5px 0;font-family:'IBM Plex Mono',monospace;font-size:10px}
+.obar-lbl{width:8px;text-align:right;color:rgba(255,255,255,.3)}
+.obar-tk{flex:1;height:4px;background:rgba(255,255,255,.03);border-radius:2px;overflow:hidden}
+.obar-fl{height:100%;border-radius:2px;transition:width .1s ease}
+.obar-vl{width:30px;text-align:right;color:rgba(255,255,255,.25)}
+
+#stats-box{margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)}
+.stat-row{display:flex;justify-content:space-between;font-size:10.5px;padding:2px 0}
+.stat-k{color:rgba(255,255,255,.25)}
+.stat-v{color:rgba(255,255,255,.5);font-family:'IBM Plex Mono',monospace;font-weight:500}
+#hist-row{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap}
+.hdot{width:14px;height:14px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8);font-weight:500}
+
+#legend{position:fixed;bottom:14px;left:20px;display:flex;gap:12px;font-size:9.5px;color:rgba(255,255,255,.22);pointer-events:none;z-index:10;flex-wrap:wrap}
+.ld{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:3px;vertical-align:middle}
+
+#controls{position:fixed;bottom:12px;right:18px;display:flex;gap:6px;z-index:10}
+#controls button{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.35);font-family:'IBM Plex Sans',sans-serif;font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .2s;white-space:nowrap}
+#controls button:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.6)}
+#controls button.on{background:rgba(90,130,255,.1);border-color:rgba(90,130,255,.2);color:rgba(150,185,255,.75)}
+
+#tutorial-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .35s;pointer-events:none}
+#tutorial-overlay.visible{opacity:1;pointer-events:auto}
+#tutorial-box{background:rgba(14,16,26,.95);border:1px solid rgba(255,255,255,.1);border-radius:12px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto;padding:32px 28px 24px;position:relative;transform:translateY(16px) scale(.97);transition:transform .35s cubic-bezier(.22,1,.36,1)}
+#tutorial-overlay.visible #tutorial-box{transform:translateY(0) scale(1)}
+#tutorial-box h2{font-size:18px;font-weight:600;color:rgba(255,255,255,.88);margin-bottom:4px}
+#tutorial-box .tsub{font-size:12px;color:rgba(255,255,255,.3);margin-bottom:18px}
+#tutorial-box h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(120,160,255,.6);margin:16px 0 6px}
+#tutorial-box p{font-size:13px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:8px}
+#tutorial-box .step{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+#tutorial-box .step-n{width:22px;height:22px;border-radius:50%;background:rgba(90,130,255,.15);color:rgba(150,185,255,.8);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+#tutorial-box .step-t{font-size:13px;color:rgba(255,255,255,.55);line-height:1.6}
+#tutorial-box .tip{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;font-size:11.5px;color:rgba(255,255,255,.4);margin-top:12px;line-height:1.6}
+#btn-close-tut{position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(255,255,255,.3);font-size:20px;cursor:pointer;padding:4px 8px;transition:color .15s}
+#btn-close-tut:hover{color:rgba(255,255,255,.7)}
+#btn-start{display:block;margin:20px auto 0;background:rgba(90,130,255,.15);border:1px solid rgba(90,130,255,.25);color:rgba(150,185,255,.85);font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;padding:9px 28px;border-radius:6px;cursor:pointer;transition:all .2s}
+#btn-start:hover{background:rgba(90,130,255,.25);color:#fff}
+#btn-help{position:fixed;top:16px;right:18px;z-index:10;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:'IBM Plex Sans',sans-serif}
+#btn-help:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.7)}
+.site-logo{position:fixed;top:16px;left:24px;z-index:50;text-decoration:none;display:flex;align-items:center;opacity:.7;transition:opacity .3s,scale .3s cubic-bezier(.16,1,.3,1)}
+.site-logo:hover{scale:1.08;opacity:1}
+.site-logo:active{scale:.94;transition-duration:.1s}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<a href="/progetti.html#formazione" class="site-logo">
+  <svg height="28" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+    <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+    <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+    <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
+  </svg>
+</a>
+
+<div id="hud-top">
+  <div id="hud-left">
+    <h1>Trainable deep neural network</h1>
+    <div class="sub">MLP · Real-time digit classification 40×40 · SGD + Momentum + Replay Buffer + Label Smoothing<br><span id="net-sum"></span></div>
+  </div>
+  <div id="hud-right"><span id="fps-el">—</span><br><span id="di-el"></span></div>
+</div>
+
+<div id="arch-panel"><div class="atitle">Architecture</div><div id="arch-rows"></div></div>
+
+<div id="left-panel">
+  <div class="ptitle">Disegna una cifra (0-9)</div>
+  <div id="draw-wrap">
+    <canvas id="draw-canvas" width="40" height="40"></canvas>
+    <div id="draw-hint">Disegna qui<br>con il mouse</div>
+  </div>
+  <div id="brush-row">
+    <button id="btn-clear">Cancella</button>
+  </div>
+
+  <div id="pred-box">
+    <div id="pred-label">La rete predice</div>
+    <div id="pred-num">—</div>
+    <div id="pred-conf">—</div>
+  </div>
+
+  <div id="keypad-box">
+    <div id="keypad-label">Numero corretto?</div>
+    <div id="keypad"></div>
+  </div>
+</div>
+
+<div id="right-panel">
+  <div class="ptitle">Output softmax</div>
+  <div id="output-bars"></div>
+  <div id="stats-box">
+    <div class="stat-row"><span class="stat-k">Campioni</span><span class="stat-v" id="st-samp">0</span></div>
+    <div class="stat-row"><span class="stat-k">Precisione</span><span class="stat-v" id="st-acc">—</span></div>
+    <div class="stat-row"><span class="stat-k">Replay buffer</span><span class="stat-v" id="st-buf">0 / 500</span></div>
+    <div class="stat-row"><span class="stat-k">Learning rate</span><span class="stat-v" id="st-lr">0.015</span></div>
+    <div class="stat-row"><span class="stat-k">Loss (media)</span><span class="stat-v" id="st-loss">—</span></div>
+    <div style="margin-top:8px">
+      <div class="stat-k" style="font-size:9px;margin-bottom:4px">Cronologia</div>
+      <div id="hist-row"></div>
+    </div>
+  </div>
+</div>
+
+<div id="legend">
+  <span><span class="ld" style="background:#7B72D8"></span>Input</span>
+  <span><span class="ld" style="background:#16A085"></span>Hidden</span>
+  <span><span class="ld" style="background:#E07040"></span>Output</span>
+  <span style="border-left:1px solid rgba(255,255,255,.06);padding-left:9px">
+    <span style="color:rgba(80,150,255,.45)">—</span> w&gt;0
+    <span style="margin-left:4px;color:rgba(255,90,90,.45)">—</span> w&lt;0
+  </span>
+  <span style="border-left:1px solid rgba(255,255,255,.06);padding-left:9px">
+    Luminosità = intensità del segnale in tempo reale
+  </span>
+</div>
+
+<div id="controls">
+  <button id="bw" class="on">Pesi ±</button>
+  <button id="bl" class="on">Label</button>
+</div>
+
+<button id="btn-help" title="Tutorial">?</button>
+
+<div id="tutorial-overlay" class="visible">
+  <div id="tutorial-box">
+    <button id="btn-close-tut">&times;</button>
+    <h2>Rete Neurale Interattiva</h2>
+    <div class="tsub">MLP trainabile in tempo reale per il riconoscimento di cifre</div>
+
+    <h3>Cos'è?</h3>
+    <p>Questa è una vera rete neurale profonda (Multi-Layer Perceptron) che funziona interamente nel tuo browser. La visualizzazione 3D mostra i neuroni e le connessioni della rete mentre elabora i dati in tempo reale.</p>
+
+    <h3>Come si usa</h3>
+    <div class="step"><span class="step-n">1</span><span class="step-t"><b style="color:rgba(255,255,255,.75)">Disegna</b> una cifra (0–9) nel riquadro in basso a sinistra usando il mouse o il dito.</span></div>
+    <div class="step"><span class="step-n">2</span><span class="step-t"><b style="color:rgba(255,255,255,.75)">Osserva</b> la predizione della rete: il numero riconosciuto e la percentuale di sicurezza appaiono sotto il riquadro.</span></div>
+    <div class="step"><span class="step-n">3</span><span class="step-t"><b style="color:rgba(255,255,255,.75)">Insegna</b> alla rete premendo il numero corretto nel tastierino numerico. La rete impara dai tuoi feedback!</span></div>
+    <div class="step"><span class="step-n">4</span><span class="step-t"><b style="color:rgba(255,255,255,.75)">Ripeti</b> con diverse cifre. Più campioni fornisci, più la rete diventa precisa.</span></div>
+
+    <h3>La visualizzazione 3D</h3>
+    <p>Ogni sfera è un neurone; le linee sono le connessioni (pesi). I colori blu e rosso indicano pesi positivi e negativi, mentre la luminosità riflette l'intensità del segnale. Puoi ruotare la vista trascinando e zoomare con la rotellina.</p>
+
+    <div class="tip">💡 <b>Suggerimento:</b> Il tasto destro del mouse cancella i tratti. Prova a disegnare almeno 10–15 cifre diverse per iniziare a vedere miglioramenti nella precisione della rete!</div>
+
+    <button id="btn-start">Ho capito, iniziamo!</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+// ═══════════════════════════════════════════════════════
+//  REAL TRAINABLE NEURAL NETWORK
+// ═══════════════════════════════════════════════════════
+const NET_SIZES=[1600,256,64,32,10];
+const LR_INIT=0.015,MOM=0.9,WEIGHT_DECAY=1e-4;
+const LABEL_SMOOTH=0.05; // 10 classes: correct=0.95, others=0.005
+const BATCH_SIZE=16; // mini-batch from replay buffer
+const REPLAY_MAX=500; // max stored samples
+const TRAIN_EPOCHS=3; // passes over mini-batch per label event
+
+let _sp=false,_sv=0;
+function randn(){if(_sp){_sp=false;return _sv}let u,v,s;do{u=Math.random()*2-1;v=Math.random()*2-1;s=u*u+v*v}while(s>=1||s===0);const m=Math.sqrt(-2*Math.log(s)/s);_sp=true;_sv=v*m;return u*m}
+
+// ── Data augmentation: slight random shifts ──
+function augment(src){
+  const out=new Float32Array(1600);
+  const dx=Math.round((Math.random()-0.5)*4); // shift ±2 px
+  const dy=Math.round((Math.random()-0.5)*4);
+  for(let r=0;r<40;r++)for(let c=0;c<40;c++){
+    const sr2=r-dy,sc2=c-dx;
+    if(sr2>=0&&sr2<40&&sc2>=0&&sc2<40) out[r*40+c]=src[sr2*40+sc2];
+  }
+  // Slight intensity jitter
+  const jit=0.9+Math.random()*0.2;
+  for(let i=0;i<1600;i++) out[i]=Math.min(1,out[i]*jit);
+  return out;
+}
+
+// ── Replay buffer ──
+const replayBuf=[];
+
+function addToReplay(input,label){
+  const copy=new Float32Array(input);
+  replayBuf.push({data:copy,label});
+  if(replayBuf.length>REPLAY_MAX) replayBuf.shift();
+}
+
+function sampleMiniBatch(currentInput,currentLabel,batchSize){
+  const batch=[];
+  // Always include current sample (+ 1 augmented version)
+  batch.push({data:new Float32Array(currentInput),label:currentLabel});
+  batch.push({data:augment(currentInput),label:currentLabel});
+  // Fill rest from replay buffer (random)
+  const remaining=batchSize-2;
+  if(replayBuf.length>0){
+    for(let i=0;i<remaining;i++){
+      const idx=Math.floor(Math.random()*replayBuf.length);
+      const s=replayBuf[idx];
+      // 50% chance to augment replay samples
+      batch.push(Math.random()<0.5?{data:augment(s.data),label:s.label}:{data:s.data,label:s.label});
+    }
+  }
+  return batch;
+}
+
+class Network{
+  constructor(sizes){
+    this.L=sizes.length;this.sizes=sizes;
+    this.W=[];this.b=[];this.vW=[];this.vb=[];
+    for(let l=0;l<this.L-1;l++){
+      const fi=sizes[l],fo=sizes[l+1],sc=Math.sqrt(2/fi);
+      const w=new Float32Array(fi*fo);for(let i=0;i<fi*fo;i++)w[i]=randn()*sc;
+      this.W[l]=w;this.b[l]=new Float32Array(fo);
+      this.vW[l]=new Float32Array(fi*fo);this.vb[l]=new Float32Array(fo);
+    }
+    this.a=[];this.z=[];
+  }
+  forward(input){
+    this.a=[input];this.z=[];let x=input;
+    for(let l=0;l<this.L-1;l++){
+      const fi=this.sizes[l],fo=this.sizes[l+1],W=this.W[l],b=this.b[l];
+      const z=new Float32Array(fo);
+      for(let j=0;j<fo;j++){let s=b[j];for(let i=0;i<fi;i++)s+=x[i]*W[i*fo+j];z[j]=s}
+      this.z.push(z);
+      if(l===this.L-2){
+        let mx=-1e9;for(let j=0;j<fo;j++)mx=Math.max(mx,z[j]);
+        const a=new Float32Array(fo);let sm=0;
+        for(let j=0;j<fo;j++){a[j]=Math.exp(z[j]-mx);sm+=a[j]}
+        for(let j=0;j<fo;j++)a[j]/=sm;x=a;
+      }else{
+        const a=new Float32Array(fo);for(let j=0;j<fo;j++)a[j]=z[j]>0?z[j]:0;x=a;
+      }
+      this.a.push(x);
+    }
+    return x;
+  }
+  backward(target,lr){
+    const L=this.L-1;
+    let delta=new Float32Array(this.sizes[L]);
+    for(let j=0;j<delta.length;j++)delta[j]=this.a[L][j]-target[j];
+    let loss=0;for(let j=0;j<target.length;j++)if(target[j]>0)loss-=target[j]*Math.log(Math.max(1e-10,this.a[L][j]));
+    for(let l=L-1;l>=0;l--){
+      const fi=this.sizes[l],fo=this.sizes[l+1],aP=this.a[l];
+      let dPrev=null;
+      if(l>0){dPrev=new Float32Array(fi);const W=this.W[l];for(let i=0;i<fi;i++){let s=0;for(let j=0;j<fo;j++)s+=W[i*fo+j]*delta[j];dPrev[i]=this.z[l-1][i]>0?s:0}}
+      const W=this.W[l],b=this.b[l],vW=this.vW[l],vb=this.vb[l];
+      for(let j=0;j<fo;j++){
+        for(let i=0;i<fi;i++){
+          const idx=i*fo+j;
+          const g=aP[i]*delta[j]+WEIGHT_DECAY*W[idx]; // L2 regularization
+          vW[idx]=MOM*vW[idx]+lr*g;
+          W[idx]-=vW[idx];
+        }
+        vb[j]=MOM*vb[j]+lr*delta[j];b[j]-=vb[j];
+      }
+      delta=dPrev;
+    }
+    return loss;
+  }
+  trainBatch(batch,lr){
+    // Train on mini-batch: accumulate over multiple epochs
+    let totalLoss=0;
+    for(let e=0;e<TRAIN_EPOCHS;e++){
+      // Shuffle batch
+      for(let i=batch.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[batch[i],batch[j]]=[batch[j],batch[i]]}
+      for(const sample of batch){
+        // Label smoothing target
+        const target=new Float32Array(10);
+        for(let k=0;k<10;k++) target[k]=LABEL_SMOOTH/10;
+        target[sample.label]+=1-LABEL_SMOOTH-LABEL_SMOOTH/10;
+        this.forward(sample.data);
+        totalLoss+=this.backward(target,lr/batch.length); // scale lr by batch
+      }
+    }
+    return totalLoss/(batch.length*TRAIN_EPOCHS);
+  }
+  predict(input){
+    const out=this.forward(input);let mx=0,mi=0;
+    for(let i=0;i<out.length;i++)if(out[i]>mx){mx=out[i];mi=i}
+    return{digit:mi,confidence:mx,probs:out};
+  }
+}
+
+const net=new Network(NET_SIZES);
+
+// ═══════════════════════════════════════════════════════
+//  VISUAL ARCHITECTURE
+// ═══════════════════════════════════════════════════════
+const VARCH=[
+  {name:"Input",   g:[40,40],act:null,     tp:"input", fd:1600,desc:"40×40 px"},
+  {name:"Dense 1", g:[16,16],act:"ReLU",   tp:"hidden",fd:256},
+  {name:"Dense 2", g:[8,8],  act:"ReLU",   tp:"hidden",fd:64},
+  {name:"Dense 3", g:[4,8],  act:"ReLU",   tp:"hidden",fd:32},
+  {name:"Output",  g:[2,5],  act:"Softmax",tp:"output",fd:10,desc:"Cifre 0-9"},
+];
+
+const LAYER_Z=7.0,TARGET_W=15.0,CONN_K=4,NEURON_SC=.6;
+
+const cv=document.getElementById('gl');
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:"high-performance"});
+R.setSize(innerWidth,innerHeight);R.setPixelRatio(Math.min(devicePixelRatio,2));R.setClearColor(0x07080d);
+const Sc=new THREE.Scene();Sc.fog=new THREE.FogExp2(0x07080d,.006);
+const cam=new THREE.PerspectiveCamera(46,innerWidth/innerHeight,.1,900);
+
+let _rs=42;function sr(){_rs=(_rs*16807)%2147483647;return(_rs&0x7fffffff)/0x7fffffff}
+
+// Build visual neurons
+const totalZ=(VARCH.length-1)*LAYER_Z;
+const vpos=[],vdepth=[],vlayerG=[];
+let vnCount=0;
+
+VARCH.forEach((L,li)=>{
+  const[c,r]=L.g;const z=-totalZ/2+li*LAYER_Z;
+  const sp=TARGET_W/Math.max(c,r);
+  const ox=-(c-1)*sp/2,oy=-(r-1)*sp/2;
+  const grp=[];
+  for(let ri=0;ri<r;ri++)for(let ci=0;ci<c;ci++){
+    vpos.push(ox+ci*sp,oy+ri*sp,z);
+    vdepth.push(li/(VARCH.length-1));
+    grp.push({x:ox+ci*sp,y:oy+ri*sp,z,idx:vnCount,li,ci,ri});vnCount++;
+  }
+  vlayerG.push(grp);
+});
+
+// Activation buffer — updated every frame
+const vAct=new Float32Array(vnCount);
+// Smoothed activation for display (lerp towards target)
+const vActSmooth=new Float32Array(vnCount);
+
+function mapActivationsToVisual(){
+  let voff=0;
+  for(let li=0;li<VARCH.length;li++){
+    const[c,r]=VARCH[li].g;const n=c*r;
+    const realAct=net.a[li];
+    if(!realAct){for(let i=0;i<n;i++)vAct[voff+i]=0;voff+=n;continue}
+    const rn=realAct.length;
+    let mx=0;for(let i=0;i<rn;i++)mx=Math.max(mx,Math.abs(realAct[i]));
+    if(rn===n){
+      if(mx>0)for(let i=0;i<n;i++)vAct[voff+i]=Math.abs(realAct[i])/mx;
+      else for(let i=0;i<n;i++)vAct[voff+i]=0;
+    }else{
+      // Resample
+      for(let i=0;i<n;i++){
+        const ri2=Math.floor(i*rn/n);
+        vAct[voff+i]=mx>0?Math.abs(realAct[Math.min(ri2,rn-1)])/mx:0;
+      }
+    }
+    voff+=n;
+  }
+}
+
+// ═══ NEURON SHADER — DIRECT ACTIVATION (no wave gating) ═══
+const nVS=`
+attribute float aD,aAct;
+varying float vD,vAct,vFog;varying vec3 vN;
+void main(){
+  vD=aD;vAct=aAct;
+  vec4 wp=instanceMatrix*vec4(position,1.);
+  vN=normalize(mat3(modelViewMatrix)*mat3(instanceMatrix)*normal);
+  vec4 mv=modelViewMatrix*wp;vFog=length(mv.xyz);
+  gl_Position=projectionMatrix*mv;
+}`;
+
+const nFS=`
+uniform float uFogD,uTime;uniform vec3 uFogC;
+varying float vD,vAct,vFog;varying vec3 vN;
+vec3 lCol(float d){
+  vec3 i=vec3(.482,.447,.847),h=vec3(.086,.627,.522),o=vec3(.878,.439,.251);
+  return d<.5?mix(i,h,d*2.):mix(h,o,(d-.5)*2.);
+}
+void main(){
+  // Direct activation — no wave envelope
+  float act=vAct;
+
+  vec3 base=lCol(vD);
+  float diff=dot(vN,normalize(vec3(.35,.75,.55)))*.45+.55;
+  float rim=pow(1.-max(dot(vN,vec3(0,0,1)),0.),3.)*.2;
+  vec3 lit=base*diff;
+  vec3 bright=lit+rim+base*.35;
+
+  // Always visible base + activation glow
+  float baseLvl=.06;
+  float vis=baseLvl+act*.94;
+  vec3 col=mix(lit*baseLvl,bright,vis);
+  float alpha=.22+vis*.78;
+
+  // White-hot for strong activations
+  if(act>.55){
+    float hot=(act-.55)/.45;
+    col=mix(col,vec3(1.),hot*.5);
+  }
+
+  // Subtle breathing on active neurons
+  if(act>.2){
+    float pulse=sin(uTime*3.+vD*12.)*.04*act;
+    col+=pulse;
+  }
+
+  float fogF=1.-exp(-uFogD*uFogD*vFog*vFog);
+  col=mix(col,uFogC,fogF);alpha*=1.-fogF*.6;
+  gl_FragColor=vec4(col,alpha);
+}`;
+
+const actAttr=new THREE.InstancedBufferAttribute(vActSmooth,1);
+actAttr.setUsage(THREE.DynamicDrawUsage);
+
+const sGeo=new THREE.IcosahedronGeometry(1,1);
+sGeo.setAttribute('aD',new THREE.InstancedBufferAttribute(new Float32Array(vdepth),1));
+sGeo.setAttribute('aAct',actAttr);
+
+const nMat=new THREE.ShaderMaterial({
+  uniforms:{uFogC:{value:new THREE.Color(0x07080d)},uFogD:{value:.006},uTime:{value:0}},
+  vertexShader:nVS,fragmentShader:nFS,transparent:true,depthWrite:false
+});
+
+const nMesh=new THREE.InstancedMesh(sGeo,nMat,vnCount);
+const dum=new THREE.Object3D();
+VARCH.forEach((L,li)=>{
+  const[c,r]=L.g;const sp=TARGET_W/Math.max(c,r);
+  const nr=Math.min(.18,sp*.32)*NEURON_SC;
+  vlayerG[li].forEach(n=>{
+    dum.position.set(vpos[n.idx*3],vpos[n.idx*3+1],vpos[n.idx*3+2]);
+    dum.scale.setScalar(nr);dum.updateMatrix();
+    nMesh.setMatrixAt(n.idx,dum.matrix);
+  });
+});
+nMesh.instanceMatrix.needsUpdate=true;Sc.add(nMesh);
+
+// ═══ CONNECTIONS — DIRECT ACTIVATION (no wave) ═══
+const pV=[],pD=[],pAI=[],nV=[],nD=[],nAI=[];let cTot=0;
+for(let li=0;li<vlayerG.length-1;li++){
+  const from=vlayerG[li],to=vlayerG[li+1];
+  const d0=li/(VARCH.length-1),d1=(li+1)/(VARCH.length-1);
+  from.forEach(fn=>{
+    const scored=to.map(tn=>({tn,d:(tn.x-fn.x)**2+(tn.y-fn.y)**2}));
+    scored.sort((a,b)=>a.d-b.d);
+    const k=Math.min(CONN_K,scored.length);
+    for(let j=0;j<k;j++){
+      const tn=scored[j].tn;const w=sr()*2-1;
+      (w>=0?pV:nV).push(fn.x,fn.y,fn.z,tn.x,tn.y,tn.z);
+      (w>=0?pD:nD).push(d0,d1);
+      (w>=0?pAI:nAI).push(fn.idx,tn.idx);cTot++;
+    }
+  });
+}
+
+const posCA=new Float32Array(pAI.length),negCA=new Float32Array(nAI.length);
+// Smoothed connection activations
+const posCAS=new Float32Array(pAI.length),negCAS=new Float32Array(nAI.length);
+
+function updConnAct(){
+  for(let i=0;i<pAI.length;i++)posCA[i]=vActSmooth[pAI[i]];
+  for(let i=0;i<nAI.length;i++)negCA[i]=vActSmooth[nAI[i]];
+}
+
+const cVS=`attribute float aD,aAct;varying float vD,vAct,vFog;
+void main(){vD=aD;vAct=aAct;vec4 mv=modelViewMatrix*vec4(position,1.);vFog=length(mv.xyz);gl_Position=projectionMatrix*mv;}`;
+
+function cFS(isP){const rgb=isP?'vec3(.28,.52,.95)':'vec3(.92,.28,.28)';
+return `uniform float uSW,uFogD;uniform vec3 uFogC;varying float vD,vAct,vFog;
+void main(){
+  float act=vAct;
+  vec3 neutral=vec3(.3,.5,.6);vec3 signed=${rgb};
+  vec3 base=mix(neutral,signed,uSW);
+  vec3 col=mix(base*.003,base,act);
+  float alpha=.003+act*.5;
+  float fogF=1.-exp(-uFogD*uFogD*vFog*vFog);
+  col=mix(col,uFogC,fogF);alpha*=1.-fogF*.6;
+  gl_FragColor=vec4(col,alpha);
+}`;}
+
+function mkConn(vts,dps,aArr,isP){
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.Float32BufferAttribute(vts,3));
+  g.setAttribute('aD',new THREE.Float32BufferAttribute(dps,1));
+  const aB=new THREE.Float32BufferAttribute(aArr,1);aB.setUsage(THREE.DynamicDrawUsage);
+  g.setAttribute('aAct',aB);
+  return new THREE.LineSegments(g,new THREE.ShaderMaterial({
+    uniforms:{uSW:{value:1},uFogC:{value:new THREE.Color(0x07080d)},uFogD:{value:.006}},
+    vertexShader:cVS,fragmentShader:cFS(isP),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending
+  }));
+}
+const posL=mkConn(pV,pD,posCAS,true),negL=mkConn(nV,nD,negCAS,false);
+Sc.add(posL);Sc.add(negL);
+
+// ═══ LABELS ═══
+const lbls=[];
+function mkLbl(text,sub,x,y,z){
+  const c=document.createElement('canvas');c.width=512;c.height=130;
+  const cx=c.getContext('2d');cx.clearRect(0,0,512,130);
+  cx.fillStyle='rgba(255,255,255,.75)';cx.font='500 26px IBM Plex Sans,sans-serif';cx.textAlign='center';cx.fillText(text,256,40);
+  if(sub){cx.fillStyle='rgba(255,255,255,.28)';cx.font='400 18px IBM Plex Mono,monospace';cx.fillText(sub,256,70)}
+  const t=new THREE.CanvasTexture(c);t.minFilter=THREE.LinearFilter;
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false,depthTest:false}));
+  sp.position.set(x,y,z);sp.scale.set(4,1.1,1);Sc.add(sp);lbls.push(sp);
+}
+VARCH.forEach((L,li)=>{
+  const[c,r]=L.g;const z=-totalZ/2+li*LAYER_Z;
+  const sp=TARGET_W/Math.max(c,r);const topY=(r-1)*sp/2+1.4;
+  const sub=L.act?(L.fd+'  ·  '+L.act):(L.desc?L.fd+'  ·  '+L.desc:''+L.fd);
+  mkLbl(L.name,sub,0,topY,z);
+});
+
+// ═══ HUD ═══
+const archEl=document.getElementById('arch-rows');
+VARCH.forEach((L,li)=>{
+  const col=L.tp==='input'?'#7B72D8':L.tp==='output'?'#E07040':'#16A085';
+  const d=document.createElement('div');d.className='lr';
+  d.innerHTML=`<span class="dd" style="background:${col}"></span><span class="nn">${L.name}</span><span class="dm">${L.fd}</span>${L.act?'<span class="af">'+L.act+'</span>':''}`;
+  archEl.appendChild(d);
+});
+const archLR=archEl.querySelectorAll('.lr');
+
+document.getElementById('net-sum').textContent=VARCH.length+' layer · '+vnCount+' vis. neuroni · '+cTot.toLocaleString()+' connessioni · pesi reali: '+
+  NET_SIZES.reduce((s,v,i)=>i<NET_SIZES.length-1?s+v*NET_SIZES[i+1]:s,0).toLocaleString();
+document.getElementById('di-el').textContent='3 draw calls';
+
+// Output bars
+const outBarsEl=document.getElementById('output-bars');const outBarEls=[];
+for(let i=0;i<10;i++){
+  const row=document.createElement('div');row.className='obar-row';
+  row.innerHTML=`<span class="obar-lbl">${i}</span><div class="obar-tk"><div class="obar-fl"></div></div><span class="obar-vl">0%</span>`;
+  outBarsEl.appendChild(row);
+  outBarEls.push({fill:row.querySelector('.obar-fl'),val:row.querySelector('.obar-vl')});
+}
+
+function updateOutputBars(probs){
+  if(!probs){for(let i=0;i<10;i++){outBarEls[i].fill.style.width='0%';outBarEls[i].val.textContent='0%';outBarEls[i].fill.style.background='rgba(100,160,255,.2)';outBarEls[i].val.style.color='rgba(255,255,255,.22)'}return}
+  let mx=0;for(let i=0;i<10;i++)mx=Math.max(mx,probs[i]);
+  for(let i=0;i<10;i++){
+    const pct=Math.round(probs[i]*100);
+    outBarEls[i].fill.style.width=pct+'%';
+    const isWin=probs[i]>=mx-1e-6&&mx>0;
+    outBarEls[i].fill.style.background=isWin?'rgba(224,112,64,.65)':'rgba(100,160,255,.2)';
+    outBarEls[i].val.textContent=pct+'%';
+    outBarEls[i].val.style.color=isWin?'rgba(224,112,64,.75)':'rgba(255,255,255,.22)';
+  }
+}
+
+// Keypad
+const keypadEl=document.getElementById('keypad');
+for(let i=0;i<10;i++){
+  const b=document.createElement('button');b.className='kbtn';b.textContent=i;
+  b.addEventListener('click',()=>onLabel(i));keypadEl.appendChild(b);
+}
+const kbtns=keypadEl.querySelectorAll('.kbtn');
+
+// ═══ DRAWING ═══
+const drawCvs=document.getElementById('draw-canvas');
+const drawCtx=drawCvs.getContext('2d');
+const inputBuf=new Float32Array(1600);
+let brushR=2.0,drawing=false,erasing=false,hasDrawn=false;
+let lastDx=null,lastDy=null,inputDirty=true;
+
+function canvasToBuffer(){
+  const id=drawCtx.getImageData(0,0,40,40);
+  for(let i=0;i<1600;i++)inputBuf[1599-i]=id.data[i*4+3]/255;
+}
+
+function drawDot(cx,cy,radius,erase){
+  const r=Math.ceil(radius);
+  for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
+    const px=Math.round(cx+dx),py=Math.round(cy+dy);
+    if(px<0||px>=40||py<0||py>=40)continue;
+    const d=Math.sqrt(dx*dx+dy*dy);if(d>radius)continue;
+    const f=1-d/radius,str=f*f;
+    const id=drawCtx.getImageData(px,py,1,1);
+    const cur=id.data[3]/255;
+    const nv=erase?Math.max(0,cur-str):Math.min(1,cur+str*.7);
+    id.data[0]=id.data[1]=id.data[2]=255;id.data[3]=Math.round(nv*255);
+    drawCtx.putImageData(id,px,py);
+  }
+}
+
+const dWrap=document.getElementById('draw-wrap');
+const hintEl=document.getElementById('draw-hint');
+function getDP(e){const r=dWrap.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*40,y:(e.clientY-r.top)/r.height*40}}
+
+dWrap.addEventListener('pointerdown',e=>{
+  e.preventDefault();e.stopPropagation();dWrap.setPointerCapture(e.pointerId);
+  drawing=true;erasing=e.button===2;
+  if(!hasDrawn){hasDrawn=true;hintEl.style.opacity='0'}
+  const p=getDP(e);drawDot(p.x,p.y,brushR,erasing);lastDx=p.x;lastDy=p.y;
+  canvasToBuffer();inputDirty=true;
+});
+dWrap.addEventListener('pointermove',e=>{
+  if(!drawing)return;e.preventDefault();e.stopPropagation();
+  const p=getDP(e);
+  if(lastDx!==null){
+    const dx=p.x-lastDx,dy=p.y-lastDy,dist=Math.sqrt(dx*dx+dy*dy);
+    const steps=Math.max(1,Math.ceil(dist/(brushR*.4)));
+    for(let i=0;i<=steps;i++){const t=i/steps;drawDot(lastDx+dx*t,lastDy+dy*t,brushR,erasing)}
+  }
+  lastDx=p.x;lastDy=p.y;canvasToBuffer();inputDirty=true;
+});
+dWrap.addEventListener('pointerup',()=>{drawing=false;lastDx=lastDy=null});
+dWrap.addEventListener('contextmenu',e=>e.preventDefault());
+dWrap.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+
+document.getElementById('btn-clear').addEventListener('click',clearCanvas);
+
+function clearCanvas(){
+  drawCtx.clearRect(0,0,40,40);inputBuf.fill(0);inputDirty=true;
+  hasDrawn=false;hintEl.style.opacity='1';
+  predNumEl.textContent='—';predNumEl.style.color='rgba(255,255,255,.15)';
+  predConfEl.textContent='—';
+  // Immediate visual reset
+  vAct.fill(0);
+}
+
+// ═══ PREDICTION ═══
+const predNumEl=document.getElementById('pred-num');
+const predConfEl=document.getElementById('pred-conf');
+let currentPred=-1,lastPred=-2,totalSamples=0,correctCount=0,currentLR=LR_INIT;
+const history=[];
+
+function runForward(){
+  const res=net.predict(inputBuf);
+  currentPred=res.digit;
+  const conf=res.confidence;
+
+  // Animate digit change
+  if(currentPred!==lastPred){
+    predNumEl.classList.remove('pop');
+    void predNumEl.offsetWidth;
+    predNumEl.classList.add('pop');
+    setTimeout(()=>predNumEl.classList.remove('pop'),150);
+    lastPred=currentPred;
+  }
+
+  // Check if canvas has any content
+  let hasContent=false;for(let i=0;i<1600;i++)if(inputBuf[i]>.05){hasContent=true;break}
+
+  if(!hasContent){
+    predNumEl.textContent='—';predNumEl.style.color='rgba(255,255,255,.15)';
+    predConfEl.textContent='—';
+    updateOutputBars(null);
+    return;
+  }
+
+  const hue=conf>.5?`rgba(${Math.round(255-conf*180)},${Math.round(100+conf*155)},${Math.round(80+conf*40)},${.5+conf*.45})`
+    :`rgba(255,255,255,${.2+conf*.3})`;
+  predNumEl.textContent=res.digit;predNumEl.style.color=hue;
+  predConfEl.textContent=Math.round(conf*100)+'% sicuro';
+  updateOutputBars(res.probs);
+  mapActivationsToVisual();
+
+  // Highlight arch panel based on activation magnitudes
+  for(let li=0;li<VARCH.length;li++){
+    const a=net.a[li];let sum=0;
+    if(a)for(let i=0;i<a.length;i++)sum+=Math.abs(a[i]);
+    const avg=a?sum/a.length:0;
+    archLR[li].classList.toggle('on',avg>.05);
+  }
+}
+
+function onLabel(label){
+  if(!hasDrawn)return;
+  const wasCorrect=currentPred===label;
+
+  // Store in replay buffer
+  addToReplay(inputBuf,label);
+
+  // Build mini-batch from buffer + current sample + augmented versions
+  const batch=sampleMiniBatch(inputBuf,label,BATCH_SIZE);
+
+  // Adaptive learning rate based on buffer diversity
+  const bufSize=replayBuf.length;
+  if(bufSize>200)currentLR=0.005;
+  else if(bufSize>100)currentLR=0.008;
+  else if(bufSize>40)currentLR=0.012;
+
+  // Train on mini-batch
+  const loss=net.trainBatch(batch,currentLR);
+  totalSamples++;if(wasCorrect)correctCount++;
+
+  kbtns[label].classList.add(wasCorrect?'flash-ok':'flash-no');
+  setTimeout(()=>kbtns[label].classList.remove('flash-ok','flash-no'),400);
+
+  document.getElementById('st-samp').textContent=totalSamples;
+  document.getElementById('st-acc').textContent=Math.round(correctCount/totalSamples*100)+'%';
+  document.getElementById('st-buf').textContent=replayBuf.length+' / '+REPLAY_MAX;
+  document.getElementById('st-lr').textContent=currentLR.toFixed(4);
+  document.getElementById('st-loss').textContent=loss.toFixed(3);
+
+  history.push({digit:label,correct:wasCorrect,predicted:currentPred});
+  if(history.length>20)history.shift();
+  const histEl=document.getElementById('hist-row');histEl.innerHTML='';
+  history.forEach(h=>{
+    const d=document.createElement('span');d.className='hdot';
+    d.style.background=h.correct?'rgba(30,180,100,.35)':'rgba(220,60,60,.35)';
+    d.textContent=h.digit;d.title=h.correct?'Corretto':'Pred: '+h.predicted;
+    histEl.appendChild(d);
+  });
+
+  clearCanvas();runForward();
+}
+
+// ═══ ORBIT ═══
+let drag=false,px=0,py=0;
+let th=.3,ph=.18,di2=68;
+let tTh=th,tPh=ph,tDi=di2;
+let aRot=true,aTmr=0;const DMP=.05;
+
+cv.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;cv.setPointerCapture(e.pointerId);aRot=false;aTmr=0});
+cv.addEventListener('pointermove',e=>{if(!drag)return;tTh-=(e.clientX-px)*.004;tPh+=(e.clientY-py)*.004;tPh=Math.max(-1.2,Math.min(1.2,tPh));px=e.clientX;py=e.clientY});
+cv.addEventListener('pointerup',()=>{drag=false});
+cv.addEventListener('wheel',e=>{e.preventDefault();tDi=Math.max(20,Math.min(160,tDi+e.deltaY*.06))},{passive:false});
+let p0=0;
+cv.addEventListener('touchstart',e=>{if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;p0=Math.hypot(dx,dy)}},{passive:true});
+cv.addEventListener('touchmove',e=>{if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;const d=Math.hypot(dx,dy);tDi=Math.max(20,Math.min(160,tDi-(d-p0)*.15));p0=d}},{passive:true});
+
+// Controls
+let showW=true,showLbl=true;
+document.getElementById('bw').onclick=function(){showW=!showW;this.classList.toggle('on',showW)};
+document.getElementById('bl').onclick=function(){showLbl=!showLbl;this.classList.toggle('on',showLbl);lbls.forEach(s=>{s.visible=showLbl})};
+
+// ═══ MAIN LOOP ═══
+let time=0,fr=0,fA=0,lTS=0;
+const fpsEl=document.getElementById('fps-el');
+const SMOOTH_SPEED=0.18; // lerp factor per frame for smooth activation transitions
+
+function animate(ts){
+  requestAnimationFrame(animate);
+  const dt=1/60;
+  time+=dt;
+
+  // Run forward pass every frame if input changed
+  if(inputDirty){runForward();inputDirty=false}
+
+  // Smooth activations: lerp vActSmooth towards vAct
+  for(let i=0;i<vnCount;i++){
+    vActSmooth[i]+=(vAct[i]-vActSmooth[i])*SMOOTH_SPEED;
+  }
+  actAttr.needsUpdate=true;
+
+  // Update connection activations from smoothed values
+  updConnAct();
+  posL.geometry.attributes.aAct.array.set(posCA);posL.geometry.attributes.aAct.needsUpdate=true;
+  negL.geometry.attributes.aAct.array.set(negCA);negL.geometry.attributes.aAct.needsUpdate=true;
+
+  // Camera
+  if(!drag&&!aRot){aTmr+=dt;if(aTmr>4)aRot=true}
+  if(aRot)tTh-=.001;
+  th+=(tTh-th)*DMP;ph+=(tPh-ph)*DMP;di2+=(tDi-di2)*DMP;
+  cam.position.set(Math.sin(th)*Math.cos(ph)*di2,Math.sin(ph)*di2*.55+2,Math.cos(th)*Math.cos(ph)*di2);
+  cam.lookAt(0,0,0);
+
+  nMat.uniforms.uTime.value=time;
+
+  const sw=showW?1:0;
+  posL.material.uniforms.uSW.value+=(sw-posL.material.uniforms.uSW.value)*.08;
+  negL.material.uniforms.uSW.value+=(sw-negL.material.uniforms.uSW.value)*.08;
+
+  R.render(Sc,cam);
+  fr++;fA+=ts-(lTS||ts);
+  if(fr>=30){fpsEl.textContent=Math.round(30000/fA)+' fps';fr=0;fA=0}
+  lTS=ts;
+}
+
+net.forward(inputBuf);mapActivationsToVisual();updateOutputBars(null);
+window.addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();R.setSize(innerWidth,innerHeight)});
+animate(0);
+
+// Tutorial
+const tutOv=document.getElementById('tutorial-overlay');
+function closeTut(){tutOv.classList.remove('visible')}
+function openTut(){tutOv.classList.add('visible')}
+document.getElementById('btn-close-tut').addEventListener('click',closeTut);
+document.getElementById('btn-start').addEventListener('click',closeTut);
+document.getElementById('btn-help').addEventListener('click',openTut);
+tutOv.addEventListener('click',e=>{if(e.target===tutOv)closeTut()});
+})();
+</script>
+</body>
+</html>
