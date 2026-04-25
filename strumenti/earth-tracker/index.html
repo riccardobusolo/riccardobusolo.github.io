@@ -306,10 +306,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 
   const MAX_PLANES = 12000;
   const planeGeo = new THREE.PlaneGeometry(3.6, 3.6);
+  // Alpha cutout to fix the "transparent corners block neighbours" bug
+  // common with InstancedMesh + transparent quads. alphaTest discards
+  // empty pixels before they reach the depth buffer.
   const planeMat = new THREE.MeshBasicMaterial({
     map: planeTex,
     transparent: true,
-    alphaTest: 0,
+    alphaTest: 0.5,
     side: THREE.DoubleSide,
     depthWrite: true
   });
