@@ -626,6 +626,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   // ----- per-frame loop: dead reckoning + sort + InstancedMesh update -----
   let lastFrameTs = performance.now();
   let lastTrajTs  = 0;
+  let lastSortTs  = 0;
   const _tmpMatrix = new THREE.Matrix4();
   function tickPlanes(){
     const now = performance.now();
@@ -643,21 +644,28 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
       updatePlanePosition(p);
     }
 
-    // 2. Sort renderOrder back-to-front by camera distance (for correct alpha blend)
+    // 2. Sort renderOrder back-to-front by camera distance (throttled to ~5Hz —
+    //    sorting 1500 items every frame was burning ~3ms of main thread, and
+    //    visually a slightly stale order is imperceptible at orbital speed).
     if (state.renderOrder.length !== n){
       state.renderOrder = planes.map((_, i) => i);
+      lastSortTs = 0; // force a fresh sort below
     }
-    const cam = world.camera().position;
-    const cx = cam.x, cy = cam.y, cz = cam.z;
-    state.renderOrder.sort((a, b) => {
-      const pa = planes[a], pb = planes[b];
-      const dxa = pa.x - cx, dya = pa.y - cy, dza = pa.z - cz;
-      const dxb = pb.x - cx, dyb = pb.y - cy, dzb = pb.z - cz;
-      return (dxb*dxb + dyb*dyb + dzb*dzb) - (dxa*dxa + dya*dya + dza*dza); // far first
-    });
+    if (now - lastSortTs > 200){
+      const cam = world.camera().position;
+      const cx = cam.x, cy = cam.y, cz = cam.z;
+      state.renderOrder.sort((a, b) => {
+        const pa = planes[a], pb = planes[b];
+        const dxa = pa.x - cx, dya = pa.y - cy, dza = pa.z - cz;
+        const dxb = pb.x - cx, dyb = pb.y - cy, dzb = pb.z - cz;
+        return (dxb*dxb + dyb*dyb + dzb*dzb) - (dxa*dxa + dya*dya + dza*dza); // far first
+      });
+      lastSortTs = now;
+    }
 
     // 3. Push instance matrices in sorted order
-    const camDist = Math.hypot(cx, cy, cz);
+    const camPos = world.camera().position;
+    const camDist = Math.hypot(camPos.x, camPos.y, camPos.z);
     const scale = Math.max(0.45, Math.min(1.8, camDist / 240));
     const order = state.renderOrder;
     for (let i = 0; i < n; i++){
@@ -691,25 +699,55 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 
   const gvEl = document.getElementById('globeViz');
 
-  // Hover tooltip
+  // Drag-aware hover/click. The raycaster against an InstancedMesh of 1500
+  // planes is the single biggest cost during drag (~100 mousemoves/sec each
+  // testing 3000 ray-triangle pairs), so we DISABLE it while dragging.
+  let _mouseDownPos = null;
+  let _isDragging = false;
+  let _lastRayTs  = 0;
+
+  function tryHoverAt(clientX, clientY){
+    const rect = gvEl.getBoundingClientRect();
+    _mouseNDC.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    _mouseNDC.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    _ray.setFromCamera(_mouseNDC, world.camera());
+    const hits = _ray.intersectObject(planesMesh, false);
+    return hits.length ? { p: planeAtInstance(hits[0].instanceId), id: hits[0].instanceId } : null;
+  }
+
+  gvEl.addEventListener('mousedown', e => {
+    _mouseDownPos = { x:e.clientX, y:e.clientY };
+    _isDragging = false;
+  });
+
   gvEl.addEventListener('mousemove', (e) => {
-    if (!state.layers.planes || planesMesh.count === 0) {
+    // Detect drag start (>5px from down position)
+    if (_mouseDownPos && !_isDragging){
+      if (Math.hypot(e.clientX - _mouseDownPos.x, e.clientY - _mouseDownPos.y) > 5){
+        _isDragging = true;
+        tipEl.classList.remove('on');
+        gvEl.style.cursor = '';
+        _lastHoverIdx = -1;
+      }
+    }
+    if (_isDragging) return; // skip raycaster while user drags the globe
+    if (!state.layers.planes || planesMesh.count === 0){
       tipEl.classList.remove('on');
       _lastHoverIdx = -1;
       return;
     }
-    const rect = e.currentTarget.getBoundingClientRect();
-    _mouseNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    _mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-    _ray.setFromCamera(_mouseNDC, world.camera());
-    const hits = _ray.intersectObject(planesMesh, false);
-    const p = hits.length ? planeAtInstance(hits[0].instanceId) : null;
-    if (p){
-      if (hits[0].instanceId !== _lastHoverIdx){
+    // Throttle raycaster to ~30Hz max so fast mouse motion doesn't burn CPU
+    const now = performance.now();
+    if (now - _lastRayTs < 33) return;
+    _lastRayTs = now;
+    const hit = tryHoverAt(e.clientX, e.clientY);
+    if (hit && hit.p){
+      if (hit.id !== _lastHoverIdx){
+        const p = hit.p;
         const altFt = Math.round(p.alt * 3.28084);
         const kmh   = Math.round(p.speed * 3.6);
         tipEl.innerHTML = `<b>${p.flight}</b><br><span style="color:#9a9a9e">${p.country||''}</span><br>Alt ${altFt} ft  ${kmh} km/h<br>HDG ${Math.round(p.heading)}<br><span style="color:#6a6a7a;font-size:.62rem">click per dettagli</span>`;
-        _lastHoverIdx = hits[0].instanceId;
+        _lastHoverIdx = hit.id;
       }
       tipEl.style.left = e.clientX + 'px';
       tipEl.style.top = e.clientY + 'px';
@@ -722,23 +760,23 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
     }
   });
 
-  // Click handler — opens info panel + draws trajectory.
-  // Distinguishes click vs drag by tracking mousedown distance.
-  let _mouseDownPos = null;
-  gvEl.addEventListener('mousedown', e => { _mouseDownPos = {x:e.clientX, y:e.clientY}; });
   gvEl.addEventListener('mouseup', e => {
+    const wasDragging = _isDragging;
+    _isDragging = false;
     if (!_mouseDownPos) return;
     const moved = Math.hypot(e.clientX - _mouseDownPos.x, e.clientY - _mouseDownPos.y);
     _mouseDownPos = null;
-    if (moved > 5) return; // drag, not click
+    if (wasDragging || moved > 5) return; // drag, not click
     if (!state.layers.planes || planesMesh.count === 0) return;
-    const rect = gvEl.getBoundingClientRect();
-    _mouseNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    _mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-    _ray.setFromCamera(_mouseNDC, world.camera());
-    const hits = _ray.intersectObject(planesMesh, false);
-    const p = hits.length ? planeAtInstance(hits[0].instanceId) : null;
-    if (p) showPlaneInfo(p);
+    const hit = tryHoverAt(e.clientX, e.clientY);
+    if (hit && hit.p) showPlaneInfo(hit.p);
+  });
+
+  gvEl.addEventListener('mouseleave', () => {
+    _isDragging = false;
+    _mouseDownPos = null;
+    tipEl.classList.remove('on');
+    _lastHoverIdx = -1;
   });
 
   // ============================================================
@@ -888,7 +926,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
             propagateSats();
             el.classList.remove('loading');
           }
-          state.refreshTimers.satellites = setInterval(propagateSats, 4000);
+          state.refreshTimers.satellites = setInterval(propagateSats, 8000);
         } else if (k === 'ships'){
           loadShips();
           el.classList.remove('loading');
