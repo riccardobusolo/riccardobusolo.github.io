@@ -83,6 +83,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 .status__sep{width:1px;height:14px;background:var(--border)}
 .status__coords{font-family:var(--mono);font-size:.62rem;color:var(--text-muted);letter-spacing:.04em}
 
+.plane-tip{position:fixed;z-index:18;pointer-events:none;font-family:var(--mono);font-size:.7rem;line-height:1.55;background:rgba(8,8,14,.94);padding:8px 10px;border:1px solid rgba(255,181,71,.45);border-radius:6px;color:#ffb547;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transform:translate(12px,12px);opacity:0;transition:opacity .15s}
+.plane-tip.on{opacity:1}
+.plane-tip b{color:#fff}
+
 .loader{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);transition:opacity .6s var(--ease)}
 .loader.hide{opacity:0;pointer-events:none}
 .loader__ring{width:42px;height:42px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:18px}
@@ -133,7 +137,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   <div class="layer" data-layer="planes">
     <div class="layer__l">
       <div class="layer__icon"><svg viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2Z"/></svg></div>
-      <div class="layer__txt"><span class="layer__name">Aerei</span><span class="layer__count" data-count="planes">adsb.lol  multi-regione</span></div>
+      <div class="layer__txt"><span class="layer__name">Aerei</span><span class="layer__count" data-count="planes">OpenSky  globale</span></div>
     </div>
     <div class="layer__sw"></div>
   </div>
@@ -157,7 +161,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
     <div class="legend__row"><span class="legend__dot" style="background:var(--amber);box-shadow:0 0 8px var(--amber)"></span>Aerei (ADS-B)</div>
     <div class="legend__row"><span class="legend__dot" style="background:var(--cyan);box-shadow:0 0 8px var(--cyan)"></span>Satelliti (TLE)</div>
   </div>
-  <div class="info__hint"><b>Sorgenti dati:</b><br>Aerei via adsb.lol (multi-regione) · Satelliti via CelesTrak TLE + satellite.js · Navi: dataset demo (per AIS live serve chiave AISStream gratuita).</div>
+  <div class="info__hint"><b>Sorgenti dati:</b><br>Aerei via OpenSky Network (globale, ~10k mezzi, dead reckoning 60fps) · Satelliti via CelesTrak TLE + satellite.js · Navi: dataset demo (per AIS live serve chiave AISStream gratuita).</div>
 </aside>
 
 <div class="panel panel--status">
@@ -166,6 +170,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   <div class="status__sep"></div>
   <div class="status__coords" id="coords">LAT 0.00 LON 0.00</div>
 </div>
+
+<div class="plane-tip" id="planeTip"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.32.5/dist/globe.gl.min.js"></script>
@@ -265,38 +271,101 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   // ============================================================
   const state = {
     layers: { ships:false, planes:false, satellites:false },
-    data:   { ships:[], planes:[], satellites:[] },
+    data:   { ships:[], satellites:[] },  // planes managed separately for InstancedMesh
+    planes: [],                            // [{hex,flight,lat,lng,alt,speed,heading,country}, ...]
     satrecs: [],
     refreshTimers: {}
   };
 
   function refresh() {
+    // Note: planes are NOT in pointsData anymore — they use the InstancedMesh below.
     const all = []
       .concat(state.layers.ships ? state.data.ships : [])
-      .concat(state.layers.planes ? state.data.planes : [])
       .concat(state.layers.satellites ? state.data.satellites : []);
     world.pointsData(all);
   }
 
   // ============================================================
-  // PLANES — OpenSky Network (CORS-enabled, no auth)
-  // https://opensky-network.org/api/states/all
-  // Returns up to ~10k aircraft globally; sampled for performance.
+  // PLANES — OpenSky Network global feed + InstancedMesh + dead reckoning
   // ============================================================
-  // adsb.lol v2 — CORS-enabled, free, no auth. Max radius 250 nm/region.
-  // We query 8 strategic global hubs to cover most populated airspace.
-  const ADSB_REGIONS = [
-    {lat:50,  lng:5},     // Europa
-    {lat:40,  lng:-95},   // Nord America
-    {lat:1,   lng:103},   // Sud-Est Asia
-    {lat:35,  lng:138},   // Asia orientale (Giappone)
-    {lat:-30, lng:145},   // Australia
-    {lat:-15, lng:-50},   // Sud America
-    {lat:25,  lng:55},    // Medio Oriente
-    {lat:60,  lng:60}     // Russia/Asia centrale
-  ];
+  // OpenSky `/states/all` returns ALL aircraft worldwide in one request.
+  // Anonymous rate limit: every 10s. We poll every 15s and dead-reckon
+  // each plane's position locally at 60fps in between.
+  // CORS isn't direct from the browser — smartFetch() falls back to a
+  // public proxy if needed.
+  // ============================================================
 
-  // Try direct fetch; fall back through CORS proxies if blocked.
+  // SVG plane silhouette (top-down). Nose points UP (-y) so when mapped
+  // onto a PlaneGeometry whose +Y axis we align with the heading vector,
+  // the plane visually faces the direction of travel.
+  const PLANE_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="-20 -20 40 40"><path d="M0 -16 L2 -3 L18 0 L18 2 L2 5 L1.5 14 L7 17 L7 18 L-7 18 L-7 17 L-1.5 14 L-2 5 L-18 2 L-18 0 L-2 -3 Z" fill="#ffb547" stroke="#000" stroke-opacity=".55" stroke-width="1" stroke-linejoin="round"/></svg>';
+
+  const planeBlobURL = URL.createObjectURL(new Blob([PLANE_SVG], { type:'image/svg+xml' }));
+  const planeTex = new THREE.TextureLoader().load(planeBlobURL);
+  if ('colorSpace' in planeTex) planeTex.colorSpace = THREE.SRGBColorSpace;
+
+  const MAX_PLANES = 12000;
+  const planeGeo = new THREE.PlaneGeometry(3.6, 3.6);
+  const planeMat = new THREE.MeshBasicMaterial({
+    map: planeTex,
+    transparent: true,
+    alphaTest: 0,
+    side: THREE.DoubleSide,
+    depthWrite: true
+  });
+  const planesMesh = new THREE.InstancedMesh(planeGeo, planeMat, MAX_PLANES);
+  planesMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  planesMesh.count = 0;
+  planesMesh.frustumCulled = false;
+  planesMesh.visible = false;
+  planesMesh.renderOrder = 5;
+  world.scene().add(planesMesh);
+
+  // ----- math helpers -----
+  const GLOBE_R = 100;       // Globe.gl default radius (scene units)
+  const EARTH_R = 6371000;   // meters
+  const DEG = Math.PI / 180;
+  const _dummy = new THREE.Object3D();
+
+  function computeInstanceMatrix(out, lat, lng, altMeters, headingDeg, scale){
+    // Visualisation altitude: capped, exaggerated so planes are visible.
+    const altScene = Math.min(3.5, (altMeters / EARTH_R) * GLOBE_R * 35);
+    const phi = (90 - lat) * DEG;
+    const theta = (lng + 180) * DEG;
+    const r = GLOBE_R + altScene;
+    const px = -r * Math.sin(phi) * Math.cos(theta);
+    const py =  r * Math.cos(phi);
+    const pz =  r * Math.sin(phi) * Math.sin(theta);
+
+    _dummy.position.set(px, py, pz);
+    _dummy.up.set(0, 1, 0);
+    _dummy.lookAt(0, 0, 0);          // +Z faces outward, +Y aligns with local north
+    _dummy.rotateZ(-headingDeg * DEG); // rotate around outward normal to face heading
+    _dummy.scale.setScalar(scale);
+    _dummy.updateMatrix();
+    out.copy(_dummy.matrix);
+  }
+
+  // Dead reckoning: advance lat/lng of each plane by speed * dt along heading.
+  // Uses great-circle (haversine forward) for accuracy near poles.
+  function advancePlane(p, dtSec){
+    if (!p.speed || p.speed < 0.5) return;
+    const angDist = (p.speed * dtSec) / EARTH_R; // radians
+    const lat1 = p.lat * DEG;
+    const lng1 = p.lng * DEG;
+    const brng = p.heading * DEG;
+    const sinLat1 = Math.sin(lat1), cosLat1 = Math.cos(lat1);
+    const sinAng  = Math.sin(angDist), cosAng = Math.cos(angDist);
+    const lat2 = Math.asin(sinLat1*cosAng + cosLat1*sinAng*Math.cos(brng));
+    const lng2 = lng1 + Math.atan2(
+      Math.sin(brng)*sinAng*cosLat1,
+      cosAng - sinLat1*Math.sin(lat2)
+    );
+    p.lat = lat2 / DEG;
+    p.lng = ((lng2 / DEG + 540) % 360) - 180;
+  }
+
+  // ----- OpenSky fetcher -----
   async function smartFetch(url){
     try {
       const r = await fetch(url);
@@ -312,53 +381,137 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
     return null;
   }
 
-  async function fetchPlanes() {
-    try {
-      const seen = new Set();
-      const all = [];
-      const results = await Promise.allSettled(
-        ADSB_REGIONS.map(r =>
-          smartFetch(`https://api.adsb.lol/v2/lat/${r.lat}/lon/${r.lng}/dist/250`)
-        )
-      );
-      for (const r of results){
-        const j = r.status === 'fulfilled' ? r.value : null;
-        if (!j || !j.ac) continue;
-        for (const a of j.ac){
-          if (a.lat == null || a.lon == null) continue;
-          if (seen.has(a.hex)) continue;
-          seen.add(a.hex);
-          all.push(a);
-        }
-      }
-      // Cap to 1500 for WebGL perf
-      const sample = all.length > 1500
-        ? Array.from({length:1500}, (_,i)=>all[Math.floor(i*all.length/1500)])
-        : all;
+  // Fallback regional source (used when OpenSky is unreachable).
+  const ADSB_REGIONS = [
+    {lat:50,  lng:5},     {lat:40,  lng:-95},   {lat:1,   lng:103},
+    {lat:35,  lng:138},   {lat:-30, lng:145},   {lat:-15, lng:-50},
+    {lat:25,  lng:55},    {lat:60,  lng:60}
+  ];
 
-      state.data.planes = sample.map(a => {
-        const flight = (a.flight || a.r || a.hex || '').trim();
-        const altFt  = a.alt_baro || a.alt_geom || 0;
-        const altM   = altFt * 0.3048;
-        const gsKt   = a.gs || 0;
-        const track  = a.track || 0;
-        const tCode  = a.t || '';
-        const reg    = a.r || '';
-        return {
-          type:'plane', lat:a.lat, lng:a.lon,
-          alt: Math.min(0.04, (altM/6371000)*40),
-          radius: 0.18,
-          color: '#ffb547',
-          label: `<div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.5;background:rgba(8,8,14,.92);padding:8px 10px;border:1px solid rgba(255,181,71,.4);border-radius:6px;color:#ffb547"><b>${flight||'—'}</b><br><span style="color:#9a9a9e">${tCode} ${reg}</span><br>Alt ${altFt} ft  ${Math.round(gsKt*1.852)} km/h<br>HDG ${Math.round(track)}</div>`
-        };
+  async function fetchFromOpenSky(){
+    const j = await smartFetch('https://opensky-network.org/api/states/all');
+    if (!j || !Array.isArray(j.states)) return null;
+    const out = [];
+    for (const s of j.states){
+      if (s[5] == null || s[6] == null || s[8]) continue;
+      out.push({
+        hex: s[0],
+        flight: (s[1]||'').trim() || s[0],
+        country: s[2] || '',
+        lng: s[5], lat: s[6],
+        alt: s[7] || 0,                // meters
+        speed: s[9] || 0,              // m/s
+        heading: s[10] || 0            // degrees true
       });
-      setCount('planes', state.data.planes.length, 'aerei live');
-      refresh();
-    } catch(e){
-      console.warn('adsb.lol:', e);
-      setCount('planes', 0, 'errore API');
     }
+    return out;
   }
+
+  async function fetchFromAdsbLol(){
+    const seen = new Set();
+    const out = [];
+    const results = await Promise.allSettled(
+      ADSB_REGIONS.map(r => smartFetch(`https://api.adsb.lol/v2/lat/${r.lat}/lon/${r.lng}/dist/250`))
+    );
+    for (const r of results){
+      const j = r.status === 'fulfilled' ? r.value : null;
+      if (!j || !j.ac) continue;
+      for (const a of j.ac){
+        if (a.lat == null || a.lon == null || seen.has(a.hex)) continue;
+        seen.add(a.hex);
+        out.push({
+          hex: a.hex,
+          flight: (a.flight || a.r || a.hex || '').trim(),
+          country: a.r || '',
+          lat: a.lat, lng: a.lon,
+          alt:    (a.alt_baro || a.alt_geom || 0) * 0.3048,  // ft -> m
+          speed:  (a.gs || 0) * 0.5144,                       // kt -> m/s
+          heading: a.track || 0
+        });
+      }
+    }
+    return out.length ? out : null;
+  }
+
+  async function fetchPlanes() {
+    let next = await fetchFromOpenSky();
+    let source = 'live';
+    if (!next || !next.length) {
+      next = await fetchFromAdsbLol();
+      source = 'live (regionale)';
+    }
+    if (!next || !next.length){
+      setCount('planes', state.planes.length, state.planes.length ? 'aerei (cache)' : 'errore API');
+      return;
+    }
+    // Merge with existing planes (preserve interpolated state for in-flight ones)
+    const oldByHex = new Map(state.planes.map(p => [p.hex, p]));
+    for (let i = 0; i < next.length; i++){
+      const np = next[i];
+      const ex = oldByHex.get(np.hex);
+      if (ex){ Object.assign(ex, np); next[i] = ex; }
+    }
+    state.planes = next.length > MAX_PLANES ? next.slice(0, MAX_PLANES) : next;
+    setCount('planes', state.planes.length, 'aerei ' + source);
+  }
+
+  // ----- per-frame loop: dead reckoning + InstancedMesh update -----
+  let lastFrameTs = performance.now();
+  const _tmpMatrix = new THREE.Matrix4();
+  function tickPlanes(){
+    const now = performance.now();
+    const dt = Math.min(0.25, (now - lastFrameTs) / 1000); // clamp big gaps
+    lastFrameTs = now;
+    if (!state.layers.planes) { requestAnimationFrame(tickPlanes); return; }
+    const planes = state.planes;
+    const camDist = world.camera().position.length();
+    // Scale planes with zoom: bigger when zoomed out, smaller when close so users can pick out details
+    const scale = Math.max(0.45, Math.min(1.8, camDist / 240));
+    for (let i = 0; i < planes.length; i++){
+      const p = planes[i];
+      advancePlane(p, dt);
+      computeInstanceMatrix(_tmpMatrix, p.lat, p.lng, p.alt, p.heading, scale);
+      planesMesh.setMatrixAt(i, _tmpMatrix);
+    }
+    planesMesh.count = planes.length;
+    planesMesh.instanceMatrix.needsUpdate = true;
+    requestAnimationFrame(tickPlanes);
+  }
+  requestAnimationFrame(tickPlanes);
+
+  // ----- hover tooltip via raycaster -----
+  const _ray = new THREE.Raycaster();
+  const _mouseNDC = new THREE.Vector2();
+  let _lastHoverIdx = -1;
+  const tipEl = document.getElementById('planeTip');
+
+  document.getElementById('globeViz').addEventListener('mousemove', (e) => {
+    if (!state.layers.planes || planesMesh.count === 0) {
+      tipEl.classList.remove('on');
+      _lastHoverIdx = -1;
+      return;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    _mouseNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    _mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    _ray.setFromCamera(_mouseNDC, world.camera());
+    const hits = _ray.intersectObject(planesMesh, false);
+    if (hits.length && hits[0].instanceId != null && hits[0].instanceId < state.planes.length){
+      const p = state.planes[hits[0].instanceId];
+      if (hits[0].instanceId !== _lastHoverIdx){
+        const altFt = Math.round(p.alt * 3.28084);
+        const kmh   = Math.round(p.speed * 3.6);
+        tipEl.innerHTML = `<b>${p.flight}</b><br><span style="color:#9a9a9e">${p.country||''}</span><br>Alt ${altFt} ft  ${kmh} km/h<br>HDG ${Math.round(p.heading)}`;
+        _lastHoverIdx = hits[0].instanceId;
+      }
+      tipEl.style.left = e.clientX + 'px';
+      tipEl.style.top = e.clientY + 'px';
+      tipEl.classList.add('on');
+    } else {
+      tipEl.classList.remove('on');
+      _lastHoverIdx = -1;
+    }
+  });
 
   // ============================================================
   // SATELLITES — CelesTrak (TLE) + satellite.js propagation
@@ -497,8 +650,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
       if (state.layers[k]){
         el.classList.add('loading');
         if (k === 'planes'){
+          planesMesh.visible = true;
           fetchPlanes().finally(() => el.classList.remove('loading'));
-          state.refreshTimers.planes = setInterval(fetchPlanes, 30000);
+          state.refreshTimers.planes = setInterval(fetchPlanes, 15000);
         } else if (k === 'satellites'){
           if (!state.satrecs.length){
             fetchSatTLE().finally(() => el.classList.remove('loading'));
@@ -513,8 +667,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
         }
       } else {
         clearInterval(state.refreshTimers[k]);
-        state.data[k] = [];
-        const lbl = { ships:'demo  40 unita', planes:'adsb.lol  multi-regione', satellites:'CelesTrak  visual' }[k];
+        if (k === 'planes'){
+          state.planes = [];
+          planesMesh.count = 0;
+          planesMesh.visible = false;
+          document.getElementById('planeTip').classList.remove('on');
+        } else {
+          state.data[k] = [];
+        }
+        const lbl = { ships:'demo  40 unita', planes:'OpenSky  globale', satellites:'CelesTrak  visual' }[k];
         document.querySelector(`[data-count="${k}"]`).textContent = lbl;
         refresh();
       }
