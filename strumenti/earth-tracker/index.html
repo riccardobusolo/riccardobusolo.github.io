@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earth Tracker — Tracking 3D in tempo reale | Riccardo Busolo</title>
+<meta name="description" content="Mappa 3D interattiva della Terra ad alta risoluzione per il tracking in tempo reale di navi, aerei e satelliti tramite API gratuite.">
+<meta name="robots" content="index, follow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#04040a;--bg-panel:rgba(15,15,22,.72);--border:rgba(180,180,190,.1);--border-hover:rgba(180,180,190,.25);--text:#e6e6ea;--text-dim:#9a9a9e;--text-muted:#6a6a7a;--cyan:#00e0d0;--cyan-glow:rgba(0,224,208,.35);--cyan-subtle:rgba(0,224,208,.08);--amber:#ffb547;--green:#4ade80;--red:#f87171;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+#globeViz{position:fixed;inset:0;z-index:1;cursor:grab}
+#globeViz:active{cursor:grabbing}
+
+/* Top nav minimal */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;pointer-events:none}
+.topbar__left,.topbar__right{display:flex;align-items:center;gap:16px;pointer-events:auto}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);background:var(--bg-panel);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:8px 14px;border-radius:10px;border:1px solid var(--border);transition:all .25s var(--ease)}
+.brand:hover{border-color:var(--border-hover)}
+.brand svg{width:22px;height:22px}
+.brand__txt{font-family:var(--mono);font-size:.7rem;letter-spacing:.05em;color:var(--text-dim)}
+.title{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);background:var(--bg-panel);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:10px 16px;border-radius:10px;border:1px solid rgba(0,224,208,.2);box-shadow:0 0 24px rgba(0,224,208,.06)}
+
+/* Side panel: layers */
+.panel{position:fixed;z-index:15;background:var(--bg-panel);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:14px;padding:16px 18px;transition:all .3s var(--ease)}
+.panel--layers{left:24px;top:80px;width:240px}
+.panel--info{right:24px;top:80px;width:260px}
+.panel--status{left:50%;bottom:24px;transform:translateX(-50%);padding:10px 18px;display:flex;align-items:center;gap:14px;border-radius:999px}
+
+.panel__title{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.panel__title::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan-glow)}
+
+.layer{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;border:1px solid transparent;background:rgba(255,255,255,.02);margin-bottom:6px;transition:all .2s var(--ease);cursor:not-allowed;opacity:.55}
+.layer:last-child{margin-bottom:0}
+.layer.active{cursor:pointer;opacity:1}
+.layer.active:hover{background:rgba(255,255,255,.04);border-color:var(--border-hover)}
+.layer.on{background:var(--cyan-subtle);border-color:rgba(0,224,208,.25)}
+
+.layer__l{display:flex;align-items:center;gap:10px}
+.layer__icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:7px;background:rgba(255,255,255,.04)}
+.layer__icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.layer.on .layer__icon{background:rgba(0,224,208,.12);color:var(--cyan)}
+.layer__txt{display:flex;flex-direction:column;gap:1px}
+.layer__name{font-size:.78rem;font-weight:500}
+.layer__count{font-family:var(--mono);font-size:.58rem;color:var(--text-muted);letter-spacing:.04em}
+.layer__sw{width:32px;height:18px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--border);position:relative;flex-shrink:0;transition:all .25s var(--ease)}
+.layer__sw::after{content:'';position:absolute;top:1px;left:1px;width:14px;height:14px;border-radius:50%;background:var(--text-muted);transition:all .25s var(--ease)}
+.layer.on .layer__sw{background:rgba(0,224,208,.2);border-color:rgba(0,224,208,.35)}
+.layer.on .layer__sw::after{left:15px;background:var(--cyan);box-shadow:0 0 8px var(--cyan-glow)}
+
+.info__row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.78rem}
+.info__row:last-child{border-bottom:none}
+.info__k{color:var(--text-muted);font-family:var(--mono);font-size:.7rem;letter-spacing:.04em}
+.info__v{color:var(--text);font-family:var(--mono);font-size:.7rem;font-weight:500}
+.info__v--cyan{color:var(--cyan)}
+.info__hint{margin-top:12px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px;font-size:.7rem;color:var(--text-muted);line-height:1.55}
+.info__hint b{color:var(--text-dim);font-weight:500}
+
+.status__dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.status__txt{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim)}
+.status__sep{width:1px;height:14px;background:var(--border)}
+.status__coords{font-family:var(--mono);font-size:.62rem;color:var(--text-muted);letter-spacing:.04em}
+
+.loader{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);transition:opacity .6s var(--ease)}
+.loader.hide{opacity:0;pointer-events:none}
+.loader__ring{width:42px;height:42px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:18px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader__txt{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted)}
+
+/* Mobile fallback */
+@media (max-width:780px){
+  .panel--layers,.panel--info{position:fixed;left:12px;right:12px;width:auto;top:auto}
+  .panel--layers{bottom:80px}
+  .panel--info{display:none}
+  .topbar{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="loader__ring"></div>
+  <div class="loader__txt">Caricamento globo...</div>
+</div>
+
+<div id="globeViz"></div>
+
+<header class="topbar">
+  <div class="topbar__left">
+    <a href="/progetti.html#strumenti" class="brand" title="Torna ai progetti">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      <span class="brand__txt">Progetti</span>
+    </a>
+  </div>
+  <div class="topbar__right">
+    <div class="title">Earth Tracker</div>
+  </div>
+</header>
+
+<aside class="panel panel--layers">
+  <div class="panel__title">Layer attivi</div>
+
+  <div class="layer" data-layer="ships">
+    <div class="layer__l">
+      <div class="layer__icon"><svg viewBox="0 0 24 24"><path d="M3 17h18l-2 4H5l-2-4Z"/><path d="M5 17V8l7-3 7 3v9"/><path d="M12 5v12"/></svg></div>
+      <div class="layer__txt"><span class="layer__name">Navi</span><span class="layer__count">in arrivo</span></div>
+    </div>
+    <div class="layer__sw"></div>
+  </div>
+
+  <div class="layer" data-layer="planes">
+    <div class="layer__l">
+      <div class="layer__icon"><svg viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2Z"/></svg></div>
+      <div class="layer__txt"><span class="layer__name">Aerei</span><span class="layer__count">in arrivo</span></div>
+    </div>
+    <div class="layer__sw"></div>
+  </div>
+
+  <div class="layer" data-layer="satellites">
+    <div class="layer__l">
+      <div class="layer__icon"><svg viewBox="0 0 24 24"><path d="m13 7 9 9"/><path d="M11 17 2 8"/><path d="m7 11 4-4"/><path d="m17 13-4 4"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <div class="layer__txt"><span class="layer__name">Satelliti</span><span class="layer__count">in arrivo</span></div>
+    </div>
+    <div class="layer__sw"></div>
+  </div>
+</aside>
+
+<aside class="panel panel--info">
+  <div class="panel__title">Controlli</div>
+  <div class="info__row"><span class="info__k">Trascina</span><span class="info__v info__v--cyan">Ruota globo</span></div>
+  <div class="info__row"><span class="info__k">Rotellina</span><span class="info__v info__v--cyan">Zoom</span></div>
+  <div class="info__row"><span class="info__k">Texture</span><span class="info__v">Blue Marble · NASA</span></div>
+  <div class="info__row"><span class="info__k">Risoluzione</span><span class="info__v">8K</span></div>
+  <div class="info__hint"><b>Prossimi step:</b><br>Tracking aerei via OpenSky Network, navi via AISStream, satelliti via CelesTrak/N2YO. Tutti con API gratuite.</div>
+</aside>
+
+<div class="panel panel--status">
+  <div class="status__dot"></div>
+  <div class="status__txt">Ambiente pronto</div>
+  <div class="status__sep"></div>
+  <div class="status__coords" id="coords">LAT 0.00°  ·  LON 0.00°</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/globe.gl@2.32.5/dist/globe.gl.min.js"></script>
+<script>
+(function(){
+  const EARTH_TEXTURE = 'https://unpkg.com/three-globe@2.31.1/example/img/earth-blue-marble.jpg';
+  const BUMP_TEXTURE  = 'https://unpkg.com/three-globe@2.31.1/example/img/earth-topology.png';
+
+  const world = Globe()(document.getElementById('globeViz'))
+    .globeImageUrl(EARTH_TEXTURE)
+    .bumpImageUrl(BUMP_TEXTURE)
+    .backgroundColor('#04040a')
+    .showAtmosphere(true)
+    .atmosphereColor('#3092b0')
+    .atmosphereAltitude(0.18);
+
+  // Stars background
+  const scene = world.scene();
+  const THREE = window.THREE;
+  const starsGeo = new THREE.BufferGeometry();
+  const starCount = 4000;
+  const starPos = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount; i++) {
+    const r = 800 + Math.random() * 400;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    starPos[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+    starPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    starPos[i*3+2] = r * Math.cos(phi);
+  }
+  starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.1, sizeAttenuation: true, transparent: true, opacity: .85 });
+  scene.add(new THREE.Points(starsGeo, starsMat));
+
+  // Subtle auto-rotation until the user interacts
+  const ctrl = world.controls();
+  ctrl.autoRotate = true;
+  ctrl.autoRotateSpeed = 0.35;
+  ctrl.enableDamping = true;
+  ctrl.dampingFactor = 0.08;
+  ctrl.rotateSpeed = 0.7;
+  ctrl.zoomSpeed = 0.9;
+
+  const stopAutoRotate = () => { ctrl.autoRotate = false; };
+  ['mousedown','touchstart','wheel'].forEach(ev => document.getElementById('globeViz').addEventListener(ev, stopAutoRotate, { passive:true, once:true }));
+
+  // Resize
+  const resize = () => world.width(window.innerWidth).height(window.innerHeight);
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Coords readout
+  const coordsEl = document.getElementById('coords');
+  document.getElementById('globeViz').addEventListener('mousemove', (e) => {
+    const c = world.toGeoCoords({ x: e.clientX, y: e.clientY });
+    if (c) coordsEl.textContent = `LAT ${c.lat.toFixed(2)}°  ·  LON ${c.lng.toFixed(2)}°`;
+  });
+
+  // Hide loader once texture is loaded
+  const tex = new THREE.TextureLoader();
+  tex.load(EARTH_TEXTURE, () => {
+    setTimeout(() => document.getElementById('loader').classList.add('hide'), 350);
+  }, undefined, () => {
+    document.getElementById('loader').classList.add('hide');
+  });
+
+  // Layer toggles (placeholder — wired to real APIs in next iterations)
+  document.querySelectorAll('.layer').forEach(l => {
+    l.addEventListener('click', () => {
+      if (!l.classList.contains('active')) return;
+      l.classList.toggle('on');
+    });
+  });
+})();
+</script>
+</body>
+</html>
