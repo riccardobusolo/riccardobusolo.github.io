@@ -347,15 +347,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 
   const MAX_PLANES = 12000;
   const planeGeo = new THREE.PlaneGeometry(3.6, 3.6);
-  // Alpha cutout to fix the "transparent corners block neighbours" bug
-  // common with InstancedMesh + transparent quads. alphaTest discards
-  // empty pixels before they reach the depth buffer.
+  // Proper alpha-blended sprites with back-to-front sorting (done per frame
+  // in tickPlanes via state.renderOrder). depthWrite=false avoids transparent
+  // corners blocking neighbours; low alphaTest discards fully empty pixels.
   const planeMat = new THREE.MeshBasicMaterial({
     map: planeTex,
     transparent: true,
-    alphaTest: 0.5,
+    alphaTest: 0.01,
     side: THREE.DoubleSide,
-    depthWrite: true
+    depthWrite: false,
+    depthTest: true
   });
   const planesMesh = new THREE.InstancedMesh(planeGeo, planeMat, MAX_PLANES);
   planesMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
@@ -369,25 +370,66 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   const GLOBE_R = 100;       // Globe.gl default radius (scene units)
   const EARTH_R = 6371000;   // meters
   const DEG = Math.PI / 180;
-  const _dummy = new THREE.Object3D();
 
-  function computeInstanceMatrix(out, lat, lng, altMeters, headingDeg, scale){
-    // Visualisation altitude: capped, exaggerated so planes are visible.
-    const altScene = Math.min(3.5, (altMeters / EARTH_R) * GLOBE_R * 35);
-    const phi = (90 - lat) * DEG;
-    const theta = (lng + 180) * DEG;
+  // Deterministic per-plane jitter so two planes at the same lat/lng/alt
+  // don't render with exactly coplanar quads (avoids residual z-fight).
+  function hexJitter(hex){
+    let h = 0;
+    for (let i = 0; i < hex.length; i++) h = ((h * 31 + hex.charCodeAt(i)) >>> 0);
+    return ((h % 1000) / 1000) - 0.5; // [-0.5, 0.5)
+  }
+
+  // Recompute scene-space position from current lat/lng/alt and cache on the plane.
+  function updatePlanePosition(p){
+    const altScene = Math.min(7, (p.alt / EARTH_R) * GLOBE_R * 38) + (p._jitter || 0) * 0.4;
+    const phi = (90 - p.lat) * DEG;
+    const theta = (p.lng + 180) * DEG;
     const r = GLOBE_R + altScene;
-    const px = -r * Math.sin(phi) * Math.cos(theta);
-    const py =  r * Math.cos(phi);
-    const pz =  r * Math.sin(phi) * Math.sin(theta);
+    const sinPhi = Math.sin(phi), cosPhi = Math.cos(phi);
+    const sinTheta = Math.sin(theta), cosTheta = Math.cos(theta);
+    p._sinPhi = sinPhi; p._cosPhi = cosPhi;
+    p._sinTheta = sinTheta; p._cosTheta = cosTheta;
+    p.x = -r * sinPhi * cosTheta;
+    p.y =  r * cosPhi;
+    p.z =  r * sinPhi * sinTheta;
+  }
 
-    _dummy.position.set(px, py, pz);
-    _dummy.up.set(0, 1, 0);
-    _dummy.lookAt(0, 0, 0);          // +Z faces outward, +Y aligns with local north
-    _dummy.rotateZ(-headingDeg * DEG); // rotate around outward normal to face heading
-    _dummy.scale.setScalar(scale);
-    _dummy.updateMatrix();
-    out.copy(_dummy.matrix);
+  // Direct matrix builder — no Object3D allocations, ~10x faster per call.
+  // Builds a basis (right, forward, normal) tangent to the globe at p, with
+  // forward aligned to the heading direction (so the plane's nose points along travel).
+  function buildPlaneMatrix(out, p, scale){
+    const sinPhi = p._sinPhi, cosPhi = p._cosPhi;
+    const sinTheta = p._sinTheta, cosTheta = p._cosTheta;
+    // Outward normal at this point on the globe
+    const nx = -sinPhi * cosTheta, ny = cosPhi, nz = sinPhi * sinTheta;
+    // North tangent: project worldUp(0,1,0) onto tangent plane
+    const dot = ny;
+    let northX = -dot * nx, northY = 1 - dot * ny, northZ = -dot * nz;
+    let nLen = Math.hypot(northX, northY, northZ);
+    if (nLen < 1e-6){ northX = 1; northY = 0; northZ = 0; }
+    else { northX /= nLen; northY /= nLen; northZ /= nLen; }
+    // East = north × normal
+    const eastX = northY * nz - northZ * ny;
+    const eastY = northZ * nx - northX * nz;
+    const eastZ = northX * ny - northY * nx;
+    // Forward = north * cos(h) + east * sin(h) where h=0 is north, h=90 is east
+    const hRad = p.heading * DEG;
+    const cH = Math.cos(hRad), sH = Math.sin(hRad);
+    const fX = northX * cH + eastX * sH;
+    const fY = northY * cH + eastY * sH;
+    const fZ = northZ * cH + eastZ * sH;
+    // Right = forward × normal (so right×forward = normal, matching PlaneGeometry +Z = normal)
+    const rX = fY * nz - fZ * ny;
+    const rY = fZ * nx - fX * nz;
+    const rZ = fX * ny - fY * nx;
+    const s = scale;
+    // PlaneGeometry expects: localX=right (+X), localY=forward (+Y), localZ=normal (+Z)
+    out.set(
+      rX*s, fX*s, nx*s, p.x,
+      rY*s, fY*s, ny*s, p.y,
+      rZ*s, fZ*s, nz*s, p.z,
+      0, 0, 0, 1
+    );
   }
 
   // Dead reckoning: advance lat/lng of each plane by speed * dt along heading.
@@ -492,20 +534,25 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
         setCount('planes', state.planes.length, state.planes.length ? 'aerei (cache)' : 'errore API');
         return;
       }
-      // Merge with existing planes (preserve interpolated state for in-flight ones)
+      // Merge with existing planes — chunked so we don't block the main thread on
+      // 1500+ Object.assign calls (this was causing the periodic drag stutter).
       const oldByHex = new Map(state.planes.map(p => [p.hex, p]));
-      for (let i = 0; i < next.length; i++){
-        const np = next[i];
-        const ex = oldByHex.get(np.hex);
-        if (ex){ Object.assign(ex, np); next[i] = ex; }
+      const CHUNK = 250;
+      for (let i = 0; i < next.length; i += CHUNK){
+        const end = Math.min(i + CHUNK, next.length);
+        for (let j = i; j < end; j++){
+          const np = next[j];
+          const ex = oldByHex.get(np.hex);
+          if (ex){ Object.assign(ex, np); next[j] = ex; }
+          else if (np._jitter == null){ np._jitter = hexJitter(np.hex); }
+          updatePlanePosition(next[j]);
+        }
+        if (end < next.length) await new Promise(r => requestAnimationFrame(r));
       }
       state.planes = next.length > MAX_PLANES ? next.slice(0, MAX_PLANES) : next;
-      // Sort render order: lower-altitude planes first (drawn last/on-top would mean reverse,
-      // but with depth test enabled and alpha cutout, drawing order doesn't matter much).
-      // We sort high-alt LAST so they render on top of low-alt where they overlap.
-      state.renderOrder = state.planes.map((_, i) => i).sort(
-        (a, b) => state.planes[a].alt - state.planes[b].alt
-      );
+      // renderOrder is rebuilt every frame in tickPlanes (back-to-front by camera distance);
+      // initialise as identity so it has the right length.
+      state.renderOrder = state.planes.map((_, i) => i);
       setCount('planes', state.planes.length, 'aerei ' + source);
       // Refresh trajectory if selected plane is still tracked
       if (state.selectedHex) updateTrajectory();
@@ -576,30 +623,50 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   }
   document.getElementById('piClose').onclick = hidePlaneInfo;
 
-  // ----- per-frame loop: dead reckoning + InstancedMesh update -----
+  // ----- per-frame loop: dead reckoning + sort + InstancedMesh update -----
   let lastFrameTs = performance.now();
   let lastTrajTs  = 0;
   const _tmpMatrix = new THREE.Matrix4();
   function tickPlanes(){
     const now = performance.now();
-    const dt = Math.min(0.25, (now - lastFrameTs) / 1000); // clamp big gaps
+    const dt = Math.min(0.25, (now - lastFrameTs) / 1000);
     lastFrameTs = now;
     if (!state.layers.planes) { requestAnimationFrame(tickPlanes); return; }
     const planes = state.planes;
-    const order  = state.renderOrder.length === planes.length ? state.renderOrder : null;
-    const camDist = world.camera().position.length();
-    const scale = Math.max(0.45, Math.min(1.8, camDist / 240));
     const n = planes.length;
+    if (n === 0) { planesMesh.count = 0; requestAnimationFrame(tickPlanes); return; }
+
+    // 1. Dead reckoning + recompute cached scene positions
     for (let i = 0; i < n; i++){
-      const planeIdx = order ? order[i] : i;
-      const p = planes[planeIdx];
+      const p = planes[i];
       advancePlane(p, dt);
-      computeInstanceMatrix(_tmpMatrix, p.lat, p.lng, p.alt, p.heading, scale);
+      updatePlanePosition(p);
+    }
+
+    // 2. Sort renderOrder back-to-front by camera distance (for correct alpha blend)
+    if (state.renderOrder.length !== n){
+      state.renderOrder = planes.map((_, i) => i);
+    }
+    const cam = world.camera().position;
+    const cx = cam.x, cy = cam.y, cz = cam.z;
+    state.renderOrder.sort((a, b) => {
+      const pa = planes[a], pb = planes[b];
+      const dxa = pa.x - cx, dya = pa.y - cy, dza = pa.z - cz;
+      const dxb = pb.x - cx, dyb = pb.y - cy, dzb = pb.z - cz;
+      return (dxb*dxb + dyb*dyb + dzb*dzb) - (dxa*dxa + dya*dya + dza*dza); // far first
+    });
+
+    // 3. Push instance matrices in sorted order
+    const camDist = Math.hypot(cx, cy, cz);
+    const scale = Math.max(0.45, Math.min(1.8, camDist / 240));
+    const order = state.renderOrder;
+    for (let i = 0; i < n; i++){
+      buildPlaneMatrix(_tmpMatrix, planes[order[i]], scale);
       planesMesh.setMatrixAt(i, _tmpMatrix);
     }
     planesMesh.count = n;
     planesMesh.instanceMatrix.needsUpdate = true;
-    // Refresh trajectory of selected plane every ~500ms (it follows the dead-reckoned position)
+
     if (state.selectedHex && (now - lastTrajTs) > 500){
       updateTrajectory();
       lastTrajTs = now;
