@@ -345,7 +345,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   const planeTex = new THREE.TextureLoader().load(planeBlobURL);
   if ('colorSpace' in planeTex) planeTex.colorSpace = THREE.SRGBColorSpace;
 
-  const MAX_PLANES = 12000;
+  // Hard cap on planes we actually animate. 800 keeps the per-frame cost
+  // (1500-3000 trig ops + matrix builds) under control on integrated GPUs.
+  // We sample down to this from whatever the API returns.
+  const MAX_PLANES = 800;
   const planeGeo = new THREE.PlaneGeometry(3.6, 3.6);
   // Proper alpha-blended sprites with back-to-front sorting (done per frame
   // in tickPlanes via state.renderOrder). depthWrite=false avoids transparent
@@ -534,22 +537,29 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
         setCount('planes', state.planes.length, state.planes.length ? 'aerei (cache)' : 'errore API');
         return;
       }
-      // Merge with existing planes — chunked so we don't block the main thread on
-      // 1500+ Object.assign calls (this was causing the periodic drag stutter).
-      const oldByHex = new Map(state.planes.map(p => [p.hex, p]));
-      const CHUNK = 250;
-      for (let i = 0; i < next.length; i += CHUNK){
-        const end = Math.min(i + CHUNK, next.length);
-        for (let j = i; j < end; j++){
-          const np = next[j];
-          const ex = oldByHex.get(np.hex);
-          if (ex){ Object.assign(ex, np); next[j] = ex; }
-          else if (np._jitter == null){ np._jitter = hexJitter(np.hex); }
-          updatePlanePosition(next[j]);
-        }
-        if (end < next.length) await new Promise(r => requestAnimationFrame(r));
+      // Sample down BEFORE merge — large fetch sets are sampled uniformly so
+      // the visible distribution stays globally representative.
+      let sample = next;
+      if (next.length > MAX_PLANES){
+        sample = new Array(MAX_PLANES);
+        const step = next.length / MAX_PLANES;
+        for (let i = 0; i < MAX_PLANES; i++) sample[i] = next[Math.floor(i * step)];
       }
-      state.planes = next.length > MAX_PLANES ? next.slice(0, MAX_PLANES) : next;
+      // Merge with existing planes — chunked so we don't block the main thread.
+      const oldByHex = new Map(state.planes.map(p => [p.hex, p]));
+      const CHUNK = 200;
+      for (let i = 0; i < sample.length; i += CHUNK){
+        const end = Math.min(i + CHUNK, sample.length);
+        for (let j = i; j < end; j++){
+          const np = sample[j];
+          const ex = oldByHex.get(np.hex);
+          if (ex){ Object.assign(ex, np); sample[j] = ex; }
+          else if (np._jitter == null){ np._jitter = hexJitter(np.hex); }
+          updatePlanePosition(sample[j]);
+        }
+        if (end < sample.length) await new Promise(r => requestAnimationFrame(r));
+      }
+      state.planes = sample;
       // renderOrder is rebuilt every frame in tickPlanes (back-to-front by camera distance);
       // initialise as identity so it has the right length.
       state.renderOrder = state.planes.map((_, i) => i);
@@ -663,16 +673,30 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
       lastSortTs = now;
     }
 
-    // 3. Push instance matrices in sorted order
+    // 3. Push instance matrices in sorted order, CULLING far-side planes.
+    //    A plane is "far side" when the dot product of its position with the
+    //    camera-position vector is negative (it's behind the globe relative
+    //    to the camera). Skipping them halves the per-frame matrix work.
     const camPos = world.camera().position;
-    const camDist = Math.hypot(camPos.x, camPos.y, camPos.z);
+    const cx2 = camPos.x, cy2 = camPos.y, cz2 = camPos.z;
+    const camDist = Math.hypot(cx2, cy2, cz2);
     const scale = Math.max(0.45, Math.min(1.8, camDist / 240));
     const order = state.renderOrder;
+    let visible = 0;
+    if (!state.visibleMap || state.visibleMap.length < n) state.visibleMap = new Int32Array(MAX_PLANES);
     for (let i = 0; i < n; i++){
-      buildPlaneMatrix(_tmpMatrix, planes[order[i]], scale);
-      planesMesh.setMatrixAt(i, _tmpMatrix);
+      const idx = order[i];
+      const p = planes[idx];
+      // Visibility: cosine of angle between plane vector and camera vector
+      const planeMag = Math.hypot(p.x, p.y, p.z);
+      const cosA = (p.x * cx2 + p.y * cy2 + p.z * cz2) / (planeMag * camDist);
+      if (cosA < -0.05) continue; // behind globe — skip rendering this plane
+      buildPlaneMatrix(_tmpMatrix, p, scale);
+      planesMesh.setMatrixAt(visible, _tmpMatrix);
+      state.visibleMap[visible] = idx;
+      visible++;
     }
-    planesMesh.count = n;
+    planesMesh.count = visible;
     planesMesh.instanceMatrix.needsUpdate = true;
 
     if (state.selectedHex && (now - lastTrajTs) > 500){
@@ -683,12 +707,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   }
   requestAnimationFrame(tickPlanes);
 
-  // Helper: instanceId -> plane object (uses renderOrder mapping)
+  // Helper: instanceId -> plane object. With far-side culling, instance i in
+  // the InstancedMesh corresponds to state.visibleMap[i] in state.planes.
   function planeAtInstance(instanceId){
     if (instanceId == null) return null;
-    const order = state.renderOrder.length === state.planes.length ? state.renderOrder : null;
-    const idx = order ? order[instanceId] : instanceId;
-    return state.planes[idx] || null;
+    const map = state.visibleMap;
+    if (map && instanceId < map.length){
+      return state.planes[map[instanceId]] || null;
+    }
+    return state.planes[instanceId] || null;
   }
 
   // ----- hover tooltip via raycaster -----
