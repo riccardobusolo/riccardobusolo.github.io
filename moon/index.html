@@ -732,6 +732,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .mp__node-text{font-family:var(--mono);font-size:11px;fill:var(--text);text-anchor:middle;pointer-events:none;font-weight:600}
 .mp__edge{stroke:var(--bh);stroke-width:1.5;opacity:.5}
 .mp__map-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-family:var(--mono);font-size:.78rem;text-align:center;gap:14px;padding:40px}
+.mp__fab{position:absolute;right:18px;bottom:18px;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;background:var(--gold);color:#0d0d12;border:none;border-radius:22px;font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.05em;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.32),0 0 0 1px rgba(0,0,0,.14);transition:all .15s;z-index:5;text-transform:uppercase}
+.mp__fab:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(0,0,0,.18)}
+.mp__fab:active{transform:translateY(0)}
+.mp__main{position:relative}
 
 .spe__lvl{font-family:var(--mono);font-size:.66rem;font-weight:700;color:var(--gold);background:rgba(196,154,50,.1);border:1px solid rgba(196,154,50,.18);border-radius:4px;padding:2px 7px;min-width:22px;text-align:center;flex-shrink:0}
 .spe__name{font-size:.84rem;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -950,6 +954,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <div class="mp__main">
 <div class="mp__viewbar"><button class="mp__vb mp__vb--on" data-mpv="editor">📝 Editor</button><button class="mp__vb" data-mpv="map">🗺️ Mappa</button></div>
 <div class="mp__view" id="mpView"></div>
+<button class="mp__fab" id="mpFab" title="Crea nuovo documento">+ Nuovo</button>
 </div>
 </div>
 </div></div>
@@ -2102,7 +2107,9 @@ function setView(v){view=v;document.querySelectorAll('#winMap .mp__vb').forEach(
 function selectDoc(id){currentId=id;render()}
 /* sidebar handlers */
 document.getElementById('mpList').addEventListener('click',function(e){if(e.target.id==='mpEmpty3'){var d=newDoc();currentId=d.id;view='editor';setView('editor');render();setTimeout(function(){var t=document.getElementById('mpTitle');if(t)t.focus()},80);return}var sel=e.target.closest('[data-mpsel]');if(!sel)return;selectDoc(sel.dataset.mpsel);if(view!=='editor')setView('editor')});
-document.getElementById('mpNew').addEventListener('click',function(){var d=newDoc();currentId=d.id;view='editor';setView('editor');render();setTimeout(function(){var t=document.getElementById('mpTitle');if(t)t.focus()},80)});
+function _mpCreateNew(){var d=newDoc();currentId=d.id;view='editor';setView('editor');render();setTimeout(function(){var t=document.getElementById('mpTitle');if(t)t.focus()},80)}
+document.getElementById('mpNew').addEventListener('click',_mpCreateNew);
+document.getElementById('mpFab').addEventListener('click',_mpCreateNew);
 document.getElementById('mpSearch').addEventListener('input',function(e){searchQ=e.target.value;renderSb()});
 /* view toggles */
 document.querySelectorAll('#winMap .mp__vb').forEach(function(b){b.addEventListener('click',function(){setView(b.dataset.mpv)})});
@@ -2114,7 +2121,7 @@ document.getElementById('mpView').addEventListener('click',function(e){var go=e.
 var _dragNode=null,_dragOff={x:0,y:0},_dragSvg=null,_dragMoved=false;
 var _isPanning=false,_panStart={x:0,y:0,vbX:0,vbY:0,sx:1,sy:1},_panSvg=null;
 document.getElementById('mpView').addEventListener('mousedown',function(e){if(view!=='map')return;var node=e.target.closest('[data-mpnode]');if(node){var svg=node.closest('svg');if(!svg)return;e.preventDefault();_dragNode=node.dataset.mpnode;_dragSvg=svg;_dragMoved=false;var pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var ctm=svg.getScreenCTM().inverse();var loc=pt.matrixTransform(ctm);var p=positions[_dragNode]||{x:0,y:0};_dragOff={x:loc.x-p.x,y:loc.y-p.y};svg.classList.add('mp__svg--dragging');return}var svg2=e.target.closest('svg.mp__svg');if(!svg2||!mapView)return;e.preventDefault();_isPanning=true;_panSvg=svg2;var rect=svg2.getBoundingClientRect();_panStart={x:e.clientX,y:e.clientY,vbX:mapView.x,vbY:mapView.y,sx:mapView.w/Math.max(1,rect.width),sy:mapView.h/Math.max(1,rect.height)};svg2.classList.add('mp__svg--dragging')});
-document.addEventListener('mousemove',function(e){if(_dragNode&&_dragSvg){var pt=_dragSvg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var loc=pt.matrixTransform(_dragSvg.getScreenCTM().inverse());positions[_dragNode]={x:loc.x-_dragOff.x,y:loc.y-_dragOff.y};_dragMoved=true;renderMap();return}if(_isPanning&&_panSvg&&mapView){var dx=(e.clientX-_panStart.x)*_panStart.sx,dy=(e.clientY-_panStart.y)*_panStart.sy;mapView.x=_panStart.vbX-dx;mapView.y=_panStart.vbY-dy;_panSvg.setAttribute('viewBox',mapView.x+' '+mapView.y+' '+mapView.w+' '+mapView.h)}});
+document.addEventListener('mousemove',function(e){if(_dragNode){var liveSvg=document.getElementById('mpSvg');if(!liveSvg)return;var ctm=liveSvg.getScreenCTM();if(!ctm)return;var pt=liveSvg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var loc=pt.matrixTransform(ctm.inverse());positions[_dragNode]={x:loc.x-_dragOff.x,y:loc.y-_dragOff.y};_dragMoved=true;renderMap();_dragSvg=document.getElementById('mpSvg');return}if(_isPanning&&_panSvg&&mapView){var dx=(e.clientX-_panStart.x)*_panStart.sx,dy=(e.clientY-_panStart.y)*_panStart.sy;mapView.x=_panStart.vbX-dx;mapView.y=_panStart.vbY-dy;_panSvg.setAttribute('viewBox',mapView.x+' '+mapView.y+' '+mapView.w+' '+mapView.h)}});
 document.addEventListener('mouseup',function(){if(_dragNode){if(_dragMoved)savePos();else{selectDoc(_dragNode);setView('editor')}if(_dragSvg)_dragSvg.classList.remove('mp__svg--dragging');_dragNode=null;_dragSvg=null}if(_isPanning){_isPanning=false;if(_panSvg)_panSvg.classList.remove('mp__svg--dragging');_panSvg=null;saveMapView()}});
 document.getElementById('mpView').addEventListener('wheel',function(e){if(view!=='map'||!mapView)return;var svg=e.target.closest('svg.mp__svg');if(!svg)return;e.preventDefault();var rect=svg.getBoundingClientRect();var mx=(e.clientX-rect.left)/Math.max(1,rect.width)*mapView.w+mapView.x;var my=(e.clientY-rect.top)/Math.max(1,rect.height)*mapView.h+mapView.y;var factor=e.deltaY<0?1.15:1/1.15;var newW=mapView.w/factor,newH=mapView.h/factor;if(newW<40||newW>40000)return;mapView.x=mx-(mx-mapView.x)/factor;mapView.y=my-(my-mapView.y)/factor;mapView.w=newW;mapView.h=newH;svg.setAttribute('viewBox',mapView.x+' '+mapView.y+' '+mapView.w+' '+mapView.h);saveMapView()},{passive:false});
 /* re-render map on window resize */
