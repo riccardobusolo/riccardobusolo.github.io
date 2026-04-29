@@ -32,14 +32,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 :root[data-theme="sword-coast"] .pgsel-cls,:root[data-theme="sword-coast"] .pg__pgsel-cls{color:var(--muted)}
 .scbg{display:none;position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;contain:strict}
 :root[data-theme="sword-coast"] .scbg{display:block}
-.scbg__pan{position:absolute;inset:0;--pan-x:0px;transform:translate3d(var(--pan-x),0,0);will-change:transform}
 .scbg__layer{position:absolute;top:0;left:0;display:flex;height:100%;width:max-content;flex-shrink:0;animation:scrot 280s linear infinite;will-change:transform;contain:layout paint}
 .scbg__layer img{height:100%;width:auto;display:block;flex-shrink:0;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .scbg__veil{position:absolute;inset:0;pointer-events:none;-webkit-backdrop-filter:blur(28px) saturate(1.05) brightness(.97);backdrop-filter:blur(28px) saturate(1.05) brightness(.97);opacity:1;transition:opacity 1.5s ease}
 .scbg__veil--hidden{opacity:0;transition:opacity .18s ease}
 .scbg__fog{display:none}
-:root[data-theme="sword-coast"] .main{cursor:grab}
-:root[data-theme="sword-coast"] .main.sc-grabbing{cursor:grabbing}
 @keyframes scrot{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
 :root[data-theme="sword-coast"] #fireCanvas,:root[data-theme="sword-coast"] #maskCanvas{display:none}
 
@@ -788,7 +785,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <div class="main" id="main">
 <div class="empty" id="emptyState"></div>
 <div class="scbg" id="scBg">
-<div class="scbg__pan" id="scPan"><div class="scbg__layer scbg__layer--sharp" id="scSharp"><img src="img/Background_sword_coast_theme.webp" alt="" decoding="async" fetchpriority="low"><img src="img/Background_sword_coast_theme.webp" alt="" decoding="async" fetchpriority="low" aria-hidden="true"></div></div>
+<div class="scbg__layer scbg__layer--sharp" id="scSharp"><img src="img/Background_sword_coast_theme.webp" alt="" decoding="async" fetchpriority="low"><img src="img/Background_sword_coast_theme.webp" alt="" decoding="async" fetchpriority="low" aria-hidden="true"></div>
 <div class="scbg__veil" id="scVeil"></div>
 <canvas class="scbg__fog" id="scFog"></canvas>
 </div>
@@ -1768,13 +1765,12 @@ var mn=document.getElementById('main');
 mn.addEventListener('mousedown',function(e){if(document.documentElement.dataset.theme==='sword-coast')return;if(e.target!==mn&&e.target!==cv&&e.target!==mcv&&!e.target.closest('.empty'))return;e.preventDefault();var r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;active=true;spawn(mx,my,12);if(!raf)raf=requestAnimationFrame(draw)});window._cmRedrawMask=function(){particles.length=0;cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;mcv.width=mcv.offsetWidth;mcv.height=mcv.offsetHeight;ctx.clearRect(0,0,cv.width,cv.height);drawMask()};
 document.addEventListener('mousemove',function(e){if(!active)return;var r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});
 document.addEventListener('mouseup',function(){active=false})})();
-/* Sword Coast: blur veil with click-reveal-all + drag-to-pan */
-(function(){var pan=document.getElementById('scPan'),veil=document.getElementById('scVeil'),mn=document.getElementById('main');if(!pan||!veil||!mn)return;
-var pressed=false,startX=0,accumX=0;
-function open(e){if(document.documentElement.dataset.theme!=='sword-coast')return;if(e.target.closest('.win,.setpanel,.sb'))return;e.preventDefault();pressed=true;startX=e.clientX;veil.classList.add('scbg__veil--hidden');mn.classList.add('sc-grabbing')}
-function move(e){if(!pressed)return;var dx=e.clientX-startX;pan.style.setProperty('--pan-x',(accumX+dx)+'px')}
-function close(){if(!pressed)return;pressed=false;var v=pan.style.getPropertyValue('--pan-x')||'0px';accumX=parseFloat(v)||0;veil.classList.remove('scbg__veil--hidden');mn.classList.remove('sc-grabbing')}
-mn.addEventListener('mousedown',open);document.addEventListener('mousemove',move,{passive:true});document.addEventListener('mouseup',close);document.addEventListener('mouseleave',close)})();
+/* Sword Coast: blur veil with click-reveal-all (press to clear, release fades blur back) */
+(function(){var veil=document.getElementById('scVeil'),mn=document.getElementById('main');if(!veil||!mn)return;
+var pressed=false;
+function open(e){if(document.documentElement.dataset.theme!=='sword-coast')return;if(e.target.closest('.win,.setpanel,.sb'))return;e.preventDefault();pressed=true;veil.classList.add('scbg__veil--hidden')}
+function close(){if(!pressed)return;pressed=false;veil.classList.remove('scbg__veil--hidden')}
+mn.addEventListener('mousedown',open);document.addEventListener('mouseup',close);document.addEventListener('mouseleave',close)})();
 /* Theme-aware die color cache */
 window._dieC={face:'45,8,8',faceH:'40,40,45',edge:'170,45,45',edgeH:'190,190,200'};
 window._refreshDieC=function(){var s=getComputedStyle(document.documentElement);var g=function(n,d){var v=s.getPropertyValue(n).trim();return v||d};window._dieC={face:g('--die-face','45,8,8'),faceH:g('--die-face-h','40,40,45'),edge:g('--die-edge','170,45,45'),edgeH:g('--die-edge-h','190,190,200')};};
