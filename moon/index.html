@@ -724,6 +724,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .rs__manual-d{font-family:var(--mono);font-size:.66rem;color:var(--dim);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:1px}
 .rs__manual-foot{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.58rem;color:var(--muted);margin-top:auto;padding-top:6px;text-transform:uppercase;letter-spacing:.06em}
 .rs__manual-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--dim);font-weight:600}
+.rs__manual{position:relative}
+.rs__manual-edit{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(20,20,20,.85);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;font-size:.78rem;transition:all .12s;z-index:3}
+.rs__manual:hover .rs__manual-edit{display:flex}
+.rs__manual-edit:hover{color:var(--gold);border-color:var(--gold);transform:scale(1.1)}
+/* Manual edit modal */
+.rsmn-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:600}
+.rsmn-ov.on{display:block}
+.rsmn-md{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;width:480px;max-width:96vw;max-height:90vh;flex-direction:column;gap:10px;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:601;font-family:var(--font);overflow:auto}
+.rsmn-md.on{display:flex}
+.rsmn-md__head{display:flex;align-items:center;justify-content:space-between;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.rsmn-md__title-h{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.07em}
+.rsmn-md__close{background:transparent;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1;padding:0 4px}
+.rsmn-md__close:hover{color:var(--red)}
+.rsmn-md__body{display:flex;flex-direction:column;gap:8px}
+.rsmn-md__body>input,.rsmn-md__body>textarea{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:.74rem;outline:none;box-sizing:border-box;width:100%}
+.rsmn-md__body>input:focus,.rsmn-md__body>textarea:focus{border-color:var(--gold)}
+.rsmn-md__body>textarea{resize:vertical;min-height:60px;line-height:1.45}
+.rsmn-md__row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rsmn-md__row>label{font-family:var(--mono);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;min-width:54px}
+.rsmn-md__row>input[type=color]{width:36px;height:28px;padding:0;cursor:pointer;flex:none;border:1px solid var(--border);border-radius:4px;background:transparent}
+.rsmn-md__row>input[type=text]{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:.74rem;outline:none}
+.rsmn-md__row>input[type=text]:focus{border-color:var(--gold)}
+.rsmn-md__swatches{display:flex;gap:4px;flex-wrap:wrap}
+.rsmn-md__sw{width:22px;height:22px;border-radius:50%;border:1px solid var(--border);cursor:pointer;padding:0;transition:transform .12s}
+.rsmn-md__sw:hover{transform:scale(1.18)}
+.rsmn-md__filename{font-family:var(--mono);font-size:.6rem;color:var(--muted);padding:6px 0 0;border-top:1px solid var(--border);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rsmn-md__btns{display:flex;gap:8px;align-items:center;padding-top:6px;border-top:1px solid var(--border)}
+.rsmn-md__btn{padding:7px 14px;border-radius:5px;font-family:var(--mono);font-size:.7rem;cursor:pointer;border:1px solid var(--border);transition:all .12s;background:transparent}
+.rsmn-md__btn--cancel{color:var(--muted)}
+.rsmn-md__btn--cancel:hover{color:var(--text);border-color:var(--bh)}
+.rsmn-md__btn--ok{background:rgba(196,154,50,.18);border-color:rgba(196,154,50,.5);color:var(--gold)}
+.rsmn-md__btn--ok:hover{background:rgba(196,154,50,.3)}
+.rsmn-md__btn--del{color:var(--red);border-color:var(--rb)}
+.rsmn-md__btn--del:hover{background:var(--rl)}
 .rs__newbtn{align-self:flex-start;display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:1px solid rgba(196,154,50,.4);background:rgba(196,154,50,.08);color:var(--gold);font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.04em;cursor:pointer;border-radius:5px;transition:all .12s}
 .rs__newbtn:hover{background:rgba(196,154,50,.18);border-color:rgba(196,154,50,.6)}
 .rs__newbtn:active{transform:scale(.97)}
@@ -1176,6 +1210,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <div class="rs__list" id="rsLinkList"></div>
 </div>
 <div class="rs__view" id="rsViewManuals" style="display:none">
+<div class="rs__upzone" id="rsMnZone"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M2 3h7a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-7a4 4 0 00-4 4v14a3 3 0 013-3h8z"/></svg><span class="rs__upzone-t">Trascina i tuoi PDF qui o clicca per caricare</span><input type="file" id="rsMnInput" accept="application/pdf,.pdf" multiple style="display:none"></div>
 <div class="rs__list" id="rsManualList"></div>
 </div>
 <div class="rs__view" id="rsViewImages" style="display:none">
@@ -1191,6 +1226,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <div class="rs__grid" id="rsDrawGrid"></div>
 </div>
 </div>
+</div>
+
+<!-- MANUAL EDIT MODAL -->
+<div class="rsmn-ov" id="rsmnOv"></div>
+<div class="rsmn-md" id="rsmnMd">
+<div class="rsmn-md__head"><span class="rsmn-md__title-h">Modifica manuale</span><button class="rsmn-md__close" id="rsmnClose" type="button">&times;</button></div>
+<div class="rsmn-md__body">
+<input type="text" id="rsmnTitle" placeholder="Titolo">
+<input type="text" id="rsmnSubtitle" placeholder="Sottotitolo (opzionale)">
+<textarea id="rsmnDesc" placeholder="Descrizione (opzionale)" rows="3"></textarea>
+<div class="rsmn-md__row"><label>Icona</label><input type="text" id="rsmnIcon" maxlength="4" placeholder="📕"></div>
+<div class="rsmn-md__row"><label>Colore</label><input type="color" id="rsmnAccent" value="#444444"><div class="rsmn-md__swatches" id="rsmnSwatches"></div></div>
+<div class="rsmn-md__filename" id="rsmnFilename"></div>
+</div>
+<div class="rsmn-md__btns"><button class="rsmn-md__btn rsmn-md__btn--del" id="rsmnDelete" type="button">Elimina</button><span style="flex:1"></span><button class="rsmn-md__btn rsmn-md__btn--cancel" id="rsmnCancel" type="button">Annulla</button><button class="rsmn-md__btn rsmn-md__btn--ok" id="rsmnSave" type="button">Salva</button></div>
 </div>
 
 <!-- TEXT EDITOR MODAL -->
@@ -2486,22 +2536,32 @@ function genId(p){return p+'_'+Date.now()+'_'+Math.random().toString(36).slice(2
 function compressImg(file,cb){if(!file||!file.type||file.type.indexOf('image/')!==0){cb(null);return}var fr=new FileReader();fr.onload=function(ev){var img=new Image();img.onload=function(){var w=img.naturalWidth,h=img.naturalHeight,M=1600;if(w>M||h>M){if(w>h){h=Math.round(h*M/w);w=M}else{w=Math.round(w*M/h);h=M}}var cv=document.createElement('canvas');cv.width=w;cv.height=h;var cx=cv.getContext('2d');cx.imageSmoothingQuality='high';cx.drawImage(img,0,0,w,h);cv.toBlob(function(b){if(!b){cb(null);return}var r2=new FileReader();r2.onload=function(){cb(r2.result)};r2.readAsDataURL(b)},'image/webp',0.82)};img.onerror=function(){cb(null)};img.src=ev.target.result};fr.onerror=function(){cb(null)};fr.readAsDataURL(file)}
 function confirmDel(msg,onOk){if(typeof pgConfirm==='function')pgConfirm(msg,onOk,{title:'Elimina',okLabel:'Elimina'});else if(confirm(msg))onOk()}
 var links=loadArr(LINK_KEY),imgs=loadArr(IMG_KEY),texts=loadArr(TXT_KEY),draws=loadArr(DRAW_KEY);
-var MANUALS=[
-{title:'The Crooked Moon',subtitle:'Edizione 2024 — V2',desc:'Manuale di campagna homebrew per D&D 5e con ambientazione horror gotica, sottoclassi, mostri e meccaniche personalizzate.',file:'The Crooked Moon (2024) - V2.pdf',accent:'#7a3030',icon:'🌙'},
-{title:'Manuale del Giocatore',subtitle:'D&D 5e — Italiano',desc:'Manuale base di Dungeons & Dragons 5ª edizione: razze, classi, magie, equipaggiamento e regole di gioco.',file:'Manuale del Giocatore D&D 5e.pdf',accent:'#8a2828',icon:'⚔️'},
-{title:'Manuale del Dungeon Master',subtitle:'D&D 5e — Italiano',desc:'Guida del Dungeon Master per D&D 5e: creazione di avventure, mostri, oggetti magici, ambientazioni e gestione del gioco.',file:'Manuale del Dungeon Master D&D 5e.pdf',accent:'#2d4a8a',icon:'🎲'},
-{title:'Manuale dei Mostri',subtitle:'D&D 5e — Italiano',desc:'Bestiario ufficiale di D&D 5e: oltre 400 mostri con statistiche, descrizioni, tattiche e illustrazioni.',file:'Manuale dei Mostri D&D 5e.pdf',accent:'#2d7a3d',icon:'👹'},
-{title:'Tasha’s Cauldron of Everything',subtitle:'HQ — Both Covers',desc:'Espansione ufficiale di D&D 5e: nuove sottoclassi, talenti, oggetti magici, regole opzionali e idee per il DM.',file:'Tasha’s Cauldron of Everything (HQ, Both Covers).pdf',accent:'#5a2d8a',icon:'🍵'},
-{title:'Xanathar’s Guide to Everything',subtitle:'Deluxe Edition',desc:'Espansione di D&D 5e con sottoclassi, incantesimi, regole opzionali e tabelle casuali per giocatori e DM.',file:'Xanathar\'s Guide to Everything Deluxe.pdf',accent:'#2d6a6a',icon:'👁'},
-{title:'Fizban’s Treasury of Dragons',subtitle:'Sourcebook ufficiale',desc:'Compendio dedicato ai draghi nel multiverso di D&D: nuove razze draconiche, oggetti magici, mostri e avventure.',file:'Fizban\'s_Treasury_of_Dragons.pdf',accent:'#b06820',icon:'🐉'}
-];
+/* Manuali: IndexedDB-backed */
+var MN_DB='cm_res_db',MN_STORE='manuals',MN_VER=1;
+var manuals=[];
+var KNOWN_MANUALS={
+'The Crooked Moon (2024) - V2.pdf':{title:'The Crooked Moon',subtitle:'Edizione 2024 — V2',desc:'Manuale di campagna homebrew per D&D 5e con ambientazione horror gotica, sottoclassi, mostri e meccaniche personalizzate.',accent:'#7a3030',icon:'🌙'},
+'Manuale del Giocatore D&D 5e.pdf':{title:'Manuale del Giocatore',subtitle:'D&D 5e — Italiano',desc:'Manuale base di Dungeons & Dragons 5ª edizione: razze, classi, magie, equipaggiamento e regole di gioco.',accent:'#8a2828',icon:'⚔️'},
+'Manuale del Dungeon Master D&D 5e.pdf':{title:'Manuale del Dungeon Master',subtitle:'D&D 5e — Italiano',desc:'Guida del Dungeon Master per D&D 5e: creazione di avventure, mostri, oggetti magici, ambientazioni e gestione del gioco.',accent:'#2d4a8a',icon:'🎲'},
+'Manuale dei Mostri D&D 5e.pdf':{title:'Manuale dei Mostri',subtitle:'D&D 5e — Italiano',desc:'Bestiario ufficiale di D&D 5e: oltre 400 mostri con statistiche, descrizioni, tattiche e illustrazioni.',accent:'#2d7a3d',icon:'👹'},
+'Tasha’s Cauldron of Everything (HQ, Both Covers).pdf':{title:'Tasha’s Cauldron of Everything',subtitle:'HQ — Both Covers',desc:'Espansione ufficiale di D&D 5e: nuove sottoclassi, talenti, oggetti magici, regole opzionali e idee per il DM.',accent:'#5a2d8a',icon:'🍵'},
+"Xanathar's Guide to Everything Deluxe.pdf":{title:'Xanathar’s Guide to Everything',subtitle:'Deluxe Edition',desc:'Espansione di D&D 5e con sottoclassi, incantesimi, regole opzionali e tabelle casuali per giocatori e DM.',accent:'#2d6a6a',icon:'👁'},
+"Fizban's_Treasury_of_Dragons.pdf":{title:'Fizban’s Treasury of Dragons',subtitle:'Sourcebook ufficiale',desc:'Compendio dedicato ai draghi nel multiverso di D&D: nuove razze draconiche, oggetti magici, mostri e avventure.',accent:'#b06820',icon:'🐉'}
+};
+var ACCENTS=['#7a3030','#8a2828','#2d4a8a','#2d7a3d','#5a2d8a','#2d6a6a','#b06820','#444444'];
 var THUMB_PREFIX='cm_res_manual_thumb_';
 function _hashKey(s){var h=0;for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h=h&h}return Math.abs(h).toString(36)}
 function _getThumb(k){try{return localStorage.getItem(THUMB_PREFIX+k)||null}catch(e){return null}}
 function _setThumb(k,u){try{localStorage.setItem(THUMB_PREFIX+k,u)}catch(e){}}
 var _thumbsLoading={};
-function renderManualThumb(idx){var m=MANUALS[idx];if(!m)return;var k=_hashKey(m.file);var cached=_getThumb(k);if(cached){_applyThumb(idx,cached);return}if(_thumbsLoading[k])return;if(typeof pdfjsLib==='undefined')return;_thumbsLoading[k]=true;if(!pdfjsLib.GlobalWorkerOptions.workerSrc)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';var url='risorse/'+encodeURIComponent(m.file);pdfjsLib.getDocument({url:url,disableAutoFetch:true,disableStream:false}).promise.then(function(pdf){return pdf.getPage(1)}).then(function(page){var vp=page.getViewport({scale:1});var maxW=240;var scale=Math.min(maxW/vp.width,2);var vp2=page.getViewport({scale:scale});var cv=document.createElement('canvas');cv.width=Math.ceil(vp2.width);cv.height=Math.ceil(vp2.height);var cx=cv.getContext('2d');return page.render({canvasContext:cx,viewport:vp2}).promise.then(function(){return new Promise(function(res){if(!cv.toBlob){res(cv.toDataURL('image/webp',0.78));return}cv.toBlob(function(b){if(!b){res(null);return}var fr=new FileReader();fr.onload=function(){res(fr.result)};fr.onerror=function(){res(null)};fr.readAsDataURL(b)},'image/webp',0.78)})})}).then(function(data){_thumbsLoading[k]=false;if(!data)return;_setThumb(k,data);_applyThumb(idx,data)}).catch(function(e){_thumbsLoading[k]=false;console.warn('PDF thumb failed',m.file,e)})}
-function _applyThumb(idx,url){var card=document.querySelector('[data-rsmnidx="'+idx+'"]');if(!card)return;var cover=card.querySelector('.rs__manual-cover');if(!cover)return;cover.innerHTML='<img src="'+esc(url)+'" alt="">'}
+function _openMnDB(){return new Promise(function(res,rej){if(!window.indexedDB){rej(new Error('IndexedDB non disponibile'));return}var r=indexedDB.open(MN_DB,MN_VER);r.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains(MN_STORE))db.createObjectStore(MN_STORE,{keyPath:'id'})};r.onsuccess=function(e){res(e.target.result)};r.onerror=function(e){rej(e.target.error)}})}
+function dbAll(){return _openMnDB().then(function(db){return new Promise(function(res){var tx=db.transaction(MN_STORE,'readonly');var req=tx.objectStore(MN_STORE).getAll();req.onsuccess=function(){res(req.result||[])};req.onerror=function(){res([])}})})}
+function dbGet(id){return _openMnDB().then(function(db){return new Promise(function(res){var tx=db.transaction(MN_STORE,'readonly');var req=tx.objectStore(MN_STORE).get(id);req.onsuccess=function(){res(req.result||null)};req.onerror=function(){res(null)}})})}
+function dbPut(rec){return _openMnDB().then(function(db){return new Promise(function(res,rej){var tx=db.transaction(MN_STORE,'readwrite');tx.objectStore(MN_STORE).put(rec);tx.oncomplete=function(){res()};tx.onerror=function(e){rej(e.target.error)}})})}
+function dbDel(id){return _openMnDB().then(function(db){return new Promise(function(res,rej){var tx=db.transaction(MN_STORE,'readwrite');tx.objectStore(MN_STORE).delete(id);tx.oncomplete=function(){res()};tx.onerror=function(e){rej(e.target.error)}})})}
+function fmtSize(n){if(!n)return'';if(n>=1024*1024)return(n/(1024*1024)).toFixed(0)+' MB';if(n>=1024)return(n/1024).toFixed(0)+' KB';return n+' B'}
+function _applyThumbId(id,url){var card=document.querySelector('.rs__manual[data-rsmnid="'+id+'"]');if(!card)return;var cover=card.querySelector('.rs__manual-cover');if(!cover)return;cover.innerHTML='<img src="'+esc(url)+'" alt="">'}
+function renderManualThumb(rec){if(!rec)return;var k=_hashKey(rec.filename||rec.id);var cached=_getThumb(k);if(cached){_applyThumbId(rec.id,cached);return}if(_thumbsLoading[k])return;if(typeof pdfjsLib==='undefined')return;_thumbsLoading[k]=true;if(!pdfjsLib.GlobalWorkerOptions.workerSrc)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';dbGet(rec.id).then(function(full){if(!full||!full.blob)return null;return full.blob.arrayBuffer()}).then(function(ab){if(!ab)return null;return pdfjsLib.getDocument({data:ab}).promise}).then(function(pdf){if(!pdf)return null;return pdf.getPage(1)}).then(function(page){if(!page)return null;var vp=page.getViewport({scale:1});var maxW=240;var scale=Math.min(maxW/vp.width,2);var vp2=page.getViewport({scale:scale});var cv=document.createElement('canvas');cv.width=Math.ceil(vp2.width);cv.height=Math.ceil(vp2.height);var cx=cv.getContext('2d');return page.render({canvasContext:cx,viewport:vp2}).promise.then(function(){return new Promise(function(res){if(!cv.toBlob){res(cv.toDataURL('image/webp',0.78));return}cv.toBlob(function(b){if(!b){res(null);return}var fr=new FileReader();fr.onload=function(){res(fr.result)};fr.onerror=function(){res(null)};fr.readAsDataURL(b)},'image/webp',0.78)})})}).then(function(data){_thumbsLoading[k]=false;if(!data)return;_setThumb(k,data);_applyThumbId(rec.id,data)}).catch(function(e){_thumbsLoading[k]=false;console.warn('PDF thumb failed',rec.filename,e)})}
 var ICON_LINK='<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07l-1 1"/><path d="M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07l1-1"/></svg>';
 var ICON_BOOK='<svg viewBox="0 0 24 24"><path d="M2 3h7a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-7a4 4 0 00-4 4v14a3 3 0 013-3h8z"/></svg>';
 var ICON_EXT='<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
@@ -2509,9 +2569,32 @@ var ICON_EXT='<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentCol
 /* === LINKS === */
 function saveLinks(){return saveArr(LINK_KEY,links)}
 function renderLinks(){var list=document.getElementById('rsLinkList');if(!list)return;if(!links.length){list.innerHTML='<div class="rs__empty">Nessun link salvato. Aggiungi il primo qui sopra.</div>';return}var h='';links.forEach(function(l,i){var u=l.url||'';var host='';try{host=new URL(u).hostname.replace(/^www\./,'')}catch(e){host=u}h+='<div class="rs__item"><a class="rs__item-link" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer"><span class="rs__item-icon">'+ICON_LINK+'</span><span class="rs__item-meta"><span class="rs__item-title">'+esc(l.title||u)+'</span><span class="rs__item-sub">'+esc(host)+'</span></span><span class="rs__item-ext">'+ICON_EXT+'</span></a><button class="rs__item-del" data-rsdel="'+i+'" type="button" title="Elimina">&times;</button></div>'});list.innerHTML=h}
-function renderManuals(){var list=document.getElementById('rsManualList');if(!list)return;var h='';MANUALS.forEach(function(m,i){var url='risorse/'+encodeURIComponent(m.file);h+='<a class="rs__manual" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" data-rsmnidx="'+i+'" style="--rs-accent:'+esc(m.accent||'#444')+'"><div class="rs__manual-cover"><span class="rs__manual-cover-ph">'+(m.icon||'📕')+'</span></div><div class="rs__manual-meta"><div class="rs__manual-row"><div class="rs__manual-t">'+esc(m.title)+'</div><span class="rs__manual-ext">↗</span></div>'+(m.subtitle?'<div class="rs__manual-st">'+esc(m.subtitle)+'</div>':'')+'<div class="rs__manual-d">'+esc(m.desc||'')+'</div><div class="rs__manual-foot"><span class="rs__manual-tag">📕 PDF</span><span data-rsmnsz="'+i+'">risorse</span></div></div></a>'});list.innerHTML=h;MANUALS.forEach(function(m,i){renderManualThumb(i);_fetchManualSize(i)})}
-function _fetchManualSize(idx){var m=MANUALS[idx];if(!m)return;if(m._size){_applySize(idx,m._size);return}var url='risorse/'+encodeURIComponent(m.file);fetch(url,{method:'HEAD'}).then(function(r){if(!r.ok)return;var l=parseInt(r.headers.get('content-length')||'0');if(!l)return;var mb=l/(1024*1024);var s=mb>=1?mb.toFixed(0)+' MB':(l/1024).toFixed(0)+' KB';m._size=s;_applySize(idx,s)}).catch(function(){})}
-function _applySize(idx,s){var el=document.querySelector('[data-rsmnsz="'+idx+'"]');if(el)el.textContent=s}
+function renderManuals(){var list=document.getElementById('rsManualList');if(!list)return;if(!manuals.length){list.innerHTML='<div class="rs__empty">Nessun manuale caricato.<br>Trascina i tuoi PDF nella zona qui sopra per iniziare.</div>';return}var sorted=manuals.slice().sort(function(a,b){return(a.added||0)-(b.added||0)});var h='';sorted.forEach(function(m){h+='<div class="rs__manual" data-rsmnid="'+esc(m.id)+'" style="--rs-accent:'+esc(m.accent||'#444')+'"><div class="rs__manual-cover"><span class="rs__manual-cover-ph">'+esc(m.icon||'📕')+'</span></div><div class="rs__manual-meta"><div class="rs__manual-row"><div class="rs__manual-t">'+esc(m.title||m.filename||'(senza titolo)')+'</div><span class="rs__manual-ext">↗</span></div>'+(m.subtitle?'<div class="rs__manual-st">'+esc(m.subtitle)+'</div>':'')+(m.desc?'<div class="rs__manual-d">'+esc(m.desc)+'</div>':'')+'<div class="rs__manual-foot"><span class="rs__manual-tag">📕 PDF</span><span>'+esc(fmtSize(m.size))+'</span></div></div><button class="rs__manual-edit" data-rsmnedit="'+esc(m.id)+'" type="button" title="Modifica">✎</button></div>'});list.innerHTML=h;sorted.forEach(function(m){renderManualThumb(m)})}
+function processManualFile(file){if(!file)return;if(file.type&&file.type.indexOf('pdf')<0&&!/\.pdf$/i.test(file.name||''))return;var fname=file.name||'manuale.pdf';var k=KNOWN_MANUALS[fname]||{};var rec={id:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),filename:fname,title:k.title||fname.replace(/\.pdf$/i,''),subtitle:k.subtitle||'',desc:k.desc||'',accent:k.accent||ACCENTS[Math.floor(Math.random()*ACCENTS.length)],icon:k.icon||'📕',size:file.size,type:file.type||'application/pdf',blob:file,added:Date.now()};dbPut(rec).then(function(){manuals.push(rec);renderManuals()}).catch(function(e){alert('Errore salvataggio "'+fname+'": '+(e&&e.message?e.message:e))})}
+function processManualFiles(files){if(!files)return;for(var i=0;i<files.length;i++)processManualFile(files[i])}
+var mnZone=document.getElementById('rsMnZone'),mnInp=document.getElementById('rsMnInput');
+mnZone.addEventListener('click',function(){mnInp.click()});
+mnInp.addEventListener('change',function(e){processManualFiles(e.target.files);e.target.value=''});
+mnZone.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();mnZone.classList.add('rs__upzone--over');if(e.dataTransfer)e.dataTransfer.dropEffect='copy'});
+mnZone.addEventListener('dragleave',function(e){e.preventDefault();e.stopPropagation();if(!mnZone.contains(e.relatedTarget))mnZone.classList.remove('rs__upzone--over')});
+mnZone.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();mnZone.classList.remove('rs__upzone--over');if(e.dataTransfer&&e.dataTransfer.files)processManualFiles(e.dataTransfer.files)});
+function openManualPdf(id){dbGet(id).then(function(rec){if(!rec||!rec.blob)return;var url=URL.createObjectURL(rec.blob);var a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url)},120000)})}
+document.getElementById('rsManualList').addEventListener('click',function(e){var ed=e.target.closest('[data-rsmnedit]');if(ed){e.stopPropagation();openMnEditModal(ed.dataset.rsmnedit);return}var card=e.target.closest('[data-rsmnid]');if(!card)return;openManualPdf(card.dataset.rsmnid)});
+/* Manual edit modal */
+var _mnEditingId=null;
+function openMnEditModal(id){var rec=manuals.filter(function(x){return x.id===id})[0];if(!rec)return;_mnEditingId=id;document.getElementById('rsmnTitle').value=rec.title||'';document.getElementById('rsmnSubtitle').value=rec.subtitle||'';document.getElementById('rsmnDesc').value=rec.desc||'';document.getElementById('rsmnIcon').value=rec.icon||'📕';document.getElementById('rsmnAccent').value=rec.accent||'#444444';document.getElementById('rsmnFilename').textContent=(rec.filename||'')+' · '+fmtSize(rec.size);renderMnSwatches();document.getElementById('rsmnOv').classList.add('on');document.getElementById('rsmnMd').classList.add('on');setTimeout(function(){document.getElementById('rsmnTitle').focus()},80)}
+function closeMnEditModal(){document.getElementById('rsmnOv').classList.remove('on');document.getElementById('rsmnMd').classList.remove('on');_mnEditingId=null}
+function renderMnSwatches(){var sw=document.getElementById('rsmnSwatches');var h='';ACCENTS.forEach(function(c){h+='<button class="rsmn-md__sw" data-rsmnsw="'+c+'" type="button" style="background:'+c+'"></button>'});sw.innerHTML=h}
+function saveMnEdit(){if(!_mnEditingId)return;var rec=manuals.filter(function(x){return x.id===_mnEditingId})[0];if(!rec)return;rec.title=document.getElementById('rsmnTitle').value.trim();rec.subtitle=document.getElementById('rsmnSubtitle').value.trim();rec.desc=document.getElementById('rsmnDesc').value.trim();rec.icon=document.getElementById('rsmnIcon').value.trim()||'📕';rec.accent=document.getElementById('rsmnAccent').value;dbPut(rec).then(function(){closeMnEditModal();renderManuals()})}
+function deleteMnEdit(){if(!_mnEditingId)return;var rec=manuals.filter(function(x){return x.id===_mnEditingId})[0];if(!rec)return;confirmDel('Eliminare "'+(rec.title||rec.filename)+'"?',function(){var id=rec.id;var k=_hashKey(rec.filename||rec.id);dbDel(id).then(function(){manuals=manuals.filter(function(x){return x.id!==id});try{localStorage.removeItem(THUMB_PREFIX+k)}catch(e){}closeMnEditModal();renderManuals()})})}
+document.getElementById('rsmnSave').addEventListener('click',saveMnEdit);
+document.getElementById('rsmnCancel').addEventListener('click',closeMnEditModal);
+document.getElementById('rsmnClose').addEventListener('click',closeMnEditModal);
+document.getElementById('rsmnDelete').addEventListener('click',deleteMnEdit);
+document.getElementById('rsmnOv').addEventListener('click',closeMnEditModal);
+document.getElementById('rsmnSwatches').addEventListener('click',function(e){var sw=e.target.closest('[data-rsmnsw]');if(!sw)return;document.getElementById('rsmnAccent').value=sw.dataset.rsmnsw});
+document.addEventListener('keydown',function(e){if(!document.getElementById('rsmnMd').classList.contains('on'))return;if(e.key==='Escape'){closeMnEditModal()}else if((e.ctrlKey||e.metaKey)&&(e.key==='s'||e.key==='S')){e.preventDefault();saveMnEdit()}});
+dbAll().then(function(arr){manuals=arr||[];renderManuals()}).catch(function(e){console.warn('Manuali load failed',e);manuals=[];renderManuals()});
 function addLink(){var t=document.getElementById('rsLnkTitle').value.trim();var u=document.getElementById('rsLnkUrl').value.trim();if(!u)return;if(!/^[a-z]+:\/\//i.test(u))u='https://'+u;links.push({title:t||u,url:u});if(!saveLinks())links.pop();document.getElementById('rsLnkTitle').value='';document.getElementById('rsLnkUrl').value='';renderLinks();document.getElementById('rsLnkTitle').focus()}
 document.getElementById('rsLnkAdd').addEventListener('click',addLink);
 document.getElementById('rsLnkUrl').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addLink()}});
