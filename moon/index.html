@@ -2824,7 +2824,7 @@ var rulerStart=null,rulerLive=null,rulerActive=false;
 var calibrating=false;
 var selectedPinId=null;
 var draggingPin=null,dragPinStart=null;
-var EMOJI_PINS=['📍','🏰','🏠','🏕','🌳','⛰','🌋','🌊','🔥','🌙','✨','🌟','⚔️','🏹','💀','☠️','🐉','🐺','🐍','🦇','👑','💎','💰','🍺','⚓','🚪','📜','🔮','🏛','⚱️','❓','⚠️'];
+var EMOJI_PINS=['📍','🏰','🏠','⛪','🌳','🌲','🗻','🌋','🌊','🔥','🌙','✨','🌟','⚔️','🏹','💀','☠️','🐉','🐺','🐍','👑','💎','💰','🍺','⚓','🚪','📜','🔮','🎲','⚱️','❓','⚠️'];
 function _open(){return new Promise(function(res,rej){if(!window.indexedDB){rej(new Error('IDB n/a'));return}var r=indexedDB.open(DB,VER);r.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains('manuals'))db.createObjectStore('manuals',{keyPath:'id'});if(!db.objectStoreNames.contains('images'))db.createObjectStore('images',{keyPath:'id'});if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE,{keyPath:'id'})};r.onsuccess=function(e){res(e.target.result)};r.onerror=function(e){rej(e.target.error)}})}
 function dbAll(){return _open().then(function(db){return new Promise(function(res){var tx=db.transaction(STORE,'readonly');var req=tx.objectStore(STORE).getAll();req.onsuccess=function(){res(req.result||[])};req.onerror=function(){res([])}})})}
 function dbGet(id){return _open().then(function(db){return new Promise(function(res){var tx=db.transaction(STORE,'readonly');var req=tx.objectStore(STORE).get(id);req.onsuccess=function(){res(req.result||null)};req.onerror=function(){res(null)}})})}
