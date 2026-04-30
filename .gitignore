@@ -1,0 +1,5 @@
+# Local Claude Code helpers (scripts, worktrees, launch config)
+.claude/
+
+# Local manual PDFs — too large for git, must be hosted elsewhere or kept local
+moon/risorse/*.pdf
