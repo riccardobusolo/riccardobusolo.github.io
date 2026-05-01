@@ -498,9 +498,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .pg__expitem-tog{flex-shrink:0;background:transparent;border:none;color:var(--muted);cursor:pointer;width:22px;font-size:.62rem;display:flex;align-items:center;justify-content:center;padding:0;transition:color .12s,transform .15s}
 .pg__expitem-tog:hover{color:var(--gold)}
 .pg__expitem--on .pg__expitem-tog{transform:rotate(90deg);color:var(--gold)}
-.pg__expitem-row>input{padding-left:8px;text-align:left;color:var(--text);font-family:var(--mono);font-size:.7rem;cursor:text}
-.pg__expitem-row>input[readonly]{cursor:pointer;color:var(--dim)}
+.pg__expitem-row>input{padding-left:8px;text-align:left;color:var(--text);font-family:var(--mono);font-size:.7rem;cursor:text;outline:none;box-shadow:none}
+.pg__expitem-row>input:focus{outline:none;box-shadow:none}
+.pg__expitem-row>input[readonly]{cursor:pointer;color:var(--dim);outline:none!important;box-shadow:none!important}
 .pg__expitem-row>input[readonly]:hover{color:var(--text)}
+.pg__expitem-row>input[readonly]:focus{outline:none!important;box-shadow:none!important}
 .pg__expitem-edit,.pg__expitem-row .pg__atk-del{display:none}
 .pg__expitem--on .pg__expitem-edit,.pg__expitem--on .pg__atk-del{display:flex}
 .pg__expitem-edit{flex-shrink:0;background:transparent;border:none;color:var(--muted);cursor:pointer;width:24px;height:auto;align-items:center;justify-content:center;padding:0;transition:color .12s}
