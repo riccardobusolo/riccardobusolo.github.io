@@ -604,6 +604,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .pg__roll{display:inline-flex;align-items:center;gap:2px;padding:3px 7px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:var(--dim);font-family:var(--mono);font-size:.68rem;cursor:var(--cur-pointer);transition:all .12s}.pg__roll:hover{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.06)}
 .pg__atk{display:flex;gap:3px;align-items:center;margin-bottom:3px;flex-wrap:wrap}
 .pg__atk .pg__inp{font-size:.68rem;padding:4px 4px;min-height:0}
+/* New 2-row attack layout */
+.pg__expitem--atk .pg__expitem-row{align-items:flex-start;padding:5px 0}
+.pg__atk-fields{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:0 4px}
+.pg__atk-name{width:100%;padding:4px 6px;font-size:.72rem;font-weight:600}
+.pg__atk-line2{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
+.pg__atk-line2 .pg__inp{padding:3px 4px;font-size:.64rem;min-height:0}
+.pg__atk-bonus{width:3.5ch;text-align:center;flex-shrink:0;color:var(--gold)}
+.pg__atk-abil{width:auto;min-width:48px;flex-shrink:0;cursor:var(--cur-pointer);padding-right:14px;text-align:center;font-weight:600;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23c49a32'><path d='M4 6l4 4 4-4'/></svg>");background-repeat:no-repeat;background-position:right 2px center;background-size:11px}
+.pg__atk-dmg{flex:1;min-width:42px;text-align:center;color:var(--text)}
+.pg__atk-type{flex:1;min-width:50px;text-align:center;color:var(--dim)}
+.pg__atk-arma{width:3.5ch;text-align:center;flex-shrink:0;color:var(--gold)}
+.pg__atk-roll{width:26px;height:24px;border-radius:5px;border:1px solid rgba(196,154,50,.4);background:rgba(196,154,50,.08);color:var(--gold);cursor:var(--cur-pointer);display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;line-height:1;padding:0;flex-shrink:0;transition:all .12s}
+.pg__atk-roll:hover{background:rgba(196,154,50,.2);border-color:var(--gold);transform:scale(1.05)}
+.pg__atk-roll:active{transform:scale(.95)}
+.pg__expitem--atk .pg__atk-del{align-self:flex-start;margin-top:5px}
 /* Expandable items: title row + body textarea dropdown */
 .pg__expitem{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:5px;background:var(--bg);margin-bottom:3px;overflow:hidden;transition:border-color .12s}
 .pg__expitem--on{border-color:var(--bh)}
@@ -2871,8 +2886,30 @@ var coinsH='<div class="pg__sec"><div class="pg__sec-title">\uD83E\uDE99 Monete<
 [['MR','mr','#b87333'],['MA','ma','#c0c0c0'],['ME','me','#8fa89a'],['MO','mo','#d4af37'],['MP','mp','#e5e4e2']].forEach(function(m){var coinSvg='<svg width="11" height="11" viewBox="0 0 12 12" style="vertical-align:-2px;flex-shrink:0;margin-right:3px" aria-hidden="true"><circle cx="6" cy="6" r="5.2" fill="'+m[2]+'" stroke="rgba(0,0,0,.35)" stroke-width="0.6"/><circle cx="6" cy="6" r="3.2" fill="none" stroke="rgba(0,0,0,.22)" stroke-width="0.5"/><ellipse cx="4.6" cy="4.2" rx="1.4" ry="0.7" fill="rgba(255,255,255,.55)"/></svg>';coinsH+='<div style="text-align:center;flex:1"><div class="pg__lbl" style="display:inline-flex;align-items:center;justify-content:center;gap:0">'+coinSvg+m[0]+'</div><input class="pg__inp" data-nf="coins_'+m[1]+'" value="'+(c.coins[m[1]]||0)+'" style="padding:4px 2px;font-size:.72rem"></div>'});
 coinsH+='</div></div>';
 if(!c.attacks)c.attacks=[];
-var atkRows='';c.attacks.forEach(function(a,i){atkRows+='<div class="pg__expitem"><div class="pg__expitem-row"><button class="pg__expitem-tog" data-atktog="'+i+'" type="button" title="Mostra/nascondi descrizione">\u25B8</button><div class="pg__atk" style="flex:1;border:none;background:transparent;display:flex;gap:3px;align-items:center;padding:0 4px"><input class="pg__inp pg__inp--sm" data-atk="'+i+'" data-af="name" value="'+esc(a.name||'')+'" placeholder="Nome" style="flex:3;min-width:60px"><input class="pg__inp pg__inp--sm" data-atk="'+i+'" data-af="bonus" value="'+esc(a.bonus||'')+'" placeholder="Bonus" style="flex:1;min-width:40px;text-align:center"><input class="pg__inp pg__inp--sm" data-atk="'+i+'" data-af="damage" value="'+esc(a.damage||'')+'" placeholder="Danni/Tipo" style="flex:2;min-width:60px"></div><button class="pg__atk-del" data-atkdel="'+i+'"><svg viewBox="0 0 24 24" width="10" height="10"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div><textarea class="pg__expitem-body" data-atk="'+i+'" data-af="desc" placeholder="Descrizione...">'+esc(a.desc||'')+'</textarea></div>'});
-var atkH='<div class="pg__sec"><div class="pg__sec-title"><span>\u2694\ufe0f Attacchi & Incantesimi</span><button class="pg__sec-add" data-atkadd="1" type="button">+ Aggiungi</button></div><div class="pg__row" style="gap:0;margin-bottom:2px;flex-wrap:nowrap;align-items:center"><span style="width:22px;flex-shrink:0"></span><div style="flex:1;display:flex;gap:3px;padding:0 4px;min-width:0"><span class="pg__lbl" style="flex:3;min-width:60px;width:0;margin:0">NOME</span><span class="pg__lbl" style="flex:1;min-width:40px;width:0;text-align:center;margin:0">BONUS</span><span class="pg__lbl" style="flex:2;min-width:60px;width:0;text-align:center;margin:0">DANNI/TIPO</span></div></div>'+atkRows+'</div>';
+var _ATK_ABILS=[['str','FOR'],['dex','DES'],['con','COS'],['intl','INT'],['wis','SAG'],['cha','CAR']];
+var atkRows='';c.attacks.forEach(function(a,i){
+  var abilOpts='<option value="">\u2014</option>';
+  _ATK_ABILS.forEach(function(o){abilOpts+='<option value="'+o[0]+'"'+(a.abil===o[0]?' selected':'')+'>'+o[1]+'</option>'});
+  atkRows+='<div class="pg__expitem pg__expitem--atk">'+
+    '<div class="pg__expitem-row">'+
+      '<button class="pg__expitem-tog" data-atktog="'+i+'" type="button" title="Mostra/nascondi descrizione">\u25B8</button>'+
+      '<div class="pg__atk-fields">'+
+        '<input class="pg__inp pg__inp--sm pg__atk-name" data-atk="'+i+'" data-af="name" value="'+esc(a.name||'')+'" placeholder="Nome attacco/incantesimo" title="Nome">'+
+        '<div class="pg__atk-line2">'+
+          '<input class="pg__inp pg__inp--sm pg__atk-bonus" data-atk="'+i+'" data-af="bonus" value="'+esc(a.bonus||'')+'" placeholder="+col" title="Bonus a colpire">'+
+          '<select class="pg__inp pg__inp--sm pg__atk-abil" data-atk="'+i+'" data-af="abil" title="Caratteristica usata per il danno">'+abilOpts+'</select>'+
+          '<input class="pg__inp pg__inp--sm pg__atk-dmg" data-atk="'+i+'" data-af="damage" value="'+esc(a.damage||'')+'" placeholder="1d8" title="Formula danno (es. 1d8, 2d6+1)">'+
+          '<input class="pg__inp pg__inp--sm pg__atk-type" data-atk="'+i+'" data-af="dmgType" value="'+esc(a.dmgType||'')+'" placeholder="tipo" title="Tipo di danno (taglio, perforante, fuoco...)">'+
+          '<input class="pg__inp pg__inp--sm pg__atk-arma" data-atk="'+i+'" data-af="armaBonus" value="'+esc(a.armaBonus||'')+'" placeholder="+0" title="Bonus arma extra">'+
+          '<button class="pg__atk-roll" data-atkroll="'+i+'" type="button" title="Tira danno con dado + caratteristica + bonus arma">\ud83c\udfb2</button>'+
+        '</div>'+
+      '</div>'+
+      '<button class="pg__atk-del" data-atkdel="'+i+'" title="Elimina"><svg viewBox="0 0 24 24" width="10" height="10"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>'+
+    '</div>'+
+    '<textarea class="pg__expitem-body" data-atk="'+i+'" data-af="desc" placeholder="Descrizione, propriet\u00e0, range...">'+esc(a.desc||'')+'</textarea>'+
+  '</div>';
+});
+var atkH='<div class="pg__sec"><div class="pg__sec-title"><span>\u2694\ufe0f Attacchi & Incantesimi</span><button class="pg__sec-add" data-atkadd="1" type="button">+ Aggiungi</button></div>'+atkRows+'</div>';
 var hdH='<div class="pg__sec"><div class="pg__sec-title">\uD83C\uDFB2 Dadi Vita</div><div class="pg__row" style="align-items:center;gap:6px;flex-wrap:nowrap"><div class="pg__val" data-nf="hitDie" style="padding:2px 6px;min-height:0;font-size:.68rem">d'+(c.hitDie||8)+'</div><input class="pg__inp" data-hdinp="1" value="'+hdLeft+'" style="width:28px;padding:2px 4px;font-size:.68rem;text-align:center;min-height:0"><span style="font-family:var(--mono);font-size:.58rem;color:var(--muted)">/'+c.lvl+'</span><div style="display:flex;gap:2px;margin-left:auto"><button class="pg__roll" data-rollhd="1">\uD83C\uDFB2 Tira</button><button class="pg__roll" data-resethd="1">\u21BA</button></div></div></div>';
 var dsH='<div class="pg__sec"><div class="pg__sec-title">\u2620\ufe0f TS Morte</div><div class="pg__row" style="align-items:center;gap:6px;flex-wrap:nowrap"><div style="display:flex;align-items:center;gap:2px"><span class="pg__lbl" style="margin:0;font-size:.46rem">\u2714</span><div class="pg__dots">'+dotRow(c.dsc.s,3,'s')+'</div></div><div style="display:flex;align-items:center;gap:2px"><span class="pg__lbl" style="margin:0;font-size:.46rem">\u2718</span><div class="pg__dots">'+dotRow(c.dsc.f,3,'f')+'</div></div><div style="display:flex;gap:2px;margin-left:auto"><button class="pg__roll" data-rollds="1">\uD83C\uDFB2 Tira</button><button class="pg__roll" data-resetds="1">\u21BA</button></div></div></div>';
 if(!c.equipList)c.equipList=[];
@@ -2967,8 +3004,34 @@ var exDot=e.target.closest('.pg__dot--ex');if(exDot){var ei=parseInt(exDot.datas
 var rHd=e.target.closest('[data-rollhd]');if(rHd){var left=pg.hitDiceLeft!=null?pg.hitDiceLeft:pg.lvl;if(left<=0){window._pgLastAbResult='\u26A0 Nessun dado vita rimasto!';window._pgLastAbClass='pg__roll-row--fail';render();return}var die=pg.hitDie||8,conMod=pgMod(pg.con),roll=rollD(die),heal=Math.max(1,roll+conMod);pg.hitDiceLeft=left-1;if(pg.hpCur==null)pg.hpCur=pg.hp;var oldHp=pg.hpCur;pg.hpCur=Math.min(pg.hp,pg.hpCur+heal);savePG(pg);window._pgLastAbResult='\uD83C\uDFB2 Dado vita: <strong>'+roll+'</strong> (d'+die+') + COS '+pgFmt(conMod)+' = <strong style="color:var(--gold)">'+heal+' PF</strong> ('+oldHp+' \u2192 '+pg.hpCur+')';window._pgLastAbClass='pg__roll-row--hit';render();return}
 var rDs=e.target.closest('[data-rollds]');if(rDs){if(!pg.dsc)pg.dsc={s:0,f:0};if(pg.dsc.s>=3||pg.dsc.f>=3)return;var roll=rollD(20),msg='',cls='';if(roll===1){pg.dsc.f=Math.min(3,pg.dsc.f+2);msg='\uD83C\uDFB2 TS Morte: <strong style="color:var(--red)">1</strong> (d20) \u2014 Fallimento critico!';cls='pg__roll-row--fail'}else if(roll<10){pg.dsc.f=Math.min(3,pg.dsc.f+1);msg='\uD83C\uDFB2 TS Morte: <strong style="color:var(--red)">'+roll+'</strong> (d20) \u2014 Fallimento';cls='pg__roll-row--fail'}else if(roll===20){pg.dsc.s=3;if(pg.hpCur==null)pg.hpCur=pg.hp;if(pg.hpCur<=0)pg.hpCur=1;msg='\uD83C\uDFB2 TS Morte: <strong style="color:var(--gold)">20</strong> (d20) \u2014 NAT 20! Ti rialzi con 1 PF!';cls='pg__roll-row--crit'}else{pg.dsc.s=Math.min(3,pg.dsc.s+1);msg='\uD83C\uDFB2 TS Morte: <strong style="color:#4a9a5a">'+roll+'</strong> (d20) \u2014 Successo!';cls='pg__roll-row--hit'}savePG(pg);window._pgLastAbResult=msg;window._pgLastAbClass=cls;render();return}
 var rsDs=e.target.closest('[data-resetds]');if(rsDs){pg.dsc={s:0,f:0};savePG(pg);render();return}
-var atkAdd=e.target.closest('[data-atkadd]');if(atkAdd){if(!pg.attacks)pg.attacks=[];pg.attacks.push({name:'',bonus:'',damage:''});savePG(pg);render();return}
+var atkAdd=e.target.closest('[data-atkadd]');if(atkAdd){if(!pg.attacks)pg.attacks=[];pg.attacks.push({name:'',bonus:'',abil:'',damage:'',dmgType:'',armaBonus:'',desc:''});savePG(pg);render();return}
 var atkDel=e.target.closest('[data-atkdel]');if(atkDel){var ai=parseInt(atkDel.dataset.atkdel);if(pg.attacks)pg.attacks.splice(ai,1);savePG(pg);render();return}
+var atkRoll=e.target.closest('[data-atkroll]');if(atkRoll){
+  var ri=parseInt(atkRoll.dataset.atkroll);
+  var atk=pg.attacks&&pg.attacks[ri];
+  if(!atk)return;
+  var formula=(atk.damage||'').replace(/\s/g,'').toLowerCase();
+  var m=formula.match(/^(\d*)d(\d+)([+-]\d+)?/);
+  if(!m){window._pgLastAbResult='⚠ Formula danno non valida: <code>'+esc(atk.damage||'(vuota)')+'</code>. Usa formato tipo <code>1d8</code> o <code>2d6+1</code>.';window._pgLastAbClass='pg__roll-row--fail';render();return}
+  var count=parseInt(m[1])||1,sides=parseInt(m[2]),inlineMod=m[3]?parseInt(m[3]):0;
+  if(count<1||count>20||sides<2||sides>100){window._pgLastAbResult='⚠ Formula danno fuori limite: '+esc(atk.damage);window._pgLastAbClass='pg__roll-row--fail';render();return}
+  var rollsArr=[],sum=0;
+  for(var rI=0;rI<count;rI++){var rr=rollD(sides);rollsArr.push(rr);sum+=rr}
+  var abilMod=atk.abil?pgMod(pg[atk.abil]||10):0;
+  var armaBonus=parseInt(atk.armaBonus)||0;
+  var total=sum+inlineMod+abilMod+armaBonus;
+  var abilLbl={str:'FOR',dex:'DES',con:'COS',intl:'INT',wis:'SAG',cha:'CAR'};
+  var bits=['<strong>'+sum+'</strong>'];
+  if(rollsArr.length>1)bits.push('['+rollsArr.join(', ')+']');
+  if(inlineMod)bits.push((inlineMod>=0?'+':'')+inlineMod);
+  if(abilMod||atk.abil)bits.push((abilMod>=0?'+':'')+abilMod+' '+(abilLbl[atk.abil]||''));
+  if(armaBonus)bits.push((armaBonus>=0?'+':'')+armaBonus+' arma');
+  var nm=atk.name||'Attacco';
+  var typeStr=atk.dmgType?' <span style="color:var(--muted)">('+esc(atk.dmgType)+')</span>':'';
+  window._pgLastAbResult='⚔ '+esc(nm)+': '+bits.join(' ')+' = <strong style="color:var(--gold)">'+total+'</strong> danni'+typeStr;
+  window._pgLastAbClass=total>=count*sides?'pg__roll-row--crit':'pg__roll-row--hit';
+  render();return;
+}
 var eqAdd=e.target.closest('[data-eqadd]');if(eqAdd){if(!pg.equipList)pg.equipList=[];pg.equipList.push('');savePG(pg);render();return}
 var eqDel=e.target.closest('[data-eqdel]');if(eqDel){var ei=parseInt(eqDel.dataset.eqdel);if(pg.equipList)pg.equipList.splice(ei,1);savePG(pg);render();return}
 var ftAdd=e.target.closest('[data-ftadd]');if(ftAdd){if(!pg.featList)pg.featList=[];pg.featList.push('');savePG(pg);render();return}
