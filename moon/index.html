@@ -525,8 +525,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .pg__sec--exh{padding:6px 10px}
 .pg__exh-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .pg__exh-title{font-family:var(--mono);font-size:.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-weight:600;flex-shrink:0}
-.pg__exh-help{width:18px;height:18px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);font-family:var(--mono);font-size:.6rem;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:all .12s}
-.pg__exh-help:hover{background:rgba(196,154,50,.1);color:var(--gold);border-color:rgba(196,154,50,.5)}
+.pg__exh-help,.pg__sec-help{width:18px;height:18px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);font-family:var(--mono);font-size:.6rem;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:all .12s;margin-left:6px}
+.pg__exh-help:hover,.pg__sec-help:hover{background:rgba(196,154,50,.1);color:var(--gold);border-color:rgba(196,154,50,.5)}
 .pg__exh-val{font-family:var(--mono);font-size:.6rem;color:var(--muted);font-style:italic;flex-shrink:0}
 .pg__exh-dots{margin-left:auto;display:flex;gap:3px;flex-shrink:0}
 .pg__slot-mode{display:flex;gap:2px;margin-bottom:5px}
@@ -2898,11 +2898,11 @@ var atkRows='';c.attacks.forEach(function(a,i){
       '<div class="pg__atk-fields">'+
         '<input class="pg__inp pg__inp--sm pg__atk-name" data-atk="'+i+'" data-af="name" value="'+esc(a.name||'')+'" placeholder="Nome attacco/incantesimo" title="Nome">'+
         '<div class="pg__atk-line2">'+
+          '<input class="pg__inp pg__inp--sm pg__atk-dmg" data-atk="'+i+'" data-af="damage" value="'+esc(a.damage||'')+'" placeholder="1d8" title="Formula danno (es. 1d8, 2d6+1)">'+
           '<select class="pg__inp pg__inp--sm pg__atk-abil" data-atk="'+i+'" data-af="abil" title="Caratteristica usata per colpire e per il danno">'+abilOpts+'</select>'+
           '<span class="pg__atk-modauto" title="Modificatore della caratteristica (auto)">'+modAuto+'</span>'+
           '<input class="pg__inp pg__inp--sm pg__atk-type" data-atk="'+i+'" data-af="dmgType" value="'+esc(a.dmgType||'')+'" placeholder="tipo" title="Tipo di danno (taglio, perforante, fuoco...)">'+
           '<input class="pg__inp pg__inp--sm pg__atk-arma" data-atk="'+i+'" data-af="armaBonus" value="'+esc(a.armaBonus||'')+'" placeholder="+0 extra" title="Modificatori extra (es. bonus arma magica)">'+
-          '<input class="pg__inp pg__inp--sm pg__atk-dmg" data-atk="'+i+'" data-af="damage" value="'+esc(a.damage||'')+'" placeholder="1d8" title="Formula danno (es. 1d8, 2d6+1)">'+
           '<button class="pg__atk-roll" data-atkroll="'+i+'" type="button" title="Tira: tiro per colpire + danno">\ud83c\udfb2</button>'+
         '</div>'+
       '</div>'+
@@ -2911,7 +2911,7 @@ var atkRows='';c.attacks.forEach(function(a,i){
     '<textarea class="pg__expitem-body" data-atk="'+i+'" data-af="desc" placeholder="Descrizione, propriet\u00e0, range...">'+esc(a.desc||'')+'</textarea>'+
   '</div>';
 });
-var atkH='<div class="pg__sec"><div class="pg__sec-title"><span>\u2694\ufe0f Attacchi & Incantesimi</span><button class="pg__sec-add" data-atkadd="1" type="button">+ Aggiungi</button></div>'+atkRows+'</div>';
+var atkH='<div class="pg__sec"><div class="pg__sec-title"><span>\u2694\ufe0f Attacchi & Incantesimi</span><button class="pg__sec-help" data-help="attacks" type="button" title="Come funziona la sezione attacchi" aria-label="Aiuto attacchi">?</button><button class="pg__sec-add" data-atkadd="1" type="button">+ Aggiungi</button></div>'+atkRows+'</div>';
 var hdH='<div class="pg__sec"><div class="pg__sec-title">\uD83C\uDFB2 Dadi Vita</div><div class="pg__row" style="align-items:center;gap:6px;flex-wrap:nowrap"><div class="pg__val" data-nf="hitDie" style="padding:2px 6px;min-height:0;font-size:.68rem">d'+(c.hitDie||8)+'</div><input class="pg__inp" data-hdinp="1" value="'+hdLeft+'" style="width:28px;padding:2px 4px;font-size:.68rem;text-align:center;min-height:0"><span style="font-family:var(--mono);font-size:.58rem;color:var(--muted)">/'+c.lvl+'</span><div style="display:flex;gap:2px;margin-left:auto"><button class="pg__roll" data-rollhd="1">\uD83C\uDFB2 Tira</button><button class="pg__roll" data-resethd="1">\u21BA</button></div></div></div>';
 var dsH='<div class="pg__sec"><div class="pg__sec-title">\u2620\ufe0f TS Morte</div><div class="pg__row" style="align-items:center;gap:6px;flex-wrap:nowrap"><div style="display:flex;align-items:center;gap:2px"><span class="pg__lbl" style="margin:0;font-size:.46rem">\u2714</span><div class="pg__dots">'+dotRow(c.dsc.s,3,'s')+'</div></div><div style="display:flex;align-items:center;gap:2px"><span class="pg__lbl" style="margin:0;font-size:.46rem">\u2718</span><div class="pg__dots">'+dotRow(c.dsc.f,3,'f')+'</div></div><div style="display:flex;gap:2px;margin-left:auto"><button class="pg__roll" data-rollds="1">\uD83C\uDFB2 Tira</button><button class="pg__roll" data-resetds="1">\u21BA</button></div></div></div>';
 if(!c.equipList)c.equipList=[];
@@ -3909,6 +3909,26 @@ var HELP={
     +'<li>Il tab <strong>Link</strong> è oro per le risorse online che usi sempre: Roll20, dndbeyond, generatori di nomi, fan-made tools. Niente più caccia ai bookmark del browser.</li>'
     +'<li>I <strong>PDF dei manuali</strong> restano <em>solo</em> nel tuo browser per scelta — non vengono mai caricati nel cloud. Se cambi dispositivo o pulisci la cache, devi ricaricarli.</li>'
     +'<li>Tutto il resto (link, immagini, testi, disegni) è invece sincronizzato: lo ritrovi su qualsiasi dispositivo dove fai login.</li>'
+    +'</ul>'
+  },
+  attacks:{title:'Attacchi & Incantesimi',body:''
+    +'<p>Aggiungi armi, incantesimi e altre fonti di danno per averli a portata di click. Il pulsante 🎲 tira sia il <strong>tiro per colpire</strong> sia i <strong>danni</strong> con tutti i modificatori del PG già inclusi automaticamente.</p>'
+    +'<h4>I 5 campi della seconda riga</h4>'
+    +'<ul>'
+    +'<li><strong>Dado</strong>: la formula del danno (es. <code>1d8</code>, <code>2d6</code>, <code>3d10+2</code>). Accetta dadi singoli o multipli, con o senza modificatore inline.</li>'
+    +'<li><strong>Caratteristica</strong>: FOR, DES, COS, INT, SAG, CAR. Usata sia per il tiro per colpire sia per il danno.</li>'
+    +'<li><strong>Modificatore</strong>: read-only, calcolato dalla caratteristica selezionata. Si aggiorna da solo quando cambi punteggio o caratteristica.</li>'
+    +'<li><strong>Tipo</strong>: solo descrittivo (taglio, perforante, fuoco, radioso…). Appare tra parentesi nel risultato.</li>'
+    +'<li><strong>Modificatori extra</strong>: bonus aggiuntivi (arma magica +1, feature di classe come Stile di Combattimento Difesa, ecc.).</li>'
+    +'</ul>'
+    +'<h4>💡 Tips</h4>'
+    +'<ul>'
+    +'<li>Il <strong>tiro per colpire</strong> è calcolato come <code>1d20 + caratt + competenza</code>. La competenza viene dal livello del PG, niente da configurare.</li>'
+    +'<li>Il <strong>danno</strong> è calcolato come <code>dado + caratt + extra (+ modificatore inline della formula)</code>.</li>'
+    +'<li>Click su <code>▸</code> a sinistra per espandere la <strong>descrizione</strong>: utile per annotare range, proprietà speciali, slot incantesimo, ecc.</li>'
+    +'<li>20 naturale sul d20 → banner verde (critico). 1 naturale → banner rosso (fallimento).</li>'
+    +'<li>Per attacchi senza caratteristica (es. dardo da fuoco fisso), lascia la caratteristica su <em>—</em>: il tiro userà solo dado + competenza.</li>'
+    +'<li>Per incantesimi che non richiedono tiro per colpire (es. <em>palla di fuoco</em> con TS), ignora il risultato della prima riga e usa solo i danni.</li>'
     +'</ul>'
   },
   exhaustion:{title:'Esaustione',body:''
