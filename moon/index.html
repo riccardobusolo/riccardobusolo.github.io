@@ -67,6 +67,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .setpanel__btn:hover{border-color:rgba(196,154,50,.4);color:var(--gold);background:rgba(196,154,50,.05)}
 .setpanel__btn svg{stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
 .setpanel__btn--danger:hover{border-color:var(--rb);color:var(--red);background:var(--rl)}
+.setpanel__hint{font-family:var(--mono);font-size:.6rem;color:var(--muted);line-height:1.45;padding:6px 4px 0;font-style:italic}
 .setpanel__info{display:flex;justify-content:space-between;align-items:center;padding:.4375rem .6875rem;background:var(--bg);border:1px solid var(--border);border-radius:5px}
 .setpanel__lbl{font-family:var(--mono);font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .setpanel__val{font-family:var(--mono);font-size:.74rem;color:var(--gold);font-weight:600}
@@ -1746,6 +1747,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <button class="setpanel__btn" id="setExport"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Esporta backup</button>
 <label class="setpanel__btn"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Importa backup<input type="file" id="setImport" accept=".json,application/json" style="display:none"></label>
 <button class="setpanel__btn setpanel__btn--danger" id="setReset"><svg viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> Resetta tutto</button>
+<div class="setpanel__hint">Il backup include solo i dati locali (PG, foto, suoni, mappe…). I PDF dei manuali e i dati cloud non sono inclusi.</div>
 </section>
 <section class="setpanel__sec">
 <h4 class="setpanel__h4">🎨 Tema</h4>
@@ -1957,9 +1959,25 @@ var _toolList=document.getElementById('setToolList');if(_toolList){_toolList.add
 var origSetOpen3=setOpen;setOpen=function(){origSetOpen3();_renderToolList()};
 _applyToolHide();
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&panel.classList.contains('on'))setClose()});
-document.getElementById('setExport').onclick=function(){var data={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);data[k]=localStorage.getItem(k)}var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');var d=new Date();var ts=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0');a.href=url;a.download='crooked-moon-backup_'+ts+'.json';a.click();setTimeout(function(){URL.revokeObjectURL(url)},100)};
-document.getElementById('setImport').onchange=function(e){var f=e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(ev){try{var data=JSON.parse(ev.target.result);if(typeof pgConfirm==='function'){pgConfirm('Importare il backup? I dati attuali verranno SOSTITUITI.',function(){Object.keys(data).forEach(function(k){localStorage.setItem(k,data[k])});location.reload()},{title:'Importa backup',okLabel:'Importa'})}else if(confirm('Sostituire i dati attuali con il backup?')){Object.keys(data).forEach(function(k){localStorage.setItem(k,data[k])});location.reload()}}catch(err){alert('File non valido: '+err.message)}};rd.readAsText(f);e.target.value=''};
-document.getElementById('setReset').onclick=function(){var doReset=function(){localStorage.clear();location.reload()};if(typeof pgConfirm==='function'){pgConfirm('Cancellare TUTTI i dati salvati?\nPersonaggi, preferiti e impostazioni andranno persi.\nL\'azione \u00e8 irreversibile.',doReset,{title:'Reset completo',okLabel:'Resetta tutto'})}else if(confirm('Cancellare tutti i dati?')){doReset()}};
+/* Chiavi escluse dal backup esportato: flag privati o ephemeral.
+   cm_dm = dev mode segreto. cm_last_sync = timestamp transitorio. */
+var BACKUP_EXCLUDE={'cm_dm':1,'cm_last_sync':1};
+document.getElementById('setExport').onclick=function(){var data={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(BACKUP_EXCLUDE[k])continue;data[k]=localStorage.getItem(k)}var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');var d=new Date();var ts=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0');a.href=url;a.download='crooked-moon-backup_'+ts+'.json';a.click();setTimeout(function(){URL.revokeObjectURL(url)},100)};
+document.getElementById('setImport').onchange=function(e){var f=e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(ev){try{var data=JSON.parse(ev.target.result);var msg='Importare il backup?\nLe chiavi attuali con lo stesso nome verranno sovrascritte; le altre resteranno intatte.\n(I PDF dei manuali non sono nel backup e non vengono toccati.)';var doImport=function(){Object.keys(data).forEach(function(k){if(BACKUP_EXCLUDE[k])return;try{localStorage.setItem(k,data[k])}catch(_){}});location.reload()};if(typeof pgConfirm==='function'){pgConfirm(msg,doImport,{title:'Importa backup',okLabel:'Importa'})}else if(confirm(msg)){doImport()}}catch(err){alert('File non valido: '+err.message)}};rd.readAsText(f);e.target.value=''};
+document.getElementById('setReset').onclick=function(){var doReset=function(){
+  /* 1) cancella localStorage (tutti i cm_*, pg_*, settings...) */
+  try{localStorage.clear()}catch(_){}
+  /* 2) cancella tutti gli IndexedDB locali, inclusi i PDF manuali */
+  var dbs=['cm_sounds','cm_res_db'];
+  var pending=dbs.length;
+  function done(){if(--pending<=0)location.reload()}
+  if(!window.indexedDB){location.reload();return}
+  dbs.forEach(function(name){try{var r=indexedDB.deleteDatabase(name);r.onsuccess=done;r.onerror=done;r.onblocked=done}catch(_){done()}});
+  /* fallback: se le delete impiegano troppo, forziamo il reload comunque */
+  setTimeout(function(){location.reload()},2500);
+};
+var resetMsg='Cancellare TUTTI i dati locali?\n\u2022 Personaggi, schede PG, combat tracker\n\u2022 Suoni, immagini, mappe, disegni, link, testi, preferiti\n\u2022 Foto miniatura locali\n\u2022 PDF dei manuali caricati\n\u2022 Tutte le impostazioni\n\nI dati nel cloud (foto Cloudinary, sync Firestore) NON saranno toccati: per quelli usa Account \u2192 Zona pericolosa.\n\nL\'azione \u00e8 irreversibile.';
+if(typeof pgConfirm==='function'){pgConfirm(resetMsg,doReset,{title:'Reset completo',okLabel:'Resetta tutto'})}else if(confirm(resetMsg)){doReset()}};
 })();
 
 /* === Account panel + Auth Wall === */
