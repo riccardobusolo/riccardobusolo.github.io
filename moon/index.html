@@ -113,6 +113,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .acc__msg.acc__msg--info{display:block;background:rgba(196,154,50,.08);border:1px solid rgba(196,154,50,.3);color:var(--gold)}
 .acc__info{font-family:var(--mono);font-size:.7rem;color:var(--dim);line-height:1.5}
 .acc__info strong{color:var(--gold);font-weight:600}
+.acc__autosync{display:flex;gap:.65rem;align-items:flex-start;padding:.7rem .8rem;background:rgba(196,154,50,.05);border:1px solid rgba(196,154,50,.22);border-radius:7px;cursor:var(--cur-pointer);transition:background .15s,border-color .15s}
+.acc__autosync:hover{background:rgba(196,154,50,.09);border-color:rgba(196,154,50,.35)}
+.acc__autosync input[type="checkbox"]{margin-top:.18rem;flex-shrink:0;cursor:var(--cur-pointer);accent-color:var(--gold);width:14px;height:14px}
+.acc__autosync__txt{display:flex;flex-direction:column;gap:.25rem;font-family:var(--mono);min-width:0}
+.acc__autosync__title{font-size:.74rem;color:var(--text);font-weight:600;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.acc__autosync__pill{font-size:.55rem;padding:.1rem .35rem;background:rgba(40,140,60,.15);border:1px solid rgba(40,140,60,.4);color:#6fc47f;border-radius:3px;font-weight:500;letter-spacing:.5px;text-transform:uppercase}
+.acc__autosync__desc{font-size:.65rem;color:var(--dim);line-height:1.45}
+.acc__synchint{font-family:var(--mono);font-size:.62rem;color:var(--muted);line-height:1.4;padding:.15rem .15rem .25rem}
 .acc__pwwrap{position:relative;display:flex;align-items:center}
 .acc__pwwrap .acc__inp{padding-right:2.2rem}
 .acc__pweye{position:absolute;right:.45rem;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--muted);cursor:var(--cur-pointer);padding:.25rem;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:color .15s,background .15s}
@@ -1702,9 +1710,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 </section>
 <section class="setpanel__sec acc__loggedin" style="display:none">
 <h4 class="setpanel__h4">☁️ Sincronizzazione</h4>
+<label class="acc__autosync" for="accAutoSync"><input type="checkbox" id="accAutoSync"><span class="acc__autosync__txt"><span class="acc__autosync__title">Sync automatico al cambio <span class="acc__autosync__pill">consigliato</span></span><span class="acc__autosync__desc">Ogni modifica (PG, foto, note, mappe…) viene caricata nel cloud automaticamente dopo 2,5 secondi di pausa. Disattivalo solo se vuoi sperimentare in locale senza salvare nel cloud.</span></span></label>
+<div class="acc__synchint">Carica/scarica manualmente solo se hai disattivato il sync automatico, o per forzare un sync subito.</div>
+<div class="acc__btnrow">
 <button class="setpanel__btn" id="accSyncUp"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Carica nel cloud</button>
 <button class="setpanel__btn" id="accSyncDown"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Scarica dal cloud</button>
-<label class="setpanel__btn" style="cursor:var(--cur-pointer)"><input type="checkbox" id="accAutoSync" style="margin-right:8px"> Sync automatico al cambio</label>
+</div>
 <div class="acc__msg" id="accSyncMsg"></div>
 </section>
 <section class="setpanel__sec acc__loggedin" style="display:none">
@@ -2226,8 +2237,8 @@ function accSyncDown(silent){
 document.getElementById('accSyncUp').onclick=function(){accSyncUp(false)};
 document.getElementById('accSyncDown').onclick=function(){accSyncDown(false)};
 
-/* ----- Auto-sync ----- */
-function accAutoSyncEnabled(){return localStorage.getItem('cm_autosync')==='1'}
+/* ----- Auto-sync (default ON for new users) ----- */
+function accAutoSyncEnabled(){var v=localStorage.getItem('cm_autosync');return v===null?true:v==='1'}
 var _autoTimer=null;
 function _armAutoSync(){
   if(!fbReady||!curUser||!accAutoSyncEnabled())return;
@@ -2236,7 +2247,7 @@ function _armAutoSync(){
   localStorage.setItem=function(k,v){origSet(k,v);if(!accAutoSyncEnabled()||!curUser)return;if(k==='cm_last_sync'||k==='cm_autosync')return;clearTimeout(_autoTimer);_autoTimer=setTimeout(function(){accSyncUp(true)},2500)};
 }
 var autoCb=document.getElementById('accAutoSync');
-if(autoCb){autoCb.onchange=function(){localStorage.setItem('cm_autosync',autoCb.checked?'1':'0');if(autoCb.checked)_armAutoSync();setMsg('accSyncMsg',autoCb.checked?'Sync automatico attivo (debounced 2.5s)':'Sync automatico disattivato','info')}}
+if(autoCb){autoCb.onchange=function(){localStorage.setItem('cm_autosync',autoCb.checked?'1':'0');if(autoCb.checked)_armAutoSync();setMsg('accSyncMsg',autoCb.checked?'✅ Sync automatico attivato — le modifiche verranno salvate nel cloud automaticamente':'⚠️ Sync automatico disattivato — ricordati di cliccare "Carica nel cloud" per salvare','info')}}
 })();
 
 rW();
