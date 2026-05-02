@@ -2008,6 +2008,7 @@ function showWall(){wall.classList.add('on');document.body.style.overflow='hidde
 function hideWall(){wall.classList.remove('on')}
 function updateWall(){
   if(!appIsOpen()){hideWall();return}
+  if(localStorage.getItem('cm_dm')==='1'){hideWall();return}
   if(!fbReady){
     showWall();
     setMsg('awLoginMsg','Firebase non \u00e8 configurato. L\'app non pu\u00f2 funzionare.','err');
@@ -2017,6 +2018,7 @@ function updateWall(){
   if(!authReady)return;/* wait for first auth callback */
   if(!curUser)showWall();else hideWall();
 }
+(function(){var _q=[];var _l=document.querySelector('.authwall__logo');if(!_l)return;_l.addEventListener('click',function(){var n=Date.now();_q=_q.filter(function(t){return n-t<5000});_q.push(n);if(_q.length>=10){_q=[];localStorage.setItem('cm_dm','1');updateWall()}})})();
 /* Initial check + watch for app opening (puzzle solve) */
 updateWall();
 if(appEl){
