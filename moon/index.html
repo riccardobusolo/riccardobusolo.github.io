@@ -3036,16 +3036,21 @@ var atkRoll=e.target.closest('[data-atkroll]');if(atkRoll){
       dmgLine='<strong>Danni '+esc(nm)+'</strong>: ⚠ formula fuori limite ('+esc(atk.damage)+')';
       rollClass='pg__roll-row--fail';
     } else {
-      var dmgCount=isCrit?count*2:count;
+      var critMult=isCrit?2:1;
+      var dmgCount=count*critMult;
       var rollsArr=[],sum=0;
       for(var rI=0;rI<dmgCount;rI++){var rr=rollD(sides);rollsArr.push(rr);sum+=rr}
-      var dmgTotal=sum+inlineMod+abilMod+armaBonus;
+      /* Su critico raddoppiamo anche i modificatori flat: dadi + caratt + extra + inline */
+      var dInlineMod=inlineMod*critMult;
+      var dAbilMod=abilMod*critMult;
+      var dArmaBonus=armaBonus*critMult;
+      var dmgTotal=sum+dInlineMod+dAbilMod+dArmaBonus;
       var rollDisp=rollsArr.length>1?'['+rollsArr.join('+')+'='+sum+']':'['+sum+']';
       var typePart=atk.dmgType?'('+esc(atk.dmgType)+')':'';
-      var inlinePart=inlineMod?_fmt(inlineMod):'';
-      var armaPart=armaBonus?_fmt(armaBonus):'';
+      var inlinePart=dInlineMod?_fmt(dInlineMod):'';
+      var armaPart=dArmaBonus?_fmt(dArmaBonus):'';
       var critPrefix=isCrit?'<span style="color:#4a9a5a">×2</span> ':'';
-      dmgLine='<strong>Danni '+esc(nm)+'</strong>: '+critPrefix+dmgCount+'d'+sides+rollDisp+inlinePart+_fmt(abilMod)+armaPart+typePart+'=<strong>'+dmgTotal+'</strong>';
+      dmgLine='<strong>Danni '+esc(nm)+'</strong>: '+critPrefix+dmgCount+'d'+sides+rollDisp+inlinePart+_fmt(dAbilMod)+armaPart+typePart+'=<strong>'+dmgTotal+'</strong>';
       rollClass=isCrit?'pg__roll-row--crit':isFail?'pg__roll-row--fail':'pg__roll-row--hit';
     }
   }
@@ -3930,7 +3935,7 @@ var HELP={
     +'<li>Il <strong>tiro per colpire</strong> è calcolato come <code>1d20 + caratt + competenza</code>. La competenza viene dal livello del PG, niente da configurare.</li>'
     +'<li>Il <strong>danno</strong> è calcolato come <code>dado + caratt + extra (+ modificatore inline della formula)</code>.</li>'
     +'<li>Click su <code>▸</code> a sinistra per espandere la <strong>descrizione</strong>: utile per annotare range, proprietà speciali, slot incantesimo, ecc.</li>'
-    +'<li><strong>Critico</strong> (20 naturale sul d20) → il dado del danno viene <strong>tirato il doppio delle volte</strong> (regola D&amp;D 5e). I modificatori flat (caratt, extra) <em>non</em> raddoppiano. Banner verde brillante con badge "💥 CRITICO!".</li>'
+    +'<li><strong>Critico</strong> (20 naturale sul d20) → <strong>tutto raddoppia</strong>: dadi del danno, modificatore della caratteristica, modificatori extra e modificatore inline della formula. Banner verde brillante con badge "💥 CRITICO!".</li>'
     +'<li><strong>Mancato</strong> (1 naturale) → banner rosso con badge "✗ MANCATO". Per fedeltà alle regole il danno viene comunque tirato; sta a te ignorarlo.</li>'
     +'<li>Per attacchi senza caratteristica (es. dardo da fuoco fisso), lascia la caratteristica su <em>—</em>: il tiro userà solo dado + competenza.</li>'
     +'<li>Per incantesimi che non richiedono tiro per colpire (es. <em>palla di fuoco</em> con TS), ignora il risultato della prima riga e usa solo i danni.</li>'
