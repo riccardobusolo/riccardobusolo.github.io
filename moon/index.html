@@ -2322,37 +2322,78 @@ function cmMigrateBase64ToCloud(){
   function _idbHasStore(db,store){try{return db.objectStoreNames.contains(store)}catch(e){return false}}
   function _idbAll(db,store){return new Promise(function(res){try{var tx=db.transaction(store,'readonly');var rq=tx.objectStore(store).getAll();rq.onsuccess=function(){res(rq.result||[])};rq.onerror=function(){res([])}}catch(e){res([])}})}
   function _idbPut(db,store,rec){return new Promise(function(res,rej){try{var tx=db.transaction(store,'readwrite');tx.objectStore(store).put(rec);tx.oncomplete=function(){res()};tx.onerror=function(e){rej(e.target.error)}}catch(e){rej(e)}})}
-  /* cm_sounds (sounds store): s.img è base64 da processImg. */
+  /* cm_sounds (sounds store): icon base64 + audio binary → cloud + record → localStorage cm_sounds_list. */
   var pSounds=_idbOpenSafe('cm_sounds').then(function(db){
     if(!_idbHasStore(db,'sounds'))return;
     return _idbAll(db,'sounds').then(function(arr){
+      if(!arr.length)return;
+      var existing=[];try{existing=JSON.parse(localStorage.getItem('cm_sounds_list')||'[]')||[]}catch(e){existing=[]}
+      var existingIds={};existing.forEach(function(s){existingIds[s.id]=true});
       return arr.reduce(function(p,s){return p.then(function(){
-        if(!cmCloud.isDataUrl(s.img))return;
-        return migOne(s.img).then(function(v){if(v!==s.img){s.img=v;return _idbPut(db,'sounds',s)}});
+        if(existingIds[s.id])return; /* già migrato */
+        var tasks=Promise.resolve();
+        /* icon: base64 → cloud URL */
+        if(cmCloud.isDataUrl(s.img)){
+          tasks=tasks.then(function(){stats.scanned++;return cmCloud.upload(s.img).then(function(res){stats.migrated++;s.img=res.url}).catch(function(e){stats.failed++;console.warn('[cmMigrate] sound icon fallito:',e.message)})});
+        }
+        /* audio: ArrayBuffer → cloud URL (resourceType video) */
+        if(s.data&&(s.data instanceof ArrayBuffer||(s.data.buffer&&s.data.buffer instanceof ArrayBuffer))){
+          tasks=tasks.then(function(){
+            stats.scanned++;
+            var blob=new Blob([s.data],{type:s.type||'audio/mpeg'});
+            return cmCloud.upload(blob,{resourceType:'video'}).then(function(res){stats.migrated++;s.data=res.url;s.publicId=res.publicId||null}).catch(function(e){stats.failed++;console.warn('[cmMigrate] audio fallito:',e.message)});
+          });
+        }
+        return tasks.then(function(){
+          /* Aggiungi a localStorage solo se l'audio è una URL stringa (altrimenti salteremmo dati audio). */
+          if(typeof s.data==='string'&&s.data){
+            existing.push(s);
+            existingIds[s.id]=true;
+            localStorage.setItem('cm_sounds_list',JSON.stringify(existing));
+          }
+        });
       })},Promise.resolve());
     });
   }).catch(function(e){console.warn('[cmMigrate] sounds skip:',e&&e.message)});
-  /* cm_res_db (images + maps): rec.blob → upload, rec.url, drop blob. */
+  /* cm_res_db (images + maps): rec.blob → upload, rec.url, drop blob; poi mirror in localStorage. */
   var pResDb=_idbOpenSafe('cm_res_db').then(function(db){
-    function migIdbBlobs(store){
+    function migStore(store,lsKey){
       if(!_idbHasStore(db,store))return Promise.resolve();
       return _idbAll(db,store).then(function(arr){
+        if(!arr.length)return;
+        var existing=[];try{existing=JSON.parse(localStorage.getItem(lsKey)||'[]')||[]}catch(e){existing=[]}
+        var existingIds={};existing.forEach(function(r){existingIds[r.id]=true});
         return arr.reduce(function(p,rec){return p.then(function(){
-          if(rec.url)return; /* già migrato */
-          if(!(rec.blob instanceof Blob))return;
-          stats.scanned++;
-          return cmCloud.upload(rec.blob).then(function(res){
-            stats.migrated++;
-            rec.url=res.url;delete rec.blob;
-            return _idbPut(db,store,rec);
-          }).catch(function(e){stats.failed++;console.warn('[cmMigrate] '+store+' upload fallito:',e.message)});
+          if(existingIds[rec.id])return; /* già migrato */
+          var tasks=Promise.resolve();
+          if(!rec.url&&rec.blob instanceof Blob){
+            tasks=tasks.then(function(){
+              stats.scanned++;
+              return cmCloud.upload(rec.blob).then(function(res){
+                stats.migrated++;
+                rec.url=res.url;delete rec.blob;
+                return _idbPut(db,store,rec);
+              }).catch(function(e){stats.failed++;console.warn('[cmMigrate] '+store+' upload fallito:',e.message)});
+            });
+          }
+          return tasks.then(function(){
+            if(rec.url){
+              /* Strip the heavy blob if still present, then mirror to localStorage */
+              if(rec.blob)delete rec.blob;
+              existing.push(rec);
+              existingIds[rec.id]=true;
+              localStorage.setItem(lsKey,JSON.stringify(existing));
+            }
+          });
         })},Promise.resolve());
       });
     }
-    return migIdbBlobs('images').then(function(){return migIdbBlobs('maps')});
+    return migStore('images','cm_res_imgs2').then(function(){return migStore('maps','cm_maps')});
   }).catch(function(e){console.warn('[cmMigrate] cm_res_db skip:',e&&e.message)});
   return Promise.all([pChars,pHp,pPgs,pDraws,pSounds,pResDb]).then(function(){
     if(stats.scanned>0){console.info('[cmMigrate] Completato — migrate '+stats.migrated+'/'+stats.scanned+' asset su Cloudinary. Fallite: '+stats.failed)}
+    /* Notifica UI di soundboard/library/maps di ricaricare dai nuovi storage */
+    try{window.dispatchEvent(new Event('cm:migration:done'))}catch(e){}
     return stats;
   });
 }
@@ -2578,15 +2619,32 @@ cRen();
 })();
 /* SOUNDBOARD */
 (function(){
-var DB='cm_sounds',VER=1,ST='sounds',db=null,rafId=null;
+var SOUNDS_KEY='cm_sounds_list';
+var rafId=null;
 var playing={};
 var showFav=false,showArch=false;
-function oDB(cb){if(db)return cb(db);try{var r=indexedDB.open(DB,VER);r.onupgradeneeded=function(e){var d=e.target.result;if(!d.objectStoreNames.contains(ST))d.createObjectStore(ST,{keyPath:'id',autoIncrement:true})};r.onsuccess=function(e){db=e.target.result;cb(db)};r.onerror=function(){board.innerHTML='<div style="text-align:center;padding:20px;font-family:var(--mono);font-size:.6rem;color:var(--red)">Errore database audio.</div>'}}catch(e){board.innerHTML='<div style="text-align:center;padding:20px;font-family:var(--mono);font-size:.6rem;color:var(--red)">IndexedDB non disponibile.</div>'}}
-function addS(file,cb){var rd=new FileReader();rd.onload=function(){oDB(function(d){var tx=d.transaction(ST,'readwrite');tx.objectStore(ST).add({name:file.name,title:file.name.replace(/\.[^.]+$/,''),desc:'',emoji:'\uD83C\uDFB5',img:'',type:file.type,size:file.size,data:rd.result,loop:false,vol:0.8,pos:Date.now(),fav:false,archived:false}).onsuccess=function(){if(cb)cb()}})};rd.readAsArrayBuffer(file)}
-function getAll(cb){oDB(function(d){var tx=d.transaction(ST,'readonly');tx.objectStore(ST).getAll().onsuccess=function(e){cb(e.target.result||[])}})}
-function getS(id,cb){oDB(function(d){var tx=d.transaction(ST,'readonly');tx.objectStore(ST).get(id).onsuccess=function(e){cb(e.target.result)}})}
-function updS(rec,cb){oDB(function(d){var tx=d.transaction(ST,'readwrite');tx.objectStore(ST).put(rec).onsuccess=function(){if(cb)cb()}})}
-function delS(id,cb){oDB(function(d){var tx=d.transaction(ST,'readwrite');tx.objectStore(ST).delete(id).onsuccess=function(){if(cb)cb()}})}
+function _loadSounds(){try{return JSON.parse(localStorage.getItem(SOUNDS_KEY)||'[]')||[]}catch(e){return []}}
+function _saveSounds(arr){try{localStorage.setItem(SOUNDS_KEY,JSON.stringify(arr));return true}catch(e){console.error('saveSounds:',e);return false}}
+var _lastSoundId=0;
+function _nextSoundId(){var id=Date.now();if(id<=_lastSoundId)id=_lastSoundId+1;_lastSoundId=id;return id}
+function getAll(cb){cb(_loadSounds())}
+function getS(id,cb){var arr=_loadSounds();for(var i=0;i<arr.length;i++)if(arr[i].id===id){cb(arr[i]);return}cb(null)}
+function updS(rec,cb){var arr=_loadSounds();var found=false;for(var i=0;i<arr.length;i++)if(arr[i].id===rec.id){arr[i]=rec;found=true;break}if(!found)arr.push(rec);_saveSounds(arr);if(cb)cb()}
+function delS(id,cb){_saveSounds(_loadSounds().filter(function(s){return s.id!==id}));if(cb)cb()}
+function addS(file,cb){
+  if(!window.cmCloud||!cmCloud.isConfigured()){alert('Cloudinary non configurato \u2014 impossibile caricare audio.');if(cb)cb();return}
+  var title=file.name.replace(/\.[^.]+$/,'');
+  cmCloud.upload(file,{resourceType:'video'}).then(function(res){
+    var rec={id:_nextSoundId(),name:file.name,title:title,desc:'',emoji:'\uD83C\uDFB5',img:'',type:file.type,size:file.size,data:res.url,publicId:res.publicId||null,loop:false,vol:0.8,pos:Date.now(),fav:false,archived:false};
+    var arr=_loadSounds();arr.push(rec);_saveSounds(arr);
+    if(cb)cb();
+  }).catch(function(e){
+    console.error('[cmCloud] sound upload fallito:',e.message);
+    alert('Errore caricamento audio "'+title+'": '+e.message);
+    if(cb)cb();
+  });
+}
+window.addEventListener('cm:migration:done',function(){if(typeof render==='function')render()});
 var board=document.getElementById('sBoard'),sbCount=document.getElementById('sbCount');
 var sbFavBtn=document.getElementById('sbFav'),sbArchBtn=document.getElementById('sbArch');
 sbFavBtn.addEventListener('click',function(){showFav=!showFav;if(showFav)showArch=false;sbFavBtn.classList.toggle('sboard__fb--on',showFav);sbArchBtn.classList.toggle('sboard__fb--on',showArch);render()});
@@ -2613,9 +2671,9 @@ var archTitle=s.archived?'Ripristina':'Archivia';
 d.innerHTML='<div class="spad__head"><span class="spad__grip" data-grip="'+s.id+'">\u2630</span><button class="'+starCls+'" data-sfav="'+s.id+'">'+(s.fav?'\u2605':'\u2606')+'</button>'+(s.img?'<img class="spad__img" src="'+s.img+'">':'<span class="spad__emoji">'+s.emoji+'</span>')+'<div class="spad__info"><div class="spad__title">'+s.title+'</div>'+(s.desc?'<div class="spad__desc">'+s.desc+'</div>':'')+'</div><div class="spad__acts"><button class="spad__ab" data-sarch="'+s.id+'" title="'+archTitle+'">'+archIcon+'</button><button class="spad__ab" data-edit="'+s.id+'" title="Modifica">\u270E</button><button class="spad__ab" data-del="'+s.id+'" title="Elimina">\u2716</button></div></div><div class="spad__bar" data-seek="'+s.id+'"><div class="spad__prog" data-prog="'+s.id+'"></div></div><div class="spad__ctrls"><button class="spad__btn spad__btn--play'+(isP?' spad__btn--pause':'')+'" data-play="'+s.id+'">'+(isP?'\u275A\u275A':'\u25B6')+'</button><button class="spad__btn" data-stop="'+s.id+'">\u25A0</button><button class="spad__btn" data-restart="'+s.id+'" title="Ricomincia">\u21BB</button><button class="spad__btn'+(s.loop?' spad__btn--on':'')+'" data-loop="'+s.id+'" title="Loop" style="font-size:1.05rem;line-height:1;padding-bottom:1px">\u221E</button><span class="spad__time" data-time="'+s.id+'">0:00 / 0:00</span><div class="spad__volw"><svg class="spad__vicon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg><input type="range" class="spad__vol" data-vol="'+s.id+'" min="0" max="100" value="'+Math.round((s.vol||0.8)*100)+'"></div></div>';
 board.appendChild(d)});volFillAll();tickAll()})}
 function tickAll(){cancelAnimationFrame(rafId);var anyPlaying=false;for(var k in playing){if(playing[k]&&!playing[k].audio.paused)anyPlaying=true}if(!anyPlaying)return;function tick(){var still=false;for(var k in playing){if(!playing[k])continue;var a=playing[k].audio;if(a.paused&&!a.loop)continue;still=true;var prog=board.querySelector('[data-prog="'+k+'"]');var time=board.querySelector('[data-time="'+k+'"]');if(prog)prog.style.width=(a.duration?a.currentTime/a.duration*100:0)+'%';if(time)time.textContent=fmtT(a.currentTime)+' / '+fmtT(a.duration)}if(still)rafId=requestAnimationFrame(tick)}tick()}
-function playS(id){getS(id,function(s){if(!s)return;var blob=new Blob([s.data],{type:s.type});var url=URL.createObjectURL(blob);var a=new Audio(url);a.volume=s.vol||0.8;a.loop=!!s.loop;playing[s.id]={audio:a,url:url};a.play().catch(function(){});renderPad(s.id);tickAll();a.onended=function(){if(!a.loop){delete playing[s.id];URL.revokeObjectURL(url);renderPad(s.id)}}})}
-function stopS(id){var p=playing[id];if(p){p.audio.pause();p.audio.currentTime=0;URL.revokeObjectURL(p.url);delete playing[id]}renderPad(id)}
-function stopAll(){for(var k in playing){var p=playing[k];if(p){p.audio.pause();p.audio.currentTime=0;URL.revokeObjectURL(p.url)}}playing={};render()}
+function playS(id){getS(id,function(s){if(!s)return;var src,objUrl=null;if(typeof s.data==='string'&&s.data){src=s.data}else if(s.data&&(s.data instanceof ArrayBuffer||(s.data.buffer&&s.data.buffer instanceof ArrayBuffer))){var blob=new Blob([s.data],{type:s.type});objUrl=URL.createObjectURL(blob);src=objUrl}else{console.warn('Sound data missing for',id);return}var a=new Audio(src);a.volume=s.vol||0.8;a.loop=!!s.loop;playing[s.id]={audio:a,objUrl:objUrl};a.play().catch(function(){});renderPad(s.id);tickAll();a.onended=function(){if(!a.loop){var p=playing[s.id];if(p&&p.objUrl)URL.revokeObjectURL(p.objUrl);delete playing[s.id];renderPad(s.id)}}})}
+function stopS(id){var p=playing[id];if(p){p.audio.pause();p.audio.currentTime=0;if(p.objUrl)URL.revokeObjectURL(p.objUrl);delete playing[id]}renderPad(id)}
+function stopAll(){for(var k in playing){var p=playing[k];if(p){p.audio.pause();p.audio.currentTime=0;if(p.objUrl)URL.revokeObjectURL(p.objUrl)}}playing={};render()}
 function renderPad(id){var el=board.querySelector('[data-sid="'+id+'"]');if(!el)return;var isP=isPlaying(id);el.classList.toggle('spad--play',isP);var btn=el.querySelector('[data-play="'+id+'"]');if(btn){btn.classList.toggle('spad__btn--pause',isP);btn.textContent=isP?'\u275A\u275A':'\u25B6'}}
 /* Upload */
 var sup=document.getElementById('supZone'),sIn=document.getElementById('supInput');
@@ -2651,7 +2709,7 @@ document.getElementById('seditOv').addEventListener('click',function(e){if(e.tar
 document.getElementById('seditEmoji').addEventListener('click',function(e){e.stopPropagation();var el=this,r=el.getBoundingClientRect();var ep=document.getElementById('epick');ep.style.zIndex='600';ep.style.top=Math.min(r.bottom+4,window.innerHeight-320)+'px';ep.style.left=Math.min(r.left,window.innerWidth-390)+'px';var origCb=epCb;epCb=function(em){el.textContent=em;ep.style.zIndex=''};ep.classList.add('on')});
 document.getElementById('seditSave').addEventListener('click',function(){if(editId===null)return;getS(editId,function(s){s.emoji=document.getElementById('seditEmoji').textContent;s.title=document.getElementById('seditTitle').value.trim()||s.name;s.desc=document.getElementById('seditDesc').value.trim();s.img=editImg||'';updS(s,function(){render();closeEdit()})})});
 document.getElementById('seditDel').addEventListener('click',function(){if(editId===null)return;stopS(editId);delS(editId,function(){render();closeEdit()})});
-oDB(function(){render()})})();
+render();})();
 /* SCHEDA PG */
 (function(){
 var wrap=document.getElementById('pgWrap');
@@ -3342,9 +3400,12 @@ function _getThumb(k){try{return localStorage.getItem(THUMB_PREFIX+k)||null}catc
 function _setThumb(k,u){try{localStorage.setItem(THUMB_PREFIX+k,u)}catch(e){}}
 var _thumbsLoading={};
 function _openMnDB(){return new Promise(function(res,rej){if(!window.indexedDB){rej(new Error('IndexedDB non disponibile'));return}var r=indexedDB.open(MN_DB,MN_VER);r.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains(MN_STORE))db.createObjectStore(MN_STORE,{keyPath:'id'});if(!db.objectStoreNames.contains(IMG_STORE))db.createObjectStore(IMG_STORE,{keyPath:'id'});if(!db.objectStoreNames.contains('maps'))db.createObjectStore('maps',{keyPath:'id'})};r.onsuccess=function(e){res(e.target.result)};r.onerror=function(e){rej(e.target.error)}})}
-function dbAllImg(){return _openMnDB().then(function(db){return new Promise(function(res){var tx=db.transaction(IMG_STORE,'readonly');var req=tx.objectStore(IMG_STORE).getAll();req.onsuccess=function(){res(req.result||[])};req.onerror=function(){res([])}})})}
-function dbPutImg(rec){return _openMnDB().then(function(db){return new Promise(function(res,rej){var tx=db.transaction(IMG_STORE,'readwrite');tx.objectStore(IMG_STORE).put(rec);tx.oncomplete=function(){res()};tx.onerror=function(e){rej(e.target.error)}})})}
-function dbDelImg(id){return _openMnDB().then(function(db){return new Promise(function(res,rej){var tx=db.transaction(IMG_STORE,'readwrite');tx.objectStore(IMG_STORE).delete(id);tx.oncomplete=function(){res()};tx.onerror=function(e){rej(e.target.error)}})})}
+var IMGS_LS_KEY='cm_res_imgs2';
+function _loadImgs(){try{return JSON.parse(localStorage.getItem(IMGS_LS_KEY)||'[]')||[]}catch(e){return []}}
+function _saveImgs(arr){try{localStorage.setItem(IMGS_LS_KEY,JSON.stringify(arr));return true}catch(e){console.error('saveImgs:',e);return false}}
+function dbAllImg(){return Promise.resolve(_loadImgs())}
+function dbPutImg(rec){var arr=_loadImgs();var found=false;for(var k=0;k<arr.length;k++)if(arr[k].id===rec.id){arr[k]=rec;found=true;break}if(!found)arr.push(rec);_saveImgs(arr);return Promise.resolve()}
+function dbDelImg(id){_saveImgs(_loadImgs().filter(function(x){return x.id!==id}));return Promise.resolve()}
 function dbAll(){return _openMnDB().then(function(db){return new Promise(function(res){var tx=db.transaction(MN_STORE,'readonly');var req=tx.objectStore(MN_STORE).getAll();req.onsuccess=function(){res(req.result||[])};req.onerror=function(){res([])}})})}
 function dbGet(id){return _openMnDB().then(function(db){return new Promise(function(res){var tx=db.transaction(MN_STORE,'readonly');var req=tx.objectStore(MN_STORE).get(id);req.onsuccess=function(){res(req.result||null)};req.onerror=function(){res(null)}})})}
 function dbPut(rec){return _openMnDB().then(function(db){return new Promise(function(res,rej){var tx=db.transaction(MN_STORE,'readwrite');tx.objectStore(MN_STORE).put(rec);tx.oncomplete=function(){res()};tx.onerror=function(e){rej(e.target.error)}})})}
@@ -3411,9 +3472,10 @@ function openImgLightbox(im){var ov=document.getElementById('rsimgOv'),lb=docume
 function closeImgLightbox(){document.getElementById('rsimgOv').classList.remove('on');document.getElementById('rsimgLb').classList.remove('on');document.getElementById('rsimgFull').src='';if(_lightboxUrl){URL.revokeObjectURL(_lightboxUrl);_lightboxUrl=null}}
 document.getElementById('rsimgClose').addEventListener('click',closeImgLightbox);
 document.getElementById('rsimgOv').addEventListener('click',closeImgLightbox);
-/* Migrate old localStorage imgs (data URLs) → IDB blobs */
-function migrateImgsToIdb(){return new Promise(function(res){var raw=null;try{raw=localStorage.getItem(IMG_KEY)}catch(e){}if(raw===null){res();return}var oldArr=[];try{oldArr=JSON.parse(raw||'[]')||[]}catch(e){oldArr=[]}if(!oldArr.length){try{localStorage.removeItem(IMG_KEY)}catch(e){}res();return}var done=0,total=oldArr.length;function tick(){done++;if(done>=total){try{localStorage.removeItem(IMG_KEY)}catch(e){}res()}}oldArr.forEach(function(it){if(!it.url||it.url.indexOf('data:')!==0){tick();return}fetch(it.url).then(function(r){return r.blob()}).then(function(b){return dbPutImg({id:it.id||genId('i'),name:it.name||'immagine',blob:b,type:b.type||'image/webp',size:b.size,added:it.created||Date.now()})}).catch(function(e){console.warn('migrate img failed',e)}).then(tick)})})}
-migrateImgsToIdb().then(function(){return dbAllImg()}).then(function(arr){imgs=arr||[];renderImgs()}).catch(function(e){console.warn('Imgs IDB load failed',e);imgs=[];renderImgs()});
+/* Carica immagini da localStorage. La migrazione IDB→localStorage avviene
+   in cmMigrateBase64ToCloud al login; quando completa, ricaricare. */
+dbAllImg().then(function(arr){imgs=arr||[];renderImgs()});
+window.addEventListener('cm:migration:done',function(){dbAllImg().then(function(arr){imgs=arr||[];renderImgs()})});
 
 /* === TEXTS === */
 function saveTexts(){return saveArr(TXT_KEY,texts)}
@@ -3486,7 +3548,7 @@ renderLinks();renderManuals();renderImgs();renderTexts();renderDraws();
 /* === MAPPE === */
 (function(){
 if(!document.getElementById('winMaps'))return;
-var DB='cm_res_db',STORE='maps',VER=3;
+var MAPS_KEY='cm_maps';
 var maps=[],currentId=null,currentTool='pan';
 var view={x:0,y:0,zoom:1};
 var imgUrl=null,imgEl=null;
@@ -3495,11 +3557,13 @@ var calibrating=false;
 var selectedPinId=null;
 var draggingPin=null,dragPinStart=null;
 var EMOJI_PINS=['📍','🏰','🏠','⛪','🌳','🌲','🗻','🌋','🌊','🔥','🌙','✨','🌟','⚔️','🏹','💀','☠️','🐉','🐺','🐍','👑','💎','💰','🍺','⚓','🚪','📜','🔮','🎲','⚱️','❓','⚠️'];
-function _open(){return new Promise(function(res,rej){if(!window.indexedDB){rej(new Error('IDB n/a'));return}var r=indexedDB.open(DB,VER);r.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains('manuals'))db.createObjectStore('manuals',{keyPath:'id'});if(!db.objectStoreNames.contains('images'))db.createObjectStore('images',{keyPath:'id'});if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE,{keyPath:'id'})};r.onsuccess=function(e){res(e.target.result)};r.onerror=function(e){rej(e.target.error)}})}
-function dbAll(){return _open().then(function(db){return new Promise(function(res){var tx=db.transaction(STORE,'readonly');var req=tx.objectStore(STORE).getAll();req.onsuccess=function(){res(req.result||[])};req.onerror=function(){res([])}})})}
-function dbGet(id){return _open().then(function(db){return new Promise(function(res){var tx=db.transaction(STORE,'readonly');var req=tx.objectStore(STORE).get(id);req.onsuccess=function(){res(req.result||null)};req.onerror=function(){res(null)}})})}
-function dbPut(rec){return _open().then(function(db){return new Promise(function(res,rej){var tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(rec);tx.oncomplete=function(){res()};tx.onerror=function(e){rej(e.target.error)}})})}
-function dbDel(id){return _open().then(function(db){return new Promise(function(res,rej){var tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=function(){res()};tx.onerror=function(e){rej(e.target.error)}})})}
+function _loadMaps(){try{return JSON.parse(localStorage.getItem(MAPS_KEY)||'[]')||[]}catch(e){return []}}
+function _saveMaps(arr){try{localStorage.setItem(MAPS_KEY,JSON.stringify(arr));return true}catch(e){console.error('saveMaps:',e);return false}}
+function dbAll(){return Promise.resolve(_loadMaps())}
+function dbGet(id){return Promise.resolve(_loadMaps().filter(function(m){return m.id===id})[0]||null)}
+function dbPut(rec){var arr=_loadMaps();var found=false;for(var k=0;k<arr.length;k++)if(arr[k].id===rec.id){arr[k]=rec;found=true;break}if(!found)arr.push(rec);_saveMaps(arr);return Promise.resolve()}
+function dbDel(id){_saveMaps(_loadMaps().filter(function(m){return m.id!==id}));return Promise.resolve()}
+window.addEventListener('cm:migration:done',function(){dbAll().then(function(arr){maps=arr||[];renderSidebar();if(currentId&&!findMap(currentId))currentId=maps.length?maps[0].id:null;loadCurrent()})});
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function genId(p){return p+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7)}
 function findMap(id){for(var i=0;i<maps.length;i++)if(maps[i].id===id)return maps[i];return null}

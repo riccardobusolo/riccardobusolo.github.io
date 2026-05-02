@@ -1,27 +1,28 @@
 /* ============================================================
- * CROOKED MOON — Cloudinary photo upload helper
+ * CROOKED MOON — Cloudinary asset upload helper
  * ============================================================
  *
  * Esposto come window.cmCloud:
- *   cmCloud.upload(input) → Promise<{url, publicId, bytes, format}>
- *     - input può essere: Blob, File, o stringa data URL base64
- *     - se input è già un URL Cloudinary, ritorna {url:input, publicId:null}
+ *   cmCloud.upload(input, opts?) → Promise<{url, publicId, bytes, format, resourceType}>
+ *     - input: Blob | File | stringa data URL | stringa URL Cloudinary (no-op)
+ *     - opts.resourceType: 'image' (default) | 'video' (audio incluso) | 'auto' | 'raw'
+ *   cmCloud.uploadAuto(input) → Promise — alias con resourceType:'auto'
  *   cmCloud.isCloudUrl(s) → boolean
- *   cmCloud.isDataUrl(s)  → boolean
+ *   cmCloud.isDataUrl(s)  → boolean (data URL di un'immagine)
  *   cmCloud.isConfigured() → boolean
  *
  * Le credenziali sono pubbliche per design (unsigned upload preset).
- * La sicurezza dipende dalle restrizioni del preset stesso (formati
- * ammessi, dimensione max) — vedi console Cloudinary → Settings →
- * Upload → preset "crooked_moon".
+ * Il preset "crooked_moon" deve avere "Resource type" impostato su
+ * "auto" o accettare image+video — altrimenti gli upload audio
+ * falliscono. La sicurezza dipende dalle restrizioni del preset
+ * (formati, dimensione max) — vedi console Cloudinary.
  * ============================================================ */
 (function(){
 'use strict';
 
 var CLOUD_NAME = 'dxepwrped';
 var UPLOAD_PRESET = 'crooked_moon';
-var UPLOAD_URL = 'https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/image/upload';
-var UPLOAD_TIMEOUT_MS = 60000;
+var UPLOAD_TIMEOUT_MS = 120000;
 
 var CLOUD_URL_RX = /^https:\/\/res\.cloudinary\.com\//;
 var DATA_URL_RX = /^data:image\//;
@@ -29,6 +30,10 @@ var DATA_URL_RX = /^data:image\//;
 function isCloudUrl(s){return typeof s==='string' && CLOUD_URL_RX.test(s);}
 function isDataUrl(s){return typeof s==='string' && DATA_URL_RX.test(s);}
 function isConfigured(){return !!CLOUD_NAME && !!UPLOAD_PRESET;}
+
+function endpointFor(resourceType){
+  return 'https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/' + resourceType + '/upload';
+}
 
 function dataUrlToBlob(dataUrl){
   var parts = dataUrl.split(',');
@@ -44,13 +49,15 @@ function dataUrlToBlob(dataUrl){
   return new Blob([arr], {type:mime});
 }
 
-function upload(input){
+function upload(input, opts){
+  opts = opts || {};
+  var resourceType = opts.resourceType || 'image';
   return new Promise(function(resolve, reject){
     if(!isConfigured()){reject(new Error('Cloudinary non configurato')); return;}
     var blob;
     try{
       if(typeof input === 'string'){
-        if(isCloudUrl(input)){resolve({url:input, publicId:null, bytes:null, format:null}); return;}
+        if(isCloudUrl(input)){resolve({url:input, publicId:null, bytes:null, format:null, resourceType:resourceType}); return;}
         if(!isDataUrl(input)){reject(new Error('Stringa non riconosciuta come data URL o URL Cloudinary')); return;}
         blob = dataUrlToBlob(input);
       } else if(input && (input instanceof Blob || (typeof File !== 'undefined' && input instanceof File))){
@@ -65,20 +72,20 @@ function upload(input){
     fd.append('upload_preset', UPLOAD_PRESET);
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', UPLOAD_URL, true);
+    xhr.open('POST', endpointFor(resourceType), true);
     xhr.timeout = UPLOAD_TIMEOUT_MS;
     xhr.onload = function(){
       if(xhr.status >= 200 && xhr.status < 300){
         try{
           var res = JSON.parse(xhr.responseText);
           if(res && res.secure_url){
-            resolve({url:res.secure_url, publicId:res.public_id||null, bytes:res.bytes||null, format:res.format||null});
+            resolve({url:res.secure_url, publicId:res.public_id||null, bytes:res.bytes||null, format:res.format||null, resourceType:res.resource_type||resourceType});
           } else {
             reject(new Error('Risposta Cloudinary inattesa: '+xhr.responseText.slice(0,200)));
           }
         } catch(e){ reject(e); }
       } else {
-        reject(new Error('Upload fallito ('+xhr.status+'): '+xhr.responseText.slice(0,200)));
+        reject(new Error('Upload fallito ('+xhr.status+', '+resourceType+'): '+xhr.responseText.slice(0,300)));
       }
     };
     xhr.onerror = function(){ reject(new Error('Errore di rete durante upload Cloudinary')); };
@@ -87,8 +94,11 @@ function upload(input){
   });
 }
 
+function uploadAuto(input){return upload(input, {resourceType:'auto'});}
+
 window.cmCloud = {
   upload: upload,
+  uploadAuto: uploadAuto,
   isCloudUrl: isCloudUrl,
   isDataUrl: isDataUrl,
   isConfigured: isConfigured,
