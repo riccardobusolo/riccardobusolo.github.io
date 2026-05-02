@@ -236,7 +236,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .wh{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0;cursor:var(--cur-grab)}.wh:active{cursor:var(--cur-grabbing)}
 .wh__i{color:var(--red);display:flex}.wh__i svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
 .wh__t{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);flex:1}
+.wh__h{width:22px;height:22px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;line-height:1;margin-right:8px;transition:all .15s;flex-shrink:0;padding:0}
+.wh__h:hover{background:rgba(196,154,50,.1);color:var(--gold);border-color:rgba(196,154,50,.5)}
 .wh__x{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:600;transition:all .15s;line-height:1}.wh__x:hover{background:var(--rl);color:var(--red);border-color:var(--rb)}
+.helpMd-ov{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:9100;display:none}
+.helpMd-ov.on{display:block}
+.helpMd{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:600px;width:92vw;max-height:82vh;background:var(--bg2);border:1px solid var(--border);border-radius:10px;display:none;flex-direction:column;z-index:9101;box-shadow:0 12px 48px rgba(0,0,0,.5)}
+.helpMd.on{display:flex}
+.helpMd__head{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--bg3);border-radius:10px 10px 0 0}
+.helpMd__t{flex:1;font-family:var(--mono);font-size:.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin:0;font-weight:600}
+.helpMd__x{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;font-size:1.1rem;line-height:1;font-weight:600}
+.helpMd__x:hover{background:var(--rl);color:var(--red);border-color:var(--rb)}
+.helpMd__body{padding:16px 22px 20px;overflow-y:auto;font-family:var(--font);font-size:.78rem;line-height:1.6;color:var(--dim);scrollbar-width:thin}
+.helpMd__body h4{color:var(--text);font-size:.84rem;margin:18px 0 6px;font-weight:600;letter-spacing:.01em}
+.helpMd__body h4:first-child{margin-top:0}
+.helpMd__body p{margin:6px 0}
+.helpMd__body ul{margin:4px 0 8px;padding-left:18px}
+.helpMd__body li{margin:3px 0}
+.helpMd__body kbd{background:var(--bg3);border:1px solid var(--border);border-bottom-width:2px;border-radius:3px;padding:1px 6px;font-family:var(--mono);font-size:.7rem;color:var(--gold);font-weight:600;white-space:nowrap}
+.helpMd__body code{background:var(--bg3);border-radius:3px;padding:1px 5px;font-family:var(--mono);font-size:.72rem;color:var(--text)}
+.helpMd__body strong{color:var(--text);font-weight:600}
+.helpMd__body em{color:var(--muted);font-style:italic}
 .wh__lay{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1;padding:0;flex-shrink:0}
 .wh__lay:hover{background:rgba(196,154,50,.08);color:var(--gold);border-color:rgba(196,154,50,.3)}
 .wh__lay svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.6}
@@ -1688,6 +1708,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <div class="dlcdMd__msg" id="dlcdMsg"></div>
 </div>
 <div class="dlcdMd__foot"><button class="dlcdMd__btn" id="dlcdCancel">Annulla</button><button class="dlcdMd__btn dlcdMd__btn--danger" id="dlcdConfirm" disabled>Cancella tutto</button></div>
+</div>
+<!-- HELP MODAL — opened from the ? button on every tool window header -->
+<div class="helpMd-ov" id="helpMdOv"></div>
+<div class="helpMd" id="helpMd" role="dialog" aria-labelledby="helpMdT" aria-modal="true">
+<div class="helpMd__head"><h3 class="helpMd__t" id="helpMdT">Aiuto</h3><button class="helpMd__x" id="helpMdX" aria-label="Chiudi">&times;</button></div>
+<div class="helpMd__body" id="helpMdB"></div>
 </div>
 <div class="mpd-ov" id="mpdOv"></div>
 <div class="mpd-md" id="mpdMd">
@@ -3655,6 +3681,162 @@ document.getElementById('mpxPinDel').addEventListener('click',function(){if(!_ed
 window.addEventListener('resize',function(){if(!document.getElementById('winMaps').classList.contains('on'))return;positionRulerLabel()});
 /* Initial load */
 dbAll().then(function(arr){maps=arr||[];if(maps.length)currentId=maps.sort(function(a,b){return(b.updated||0)-(a.updated||0)})[0].id;renderSidebar();loadCurrent()}).catch(function(e){console.warn('Maps IDB load failed',e);maps=[];renderSidebar();loadCurrent()});
+})();
+
+/* === HELP SYSTEM ===
+   Inietta un pulsante "?" in alto a sinistra di ogni window header.
+   Click apre helpMd con descrizione dettagliata dello strumento. */
+(function(){
+var HELP={
+  dice:{title:'Dadi',body:''
+    +'<h4>Tiri rapidi</h4>'
+    +'<p>Clicca i pulsanti colorati per tirare un dado standard: <kbd>d4</kbd> <kbd>d6</kbd> <kbd>d8</kbd> <kbd>d10</kbd> <kbd>d12</kbd> <kbd>d20</kbd> <kbd>d100</kbd>.</p>'
+    +'<h4>Vantaggio / Svantaggio</h4>'
+    +'<p>I pulsanti <kbd>V</kbd> e <kbd>S</kbd> attivano vantaggio (tira due volte, prendi il più alto) o svantaggio (prendi il più basso). Si applica al prossimo tiro.</p>'
+    +'<h4>Tiri composti</h4>'
+    +'<p>Usa la barra di composizione per tiri complessi:</p>'
+    +'<ul><li><code>2d6+3</code> — due d6 più 3</li><li><code>1d20+5</code> — d20 con modificatore</li><li><code>3d8-2</code> — tre d8 meno 2</li><li><code>1d20v</code> — d20 con vantaggio</li><li><code>1d20s</code> — d20 con svantaggio</li></ul>'
+    +'<p>Premi <kbd>=</kbd> per eseguire il tiro.</p>'
+    +'<h4>Storico e preferiti</h4>'
+    +'<p>Ogni tiro va nello storico (ultimi 50). Click sulla <strong>stella ☆</strong> per aggiungerlo ai preferiti, sempre in cima. Click sull\'espressione per rilanciarla.</p>'
+  },
+  chars:{title:'Personaggi',body:''
+    +'<h4>Aggiungere un personaggio</h4>'
+    +'<p>Scrivi il nome nel campo in basso e premi <kbd>Invio</kbd>. Compare nella sidebar con valori di default.</p>'
+    +'<h4>Modificare</h4>'
+    +'<ul><li>Click sul <strong>nome</strong>: rinomina inline</li><li>Click sull\'<strong>emoji/foto</strong>: cambia avatar (carica file, scegli emoji, drag, paste, o sceglie da galleria PG)</li><li>Click sulla card: apre la <strong>scheda PG</strong> completa</li></ul>'
+    +'<h4>Trascinare in combattimento</h4>'
+    +'<p>Trascina il personaggio sull\'icona <strong>Combattimento</strong> nella sidebar a sinistra per inserirlo nel tracker iniziativa con HP e CA correnti.</p>'
+    +'<h4>Riordinare</h4>'
+    +'<p>Trascina con il grip <code>⠿</code> a sinistra per cambiare l\'ordine.</p>'
+    +'<h4>Foto</h4>'
+    +'<p>Apri la scheda PG → tab Informazioni e usa la sezione Foto per caricarne fino a 2 (max 800px, compressione WebP). La prima diventa l\'avatar mostrato in sidebar e nel combat tracker.</p>'
+  },
+  hp:{title:'Combattimento',body:''
+    +'<h4>Aggiungere combattenti</h4>'
+    +'<p>Compila i campi (Nome, CA, HP, modificatore iniziativa) e premi <kbd>+</kbd> o <kbd>Invio</kbd>. Oppure trascina un PG dalla sezione Personaggi.</p>'
+    +'<h4>Iniziativa</h4>'
+    +'<ul><li><strong>⚡</strong> tira il d20 di iniziativa per quella creatura</li><li>Click sul totale per modificarlo manualmente</li><li><kbd>Sort</kbd> ordina dal più alto al più basso</li><li><kbd>Next</kbd> avanza il turno e gestisce i timer di condizioni</li></ul>'
+    +'<h4>HP, danno, cure</h4>'
+    +'<ul><li>Inserisci un numero in <strong>💥 Danno</strong>, <strong>💚 Cura</strong>, <strong>🛡 Temp</strong> e premi il pulsante. <strong>Tieni premuto</strong> per applicare ripetutamente</li><li>Click+drag sulla barra HP per impostarli direttamente</li><li>Click sui valori HP/Max/Temp per editarli inline</li><li>Il danno consuma prima i temp HP, poi gli HP normali</li></ul>'
+    +'<h4>Condizioni</h4>'
+    +'<p>Click su <kbd>⚑</kbd> per aggiungere una condizione (avvelenato, paralizzato, ecc.). Imposta CD del tiro salvezza, abilità, durata in round e quando scade (fine turno o inizio). Le condizioni con CD appaiono nel <strong>Promemoria Turno</strong> all\'inizio del turno della creatura.</p>'
+    +'<h4>Foto avatar</h4>'
+    +'<p>Click sulla foto a sinistra per cambiarla (file, drag, paste). Per i PG l\'avatar è condiviso con la sidebar Personaggi e la galleria della scheda.</p>'
+  },
+  timer:{title:'Timer',body:''
+    +'<h4>Avviare un timer</h4>'
+    +'<p>Scegli un preset rapido (<kbd>15s</kbd> <kbd>30s</kbd> <kbd>1 min</kbd> <kbd>5 min</kbd> <kbd>30 min</kbd> <kbd>1 ora</kbd>…) oppure usa il picker stile iPhone per impostare ore/minuti/secondi (massimo 6 ore).</p>'
+    +'<h4>Controlli</h4>'
+    +'<ul><li><strong>▶</strong> Avvia · <strong>⏸</strong> Pausa · <strong>↺</strong> Reset</li><li>Più timer simultanei: clicca <kbd>+</kbd> per aggiungerne</li><li>Click sul nome per rinominare il timer</li></ul>'
+    +'<h4>Avviso fine</h4>'
+    +'<p>Quando un timer arriva a zero suona un beep e l\'icona lampeggia. Sotto il 40% lampeggia piano, sotto il 20% veloce — visivamente capisci da lontano se sta per scadere.</p>'
+  },
+  calc:{title:'Calcolatrice',body:''
+    +'<h4>Modalità</h4>'
+    +'<p>Switch tra <strong>Base</strong> (operazioni standard) e <strong>Scientifica</strong> con sin, cos, tan, √, x², ln, log, π, e, fattoriale (n!), 1/x, parentesi.</p>'
+    +'<h4>Cronologia</h4>'
+    +'<p>A destra trovi le ultime 20 operazioni complete con risultato.</p>'
+    +'<h4>Tastiera</h4>'
+    +'<ul><li><kbd>0</kbd>-<kbd>9</kbd>, <kbd>+</kbd>, <kbd>-</kbd>, <kbd>*</kbd>, <kbd>/</kbd>, <kbd>.</kbd> input diretto</li><li><kbd>Enter</kbd> = uguale</li><li><kbd>Esc</kbd> = clear totale</li><li><kbd>Backspace</kbd> = cancella ultima cifra</li></ul>'
+  },
+  spells:{title:'Incantesimi',body:''
+    +'<h4>Cercare e filtrare</h4>'
+    +'<p>Digita il nome nel campo di ricerca. Combina con i filtri:</p>'
+    +'<ul><li><strong>Livello</strong>: Trucchetto fino a 9°</li><li><strong>Scuola</strong>: evocazione, abiurazione, divinazione, ammaliamento, invocazione, illusione, necromanzia, trasmutazione</li><li><strong>Classe</strong>: mago, chierico, druido, bardo, stregone, paladino, ranger, warlock, artefice</li></ul>'
+    +'<h4>Aggiungere a un PG</h4>'
+    +'<p>Trascina un incantesimo dalla lista verso la <strong>Scheda PG → tab Incantesimi</strong>. I trucchetti vanno nella zona cantrip, gli altri nel libro al livello corretto.</p>'
+    +'<h4>Dettagli</h4>'
+    +'<p>Click su un incantesimo per aprire la scheda completa: componenti V/S/M, tempo di lancio, gittata, durata, classi, descrizione integrale (in italiano per gli incantesimi tradotti).</p>'
+  },
+  sound:{title:'Soundboard',body:''
+    +'<h4>Caricare audio</h4>'
+    +'<p>Trascina file audio (mp3, wav, ogg, m4a) nella zona di upload, o clicca per scegliere. <strong>Massimo 100 MB per file.</strong> L\'audio viene caricato su Cloudinary ed è accessibile da tutti i tuoi dispositivi.</p>'
+    +'<h4>Riprodurre</h4>'
+    +'<ul><li><strong>▶</strong> avvia · <strong>⏸</strong> pausa · <strong>■</strong> stop · <strong>↺</strong> ricomincia da capo</li><li><strong>∞</strong> attiva il loop continuo</li><li>Slider <strong>volume</strong> regola ogni traccia indipendentemente</li><li>Click sulla barra di progresso per saltare a un punto preciso</li></ul>'
+    +'<h4>Organizzare</h4>'
+    +'<ul><li><strong>★</strong> aggiunge ai preferiti — filtro 🤍 in alto per vedere solo questi</li><li><strong>📥</strong> archivia — filtro 📤 per vedere gli archiviati</li><li><strong>✎</strong> apre l\'editor: titolo, descrizione, emoji, immagine personalizzata</li><li>Trascina con il grip <code>☰</code> per riordinare</li></ul>'
+  },
+  sheet:{title:'Scheda PG',body:''
+    +'<h4>Selettore PG</h4>'
+    +'<p>In alto trovi il pulsante con il nome del PG corrente. Click per cambiare PG attivo o crearne uno nuovo (<kbd>+ Nuovo Personaggio</kbd>).</p>'
+    +'<h4>Tab Scheda</h4>'
+    +'<ul><li>Identità: nome, razza, classe, sottoclasse, livello, allineamento, background</li><li>Caratteristiche (FOR, DES, COS, INT, SAG, CAR): click per editare, modificatori calcolati automaticamente</li><li>Tiri salvezza e abilità: il <strong>pallino</strong> attiva la competenza (raddoppia il bonus)</li><li>HP, CA, iniziativa, velocità, ispirazione, dadi vita, tiri morte</li></ul>'
+    +'<h4>Tab Incantesimi</h4>'
+    +'<ul><li>Slot per livello: click per consumarne uno o recuperarli</li><li>Trucchetti e libro: trascina dalla finestra <strong>Incantesimi</strong></li><li>Spellcasting ability, CD, bonus attacco — tutti modificabili</li><li>Concentrazione: tracker con CD del tiro Costituzione</li></ul>'
+    +'<h4>Tab Informazioni</h4>'
+    +'<p>Aspetto fisico (età, altezza, peso, occhi, capelli, segni…), foto del personaggio (max 2, click per ingrandire in lightbox), tratti, ideali, vincoli, difetti, equipaggiamento, lingue, background story.</p>'
+    +'<h4>Tab Note</h4>'
+    +'<p>Editor di testo libero per appunti vari. Salvataggio automatico.</p>'
+  },
+  map:{title:'Appunti',body:''
+    +'<h4>Editor</h4>'
+    +'<p>Crea documenti di testo lunghi: appunti di sessione, riassunti, dialoghi NPC, lore world-building. Salvataggio automatico a ogni modifica.</p>'
+    +'<h4>Mappa concettuale</h4>'
+    +'<p>Vista alternativa per organizzare informazioni in <strong>nodi connessi</strong>. Utile per genealogie, fazioni, reti di intrighi politici, alberi decisionali per storyline.</p>'
+    +'<h4>Sidebar</h4>'
+    +'<p>Tutti i documenti elencati a sinistra. <strong>Cerca</strong> per titolo. <kbd>+ Nuovo</kbd> per crearne uno. Click su un documento per aprirlo.</p>'
+  },
+  res:{title:'Risorse',body:''
+    +'<h4>5 categorie</h4>'
+    +'<ul><li><strong>🔗 Link</strong> — bookmark con titolo + URL</li><li><strong>📖 Manuali</strong> — PDF caricati. <em>Solo locale, niente cloud, niente sync</em></li><li><strong>🖼️ Immagini</strong> — galleria immagini di riferimento (NPC, oggetti, scene)</li><li><strong>📝 Testi</strong> — note testuali rapide</li><li><strong>🎨 Disegni</strong> — editor canvas integrato</li></ul>'
+    +'<h4>Caricare immagini</h4>'
+    +'<p>Drag &amp; drop, click sulla zona, o <kbd>Ctrl+V</kbd> per incollare dagli appunti. Compressione automatica in WebP fino a 1600px. Massimo 10 MB dopo compressione.</p>'
+    +'<h4>Disegni</h4>'
+    +'<p>Editor con pennello, gomma, palette colori, sfondo bianco/nero, undo. <kbd>Ctrl+Z</kbd> per annullare. <kbd>+ Nuovo</kbd> per disegnarne uno nuovo. Salvati come WebP nel cloud.</p>'
+    +'<h4>Manuali PDF</h4>'
+    +'<p><strong>Restano sul tuo browser</strong>: non vengono sincronizzati né caricati nel cloud per nessun motivo. Se cancelli i dati del sito o cambi dispositivo, devi ricaricarli.</p>'
+  },
+  maps:{title:'Mappe',body:''
+    +'<h4>Caricare una mappa</h4>'
+    +'<p>Drag &amp; drop di un\'immagine nella zona principale, o <kbd>+ Nuova</kbd> per scegliere il file. Conversione automatica a WebP, massimo 10 MB dopo compressione.</p>'
+    +'<h4>Strumenti</h4>'
+    +'<ul><li><strong>Pan</strong> (<kbd>V</kbd>): trascina per spostare la vista, rotella per zoom</li><li><strong>Righello</strong> (<kbd>R</kbd>): trascina dal punto A al punto B per misurare la distanza</li><li><strong>Pin</strong> (<kbd>P</kbd>): click sulla mappa per piazzare un segnalibro con emoji + descrizione</li></ul>'
+    +'<h4>Calibrazione del righello</h4>'
+    +'<p>Click su <kbd>Calibra</kbd> in modalità righello, poi traccia una linea che corrisponda a 1 unità reale (metro o piede). Da quel momento le misure sono in unità invece che pixel. Cambia unità nel selettore in cima.</p>'
+    +'<h4>Pin</h4>'
+    +'<p>Click su un pin per modificare emoji o testo. Trascinabili per riposizionarli. Cancellabili dal popup. Si salvano nella mappa stessa.</p>'
+    +'<h4>Sostituire l\'immagine</h4>'
+    +'<p>Click sulla <strong>miniatura</strong> nella sidebar per caricare un\'immagine sostitutiva mantenendo pin, calibrazione e nome.</p>'
+    +'<h4>Sidebar</h4>'
+    +'<p>Lista di tutte le mappe caricate. Cerca per nome. Click sulla card per aprire la mappa, click sul cestino per cancellarla.</p>'
+  }
+};
+function openHelp(key){
+  var item=HELP[key];if(!item)return;
+  document.getElementById('helpMdT').textContent='Aiuto: '+item.title;
+  document.getElementById('helpMdB').innerHTML=item.body;
+  document.getElementById('helpMdB').scrollTop=0;
+  document.getElementById('helpMdOv').classList.add('on');
+  document.getElementById('helpMd').classList.add('on');
+}
+function closeHelp(){
+  document.getElementById('helpMdOv').classList.remove('on');
+  document.getElementById('helpMd').classList.remove('on');
+}
+/* Inietta il pulsante "?" in tutti i window header che hanno una chiave HELP */
+document.querySelectorAll('.win .wh').forEach(function(wh){
+  var x=wh.querySelector('.wh__x');if(!x)return;
+  var key=x.dataset.close;if(!key||!HELP[key])return;
+  if(wh.querySelector('.wh__h'))return; /* già iniettato */
+  var btn=document.createElement('button');
+  btn.className='wh__h';btn.type='button';
+  btn.setAttribute('data-help',key);
+  btn.title='Aiuto: '+HELP[key].title;
+  btn.setAttribute('aria-label','Aiuto: '+HELP[key].title);
+  btn.textContent='?';
+  wh.insertBefore(btn,wh.firstChild);
+});
+/* Click handler delegato — funziona anche su pulsanti aggiunti dinamicamente in futuro */
+document.addEventListener('click',function(e){
+  var btn=e.target.closest('[data-help]');
+  if(btn){e.stopPropagation();openHelp(btn.dataset.help);return}
+  if(e.target.id==='helpMdX'||e.target.id==='helpMdOv'){closeHelp();return}
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&document.getElementById('helpMd').classList.contains('on'))closeHelp();
+});
+window.cmHelp={open:openHelp,close:closeHelp,texts:HELP};
 })();
 })();
 </script>
