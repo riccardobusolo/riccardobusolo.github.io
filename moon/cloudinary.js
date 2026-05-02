@@ -24,14 +24,16 @@ var CLOUD_NAME = 'dxepwrped';
 var UPLOAD_PRESET = 'crooked_moon';
 var UPLOAD_TIMEOUT_MS = 120000;
 
-/* Limiti hard di Cloudinary per il piano Free. Servono come guardrail
-   per non sprecare il roundtrip e per dare un messaggio chiaro all'utente
-   prima dell'errore generico del server. */
+/* Limiti pre-flight. Per le immagini è il vero hard limit Cloudinary
+   (10 MB sul piano Free). Per audio ho scelto 50 MB invece dei 100 MB
+   massimi: copre tracce D&D realistiche fino a ~35 min a 192 kbps,
+   protegge bandwidth/storage dell'account, blocca solo master FLAC
+   o podcast lunghi. */
 var LIMITS = {
   image: 10 * 1024 * 1024,
-  video: 100 * 1024 * 1024,
+  video: 50 * 1024 * 1024,
   raw:   10 * 1024 * 1024,
-  auto: 100 * 1024 * 1024
+  auto:  50 * 1024 * 1024
 };
 
 var CLOUD_URL_RX = /^https:\/\/res\.cloudinary\.com\//;
@@ -93,7 +95,8 @@ function upload(input, opts){
     if(blob.size > limit){
       var kind = resourceType === 'video' ? 'audio' : 'immagine';
       var label = srcName ? '"'+srcName+'" ('+kind+')' : 'Il file '+kind;
-      var err = new Error(label+' è troppo grande: '+fmtBytes(blob.size)+' (max '+fmtBytes(limit)+' su Cloudinary). Riduci risoluzione o qualità e riprova.');
+      var advice = resourceType === 'video' ? 'Riduci durata o bitrate e riprova.' : 'Riduci risoluzione o qualità e riprova.';
+      var err = new Error(label+' è troppo grande: '+fmtBytes(blob.size)+' (max '+fmtBytes(limit)+'). '+advice);
       err.cmTooBig = true;
       err.actualBytes = blob.size;
       err.maxBytes = limit;
