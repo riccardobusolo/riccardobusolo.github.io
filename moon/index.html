@@ -961,6 +961,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .rs__upzone.rs__upzone--over{border-color:var(--gold);border-style:solid;background:rgba(196,154,50,.1);color:var(--gold);transform:scale(1.01)}
 .rs__upzone svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .rs__upzone-t{font-size:.66rem}
+.rs__local-notice{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;margin-bottom:10px;background:rgba(196,154,50,.08);border:1px solid rgba(196,154,50,.35);border-radius:6px;font-family:var(--mono);font-size:.66rem;color:var(--dim);line-height:1.45}
+.rs__local-notice svg{flex-shrink:0;stroke:var(--gold);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
+.rs__local-notice b{color:var(--gold);font-weight:600}
 .rs__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
 .rs__card{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:var(--cur-pointer);display:flex;flex-direction:column;transition:border-color .12s,transform .12s}
 .rs__card:hover{border-color:var(--gold);transform:translateY(-1px)}
@@ -1411,6 +1414,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <div class="rs__list" id="rsLinkList"></div>
 </div>
 <div class="rs__view" id="rsViewManuals" style="display:none">
+<div class="rs__local-notice"><svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div><b>Solo locale, niente cloud.</b> I PDF caricati qui restano <b>esclusivamente</b> nel browser di questo dispositivo: non vengono inviati al cloud, non sincronizzano tra dispositivi e si perdono se cancelli i dati del sito. Se ti serve un manuale anche altrove, ricaricalo manualmente lì.</div></div>
 <div class="rs__upzone" id="rsMnZone"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M2 3h7a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-7a4 4 0 00-4 4v14a3 3 0 013-3h8z"/></svg><span class="rs__upzone-t">Trascina i tuoi PDF qui o clicca per caricare</span><input type="file" id="rsMnInput" accept="application/pdf,.pdf" multiple style="display:none"></div>
 <div class="rs__list" id="rsManualList"></div>
 </div>
