@@ -236,8 +236,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .wh{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0;cursor:var(--cur-grab)}.wh:active{cursor:var(--cur-grabbing)}
 .wh__i{color:var(--red);display:flex}.wh__i svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
 .wh__t{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);flex:1}
-.wh__h{width:22px;height:22px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;line-height:1;margin-right:8px;transition:all .15s;flex-shrink:0;padding:0}
-.wh__h:hover{background:rgba(196,154,50,.1);color:var(--gold);border-color:rgba(196,154,50,.5)}
+.wh__h{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.85rem;font-weight:700;line-height:1;margin-right:6px;transition:all .15s;flex-shrink:0;padding:0}
+.wh__h:hover{background:rgba(196,154,50,.08);color:var(--gold);border-color:rgba(196,154,50,.3)}
 .wh__x{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:600;transition:all .15s;line-height:1}.wh__x:hover{background:var(--rl);color:var(--red);border-color:var(--rb)}
 .helpMd-ov{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:9100;display:none}
 .helpMd-ov.on{display:block}
@@ -3814,19 +3814,27 @@ function closeHelp(){
   document.getElementById('helpMdOv').classList.remove('on');
   document.getElementById('helpMd').classList.remove('on');
 }
-/* Inietta il pulsante "?" in tutti i window header che hanno una chiave HELP */
-document.querySelectorAll('.win .wh').forEach(function(wh){
-  var x=wh.querySelector('.wh__x');if(!x)return;
-  var key=x.dataset.close;if(!key||!HELP[key])return;
-  if(wh.querySelector('.wh__h'))return; /* già iniettato */
-  var btn=document.createElement('button');
-  btn.className='wh__h';btn.type='button';
-  btn.setAttribute('data-help',key);
-  btn.title='Aiuto: '+HELP[key].title;
-  btn.setAttribute('aria-label','Aiuto: '+HELP[key].title);
-  btn.textContent='?';
-  wh.insertBefore(btn,wh.firstChild);
-});
+/* Inietta il pulsante "?" appena prima dei comandi finestra (.wh__lay → .wh__x).
+   Posizione effettiva: a destra del titolo, a sinistra del menu layout e della ×. */
+function _injectHelpBtns(){
+  document.querySelectorAll('.win .wh').forEach(function(wh){
+    var x=wh.querySelector('.wh__x');if(!x)return;
+    var key=x.dataset.close;if(!key||!HELP[key])return;
+    if(wh.querySelector('.wh__h'))return; /* già iniettato */
+    var btn=document.createElement('button');
+    btn.className='wh__h';btn.type='button';
+    btn.setAttribute('data-help',key);
+    btn.title='Aiuto: '+HELP[key].title;
+    btn.setAttribute('aria-label','Aiuto: '+HELP[key].title);
+    btn.textContent='?';
+    /* anchor: il primo dei comandi finestra (.wh__lay se c'è, altrimenti .wh__x) */
+    var anchor=wh.querySelector('.wh__lay')||x;
+    wh.insertBefore(btn,anchor);
+  });
+}
+_injectHelpBtns();
+/* Re-inject quando le finestre vengono ricreate o se _injectLayBtns gira dopo */
+setTimeout(_injectHelpBtns,500);
 /* Click handler delegato — funziona anche su pulsanti aggiunti dinamicamente in futuro */
 document.addEventListener('click',function(e){
   var btn=e.target.closest('[data-help]');
