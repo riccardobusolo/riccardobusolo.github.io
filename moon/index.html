@@ -2877,16 +2877,33 @@ var skillMap=[
 {ab:'cha',name:'CAR',save:'TS Carisma',skills:[['inganno','Inganno'],['intimidire','Intimidire'],['intrattenere','Intrattenere'],['persuasione','Persuasione']]}];
 /* Risorse di classe con formula massimo (manuale D&D 5e) — accessibile sia
    da render() che dai click handler dell'IIFE PG. */
+/* Cariche risorse: numeri allineati al PHB D&D 5e 2024.
+   Note di compatibilità 2014 (per le classi unificate Chierico/Druido/
+   Barbaro/Guerriero):
+   - Cleric CD: 2014 era 1/2/3 a lvl 2/6/18 → 2024 è 2/3/4
+   - Druid Wild Shape: 2014 era 2 fisso (illimitato a lvl 20) → 2024 è 2/3/4
+   - Barbarian Rages: 2014 a lvl 20 era illimitato → 2024 cappa a 6
+   - Fighter Second Wind: 2014 era sempre 1 → 2024 è 2/3/4
+   I PG 2014 possono ridurre con il "Modificatore" della risorsa. */
 var RESOURCES=[
   {key:'',label:'— Nessuno —'},
   {key:'sorcery',label:'Punti Stregoneria',maxFn:function(c){return c.lvl<2?0:c.lvl}},
   {key:'ki',label:'Punti Ki',maxFn:function(c){return c.lvl<2?0:c.lvl}},
   {key:'bardic',label:'Ispirazione Bardica',maxFn:function(c){return Math.max(1,pgMod(c.cha||10))}},
-  {key:'channel',label:'Canalizzare Divinità',maxFn:function(c){return c.lvl>=18?3:c.lvl>=6?2:c.lvl>=2?1:0}},
-  {key:'wildshape',label:'Forma Selvatica',maxFn:function(c){return c.lvl<2?0:2}},
-  {key:'lay-on-hands',label:'Imposizione delle Mani',maxFn:function(c){return c.lvl<2?0:5*c.lvl}},
-  {key:'rage',label:'Ire (Barbaro)',maxFn:function(c){return c.lvl>=20?99:c.lvl>=17?6:c.lvl>=12?5:c.lvl>=6?4:c.lvl>=3?3:2}},
-  {key:'second-wind',label:'Secondo Fiato',maxFn:function(c){return 1}},
+  {key:'channel',label:'Canalizzare Divinità',maxFn:function(c){
+    /* Chierico vs Paladino hanno progressioni diverse di CD.
+       Identifico la classe dal classKey del PG. Se non è paladino,
+       uso lo schema del Chierico (anche per altre classi che potrebbero
+       attaccarci la risorsa manualmente). */
+    var ck=(c.classKey||'');
+    if(ck.indexOf('paladin')>=0) return c.lvl>=11?3:c.lvl>=3?2:0;
+    /* Cleric 2024: 2 cariche dal lvl 2, 3 dal lvl 6, 4 dal lvl 18 */
+    return c.lvl>=18?4:c.lvl>=6?3:c.lvl>=2?2:0;
+  }},
+  {key:'wildshape',label:'Forma Selvatica',maxFn:function(c){return c.lvl>=17?4:c.lvl>=6?3:c.lvl>=2?2:0}},
+  {key:'lay-on-hands',label:'Imposizione delle Mani',maxFn:function(c){return c.lvl>=1?5*c.lvl:0}},
+  {key:'rage',label:'Ire (Barbaro)',maxFn:function(c){return c.lvl>=17?6:c.lvl>=12?5:c.lvl>=6?4:c.lvl>=3?3:2}},
+  {key:'second-wind',label:'Secondo Fiato',maxFn:function(c){return c.lvl>=10?4:c.lvl>=4?3:2}},
   {key:'action-surge',label:'Azione Impetuosa',maxFn:function(c){return c.lvl>=17?2:c.lvl>=2?1:0}},
   {key:'sneak',label:'Dadi Superiorità',maxFn:function(c){return c.lvl>=15?6:c.lvl>=7?5:c.lvl>=3?4:0}},
   {key:'custom',label:'Personalizzato'}
