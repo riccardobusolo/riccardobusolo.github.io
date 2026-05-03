@@ -68,6 +68,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .setpanel__btn svg{stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
 .setpanel__btn--danger:hover{border-color:var(--rb);color:var(--red);background:var(--rl)}
 .setpanel__hint{font-family:var(--mono);font-size:.6rem;color:var(--muted);line-height:1.45;padding:6px 4px 0;font-style:italic}
+.fs-toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-12px);background:var(--bg2);border:1px solid rgba(196,154,50,.45);color:var(--text);font-family:var(--mono);font-size:.74rem;padding:10px 18px;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:99999;opacity:0;transition:opacity .25s ease,transform .25s ease;pointer-events:none;display:none}
+.fs-toast.fs-toast--on{display:block;opacity:1;transform:translateX(-50%) translateY(0)}
+.fs-toast.fs-toast--out{opacity:0;transform:translateX(-50%) translateY(-8px)}
+.fs-toast kbd{background:var(--bg3);border:1px solid var(--border);border-bottom-width:2px;border-radius:3px;padding:1px 6px;font-family:var(--mono);color:var(--gold);font-weight:600;margin:0 2px}
 .setpanel__info{display:flex;justify-content:space-between;align-items:center;padding:.4375rem .6875rem;background:var(--bg);border:1px solid var(--border);border-radius:5px}
 .setpanel__lbl{font-family:var(--mono);font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .setpanel__val{font-family:var(--mono);font-size:.74rem;color:var(--gold);font-weight:600}
@@ -1841,6 +1845,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 </div>
 </section>
 <section class="setpanel__sec">
+<h4 class="setpanel__h4">🖥 Schermo</h4>
+<button class="setpanel__btn" id="setFullscreen"><svg viewBox="0 0 24 24" width="14" height="14"><polyline points="4 14 4 20 10 20"/><polyline points="20 10 20 4 14 4"/><line x1="4" y1="20" x2="10" y2="14"/><line x1="20" y1="4" x2="14" y2="10"/></svg> <span id="setFullscreenLbl">Schermo intero</span></button>
+<div class="setpanel__hint">Premi <kbd style="font-family:var(--mono);font-size:.66rem;background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:0 4px;color:var(--gold)">Esc</kbd> per uscire dalla modalità a schermo intero.</div>
+</section>
+<section class="setpanel__sec">
 <h4 class="setpanel__h4">🧰 Visualizzazione strumenti</h4>
 <div class="setpanel__tools" id="setToolList"></div>
 </section>
@@ -2070,6 +2079,13 @@ document.getElementById('setReset').onclick=function(){var doReset=function(){
 };
 var resetMsg='Cancellare TUTTI i dati locali?\n\u2022 Personaggi, schede PG, combat tracker\n\u2022 Suoni, immagini, mappe, disegni, link, testi, preferiti\n\u2022 Foto miniatura locali\n\u2022 PDF dei manuali caricati\n\u2022 Tutte le impostazioni\n\nI dati nel cloud (foto Cloudinary, sync Firestore) NON saranno toccati: per quelli usa Account \u2192 Zona pericolosa.\n\nL\'azione \u00e8 irreversibile.';
 if(typeof pgConfirm==='function'){pgConfirm(resetMsg,doReset,{title:'Reset completo',okLabel:'Resetta tutto'})}else if(confirm(resetMsg)){doReset()}};
+/* Schermo intero */
+function _isFs(){return !!(document.fullscreenElement||document.webkitFullscreenElement||document.msFullscreenElement)}
+function _showFsToast(){var t=document.getElementById('fsToast');if(!t){t=document.createElement('div');t.id='fsToast';t.className='fs-toast';t.innerHTML='Premi <kbd>Esc</kbd> per uscire dalla modalità a schermo intero';document.body.appendChild(t)}t.classList.remove('fs-toast--out');t.classList.add('fs-toast--on');clearTimeout(t._tmr);t._tmr=setTimeout(function(){t.classList.add('fs-toast--out');setTimeout(function(){t.classList.remove('fs-toast--on');t.classList.remove('fs-toast--out')},400)},3500)}
+function _updateFsLabel(){var lbl=document.getElementById('setFullscreenLbl');if(lbl)lbl.textContent=_isFs()?'Esci da schermo intero':'Schermo intero'}
+document.getElementById('setFullscreen').onclick=function(){var el=document.documentElement;if(_isFs()){(document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen).call(document)}else{var fn=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;if(fn)fn.call(el).catch(function(e){console.warn('Fullscreen denied:',e&&e.message)})}};
+document.addEventListener('fullscreenchange',function(){_updateFsLabel();if(_isFs())_showFsToast()});
+document.addEventListener('webkitfullscreenchange',function(){_updateFsLabel();if(_isFs())_showFsToast()});
 })();
 
 /* === Account panel + Auth Wall === */
