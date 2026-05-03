@@ -719,27 +719,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .sp__header-row{display:flex;gap:6px;align-items:stretch;flex-wrap:wrap}
 .sp__header-box{flex:1 1 70px;min-width:62px}
 .sp__resources-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.sp__resource-card{flex:1 1 calc(50% - 3px);min-width:260px;display:flex;flex-direction:column;gap:5px;padding:6px 8px;border-radius:5px;background:var(--bg3);border:1px solid var(--border)}
-.sp__resource-card-top{display:flex;gap:5px;align-items:center}
-.sp__resource-card-top .sp__resource-type{flex:1;min-width:0}
-.sp__resource-card-custom{display:flex;gap:5px;align-items:center}
-.sp__resource-card-custom .sp__resource-title{flex:1;min-width:0}
-.sp__resource-card-ctrls{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
-.sp__resource-icon{font-size:.78rem;flex-shrink:0;color:var(--gold);opacity:.85}
-.sp__resource-type{cursor:var(--cur-pointer);font-family:var(--mono);font-size:.65rem;padding:3px 22px 3px 6px;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23c49a32'><path d='M4 6l4 4 4-4'/></svg>");background-repeat:no-repeat;background-position:right 4px center;background-size:11px}
-.sp__resource-name{font-family:var(--mono);font-size:.62rem;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sp__resource-title{font-size:.65rem;padding:3px 6px}
-.sp__resource-max{width:5ch;text-align:center;font-size:.65rem;padding:3px 4px;flex-shrink:0}
-.sp__resource-del{width:20px;height:20px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;font-size:.85rem;line-height:1;padding:0;flex-shrink:0;transition:all .12s}
-.sp__resource-del:hover{background:var(--rl);color:var(--red);border-color:var(--rb)}
-.sp__resource-btn{width:24px;height:22px;padding:0;font-size:.85rem;font-weight:700;line-height:1;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.sp__resource-card{flex:1 1 calc(50% - 3px);min-width:280px;display:flex;align-items:center;gap:3px;padding:4px 6px;border-radius:5px;background:var(--bg3);border:1px solid var(--border)}
+.sp__resource-type{flex:1 1 80px;min-width:0;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.62rem;padding:3px 18px 3px 5px;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23c49a32'><path d='M4 6l4 4 4-4'/></svg>");background-repeat:no-repeat;background-position:right 3px center;background-size:10px}
+.sp__resource-title{flex:1 1 60px;min-width:50px;font-size:.62rem;padding:3px 5px}
+.sp__resource-max{width:3.5ch;text-align:center;font-size:.62rem;padding:3px 3px;flex-shrink:0}
+.sp__resource-btn{width:22px;height:20px;padding:0;font-size:.78rem;font-weight:700;line-height:1;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
 .sp__resource-btn[disabled]{opacity:.35;cursor:not-allowed}
-.sp__resource-val{font-family:var(--mono);font-size:.78rem;color:var(--text);min-width:48px;text-align:center;padding:0 4px;font-weight:500;flex-shrink:0}
+.sp__resource-val{font-family:var(--mono);font-size:.72rem;color:var(--text);min-width:40px;text-align:center;padding:0 2px;font-weight:500;flex-shrink:0;white-space:nowrap}
 .sp__resource-val strong{color:var(--gold);font-weight:700}
-.sp__resource-mod-lbl{font-family:var(--mono);font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;margin-left:4px}
-.sp__resource-mod{width:4.5ch;text-align:center;font-size:.65rem;padding:3px 4px;color:var(--gold)}
-.sp__resource-reset{margin-left:auto;color:var(--gold)}
-.sp__resource-add{flex:1 1 100%;border:1px dashed rgba(196,154,50,.35);background:transparent;color:var(--muted);font-family:var(--mono);font-size:.65rem;padding:7px 6px;cursor:var(--cur-pointer);border-radius:5px;transition:all .12s;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.sp__resource-mod{width:3.5ch;text-align:center;font-size:.62rem;padding:3px 3px;color:var(--gold);flex-shrink:0}
+.sp__resource-reset{color:var(--gold)}
+.sp__resource-del{width:18px;height:18px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;font-size:.8rem;line-height:1;padding:0;flex-shrink:0;transition:all .12s;margin-left:auto}
+.sp__resource-del:hover{background:var(--rl);color:var(--red);border-color:var(--rb)}
+.sp__resource-add{flex:1 1 100%;border:1px dashed rgba(196,154,50,.35);background:transparent;color:var(--muted);font-family:var(--mono);font-size:.62rem;padding:6px;cursor:var(--cur-pointer);border-radius:5px;transition:all .12s;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
 .sp__resource-add:hover{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.04)}
 @container pgsheet (max-width:680px){
 .pg__col--slot{flex:1 1 100%;max-width:none}
@@ -2959,7 +2951,7 @@ var spAbilMap={intl:'INT',wis:'SAG',cha:'CAR'};var spAbilNames={intl:'Intelligen
 /* Lista risorse di classe con formula del massimo basata su livello/manuale D&D 5e */
 var RESOURCES=[
   {key:'',label:'— Nessuno —'},
-  {key:'sorcery',label:'Punti Stregoneria',maxFn:function(c){return c.lvl<2?0:c.lvl}},
+  {key:'sorcery',label:'Metamagia',maxFn:function(c){return c.lvl<2?0:c.lvl}},
   {key:'ki',label:'Punti Ki',maxFn:function(c){return c.lvl<2?0:c.lvl}},
   {key:'bardic',label:'Ispirazione Bardica',maxFn:function(c){return Math.max(1,pgMod(c.cha||10))}},
   {key:'channel',label:'Canalizzare Divinità',maxFn:function(c){return c.lvl>=18?3:c.lvl>=6?2:c.lvl>=2?1:0}},
@@ -2983,35 +2975,25 @@ function _resourceComputed(c,r){
   return {type:rt,def:rDef,baseMax:rMax,modifier:rMod,effMax:rEffMax,current:rCur,title:rTitle};
 }
 var spAbilKey=c.spAbil||'cha';var spAbilMod=pgMod(c[spAbilKey]);var spDcBn=c.spDcBonus||0;var spAtkBn=c.spAtkBonus||0;var spDC=8+pb+spAbilMod+spDcBn;var spAtk=pb+spAbilMod+spAtkBn;
-/* Risorse di classe — multi contatori, due per riga */
+/* Risorse di classe — multi contatori, mezza riga ciascuno, su singola riga orizzontale */
 var _resWidget='<div class="sp__resources-grid">';
 c.resources.forEach(function(r,ridx){
   var info=_resourceComputed(c,r);
   var opts='';RESOURCES.forEach(function(rd){opts+='<option value="'+rd.key+'"'+(info.type===rd.key?' selected':'')+'>'+rd.label+'</option>'});
   _resWidget+='<div class="sp__resource-card">';
-  _resWidget+='<div class="sp__resource-card-top">';
-  _resWidget+='<span class="sp__resource-icon" title="Contatore risorse">⚡</span>';
-  _resWidget+='<select class="pg__inp pg__inp--sm sp__resource-type" data-restype="'+ridx+'">'+opts+'</select>';
-  _resWidget+='<button class="sp__resource-del" data-resdel="'+ridx+'" type="button" title="Rimuovi contatore">×</button>';
-  _resWidget+='</div>';
-  if(info.type){
-    if(info.type==='custom'){
-      _resWidget+='<div class="sp__resource-card-custom">';
-      _resWidget+='<input class="pg__inp pg__inp--sm sp__resource-title" data-restitle="'+ridx+'" value="'+esc(r.title||'')+'" placeholder="Nome contatore">';
-      _resWidget+='<input class="pg__inp pg__inp--sm sp__resource-max" type="number" min="0" data-resmax="'+ridx+'" value="'+(parseInt(r.max)||0)+'" title="Punti massimi">';
-      _resWidget+='</div>';
-    } else {
-      _resWidget+='<div class="sp__resource-name" title="'+esc(info.title)+'">'+esc(info.title)+'</div>';
-    }
-    _resWidget+='<div class="sp__resource-card-ctrls">';
-    _resWidget+='<button class="pg__roll sp__resource-btn" data-resdec="'+ridx+'" type="button" title="Consuma 1"'+(info.current<=0?' disabled':'')+'>−</button>';
-    _resWidget+='<span class="sp__resource-val" title="Correnti / Massimo'+(info.modifier?' ('+(info.modifier>=0?'+':'')+info.modifier+' mod)':'')+'"><strong>'+info.current+'</strong> / '+info.effMax+'</span>';
-    _resWidget+='<button class="pg__roll sp__resource-btn" data-resinc="'+ridx+'" type="button" title="Recupera 1"'+(info.current>=info.effMax?' disabled':'')+'>+</button>';
-    _resWidget+='<span class="sp__resource-mod-lbl" title="Modificatore al massimo">Mod</span>';
-    _resWidget+='<input class="pg__inp pg__inp--sm sp__resource-mod" type="number" data-resmod="'+ridx+'" value="'+info.modifier+'" title="Aggiungi/togli punti dal massimo">';
-    _resWidget+='<button class="pg__roll sp__resource-btn sp__resource-reset" data-resreset="'+ridx+'" type="button" title="Riporta al massimo">↺</button>';
-    _resWidget+='</div>';
+  _resWidget+='<select class="pg__inp pg__inp--sm sp__resource-type" data-restype="'+ridx+'" title="Tipo di contatore">'+opts+'</select>';
+  if(info.type==='custom'){
+    _resWidget+='<input class="pg__inp pg__inp--sm sp__resource-title" data-restitle="'+ridx+'" value="'+esc(r.title||'')+'" placeholder="Nome" title="Nome contatore">';
+    _resWidget+='<input class="pg__inp pg__inp--sm sp__resource-max" type="number" min="0" data-resmax="'+ridx+'" value="'+(parseInt(r.max)||0)+'" title="Punti massimi">';
   }
+  if(info.type){
+    _resWidget+='<button class="pg__roll sp__resource-btn" data-resdec="'+ridx+'" type="button" title="Consuma 1"'+(info.current<=0?' disabled':'')+'>−</button>';
+    _resWidget+='<span class="sp__resource-val" title="Correnti / Massimo'+(info.modifier?' (mod '+(info.modifier>=0?'+':'')+info.modifier+')':'')+'"><strong>'+info.current+'</strong>/'+info.effMax+'</span>';
+    _resWidget+='<button class="pg__roll sp__resource-btn" data-resinc="'+ridx+'" type="button" title="Recupera 1"'+(info.current>=info.effMax?' disabled':'')+'>+</button>';
+    _resWidget+='<input class="pg__inp pg__inp--sm sp__resource-mod" type="number" data-resmod="'+ridx+'" value="'+info.modifier+'" placeholder="±" title="Modificatore al massimo (es. +1 da feature, -1 da esaustione)">';
+    _resWidget+='<button class="pg__roll sp__resource-btn sp__resource-reset" data-resreset="'+ridx+'" type="button" title="Riporta al massimo">↺</button>';
+  }
+  _resWidget+='<button class="sp__resource-del" data-resdel="'+ridx+'" type="button" title="Rimuovi contatore">×</button>';
   _resWidget+='</div>';
 });
 _resWidget+='<button class="sp__resource-add" data-resadd="1" type="button" title="Aggiungi un nuovo contatore">+ Aggiungi contatore</button>';
