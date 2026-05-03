@@ -2881,6 +2881,52 @@ function _resourceComputed(c,r){
   var rCur=Math.max(0,Math.min(rEffMax,parseInt(r&&r.current)||0));
   return {type:rt,def:rDef,baseMax:rMax,modifier:rMod,effMax:rEffMax,current:rCur,title:rTitle};
 }
+/* Tabelle slot incantesimo da PHB D&D 5e per ogni archetipo di caster.
+   Indici: SLOT_TABLES[type][lvlPG-1][slotLvl-1] = numero slot massimo. */
+var SLOT_TABLES={
+  full:[
+    [2,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0],[4,2,0,0,0,0,0,0,0],[4,3,0,0,0,0,0,0,0],
+    [4,3,2,0,0,0,0,0,0],[4,3,3,0,0,0,0,0,0],[4,3,3,1,0,0,0,0,0],[4,3,3,2,0,0,0,0,0],
+    [4,3,3,3,1,0,0,0,0],[4,3,3,3,2,0,0,0,0],[4,3,3,3,2,1,0,0,0],[4,3,3,3,2,1,0,0,0],
+    [4,3,3,3,2,1,1,0,0],[4,3,3,3,2,1,1,0,0],[4,3,3,3,2,1,1,1,0],[4,3,3,3,2,1,1,1,0],
+    [4,3,3,3,2,1,1,1,1],[4,3,3,3,3,1,1,1,1],[4,3,3,3,3,2,1,1,1],[4,3,3,3,3,2,2,1,1]
+  ],
+  half:[
+    [0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0],
+    [4,2,0,0,0,0,0,0,0],[4,2,0,0,0,0,0,0,0],[4,3,0,0,0,0,0,0,0],[4,3,0,0,0,0,0,0,0],
+    [4,3,2,0,0,0,0,0,0],[4,3,2,0,0,0,0,0,0],[4,3,3,0,0,0,0,0,0],[4,3,3,0,0,0,0,0,0],
+    [4,3,3,1,0,0,0,0,0],[4,3,3,1,0,0,0,0,0],[4,3,3,2,0,0,0,0,0],[4,3,3,2,0,0,0,0,0],
+    [4,3,3,3,1,0,0,0,0],[4,3,3,3,1,0,0,0,0],[4,3,3,3,2,0,0,0,0],[4,3,3,3,2,0,0,0,0]
+  ],
+  third:[
+    [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0],
+    [3,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0],[4,2,0,0,0,0,0,0,0],[4,2,0,0,0,0,0,0,0],
+    [4,2,0,0,0,0,0,0,0],[4,3,0,0,0,0,0,0,0],[4,3,0,0,0,0,0,0,0],[4,3,0,0,0,0,0,0,0],
+    [4,3,2,0,0,0,0,0,0],[4,3,2,0,0,0,0,0,0],[4,3,2,0,0,0,0,0,0],[4,3,3,0,0,0,0,0,0],
+    [4,3,3,0,0,0,0,0,0],[4,3,3,0,0,0,0,0,0],[4,3,3,1,0,0,0,0,0],[4,3,3,1,0,0,0,0,0]
+  ],
+  warlock:[
+    [1,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,0],[0,2,0,0,0,0,0,0,0],[0,2,0,0,0,0,0,0,0],
+    [0,0,2,0,0,0,0,0,0],[0,0,2,0,0,0,0,0,0],[0,0,0,2,0,0,0,0,0],[0,0,0,2,0,0,0,0,0],
+    [0,0,0,0,2,0,0,0,0],[0,0,0,0,2,0,0,0,0],[0,0,0,0,3,0,0,0,0],[0,0,0,0,3,0,0,0,0],
+    [0,0,0,0,3,0,0,0,0],[0,0,0,0,3,0,0,0,0],[0,0,0,0,3,0,0,0,0],[0,0,0,0,3,0,0,0,0],
+    [0,0,0,0,4,0,0,0,0],[0,0,0,0,4,0,0,0,0],[0,0,0,0,4,0,0,0,0],[0,0,0,0,4,0,0,0,0]
+  ]
+};
+var SPELL_CASTERS=[
+  {key:'',label:'— Auto-popola tabella slot da classe —'},
+  {key:'wizard',label:'Mago',table:'full'},
+  {key:'cleric',label:'Chierico',table:'full'},
+  {key:'druid',label:'Druido',table:'full'},
+  {key:'bard',label:'Bardo',table:'full'},
+  {key:'sorcerer',label:'Stregone',table:'full'},
+  {key:'paladin',label:'Paladino',table:'half'},
+  {key:'ranger',label:'Ranger',table:'half'},
+  {key:'artificer',label:'Artefice',table:'half'},
+  {key:'eldritch-knight',label:'Cavaliere Mistico (Guerriero)',table:'third'},
+  {key:'arcane-trickster',label:'Furfante Arcano (Ladro)',table:'third'},
+  {key:'warlock',label:'Warlock (Magia del Patto)',table:'warlock'}
+];
 function render(){var pg=loadPG();var allPgs=loadAllPGs();if(typeof window._pgLastAbResult==="undefined"){window._pgLastAbResult="";window._pgLastAbClass=""}
 if(!pg){if(allPgs.length>0)setCurrentPGId(allPgs[0].id),pg=allPgs[0];else{wrap.innerHTML='<div class="pg__empty">\u2694\ufe0f Nessun personaggio creato<br>Crea il tuo avventuriero per iniziare<br><button class="pg__create" id="pgNew">\u2728 Crea Personaggio</button></div>';return}}
 var c=pg,pb=profBonus(c.lvl),hdLeft=c.hitDiceLeft!=null?c.hitDiceLeft:c.lvl;if(!c.profs)c.profs={};if(!c.dsc)c.dsc={s:0,f:0};if(!c.cantrips)c.cantrips=[];if(!c.spBook)c.spBook=[[],[],[],[],[],[],[],[],[]];if(!c.spAbil)c.spAbil='cha';if(c.spConc==null)c.spConc='';if(c.initBonus==null)c.initBonus=(c.init||0)-pgMod(c.dex);if(c.exhaustion==null)c.exhaustion=0;if(c.exhaustion<0)c.exhaustion=0;if(c.exhaustion>6)c.exhaustion=6;
@@ -3014,7 +3060,9 @@ for(var lv=0;lv<20;lv++){var rowCls=(lv===_curLv)?' class="pg__slot-row--cur"':'
 slotTblH+='</tbody></table></div>';
 var hidLvls=[];for(var k=0;k<9;k++)if(c.hiddenSlots[k])hidLvls.push(k);
 var showAllH='';if(hidLvls.length>0){showAllH='<span style="font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-left:8px;align-self:center">Nascosti:</span>';hidLvls.forEach(function(li){showAllH+='<button class="pg__roll" data-slotshow="'+li+'" style="margin-left:3px" title="Mostra '+(li+1)+'\u00b0">+ '+(li+1)+'\u00b0</button>'});if(hidLvls.length>1)showAllH+='<button class="pg__roll" data-slotshowall="1" style="margin-left:6px">Mostra tutti</button>'}
-var slotSecH='<div class="pg__sec"><div class="pg__sec-title">\uD83C\uDFAF Slot Incantesimo \u2014 Liv. '+(_curLv+1)+'</div><div class="pg__sec-title" style="margin-top:0;font-size:.62rem;color:var(--muted);text-transform:none;letter-spacing:0">Tabella MAX (clicca cella per modificare)</div>'+slotTblH+'<div class="pg__row" style="margin-top:5px"><button class="pg__roll" data-resetallmax="1">\u2718 Azzera riga corrente</button>'+showAllH+'</div></div>';
+var _classOpts='';SPELL_CASTERS.forEach(function(cl){_classOpts+='<option value="'+cl.key+'">'+cl.label+'</option>'});
+var classFillH='<select class="pg__inp pg__inp--sm pg__class-fill" data-classfill style="width:100%;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.62rem;padding:3px 22px 3px 6px;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url(\"data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\' fill=\'%23c49a32\'><path d=\'M4 6l4 4 4-4\'/></svg>\");background-repeat:no-repeat;background-position:right 4px center;background-size:11px" title="Auto-popola la tabella slot in base alla classe (manuale D&D 5e)">'+_classOpts+'</select>';
+var slotSecH='<div class="pg__sec"><div class="pg__sec-title">\uD83C\uDFAF Slot Incantesimo \u2014 Liv. '+(_curLv+1)+'</div><div class="pg__sec-title" style="margin-top:0;font-size:.62rem;color:var(--muted);text-transform:none;letter-spacing:0">Tabella MAX (clicca cella per modificare)</div><div style="margin-bottom:5px">'+classFillH+'</div>'+slotTblH+'<div class="pg__row" style="margin-top:5px;align-items:center"><button class="pg__roll" data-resetallmax="1">\u2718 Azzera riga corrente</button><button class="pg__roll" data-clearalltable="1" style="margin-left:3px">\uD83D\uDDD1 Azzera tabella</button>'+showAllH+'</div></div>';
 var cantH='';c.cantrips.forEach(function(name,i){var nmTxt=name||'(senza nome)';var nmCls='sp__prep-name'+(name?'':' sp__name--empty');cantH+='<div class="sp__prep-item sp__prep-item--cant" data-cantedit="'+i+'" title="Clicca per modificare"><span class="sp__prep-lvl">T</span><span class="'+nmCls+'">'+esc(nmTxt)+'</span><button class="sp__prep-x sp__prep-x--btn" data-cantdel="'+i+'" title="Elimina">\u2715</button></div>'});
 var cantSecH='<div class="pg__sec pg__sec--spdrop" data-spdrop="cantrip"><div class="pg__sec-title">\uD83D\uDD2E Trucchetti'+(c.cantrips.length?' ('+c.cantrips.length+')':'')+'</div>'+(cantH?'<div class="sp__prep-list">'+cantH+'</div>':'<div class="sp__prep-empty">Nessun trucchetto</div>')+'<button class="pg__roll" data-cantadd="1" style="margin-top:5px">+ Trucchetto</button></div>';
 var spPerLvlH='';for(var sl=1;sl<=9;sl++){var mx=(c.slotsTable[_curLv]||[])[sl-1]||0;var spells=c.spBook[sl-1]||[];if(mx>0||spells.length>0){var spItems='';spells.forEach(function(sp,si){var nm=sp.n||'';var nmCls='sp__name'+(nm?'':' sp__name--empty');spItems+='<div class="sp__item"><button class="sp__prep'+(sp.p?' sp__prep--on':'')+'" data-spprep="'+(sl-1)+'-'+si+'" title="'+(sp.p?'Preparato':'Non preparato')+'"></button><div class="'+nmCls+'" data-spclick="'+(sl-1)+'-'+si+'" title="Clicca per modificare">'+esc(nm||'(senza nome)')+'</div><button class="pg__atk-del" data-spdel="'+(sl-1)+'-'+si+'" title="Elimina"><svg viewBox="0 0 24 24" width="10" height="10"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div>'});var titleSuffix=mx>0?' \u2014 '+mx+' slot':' \u2014 nessuno slot';var addBtn=mx>0?'<button class="pg__roll" data-spadd="'+(sl-1)+'" style="margin-top:3px">+ Incantesimo</button>':'';spPerLvlH+='<div class="sp__lvl-group"><div class="sp__lvl-title">'+sl+'\u00b0 Livello'+titleSuffix+'</div>'+spItems+addBtn+'</div>'}}
@@ -3062,6 +3110,7 @@ var slotInc=e.target.closest('[data-slotinc]');if(slotInc){var _siI=parseInt(slo
 var slotDec=e.target.closest('[data-slotdec]');if(slotDec){var _siD=parseInt(slotDec.dataset.slotdec);if(!pg.slotsCurrent)pg.slotsCurrent=[0,0,0,0,0,0,0,0,0];if(pg.slotsCurrent[_siD]>0){pg.slotsCurrent[_siD]--;savePG(pg);render()}return}
 var slotResetCur=e.target.closest('[data-slotresetcur]');if(slotResetCur){var _clR=Math.max(1,Math.min(20,pg.lvl||1))-1;if(!pg.slotsCurrent)pg.slotsCurrent=[0,0,0,0,0,0,0,0,0];for(var _x=0;_x<9;_x++)pg.slotsCurrent[_x]=(pg.slotsTable[_clR]||[])[_x]||0;savePG(pg);render();return}
 var resetMax=e.target.closest('[data-resetallmax]');if(resetMax){var _cl=Math.max(1,Math.min(20,pg.lvl||1))-1;if(pg.slotsTable&&pg.slotsTable[_cl]){for(var _x=0;_x<9;_x++){pg.slotsTable[_cl][_x]=0;if(pg.slotsCurrent)pg.slotsCurrent[_x]=0}}savePG(pg);render();return}
+var clearAll=e.target.closest('[data-clearalltable]');if(clearAll){pgConfirm('Azzerare l\'intera tabella degli slot incantesimo?\nTutti i 20 livelli verranno svuotati.',function(){if(!pg.slotsTable)pg.slotsTable=[];for(var _i=0;_i<20;_i++)pg.slotsTable[_i]=[0,0,0,0,0,0,0,0,0];if(!pg.slotsCurrent)pg.slotsCurrent=[0,0,0,0,0,0,0,0,0];for(var _j=0;_j<9;_j++)pg.slotsCurrent[_j]=0;savePG(pg);render()},{title:'Azzera tabella slot',okLabel:'Azzera tutto'});return}
 var slotHide=e.target.closest('[data-slothide]');if(slotHide){var _hi=parseInt(slotHide.dataset.slothide);if(!pg.hiddenSlots)pg.hiddenSlots=[false,false,false,false,false,false,false,false,false];pg.hiddenSlots[_hi]=true;savePG(pg);render();return}
 var slotShow=e.target.closest('[data-slotshow]');if(slotShow){var _si=parseInt(slotShow.dataset.slotshow);if(!pg.hiddenSlots)pg.hiddenSlots=[false,false,false,false,false,false,false,false,false];pg.hiddenSlots[_si]=false;savePG(pg);render();return}
 var slotShowAll=e.target.closest('[data-slotshowall]');if(slotShowAll){pg.hiddenSlots=[false,false,false,false,false,false,false,false,false];savePG(pg);render();return}
@@ -3211,6 +3260,7 @@ document.addEventListener('dragleave',function(e){var z=e.target.closest('[data-
 document.addEventListener('drop',function(e){var z=e.target.closest('[data-spdrop]');if(!z)return;e.preventDefault();z.classList.remove('spdrop-over');z.classList.remove('spdrop-bad');var raw=e.dataTransfer.getData('application/x-spell');if(!raw)return;var sp;try{sp=JSON.parse(raw)}catch(err){return}var pg=loadPG();if(!pg)return;var zone=z.dataset.spdrop;var isCantrip=sp.level===0;if(zone==='cantrip'){if(!isCantrip)return;if(!pg.cantrips)pg.cantrips=[];if(pg.cantrips.indexOf(sp.name)<0)pg.cantrips.push(sp.name);savePG(pg);render();return}if(zone==='book'){if(isCantrip)return;if(!pg.spBook)pg.spBook=[[],[],[],[],[],[],[],[],[]];var li=Math.max(1,Math.min(9,sp.level||1))-1;var classes=(sp.classes||[]).map(_ttClass).join(', ');var schoolIt=_ttSchool(sp.school||'');pg.spBook[li].push({n:sp.name,p:false,ct:sp.castingTime||'',rg:sp.range||'',cmp:_compStr(sp.components||{}),dur:sp.duration||'',desc:(sp.description||'')+(sp.higherLevels?'\n\nAi livelli superiori: '+sp.higherLevels:''),school:schoolIt,classes:classes,source:sp.source||''});savePG(pg);render();return}});
 
 wrap.addEventListener('change',function(e){var pg=loadPG();if(!pg)return;
+var classFill=e.target.closest('[data-classfill]');if(classFill){var key=classFill.value;classFill.value='';if(!key)return;var def=null;SPELL_CASTERS.forEach(function(cl){if(cl.key===key)def=cl});if(!def||!def.table||!SLOT_TABLES[def.table])return;if(!pg.slotsTable)pg.slotsTable=[];for(var _i=0;_i<20;_i++){pg.slotsTable[_i]=SLOT_TABLES[def.table][_i].slice()}savePG(pg);render();return}
 var ef=e.target.closest('[data-ef]');if(ef){pg[ef.dataset.ef]=ef.value.trim()||'';savePG(pg);render();return}
 var nf=e.target.closest('[data-nf]');if(nf){var f=nf.dataset.nf;var v=parseInt(nf.value);if(!isNaN(v)){if(f.indexOf('coins_')===0){if(!pg.coins)pg.coins={mr:0,ma:0,me:0,mo:0,mp:0};pg.coins[f.substring(6)]=v}else{pg[f]=v;if(f==='lvl'){pg.lvl=Math.max(1,v);if(pg.hitDiceLeft>pg.lvl)pg.hitDiceLeft=pg.lvl}if(f==='hpCur'&&pg.hpCur>pg.hp)pg.hpCur=pg.hp;if(f==='hp'&&(pg.hpCur==null||pg.hpCur>pg.hp))pg.hpCur=pg.hp}}savePG(pg);render();return}
 var hdInp=e.target.closest('[data-hdinp]');if(hdInp){var v=parseInt(hdInp.value);if(!isNaN(v)){pg.hitDiceLeft=Math.max(0,Math.min(pg.lvl,v))}savePG(pg);render();return}
