@@ -718,6 +718,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .pg__sec-hint{font-family:var(--mono);font-size:.62rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;margin-left:auto;white-space:nowrap}
 .sp__header-row{display:flex;gap:6px;align-items:stretch;flex-wrap:wrap}
 .sp__header-box{flex:1 1 70px;min-width:62px}
+.sp__resource-row{display:flex;gap:5px;align-items:center;margin-top:6px;padding:5px 8px;border-radius:5px;background:var(--bg3);border:1px solid var(--border);flex-wrap:wrap;row-gap:4px}
+.sp__resource-icon{font-size:.78rem;flex-shrink:0;color:var(--gold);opacity:.85}
+.sp__resource-type{flex:0 1 auto;min-width:130px;max-width:180px;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.65rem;padding:3px 22px 3px 6px;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23c49a32'><path d='M4 6l4 4 4-4'/></svg>");background-repeat:no-repeat;background-position:right 4px center;background-size:11px}
+.sp__resource-name{font-family:var(--mono);font-size:.62rem;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:0 4px;flex-shrink:0}
+.sp__resource-title{flex:1 1 110px;min-width:90px;font-size:.65rem;padding:3px 6px}
+.sp__resource-max{width:5ch;text-align:center;font-size:.65rem;padding:3px 4px}
+.sp__resource-btn{width:24px;height:22px;padding:0;font-size:.85rem;font-weight:700;line-height:1;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.sp__resource-btn[disabled]{opacity:.35;cursor:not-allowed}
+.sp__resource-val{font-family:var(--mono);font-size:.78rem;color:var(--text);min-width:50px;text-align:center;padding:0 4px;font-weight:500;flex-shrink:0}
+.sp__resource-val strong{color:var(--gold);font-weight:700}
+.sp__resource-mod-lbl{font-family:var(--mono);font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;margin-left:4px}
+.sp__resource-mod{width:5ch;text-align:center;font-size:.65rem;padding:3px 4px;color:var(--gold)}
+.sp__resource-reset{margin-left:auto;color:var(--gold)}
 @container pgsheet (max-width:680px){
 .pg__col--slot{flex:1 1 100%;max-width:none}
 }
@@ -2846,6 +2859,7 @@ if(!c.slotsCurrent||c.slotsCurrent.length!==9){c.slotsCurrent=[0,0,0,0,0,0,0,0,0
 for(var _s=0;_s<9;_s++){var _mx2=c.slotsTable[_curLv][_s]||0;if(c.slotsCurrent[_s]>_mx2)c.slotsCurrent[_s]=_mx2;if(c.slotsCurrent[_s]<0)c.slotsCurrent[_s]=0}
 if(c.spConcDc==null)c.spConcDc=10;
 if(c.spDcBonus==null)c.spDcBonus=0;if(c.spAtkBonus==null)c.spAtkBonus=0;
+if(!c.resource||typeof c.resource!=='object')c.resource={type:'',current:0,modifier:0,title:'',max:0};
 if(!c.photos||!Array.isArray(c.photos))c.photos=[];
 if(!c.appearance||typeof c.appearance!=='object')c.appearance={age:'',height:'',weight:'',eyes:'',hair:'',skin:'',marks:''};
 ['age','height','weight','eyes','hair','skin','marks'].forEach(function(k){if(c.appearance[k]==null)c.appearance[k]=''});
@@ -2923,8 +2937,53 @@ var privH='<div class="pg__sec"><div class="pg__sec-title"><span>\u2699\ufe0f Pr
 var pgRollRowH='<div class="pg__roll-row '+(window._pgLastAbClass||'')+'" id="pgRollRow">'+(window._pgLastAbResult||'\uD83C\uDFB2 Clicca un\'abilit\u00e0 o un tiro per lanciare un d20')+'</div>';var tab1='<div class="pg__page'+(curTab==='scheda'?' pg__page--on':'')+'" data-page="scheda">'+idH+pgRollRowH+'<div class="pg__sheet"><div class="pg__col">'+coreH+absH+combatH+hdH+dsH+atkH+'</div><div class="pg__col">'+exhH+ssH+'</div><div class="pg__col">'+coinsH+equipSchH+privH+'</div></div></div>';
 /* === TAB 2: INCANTESIMI === */
 var spAbilMap={intl:'INT',wis:'SAG',cha:'CAR'};var spAbilNames={intl:'Intelligenza',wis:'Saggezza',cha:'Carisma'};
+/* Lista risorse di classe con formula del massimo basata su livello/manuale D&D 5e */
+var RESOURCES=[
+  {key:'',label:'— Nessuno —'},
+  {key:'sorcery',label:'Punti Stregoneria',maxFn:function(c){return c.lvl<2?0:c.lvl}},
+  {key:'ki',label:'Punti Ki',maxFn:function(c){return c.lvl<2?0:c.lvl}},
+  {key:'bardic',label:'Ispirazione Bardica',maxFn:function(c){return Math.max(1,pgMod(c.cha||10))}},
+  {key:'channel',label:'Canalizzare Divinità',maxFn:function(c){return c.lvl>=18?3:c.lvl>=6?2:c.lvl>=2?1:0}},
+  {key:'wildshape',label:'Forma Selvatica',maxFn:function(c){return c.lvl<2?0:2}},
+  {key:'lay-on-hands',label:'Imposizione delle Mani',maxFn:function(c){return c.lvl<2?0:5*c.lvl}},
+  {key:'rage',label:'Ire (Barbaro)',maxFn:function(c){return c.lvl>=20?99:c.lvl>=17?6:c.lvl>=12?5:c.lvl>=6?4:c.lvl>=3?3:2}},
+  {key:'second-wind',label:'Secondo Fiato',maxFn:function(c){return 1}},
+  {key:'action-surge',label:'Azione Impetuosa',maxFn:function(c){return c.lvl>=17?2:c.lvl>=2?1:0}},
+  {key:'sneak',label:'Dadi Superiorità',maxFn:function(c){return c.lvl>=15?6:c.lvl>=7?5:c.lvl>=3?4:0}},
+  {key:'custom',label:'Personalizzato'}
+];
+function _resourceComputed(c){
+  var rt=c.resource.type||'';
+  var rDef=null;RESOURCES.forEach(function(rd){if(rd.key===rt)rDef=rd});
+  var rMax=0,rTitle='';
+  if(rt==='custom'){rMax=parseInt(c.resource.max)||0;rTitle=c.resource.title||'Personalizzato'}
+  else if(rDef&&rDef.maxFn){rMax=rDef.maxFn(c);rTitle=rDef.label}
+  var rMod=parseInt(c.resource.modifier)||0;
+  var rEffMax=Math.max(0,rMax+rMod);
+  var rCur=Math.max(0,Math.min(rEffMax,parseInt(c.resource.current)||0));
+  return {type:rt,def:rDef,baseMax:rMax,modifier:rMod,effMax:rEffMax,current:rCur,title:rTitle};
+}
 var spAbilKey=c.spAbil||'cha';var spAbilMod=pgMod(c[spAbilKey]);var spDcBn=c.spDcBonus||0;var spAtkBn=c.spAtkBonus||0;var spDC=8+pb+spAbilMod+spDcBn;var spAtk=pb+spAbilMod+spAtkBn;
-var spHeaderH='<div class="pg__sec"><div class="pg__sec-title">\u2728 Incantesimi</div><div class="sp__header-row"><div class="sp__header-box" data-spabil="1" style="cursor:var(--cur-pointer)" title="Clicca per cambiare: '+spAbilNames[spAbilKey]+'"><div class="sp__header-val">'+spAbilMap[spAbilKey]+'</div><div class="sp__header-lbl">Abilit\u00e0</div></div><div class="sp__header-box sp__header-box--clk" data-spdcedit="1" title="Clicca per modificare il bonus extra (attuale: '+(spDcBn>=0?'+':'')+spDcBn+')"><div class="sp__header-val">'+spDC+'</div><div class="sp__header-lbl">CD Tiro Salv.'+(spDcBn?' <span class="sp__header-bn">('+(spDcBn>=0?'+':'')+spDcBn+')</span>':'')+'</div></div><div class="sp__header-box sp__header-box--clk" data-spatkedit="1" title="Clicca per modificare il bonus extra (attuale: '+(spAtkBn>=0?'+':'')+spAtkBn+')"><div class="sp__header-val">'+pgFmt(spAtk)+'</div><div class="sp__header-lbl">Bonus Att.'+(spAtkBn?' <span class="sp__header-bn">('+(spAtkBn>=0?'+':'')+spAtkBn+')</span>':'')+'</div></div><div class="sp__conc'+(c.spConc?' sp__conc--active':'')+'"><button class="sp__conc-toggle'+(c.spConc?' on':'')+'" data-conctoggle="1" title="'+(c.spConc?'Disattiva concentrazione':'Attiva concentrazione')+'"><span class="sp__conc-cb"></span><span class="sp__conc-icon">\u23F3</span><span class="sp__conc-lbl">Concentrazione</span></button><span class="sp__conc-dclbl">CD</span><input class="pg__inp pg__inp--sm sp__conc-dc" id="spConcDc" type="number" min="10" value="'+Math.max(10,c.spConcDc||10)+'" style="min-height:0;padding:3px 4px"><button class="pg__roll sp__conc-ts" data-concts="1" title="Tira TS Costituzione (CON "+pgFmt(pgMod(c.con)+(c.profs.save_con||0)*pb)+")">\uD83C\uDFB2 TS</button><span class="sp__conc-result-inline'+(window.__concRes?' on '+window.__concResCls:'')+'" id="spConcResult">'+(window.__concRes||'')+'</span></div></div>'+_buildAvailRow()+'</div>';
+/* Risorse di classe widget */
+var _resInfo=_resourceComputed(c);
+var _resOpts='';RESOURCES.forEach(function(rd){_resOpts+='<option value="'+rd.key+'"'+(_resInfo.type===rd.key?' selected':'')+'>'+rd.label+'</option>'});
+var _resWidget='<div class="sp__resource-row"><span class="sp__resource-icon" title="Contatore risorse di classe">⚡</span><select class="pg__inp pg__inp--sm sp__resource-type" data-restype>'+_resOpts+'</select>';
+if(_resInfo.type){
+  if(_resInfo.type==='custom'){
+    _resWidget+='<input class="pg__inp pg__inp--sm sp__resource-title" data-restitle value="'+esc(c.resource.title||'')+'" placeholder="Nome contatore" title="Nome del contatore personalizzato">';
+    _resWidget+='<input class="pg__inp pg__inp--sm sp__resource-max" type="number" min="0" data-resmax value="'+(parseInt(c.resource.max)||0)+'" title="Punti massimi">';
+  } else {
+    _resWidget+='<span class="sp__resource-name">'+esc(_resInfo.title)+'</span>';
+  }
+  _resWidget+='<button class="pg__roll sp__resource-btn" data-resdec type="button" title="Consuma 1"'+(_resInfo.current<=0?' disabled':'')+'>−</button>';
+  _resWidget+='<span class="sp__resource-val" title="Correnti / Massimo'+(_resInfo.modifier?' ('+(_resInfo.modifier>=0?'+':'')+_resInfo.modifier+' mod)':'')+'"><strong>'+_resInfo.current+'</strong> / '+_resInfo.effMax+'</span>';
+  _resWidget+='<button class="pg__roll sp__resource-btn" data-resinc type="button" title="Recupera 1"'+(_resInfo.current>=_resInfo.effMax?' disabled':'')+'>+</button>';
+  _resWidget+='<span class="sp__resource-mod-lbl" title="Modificatore al massimo (es. da feature, esaustione, oggetti)">Mod</span>';
+  _resWidget+='<input class="pg__inp pg__inp--sm sp__resource-mod" type="number" data-resmod value="'+_resInfo.modifier+'" title="Aggiungi/togli punti dal massimo (positivo o negativo)">';
+  _resWidget+='<button class="pg__roll sp__resource-btn sp__resource-reset" data-resreset type="button" title="Riporta al massimo">↺</button>';
+}
+_resWidget+='</div>';
+var spHeaderH='<div class="pg__sec"><div class="pg__sec-title">\u2728 Incantesimi</div><div class="sp__header-row"><div class="sp__header-box" data-spabil="1" style="cursor:var(--cur-pointer)" title="Clicca per cambiare: '+spAbilNames[spAbilKey]+'"><div class="sp__header-val">'+spAbilMap[spAbilKey]+'</div><div class="sp__header-lbl">Abilit\u00e0</div></div><div class="sp__header-box sp__header-box--clk" data-spdcedit="1" title="Clicca per modificare il bonus extra (attuale: '+(spDcBn>=0?'+':'')+spDcBn+')"><div class="sp__header-val">'+spDC+'</div><div class="sp__header-lbl">CD Tiro Salv.'+(spDcBn?' <span class="sp__header-bn">('+(spDcBn>=0?'+':'')+spDcBn+')</span>':'')+'</div></div><div class="sp__header-box sp__header-box--clk" data-spatkedit="1" title="Clicca per modificare il bonus extra (attuale: '+(spAtkBn>=0?'+':'')+spAtkBn+')"><div class="sp__header-val">'+pgFmt(spAtk)+'</div><div class="sp__header-lbl">Bonus Att.'+(spAtkBn?' <span class="sp__header-bn">('+(spAtkBn>=0?'+':'')+spAtkBn+')</span>':'')+'</div></div><div class="sp__conc'+(c.spConc?' sp__conc--active':'')+'"><button class="sp__conc-toggle'+(c.spConc?' on':'')+'" data-conctoggle="1" title="'+(c.spConc?'Disattiva concentrazione':'Attiva concentrazione')+'"><span class="sp__conc-cb"></span><span class="sp__conc-icon">\u23F3</span><span class="sp__conc-lbl">Concentrazione</span></button><span class="sp__conc-dclbl">CD</span><input class="pg__inp pg__inp--sm sp__conc-dc" id="spConcDc" type="number" min="10" value="'+Math.max(10,c.spConcDc||10)+'" style="min-height:0;padding:3px 4px"><button class="pg__roll sp__conc-ts" data-concts="1" title="Tira TS Costituzione (CON "+pgFmt(pgMod(c.con)+(c.profs.save_con||0)*pb)+")">\uD83C\uDFB2 TS</button><span class="sp__conc-result-inline'+(window.__concRes?' on '+window.__concResCls:'')+'" id="spConcResult">'+(window.__concRes||'')+'</span></div></div>'+_resWidget+_buildAvailRow()+'</div>';
 function _buildAvailRow(){var availH='';var hasAnyMax=false;for(var sl=0;sl<9;sl++){var mxA=c.slotsTable[_curLv][sl]||0;if(mxA===0)continue;hasAnyMax=true;var curA=c.slotsCurrent[sl]||0;if(curA>mxA)curA=mxA;var pillCls='pg__slot-pill';if(curA===0)pillCls+=' pg__slot-pill--depleted';else if(curA===mxA)pillCls+=' pg__slot-pill--full';availH+='<div class="'+pillCls+'"><span class="pg__slot-pill-lvl">'+(sl+1)+'\u00b0</span><button class="pg__slot-pill-btn pg__slot-pill-btn--dec" data-slotdec="'+sl+'" '+(curA<=0?'disabled':'')+' title="Consuma slot">\u2212</button><span class="pg__slot-pill-val">'+curA+'/'+mxA+'</span><button class="pg__slot-pill-btn pg__slot-pill-btn--inc" data-slotinc="'+sl+'" '+(curA>=mxA?'disabled':'')+' title="Recupera slot">+</button></div>'}
 if(hasAnyMax)availH+='<button class="pg__roll" data-slotresetcur="1" title="Riporta tutti gli slot al massimo">\u21BA Reset</button>';
 return hasAnyMax?'<div class="pg__slot-avail">'+availH+'</div>':''}
@@ -2990,6 +3049,9 @@ var spAbilBtn=e.target.closest('[data-spabil]');if(spAbilBtn){var cycle=['intl',
 var spDcEdit=e.target.closest('[data-spdcedit]');if(spDcEdit){_editHeaderBonus(spDcEdit,'spDcBonus',pg);return}
 var spAtkEdit=e.target.closest('[data-spatkedit]');if(spAtkEdit){_editHeaderBonus(spAtkEdit,'spAtkBonus',pg);return}
 var concTog=e.target.closest('[data-conctoggle]');if(concTog){pg.spConc=pg.spConc?0:1;if(pg.spConcDc==null||pg.spConcDc<10)pg.spConcDc=10;window.__concRes='';window.__concResCls='';savePG(pg);render();return}
+var resDec=e.target.closest('[data-resdec]');if(resDec){if(!pg.resource)pg.resource={type:'',current:0,modifier:0,title:'',max:0};pg.resource.current=Math.max(0,(parseInt(pg.resource.current)||0)-1);savePG(pg);render();return}
+var resInc=e.target.closest('[data-resinc]');if(resInc){if(!pg.resource)pg.resource={type:'',current:0,modifier:0,title:'',max:0};var info=_resourceComputed(pg);pg.resource.current=Math.min(info.effMax,(parseInt(pg.resource.current)||0)+1);savePG(pg);render();return}
+var resReset=e.target.closest('[data-resreset]');if(resReset){if(!pg.resource)pg.resource={type:'',current:0,modifier:0,title:'',max:0};var info2=_resourceComputed(pg);pg.resource.current=info2.effMax;savePG(pg);render();return}
 var concTs=e.target.closest('[data-concts]');if(concTs){var _conMod=pgMod(pg.con);var _profSv=(pg.profs&&pg.profs.save_con)||0;var _pb=profBonus(pg.lvl);var _bonus=_conMod+_profSv*_pb;var _r=rollD(20);var _tot=_r+_bonus;var _dc=Math.max(10,parseInt(pg.spConcDc)||10);var _ok=(_r===20)||(_r!==1&&_tot>=_dc);var _msg='d20:<strong>'+_r+'</strong>'+(_bonus>=0?'+':'')+_bonus+'=<strong>'+_tot+'</strong> vs '+_dc+' '+(_ok?'\u2714':'\u2718');window.__concRes=_msg;window.__concResCls=_ok?'sp__conc-result--ok':'sp__conc-result--fail';if(!_ok)pg.spConc=0;savePG(pg);render();return}
 var cantEdit=e.target.closest('[data-cantedit]');if(cantEdit&&!e.target.closest('[data-cantdel]')){var _ci=parseInt(cantEdit.dataset.cantedit);var nameSpan=cantEdit.querySelector('.sp__prep-name');if(!nameSpan||nameSpan.querySelector('input'))return;var oldNm=pg.cantrips[_ci]||'';var inp=document.createElement('input');inp.type='text';inp.value=oldNm;inp.style.cssText='all:unset;font-family:var(--mono);font-size:.78rem;color:var(--gold);width:100%;text-align:center;background:rgba(196,154,50,.06);border-radius:3px;padding:1px 4px';nameSpan.textContent='';nameSpan.appendChild(inp);inp.focus();inp.select();function doneCe(){pg.cantrips[_ci]=inp.value.trim();savePG(pg);render()}inp.onblur=doneCe;inp.onkeydown=function(ev){if(ev.key==='Enter'){ev.preventDefault();inp.blur()}else if(ev.key==='Escape'){inp.onblur=null;render()}};return}
 var cantAdd=e.target.closest('[data-cantadd]');if(cantAdd){if(!pg.cantrips)pg.cantrips=[];pg.cantrips.push('');savePG(pg);render();var lastI=pg.cantrips.length-1;setTimeout(function(){var el=document.querySelector('[data-cantedit="'+lastI+'"]');if(el)el.click()},20);return}
@@ -3138,6 +3200,10 @@ var spInp=e.target.closest('[data-spinp]');if(spInp){var parts=spInp.dataset.spi
 if(e.target.id==='spConcDc'){var _dv=parseInt(e.target.value);if(isNaN(_dv)||_dv<10)_dv=10;pg.spConcDc=_dv;e.target.value=_dv;savePG(pg);return}});
 wrap.addEventListener('input',function(e){var pg=loadPG();if(!pg)return;
 var ta=e.target.closest('[data-ta]');if(ta){pg[ta.dataset.ta]=ta.value;savePG(pg);return}var aff=e.target.closest('[data-aff]');if(aff){if(!pg.appearance)pg.appearance={};pg.appearance[aff.dataset.aff]=aff.value;savePG(pg);return}
+var resType=e.target.closest('[data-restype]');if(resType){if(!pg.resource)pg.resource={type:'',current:0,modifier:0,title:'',max:0};pg.resource.type=resType.value;pg.resource.current=_resourceComputed(pg).effMax;savePG(pg);render();return}
+var resTitle=e.target.closest('[data-restitle]');if(resTitle){if(!pg.resource)pg.resource={type:'',current:0,modifier:0,title:'',max:0};pg.resource.title=resTitle.value;savePG(pg);return}
+var resMaxIn=e.target.closest('[data-resmax]');if(resMaxIn){if(!pg.resource)pg.resource={type:'',current:0,modifier:0,title:'',max:0};pg.resource.max=parseInt(resMaxIn.value)||0;var ci=_resourceComputed(pg);if(pg.resource.current>ci.effMax)pg.resource.current=ci.effMax;savePG(pg);render();return}
+var resModIn=e.target.closest('[data-resmod]');if(resModIn){if(!pg.resource)pg.resource={type:'',current:0,modifier:0,title:'',max:0};pg.resource.modifier=parseInt(resModIn.value)||0;var ci2=_resourceComputed(pg);if(pg.resource.current>ci2.effMax)pg.resource.current=ci2.effMax;savePG(pg);render();return}
 if(e.target.id==='spConcDc'){var _dv=parseInt(e.target.value);if(isNaN(_dv)||_dv<10)_dv=10;pg.spConcDc=_dv;savePG(pg);return}
 if(e.target.id==='pgPrep'){pg.prepSpellsText=e.target.value;savePG(pg)}});
 render()})();
