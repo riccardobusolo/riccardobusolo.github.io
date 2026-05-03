@@ -2917,8 +2917,11 @@ var SLOT_TABLES={
     [0,0,0,0,4,0,0,0,0],[0,0,0,0,4,0,0,0,0],[0,0,0,0,4,0,0,0,0],[0,0,0,0,4,0,0,0,0]
   ]
 };
+/* Le tabelle slot D&D 5e 2014 e 5e 2024 (revisione) sono identiche per
+   ogni classe condivisa, quindi una sola opzione copre entrambe le edizioni.
+   L'Artefice non è presente nella 2024 PHB (solo 2014 + Tasha's). */
 var SPELL_CASTERS=[
-  {key:'',label:'— Auto-popola tabella slot da classe —'},
+  {key:'',label:'— Auto-popola tabella (5e 2014 / 2024) —'},
   {key:'wizard',label:'Mago',table:'full'},
   {key:'cleric',label:'Chierico',table:'full'},
   {key:'druid',label:'Druido',table:'full'},
@@ -2926,7 +2929,7 @@ var SPELL_CASTERS=[
   {key:'sorcerer',label:'Stregone',table:'full'},
   {key:'paladin',label:'Paladino',table:'half'},
   {key:'ranger',label:'Ranger',table:'half'},
-  {key:'artificer',label:'Artefice',table:'half'},
+  {key:'artificer',label:'Artefice (solo 5e 2014 / Tasha\'s)',table:'half'},
   {key:'eldritch-knight',label:'Cavaliere Mistico (Guerriero)',table:'third'},
   {key:'arcane-trickster',label:'Furfante Arcano (Ladro)',table:'third'},
   {key:'warlock',label:'Warlock (Magia del Patto)',table:'warlock'}
@@ -3065,7 +3068,7 @@ slotTblH+='</tbody></table></div>';
 var hidLvls=[];for(var k=0;k<9;k++)if(c.hiddenSlots[k])hidLvls.push(k);
 var showAllH='';if(hidLvls.length>0){showAllH='<span style="font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-left:8px;align-self:center">Nascosti:</span>';hidLvls.forEach(function(li){showAllH+='<button class="pg__roll" data-slotshow="'+li+'" style="margin-left:3px" title="Mostra '+(li+1)+'\u00b0">+ '+(li+1)+'\u00b0</button>'});if(hidLvls.length>1)showAllH+='<button class="pg__roll" data-slotshowall="1" style="margin-left:6px">Mostra tutti</button>'}
 var _classOpts='';SPELL_CASTERS.forEach(function(cl){_classOpts+='<option value="'+cl.key+'">'+cl.label+'</option>'});
-var classFillH='<select class="pg__inp pg__inp--sm pg__class-fill" data-classfill style="width:100%;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.62rem;padding:3px 22px 3px 6px;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url(\"data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\' fill=\'%23c49a32\'><path d=\'M4 6l4 4 4-4\'/></svg>\");background-repeat:no-repeat;background-position:right 4px center;background-size:11px" title="Auto-popola la tabella slot in base alla classe (manuale D&D 5e)">'+_classOpts+'</select>';
+var classFillH='<select class="pg__inp pg__inp--sm pg__class-fill" data-classfill style="width:100%;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.62rem;padding:3px 22px 3px 6px;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url(\"data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\' fill=\'%23c49a32\'><path d=\'M4 6l4 4 4-4\'/></svg>\");background-repeat:no-repeat;background-position:right 4px center;background-size:11px" title="Auto-popola la tabella slot in base alla classe (D&D 5e 2014 e 5e 2024 hanno tabelle identiche per tutte le classi condivise)">'+_classOpts+'</select>';
 var slotSecH='<div class="pg__sec"><div class="pg__sec-title">\uD83C\uDFAF Slot Incantesimo \u2014 Liv. '+(_curLv+1)+'</div><div style="margin-bottom:5px">'+classFillH+'</div>'+slotTblH+'<div class="pg__row" style="margin-top:5px;align-items:center"><button class="pg__roll" data-resetallmax="1">\u2718 Azzera riga corrente</button><button class="pg__roll" data-clearalltable="1" style="margin-left:3px">\uD83D\uDDD1 Azzera tabella</button>'+showAllH+'</div></div>';
 var cantH='';c.cantrips.forEach(function(name,i){var nmTxt=name||'(senza nome)';var nmCls='sp__prep-name'+(name?'':' sp__name--empty');cantH+='<div class="sp__prep-item sp__prep-item--cant" data-cantedit="'+i+'" title="Clicca per modificare"><span class="sp__prep-lvl">T</span><span class="'+nmCls+'">'+esc(nmTxt)+'</span><button class="sp__prep-x sp__prep-x--btn" data-cantdel="'+i+'" title="Elimina">\u2715</button></div>'});
 var cantSecH='<div class="pg__sec pg__sec--spdrop" data-spdrop="cantrip"><div class="pg__sec-title">\uD83D\uDD2E Trucchetti'+(c.cantrips.length?' ('+c.cantrips.length+')':'')+'</div>'+(cantH?'<div class="sp__prep-list">'+cantH+'</div>':'<div class="sp__prep-empty">Nessun trucchetto</div>')+'<button class="pg__roll" data-cantadd="1" style="margin-top:5px">+ Trucchetto</button></div>';
