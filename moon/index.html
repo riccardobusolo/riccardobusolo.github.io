@@ -2967,25 +2967,25 @@ function _spellsKnownAt(key,lvl){var arr=SPELLS_KNOWN_TABLES[key];if(!arr)return
    incantesimi conosciuti (key in SPELLS_KNOWN_TABLES). */
 var CLASSES=[
   {key:'',label:'— Seleziona classe —'},
-  {key:'wizard',label:'Mago (5e 2014/2024)',slotTable:'full',resource:null,known:'full2024'},
-  {key:'cleric',label:'Chierico (5e 2014/2024)',slotTable:'full',resource:'channel',known:'full2024'},
-  {key:'druid',label:'Druido (5e 2014/2024)',slotTable:'full',resource:'wildshape',known:'full2024'},
-  {key:'bard-2014',label:'Bardo (5e 2014)',slotTable:'full',resource:'bardic',known:'bard2014'},
-  {key:'bard-2024',label:'Bardo (5e 2024)',slotTable:'full',resource:'bardic',known:'full2024'},
-  {key:'sorcerer-2014',label:'Stregone (5e 2014)',slotTable:'full',resource:'sorcery',known:'sorc2014'},
-  {key:'sorcerer-2024',label:'Stregone (5e 2024)',slotTable:'full',resource:'sorcery',known:'full2024'},
-  {key:'paladin-2014',label:'Paladino (5e 2014)',slotTable:'half',resource:'lay-on-hands',known:null},
-  {key:'paladin-2024',label:'Paladino (5e 2024)',slotTable:'half_2024',resource:'lay-on-hands',known:null},
-  {key:'ranger-2014',label:'Ranger (5e 2014)',slotTable:'half',resource:null,known:'ranger2014'},
-  {key:'ranger-2024',label:'Ranger (5e 2024)',slotTable:'half_2024',resource:null,known:null},
-  {key:'artificer',label:'Artefice (Tasha\'s, solo 5e 2014)',slotTable:'half',resource:null,known:null},
-  {key:'eldritch-knight',label:'Cavaliere Mistico — Guerriero',slotTable:'third',resource:'second-wind',known:'ek_at'},
-  {key:'arcane-trickster',label:'Furfante Arcano — Ladro',slotTable:'third',resource:null,known:'ek_at'},
-  {key:'warlock',label:'Warlock — Magia del Patto (5e 2014/2024)',slotTable:'warlock',resource:null,known:'warlock'},
-  {key:'barbarian',label:'Barbaro',slotTable:null,resource:'rage',known:null},
-  {key:'fighter',label:'Guerriero',slotTable:null,resource:'second-wind',known:null},
-  {key:'monk',label:'Monaco',slotTable:null,resource:'ki',known:null},
-  {key:'rogue',label:'Ladro',slotTable:null,resource:null,known:null}
+  {key:'wizard',label:'Mago (5e 2014/2024)',slotTable:'full',resources:[],known:'full2024'},
+  {key:'cleric',label:'Chierico (5e 2014/2024)',slotTable:'full',resources:['channel'],known:'full2024'},
+  {key:'druid',label:'Druido (5e 2014/2024)',slotTable:'full',resources:['wildshape'],known:'full2024'},
+  {key:'bard-2014',label:'Bardo (5e 2014)',slotTable:'full',resources:['bardic'],known:'bard2014'},
+  {key:'bard-2024',label:'Bardo (5e 2024)',slotTable:'full',resources:['bardic'],known:'full2024'},
+  {key:'sorcerer-2014',label:'Stregone (5e 2014)',slotTable:'full',resources:['sorcery'],known:'sorc2014'},
+  {key:'sorcerer-2024',label:'Stregone (5e 2024)',slotTable:'full',resources:['sorcery'],known:'full2024'},
+  {key:'paladin-2014',label:'Paladino (5e 2014)',slotTable:'half',resources:['lay-on-hands','channel'],known:null},
+  {key:'paladin-2024',label:'Paladino (5e 2024)',slotTable:'half_2024',resources:['lay-on-hands','channel'],known:null},
+  {key:'ranger-2014',label:'Ranger (5e 2014)',slotTable:'half',resources:[],known:'ranger2014'},
+  {key:'ranger-2024',label:'Ranger (5e 2024)',slotTable:'half_2024',resources:[],known:null},
+  {key:'artificer',label:'Artefice (Tasha\'s, solo 5e 2014)',slotTable:'half',resources:[],known:null},
+  {key:'eldritch-knight',label:'Cavaliere Mistico — Guerriero',slotTable:'third',resources:['second-wind','action-surge'],known:'ek_at'},
+  {key:'arcane-trickster',label:'Furfante Arcano — Ladro',slotTable:'third',resources:[],known:'ek_at'},
+  {key:'warlock',label:'Warlock — Magia del Patto (5e 2014/2024)',slotTable:'warlock',resources:[],known:'warlock'},
+  {key:'barbarian',label:'Barbaro',slotTable:null,resources:['rage'],known:null},
+  {key:'fighter',label:'Guerriero',slotTable:null,resources:['second-wind','action-surge'],known:null},
+  {key:'monk',label:'Monaco',slotTable:null,resources:['ki'],known:null},
+  {key:'rogue',label:'Ladro',slotTable:null,resources:[],known:null}
 ];
 function _classByKey(k){var f=null;CLASSES.forEach(function(cd){if(cd.key===k)f=cd});return f}
 /* Migrazione da vecchio c.cls free-text → c.classKey. Se la stringa
@@ -3049,11 +3049,22 @@ var tabs='<div class="pg__tabwrap">'+pgSelH+'<div class="pg__tabs"><button class
 /* === TAB 1: SCHEDA === */
 /* Migrazione: se non c'\u00e8 classKey ma c'\u00e8 cls (vecchio free-text), prova a mappare */
 if(!c.classKey&&c.cls)c.classKey=_classKeyFromText(c.cls)||'';
-var idFields=[['Nome','name'],['Razza','race'],['Sottoclasse','subcls'],['Allineamento','align'],['Background','bg']];
-var idCells='<div class="pg__field'+(!c.classKey?' pg__field--empty':'')+'"><div class="pg__lbl">Classe</div>';
-var classOpts='';CLASSES.forEach(function(cd){classOpts+='<option value="'+esc(cd.key)+'"'+(cd.key===(c.classKey||'')?' selected':'')+'>'+esc(cd.label)+'</option>'});
-idCells+='<select class="pg__inp pg__inp--sm pg__inp--cls" data-classkey title="Cambia classe per auto-popolare slot, contatore risorse e incantesimi conosciuti">'+classOpts+'</select></div>';
-idFields.forEach(function(f){var v=c[f[1]]||'';var empty=!v;var w=v.length;var lblW=Math.ceil(f[0].length*0.8);var sty='';if(!empty){if(w>=lblW)sty=' style="width:calc('+w+'ch + 10px)"';else sty=' style="width:calc('+lblW+'ch + 10px)"'}idCells+='<div class="pg__field'+(empty?' pg__field--empty':'')+'"><div class="pg__lbl">'+f[0]+'</div><input class="pg__inp pg__inp--sm" data-ef="'+f[1]+'" value="'+esc(v)+'" placeholder="\u2014"'+sty+'></div>'});
+var idFields=[['Nome','name'],['Razza','race'],['__CLASSE__','classKey'],['Sottoclasse','subcls'],['Allineamento','align'],['Background','bg']];
+var idCells='';
+idFields.forEach(function(f){
+  if(f[0]==='__CLASSE__'){
+    var ck=c.classKey||'';var clsLbl=(_classByKey(ck)||{}).label||'';var clsEmpty=!ck;
+    var clsW=clsLbl.length;var clsLblW=Math.ceil('Classe'.length*0.8);
+    var clsSty='';
+    if(!clsEmpty){var w=Math.max(clsW,clsLblW);clsSty=' style="width:calc('+w+'ch + 24px)"'}
+    var classOpts='';CLASSES.forEach(function(cd){classOpts+='<option value="'+esc(cd.key)+'"'+(cd.key===ck?' selected':'')+'>'+esc(cd.label)+'</option>'});
+    idCells+='<div class="pg__field'+(clsEmpty?' pg__field--empty':'')+'"><div class="pg__lbl">Classe</div><select class="pg__inp pg__inp--sm pg__inp--cls" data-classkey title="Cambia classe per auto-popolare slot, contatore risorse e incantesimi conosciuti"'+clsSty+'>'+classOpts+'</select></div>';
+    return;
+  }
+  var v=c[f[1]]||'';var empty=!v;var w=v.length;var lblW=Math.ceil(f[0].length*0.8);var sty='';
+  if(!empty){if(w>=lblW)sty=' style="width:calc('+w+'ch + 10px)"';else sty=' style="width:calc('+lblW+'ch + 10px)"'}
+  idCells+='<div class="pg__field'+(empty?' pg__field--empty':'')+'"><div class="pg__lbl">'+f[0]+'</div><input class="pg__inp pg__inp--sm" data-ef="'+f[1]+'" value="'+esc(v)+'" placeholder="\u2014"'+sty+'></div>';
+});
 var idH='<div class="pg__sec"><div class="pg__sec-title">\uD83D\uDCCB Identit\u00e0</div><div class="pg__row pg__row--id">'+idCells+'</div></div>';
 var coreH='<div class="pg__sec"><div class="pg__sec-title">\u2B50 Statistiche Base</div><div class="pg__row" style="align-items:center;gap:4px;flex-wrap:nowrap"><div class="pg__field" style="flex:0 0 auto;min-width:0"><div class="pg__lbl">Lvl</div><input class="pg__inp pg__inp--gold" data-nf="lvl" value="'+c.lvl+'" style="width:4ch;padding:2px 4px"></div><div class="pg__field" style="flex:0 0 auto;min-width:0"><div class="pg__lbl">Comp</div><div class="pg__val pg__val--gold" style="min-height:0;padding:2px 6px">+'+pb+'</div></div><div class="pg__field" style="flex:1;min-width:40px"><div class="pg__lbl">XP</div><input class="pg__inp" data-nf="xp" value="'+(c.xp||0)+'" style="padding:2px 4px;text-align:left"></div><div class="pg__field" style="flex:0 0 auto;min-width:0"><div class="pg__lbl">ISP.</div><input class="pg__inp" data-nf="insp" value="'+(c.insp||0)+'" style="width:3ch;padding:2px 4px"></div><div class="pg__field" style="flex:0 0 auto;min-width:0" title="Numero massimo di incantesimi conosciuti/preparati. Auto-popolato dalla classe, modificabile a mano."><div class="pg__lbl">Inc.</div><input class="pg__inp" data-nf="spellsKnownMax" value="'+(c.spellsKnownMax!=null?c.spellsKnownMax:0)+'" style="width:3ch;padding:2px 4px"></div></div></div>';
 var absH='<div class="pg__sec"><div class="pg__sec-title">\uD83C\uDFB2 Caratteristiche</div><div class="pg__abs">';
@@ -3355,8 +3366,8 @@ wrap.addEventListener('change',function(e){var pg=loadPG();if(!pg)return;
 var classKey=e.target.closest('[data-classkey]');if(classKey){var key=classKey.value;var def=_classByKey(key);pg.classKey=key;pg.cls=def?def.label:'';
   /* 1) Slot table */
   if(def&&def.slotTable&&SLOT_TABLES[def.slotTable]){if(!pg.slotsTable)pg.slotsTable=[];for(var _i=0;_i<20;_i++){pg.slotsTable[_i]=SLOT_TABLES[def.slotTable][_i].slice()}}
-  /* 2) Aggiungi resource counter se non già presente */
-  if(def&&def.resource){if(!pg.resources)pg.resources=[];var hasIt=false;pg.resources.forEach(function(r){if(r.type===def.resource)hasIt=true});if(!hasIt){pg.resources.push({id:'r_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),type:def.resource,current:0,modifier:0,title:'',max:0});var added=pg.resources[pg.resources.length-1];var info=_resourceComputed(pg,added);added.current=info.effMax}}
+  /* 2) Aggiungi tutti i resource counter mancanti per questa classe */
+  if(def&&def.resources&&def.resources.length){if(!pg.resources)pg.resources=[];def.resources.forEach(function(rt){var hasIt=false;pg.resources.forEach(function(r){if(r.type===rt)hasIt=true});if(!hasIt){pg.resources.push({id:'r_'+Date.now()+'_'+Math.random().toString(36).slice(2,5)+'_'+rt,type:rt,current:0,modifier:0,title:'',max:0});var added=pg.resources[pg.resources.length-1];var info=_resourceComputed(pg,added);added.current=info.effMax}})}
   /* 3) Auto-set spellsKnownMax */
   if(def&&def.known){var sk=_spellsKnownAt(def.known,pg.lvl);if(sk!=null)pg.spellsKnownMax=sk}
   savePG(pg);render();return}
