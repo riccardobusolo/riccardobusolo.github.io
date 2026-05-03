@@ -1028,6 +1028,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .rs__local-notice{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;margin-bottom:10px;background:rgba(196,154,50,.08);border:1px solid rgba(196,154,50,.35);border-radius:6px;font-family:var(--mono);font-size:.66rem;color:var(--dim);line-height:1.45}
 .rs__local-notice svg{flex-shrink:0;stroke:var(--gold);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
 .rs__local-notice b{color:var(--gold);font-weight:600}
+.rs__local-notice-dismiss{align-self:flex-start;flex-shrink:0;background:rgba(196,154,50,.08);border:1px solid rgba(196,154,50,.4);color:var(--gold);cursor:var(--cur-pointer);font-family:var(--mono);font-size:.6rem;padding:3px 10px;border-radius:4px;transition:all .12s;text-transform:uppercase;letter-spacing:.04em;font-weight:600;line-height:1.2;outline:none}
+.rs__local-notice-dismiss:hover{border-color:rgba(196,154,50,.7);background:rgba(196,154,50,.18)}
+.rs__local-notice-dismiss:active{transform:scale(.96)}
+.rs__local-notice-dismiss:focus,.rs__local-notice-dismiss:focus-visible{outline:none;box-shadow:none}
 .rs__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
 .rs__card{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:var(--cur-pointer);display:flex;flex-direction:column;transition:border-color .12s,transform .12s}
 .rs__card:hover{border-color:var(--gold);transform:translateY(-1px)}
@@ -1478,7 +1482,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <div class="rs__list" id="rsLinkList"></div>
 </div>
 <div class="rs__view" id="rsViewManuals" style="display:none">
-<div class="rs__local-notice"><svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div><b>Solo locale, niente cloud.</b> I PDF caricati qui restano <b>esclusivamente</b> nel browser di questo dispositivo: non vengono inviati al cloud, non sincronizzano tra dispositivi e si perdono se cancelli i dati del sito. Se ti serve un manuale anche altrove, ricaricalo manualmente lì.</div></div>
+<div class="rs__local-notice" id="rsMnNotice"><svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div><b>Solo locale, niente cloud.</b> I PDF caricati qui restano <b>esclusivamente</b> nel browser di questo dispositivo: non vengono inviati al cloud, non sincronizzano tra dispositivi e si perdono se cancelli i dati del sito. Se ti serve un manuale anche altrove, ricaricalo manualmente lì.</div><button class="rs__local-notice-dismiss" id="rsMnNoticeDismiss" type="button" title="Ho capito, non mostrare più">Ok</button></div>
 <div class="rs__upzone" id="rsMnZone"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M2 3h7a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-7a4 4 0 00-4 4v14a3 3 0 013-3h8z"/></svg><span class="rs__upzone-t">Trascina i tuoi PDF qui o clicca per caricare</span><input type="file" id="rsMnInput" accept="application/pdf,.pdf" multiple style="display:none"></div>
 <div class="rs__list" id="rsManualList"></div>
 </div>
@@ -3737,6 +3741,10 @@ function processManualFiles(files){if(!files)return;for(var i=0;i<files.length;i
 var mnZone=document.getElementById('rsMnZone'),mnInp=document.getElementById('rsMnInput');
 mnZone.addEventListener('click',function(){mnInp.click()});
 mnInp.addEventListener('change',function(e){processManualFiles(e.target.files);e.target.value=''});
+/* Dismissibile "solo locale" notice */
+var _mnNotice=document.getElementById('rsMnNotice'),_mnDismiss=document.getElementById('rsMnNoticeDismiss');
+if(_mnNotice&&localStorage.getItem('cm_mn_notice_dismissed')==='1')_mnNotice.style.display='none';
+if(_mnDismiss)_mnDismiss.addEventListener('click',function(){localStorage.setItem('cm_mn_notice_dismissed','1');if(_mnNotice)_mnNotice.style.display='none'});
 mnZone.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();mnZone.classList.add('rs__upzone--over');if(e.dataTransfer)e.dataTransfer.dropEffect='copy'});
 mnZone.addEventListener('dragleave',function(e){e.preventDefault();e.stopPropagation();if(!mnZone.contains(e.relatedTarget))mnZone.classList.remove('rs__upzone--over')});
 mnZone.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();mnZone.classList.remove('rs__upzone--over');if(e.dataTransfer&&e.dataTransfer.files)processManualFiles(e.dataTransfer.files)});
