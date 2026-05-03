@@ -505,6 +505,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .pg__inp{font-family:var(--mono);font-size:.9rem;font-weight:600;color:var(--text);padding:3px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;cursor:var(--cur-pointer);transition:all .12s;text-align:center;min-height:24px;width:100%;box-sizing:border-box;outline:none}.pg__inp:hover{border-color:var(--rb)}.pg__inp:focus{border-color:var(--rb);color:var(--gold);cursor:text}
 .pg__inp--sm{font-size:.84rem;font-weight:400;color:var(--dim)}.pg__inp--sm:focus{color:var(--gold)}
 .pg__inp--gold{color:var(--gold)}
+.pg__inp--cls{cursor:var(--cur-pointer);-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23c49a32'><path d='M4 6l4 4 4-4'/></svg>");background-repeat:no-repeat;background-position:right 4px center;background-size:11px;padding-right:18px!important}
 .pg__inp--inline{-webkit-appearance:none;appearance:none;background:transparent;border:none;padding:0;margin:0;min-height:0;font-family:var(--mono);font-weight:700;color:inherit;text-align:center;outline:none;cursor:var(--cur-pointer);width:3ch;font-size:inherit;line-height:inherit;box-sizing:content-box}.pg__inp--inline:focus{color:var(--gold);cursor:text}.pg__inp--inline::-webkit-outer-spin-button,.pg__inp--inline::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.pg__inp--inline[type=number]{-moz-appearance:textfield}
 .pg__row--id{gap:3px}.pg__row--id .pg__field{flex:0 0 auto;position:relative;margin-top:12px;min-width:0;transition:none}.pg__row--id .pg__field--empty{flex:1 0 60px}.pg__row--id .pg__lbl{position:absolute;bottom:100%;left:0;white-space:nowrap;margin-bottom:1px}.pg__row--id .pg__inp{padding:5px 4px;width:100%;min-height:0;transition:border-color .12s,color .12s}
 .pg__val--sm{font-size:.84rem;font-weight:400;color:var(--dim)}
@@ -2948,6 +2949,57 @@ var SLOT_TABLES={
    • Half caster (Paladino, Ranger): DIFFERENTE — nel 2024 ottengono
      già 2 slot di 1° livello al lvl 1 (nel 2014 nessuno slot al lvl 1)
    • Artefice: solo 2014 + Tasha's, non presente nella 2024 PHB */
+/* Tabelle "Incantesimi conosciuti / preparati" da PHB per classi che hanno
+   una progressione fissa. Indici 0-19 = livelli PG 1-20. Per classi che
+   "preparano" senza limite fisso (Wizard 2014, Cleric, Druid, Paladin)
+   uso le tabelle del 2024 PHB che danno un numero esplicito. */
+var SPELLS_KNOWN_TABLES={
+  full2024:[4,5,6,7,9,10,11,12,14,15,16,16,17,18,19,21,22,23,24,25],
+  bard2014:[4,5,6,7,8,9,10,11,12,14,15,15,16,18,19,19,20,22,22,22],
+  sorc2014:[2,3,4,5,6,7,8,9,10,11,12,12,13,13,14,14,15,15,15,15],
+  warlock:[2,3,4,5,6,7,8,9,10,10,11,11,12,12,13,13,14,14,15,15],
+  ranger2014:[0,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11],
+  ek_at:[0,0,3,4,4,4,5,6,6,7,8,8,9,10,10,11,11,11,12,13]
+};
+function _spellsKnownAt(key,lvl){var arr=SPELLS_KNOWN_TABLES[key];if(!arr)return null;return arr[Math.max(0,Math.min(19,(lvl||1)-1))]}
+/* Classi PG: dropdown principale per l'auto-popolazione. Ogni voce indica
+   slot table, risorsa di classe (resource key in RESOURCES), e tabella
+   incantesimi conosciuti (key in SPELLS_KNOWN_TABLES). */
+var CLASSES=[
+  {key:'',label:'— Seleziona classe —'},
+  {key:'wizard',label:'Mago (5e 2014/2024)',slotTable:'full',resource:null,known:'full2024'},
+  {key:'cleric',label:'Chierico (5e 2014/2024)',slotTable:'full',resource:'channel',known:'full2024'},
+  {key:'druid',label:'Druido (5e 2014/2024)',slotTable:'full',resource:'wildshape',known:'full2024'},
+  {key:'bard-2014',label:'Bardo (5e 2014)',slotTable:'full',resource:'bardic',known:'bard2014'},
+  {key:'bard-2024',label:'Bardo (5e 2024)',slotTable:'full',resource:'bardic',known:'full2024'},
+  {key:'sorcerer-2014',label:'Stregone (5e 2014)',slotTable:'full',resource:'sorcery',known:'sorc2014'},
+  {key:'sorcerer-2024',label:'Stregone (5e 2024)',slotTable:'full',resource:'sorcery',known:'full2024'},
+  {key:'paladin-2014',label:'Paladino (5e 2014)',slotTable:'half',resource:'lay-on-hands',known:null},
+  {key:'paladin-2024',label:'Paladino (5e 2024)',slotTable:'half_2024',resource:'lay-on-hands',known:null},
+  {key:'ranger-2014',label:'Ranger (5e 2014)',slotTable:'half',resource:null,known:'ranger2014'},
+  {key:'ranger-2024',label:'Ranger (5e 2024)',slotTable:'half_2024',resource:null,known:null},
+  {key:'artificer',label:'Artefice (Tasha\'s, solo 5e 2014)',slotTable:'half',resource:null,known:null},
+  {key:'eldritch-knight',label:'Cavaliere Mistico — Guerriero',slotTable:'third',resource:'second-wind',known:'ek_at'},
+  {key:'arcane-trickster',label:'Furfante Arcano — Ladro',slotTable:'third',resource:null,known:'ek_at'},
+  {key:'warlock',label:'Warlock — Magia del Patto (5e 2014/2024)',slotTable:'warlock',resource:null,known:'warlock'},
+  {key:'barbarian',label:'Barbaro',slotTable:null,resource:'rage',known:null},
+  {key:'fighter',label:'Guerriero',slotTable:null,resource:'second-wind',known:null},
+  {key:'monk',label:'Monaco',slotTable:null,resource:'ki',known:null},
+  {key:'rogue',label:'Ladro',slotTable:null,resource:null,known:null}
+];
+function _classByKey(k){var f=null;CLASSES.forEach(function(cd){if(cd.key===k)f=cd});return f}
+/* Migrazione da vecchio c.cls free-text → c.classKey. Se la stringa
+   matcha (case-insensitive, con/senza edizione) un label di CLASSES,
+   imposta classKey. */
+function _classKeyFromText(txt){
+  if(!txt)return '';
+  var t=String(txt).toLowerCase().trim();
+  for(var i=0;i<CLASSES.length;i++){var cd=CLASSES[i];if(!cd.key)continue;
+    var lbl=cd.label.toLowerCase();
+    if(lbl===t||lbl.indexOf(t)===0||t===cd.key.split('-')[0])return cd.key;
+  }
+  return '';
+}
 var SPELL_CASTERS=[
   {key:'',label:'— Auto-popola tabella slot da classe —'},
   {key:'wizard',label:'Mago (5e 2014/2024)',table:'full'},
@@ -2995,10 +3047,15 @@ allPgs.forEach(function(p){var isCur=p.id===c.id;pgSelH+='<div class="pg__pgsel-
 pgSelH+='<button class="pg__pgsel-new" data-pgnew="1">+ Nuovo Personaggio</button></div></div>';
 var tabs='<div class="pg__tabwrap">'+pgSelH+'<div class="pg__tabs"><button class="pg__tab'+(curTab==='scheda'?' pg__tab--on':'')+'" data-pgtab="scheda">\uD83D\uDCCB Scheda</button><button class="pg__tab'+(curTab==='spells'?' pg__tab--on':'')+'" data-pgtab="spells">\u2728 Incantesimi</button><button class="pg__tab'+(curTab==='info'?' pg__tab--on':'')+'" data-pgtab="info">\uD83D\uDCDC Informazioni</button><button class="pg__tab'+(curTab==='notes'?' pg__tab--on':'')+'" data-pgtab="notes">\uD83D\uDCDD Note</button></div></div>';
 /* === TAB 1: SCHEDA === */
-var idFields=[['Nome','name'],['Razza','race'],['Classe','cls'],['Sottoclasse','subcls'],['Allineamento','align'],['Background','bg']];
-var idCells='';idFields.forEach(function(f){var v=c[f[1]]||'';var empty=!v;var w=v.length;var lblW=Math.ceil(f[0].length*0.8);var sty='';if(!empty){if(w>=lblW)sty=' style="width:calc('+w+'ch + 10px)"';else sty=' style="width:calc('+lblW+'ch + 10px)"'}idCells+='<div class="pg__field'+(empty?' pg__field--empty':'')+'"><div class="pg__lbl">'+f[0]+'</div><input class="pg__inp pg__inp--sm" data-ef="'+f[1]+'" value="'+esc(v)+'" placeholder="\u2014"'+sty+'></div>'});
+/* Migrazione: se non c'\u00e8 classKey ma c'\u00e8 cls (vecchio free-text), prova a mappare */
+if(!c.classKey&&c.cls)c.classKey=_classKeyFromText(c.cls)||'';
+var idFields=[['Nome','name'],['Razza','race'],['Sottoclasse','subcls'],['Allineamento','align'],['Background','bg']];
+var idCells='<div class="pg__field'+(!c.classKey?' pg__field--empty':'')+'"><div class="pg__lbl">Classe</div>';
+var classOpts='';CLASSES.forEach(function(cd){classOpts+='<option value="'+esc(cd.key)+'"'+(cd.key===(c.classKey||'')?' selected':'')+'>'+esc(cd.label)+'</option>'});
+idCells+='<select class="pg__inp pg__inp--sm pg__inp--cls" data-classkey title="Cambia classe per auto-popolare slot, contatore risorse e incantesimi conosciuti">'+classOpts+'</select></div>';
+idFields.forEach(function(f){var v=c[f[1]]||'';var empty=!v;var w=v.length;var lblW=Math.ceil(f[0].length*0.8);var sty='';if(!empty){if(w>=lblW)sty=' style="width:calc('+w+'ch + 10px)"';else sty=' style="width:calc('+lblW+'ch + 10px)"'}idCells+='<div class="pg__field'+(empty?' pg__field--empty':'')+'"><div class="pg__lbl">'+f[0]+'</div><input class="pg__inp pg__inp--sm" data-ef="'+f[1]+'" value="'+esc(v)+'" placeholder="\u2014"'+sty+'></div>'});
 var idH='<div class="pg__sec"><div class="pg__sec-title">\uD83D\uDCCB Identit\u00e0</div><div class="pg__row pg__row--id">'+idCells+'</div></div>';
-var coreH='<div class="pg__sec"><div class="pg__sec-title">\u2B50 Statistiche Base</div><div class="pg__row" style="align-items:center;gap:4px;flex-wrap:nowrap"><div class="pg__field" style="flex:0 0 auto;min-width:0"><div class="pg__lbl">Lvl</div><input class="pg__inp pg__inp--gold" data-nf="lvl" value="'+c.lvl+'" style="width:4ch;padding:2px 4px"></div><div class="pg__field" style="flex:0 0 auto;min-width:0"><div class="pg__lbl">Comp</div><div class="pg__val pg__val--gold" style="min-height:0;padding:2px 6px">+'+pb+'</div></div><div class="pg__field" style="flex:1;min-width:40px"><div class="pg__lbl">XP</div><input class="pg__inp" data-nf="xp" value="'+(c.xp||0)+'" style="padding:2px 4px;text-align:left"></div><div class="pg__field" style="flex:0 0 auto;min-width:0"><div class="pg__lbl">ISP.</div><input class="pg__inp" data-nf="insp" value="'+(c.insp||0)+'" style="width:3ch;padding:2px 4px"></div></div></div>';
+var coreH='<div class="pg__sec"><div class="pg__sec-title">\u2B50 Statistiche Base</div><div class="pg__row" style="align-items:center;gap:4px;flex-wrap:nowrap"><div class="pg__field" style="flex:0 0 auto;min-width:0"><div class="pg__lbl">Lvl</div><input class="pg__inp pg__inp--gold" data-nf="lvl" value="'+c.lvl+'" style="width:4ch;padding:2px 4px"></div><div class="pg__field" style="flex:0 0 auto;min-width:0"><div class="pg__lbl">Comp</div><div class="pg__val pg__val--gold" style="min-height:0;padding:2px 6px">+'+pb+'</div></div><div class="pg__field" style="flex:1;min-width:40px"><div class="pg__lbl">XP</div><input class="pg__inp" data-nf="xp" value="'+(c.xp||0)+'" style="padding:2px 4px;text-align:left"></div><div class="pg__field" style="flex:0 0 auto;min-width:0"><div class="pg__lbl">ISP.</div><input class="pg__inp" data-nf="insp" value="'+(c.insp||0)+'" style="width:3ch;padding:2px 4px"></div><div class="pg__field" style="flex:0 0 auto;min-width:0" title="Numero massimo di incantesimi conosciuti/preparati. Auto-popolato dalla classe, modificabile a mano."><div class="pg__lbl">Inc.</div><input class="pg__inp" data-nf="spellsKnownMax" value="'+(c.spellsKnownMax!=null?c.spellsKnownMax:0)+'" style="width:3ch;padding:2px 4px"></div></div></div>';
 var absH='<div class="pg__sec"><div class="pg__sec-title">\uD83C\uDFB2 Caratteristiche</div><div class="pg__abs">';
 [['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var v=c[a[1]]||10;var m=pgMod(v);absH+='<div class="pg__ab"><div class="pg__ab-name">'+a[0]+'</div><div class="pg__ab-score"><input class="pg__inp--inline" data-nf="'+a[1]+'" value="'+v+'" style="font-size:.82rem"></div><div class="pg__ab-mod">'+pgFmt(m)+'</div></div>'});
 absH+='</div></div>';
@@ -3097,9 +3154,7 @@ for(var lv=0;lv<20;lv++){var rowCls=(lv===_curLv)?' class="pg__slot-row--cur"':'
 slotTblH+='</tbody></table></div>';
 var hidLvls=[];for(var k=0;k<9;k++)if(c.hiddenSlots[k])hidLvls.push(k);
 var showAllH='';if(hidLvls.length>0){showAllH='<span style="font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-left:8px;align-self:center">Nascosti:</span>';hidLvls.forEach(function(li){showAllH+='<button class="pg__roll" data-slotshow="'+li+'" style="margin-left:3px" title="Mostra '+(li+1)+'\u00b0">+ '+(li+1)+'\u00b0</button>'});if(hidLvls.length>1)showAllH+='<button class="pg__roll" data-slotshowall="1" style="margin-left:6px">Mostra tutti</button>'}
-var _classOpts='';SPELL_CASTERS.forEach(function(cl){_classOpts+='<option value="'+cl.key+'">'+cl.label+'</option>'});
-var classFillH='<select class="pg__inp pg__inp--sm pg__class-fill" data-classfill style="width:100%;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.62rem;padding:3px 22px 3px 6px;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url(\"data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\' fill=\'%23c49a32\'><path d=\'M4 6l4 4 4-4\'/></svg>\");background-repeat:no-repeat;background-position:right 4px center;background-size:11px" title="Auto-popola la tabella slot in base alla classe. Le edizioni 5e 2014 e 5e 2024 hanno tabelle identiche per la maggior parte delle classi; Paladino e Ranger differiscono al lvl 1 (2 slot nel 2024 vs 0 nel 2014)">'+_classOpts+'</select>';
-var slotSecH='<div class="pg__sec"><div class="pg__sec-title">\uD83C\uDFAF Slot Incantesimo \u2014 Liv. '+(_curLv+1)+'</div><div style="margin-bottom:5px">'+classFillH+'</div>'+slotTblH+'<div class="pg__row" style="margin-top:5px;align-items:center"><button class="pg__roll" data-resetallmax="1">\u2718 Azzera riga corrente</button><button class="pg__roll" data-clearalltable="1" style="margin-left:3px">\uD83D\uDDD1 Azzera tabella</button>'+showAllH+'</div></div>';
+var slotSecH='<div class="pg__sec"><div class="pg__sec-title">\uD83C\uDFAF Slot Incantesimo \u2014 Liv. '+(_curLv+1)+'</div>'+slotTblH+'<div class="pg__row" style="margin-top:5px;align-items:center"><button class="pg__roll" data-resetallmax="1">\u2718 Azzera riga corrente</button><button class="pg__roll" data-clearalltable="1" style="margin-left:3px">\uD83D\uDDD1 Azzera tabella</button>'+showAllH+'</div></div>';
 var cantH='';c.cantrips.forEach(function(name,i){var nmTxt=name||'(senza nome)';var nmCls='sp__prep-name'+(name?'':' sp__name--empty');cantH+='<div class="sp__prep-item sp__prep-item--cant" data-cantedit="'+i+'" title="Clicca per modificare"><span class="sp__prep-lvl">T</span><span class="'+nmCls+'">'+esc(nmTxt)+'</span><button class="sp__prep-x sp__prep-x--btn" data-cantdel="'+i+'" title="Elimina">\u2715</button></div>'});
 var cantSecH='<div class="pg__sec pg__sec--spdrop" data-spdrop="cantrip"><div class="pg__sec-title">\uD83D\uDD2E Trucchetti'+(c.cantrips.length?' ('+c.cantrips.length+')':'')+'</div>'+(cantH?'<div class="sp__prep-list">'+cantH+'</div>':'<div class="sp__prep-empty">Nessun trucchetto</div>')+'<button class="pg__roll" data-cantadd="1" style="margin-top:5px">+ Trucchetto</button></div>';
 var spPerLvlH='';for(var sl=1;sl<=9;sl++){var mx=(c.slotsTable[_curLv]||[])[sl-1]||0;var spells=c.spBook[sl-1]||[];if(mx>0||spells.length>0){var spItems='';spells.forEach(function(sp,si){var nm=sp.n||'';var nmCls='sp__name'+(nm?'':' sp__name--empty');spItems+='<div class="sp__item"><button class="sp__prep'+(sp.p?' sp__prep--on':'')+'" data-spprep="'+(sl-1)+'-'+si+'" title="'+(sp.p?'Preparato':'Non preparato')+'"></button><div class="'+nmCls+'" data-spclick="'+(sl-1)+'-'+si+'" title="Clicca per modificare">'+esc(nm||'(senza nome)')+'</div><button class="pg__atk-del" data-spdel="'+(sl-1)+'-'+si+'" title="Elimina"><svg viewBox="0 0 24 24" width="10" height="10"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div>'});var titleSuffix=mx>0?' \u2014 '+mx+' slot':' \u2014 nessuno slot';var addBtn=mx>0?'<button class="pg__roll" data-spadd="'+(sl-1)+'" style="margin-top:3px">+ Incantesimo</button>':'';spPerLvlH+='<div class="sp__lvl-group"><div class="sp__lvl-title">'+sl+'\u00b0 Livello'+titleSuffix+'</div>'+spItems+addBtn+'</div>'}}
@@ -3297,7 +3352,14 @@ document.addEventListener('dragleave',function(e){var z=e.target.closest('[data-
 document.addEventListener('drop',function(e){var z=e.target.closest('[data-spdrop]');if(!z)return;e.preventDefault();z.classList.remove('spdrop-over');z.classList.remove('spdrop-bad');var raw=e.dataTransfer.getData('application/x-spell');if(!raw)return;var sp;try{sp=JSON.parse(raw)}catch(err){return}var pg=loadPG();if(!pg)return;var zone=z.dataset.spdrop;var isCantrip=sp.level===0;if(zone==='cantrip'){if(!isCantrip)return;if(!pg.cantrips)pg.cantrips=[];if(pg.cantrips.indexOf(sp.name)<0)pg.cantrips.push(sp.name);savePG(pg);render();return}if(zone==='book'){if(isCantrip)return;if(!pg.spBook)pg.spBook=[[],[],[],[],[],[],[],[],[]];var li=Math.max(1,Math.min(9,sp.level||1))-1;var classes=(sp.classes||[]).map(_ttClass).join(', ');var schoolIt=_ttSchool(sp.school||'');pg.spBook[li].push({n:sp.name,p:false,ct:sp.castingTime||'',rg:sp.range||'',cmp:_compStr(sp.components||{}),dur:sp.duration||'',desc:(sp.description||'')+(sp.higherLevels?'\n\nAi livelli superiori: '+sp.higherLevels:''),school:schoolIt,classes:classes,source:sp.source||''});savePG(pg);render();return}});
 
 wrap.addEventListener('change',function(e){var pg=loadPG();if(!pg)return;
-var classFill=e.target.closest('[data-classfill]');if(classFill){var key=classFill.value;classFill.value='';if(!key)return;var def=null;SPELL_CASTERS.forEach(function(cl){if(cl.key===key)def=cl});if(!def||!def.table||!SLOT_TABLES[def.table])return;if(!pg.slotsTable)pg.slotsTable=[];for(var _i=0;_i<20;_i++){pg.slotsTable[_i]=SLOT_TABLES[def.table][_i].slice()}savePG(pg);render();return}
+var classKey=e.target.closest('[data-classkey]');if(classKey){var key=classKey.value;var def=_classByKey(key);pg.classKey=key;pg.cls=def?def.label:'';
+  /* 1) Slot table */
+  if(def&&def.slotTable&&SLOT_TABLES[def.slotTable]){if(!pg.slotsTable)pg.slotsTable=[];for(var _i=0;_i<20;_i++){pg.slotsTable[_i]=SLOT_TABLES[def.slotTable][_i].slice()}}
+  /* 2) Aggiungi resource counter se non già presente */
+  if(def&&def.resource){if(!pg.resources)pg.resources=[];var hasIt=false;pg.resources.forEach(function(r){if(r.type===def.resource)hasIt=true});if(!hasIt){pg.resources.push({id:'r_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),type:def.resource,current:0,modifier:0,title:'',max:0});var added=pg.resources[pg.resources.length-1];var info=_resourceComputed(pg,added);added.current=info.effMax}}
+  /* 3) Auto-set spellsKnownMax */
+  if(def&&def.known){var sk=_spellsKnownAt(def.known,pg.lvl);if(sk!=null)pg.spellsKnownMax=sk}
+  savePG(pg);render();return}
 var ef=e.target.closest('[data-ef]');if(ef){pg[ef.dataset.ef]=ef.value.trim()||'';savePG(pg);render();return}
 var nf=e.target.closest('[data-nf]');if(nf){var f=nf.dataset.nf;var v=parseInt(nf.value);if(!isNaN(v)){if(f.indexOf('coins_')===0){if(!pg.coins)pg.coins={mr:0,ma:0,me:0,mo:0,mp:0};pg.coins[f.substring(6)]=v}else{pg[f]=v;if(f==='lvl'){pg.lvl=Math.max(1,v);if(pg.hitDiceLeft>pg.lvl)pg.hitDiceLeft=pg.lvl}if(f==='hpCur'&&pg.hpCur>pg.hp)pg.hpCur=pg.hp;if(f==='hp'&&(pg.hpCur==null||pg.hpCur>pg.hp))pg.hpCur=pg.hp}}savePG(pg);render();return}
 var hdInp=e.target.closest('[data-hdinp]');if(hdInp){var v=parseInt(hdInp.value);if(!isNaN(v)){pg.hitDiceLeft=Math.max(0,Math.min(pg.lvl,v))}savePG(pg);render();return}
