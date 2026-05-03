@@ -723,8 +723,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .sp__resource-type{flex:1 1 80px;min-width:0;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.62rem;padding:3px 18px 3px 5px;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23c49a32'><path d='M4 6l4 4 4-4'/></svg>");background-repeat:no-repeat;background-position:right 3px center;background-size:10px}
 .sp__resource-title{flex:1 1 60px;min-width:50px;font-size:.62rem;padding:3px 5px}
 .sp__resource-max{width:3.5ch;text-align:center;font-size:.62rem;padding:3px 3px;flex-shrink:0}
-.sp__resource-btn{width:22px;height:20px;padding:0;font-size:.78rem;font-weight:700;line-height:1;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.sp__resource-btn{width:22px;height:20px;padding:0;font-size:.78rem;font-weight:700;line-height:1;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;outline:none}
+.sp__resource-btn:focus,.sp__resource-btn:focus-visible{outline:none;box-shadow:none}
 .sp__resource-btn[disabled]{opacity:.35;cursor:not-allowed}
+.sp__resource-del:focus,.sp__resource-del:focus-visible,.sp__resource-add:focus,.sp__resource-add:focus-visible{outline:none;box-shadow:none}
 .sp__resource-val{font-family:var(--mono);font-size:.72rem;color:var(--text);min-width:40px;text-align:center;padding:0 2px;font-weight:500;flex-shrink:0;white-space:nowrap}
 .sp__resource-val strong{color:var(--gold);font-weight:700}
 .sp__resource-mod{width:3.5ch;text-align:center;font-size:.62rem;padding:3px 3px;color:var(--gold);flex-shrink:0}
@@ -2850,6 +2852,33 @@ var skillMap=[
 {ab:'intl',name:'INT',save:'TS Intelligenza',skills:[['arcano','Arcano'],['indagare','Indagare'],['natura','Natura'],['religione','Religione'],['storia','Storia']]},
 {ab:'wis',name:'SAG',save:'TS Saggezza',skills:[['animali','Addest. Animali'],['intuizione','Intuizione'],['medicina','Medicina'],['percezione','Percezione'],['sopravvivenza','Sopravvivenza']]},
 {ab:'cha',name:'CAR',save:'TS Carisma',skills:[['inganno','Inganno'],['intimidire','Intimidire'],['intrattenere','Intrattenere'],['persuasione','Persuasione']]}];
+/* Risorse di classe con formula massimo (manuale D&D 5e) — accessibile sia
+   da render() che dai click handler dell'IIFE PG. */
+var RESOURCES=[
+  {key:'',label:'— Nessuno —'},
+  {key:'sorcery',label:'Punti Stregoneria',maxFn:function(c){return c.lvl<2?0:c.lvl}},
+  {key:'ki',label:'Punti Ki',maxFn:function(c){return c.lvl<2?0:c.lvl}},
+  {key:'bardic',label:'Ispirazione Bardica',maxFn:function(c){return Math.max(1,pgMod(c.cha||10))}},
+  {key:'channel',label:'Canalizzare Divinità',maxFn:function(c){return c.lvl>=18?3:c.lvl>=6?2:c.lvl>=2?1:0}},
+  {key:'wildshape',label:'Forma Selvatica',maxFn:function(c){return c.lvl<2?0:2}},
+  {key:'lay-on-hands',label:'Imposizione delle Mani',maxFn:function(c){return c.lvl<2?0:5*c.lvl}},
+  {key:'rage',label:'Ire (Barbaro)',maxFn:function(c){return c.lvl>=20?99:c.lvl>=17?6:c.lvl>=12?5:c.lvl>=6?4:c.lvl>=3?3:2}},
+  {key:'second-wind',label:'Secondo Fiato',maxFn:function(c){return 1}},
+  {key:'action-surge',label:'Azione Impetuosa',maxFn:function(c){return c.lvl>=17?2:c.lvl>=2?1:0}},
+  {key:'sneak',label:'Dadi Superiorità',maxFn:function(c){return c.lvl>=15?6:c.lvl>=7?5:c.lvl>=3?4:0}},
+  {key:'custom',label:'Personalizzato'}
+];
+function _resourceComputed(c,r){
+  var rt=(r&&r.type)||'';
+  var rDef=null;RESOURCES.forEach(function(rd){if(rd.key===rt)rDef=rd});
+  var rMax=0,rTitle='';
+  if(rt==='custom'){rMax=parseInt(r.max)||0;rTitle=r.title||'Personalizzato'}
+  else if(rDef&&rDef.maxFn){rMax=rDef.maxFn(c);rTitle=rDef.label}
+  var rMod=parseInt(r&&r.modifier)||0;
+  var rEffMax=Math.max(0,rMax+rMod);
+  var rCur=Math.max(0,Math.min(rEffMax,parseInt(r&&r.current)||0));
+  return {type:rt,def:rDef,baseMax:rMax,modifier:rMod,effMax:rEffMax,current:rCur,title:rTitle};
+}
 function render(){var pg=loadPG();var allPgs=loadAllPGs();if(typeof window._pgLastAbResult==="undefined"){window._pgLastAbResult="";window._pgLastAbClass=""}
 if(!pg){if(allPgs.length>0)setCurrentPGId(allPgs[0].id),pg=allPgs[0];else{wrap.innerHTML='<div class="pg__empty">\u2694\ufe0f Nessun personaggio creato<br>Crea il tuo avventuriero per iniziare<br><button class="pg__create" id="pgNew">\u2728 Crea Personaggio</button></div>';return}}
 var c=pg,pb=profBonus(c.lvl),hdLeft=c.hitDiceLeft!=null?c.hitDiceLeft:c.lvl;if(!c.profs)c.profs={};if(!c.dsc)c.dsc={s:0,f:0};if(!c.cantrips)c.cantrips=[];if(!c.spBook)c.spBook=[[],[],[],[],[],[],[],[],[]];if(!c.spAbil)c.spAbil='cha';if(c.spConc==null)c.spConc='';if(c.initBonus==null)c.initBonus=(c.init||0)-pgMod(c.dex);if(c.exhaustion==null)c.exhaustion=0;if(c.exhaustion<0)c.exhaustion=0;if(c.exhaustion>6)c.exhaustion=6;
@@ -2948,32 +2977,6 @@ var privH='<div class="pg__sec"><div class="pg__sec-title"><span>\u2699\ufe0f Pr
 var pgRollRowH='<div class="pg__roll-row '+(window._pgLastAbClass||'')+'" id="pgRollRow">'+(window._pgLastAbResult||'\uD83C\uDFB2 Clicca un\'abilit\u00e0 o un tiro per lanciare un d20')+'</div>';var tab1='<div class="pg__page'+(curTab==='scheda'?' pg__page--on':'')+'" data-page="scheda">'+idH+pgRollRowH+'<div class="pg__sheet"><div class="pg__col">'+coreH+absH+combatH+hdH+dsH+atkH+'</div><div class="pg__col">'+exhH+ssH+'</div><div class="pg__col">'+coinsH+equipSchH+privH+'</div></div></div>';
 /* === TAB 2: INCANTESIMI === */
 var spAbilMap={intl:'INT',wis:'SAG',cha:'CAR'};var spAbilNames={intl:'Intelligenza',wis:'Saggezza',cha:'Carisma'};
-/* Lista risorse di classe con formula del massimo basata su livello/manuale D&D 5e */
-var RESOURCES=[
-  {key:'',label:'— Nessuno —'},
-  {key:'sorcery',label:'Punti Stregoneria',maxFn:function(c){return c.lvl<2?0:c.lvl}},
-  {key:'ki',label:'Punti Ki',maxFn:function(c){return c.lvl<2?0:c.lvl}},
-  {key:'bardic',label:'Ispirazione Bardica',maxFn:function(c){return Math.max(1,pgMod(c.cha||10))}},
-  {key:'channel',label:'Canalizzare Divinità',maxFn:function(c){return c.lvl>=18?3:c.lvl>=6?2:c.lvl>=2?1:0}},
-  {key:'wildshape',label:'Forma Selvatica',maxFn:function(c){return c.lvl<2?0:2}},
-  {key:'lay-on-hands',label:'Imposizione delle Mani',maxFn:function(c){return c.lvl<2?0:5*c.lvl}},
-  {key:'rage',label:'Ire (Barbaro)',maxFn:function(c){return c.lvl>=20?99:c.lvl>=17?6:c.lvl>=12?5:c.lvl>=6?4:c.lvl>=3?3:2}},
-  {key:'second-wind',label:'Secondo Fiato',maxFn:function(c){return 1}},
-  {key:'action-surge',label:'Azione Impetuosa',maxFn:function(c){return c.lvl>=17?2:c.lvl>=2?1:0}},
-  {key:'sneak',label:'Dadi Superiorità',maxFn:function(c){return c.lvl>=15?6:c.lvl>=7?5:c.lvl>=3?4:0}},
-  {key:'custom',label:'Personalizzato'}
-];
-function _resourceComputed(c,r){
-  var rt=(r&&r.type)||'';
-  var rDef=null;RESOURCES.forEach(function(rd){if(rd.key===rt)rDef=rd});
-  var rMax=0,rTitle='';
-  if(rt==='custom'){rMax=parseInt(r.max)||0;rTitle=r.title||'Personalizzato'}
-  else if(rDef&&rDef.maxFn){rMax=rDef.maxFn(c);rTitle=rDef.label}
-  var rMod=parseInt(r&&r.modifier)||0;
-  var rEffMax=Math.max(0,rMax+rMod);
-  var rCur=Math.max(0,Math.min(rEffMax,parseInt(r&&r.current)||0));
-  return {type:rt,def:rDef,baseMax:rMax,modifier:rMod,effMax:rEffMax,current:rCur,title:rTitle};
-}
 var spAbilKey=c.spAbil||'cha';var spAbilMod=pgMod(c[spAbilKey]);var spDcBn=c.spDcBonus||0;var spAtkBn=c.spAtkBonus||0;var spDC=8+pb+spAbilMod+spDcBn;var spAtk=pb+spAbilMod+spAtkBn;
 /* Risorse di classe — multi contatori, mezza riga ciascuno, su singola riga orizzontale */
 var _resWidget='<div class="sp__resources-grid">';
