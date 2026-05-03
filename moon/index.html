@@ -2951,7 +2951,7 @@ var spAbilMap={intl:'INT',wis:'SAG',cha:'CAR'};var spAbilNames={intl:'Intelligen
 /* Lista risorse di classe con formula del massimo basata su livello/manuale D&D 5e */
 var RESOURCES=[
   {key:'',label:'— Nessuno —'},
-  {key:'sorcery',label:'Metamagia',maxFn:function(c){return c.lvl<2?0:c.lvl}},
+  {key:'sorcery',label:'Punti Stregoneria',maxFn:function(c){return c.lvl<2?0:c.lvl}},
   {key:'ki',label:'Punti Ki',maxFn:function(c){return c.lvl<2?0:c.lvl}},
   {key:'bardic',label:'Ispirazione Bardica',maxFn:function(c){return Math.max(1,pgMod(c.cha||10))}},
   {key:'channel',label:'Canalizzare Divinità',maxFn:function(c){return c.lvl>=18?3:c.lvl>=6?2:c.lvl>=2?1:0}},
