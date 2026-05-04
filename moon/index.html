@@ -566,6 +566,10 @@ body.sb--global-dragging .sb__btn:not(.on):hover{background:transparent;color:va
 .pg__skill{display:flex;align-items:center;gap:3px;padding:1px 3px;border-radius:3px;transition:background .1s;overflow:hidden}.pg__skill:hover{background:rgba(140,30,30,.06)}:root[data-theme="dark"] .pg__skill:hover{background:rgba(255,255,255,.12)}
 .pg__skill--save{border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:1px}
 .pg__prof{width:9px;height:9px;border-radius:50%;border:1.5px solid rgba(200,200,210,.45);background:transparent;cursor:var(--cur-pointer);flex-shrink:0;transition:all .12s;padding:0}.pg__prof--1{background:var(--gold);border-color:var(--gold)}.pg__prof--2{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 2px var(--bg),0 0 0 3px var(--gold)}
+/* Tema Sword Coast e Chiaro: bordo dei cerchietti TS/Abilità più scuro
+   per essere visibile contro lo sfondo cremoso/chiaro. */
+:root[data-theme="sword-coast"] .pg__prof{border-color:rgba(58,46,24,.55)}
+:root[data-theme="light"] .pg__prof{border-color:rgba(0,0,0,.40)}
 .pg__skill-name{font-family:var(--mono);font-size:.72rem;color:var(--dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .pg__skill-mod{font-family:var(--mono);font-size:.76rem;font-weight:600;color:var(--text);min-width:20px;text-align:right;flex-shrink:0}
 .pg__dots{display:flex;gap:3px;align-items:center}
