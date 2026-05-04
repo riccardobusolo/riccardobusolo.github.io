@@ -481,6 +481,12 @@ window.SPELLS_IT = {
     description: "Un'onda di forza tonante si propaga da te. Ogni creatura in un cubo di 4,5 metri originato da te deve effettuare un tiro salvezza Costituzione. Con un fallimento, una creatura subisce 2d8 danni da tuono ed è spinta a 3 metri di distanza da te. Con un successo, dimezza i danni e non viene spinta. Gli oggetti non assicurati vengono automaticamente spinti di 3 metri. Il tuono è udibile fino a 90 metri.",
     higherLevels: "Il danno aumenta di 1d8 per ogni livello di slot superiore al 1°."
   },
+  "Tenser's Floating Disk": {
+    name: "Disco Fluttuante di Tenser",
+    description: "Evochi un disco orizzontale di forza, dal diametro di 90 cm e spesso 2,5 cm, che fluttua a circa 90 cm da terra in uno spazio libero entro gittata. Il disco resta nella sua posizione finché ti trovi a meno di 6 metri da esso; se ti allontani oltre, il disco ti segue lungo il percorso più diretto possibile, mantenendosi entro 6 metri da te. Può sostenere fino a 250 kg di carico: se tale soglia viene superata, l'incantesimo termina e tutto ciò che era posato sul disco cade a terra. L'incantesimo termina anche se ti allontani di più di 30 metri dal disco o se il disco rimane fuori dalla tua linea di vista per più di un round, oltre che alla scadenza naturale della durata. Al termine dell'incantesimo il disco svanisce e ogni oggetto su di esso cade.",
+    higherLevels: null,
+    materialDesc: "una goccia di mercurio"
+  },
   "Unseen Servant": {
     name: "Servitore Inosservato",
     description: "Questo incantesimo crea una forza invisibile, priva di mente e senza forma che esegue compiti semplici al tuo comando fino al termine dell'incantesimo. Ha CA 10, 1 punto ferita, Forza 2 e non può attaccare. Può eseguire compiti semplici come prendere oggetti, pulire, riparare, piegare vestiti, accendere fuochi, servire cibo e versare vino.",
