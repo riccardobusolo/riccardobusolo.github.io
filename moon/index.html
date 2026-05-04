@@ -551,7 +551,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
    chevron). Niente spazi vuoti residui. */
 .pg__cls-dd-btn{cursor:var(--cur-pointer);text-align:left;width:auto;white-space:nowrap}
 .pg__cls-dd-hidden{position:absolute;width:0;height:0;opacity:0;pointer-events:none;overflow:hidden}
-.pg__cls-dd-panel{display:none;position:absolute;top:100%;left:0;min-width:max-content;max-height:420px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bh);border-radius:4px;z-index:1000;box-shadow:0 6px 18px rgba(0,0,0,.5);margin-top:2px;padding:2px 0}
+.pg__cls-dd-panel{display:none;position:fixed;min-width:max-content;max-height:420px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bh);border-radius:4px;z-index:1000;box-shadow:0 6px 18px rgba(0,0,0,.5);margin-top:2px;padding:2px 0}
 .pg__cls-dd--open .pg__cls-dd-panel{display:block}
 .pg__cls-dd-opt{display:block;width:100%;padding:1px 10px;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:.83rem;text-align:left;cursor:var(--cur-pointer);line-height:1.3;white-space:nowrap;border-radius:0}
 .pg__cls-dd-opt:hover{background:var(--rl);color:var(--gold)}
@@ -5050,7 +5050,13 @@ document.addEventListener('click',function(e){
     if(!wrap)return;
     var wasOpen=wrap.classList.contains('pg__cls-dd--open');
     document.querySelectorAll('.pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')});
-    if(!wasOpen)wrap.classList.add('pg__cls-dd--open');
+    if(!wasOpen){
+      wrap.classList.add('pg__cls-dd--open');
+      /* Pannello position:fixed → posizione viewport-relative dinamica per
+         evitare clipping da ancestor con overflow:hidden (es. .pg__sec). */
+      var _pnl=wrap.querySelector('.pg__cls-dd-panel');
+      if(_pnl){var _r=btnAny.getBoundingClientRect();_pnl.style.top=_r.bottom+'px';_pnl.style.left=_r.left+'px'}
+    }
     return;
   }
   /* Selezione opzione caratteristica attacco */
