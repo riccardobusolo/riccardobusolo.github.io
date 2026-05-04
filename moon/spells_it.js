@@ -2012,34 +2012,34 @@ window.SPELLS_IT = {
 
   // --- CANTRIPS ---
   "Booming Blade": {
-    name: "Lama Tonante",
+    name: "Lama Roboante",
     description: "Brandisci l'arma usata per il lancio dell'incantesimo ed esegui un attacco in mischia con essa contro una creatura entro 1,5 metri da te. Se colpisci, il bersaglio subisce gli effetti normali dell'attacco con l'arma e poi viene avvolto da energia tonante fino all'inizio del tuo prossimo turno. Se il bersaglio si muove volontariamente di 1,5 metri o più prima di allora, subisce 1d8 danni da tuono, e l'incantesimo termina.",
     higherLevels: "Al 5° livello, l'attacco in mischia infligge 1d8 danni da tuono aggiuntivi al bersaglio se colpisce, e il danno che il bersaglio subisce per essersi mosso aumenta a 2d8. Entrambi i tiri per i danni aumentano di 1d8 all'11° livello (2d8 e 3d8) e al 17° livello (3d8 e 4d8)."
   },
   "Green-Flame Blade": {
-    name: "Lama di Fiamma Verde",
+    name: "Lama Verdefiamma",
     description: "Brandisci l'arma usata per il lancio dell'incantesimo ed esegui un attacco in mischia con essa contro una creatura entro 1,5 metri da te. Se colpisci, il bersaglio subisce gli effetti normali dell'attacco con l'arma, e puoi far balzare fuoco verde dal bersaglio a un'altra creatura a tua scelta che puoi vedere entro 1,5 metri da essa. La seconda creatura subisce danni da fuoco pari al tuo modificatore di caratteristica da incantatore.",
     higherLevels: "Al 5° livello, l'attacco in mischia infligge 1d8 danni da fuoco aggiuntivi al bersaglio se colpisce, e i danni da fuoco alla seconda creatura aumentano a 1d8 + il tuo modificatore di caratteristica da incantatore. Entrambi i tiri per i danni aumentano di 1d8 all'11° livello (2d8 e 2d8) e al 17° livello (3d8 e 3d8)."
   },
   "Lightning Lure": {
-    name: "Frusta del Fulmine",
+    name: "Lenza Elettrizzante",
     description: "Crei una scarica di energia elettrica che colpisce una creatura a tua scelta che puoi vedere entro 4,5 metri da te. Il bersaglio deve riuscire in un tiro salvezza Forza o essere tirato fino a 3 metri in linea retta verso di te e poi subire 1d8 danni da fulmine se si trova entro 1,5 metri da te.",
     higherLevels: "Il danno aumenta di 1d8 al raggiungimento del 5° livello (2d8), 11° livello (3d8) e 17° livello (4d8)."
   },
   "Mind Sliver": {
-    name: "Scheggia Mentale",
+    name: "Scheggia della Mente",
     description: "Conficchi una scheggia disorientante di energia psichica nella mente di una creatura che puoi vedere entro la gittata. Il bersaglio deve riuscire in un tiro salvezza Intelligenza o subire 1d6 danni psichici e sottrarre 1d4 dal prossimo tiro salvezza che effettua prima della fine del tuo prossimo turno.",
     higherLevels: "Il danno aumenta di 1d6 al raggiungimento del 5° livello (2d6), 11° livello (3d6) e 17° livello (4d6)."
   },
   "Sword Burst": {
-    name: "Esplosione di Lame",
+    name: "Turbine di Spade",
     description: "Crei un cerchio momentaneo di lame spettrali che ti circondano. Ogni altra creatura entro 1,5 metri da te deve riuscire in un tiro salvezza Destrezza o subire 1d6 danni da forza.",
     higherLevels: "Il danno aumenta di 1d6 al raggiungimento del 5° livello (2d6), 11° livello (3d6) e 17° livello (4d6)."
   },
 
   // --- LEVEL 1 ---
   "Tasha's Caustic Brew": {
-    name: "Pozione Caustica di Tasha",
+    name: "Miscela Caustica di Tasha",
     description: "Un getto di acido emana da te in una linea lunga 9 metri e larga 1,5 metri in una direzione a tua scelta. Ogni creatura nella linea deve riuscire in un tiro salvezza Destrezza o essere ricoperta di acido per la durata dell'incantesimo o finché una creatura non usa la sua azione per raschiare o lavare via l'acido da sé o da un'altra creatura. Una creatura ricoperta di acido subisce 2d4 danni acidi all'inizio di ciascuno dei suoi turni.",
     higherLevels: "Il danno aumenta di 2d4 per ogni livello di slot superiore al 1°."
   },
@@ -2051,77 +2051,77 @@ window.SPELLS_IT = {
     higherLevels: "Quando lanci questo incantesimo usando uno slot di 3° livello o superiore, usa il livello superiore ovunque appaia il livello dell'incantesimo nello statblock."
   },
   "Tasha's Mind Whip": {
-    name: "Frustata Mentale di Tasha",
+    name: "Scudiscio Mentale di Tasha",
     description: "Colpisci psichicamente una creatura che puoi vedere entro la gittata. Il bersaglio deve effettuare un tiro salvezza Intelligenza. Con un tiro salvezza fallito, il bersaglio subisce 3d6 danni psichici e non può eseguire una reazione fino alla fine del suo prossimo turno. Inoltre, nel suo prossimo turno, deve scegliere se ottenere un movimento, un'azione o un'azione bonus; ne ottiene solo uno dei tre. Con un tiro salvezza riuscito, il bersaglio subisce metà danno e non subisce nessun altro effetto dell'incantesimo.",
     higherLevels: "Puoi bersagliare una creatura aggiuntiva per ogni livello di slot superiore al 2°. Le creature devono trovarsi entro 9 metri l'una dall'altra quando le bersagli."
   },
 
   // --- LEVEL 3 ---
   "Intellect Fortress": {
-    name: "Fortezza dell'Intelletto",
+    name: "Fortezza della Mente",
     description: "Per la durata, tu o una creatura consenziente che puoi vedere entro la gittata avete resistenza ai danni psichici e vantaggio ai tiri salvezza Intelligenza, Saggezza e Carisma.",
     higherLevels: "Puoi bersagliare una creatura aggiuntiva per ogni livello di slot superiore al 3°. Le creature devono trovarsi entro 9 metri l'una dall'altra quando le bersagli."
   },
   "Spirit Shroud": {
-    name: "Manto Spirituale",
+    name: "Sudario Spirituale",
     description: "Richiami spiriti dei morti, che ti svolazzano attorno per la durata dell'incantesimo. Gli spiriti sono intangibili e invulnerabili. Fino al termine dell'incantesimo, qualsiasi attacco che esegui infligge 1d8 danni aggiuntivi quando colpisce una creatura entro 3 metri da te. Questo danno è radioso, necrotico o da freddo (a tua scelta al lancio dell'incantesimo). Qualsiasi creatura che subisce questo danno non può recuperare punti ferita fino all'inizio del tuo prossimo turno. Inoltre, qualsiasi creatura a tua scelta che puoi vedere che inizia il proprio turno entro 3 metri da te ha la velocità ridotta di 3 metri fino all'inizio del tuo prossimo turno.",
     higherLevels: "Il danno aumenta di 1d8 per ogni due livelli di slot superiori al 3°."
   },
   "Summon Fey": {
-    name: "Evocare Folletto",
+    name: "Evoca Folletto",
     description: "Richiami uno spirito folletto. Si manifesta in uno spazio non occupato che puoi vedere entro la gittata. Questa forma corporea usa lo statblock dello Spirito Folletto. Quando lanci l'incantesimo, scegli un umore: Furioso, Allegro o Burlone. La creatura assomiglia a una creatura folletto a tua scelta segnata dall'umore scelto, che determina uno dei tratti nel suo statblock. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata di te e dei tuoi compagni. In combattimento, la creatura condivide il tuo conteggio di iniziativa, ma compie il proprio turno immediatamente dopo il tuo. Obbedisce ai tuoi comandi verbali (nessuna azione richiesta da parte tua). Se non ne impartisci, compie l'azione di Schivare e usa il suo movimento per evitare il pericolo.",
     higherLevels: "Quando lanci questo incantesimo usando uno slot di 4° livello o superiore, usa il livello superiore ovunque appaia il livello dell'incantesimo nello statblock."
   },
   "Summon Shadowspawn": {
-    name: "Evocare Progenie d'Ombra",
+    name: "Evoca Bestia d'Ombra",
     description: "Richiami uno spirito ombroso. Si manifesta in uno spazio non occupato che puoi vedere entro la gittata. Questa forma corporea usa lo statblock dello Spirito d'Ombra. Quando lanci l'incantesimo, scegli un'emozione: Furia, Disperazione o Paura. La creatura assomiglia a un bipede deforme segnato dall'emozione scelta, che determina certi tratti nel suo statblock. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata di te e dei tuoi compagni. In combattimento, la creatura condivide il tuo conteggio di iniziativa, ma compie il proprio turno immediatamente dopo il tuo. Obbedisce ai tuoi comandi verbali (nessuna azione richiesta da parte tua). Se non ne impartisci, compie l'azione di Schivare e usa il suo movimento per evitare il pericolo.",
     higherLevels: "Quando lanci questo incantesimo usando uno slot di 4° livello o superiore, usa il livello superiore ovunque appaia il livello dell'incantesimo nello statblock."
   },
   "Summon Undead": {
-    name: "Evocare Non Morto",
+    name: "Evoca Non Morto",
     description: "Richiami uno spirito non morto. Si manifesta in uno spazio non occupato che puoi vedere entro la gittata. Questa forma corporea usa lo statblock dello Spirito Non Morto. Quando lanci l'incantesimo, scegli la forma della creatura: Spettrale, Putrida o Scheletrica. Lo spirito assomiglia a una creatura non morta con la forma scelta, che determina certi tratti nel suo statblock. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata di te e dei tuoi compagni. In combattimento, la creatura condivide il tuo conteggio di iniziativa, ma compie il proprio turno immediatamente dopo il tuo. Obbedisce ai tuoi comandi verbali (nessuna azione richiesta da parte tua). Se non ne impartisci, compie l'azione di Schivare e usa il suo movimento per evitare il pericolo.",
     higherLevels: "Quando lanci questo incantesimo usando uno slot di 4° livello o superiore, usa il livello superiore ovunque appaia il livello dell'incantesimo nello statblock."
   },
 
   // --- LEVEL 4 ---
   "Summon Aberration": {
-    name: "Evocare Aberrazione",
+    name: "Evoca Aberrazione",
     description: "Richiami uno spirito aberrante. Si manifesta in uno spazio non occupato che puoi vedere entro la gittata. Questa forma corporea usa lo statblock dello Spirito Aberrante. Quando lanci l'incantesimo, scegli Beholderkin, Slaad o Star Spawn. La creatura assomiglia a un'aberrazione di quel tipo, che determina certi tratti nel suo statblock. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata di te e dei tuoi compagni. In combattimento, la creatura condivide il tuo conteggio di iniziativa, ma compie il proprio turno immediatamente dopo il tuo. Obbedisce ai tuoi comandi verbali (nessuna azione richiesta da parte tua). Se non ne impartisci, compie l'azione di Schivare e usa il suo movimento per evitare il pericolo.",
     higherLevels: "Quando lanci questo incantesimo usando uno slot di 5° livello o superiore, usa il livello superiore ovunque appaia il livello dell'incantesimo nello statblock."
   },
   "Summon Construct": {
-    name: "Evocare Costrutto",
+    name: "Evoca Costrutto",
     description: "Richiami lo spirito di un costrutto. Si manifesta in uno spazio non occupato che puoi vedere entro la gittata. Questa forma corporea usa lo statblock dello Spirito Costrutto. Quando lanci l'incantesimo, scegli un materiale: Argilla, Metallo o Pietra. La creatura assomiglia a un golem o a un modron (a tua scelta) fatto del materiale scelto, che determina certi tratti nel suo statblock. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata di te e dei tuoi compagni. In combattimento, la creatura condivide il tuo conteggio di iniziativa, ma compie il proprio turno immediatamente dopo il tuo. Obbedisce ai tuoi comandi verbali (nessuna azione richiesta da parte tua). Se non ne impartisci, compie l'azione di Schivare e usa il suo movimento per evitare il pericolo.",
     higherLevels: "Quando lanci questo incantesimo usando uno slot di 5° livello o superiore, usa il livello superiore ovunque appaia il livello dell'incantesimo nello statblock."
   },
   "Summon Elemental": {
-    name: "Evocare Elementale",
+    name: "Evoca Elementale",
     description: "Richiami uno spirito elementale. Si manifesta in uno spazio non occupato che puoi vedere entro la gittata. Questa forma corporea usa lo statblock dello Spirito Elementale. Quando lanci l'incantesimo, scegli un elemento: Aria, Terra, Fuoco o Acqua. La creatura assomiglia a una forma bipede avvolta dall'elemento scelto, che determina certi tratti nel suo statblock. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata di te e dei tuoi compagni. In combattimento, la creatura condivide il tuo conteggio di iniziativa, ma compie il proprio turno immediatamente dopo il tuo. Obbedisce ai tuoi comandi verbali (nessuna azione richiesta da parte tua). Se non ne impartisci, compie l'azione di Schivare e usa il suo movimento per evitare il pericolo.",
     higherLevels: "Quando lanci questo incantesimo usando uno slot di 5° livello o superiore, usa il livello superiore ovunque appaia il livello dell'incantesimo nello statblock."
   },
 
   // --- LEVEL 5 ---
   "Summon Celestial": {
-    name: "Evocare Celestiale",
+    name: "Evoca Celestiale",
     description: "Richiami uno spirito celestiale. Si manifesta in una forma angelica in uno spazio non occupato che puoi vedere entro la gittata. Questa forma corporea usa lo statblock dello Spirito Celestiale. Quando lanci l'incantesimo, scegli Vendicatore o Difensore. La tua scelta determina l'attacco della creatura nel suo statblock. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata di te e dei tuoi compagni. In combattimento, la creatura condivide il tuo conteggio di iniziativa, ma compie il proprio turno immediatamente dopo il tuo. Obbedisce ai tuoi comandi verbali (nessuna azione richiesta da parte tua). Se non ne impartisci, compie l'azione di Schivare e usa il suo movimento per evitare il pericolo.",
     higherLevels: "Quando lanci questo incantesimo usando uno slot di 6° livello o superiore, usa il livello superiore ovunque appaia il livello dell'incantesimo nello statblock."
   },
 
   // --- LEVEL 6 ---
   "Summon Fiend": {
-    name: "Evocare Immondo",
+    name: "Evoca Immondo",
     description: "Richiami uno spirito immondo. Si manifesta in uno spazio non occupato che puoi vedere entro la gittata. Questa forma corporea usa lo statblock dello Spirito Immondo. Quando lanci l'incantesimo, scegli Demone, Diavolo o Yugoloth. La creatura assomiglia a un immondo del tipo scelto, che determina certi tratti nel suo statblock. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata di te e dei tuoi compagni. In combattimento, la creatura condivide il tuo conteggio di iniziativa, ma compie il proprio turno immediatamente dopo il tuo. Obbedisce ai tuoi comandi verbali (nessuna azione richiesta da parte tua). Se non ne impartisci, compie l'azione di Schivare e usa il suo movimento per evitare il pericolo.",
     higherLevels: "Quando lanci questo incantesimo usando uno slot di 7° livello o superiore, usa il livello superiore ovunque appaia il livello dell'incantesimo nello statblock."
   },
   "Tasha's Otherworldly Guise": {
-    name: "Sembianza Ultraterrena di Tasha",
+    name: "Abito Ultraterreno di Tasha",
     description: "Pronunciando un incantesimo, attingi alla magia dei Piani Inferiori o dei Piani Superiori (a tua scelta) per trasformarti. Ottieni i seguenti benefici fino al termine dell'incantesimo: sei immune ai danni da fuoco e da veleno (Piani Inferiori) o ai danni radiosi e necrotici (Piani Superiori). Sei immune alla condizione avvelenato (Piani Inferiori) o alla condizione ammaliato (Piani Superiori). Ali spettrali appaiono sulla tua schiena, dandoti una velocità di volo di 12 metri. Hai un bonus di +2 alla CA. Tutti i tuoi attacchi con armi sono magici, e quando esegui un attacco con un'arma, puoi usare il tuo modificatore di caratteristica da incantatore al posto della Forza o della Destrezza per i tiri per colpire e i tiri per i danni. Puoi attaccare due volte, invece di una, quando compi l'azione di Attaccare nel tuo turno (ignorato se hai già Attacco Extra o simile).",
     higherLevels: null
   },
 
   // --- LEVEL 7 ---
   "Dream of the Blue Veil": {
-    name: "Sogno del Velo Blu",
+    name: "Sogno del Velo Celeste",
     description: "Tu e fino a otto creature consenzienti entro la gittata cadete incoscienti per la durata dell'incantesimo e sperimentate visioni di un altro mondo sul Piano Materiale, come Oerth, Toril, Krynn o Eberron. Se l'incantesimo raggiunge la sua piena durata, le visioni si concludono con ognuno di voi che incontra e tira indietro un misterioso velo blu. L'incantesimo termina quindi con voi mentalmente e fisicamente trasportati nel mondo che era nelle visioni. Per lanciare questo incantesimo, devi avere un oggetto magico originato sul mondo che desideri raggiungere, e devi essere consapevole dell'esistenza del mondo. La tua destinazione nell'altro mondo è una posizione sicura entro 1,5 km dal luogo in cui l'oggetto magico è stato creato. In alternativa, puoi lanciare l'incantesimo se una delle creature colpite è nata nell'altro mondo. L'incantesimo termina anticipatamente per una creatura se quella creatura subisce qualsiasi danno, e la creatura non viene trasportata. Se tu subisci qualsiasi danno, l'incantesimo termina per te e per tutte le altre creature, senza che nessuno di voi venga trasportato.",
     higherLevels: null
   },
