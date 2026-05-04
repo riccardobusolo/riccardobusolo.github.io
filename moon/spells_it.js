@@ -244,7 +244,8 @@ window.SPELLS_IT = {
   },
   "Create or Destroy Water": {
     name: "Creare o Distruggere Acqua",
-    description: "Crei fino a 38 litri di acqua pulita entro la gittata in un contenitore aperto, o come pioggia in un cubo di 9 metri; oppure distruggi fino a 38 litri di acqua in un contenitore aperto, o distruggi nebbia in un cubo di 9 metri entro la gittata.",
+    description: "Al lancio scegli uno dei due effetti.\n\nCreare Acqua. Generi fino a 40 litri di acqua pulita all'interno di un contenitore aperto entro gittata, oppure fai cadere la stessa quantità sotto forma di pioggia in un cubo con spigolo di 9 metri entro gittata, estinguendo eventuali fiamme presenti nell'area.\n\nDistruggere Acqua. Annienti fino a 40 litri d'acqua presenti in un contenitore aperto entro gittata, oppure dissolvi la nebbia in un cubo con spigolo di 9 metri entro gittata.",
+    higherLevels: "Per ogni slot incantesimo di livello superiore al 1° usato, la quantità d'acqua generata o distrutta aumenta di 40 litri, oppure lo spigolo del cubo aumenta di 1,5 metri.",
     higherLevels: "Crei o distruggi 38 litri d'acqua aggiuntivi, oppure il cubo aumenta di 1,5 metri, per ogni livello di slot superiore al 1°.",
     materialDesc: "una goccia d'acqua (creare) o alcuni granelli di sabbia (distruggere)"
   },
@@ -1425,7 +1426,8 @@ window.SPELLS_IT = {
   },
   "Geas": {
     name: "Costrizione",
-    description: "Imponi un comando magico a una creatura entro la gittata che puoi vedere, costringendola a svolgere un servizio o ad astenersi da un'azione o linea d'azione come decidi tu. Se la creatura può capirti, deve riuscire in un tiro salvezza Saggezza o diventare ammaliata. Mentre è ammaliata, la creatura subisce 5d10 danni psichici ogni volta che agisce in modo direttamente contrario alle tue istruzioni, ma non più di una volta al giorno.",
+    description: "L'incantatore impone un ordine magico a una creatura entro gittata che riesce a vedere, vincolandola a svolgere un determinato servizio oppure ad astenersi da un'azione o da una linea di condotta da lui stabilita. La creatura subisce l'effetto solo se comprende il linguaggio dell'incantatore: in tal caso deve effettuare un TS Saggezza, e in caso di fallimento è ammaliata per la durata.\n\nMentre è ammaliata, ogni volta che agisce in modo manifestamente contrario all'istruzione ricevuta subisce 5d10 danni psichici, ma non più di una volta al giorno. Un comando che condurrebbe alla morte certa non viene eseguito e l'incantesimo termina.\n\nL'incantatore può terminare l'incantesimo prematuramente come azione. Anche desiderio, rimuovi maledizione o ristorare superiore lanciati sul bersaglio sono in grado di porvi fine.",
+    higherLevels: "Lanciato con uno slot incantesimo di 7° o 8° livello, la durata sale a 1 anno. Lanciato con uno slot di 9° livello, l'effetto persiste finché uno degli incantesimi sopra elencati non lo dissolve.",
     higherLevels: "Al 7° o 8° livello, la durata è 1 anno. Al 9° livello, finché non viene dissolta."
   },
   "Greater Restoration": {
@@ -1582,7 +1584,8 @@ window.SPELLS_IT = {
   },
   "Create Undead": {
     name: "Creare Non Morti",
-    description: "Puoi lanciare questo incantesimo solo di notte. Scegli fino a tre cadaveri di umanoidi di taglia Media o Piccola entro la gittata. Ogni cadavere diventa un ghoul sotto il tuo controllo. In ciascuno dei tuoi turni, puoi usare un'azione bonus per comandare mentalmente qualsiasi creatura che hai creato con questo incantesimo entro 36 metri. La creatura è sotto il tuo controllo per 24 ore, dopodiché smette di obbedire.",
+    description: "Questo incantesimo può essere lanciato solo di notte. Scegli fino a tre cadaveri di umanoidi di taglia Media o Piccola entro gittata: ogni cadavere si rianima come ghoul sotto il tuo controllo (le statistiche di gioco sono in possesso del DM).\n\nNei tuoi turni, come azione bonus, puoi comandare mentalmente qualsiasi creatura animata da questo incantesimo che si trovi entro 36 metri da te. Se ne controlli più di una, ogni comando si applica simultaneamente a tutte in modo identico (puoi anche non impartirne nessuno). Stabilisci quale azione la creatura compie e dove si muove al suo turno successivo, oppure le dai una direttiva generale (per esempio sorvegliare una stanza o un corridoio). In assenza di ordini, la creatura si limita a difendersi dalle minacce ostili. Una direttiva ricevuta resta valida finché non viene completata.\n\nIl controllo dura 24 ore: trascorso questo tempo, la creatura non risponde più ai comandi. Per estendere il controllo, l'incantesimo deve essere rilanciato sulla stessa creatura prima della scadenza. In quest'uso l'incantesimo non anima nuovi cadaveri ma ristabilisce il controllo su un massimo di tre creature da te già animate.",
+    higherLevels: "Slot di 7° livello: animi (o ristabilisci il controllo su) 4 ghoul. Slot di 8° livello: 5 ghoul, oppure 2 ghast o wight. Slot di 9° livello: 6 ghoul, oppure 3 ghast o wight, oppure 2 mummie.",
     higherLevels: "Al 7° livello, puoi creare o riasserire il controllo su quattro ghoul, oppure creare un ghast o wight. All'8°, cinque ghoul, due ghast o wight. Al 9°, sei ghoul, tre ghast o wight, oppure due mummie.",
     materialDesc: "un vaso di argilla riempito di terra di tomba, un vaso di argilla riempito di acqua salmastra e una pietra di onice nera da 150 mo per ogni cadavere"
   },
@@ -1874,7 +1877,7 @@ window.SPELLS_IT = {
   },
   "Control Weather": {
     name: "Controllare Tempo Atmosferico",
-    description: "Prendi il controllo del clima entro 8 km da te per la durata. Devi essere all'aperto per lanciare questo incantesimo. Quando lanci l'incantesimo, cambi le condizioni meteorologiche attuali, determinate dal DM. Puoi cambiare precipitazioni, temperatura e vento. Sono necessari 1d4 x 10 minuti perché le nuove condizioni abbiano effetto. Una volta avvenuto, puoi cambiare di nuovo le condizioni. Quando l'incantesimo termina, il clima ritorna gradualmente alla normalità.",
+    description: "Per la durata, l'incantatore prende il controllo del tempo atmosferico in un raggio di 7,5 km. Il lancio richiede di trovarsi all'aperto: se in seguito ci si sposta in un luogo privo di linea diretta verso il cielo, l'incantesimo termina prematuramente.\n\nAl momento del lancio, l'incantatore modifica le condizioni meteorologiche correnti — stabilite dal DM in base a clima e stagione — agendo su tre categorie indipendenti: precipitazioni, temperatura e vento. Le nuove condizioni richiedono 1d4 × 10 minuti per manifestarsi; quando sono entrate in vigore, l'incantatore può applicare ulteriori modifiche. Al termine dell'incantesimo il tempo torna gradualmente alla normalità.\n\nPer ogni cambio, individua la condizione corrente nelle tabelle e spostala di un grado verso l'alto o verso il basso. Quando modifica il vento può anche cambiarne la direzione.\n\nPrecipitazioni (1-5): Sereno, Poco nuvoloso, Nuvoloso o nebbia, Pioggia/grandine/neve, Pioggia torrenziale/grandine fitta/tormenta.\n\nTemperatura (1-6): Caldo insopportabile, Caldo, Mite, Fresco, Freddo, Freddo artico.\n\nVento (1-5): Calmo, Vento moderato, Vento forte, Burrasca, Tempesta.",
     higherLevels: null,
     materialDesc: "incenso che brucia e pezzi di terra e legno mescolati nell'acqua"
   },
