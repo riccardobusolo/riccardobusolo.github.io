@@ -1523,7 +1523,7 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Swift Quiver": {
-    name: "Faretra Veloce",
+    name: "Faretra Rapida",
     description: "Trasmuti la tua faretra in modo che produca una scorta infinita di munizioni non magiche. In ciascuno dei tuoi turni fino al termine dell'incantesimo, puoi usare un'azione bonus per eseguire due attacchi con un'arma che usa munizioni dalla faretra. Ogni volta che esegui un attacco a distanza, la faretra sostituisce magicamente il pezzo di munizione che hai usato.",
     higherLevels: null,
     materialDesc: "una faretra contenente almeno una munizione"
