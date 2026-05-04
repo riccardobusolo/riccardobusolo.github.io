@@ -378,7 +378,7 @@ window.SPELLS_IT = {
   },
   "Illusory Script": {
     name: "Scritto Illusorio",
-    description: "Scrivi su pergamena, carta o altro materiale di scrittura adatto e lo imbevi di una potente illusione. Per te e per le creature che designi al lancio dell'incantesimo, la scritta appare normale. Per tutti gli altri, la scritta appare come se fosse scritta in una scrittura sconosciuta o magica, illeggibile. Una creatura con visione del vero può leggere il messaggio nascosto.",
+    description: "L'incantatore scrive un testo su carta, pergamena o altro supporto idoneo, infondendolo di una potente illusione che permane per la durata.\n\nAgli occhi dell'incantatore e di ogni creatura da lui designata al lancio, lo scritto appare come un normale testo di mano dell'incantatore, con il contenuto da lui voluto. Per chiunque altro lo legga, il messaggio appare invece scritto in un linguaggio magico o sconosciuto, impossibile da decifrare. In alternativa, l'incantatore può far apparire il testo come un messaggio completamente diverso, redatto in una calligrafia e in un linguaggio differenti — purché si tratti di un linguaggio che l'incantatore conosce.\n\nUn dissolvi magie sull'oggetto cancella sia il messaggio originale sia l'illusione. Una creatura dotata di vista pura legge sempre il messaggio nascosto.",
     higherLevels: null,
     materialDesc: "un inchiostro a base di piombo del valore di almeno 10 mo, consumato"
   },
@@ -1258,7 +1258,7 @@ window.SPELLS_IT = {
     materialDesc: "un pizzico di polvere e alcune gocce d'acqua"
   },
   "Leomund's Secret Chest": {
-    name: "Scrigno Segreto",
+    name: "Scrigno Segreto di Leomund",
     description: "Nascondi un baule e tutto il suo contenuto sul Piano Etereo. Devi toccare il baule e la replica in miniatura che funge da componente materiale. Il baule può contenere fino a circa 0,3 metri cubi di materiale non vivente. Mentre il baule rimane sul Piano Etereo, puoi usare un'azione e toccare la replica per richiamare il baule. Dopo 60 giorni, c'è una probabilità cumulativa del 5% al giorno che l'effetto dell'incantesimo termini.",
     higherLevels: null,
     materialDesc: "uno scrigno raffinato di 90x60x60 cm, fatto di materiali rari del valore di almeno 5.000 mo, e una replica Minuscola fatta degli stessi materiali del valore di almeno 50 mo"
@@ -1270,15 +1270,15 @@ window.SPELLS_IT = {
     materialDesc: "un pochino di pelo di segugio"
   },
   "Mordenkainen's Faithful Hound": {
-    name: "Segugio Fedele",
+    name: "Segugio Fedele di Mordenkainen",
     description: "Evochi un mastino fantasma in uno spazio non occupato che puoi vedere entro la gittata. Il mastino è invisibile a tutte le creature eccetto te e non può essere danneggiato. Quando una creatura di taglia Piccola o superiore giunge entro 9 metri da esso senza prima pronunciare la parola d'ordine che specifichi, il mastino inizia ad abbaiare forte. Il mastino vede creature invisibili e può vedere nel Piano Etereo. Ignora le illusioni. All'inizio di ciascuno dei tuoi turni, il mastino tenta di mordere una creatura entro 1,5 metri da esso che è ostile nei tuoi confronti. Il suo bonus di attacco è pari al tuo modificatore da incantatore + il tuo bonus di competenza. Se colpisce, infligge 4d8 danni perforanti.",
     higherLevels: null,
     materialDesc: "un piccolo fischietto d'argento, un pezzo di osso e un filo"
   },
   "Mordenkainen's Private Sanctum": {
-    name: "Santuario Privato",
-    description: "Rendi un'area entro la gittata magicamente sicura. L'area è un cubo di lato variabile da 1,5 a 30 metri. Scegli una o più di queste proprietà: il suono non può attraversare la barriera, la barriera appare scura e nebbiosa impedendo la vista, i sensori di divinazione non possono apparire nell'area, le creature nell'area non possono essere bersagliate da incantesimi di divinazione, nulla può teletrasportarsi dentro o fuori dall'area, il viaggio planare è bloccato all'interno dell'area. Lanciando questo incantesimo nello stesso punto ogni giorno per un anno, l'effetto diventa permanente.",
-    higherLevels: "Puoi aumentare la dimensione del cubo di 30 metri per ogni livello di slot superiore al 4°.",
+    name: "Santuario Privato di Mordenkainen",
+    description: "L'incantatore rende un'area entro gittata magicamente sicura. L'area è un cubo il cui spigolo va da un minimo di 1,5 m a un massimo di 30 m. L'incantesimo permane per la durata, oppure finché l'incantatore non lo termina con un'azione.\n\nAl lancio, l'incantatore sceglie una o più delle seguenti proprietà di sicurezza:\n\n• Nessun suono può oltrepassare la barriera ai confini dell'area.\n\n• La barriera appare oscura e nebulosa, impedendo qualsiasi visione attraverso di essa, anche con scurovisione.\n\n• I sensori creati da incantesimi di divinazione non possono apparire all'interno dell'area protetta né attraversarne il perimetro.\n\n• Le creature dentro l'area non possono essere bersagliate da incantesimi di divinazione.\n\n• Nulla può teletrasportarsi dentro o fuori dall'area protetta.\n\n• Il viaggio planare è bloccato all'interno dell'area protetta.\n\nLanciare questo incantesimo ogni giorno per un anno sullo stesso punto rende l'effetto permanente.",
+    higherLevels: "Lanciato con uno slot di 5° livello o superiore, lo spigolo del cubo aumenta di 30 m per ogni slot superiore al 4° (quindi fino a 60 m di spigolo con uno slot di 5°).",
     materialDesc: "un sottile foglio di piombo, un pezzo di vetro opaco, un batuffolo di cotone o stoffa e crisolito in polvere"
   },
   "Otiluke's Resilient Sphere": {
@@ -1449,7 +1449,7 @@ window.SPELLS_IT = {
   },
   "Hallow": {
     name: "Santificare",
-    description: "Tocchi un punto e infondi un'area attorno ad esso con potere sacro (o profano), fino a un raggio di 18 metri. Celestiali, elementali, folletti, immondi e non morti non possono entrare nell'area e non possono ammaliare, spaventare o possedere creature al suo interno. Puoi vincolare un effetto extra all'area: Coraggio, Oscurità, Luce del Giorno, Protezione dall'Energia, Vulnerabilità all'Energia, Riposo Eterno, Interferenza Extradimensionale, Paura, Silenzio o Linguaggi.",
+    description: "L'incantatore tocca un punto e vi infonde un flusso di energia sacra (o sacrilega) all'interno di un raggio massimo di 18 metri. Il lancio fallisce se il raggio include già un'area sotto effetto di Santificare. L'area presenta i seguenti effetti.\n\nEffetto principale. Celestiali, elementali, folletti, immondi e non morti non possono entrare nell'area, e non possono ammaliare, spaventare o possedere creature al suo interno. Una creatura ammaliata, spaventata o posseduta da uno di questi tipi cessa di esserlo non appena entra nell'area. L'incantatore può escludere uno o più tipi da questo effetto.\n\nEffetto secondario. L'incantatore può collegare all'area un effetto aggiuntivo, scegliendolo dalla lista sottostante o usando un'opzione proposta dal DM. Alcuni effetti riguardano le creature presenti: l'incantatore designa se valgono per tutte le creature, per chi segue un determinato capo o divinità, o per un tipo specifico (per esempio orchi o troll). Quando una creatura potenzialmente influenzata entra nell'area per la prima volta in un turno o vi inizia il proprio turno, può effettuare un TS Carisma; con un successo ignora l'effetto secondario finché non lascia l'area.\n\nCoraggio. Le creature influenzate non possono essere spaventate finché si trovano nell'area.\n\nEterno Riposo. I corpi senza vita sepolti nell'area non possono essere trasformati in non morti.\n\nInterferenza Extradimensionale. Le creature influenzate non possono spostarsi né viaggiare per teletrasporto o tramite mezzi extradimensionali o interplanari.\n\nLinguaggi. Le creature influenzate possono comunicare con qualsiasi altra creatura nell'area, anche senza un linguaggio in comune.\n\nLuce Diurna. L'area è pervasa da luce intensa. L'oscurità magica creata da incantesimi di livello inferiore allo slot usato per Santificare non può sopprimere la luce.\n\nOscurità. L'area è avvolta nell'oscurità. La luce ordinaria e la luce magica creata da incantesimi di livello inferiore allo slot usato non possono illuminarla.\n\nPaura. Le creature influenzate sono spaventate finché si trovano nell'area.\n\nProtezione dall'Energia. Le creature influenzate ottengono resistenza a un tipo di danno a scelta dell'incantatore, esclusi contundenti, perforanti e taglienti.\n\nSilenzio. Nessun suono attraversa il confine dell'area, in entrata o in uscita.\n\nVulnerabilità all'Energia. Le creature influenzate ottengono vulnerabilità a un tipo di danno a scelta dell'incantatore, esclusi contundenti, perforanti e taglienti.",
     higherLevels: null,
     materialDesc: "erbe, oli e incenso del valore di almeno 1.000 mo, consumati"
   },
@@ -1518,7 +1518,7 @@ window.SPELLS_IT = {
   },
   "Scrying": {
     name: "Scrutare",
-    description: "Puoi vedere e sentire una particolare creatura a tua scelta che si trova sullo stesso piano di esistenza in cui sei tu. Il bersaglio deve effettuare un tiro salvezza Saggezza, modificato in base a quanto bene conosci il bersaglio e a qualsiasi connessione fisica che hai con esso. Con un fallimento, l'incantesimo crea un sensore invisibile entro 3 metri dal bersaglio. Puoi vedere e sentire attraverso il sensore come se fossi lì.",
+    description: "L'incantatore può vedere e udire una specifica creatura a sua scelta che si trovi sul suo stesso piano d'esistenza. Il bersaglio effettua un TS Saggezza, modificato dalla conoscenza che l'incantatore ha di lui e dal tipo di legame fisico utilizzato (vedi tabelle sotto). Se il bersaglio è consapevole del lancio, può scegliere di fallire volontariamente per essere osservato.\n\nModificatore al TS — livello di conoscenza del bersaglio:\n+5: Informazioni indirette (solo per sentito dire)\n0: Informazioni dirette (incontrato di persona)\n−5: Familiarità (conosciuto a fondo)\n\nModificatore al TS — legame fisico:\n−2: Descrizione o immagine del bersaglio\n−4: Oggetto personale o capo di vestiario\n−10: Parte del corpo, ciocca di capelli, unghia tagliata o simili\n\nSe il TS riesce, il bersaglio non viene osservato e l'incantatore non può rilanciare lo stesso incantesimo contro di lui per 24 ore.\n\nSe il TS fallisce, l'incantesimo crea un sensore invisibile entro 3 metri dal bersaglio. L'incantatore vede e ode attraverso il sensore come se fosse fisicamente presente nel punto. Il sensore segue il bersaglio mantenendosi entro 3 metri da lui per la durata. Una creatura in grado di vedere oggetti invisibili percepisce il sensore come un globo luminoso delle dimensioni di un pugno.\n\nIn alternativa, l'incantatore può bersagliare un luogo che ha già visto in precedenza anziché una creatura: il sensore appare in quel punto e resta immobile.",
     higherLevels: null,
     materialDesc: "un focus del valore di almeno 1.000 mo, come una sfera di cristallo, uno specchio d'argento o un fonte riempito di acqua santa"
   },
