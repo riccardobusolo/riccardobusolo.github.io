@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Livello_2" data-name="Livello 2" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 20 20">
+<svg id="Livello_2" data-name="Livello 2" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 20 20">
   <defs>
     <style>
       .cls-1 {
@@ -17,7 +17,7 @@
   </defs>
   <g id="Livello_1-2" data-name="Livello 1">
     <g>
-      <rect class="cls-2" width="32" height="32"/>
+      <rect class="cls-2" width="28" height="28"/>
       <g>
         <g>
           <path class="cls-1" d="M16.51,16.51v-3.88c0-.24-.19-.43-.43-.43h0c-.24,0-.43.19-.43.43v2.43l-4.03-4.03-.36.23-.24.37,4.03,4.03h-2.43c-.24,0-.43.19-.43.43s.19.43.43.43h3.88s0,0,0,0h0Z"/>
