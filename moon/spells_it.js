@@ -232,7 +232,7 @@ window.SPELLS_IT = {
     higherLevels: "Quando lanci questo incantesimo usando uno slot incantesimo di 2° livello o superiore, puoi influenzare una creatura aggiuntiva per ogni slot di livello superiore al 1°. Quando le bersagli, le creature devono trovarsi a non più di 9 metri l'una dall'altra."
   },
   "Compelled Duel": {
-    name: "Duello Imposto",
+    name: "Duello Obbligato",
     description: "Tenti di costringere una creatura in un duello. Una creatura entro la gittata che puoi vedere deve effettuare un tiro salvezza Saggezza. Con un fallimento, è attratta verso di te dalla tua intimazione divina. Il bersaglio ha svantaggio ai tiri per colpire contro creature diverse da te, e deve effettuare un tiro salvezza Saggezza ogni volta che cerca di muoversi a più di 9 metri da te.",
     higherLevels: null
   },
