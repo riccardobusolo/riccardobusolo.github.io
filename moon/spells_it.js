@@ -538,13 +538,13 @@ window.SPELLS_IT = {
     materialDesc: "bastoncini, ossa o gettoni simili contrassegnati appositamente, del valore di almeno 25 mo"
   },
   "Barkskin": {
-    name: "Pelle di Corteccia",
+    name: "Pelle Coriacea",
     description: "Tocchi una creatura consenziente. Fino al termine dell'incantesimo, la pelle del bersaglio assume un aspetto ruvido, simile a corteccia, e la CA del bersaglio non può essere inferiore a 16, indipendentemente dal tipo di armatura indossata.",
     higherLevels: null,
     materialDesc: "una manciata di corteccia di quercia"
   },
   "Beast Sense": {
-    name: "Senso della Bestia",
+    name: "Percezione delle Bestie",
     description: "Tocchi una bestia consenziente. Per la durata, puoi usare la tua azione per vedere attraverso gli occhi della bestia e sentire ciò che essa sente, e continui a farlo finché non usi la tua azione per tornare ai tuoi sensi normali. Mentre percepisci attraverso i sensi della bestia, ottieni i benefici di qualsiasi senso speciale posseduto da quella creatura, sebbene tu sia accecato e assordato rispetto al tuo ambiente circostante.",
     higherLevels: null
   },
@@ -1082,7 +1082,7 @@ window.SPELLS_IT = {
     materialDesc: "incenso che brucia"
   },
   "Speak with Plants": {
-    name: "Parlare con le Piante",
+    name: "Parlare con i Vegetali",
     description: "Imbevi le piante entro 9 metri da te di senzienza e animazione limitate, dando loro la capacità di comunicare con te e seguire i tuoi semplici comandi. Puoi interrogare le piante riguardo a eventi nell'area dell'incantesimo nell'ultimo giorno, oppure trasformare il terreno difficile causato dalla crescita di piante in terreno ordinario, o trasformare il terreno ordinario in terreno difficile.",
     higherLevels: null
   },
@@ -1565,6 +1565,11 @@ window.SPELLS_IT = {
     description: "Crei un muro verticale di lame vorticose e affilatissime fatte di energia magica. Il muro appare entro la gittata e dura per la durata. Puoi creare un muro dritto lungo fino a 30 metri, alto 6 metri e spesso 1,5 metri, oppure un muro circolare fino a 18 metri di diametro, alto 6 metri e spesso 1,5 metri. Il muro è opaco e fornisce tre quarti di copertura. Quando una creatura entra nell'area del muro per la prima volta in un turno o vi inizia il proprio turno, deve effettuare un tiro salvezza Destrezza, subendo 6d10 danni taglienti con un fallimento, o metà con un successo.",
     higherLevels: null
   },
+  "Arcane Gate": {
+    name: "Portale Arcano",
+    description: "L'incantatore crea due portali teleportativi collegati che restano aperti per la durata. Sceglie due punti su superfici orizzontali o verticali entro gittata che riesce a vedere, entrambi liberi: su ciascun punto si apre un portale circolare con diametro di 3 metri, perpendicolare alla superficie. Se un portale si aprirebbe nello spazio occupato da una creatura, l'incantesimo fallisce e il lancio è sprecato. I due portali sono collegati: ciò che attraversa uno emerge dall'altro mantenendo la stessa direzione di marcia. Anche incantesimi ed effetti possono passare. Il passaggio dal lato posteriore di un portale non produce alcun effetto. Come azione bonus nel proprio turno, l'incantatore può ruotare i portali per cambiarne l'orientamento, oppure spostare uno dei due fino a 12 metri entro gittata, purché riesca ancora a vedere il punto di apertura.",
+    higherLevels: null
+  },
   "Chain Lightning": {
     name: "Catena di Fulmini",
     description: "Crei una scarica di fulmine che si dirige verso un bersaglio a tua scelta entro la gittata. Tre scariche poi balzano da quel bersaglio fino a tre altri bersagli, ognuno dei quali deve trovarsi entro 9 metri dal primo bersaglio. Un bersaglio può essere una creatura o un oggetto e può essere bersagliato da una sola delle scariche. Un bersaglio deve effettuare un tiro salvezza Destrezza, subendo 10d8 danni da fulmine con un fallimento, o metà con un successo.",
@@ -1998,6 +2003,11 @@ window.SPELLS_IT = {
   "Power Word Kill": {
     name: "Parola del Potere Uccidere",
     description: "Pronunci una parola di potere che può costringere una creatura che puoi vedere entro la gittata a morire istantaneamente. Se la creatura che scegli ha 100 punti ferita o meno, muore. Altrimenti, l'incantesimo non ha effetto.",
+    higherLevels: null
+  },
+  "Power Word Heal": {
+    name: "Parola del Potere Guarire",
+    description: "Un'onda di energia curativa avvolge la creatura toccata. Il bersaglio recupera tutti i propri punti ferita. Se è ammaliata, spaventata, paralizzata o stordita, queste condizioni terminano. Se è prona, può usare la propria reazione per rialzarsi in piedi. L'incantesimo non ha effetto su non morti o costrutti.",
     higherLevels: null
   },
   "Prismatic Wall": {
