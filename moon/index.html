@@ -1895,6 +1895,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 </div>
 </section>
 <section class="setpanel__sec">
+<h4 class="setpanel__h4">📚 Manuali (Espansioni)</h4>
+<div class="setpanel__themegrp">
+<button class="setpanel__themebtn" data-book="tasha" title="Mostra/nascondi gli incantesimi di Tasha's Cauldron of Everything"><span class="setpanel__themelbl">Tasha's Cauldron of Everything</span></button>
+<button class="setpanel__themebtn" data-book="cm" title="Mostra/nascondi gli incantesimi del manuale Crooked Moon"><span class="setpanel__themelbl">The Crooked Moon</span></button>
+</div>
+<div class="setpanel__hint">Il Player's Handbook è sempre attivo. Disattiva un'espansione per nascondere i suoi incantesimi dallo strumento Incantesimi e dal filtro Manuali.</div>
+</section>
+<section class="setpanel__sec">
 <h4 class="setpanel__h4">🧰 Visualizzazione strumenti</h4>
 <div class="setpanel__tools" id="setToolList"></div>
 </section>
@@ -2099,6 +2107,33 @@ document.querySelectorAll('.setpanel__themebtn[data-theme]').forEach(function(b)
 function refreshEdition(){var cur=(localStorage.getItem('cm_dnd_ed')==='2014')?'2014':'2024';document.querySelectorAll('.setpanel__themebtn[data-edition]').forEach(function(b){if(b.dataset.edition===cur)b.classList.add('on');else b.classList.remove('on')})}refreshEdition();
 document.querySelectorAll('.setpanel__themebtn[data-edition]').forEach(function(b){b.onclick=function(){var ed=b.dataset.edition;if(ed!=='2014'&&ed!=='2024')return;localStorage.setItem('cm_dnd_ed',ed);refreshEdition();/* Re-render delle sheet aperte: triggera change event globale che le due IIFE intercettano. */if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets()}});
 var origSetOpenEd=setOpen;setOpen=function(){origSetOpenEd();refreshEdition()};
+/* Manuali (espansioni): PHB sempre attivo. Tasha + Crooked Moon
+   opzionali, di default attivi. Spegnerli filtra via gli incantesimi
+   dallo strumento Incantesimi e dall'auto-import della scheda PG. */
+window.cmBookEnabled=function(source){
+  if(!source||source==="Player's Handbook")return true;
+  if(source==="Tasha's Cauldron of Everything")return localStorage.getItem('cm_book_tasha')!=='off';
+  if(source==="The Crooked Moon")return localStorage.getItem('cm_book_cm')!=='off';
+  return true;
+};
+function refreshBooks(){
+  var taOn=localStorage.getItem('cm_book_tasha')!=='off';
+  var cmOn=localStorage.getItem('cm_book_cm')!=='off';
+  var btnTa=document.querySelector('.setpanel__themebtn[data-book="tasha"]');
+  var btnCm=document.querySelector('.setpanel__themebtn[data-book="cm"]');
+  if(btnTa)btnTa.classList.toggle('on',taOn);
+  if(btnCm)btnCm.classList.toggle('on',cmOn);
+}
+refreshBooks();
+document.querySelectorAll('.setpanel__themebtn[data-book]').forEach(function(b){b.onclick=function(){
+  var bk=b.dataset.book;var key=bk==='tasha'?'cm_book_tasha':bk==='cm'?'cm_book_cm':null;if(!key)return;
+  var cur=localStorage.getItem(key)!=='off';
+  if(cur)localStorage.setItem(key,'off');else localStorage.removeItem(key);
+  refreshBooks();
+  if(typeof window.cmRefreshSpellsTool==='function')window.cmRefreshSpellsTool();
+  if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets();
+}});
+var origSetOpenBk=setOpen;setOpen=function(){origSetOpenBk();refreshBooks()};
 var origSetOpen2=setOpen;setOpen=function(){origSetOpen2();refreshTheme()};
 var origSetOpen=setOpen;setOpen=function(){origSetOpen();refreshFs()};
 function _getHiddenTools(){try{return JSON.parse(localStorage.getItem('cm_tool_hidden')||'[]')||[]}catch(e){return[]}}
@@ -3312,11 +3347,12 @@ function _spImportPlan(c){
   if(subDef.label&&subDef.key&&subDef.key!=='custom')displayLabel+=(displayLabel?' — ':'')+subDef.label;
   var maxLvl=_spMaxLvlFor(c);
   if(!classNames.length||typeof SPELLS==='undefined')return {matches:[],newCount:0,classNames:classNames,schoolFilter:schoolFilter,displayLabel:displayLabel,maxLvl:maxLvl};
-  /* Filtro: classe matcha + (eventuale) scuola + livello ≤ maxLvl. */
+  /* Filtro: classe matcha + (eventuale) scuola + livello ≤ maxLvl + manuale abilitato. */
   var matches=SPELLS.filter(function(sp){
     if(!classNames.some(function(cn){return sp.classes.indexOf(cn)>=0}))return false;
     if(schoolFilter&&schoolFilter.indexOf(sp.school)<0)return false;
     if(sp.level>maxLvl)return false;
+    if(window.cmBookEnabled&&!window.cmBookEnabled(sp.source))return false;
     return true;
   });
   if(!c.cantrips)c.cantrips=[];
@@ -3993,16 +4029,39 @@ var favMode=false;
 var classOpts=[{v:'Bard',l:'Bardo'},{v:'Cleric',l:'Chierico'},{v:'Druid',l:'Druido'},{v:'Paladin',l:'Paladino'},{v:'Ranger',l:'Ranger'},{v:'Sorcerer',l:'Stregone'},{v:'Warlock',l:'Warlock'},{v:'Wizard',l:'Mago'}];
 var levelOpts=[{v:0,l:'Trucchetto'},{v:1,l:'1°'},{v:2,l:'2°'},{v:3,l:'3°'},{v:4,l:'4°'},{v:5,l:'5°'},{v:6,l:'6°'},{v:7,l:'7°'},{v:8,l:'8°'},{v:9,l:'9°'}];
 var srcSet={};SP.forEach(function(s){srcSet[s.source]=1});
-var sourceOpts=Object.keys(srcSet).sort().map(function(s){var l=s==="Player's Handbook"?'PHB':s==="Tasha's Cauldron of Everything"?"Tasha's":s;return{v:s,l:l}});
+var allSources=Object.keys(srcSet).sort();
+function _enabledSourceOpts(){
+  return allSources.filter(function(s){return !window.cmBookEnabled||window.cmBookEnabled(s)})
+    .map(function(s){var l=s==="Player's Handbook"?'PHB':s==="Tasha's Cauldron of Everything"?"Tasha's":s;return{v:s,l:l}});
+}
 var filters={cls:[],lvl:[],src:[]};
-function buildMS(id,opts,key){var ms=document.getElementById(id);var btn=ms.querySelector('.spf__btn');var drop=ms.querySelector('.spf__drop');var cnt=btn.querySelector('.spf__cnt');drop.innerHTML='';opts.forEach(function(o){var d=document.createElement('div');d.className='spf__opt';d.dataset.v=typeof o.v==='number'?o.v:o.v;d.innerHTML='<span class="spf__chk">\u2713</span><span>'+o.l+'</span>';drop.appendChild(d)});
-btn.addEventListener('click',function(e){e.stopPropagation();var wasOn=drop.classList.contains('spf__drop--on');closeAllMS();if(!wasOn)drop.classList.add('spf__drop--on')});
-drop.addEventListener('click',function(e){e.stopPropagation();var opt=e.target.closest('.spf__opt');if(!opt)return;opt.classList.toggle('spf__opt--sel');var sel=[];drop.querySelectorAll('.spf__opt--sel').forEach(function(o){var v=o.dataset.v;sel.push(key==='lvl'?parseInt(v):v)});filters[key]=sel;cnt.textContent=sel.length;cnt.classList.toggle('spf__cnt--on',sel.length>0);btn.classList.toggle('spf__btn--on',sel.length>0);renSp()})}
+/* buildMS: con rebuild=true ripopola solo le opzioni senza ri-bindare i
+   listener (evita duplicati su toggle ripetuti dei manuali). */
+function buildMS(id,opts,key,rebuild){
+  var ms=document.getElementById(id);var btn=ms.querySelector('.spf__btn');var drop=ms.querySelector('.spf__drop');var cnt=btn.querySelector('.spf__cnt');
+  drop.innerHTML='';
+  opts.forEach(function(o){var d=document.createElement('div');d.className='spf__opt';d.dataset.v=typeof o.v==='number'?o.v:o.v;d.innerHTML='<span class="spf__chk">\u2713</span><span>'+o.l+'</span>';drop.appendChild(d)});
+  if(rebuild){
+    /* Riapplica le selezioni esistenti che ancora corrispondono a opzioni
+       disponibili. Le opzioni rimosse spariscono anche dai filtri. */
+    var sel=filters[key]||[];var newSel=[];
+    drop.querySelectorAll('.spf__opt').forEach(function(o){var v=key==='lvl'?parseInt(o.dataset.v):o.dataset.v;if(sel.indexOf(v)>=0){o.classList.add('spf__opt--sel');newSel.push(v)}});
+    filters[key]=newSel;
+    cnt.textContent=newSel.length;
+    cnt.classList.toggle('spf__cnt--on',newSel.length>0);
+    btn.classList.toggle('spf__btn--on',newSel.length>0);
+    return;
+  }
+  btn.addEventListener('click',function(e){e.stopPropagation();var wasOn=drop.classList.contains('spf__drop--on');closeAllMS();if(!wasOn)drop.classList.add('spf__drop--on')});
+  drop.addEventListener('click',function(e){e.stopPropagation();var opt=e.target.closest('.spf__opt');if(!opt)return;opt.classList.toggle('spf__opt--sel');var sel=[];drop.querySelectorAll('.spf__opt--sel').forEach(function(o){var v=o.dataset.v;sel.push(key==='lvl'?parseInt(v):v)});filters[key]=sel;cnt.textContent=sel.length;cnt.classList.toggle('spf__cnt--on',sel.length>0);btn.classList.toggle('spf__btn--on',sel.length>0);renSp()})}
 function closeAllMS(){document.querySelectorAll('.spf__drop--on').forEach(function(d){d.classList.remove('spf__drop--on')})}
 document.addEventListener('click',closeAllMS);
 buildMS('msClass',classOpts,'cls');
 buildMS('msLevel',levelOpts,'lvl');
-buildMS('msSource',sourceOpts,'src');
+buildMS('msSource',_enabledSourceOpts(),'src');
+/* Esposto al settings panel: re-builda il dropdown Manuali e ri-renderizza
+   la lista in base ai libri attualmente abilitati. */
+window.cmRefreshSpellsTool=function(){buildMS('msSource',_enabledSourceOpts(),'src',true);renSp()};
 /* Favorites toggle */
 spFavBtn.addEventListener('click',function(){favMode=!favMode;spFavBtn.classList.toggle('spf__fav--on',favMode);renSp()});
 function isFav(name){return favs.indexOf(name)>=0}
@@ -4012,6 +4071,8 @@ function compStr(c){var p=[];if(c.verbal)p.push('V');if(c.somatic)p.push('S');if
 /* Render */
 function renSp(){var q=(spSearch.value||'').toLowerCase(),fCls=filters.cls,fLvl=filters.lvl,fSrc=filters.src;
 var filtered=SP.filter(function(s){
+/* Manuali (espansioni): filtra via gli incantesimi di libri disabilitati. */
+if(window.cmBookEnabled&&!window.cmBookEnabled(s.source))return false;
 if(favMode&&!isFav(s.name))return false;
 /* Search match: tenta sia il nome/descrizione originale che la versione
    tradotta, così l'utente trova le spell con qualunque lingua usi. */
