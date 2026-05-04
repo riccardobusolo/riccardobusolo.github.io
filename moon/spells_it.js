@@ -422,7 +422,7 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Ray of Sickness": {
-    name: "Raggio di Malattia",
+    name: "Raggio di Infermità",
     description: "Un raggio di nauseante energia verdastra colpisce una creatura entro la gittata. Esegui un attacco a distanza con incantesimo. Se colpisci, il bersaglio subisce 2d8 danni da veleno e deve effettuare un tiro salvezza Costituzione. Con un fallimento, è anche avvelenato fino alla fine del tuo prossimo turno.",
     higherLevels: "Il danno aumenta di 1d8 per ogni livello di slot superiore al 1°."
   },
@@ -433,7 +433,7 @@ window.SPELLS_IT = {
     materialDesc: "un piccolo specchio d'argento"
   },
   "Searing Smite": {
-    name: "Punizione Cocente",
+    name: "Punizione Incandescente",
     description: "La prossima volta che colpisci una creatura con un attacco in mischia con un'arma, la tua arma divampa con un'intensità incandescente, e l'attacco infligge 1d6 danni da fuoco aggiuntivi e dà fuoco al bersaglio. All'inizio di ciascuno dei suoi turni, il bersaglio deve effettuare un tiro salvezza Costituzione. Con un fallimento, subisce 1d6 danni da fuoco. Con un successo, l'incantesimo termina.",
     higherLevels: "Il danno extra iniziale aumenta di 1d6 per ogni livello di slot superiore al 1°."
   },
@@ -466,7 +466,7 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Tasha's Hideous Laughter": {
-    name: "Risata Incontenibile",
+    name: "Risata Incontenibile di Tasha",
     description: "Una creatura a tua scelta che puoi vedere entro la gittata percepisce tutto come esilarante e cade in attacchi di risata. Il bersaglio deve riuscire in un tiro salvezza Saggezza o cadere prono, diventando incapacitato e incapace di alzarsi per la durata. Una creatura con Intelligenza 4 o inferiore non viene influenzata. Alla fine di ciascuno dei suoi turni, e ogni volta che subisce danni, il bersaglio può effettuare un altro tiro salvezza Saggezza.",
     higherLevels: null,
     materialDesc: "tartine in miniatura e una piuma agitata nell'aria"
@@ -1512,7 +1512,7 @@ window.SPELLS_IT = {
   },
   "Reincarnate": {
     name: "Reincarnazione",
-    description: "Tocchi un umanoide morto o un pezzo di un umanoide morto. Purché la creatura sia morta da non più di 10 giorni, l'incantesimo forma per essa un nuovo corpo adulto e poi richiama l'anima a entrare in quel corpo. Il DM tira su una tabella o sceglie una forma per determinare la nuova razza della creatura. La creatura reincarnata ricorda la sua vita precedente e le sue esperienze.",
+    description: "L'incantatore tocca il cadavere di un umanoide o una parte di esso. Purché la creatura non sia morta da più di 10 giorni, l'incantesimo forma un nuovo corpo adulto e richiama l'anima del defunto al suo interno. Se l'anima non è consenziente o non è libera di tornare, l'incantesimo fallisce.\n\nLa magia produce un nuovo corpo idoneo a ospitare nuovamente la creatura, ma quasi sempre ciò comporta un cambio di razza. Il DM tira un d100 sulla tabella sottostante per determinare la forma assunta al ritorno in vita, oppure sceglie liberamente la razza:\n\n01-04: Dragonide\n05-13: Elfo alto\n14-21: Elfo dei boschi\n22-25: Elfo oscuro\n26-34: Gnomo delle foreste\n35-42: Gnomo delle rocce\n43-46: Halfling piedelesto\n47-52: Halfling tozzo\n53-56: Mezzelfo\n57-60: Mezzorco\n61-68: Nano delle colline\n69-76: Nano delle montagne\n77-96: Tiefling\n97-100: Umano\n\nLa creatura reincarnata conserva i ricordi della vita precedente e tutte le capacità che possedeva nella forma originale, eccezione fatta per la razza — sostituita da quella nuova — e per i tratti razziali, che vengono adattati di conseguenza.",
     higherLevels: null,
     materialDesc: "oli e unguenti rari del valore di almeno 1.000 mo, consumati"
   },
@@ -1795,8 +1795,8 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Mordenkainen's Magnificent Mansion": {
-    name: "Reggia Meravigliosa",
-    description: "Evochi una dimora extradimensionale entro la gittata che dura per la durata. Scegli dove si trova la sua unica entrata. L'ingresso scintilla debolmente, è largo 1,5 metri e alto 3 metri. Solo le creature che designi possono entrare. L'interno può contenere un numero qualsiasi di stanze. L'atmosfera è pulita, fresca e calda. Puoi creare qualsiasi planimetria desideri. Il luogo è arredato e decorato come scegli. La magione contiene cibo sufficiente a servire un banchetto di nove portate per fino a 100 persone. Uno staff di 100 servitori quasi trasparenti assiste chiunque sia all'interno.",
+    name: "Reggia Meravigliosa di Mordenkainen",
+    description: "L'incantatore evoca entro gittata una dimora extradimensionale che permane per tutta la durata. Sceglie il punto in cui apparirà l'ingresso: un portale di 1,5 m di larghezza e 3 m di altezza che emana un debole bagliore. L'incantatore e ogni creatura da lui designata al lancio possono varcare il portale fintanto che è aperto; l'incantatore può aprirlo o chiuderlo a piacimento se si trova entro 9 m da esso. Quando è chiuso, il portale è invisibile.\n\nOltre il varco si estende un sontuoso atrio circondato da numerose stanze. L'aria è fresca, pulita e accogliente. L'incantatore disegna a piacere la pianta della dimora, purché lo spazio totale non superi 50 cubi con spigolo di 3 m. Arredi e decorazioni rispondono ai gusti dell'incantatore.\n\nLa dimora dispone di provviste sufficienti a imbandire un banchetto di nove portate per fino a 100 commensali. Cento servitori semitrasparenti si occupano di ogni necessità degli ospiti: l'incantatore ne stabilisce aspetto e abbigliamento, e questi obbediscono a ogni suo ordine. Possono svolgere qualunque mansione che spetterebbe a un servitore umano comune (trasportare oggetti, pulire, riparare, piegare vesti, accendere fuochi, servire pietanze, versare vino…), ma non possono attaccare né compiere azioni che feriscano direttamente una creatura. I servitori si muovono liberamente in tutta la dimora ma non possono uscirne.\n\nMobili e oggetti generati dall'incantesimo svaniscono in una nuvola di fumo se vengono portati fuori dalla dimora. Quando l'incantesimo termina, ogni creatura presente nello spazio extradimensionale viene trasferita nel più vicino spazio libero accanto all'ingresso.",
     higherLevels: null,
     materialDesc: "un portale in miniatura intagliato nell'avorio, un piccolo pezzo di marmo levigato e un cucchiaino d'argento, ciascuno del valore di almeno 5 mo"
   },
