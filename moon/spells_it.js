@@ -670,7 +670,7 @@ window.SPELLS_IT = {
     higherLevels: "Il danno aumenta di 1d10 per ogni livello di slot superiore al 2°."
   },
   "Nystul's Magic Aura": {
-    name: "Aura Magica dell’Arcanista",
+    name: "Aura Magica di Nystul",
     description: "Crei un'illusione su una creatura o un oggetto che tocchi in modo che gli incantesimi di divinazione rivelino informazioni false su di esso. Puoi cambiare come appare agli incantesimi e agli effetti magici che rilevano le aure magiche (come individuazione del magico), o cambiare come appare agli incantesimi che rilevano i tipi di creature. Se lanci questo incantesimo sullo stesso bersaglio ogni giorno per 30 giorni, l'illusione dura finché non viene dissolta.",
     higherLevels: null
   },
