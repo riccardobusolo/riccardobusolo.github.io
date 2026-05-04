@@ -680,7 +680,7 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Phantasmal Force": {
-    name: "Forza Fantasmatica",
+    name: "Allucinazione di Forza",
     description: "Crei un'illusione che si radica nella mente di una creatura entro la gittata. Il bersaglio deve effettuare un tiro salvezza Intelligenza. Con un fallimento, crei un oggetto, una creatura o un fenomeno fantasmatico non più grande di un cubo di 3 metri di lato percepibile solo dal bersaglio. Il bersaglio razionalizza qualsiasi risultato illogico derivante dall'interazione con l'illusione. Il fantasma può infliggere 1d6 danni psichici per round se appare pericoloso.",
     higherLevels: null
   },
