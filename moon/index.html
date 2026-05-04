@@ -1483,6 +1483,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <div class="spf__ms" id="msLevel"><button class="spf__btn">Livello <span class="spf__cnt"></span></button><div class="spf__drop"></div></div>
 <div class="spf__ms" id="msSource"><button class="spf__btn">Sorgente <span class="spf__cnt"></span></button><div class="spf__drop"></div></div>
 <button class="spf__fav" id="spFav" title="Mostra preferiti">★</button>
+<button class="spf__fav" id="spLangBtn" title="Cambia lingua incantesimi (italiano / inglese)" style="font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.5px">IT</button>
 </div>
 <div class="spcount" id="spCount"></div>
 <div class="splist" id="spList"></div>
@@ -1905,6 +1906,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <script src="firebase-config.js"></script>
 <script src="cloudinary.js"></script>
 <script src="spells.js"></script>
+<script src="spells_it.js"></script>
 <script>
 (function(){'use strict';
 var EMOJIS=[
@@ -3558,7 +3560,14 @@ render()})();
 /* SPELLS */
 (function(){
 var SP=(typeof SPELLS!=='undefined')?SPELLS:[];
-var spSearch=document.getElementById('spSearch'),spList=document.getElementById('spList'),spCount=document.getElementById('spCount'),spFavBtn=document.getElementById('spFav');
+var spSearch=document.getElementById('spSearch'),spList=document.getElementById('spList'),spCount=document.getElementById('spCount'),spFavBtn=document.getElementById('spFav'),spLangBtn=document.getElementById('spLangBtn');
+/* Lingua incantesimi: 'it' (default) o 'en'. In italiano cerchiamo
+   traduzioni in window.SPELLS_IT (chiavi = nomi inglesi). Se la
+   traduzione non esiste, fallback all'inglese. */
+function _spLang(){return localStorage.getItem('cm_spell_lang')==='en'?'en':'it'}
+function _spLocal(s){if(_spLang()==='en')return s;var t=(window.SPELLS_IT||{})[s.name];if(!t)return s;var out={};for(var k in s)if(s.hasOwnProperty(k))out[k]=s[k];if(t.name)out.name=t.name;out.nameEn=s.name;if(t.description)out.description=t.description;if(t.higherLevels!==undefined)out.higherLevels=t.higherLevels;return out}
+function _refreshSpLangBtn(){if(!spLangBtn)return;var l=_spLang();spLangBtn.textContent=l==='en'?'EN':'IT';spLangBtn.title='Lingua incantesimi: '+(l==='en'?'inglese (clicca per italiano)':'italiano (clicca per inglese)')}_refreshSpLangBtn();
+if(spLangBtn)spLangBtn.addEventListener('click',function(){var l=_spLang();localStorage.setItem('cm_spell_lang',l==='en'?'it':'en');_refreshSpLangBtn();renSp();if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets()});
 var favs=JSON.parse(localStorage.getItem('cm_spfav')||'[]');
 var favMode=false;
 /* Multi-select */
@@ -3585,7 +3594,9 @@ function compStr(c){var p=[];if(c.verbal)p.push('V');if(c.somatic)p.push('S');if
 function renSp(){var q=(spSearch.value||'').toLowerCase(),fCls=filters.cls,fLvl=filters.lvl,fSrc=filters.src;
 var filtered=SP.filter(function(s){
 if(favMode&&!isFav(s.name))return false;
-if(q&&s.name.toLowerCase().indexOf(q)<0&&s.description.toLowerCase().indexOf(q)<0)return false;
+/* Search match: tenta sia il nome/descrizione originale che la versione
+   tradotta, così l'utente trova le spell con qualunque lingua usi. */
+if(q){var sl=_spLocal(s);var matchTxt=(s.name+' '+s.description+' '+sl.name+' '+sl.description).toLowerCase();if(matchTxt.indexOf(q)<0)return false}
 if(fCls.length){var match=false;for(var i=0;i<fCls.length;i++){if(s.classes.indexOf(fCls[i])>=0){match=true;break}}if(!match)return false}
 if(fLvl.length&&fLvl.indexOf(s.level)<0)return false;
 if(fSrc.length&&fSrc.indexOf(s.source)<0)return false;
@@ -3596,14 +3607,14 @@ spCount.textContent=countTxt;
 spList.innerHTML='';
 if(!SP.length){spList.innerHTML='<div style="text-align:center;padding:30px 10px;font-family:var(--mono);font-size:.62rem;color:var(--muted)">Database non trovato.<br>Assicurati che <b>spells.js</b> sia nella stessa cartella.</div>';return}
 if(!filtered.length){spList.innerHTML='<div style="text-align:center;padding:20px;font-family:var(--mono);font-size:.6rem;color:var(--muted)">'+(favMode?'Nessun preferito':'Nessun risultato')+'</div>';return}
-filtered.forEach(function(s){var d=document.createElement('div');d.className='spe';
-var fav=isFav(s.name);
+filtered.forEach(function(rawS){var s=_spLocal(rawS);var d=document.createElement('div');d.className='spe';
+var fav=isFav(rawS.name);
 var lvlTxt=s.level===0?'T':s.level+'\u00b0';
 var tags='';if(s.concentration)tags+='<span class="spe__tag spe__tag--c" title="Concentrazione">C</span>';if(s.ritual)tags+='<span class="spe__tag spe__tag--r" title="Rituale">R</span>';
 var clsH=s.classes.map(function(c){return'<span class="spe__cl">'+c+'</span>'}).join('');
 var srcLbl=s.source==="Player's Handbook"?'PHB':s.source==="Tasha's Cauldron of Everything"?"Tasha's":s.source;
-var higherH=s.higherLevels?'<div class="spe__higher"><b>Ai livelli superiori:</b> '+s.higherLevels+'</div>':'';
-d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+s.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+s.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+s.school+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>Lancio</b> <span>'+s.castingTime+'</span></span><span class="spe__prop"><b>Raggio</b> <span>'+s.range+'</span></span><span class="spe__prop"><b>Durata</b> <span>'+s.duration+'</span></span><span class="spe__prop"><b>Componenti</b> <span>'+compStr(s.components)+'</span></span></div><div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
+var higherH=s.higherLevels?'<div class="spe__higher"><b>'+(_spLang()==='it'?'Ai livelli superiori:':'At Higher Levels:')+'</b> '+s.higherLevels+'</div>':'';
+d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+rawS.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+rawS.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+s.school+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+s.castingTime+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+s.range+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+s.duration+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+compStr(s.components)+'</span></span></div><div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
 spList.appendChild(d)})}
 spList.addEventListener('click',function(e){var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}if(e.target.closest('.spe__drag'))return;var spe=e.target.closest('.spe');if(spe)spe.classList.toggle('spe--open')});
 spSearch.addEventListener('input',renSp);
