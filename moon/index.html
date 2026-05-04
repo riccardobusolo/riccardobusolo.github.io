@@ -2096,7 +2096,7 @@ document.querySelectorAll('.setpanel__themebtn[data-theme]').forEach(function(b)
 /* Edizione D&D 5e: filtra il dropdown classi. Default '2024'. */
 function refreshEdition(){var cur=(localStorage.getItem('cm_dnd_ed')==='2014')?'2014':'2024';document.querySelectorAll('.setpanel__themebtn[data-edition]').forEach(function(b){if(b.dataset.edition===cur)b.classList.add('on');else b.classList.remove('on')})}refreshEdition();
 document.querySelectorAll('.setpanel__themebtn[data-edition]').forEach(function(b){b.onclick=function(){var ed=b.dataset.edition;if(ed!=='2014'&&ed!=='2024')return;localStorage.setItem('cm_dnd_ed',ed);refreshEdition();/* Re-render delle sheet aperte: triggera change event globale che le due IIFE intercettano. */if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets()}});
-var origSetOpen3=setOpen;setOpen=function(){origSetOpen3();refreshEdition()};
+var origSetOpenEd=setOpen;setOpen=function(){origSetOpenEd();refreshEdition()};
 var origSetOpen2=setOpen;setOpen=function(){origSetOpen2();refreshTheme()};
 var origSetOpen=setOpen;setOpen=function(){origSetOpen();refreshFs()};
 function _getHiddenTools(){try{return JSON.parse(localStorage.getItem('cm_tool_hidden')||'[]')||[]}catch(e){return[]}}
