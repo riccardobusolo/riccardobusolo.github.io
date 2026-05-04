@@ -27,7 +27,7 @@ window.SPELLS_IT = {
     higherLevels: "Il danno aumenta di 1d6 al 5° livello (2d6), all'11° livello (3d6) e al 17° livello (4d6)."
   },
   "Blade Ward": {
-    name: "Protezione dalle Lame",
+    name: "Interdizione alle Lame",
     description: "Tendi la mano e tracci nell'aria un sigillo di protezione. Fino alla fine del tuo prossimo turno, hai resistenza ai danni contundenti, perforanti e taglienti inflitti da attacchi con armi.",
     higherLevels: null
   },
@@ -1226,7 +1226,7 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Grasping Vine": {
-    name: "Liana Afferrante",
+    name: "Rampicante Afferrante",
     description: "Evochi una liana che spunta dal terreno in uno spazio non occupato a tua scelta che puoi vedere entro la gittata. Quando lanci questo incantesimo, puoi dirigere la liana a colpire una creatura entro 9 metri da essa che puoi vedere. Quella creatura deve riuscire in un tiro salvezza Destrezza o essere tirata di 6 metri direttamente verso la liana. Fino al termine dell'incantesimo, puoi dirigere la liana a colpire la stessa creatura o un'altra come azione bonus in ciascuno dei tuoi turni.",
     higherLevels: null
   },
@@ -1500,7 +1500,7 @@ window.SPELLS_IT = {
     materialDesc: "un diamante del valore di almeno 500 mo, consumato"
   },
   "Rary's Telepathic Bond": {
-    name: "Legame Telepatico",
+    name: "Legame Telepatico di Rary",
     description: "Forgi un legame telepatico tra un massimo di otto creature consenzienti a tua scelta entro la gittata, collegando psichicamente ogni creatura a tutte le altre per la durata. Le creature con punteggi di Intelligenza pari o inferiori a 2 non vengono influenzate. Fino al termine dell'incantesimo, i bersagli possono comunicare telepaticamente attraverso il legame indipendentemente dalla lingua. La comunicazione è possibile a qualsiasi distanza, anche se non può estendersi ad altri piani di esistenza.",
     higherLevels: null,
     materialDesc: "pezzi di guscio d'uovo provenienti da due creature di tipi diversi"
