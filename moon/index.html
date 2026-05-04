@@ -506,6 +506,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .pg__inp--sm{font-size:.84rem;font-weight:400;color:var(--dim)}.pg__inp--sm:focus{color:var(--gold)}
 .pg__inp--gold{color:var(--gold)}
 .pg__inp--cls{cursor:var(--cur-pointer);-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23c49a32'><path d='M4 6l4 4 4-4'/></svg>");background-repeat:no-repeat;background-position:right 4px center;background-size:11px;padding-right:18px!important}
+/* Lista a tendina della classe: testo più compatto così la lista
+   con tutte le 20 opzioni sta in altezza senza scroll. Le option
+   ereditano dal select su Chrome/Edge/Firefox moderni. */
+.pg__inp--cls option{font-size:.7rem;padding:2px 6px;line-height:1.2}
 .pg__inp--inline{-webkit-appearance:none;appearance:none;background:transparent;border:none;padding:0;margin:0;min-height:0;font-family:var(--mono);font-weight:700;color:inherit;text-align:center;outline:none;cursor:var(--cur-pointer);width:3ch;font-size:inherit;line-height:inherit;box-sizing:content-box}.pg__inp--inline:focus{color:var(--gold);cursor:text}.pg__inp--inline::-webkit-outer-spin-button,.pg__inp--inline::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.pg__inp--inline[type=number]{-moz-appearance:textfield}
 .pg__row--id{gap:3px}.pg__row--id .pg__field{flex:0 0 auto;position:relative;margin-top:12px;min-width:0;transition:none}.pg__row--id .pg__field--empty{flex:1 0 60px}.pg__row--id .pg__lbl{position:absolute;bottom:100%;left:0;white-space:nowrap;margin-bottom:1px}.pg__row--id .pg__inp{padding:5px 4px;width:100%;min-height:0;transition:border-color .12s,color .12s}
 .pg__val--sm{font-size:.84rem;font-weight:400;color:var(--dim)}
