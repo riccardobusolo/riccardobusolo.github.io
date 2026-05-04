@@ -3923,73 +3923,61 @@ function _trCastingTime(en){if(_spLang()!=='it'||!en)return en;var m={'Action':'
 function _trDuration(en){if(_spLang()!=='it'||!en)return en;var m={'Instantaneous':'Istantanea','Special':'Speciale','Until dispelled':'Finché non dissolto','Until dispelled or triggered':'Finché non dissolto o innescato','1 round':'1 round','1 minute':'1 minuto','10 minutes':'10 minuti','1 hour':'1 ora','8 hours':'8 ore','24 hours':'24 ore','7 days':'7 giorni','10 days':'10 giorni','30 days':'30 giorni'};if(m[en])return m[en];if(en.indexOf('Concentration, up to ')===0){var rest=en.substring('Concentration, up to '.length);return 'Concentrazione, fino a '+(m[rest]||rest)}return en}
 function _trRange(en){if(_spLang()!=='it'||!en)return en;var direct={'Self':'Incantatore','Touch':'Contatto','Sight':'Vista','Special':'Speciale','Unlimited':'Illimitata'};if(direct[en])return direct[en];var mt;mt=en.match(/^(\d+) feet$/);if(mt)return _ftToM(parseInt(mt[1]))+' metri';mt=en.match(/^(\d+) miles?$/);if(mt){var mi=parseInt(mt[1]);return (mi*1.5)+' km'}var shapeMap={radius:'raggio',sphere:'sfera',cone:'cono',line:'linea',cube:'cubo',cylinder:'cilindro',hemisphere:'emisfera','square':'quadrato'};mt=en.match(/^Self \((\d+)-foot ([a-z]+)\)$/);if(mt){var sh=shapeMap[mt[2]]||mt[2];return 'Incantatore ('+sh+' di '+_ftToM(parseInt(mt[1]))+' metri)'}mt=en.match(/^Self \((\d+)-mile (radius)\)$/);if(mt)return 'Incantatore (raggio di '+(parseInt(mt[1])*1.5)+' km)';/* "60 feet (X-foot ...)" pattern (rare) — fallback */return en}
 function _trComponents(c){var p=[];if(c.verbal)p.push('V');if(c.somatic)p.push('S');if(c.material)p.push('M');var s=p.join(', ');if(c.material&&c.materialDesc)s+=' ('+_trMaterialDesc(c.materialDesc)+')';return s}
-/* Conversione regex per i campi materialDesc del database. Copre i
-   pattern comuni di D&D 5e: "worth at least X gp", "a pinch of X",
-   nomi di materiali ricorrenti. Non perfetto, ma copre l'80% delle
-   occorrenze; il resto resta in inglese (fallback grazioso). */
+/* Conversione materialDesc: gestisce solo pattern interi noti per
+   evitare di mescolare parole inglesi con preposizioni italiane. Per
+   spell con material descriptions complesse, la traduzione completa
+   richiede una entry SPELLS_IT[name].materialDesc dedicata (TODO). */
+var _MATERIAL_PATTERNS=[
+  /* Pattern interi (string completo) — i più comuni di D&D 5e */
+  ['a pinch of dust','un pizzico di polvere'],
+  ['a pinch of salt','un pizzico di sale'],
+  ['a pinch of sand','un pizzico di sabbia'],
+  ['a pinch of ash','un pizzico di cenere'],
+  ['a pinch of soot','un pizzico di fuliggine'],
+  ['a pinch of dust or a few drops of water','un pizzico di polvere o qualche goccia d\'acqua'],
+  ['a small piece of bone','un pezzetto di osso'],
+  ['a piece of fine silk','un pezzo di seta fine'],
+  ['a piece of cured leather','un pezzo di cuoio conciato'],
+  ['a drop of blood','una goccia di sangue'],
+  ['a bit of fleece','un fiocco di lana'],
+  ['a sprig of mistletoe','un rametto di vischio'],
+  ['a holy symbol','un simbolo sacro'],
+  ['holy water','acqua santa'],
+  ['three nutshells','tre gusci di noce'],
+  ['a nutshell','un guscio di noce'],
+  ['mistletoe','vischio'],
+  ['a small mirror','un piccolo specchio'],
+  ['a feather','una piuma'],
+  ['a leaf of mistletoe','una foglia di vischio'],
+  ['a snake\'s tongue','una lingua di serpente'],
+  ['a piece of phosphorus','un pezzo di fosforo'],
+  ['a piece of phosphorus, glowworm, or firefly','un pezzo di fosforo, di lucciola o di luccichella'],
+  ['a small silver bell','una piccola campanella d\'argento'],
+  ['fine wire','filo sottile'],
+  ['a few drops of bitumen and a spider','qualche goccia di bitume e un ragno'],
+  ['phosphorus or wychwood','fosforo o legno di stregoneria'],
+  ['a forked metallic rod worth at least 250 gp','una verga metallica biforcuta del valore di almeno 250 mo'],
+  ['a forked metal rod worth at least 250 gp','una verga metallica biforcuta del valore di almeno 250 mo'],
+  ['a tiny strip of white cloth','una piccola striscia di stoffa bianca'],
+  ['ashes of a burned holy book','ceneri di un libro sacro bruciato'],
+  ['a bit of straw','un filo di paglia'],
+  ['a drop of pitch','una goccia di pece']
+];
 function _trMaterialDesc(en){
   if(_spLang()!=='it'||!en)return en;
+  var key=en.toLowerCase().trim();
+  /* Match esatto */
+  for(var i=0;i<_MATERIAL_PATTERNS.length;i++){if(_MATERIAL_PATTERNS[i][0].toLowerCase()===key)return _MATERIAL_PATTERNS[i][1]}
+  /* Trasformazioni sicure: solo sui prefissi/pattern interi che non
+     producono "miscuglio" mid-frase */
   var s=en;
-  /* Frasi monetarie (X mo = monete d'oro, ma = mon. argento, mr = rame) */
+  /* Frasi monetarie — sicure perché gp è sempre una unità isolata */
   s=s.replace(/worth at least (\d+(?:,\d{3})*) gp(?: each)?/gi,'del valore di almeno $1 mo');
   s=s.replace(/worth (\d+(?:,\d{3})*) gp or more/gi,'del valore di $1 mo o più');
   s=s.replace(/worth (\d+(?:,\d{3})*) gp/gi,'del valore di $1 mo');
-  s=s.replace(/(\d+(?:,\d{3})*) gp(?: in value)?/gi,'$1 mo');
-  s=s.replace(/at least (\d+) gp in value/gi,'almeno $1 mo di valore');
-  s=s.replace(/totaling (\d+(?:,\d{3})*) gp/gi,'per un totale di $1 mo');
-  /* Quantità tipiche */
-  s=s.replace(/^a pinch of /i,'un pizzico di ');
-  s=s.replace(/^a small piece of /i,'un pezzetto di ');
-  s=s.replace(/^a piece of /i,'un pezzo di ');
-  s=s.replace(/^a drop of /i,'una goccia di ');
-  s=s.replace(/^a bit of /i,'un poco di ');
-  s=s.replace(/^a tiny piece of /i,'una minuscola scheggia di ');
-  s=s.replace(/^a tiny /i,'un minuscolo ');
-  s=s.replace(/^a few /i,'alcuni ');
-  s=s.replace(/^a small /i,'un piccolo ');
-  s=s.replace(/^a handful of /i,'una manciata di ');
-  s=s.replace(/^a vial of /i,'una fiala di ');
-  s=s.replace(/^a strip of /i,'una striscia di ');
-  s=s.replace(/^a sprig of /i,'un rametto di ');
-  s=s.replace(/^a sprinkle of /i,'una spruzzata di ');
-  s=s.replace(/^a forked metallic rod /i,'una bacchetta metallica biforcuta ');
-  /* Materiali comuni — sostituzione case-insensitive su parola intera */
-  var dict={
-    'dust':'polvere','sand':'sabbia','ash':'cenere','ashes':'ceneri',
-    'bone':'osso','bones':'ossa','skull':'teschio','tooth':'dente','teeth':'denti',
-    'silver':'argento','gold':'oro','iron':'ferro','copper':'rame','mercury':'mercurio',
-    'lead':'piombo','platinum':'platino','tin':'stagno',
-    'crystal':'cristallo','glass':'vetro','jade':'giada','pearl':'perla','pearls':'perle',
-    'diamond':'diamante','diamonds':'diamanti','ruby':'rubino','sapphire':'zaffiro','emerald':'smeraldo',
-    'feather':'piuma','feathers':'piume','fur':'pelo','hair':'capello','hairs':'capelli',
-    'bat':'pipistrello','spider':'ragno','snake':'serpente','rat':'topo',
-    'leaf':'foglia','leaves':'foglie','flower':'fiore','flowers':'fiori','petal':'petalo','petals':'petali',
-    'thorn':'spina','thorns':'spine','seed':'seme','seeds':'semi','root':'radice','roots':'radici',
-    'twig':'rametto','wood':'legno','bark':'corteccia','wax':'cera','salt':'sale',
-    'water':'acqua','blood':'sangue','tear':'lacrima','tears':'lacrime','sweat':'sudore',
-    'oil':'olio','wine':'vino','milk':'latte','honey':'miele','egg':'uovo','eggs':'uova',
-    'incense':'incenso','candle':'candela','candles':'candele','torch':'torcia',
-    'string':'spago','rope':'corda','silk':'seta','wool':'lana','cloth':'stoffa',
-    'parchment':'pergamena','paper':'carta','book':'libro','scroll':'pergamena',
-    'gem':'gemma','gems':'gemme','gemstone':'gemma','gemstones':'gemme',
-    'powder':'polvere','iron filings':'limatura di ferro','silver dust':'polvere d\'argento',
-    'phosphorus':'fosforo','sulfur':'zolfo','saltpeter':'salnitro',
-    'tongue':'lingua','eye':'occhio','eyes':'occhi','heart':'cuore','liver':'fegato',
-    'feather of a':'piuma di un','tail of a':'coda di un','wing of a':'ala di un',
-    'ring':'anello','amulet':'amuleto','pendant':'pendaglio','holy symbol':'simbolo sacro',
-    'staff':'bastone','wand':'bacchetta','rod':'verga','sword':'spada','dagger':'pugnale',
-    'arrow':'freccia','bolt':'dardo','bullet':'proiettile',
-    'nut':'noce','nutshell':'guscio di noce','nutshells':'gusci di noce',
-    'mistletoe':'vischio','holly':'agrifoglio','oak':'quercia',
-    'and':'e','or':'o','with':'con','of':'di','from':'da','for':'per','the':'il',
-    'each':'ciascuno','at least':'almeno','more':'più','small':'piccolo','large':'grande',
-    'tiny':'minuscolo','minute':'minuto','rare':'raro','exotic':'esotico'
-  };
-  /* Sostituzione case-insensitive su parola intera */
-  Object.keys(dict).forEach(function(en){
-    var rx=new RegExp('\\b'+en.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','gi');
-    s=s.replace(rx,dict[en]);
-  });
+  s=s.replace(/(\d+(?:,\d{3})*) gp\b/gi,'$1 mo');
+  /* Se nessuna trasformazione monetaria è stata applicata e non è un
+     pattern noto, restituisci l'inglese (meglio che il miscuglio). */
   return s;
 }
 /* Lingua incantesimi: 'it' (default) o 'en'. In italiano cerchiamo
