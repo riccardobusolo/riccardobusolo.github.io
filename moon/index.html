@@ -3274,6 +3274,18 @@ window.cmSUBCLASSES=SUBCLASSES;window.cm_subclassesFor=_subclassesFor;window.cm_
    sottoclasse magica (Guerriero+EK, Ladro+AT) usa la lista del Mago
    filtrata per le scuole canoniche. Restituisce {matches, newCount,
    classNames, schoolFilter}. */
+/* Risolve il "nome inglese" di una entry esistente: se ha nEn la
+   usa, altrimenti prova un match inverso su SPELLS_IT (caso entry
+   pre-import multilingua). */
+function _spResolveEn(stored){
+  if(!stored)return '';
+  if(stored.nEn)return stored.nEn;
+  /* legacy: se l'entry non ha nEn, controlla se il suo n è il nome
+     italiano di una spell nota → restituisci la sua chiave inglese. */
+  var IT=window.SPELLS_IT||{};
+  for(var en in IT){if(IT.hasOwnProperty(en)){var t=IT[en];if(t&&(t.name===stored.n||en===stored.n))return en}}
+  return stored.n||'';
+}
 function _spImportPlan(c){
   var ck=c.classKey||'';var sk=c.subclassKey||'';
   var classMap={wizard:['Wizard'],cleric:['Cleric'],druid:['Druid'],'bard-2014':['Bard'],'bard-2024':['Bard'],'sorcerer-2014':['Sorcerer'],'sorcerer-2024':['Sorcerer'],'paladin-2014':['Paladin'],'paladin-2024':['Paladin'],'ranger-2014':['Ranger'],'ranger-2024':['Ranger'],artificer:['Artificer'],warlock:['Warlock']};
@@ -3290,24 +3302,40 @@ function _spImportPlan(c){
   });
   if(!c.cantrips)c.cantrips=[];
   if(!c.spBook)c.spBook=[[],[],[],[],[],[],[],[],[]];
+  /* Duplicate check cross-lingua: usa il nome inglese come chiave. */
+  var IT=window.SPELLS_IT||{};
+  var hasCantrip=function(spName){return c.cantrips.some(function(n){if(n===spName)return true;var t=IT[spName];if(t&&t.name===n)return true;return false})};
+  var hasInBook=function(bl,spName){return c.spBook[bl].some(function(s){return _spResolveEn(s)===spName})};
   var newCount=0;
   matches.forEach(function(sp){
-    if(sp.level===0){if(c.cantrips.indexOf(sp.name)<0)newCount++}
-    else{var bl=sp.level-1;if(!c.spBook[bl].some(function(s){return s.n===sp.name}))newCount++}
+    if(sp.level===0){if(!hasCantrip(sp.name))newCount++}
+    else{if(!hasInBook(sp.level-1,sp.name))newCount++}
   });
   return {matches:matches,newCount:newCount,classNames:classNames,schoolFilter:schoolFilter};
 }
 function _spImportApply(c,matches){
   if(!c.cantrips)c.cantrips=[];if(!c.spBook)c.spBook=[[],[],[],[],[],[],[],[],[]];
   var compStr=function(comp){if(!comp)return '';var p=[];if(comp.verbal)p.push('V');if(comp.somatic)p.push('S');if(comp.material)p.push('M');var s=p.join(', ');if(comp.material&&comp.materialDesc)s+=' ('+comp.materialDesc+')';return s};
+  /* Lingua attiva: usata per name/description/higherLevels al momento
+     del salvataggio. Il nome inglese viene preservato in `nEn` per
+     duplicate check robusto su re-import in lingue diverse. */
+  var lang=(typeof window._spLang==='function')?window._spLang():(localStorage.getItem('cm_spell_lang')==='en'?'en':'it');
+  var IT=window.SPELLS_IT||{};
   var added=0;
+  var hasCantrip=function(spName){return c.cantrips.some(function(n){if(n===spName)return true;var t=IT[spName];if(t&&t.name===n)return true;return false})};
+  var hasInBook=function(bl,spName){return c.spBook[bl].some(function(s){return _spResolveEn(s)===spName})};
   matches.forEach(function(sp){
+    var t=IT[sp.name];
+    var dispName=(lang==='it'&&t&&t.name)?t.name:sp.name;
+    var dispDesc=(lang==='it'&&t&&t.description)?t.description:(sp.description||'');
+    var dispHL=(lang==='it'&&t&&t.higherLevels!==undefined)?t.higherLevels:sp.higherLevels;
+    var hlLabel=lang==='it'?'Ai livelli superiori':'At Higher Levels';
     if(sp.level===0){
-      if(c.cantrips.indexOf(sp.name)<0){c.cantrips.push(sp.name);added++}
+      if(!hasCantrip(sp.name)){c.cantrips.push(dispName);added++}
     }else{
       var bl=sp.level-1;
-      if(!c.spBook[bl].some(function(s){return s.n===sp.name})){
-        c.spBook[bl].push({n:sp.name,p:false,ct:sp.castingTime||'',rg:sp.range||'',cmp:compStr(sp.components||{}),dur:sp.duration||'',desc:(sp.description||'')+(sp.higherLevels?'\n\nAi livelli superiori: '+sp.higherLevels:''),school:sp.school||'',classes:(sp.classes||[]).join(', '),source:sp.source||''});
+      if(!hasInBook(bl,sp.name)){
+        c.spBook[bl].push({n:dispName,nEn:sp.name,p:false,ct:sp.castingTime||'',rg:sp.range||'',cmp:compStr(sp.components||{}),dur:sp.duration||'',desc:dispDesc+(dispHL?'\n\n'+hlLabel+': '+dispHL:''),school:sp.school||'',classes:(sp.classes||[]).join(', '),source:sp.source||''});
         added++;
       }
     }
