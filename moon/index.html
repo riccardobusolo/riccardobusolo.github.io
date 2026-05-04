@@ -27,6 +27,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 html,body{cursor:var(--cur-default)}
 input[type="text"],input[type="search"],input[type="number"],input[type="email"],input[type="password"],input[type="url"],input[type="tel"],input:not([type]),textarea,[contenteditable="true"]{cursor:var(--cur-text)}
 button:disabled,input:disabled,select:disabled,textarea:disabled,[disabled],[aria-disabled="true"]{cursor:var(--cur-na)}
+/* Elementi con HTML5 drag attivo: cursore esplicito per evitare il flash al
+   cursore di sistema durante il "potential drag" mode del browser.
+   I figli ereditano (cursor è inherited per default) ma rule specifiche tipo
+   .btn:cursor:var(--cur-pointer) vincono per specificità classe. */
+[draggable="true"]{cursor:var(--cur-grab)}
+[draggable="true"]:active{cursor:var(--cur-grabbing)}
 /* Modalità "Cursori sistema": disattiva i cursori custom forzando i valori CSS standard */
 body.no-custom-cursor{--cur-default:default;--cur-pointer:pointer;--cur-text:text;--cur-grab:grab;--cur-grabbing:grabbing;--cur-ew:ew-resize;--cur-ns:ns-resize;--cur-nwse:nwse-resize;--cur-nesw:nesw-resize;--cur-na:not-allowed}
 :root[data-theme="dark"] .main::before,:root[data-theme="light"] .main::before{display:none}
