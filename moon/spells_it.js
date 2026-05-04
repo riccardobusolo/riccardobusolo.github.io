@@ -773,6 +773,16 @@ window.SPELLS_IT = {
     description: "L'energia curativa si irradia da te in un'aura di 9 metri di raggio. Fino al termine dell'incantesimo, l'aura si muove con te, centrata su di te. Puoi usare un'azione bonus per far recuperare 2d6 punti ferita a una creatura nell'aura (incluso te stesso).",
     higherLevels: null
   },
+  "Aura of Life": {
+    name: "Aura di Vita",
+    description: "Un'aura protettiva con raggio di 9 metri si irradia da te e ti accompagna nei tuoi spostamenti. Fino al termine dell'incantesimo, ogni creatura non ostile entro l'aura (incluso te) ottiene resistenza ai danni necrotici e il suo massimo dei punti ferita non può essere abbassato. Inoltre, una creatura vivente non ostile entro l'aura recupera 1 punto ferita all'inizio del proprio turno se ha 0 punti ferita.",
+    higherLevels: null
+  },
+  "Aura of Purity": {
+    name: "Aura di Purezza",
+    description: "Un'aura purificatrice con raggio di 9 metri emana da te e ti segue nei movimenti. Fino al termine dell'incantesimo, ogni creatura non ostile entro l'aura (incluso te) non può ammalarsi, ottiene resistenza ai danni da veleno e ha vantaggio ai tiri salvezza contro effetti che impongono una delle seguenti condizioni: accecato, ammaliato, assordato, avvelenato, paralizzato, spaventato o stordito.",
+    higherLevels: null
+  },
   "Beacon of Hope": {
     name: "Faro di Speranza",
     description: "Questo incantesimo conferisce speranza e vitalità. Scegli un numero qualsiasi di creature entro la gittata. Per la durata, ogni bersaglio ha vantaggio ai tiri salvezza Saggezza e ai tiri salvezza contro morte, e recupera il numero massimo possibile di punti ferita da qualsiasi cura.",
