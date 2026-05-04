@@ -27,6 +27,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 html,body{cursor:var(--cur-default)}
 input[type="text"],input[type="search"],input[type="number"],input[type="email"],input[type="password"],input[type="url"],input[type="tel"],input:not([type]),textarea,[contenteditable="true"]{cursor:var(--cur-text)}
 button:disabled,input:disabled,select:disabled,textarea:disabled,[disabled],[aria-disabled="true"]{cursor:var(--cur-na)}
+/* Modalità "Cursori sistema": disattiva i cursori custom forzando i valori CSS standard */
+body.no-custom-cursor{--cur-default:default;--cur-pointer:pointer;--cur-text:text;--cur-grab:grab;--cur-grabbing:grabbing;--cur-ew:ew-resize;--cur-ns:ns-resize;--cur-nwse:nwse-resize;--cur-nesw:nesw-resize;--cur-na:not-allowed}
 :root[data-theme="dark"] .main::before,:root[data-theme="light"] .main::before{display:none}
 :root[data-theme="dark"] .scbg,:root[data-theme="light"] .scbg{display:none}
 :root[data-theme="dark"] #fireCanvas,:root[data-theme="dark"] #maskCanvas,:root[data-theme="light"] #fireCanvas,:root[data-theme="light"] #maskCanvas{display:none}
@@ -64,8 +66,10 @@ button:disabled,input:disabled,select:disabled,textarea:disabled,[disabled],[ari
 .setpanel__title svg{stroke:currentColor;fill:none;stroke-width:1.6}
 .setpanel__close{width:1.75rem;height:1.75rem;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;font-size:1.2rem;line-height:1;transition:all .12s}
 .setpanel__close:hover{background:var(--rl);color:var(--red);border-color:var(--rb)}
-.setpanel__body{padding:1rem 1.125rem;display:flex;gap:1.5rem;flex-wrap:wrap;overflow-y:auto;flex:1;scrollbar-width:thin}
-.setpanel__sec{flex:1;min-width:13.75rem;display:flex;flex-direction:column;gap:.375rem}
+.setpanel__body{padding:1rem 1.125rem;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem 1.5rem;overflow-y:auto;flex:1;scrollbar-width:thin}
+@media (max-width:900px){.setpanel__body{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.setpanel__body{grid-template-columns:minmax(0,1fr)}}
+.setpanel__sec{display:flex;flex-direction:column;gap:.375rem;min-width:0}
 .setpanel__h4{font-family:var(--mono);font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin:0 0 .25rem;padding-bottom:.25rem;border-bottom:1px solid var(--border)}
 .setpanel__btn{display:flex;align-items:center;gap:.5625rem;padding:.5625rem .75rem;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text);cursor:var(--cur-pointer);font-family:var(--mono);font-size:.72rem;text-align:left;transition:all .12s;width:100%}
 .setpanel__btn:hover{border-color:rgba(196,154,50,.4);color:var(--gold);background:rgba(196,154,50,.05)}
@@ -95,7 +99,7 @@ button:disabled,input:disabled,select:disabled,textarea:disabled,[disabled],[ari
 .setpanel__fsbtn.on{background:rgba(196,154,50,.1);color:var(--gold);border-color:rgba(196,154,50,.5)}
 .setpanel__fsicon{font-weight:700;line-height:1;color:inherit}
 .setpanel__fslbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.04em}
-.setpanel__tools{display:grid;grid-template-columns:1fr 1fr;gap:.25rem}
+.setpanel__tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:.25rem}
 .setpanel__toolbtn{display:flex;align-items:center;gap:.5rem;padding:.375rem .5625rem;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:var(--cur-pointer);font-family:var(--mono);font-size:.7rem;transition:all .12s;text-align:left;width:100%}
 .setpanel__toolbtn:hover{border-color:var(--bh);color:var(--dim)}
 .setpanel__toolbtn.on{background:rgba(196,154,50,.08);color:var(--text);border-color:rgba(196,154,50,.35)}
@@ -1907,6 +1911,14 @@ button:disabled,input:disabled,select:disabled,textarea:disabled,[disabled],[ari
 <div class="setpanel__hint">Il Player's Handbook è sempre attivo. Disattiva un'espansione per nascondere i suoi incantesimi dallo strumento Incantesimi e dal filtro Manuali.</div>
 </section>
 <section class="setpanel__sec">
+<h4 class="setpanel__h4">🖱 Cursori</h4>
+<div class="setpanel__themegrp">
+<button class="setpanel__themebtn" data-cursor="custom" title="Usa i cursori personalizzati a tema (default)"><span class="setpanel__themelbl">Personalizzati</span></button>
+<button class="setpanel__themebtn" data-cursor="system" title="Usa i cursori standard del sistema operativo"><span class="setpanel__themelbl">Sistema</span></button>
+</div>
+<div class="setpanel__hint">Disattiva i cursori personalizzati per usare quelli predefiniti del sistema operativo.</div>
+</section>
+<section class="setpanel__sec">
 <h4 class="setpanel__h4">🧰 Visualizzazione strumenti</h4>
 <div class="setpanel__tools" id="setToolList"></div>
 </section>
@@ -2138,6 +2150,20 @@ document.querySelectorAll('.setpanel__themebtn[data-book]').forEach(function(b){
   if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets();
 }});
 var origSetOpenBk=setOpen;setOpen=function(){origSetOpenBk();refreshBooks()};
+/* Cursori: 'custom' (default) usa i cursori SVG personalizzati;
+   'system' applica .no-custom-cursor su <body> e ricade sui cursori del browser. */
+function refreshCursorMode(){
+  var mode=localStorage.getItem('cm_cursors')==='off'?'system':'custom';
+  document.body.classList.toggle('no-custom-cursor',mode==='system');
+  document.querySelectorAll('.setpanel__themebtn[data-cursor]').forEach(function(b){if(b.dataset.cursor===mode)b.classList.add('on');else b.classList.remove('on')});
+}
+refreshCursorMode();
+document.querySelectorAll('.setpanel__themebtn[data-cursor]').forEach(function(b){b.onclick=function(){
+  var m=b.dataset.cursor;if(m!=='custom'&&m!=='system')return;
+  if(m==='system')localStorage.setItem('cm_cursors','off');else localStorage.removeItem('cm_cursors');
+  refreshCursorMode();
+}});
+var origSetOpenCur=setOpen;setOpen=function(){origSetOpenCur();refreshCursorMode()};
 var origSetOpen2=setOpen;setOpen=function(){origSetOpen2();refreshTheme()};
 var origSetOpen=setOpen;setOpen=function(){origSetOpen();refreshFs()};
 function _getHiddenTools(){try{return JSON.parse(localStorage.getItem('cm_tool_hidden')||'[]')||[]}catch(e){return[]}}
