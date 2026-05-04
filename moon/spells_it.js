@@ -897,7 +897,7 @@ window.SPELLS_IT = {
     higherLevels: "Al 5° livello, il doppio. Al 7° livello, tre volte tanto. Al 9° livello, quattro volte tanto."
   },
   "Conjure Barrage": {
-    name: "Evocare Sbarramento",
+    name: "Evoca Pioggia di Armi",
     description: "Lanci un'arma non magica o un pezzo di munizione non magico nell'aria per creare un cono di armi identiche. Ogni creatura in un cono di 18 metri deve effettuare un tiro salvezza Destrezza, subendo 3d8 danni con un fallimento, o metà con un successo. Il tipo di danno è lo stesso dell'arma o della munizione.",
     higherLevels: null,
     materialDesc: "una munizione o un'arma da lancio"
