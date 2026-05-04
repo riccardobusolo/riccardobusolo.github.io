@@ -488,7 +488,7 @@ window.SPELLS_IT = {
     materialDesc: "un pezzo di spago e un pochino di legno"
   },
   "Witch Bolt": {
-    name: "Dardo della Strega",
+    name: "Dardo Stregato",
     description: "Un raggio di energia crepitante e blu colpisce una creatura entro la gittata, formando un arco sostenuto di fulmine tra te e il bersaglio. Esegui un attacco a distanza con incantesimo. Se colpisci, il bersaglio subisce 1d12 danni da fulmine, e in ciascuno dei tuoi turni per la durata, puoi usare la tua azione per infliggere 1d12 danni da fulmine al bersaglio automaticamente. L'incantesimo termina se usi la tua azione per fare qualcos'altro, o se il bersaglio si trova al di fuori della gittata dell'incantesimo o ha copertura totale rispetto a te.",
     higherLevels: "Il danno iniziale aumenta di 1d12 per ogni livello di slot superiore al 1°.",
     materialDesc: "un rametto di un albero colpito da un fulmine"
@@ -1677,7 +1677,7 @@ window.SPELLS_IT = {
     materialDesc: "una piccola sfera di cristallo"
   },
   "Otto's Irresistible Dance": {
-    name: "Danza Irresistibile",
+    name: "Danza Irresistibile di Otto",
     description: "Scegli una creatura entro la gittata. Il bersaglio inizia una comica danza sul posto: trascinando i piedi, picchiettando e saltellando. Le creature che non possono essere ammaliate sono immuni. Una creatura danzante deve usare tutto il suo movimento per danzare senza lasciare il proprio spazio e ha svantaggio ai tiri salvezza Destrezza e ai tiri per colpire. Le altre creature hanno vantaggio ai tiri per colpire contro di essa. Come azione, la creatura danzante effettua un tiro salvezza Saggezza per terminare l'effetto.",
     higherLevels: null
   },
