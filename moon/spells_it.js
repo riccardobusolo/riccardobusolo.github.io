@@ -500,7 +500,7 @@ window.SPELLS_IT = {
     materialDesc: "un rametto di un albero colpito da un fulmine"
   },
   "Wrathful Smite": {
-    name: "Punizione Iraconda",
+    name: "Punizione Collerica",
     description: "La prossima volta che colpisci con un attacco in mischia con un'arma durante la durata dell'incantesimo, l'attacco infligge 1d6 danni psichici aggiuntivi. Inoltre, se il bersaglio è una creatura, deve effettuare un tiro salvezza Saggezza o essere spaventato da te fino al termine dell'incantesimo. Come azione, la creatura può effettuare una prova di Saggezza contro la CD del tiro salvezza del tuo incantesimo per ritrovare la determinazione e terminare l'incantesimo.",
     higherLevels: null
   },
@@ -874,6 +874,11 @@ window.SPELLS_IT = {
     name: "Scagliare Maledizione",
     description: "Tocchi una creatura, e quella creatura deve riuscire in un tiro salvezza Saggezza o diventare maledetta. Scegli uno di quattro effetti: svantaggio alle prove di caratteristica e ai tiri salvezza con un valore di caratteristica; svantaggio ai tiri per colpire contro di te; deve effettuare un tiro salvezza Saggezza ogni turno o sprecare la sua azione; oppure i tuoi attacchi e incantesimi infliggono 1d8 danni necrotici aggiuntivi.",
     higherLevels: "Al 4° livello, concentrazione fino a 10 minuti. Al 5°, 8 ore (senza concentrazione). Al 7°, 24 ore. Al 9°, finché non viene dissolta."
+  },
+  "Blinding Smite": {
+    name: "Punizione Accecante",
+    description: "Al prossimo colpo a segno con un attacco con un'arma da mischia mentre l'incantesimo è attivo, l'arma s'illumina di luce intensa. L'attacco infligge 3d8 danni radiosi extra al bersaglio, che deve effettuare un TS Costituzione: se lo fallisce, è accecato finché l'incantesimo non termina. Una creatura accecata da questo incantesimo ripete il TS Costituzione alla fine di ogni proprio turno; con un successo, non è più accecata.",
+    higherLevels: null
   },
   "Blink": {
     name: "Intermittenza",
@@ -1294,7 +1299,7 @@ window.SPELLS_IT = {
     materialDesc: "un bozzolo di bruco"
   },
   "Staggering Smite": {
-    name: "Punizione Stordente",
+    name: "Punizione Demoralizzante",
     description: "La prossima volta che colpisci una creatura con un attacco in mischia con un'arma durante la durata dell'incantesimo, la tua arma trafigge sia il corpo che la mente, e l'attacco infligge 4d6 danni psichici aggiuntivi al bersaglio. Il bersaglio deve effettuare un tiro salvezza Saggezza. Con un fallimento, ha svantaggio ai tiri per colpire e alle prove di caratteristica, e non può eseguire reazioni, fino alla fine del suo prossimo turno.",
     higherLevels: null
   },
@@ -1337,7 +1342,7 @@ window.SPELLS_IT = {
     materialDesc: "un'agata del valore di almeno 1.000 mo, consumata"
   },
   "Banishing Smite": {
-    name: "Punizione Bandente",
+    name: "Punizione Esiliante",
     description: "La prossima volta che colpisci una creatura con un attacco con un'arma, la tua arma scintilla di forza, e l'attacco infligge 5d10 danni da forza aggiuntivi al bersaglio. Inoltre, se questo attacco riduce il bersaglio a 50 punti ferita o meno, lo bandisci. Se il bersaglio è nativo di un piano di esistenza diverso, scompare e ritorna al suo piano d'origine. Se è nativo del tuo piano, svanisce in un semipiano innocuo ed è incapacitato lì. Quando l'incantesimo termina, il bersaglio riappare nello spazio che ha lasciato.",
     higherLevels: null
   },
@@ -1968,9 +1973,9 @@ window.SPELLS_IT = {
   // ============================================================
   "Astral Projection": {
     name: "Proiezione Astrale",
-    description: "Tu e fino a otto creature consenzienti entro la gittata proiettate i vostri corpi astrali nel Piano Astrale. Il corpo materiale che lasci dietro di te è incosciente e in uno stato di animazione sospesa; non ha bisogno di cibo o aria e non invecchia. Il tuo corpo astrale assomiglia alla tua forma mortale in quasi ogni modo, replicando le tue statistiche di gioco e i tuoi possedimenti. La principale differenza è l'aggiunta di un cordone argenteo che si estende tra le tue scapole e si trascina dietro di te, scomparendo all'invisibilità dopo 30 cm. Se il cordone viene tagliato, la tua anima e il tuo corpo si separano, uccidendoti istantaneamente.",
+    description: "L'incantatore e fino a otto creature consenzienti entro gittata proiettano la propria forma astrale sul Piano Astrale. Se l'incantatore si trova già sul Piano Astrale, il lancio fallisce e gli ingredienti vengono comunque consumati. Ogni corpo materiale lasciato indietro cade privo di sensi in animazione sospesa: non necessita di cibo né di aria e non invecchia.\n\nLa forma astrale ricalca quella mortale in quasi ogni dettaglio, conservando statistiche e capacità di gioco. La differenza distintiva è un cordone d'argento che parte tra le scapole e si dispiega alle spalle del proiettato, divenendo invisibile oltre i primi 30 cm. Questo filamento collega la forma astrale al corpo fisico, e finché resta integro l'incantatore conserva la via del ritorno. Se un effetto specifico recide il cordone, anima e corpo si separano e l'incantatore muore all'istante.\n\nLa forma astrale può attraversare liberamente il Piano Astrale e usare i suoi portali per raggiungere altri piani. Quando l'incantatore raggiunge un nuovo piano (o torna a quello d'origine), corpo e oggetti vengono trasferiti lungo il cordone d'argento e l'incantatore rientra nel proprio corpo all'arrivo. La forma astrale è un'incarnazione separata: danni o altri effetti subiti su di essa non si applicano al corpo materiale né persistono al ritorno.\n\nL'incantesimo dura per l'incantatore e i suoi compagni finché l'incantatore non lo termina con un'azione; al termine ogni creatura coinvolta torna nel proprio corpo e si risveglia.\n\nL'effetto può anche concludersi prematuramente per una singola creatura. Un dissolvi magie efficace contro la forma astrale o il corpo fisico di una creatura termina l'incantesimo per quella sola creatura. Allo stesso modo, scendere a 0 PF nella forma astrale o nel corpo originale conclude l'incantesimo per quella creatura. Se al momento della fine il cordone d'argento è ancora intatto, esso trascina la forma astrale dentro il corpo materiale, ponendo fine all'animazione sospesa. Se l'incantatore rientra in anticipo, i compagni restano nelle loro forme astrali e devono trovare da soli la via di ritorno (di norma scendendo a 0 PF nella forma astrale).",
     higherLevels: null,
-    materialDesc: "per ciascuna creatura coinvolta, un giacinto del valore di almeno 1.000 mo e una barra d'argento finemente intagliata del valore di almeno 100 mo"
+    materialDesc: "per ciascuna creatura coinvolta, un giacinto del valore di almeno 1.000 mo e una barra d'argento finemente intagliata del valore di almeno 100 mo, entrambi consumati dall'incantesimo"
   },
   "Foresight": {
     name: "Previsione",
