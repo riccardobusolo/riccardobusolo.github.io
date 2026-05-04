@@ -894,7 +894,7 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Leomund's Tiny Hut": {
-    name: "Capanna",
+    name: "Capanna di Leomund",
     description: "Una cupola di forza immobile di 3 metri di raggio appare attorno e sopra di te e rimane stazionaria per la durata. L'incantesimo termina se lasci la sua area. Nove creature di taglia Media o inferiore possono entrarvi con te. Le creature e gli oggetti all'interno della cupola al momento del lancio dell'incantesimo possono muoversi liberamente attraverso di essa. Tutte le altre creature e oggetti non possono attraversarla. Gli incantesimi e gli altri effetti magici non possono estendersi attraverso la cupola o essere lanciati attraverso di essa.",
     higherLevels: null
   },
