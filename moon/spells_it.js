@@ -215,7 +215,7 @@ window.SPELLS_IT = {
     higherLevels: "Puoi bersagliare una creatura aggiuntiva per ogni livello di slot superiore al 1°."
   },
   "Chromatic Orb": {
-    name: "Sfera Cromatica",
+    name: "Globo Cromatico",
     description: "Lanci una sfera di energia di 10 centimetri di diametro contro una creatura entro la gittata. Scegli acido, freddo, fuoco, fulmine, veleno o tuono per il tipo di sfera che crei, poi esegui un attacco a distanza con incantesimo. Se colpisci, la creatura subisce 3d8 danni del tipo scelto.",
     higherLevels: "Il danno aumenta di 1d8 per ogni livello di slot superiore al 1°.",
     materialDesc: "un diamante del valore di almeno 50 mo"
@@ -718,7 +718,7 @@ window.SPELLS_IT = {
     higherLevels: "Il bonus aumenta a +2 quando usi uno slot di 4° livello, e a +3 quando usi uno slot di 6° livello o superiore."
   },
   "Melf's Acid Arrow": {
-    name: "Freccia Acida",
+    name: "Freccia Acida di Melf",
     description: "Una scintillante freccia verde sfreccia verso un bersaglio entro la gittata ed esplode in uno spruzzo di acido. Esegui un attacco a distanza con incantesimo. Se colpisci, il bersaglio subisce immediatamente 4d4 danni acidi e 2d4 danni acidi alla fine del suo prossimo turno. Se manchi, la freccia spruzza il bersaglio con acido per metà del danno iniziale e nessun danno alla fine del suo prossimo turno.",
     higherLevels: "Sia il danno iniziale che quello successivo aumentano di 1d4 per ogni livello di slot superiore al 2°.",
     materialDesc: "foglia di rabarbaro in polvere e uno stomaco di vipera"
