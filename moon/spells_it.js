@@ -212,8 +212,8 @@ window.SPELLS_IT = {
   },
   "Command": {
     name: "Comando",
-    description: "Pronunci un comando di una sola parola a una creatura entro la gittata che puoi vedere. Il bersaglio deve riuscire in un tiro salvezza Saggezza o seguire il comando nel suo prossimo turno. L'incantesimo non ha effetto se il bersaglio è non morto, non comprende la tua lingua, o se il comando è direttamente dannoso. Comandi comuni: Avvicinati, Lascia, Fuggi, Inginocchiati, Fermati.",
-    higherLevels: "Puoi influenzare una creatura aggiuntiva per ogni livello di slot superiore al 1°."
+    description: "Pronunci una singola parola di comando rivolta a una creatura entro la gittata che tu sia in grado di vedere. Il bersaglio deve riuscire in un tiro salvezza Saggezza o sarà costretto a obbedire al comando nel proprio turno successivo. L'incantesimo non ha alcun effetto se il bersaglio è non morto, non comprende la tua lingua, oppure se il comando impartito è dannoso in modo diretto.\n\nDi seguito alcuni comandi tipici e i relativi effetti. Puoi impartire anche comandi diversi: in quei casi il DM decide come si comporta il bersaglio. Se il bersaglio non è in grado di eseguire il comando, l'incantesimo termina.\n\nAvvicinati. Il bersaglio si sposta verso di te lungo il percorso più breve e diretto, terminando il proprio turno appena giunge entro 1,5 metri da te.\n\nFermo. Il bersaglio non si muove e non effettua alcuna azione. Una creatura volante resta sospesa in aria se ne è in grado; in caso contrario vola della distanza minima necessaria a restare in aria.\n\nFuggi. Il bersaglio impiega il proprio turno per allontanarsi da te il più rapidamente possibile.\n\nLascia. Il bersaglio lascia cadere ciò che ha in mano, poi termina il proprio turno.\n\nSupplica. Il bersaglio cade prono e termina il proprio turno.",
+    higherLevels: "Quando lanci questo incantesimo usando uno slot incantesimo di 2° livello o superiore, puoi influenzare una creatura aggiuntiva per ogni slot di livello superiore al 1°. Quando le bersagli, le creature devono trovarsi a non più di 9 metri l'una dall'altra."
   },
   "Compelled Duel": {
     name: "Duello Imposto",
