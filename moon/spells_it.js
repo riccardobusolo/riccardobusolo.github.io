@@ -346,7 +346,7 @@ window.SPELLS_IT = {
     higherLevels: "Il danno aumenta di 1d6 per ogni livello di slot superiore al 1°."
   },
   "Hail of Thorns": {
-    name: "Grandine di Spine",
+    name: "Raffica di Spine",
     description: "La prossima volta che colpisci una creatura con un attacco a distanza con un'arma, una grandine di spine si sprigiona dalla tua arma. Il bersaglio e ogni creatura entro 1,5 metri da esso devono effettuare un tiro salvezza Destrezza. Con un fallimento, una creatura subisce 1d10 danni perforanti. Con un successo, dimezza i danni.",
     higherLevels: "Il danno aumenta di 1d10 per ogni livello di slot superiore al 1° (massimo 6d10)."
   },
