@@ -1483,6 +1483,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <div class="spf__ms" id="msLevel"><button class="spf__btn">Livello <span class="spf__cnt"></span></button><div class="spf__drop"></div></div>
 <div class="spf__ms" id="msSource"><button class="spf__btn">Sorgente <span class="spf__cnt"></span></button><div class="spf__drop"></div></div>
 <button class="spf__fav" id="spFav" title="Mostra preferiti">★</button>
+<button class="spf__fav" id="spSortBtn" title="Ordina la lista" style="font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.5px">↕ Liv</button>
 <button class="spf__fav" id="spLangBtn" title="Cambia lingua incantesimi (italiano / inglese)" style="font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.5px">IT</button>
 </div>
 <div class="spcount" id="spCount"></div>
@@ -3560,7 +3561,13 @@ render()})();
 /* SPELLS */
 (function(){
 var SP=(typeof SPELLS!=='undefined')?SPELLS:[];
-var spSearch=document.getElementById('spSearch'),spList=document.getElementById('spList'),spCount=document.getElementById('spCount'),spFavBtn=document.getElementById('spFav'),spLangBtn=document.getElementById('spLangBtn');
+var spSearch=document.getElementById('spSearch'),spList=document.getElementById('spList'),spCount=document.getElementById('spCount'),spFavBtn=document.getElementById('spFav'),spLangBtn=document.getElementById('spLangBtn'),spSortBtn=document.getElementById('spSortBtn');
+/* Ordinamento: 'level' (default) | 'alpha' | 'school'. Ciclico. */
+function _spSort(){var s=localStorage.getItem('cm_spell_sort');return(s==='alpha'||s==='school')?s:'level'}
+function _refreshSpSortBtn(){if(!spSortBtn)return;var m=_spSort();var lbl=m==='alpha'?'↕ A-Z':m==='school'?'↕ Scuola':'↕ Liv';var hint=m==='alpha'?'nome (A-Z)':m==='school'?'scuola di magia':'livello';spSortBtn.textContent=lbl;spSortBtn.title='Ordinato per '+hint+' — clicca per cambiare'}_refreshSpSortBtn();
+if(spSortBtn)spSortBtn.addEventListener('click',function(){var modes=['level','alpha','school'];var idx=modes.indexOf(_spSort());var next=modes[(idx+1)%modes.length];localStorage.setItem('cm_spell_sort',next);_refreshSpSortBtn();renSp()});
+/* Traduzione scuola (l'oggetto SPELLS ha i nomi inglesi) */
+function _trSchool(en){if(_spLang()!=='it')return en;var m={Abjuration:'Abiurazione',Conjuration:'Evocazione',Divination:'Divinazione',Enchantment:'Ammaliamento',Evocation:'Invocazione',Illusion:'Illusione',Necromancy:'Necromanzia',Transmutation:'Trasmutazione'};return m[en]||en}
 /* Lingua incantesimi: 'it' (default) o 'en'. In italiano cerchiamo
    traduzioni in window.SPELLS_IT (chiavi = nomi inglesi). Se la
    traduzione non esiste, fallback all'inglese. */
@@ -3601,7 +3608,14 @@ if(fCls.length){var match=false;for(var i=0;i<fCls.length;i++){if(s.classes.inde
 if(fLvl.length&&fLvl.indexOf(s.level)<0)return false;
 if(fSrc.length&&fSrc.indexOf(s.source)<0)return false;
 return true});
-filtered.sort(function(a,b){return a.level-b.level||a.name.localeCompare(b.name)});
+var _sortMode=_spSort();
+filtered.sort(function(a,b){
+  var aL=_spLocal(a),bL=_spLocal(b);
+  if(_sortMode==='alpha')return aL.name.localeCompare(bL.name);
+  if(_sortMode==='school'){var sa=_trSchool(a.school),sb=_trSchool(b.school);return sa.localeCompare(sb)||a.level-b.level||aL.name.localeCompare(bL.name)}
+  /* default 'level': livello crescente, poi nome */
+  return a.level-b.level||aL.name.localeCompare(bL.name);
+});
 var countTxt=filtered.length+' incantesim'+(filtered.length===1?'o':'i');if(SP.length)countTxt+=' / '+SP.length+' totali';if(favMode)countTxt+=' \u2605';
 spCount.textContent=countTxt;
 spList.innerHTML='';
@@ -3614,7 +3628,7 @@ var tags='';if(s.concentration)tags+='<span class="spe__tag spe__tag--c" title="
 var clsH=s.classes.map(function(c){return'<span class="spe__cl">'+c+'</span>'}).join('');
 var srcLbl=s.source==="Player's Handbook"?'PHB':s.source==="Tasha's Cauldron of Everything"?"Tasha's":s.source;
 var higherH=s.higherLevels?'<div class="spe__higher"><b>'+(_spLang()==='it'?'Ai livelli superiori:':'At Higher Levels:')+'</b> '+s.higherLevels+'</div>':'';
-d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+rawS.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+rawS.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+s.school+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+s.castingTime+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+s.range+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+s.duration+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+compStr(s.components)+'</span></span></div><div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
+d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+rawS.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+rawS.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+s.castingTime+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+s.range+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+s.duration+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+compStr(s.components)+'</span></span></div><div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
 spList.appendChild(d)})}
 spList.addEventListener('click',function(e){var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}if(e.target.closest('.spe__drag'))return;var spe=e.target.closest('.spe');if(spe)spe.classList.toggle('spe--open')});
 spSearch.addEventListener('input',renSp);
