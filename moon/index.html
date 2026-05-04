@@ -3244,7 +3244,7 @@ var SUBCLASSES={
     {key:'armorer',label:'Armaiolo',edition:'2014'}
   ]
 };
-function _subclassesFor(classKey,ed){if(!classKey)return [];if(!ed)ed=_getDndEdition();var arr=SUBCLASSES[classKey]||[];var filt=arr.filter(function(s){return s.edition==='both'||s.edition===ed});filt.push({key:'custom',label:'Personalizzato',edition:'both'});return filt}
+function _subclassesFor(classKey,ed){if(!classKey)return [];if(!ed)ed=_getDndEdition();var arr=SUBCLASSES[classKey]||[];var filt=arr.filter(function(s){return s.edition==='both'||s.edition===ed});filt.unshift({key:'custom',label:'Personalizzato',edition:'both'});return filt}
 function _subclassByKey(classKey,subKey){if(subKey==='custom')return {key:'custom',label:'Personalizzato',edition:'both'};if(!classKey||!subKey)return null;var arr=SUBCLASSES[classKey]||[];for(var i=0;i<arr.length;i++)if(arr[i].key===subKey)return arr[i];return null}
 function _subclassKeyFromText(classKey,txt){if(!classKey||!txt)return '';var arr=SUBCLASSES[classKey]||[];var t=String(txt).toLowerCase().trim();for(var i=0;i<arr.length;i++){var s=arr[i];if(s.label.toLowerCase()===t)return s.key}return ''}
 function _classByKey(k){var f=null;CLASSES.forEach(function(cd){if(cd.key===k)f=cd});return f}
