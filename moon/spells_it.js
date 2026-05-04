@@ -365,6 +365,12 @@ window.SPELLS_IT = {
     description: "Una creatura consenziente che tocchi viene infusa di coraggio. Fino al termine dell'incantesimo, la creatura è immune all'essere spaventata e ottiene punti ferita temporanei pari al tuo modificatore di caratteristica da incantatore all'inizio di ciascuno dei suoi turni.",
     higherLevels: "Puoi bersagliare una creatura aggiuntiva per ogni livello di slot superiore al 1°."
   },
+  "Hex": {
+    name: "Sortilegio",
+    description: "L'incantatore lancia una maledizione su una creatura entro gittata che riesce a vedere. Per la durata, ogni volta che colpisce il bersaglio con un attacco infligge 1d6 danni necrotici extra. Al lancio, l'incantatore sceglie inoltre una caratteristica: il bersaglio ha svantaggio alle prove di caratteristica effettuate con quella caratteristica. Se il bersaglio scende a 0 PF prima della fine dell'incantesimo, l'incantatore può usare un'azione bonus in un turno successivo per maledire una nuova creatura. Un rimuovi maledizione lanciato sul bersaglio termina prematuramente l'incantesimo.",
+    higherLevels: "Lanciato con uno slot di 3° o 4° livello, la concentrazione può durare fino a 8 ore. Lanciato con uno slot di 5° livello o superiore, fino a 24 ore.",
+    materialDesc: "l'occhio pietrificato di un tritone"
+  },
   "Hunter's Mark": {
     name: "Marchio del Cacciatore",
     description: "Scegli una creatura che puoi vedere entro la gittata e la marchi misticamente come tua preda. Fino al termine dell'incantesimo, infliggi 1d6 danni aggiuntivi al bersaglio ogni volta che lo colpisci con un attacco con un'arma, e hai vantaggio alle prove di Percezione e Sopravvivenza per trovarlo. Se il bersaglio scende a 0 punti ferita, puoi usare un'azione bonus in un turno successivo per marchiare una nuova creatura.",
@@ -1282,7 +1288,7 @@ window.SPELLS_IT = {
     materialDesc: "un sottile foglio di piombo, un pezzo di vetro opaco, un batuffolo di cotone o stoffa e crisolito in polvere"
   },
   "Otiluke's Resilient Sphere": {
-    name: "Sfera Elastica",
+    name: "Sfera Elastica di Otiluke",
     description: "Una sfera di forza scintillante racchiude una creatura o un oggetto di taglia Grande o inferiore entro la gittata. Una creatura non consenziente deve effettuare un tiro salvezza Destrezza o essere racchiusa per la durata. Nulla può attraversare la barriera. La sfera è immune a tutti i danni. Una creatura all'interno può usare la sua azione per spingere contro le pareti della sfera e farla rotolare fino a metà della velocità della creatura. Un incantesimo Disintegrazione che bersaglia la sfera la distrugge senza danneggiare nulla all'interno.",
     higherLevels: null,
     materialDesc: "un pezzo emisferico di cristallo trasparente e un corrispondente pezzo emisferico di gomma arabica"
@@ -1687,7 +1693,7 @@ window.SPELLS_IT = {
     materialDesc: "una lama di ferro e un piccolo sacchetto contenente una miscela di terreni: argilla, terriccio e sabbia"
   },
   "Otiluke's Freezing Sphere": {
-    name: "Sfera Congelante",
+    name: "Sfera Congelante di Otiluke",
     description: "Un globo gelido di energia fredda parte dalle tue dita verso un punto a tua scelta entro la gittata, dove esplode in una sfera di 18 metri di raggio. Ogni creatura nell'area deve effettuare un tiro salvezza Costituzione, subendo 10d6 danni da freddo con un fallimento, o metà con un successo. Se il globo colpisce uno specchio d'acqua o un liquido principalmente acquoso, congela il liquido a una profondità di 15 centimetri su un'area di 9 metri quadrati.",
     higherLevels: "Il danno aumenta di 1d6 per ogni livello di slot superiore al 6°.",
     materialDesc: "una piccola sfera di cristallo"
@@ -1801,7 +1807,7 @@ window.SPELLS_IT = {
     materialDesc: "un portale in miniatura intagliato nell'avorio, un piccolo pezzo di marmo levigato e un cucchiaino d'argento, ciascuno del valore di almeno 5 mo"
   },
   "Mordenkainen's Sword": {
-    name: "Spada Arcana",
+    name: "Spada di Mordenkainen",
     description: "Crei un piano di forza a forma di spada che fluttua entro la gittata. Quando la spada appare, esegui un attacco in mischia con incantesimo contro un bersaglio a tua scelta entro 1,5 metri dalla spada. Se colpisci, il bersaglio subisce 3d10 danni da forza. Fino al termine dell'incantesimo, puoi usare un'azione bonus in ciascuno dei tuoi turni per muovere la spada fino a 6 metri e ripetere l'attacco contro un bersaglio entro 1,5 metri da essa.",
     higherLevels: null,
     materialDesc: "una spada di platino in miniatura con impugnatura e pomolo di rame e zinco, del valore di 250 mo"
@@ -1849,13 +1855,13 @@ window.SPELLS_IT = {
   },
   "Simulacrum": {
     name: "Simulacro",
-    description: "Modelli un duplicato illusorio di una bestia o umanoide che si trova entro la gittata per l'intero tempo di lancio. Il duplicato è una creatura, parzialmente reale, formata da ghiaccio o neve. Sembra essere uguale all'originale ma ha la metà del massimo di punti ferita della creatura ed è formato senza alcun equipaggiamento. Il simulacro è amichevole verso di te e le creature che designi. Obbedisce ai tuoi comandi verbali. Il simulacro non ha la capacità di imparare o diventare più potente, quindi non aumenta mai il suo livello o altre abilità. Se il simulacro viene danneggiato, puoi ripararlo in un laboratorio alchemico usando erbe e minerali rari del valore di 100 mo per punto ferita recuperato.",
+    description: "L'incantatore plasma il duplicato illusorio di una bestia o di un umanoide che deve trovarsi entro gittata per tutto il tempo di lancio. Il duplicato è una creatura parzialmente reale, fatta di neve o ghiaccio, capace di compiere azioni e di subire effetti come una creatura comune. Ha lo stesso aspetto dell'originale, ma possiede metà del massimo di punti ferita e nasce privo di equipaggiamento. Sotto ogni altro aspetto utilizza le statistiche della creatura duplicata, salvo che il suo tipo è Costrutto.\n\nIl simulacro è amichevole verso l'incantatore e le creature da lui designate. Obbedisce ai suoi comandi vocali, si muove e agisce secondo i suoi desideri e in combattimento agisce nel turno dell'incantatore. Il simulacro non è in grado di apprendere o di crescere in potere: non guadagna livelli, le sue caratteristiche non aumentano e non recupera mai gli slot incantesimo spesi.\n\nSe subisce danni, il simulacro può essere riparato in un laboratorio alchemico spendendo 100 mo in minerali ed erbe rari per ogni punto ferita ripristinato. Resta integro fino a quando non scende a 0 PF, momento in cui torna immediatamente a essere neve sciogliendosi all'istante.\n\nSe l'incantatore lancia di nuovo questo incantesimo, il duplicato attualmente attivo creato in precedenza viene distrutto sul colpo.",
     higherLevels: null,
     materialDesc: "neve o ghiaccio in quantità sufficiente per fare una copia a grandezza naturale della creatura duplicata; alcuni capelli, ritagli di unghie o altri pezzi del corpo della creatura; e polvere di rubino del valore di 1.500 mo, cosparsa sul duplicato"
   },
   "Symbol": {
     name: "Simbolo",
-    description: "Quando lo iscrivi, scegli uno dei seguenti effetti che si verifichi quando attivato: Morte (10d10 danni necrotici, tiro salvezza Costituzione per metà), Discordia (i bersagli litigano per 1 minuto), Paura (i bersagli sono spaventati per 1 minuto), Disperazione (i bersagli sono sopraffatti dalla disperazione per 1 minuto), Follia (i bersagli sono resi pazzi per 1 minuto), Dolore (i bersagli sono incapacitati per 1 minuto), Sonno (i bersagli cadono incoscienti per 10 minuti), o Stordimento (i bersagli sono storditi per 1 minuto). Il glifo copre una sfera di 3 metri di raggio quando attivato.",
+    description: "Al lancio, l'incantatore traccia un glifo nocivo su una superficie come un tavolo, una porzione di pavimento o una parete (l'area massima coperta è un cerchio di 3 m di diametro), oppure all'interno di un oggetto richiudibile come un libro, una pergamena o un forziere. Se il glifo è inscritto in un oggetto, l'oggetto deve restare al suo posto: spostato di oltre 3 m dal punto in cui è stato lanciato l'incantesimo, il glifo si infrange e l'incantesimo termina senza scattare.\n\nIl glifo è quasi invisibile: per individuarlo serve una prova di Intelligenza (Indagare) contro la CD del TS dell'incantesimo.\n\nAl lancio l'incantatore stabilisce l'innesco. Per glifi su superficie, gli inneschi tipici sono toccarli, calpestarli, rimuovere un oggetto che li copre, avvicinarsi a una certa distanza o manipolare l'oggetto su cui sono stati tracciati. Per glifi inscritti in un oggetto, gli inneschi tipici sono aprire l'oggetto, avvicinarsi entro una certa distanza, vedere o leggere il glifo. L'innesco può essere ulteriormente raffinato in base a caratteristiche fisiche (altezza, peso), tipo di creatura (per esempio megere o mutaforma), oppure includere condizioni di esclusione (es. una parola d'ordine).\n\nUna volta innescato, il glifo emana luce fioca in una sfera di raggio 18 m per 10 minuti, dopodiché l'incantesimo termina. Tutte le creature presenti nella sfera al momento dell'attivazione, e ogni creatura che entra per la prima volta in un turno o vi termina il proprio turno, sono bersaglio dell'effetto scelto al lancio fra i seguenti:\n\nDiscordia. TS Costituzione. Fallendo, il bersaglio litiga e si scontra con le altre creature per 1 minuto, non riesce a comunicare in modo coerente e ha svantaggio ai tiri per colpire e alle prove di caratteristica.\n\nDisperazione. TS Carisma. Fallendo, è sopraffatto dalla disperazione per 1 minuto e non può attaccare né bersagliare alcuna creatura con capacità, incantesimi o altri effetti magici.\n\nDolore. TS Costituzione. Fallendo, è dilaniato dal dolore e diventa incapacitato per 1 minuto.\n\nMorte. TS Costituzione. Fallendo, subisce 10d10 danni necrotici; con un successo, metà.\n\nPaura. TS Saggezza. Fallendo, è spaventato per 1 minuto: lascia cadere ciò che impugnava e deve allontanarsi di almeno 9 m dal glifo a ogni proprio turno, se possibile.\n\nPazzia. TS Intelligenza. Fallendo, diventa pazzo per 1 minuto: non può intraprendere azioni, non comprende ciò che le altre creature dicono, non sa leggere e pronuncia solo frasi senza senso. I suoi movimenti, decisi dal DM, sono imprevedibili.\n\nSonno. TS Saggezza. Fallendo, cade privo di sensi per 10 minuti. Si sveglia se subisce danni o se qualcun altro usa la propria azione per scuoterlo o schiaffeggiarlo.\n\nStordimento. TS Saggezza. Fallendo, è stordito per 1 minuto.",
     higherLevels: null,
     materialDesc: "mercurio, fosforo e diamante e opale in polvere del valore complessivo di almeno 1.000 mo, consumati"
   },
