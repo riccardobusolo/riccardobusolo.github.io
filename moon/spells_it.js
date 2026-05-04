@@ -1602,7 +1602,7 @@ window.SPELLS_IT = {
     materialDesc: "un magnete (lodestone) e un pizzico di polvere"
   },
   "Drawmij's Instant Summons": {
-    name: "Evocazioni Istantanee",
+    name: "Evocazioni Istantanee di Drawmij",
     description: "Tocchi un oggetto del peso di 4,5 kg o meno la cui dimensione più lunga è di 1,8 metri o meno. L'incantesimo lascia un marchio invisibile sulla sua superficie e iscrive invisibilmente il nome dell'oggetto sullo zaffiro che usi come componente materiale. Ogni volta che lanci questo incantesimo, devi usare uno zaffiro diverso. In qualsiasi momento successivo, puoi usare la tua azione per pronunciare il nome dell'oggetto e schiacciare lo zaffiro. L'oggetto appare istantaneamente nella tua mano.",
     higherLevels: null,
     materialDesc: "uno zaffiro del valore di 1.000 mo"
