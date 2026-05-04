@@ -1044,8 +1044,8 @@ window.SPELLS_IT = {
   },
   "Confusion": {
     name: "Confusione",
-    description: "Ogni creatura in una sfera di 3 metri di raggio centrata su un punto a tua scelta entro la gittata deve riuscire in un tiro salvezza Saggezza o esserne colpita. Un bersaglio colpito non può eseguire reazioni e deve tirare 1d10 all'inizio di ciascuno dei suoi turni per determinarne il comportamento: 1 - si muove a caso; 2-6 - non fa nulla; 7-8 - attacca in mischia una creatura vicina a caso; 9-10 - agisce normalmente. Alla fine di ciascuno dei suoi turni, un bersaglio colpito può effettuare un tiro salvezza Saggezza per terminare l'effetto.",
-    higherLevels: "Il raggio della sfera aumenta di 1,5 metri per ogni livello di slot superiore al 4°."
+    description: "L'incantesimo aggredisce e sconvolge la mente delle creature, inducendole al delirio e a comportamenti incontrollati. Al momento del lancio, ogni creatura in una sfera con raggio di 3 metri centrata su un punto a scelta entro la gittata deve superare un tiro salvezza Saggezza, altrimenti ne è influenzata.\n\nUn bersaglio influenzato non può effettuare reazioni e all'inizio di ogni proprio turno deve tirare 1d10 per determinare il proprio comportamento per quel turno:\n\n1 — Usa tutto il movimento per spostarsi in una direzione casuale (tira un d8 e assegna una direzione a ciascuna faccia). Non effettua azioni in quel turno.\n\n2-6 — Non si muove e non effettua azioni in quel turno.\n\n7-8 — Usa la sua azione per effettuare un attacco in mischia contro una creatura scelta a caso entro la sua portata. Se nessuna creatura è a portata, non fa nulla.\n\n9-10 — Agisce e si muove normalmente.\n\nAlla fine di ogni proprio turno, un bersaglio influenzato può ripetere il tiro salvezza Saggezza: se lo supera, l'effetto per lui termina.",
+    higherLevels: "Quando lanci questo incantesimo usando uno slot incantesimo di 5° livello o superiore, il raggio della sfera aumenta di 1,5 metri per ogni slot di livello superiore al 4°."
   },
   "Conjure Minor Elementals": {
     name: "Evoca Elementali Minori",
