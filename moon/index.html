@@ -3002,7 +3002,11 @@ var CLASSES=[
   {key:'barbarian',label:'Barbaro',slotTable:null,resources:['rage'],known:null},
   {key:'fighter',label:'Guerriero',slotTable:null,resources:['second-wind','action-surge'],known:null},
   {key:'monk',label:'Monaco',slotTable:null,resources:['ki'],known:null},
-  {key:'rogue',label:'Ladro',slotTable:null,resources:[],known:null}
+  {key:'rogue',label:'Ladro',slotTable:null,resources:[],known:null},
+  /* Personalizzato: nessuna auto-popolazione di slot/risorse/incantesimi.
+     L'utente digita il nome classe nel campo testo e gestisce manualmente
+     tutto il resto (slot, risorse, incantesimi conosciuti). */
+  {key:'custom',label:'Personalizzato',slotTable:null,resources:[],known:null}
 ];
 function _classByKey(k){var f=null;CLASSES.forEach(function(cd){if(cd.key===k)f=cd});return f}
 /* Migrazione da vecchio c.cls free-text → c.classKey. Se la stringa
@@ -3071,11 +3075,20 @@ var idCells='';
 idFields.forEach(function(f){
   if(f[0]==='__CLASSE__'){
     var ck=c.classKey||'';var clsLbl=(_classByKey(ck)||{}).label||'';var clsEmpty=!ck;
-    var clsW=clsLbl.length;var clsLblW=Math.ceil('Classe'.length*0.8);
-    var clsSty='';
-    if(!clsEmpty){var w=Math.max(clsW,clsLblW);clsSty=' style="width:calc('+w+'ch + 24px)"'}
+    var isCustomCls=ck==='custom';
     var classOpts='';CLASSES.forEach(function(cd){classOpts+='<option value="'+esc(cd.key)+'"'+(cd.key===ck?' selected':'')+'>'+esc(cd.label)+'</option>'});
-    idCells+='<div class="pg__field'+(clsEmpty?' pg__field--empty':'')+'"><div class="pg__lbl">Classe</div><select class="pg__inp pg__inp--sm pg__inp--cls" data-classkey title="Cambia classe per auto-popolare slot, contatore risorse e incantesimi conosciuti"'+clsSty+'>'+classOpts+'</select></div>';
+    if(isCustomCls){
+      /* Personalizzato: dropdown + input testuale per il nome libero della
+         classe homebrew. Slot, risorse e incantesimi vanno gestiti a mano. */
+      var customName=c.cls||'';
+      var customNameW=Math.max(8,customName.length);
+      idCells+='<div class="pg__field"><div class="pg__lbl">Classe</div><div style="display:flex;gap:3px;align-items:stretch"><select class="pg__inp pg__inp--sm pg__inp--cls" data-classkey title="Cambia classe per auto-popolare slot, contatore risorse e incantesimi conosciuti" style="width:auto;flex:0 0 auto">'+classOpts+'</select><input class="pg__inp pg__inp--sm" data-ef="cls" value="'+esc(customName)+'" placeholder="Nome classe..." title="Nome libero della classe homebrew" style="flex:0 0 auto;width:calc('+customNameW+'ch + 14px);min-width:60px"></div></div>';
+    } else {
+      var clsW=clsLbl.length;var clsLblW=Math.ceil('Classe'.length*0.8);
+      var clsSty='';
+      if(!clsEmpty){var w=Math.max(clsW,clsLblW);clsSty=' style="width:calc('+w+'ch + 24px)"'}
+      idCells+='<div class="pg__field'+(clsEmpty?' pg__field--empty':'')+'"><div class="pg__lbl">Classe</div><select class="pg__inp pg__inp--sm pg__inp--cls" data-classkey title="Cambia classe per auto-popolare slot, contatore risorse e incantesimi conosciuti"'+clsSty+'>'+classOpts+'</select></div>';
+    }
     return;
   }
   var v=c[f[1]]||'';var empty=!v;var w=v.length;var lblW=Math.ceil(f[0].length*0.8);var sty='';
@@ -3380,7 +3393,11 @@ document.addEventListener('dragleave',function(e){var z=e.target.closest('[data-
 document.addEventListener('drop',function(e){var z=e.target.closest('[data-spdrop]');if(!z)return;e.preventDefault();z.classList.remove('spdrop-over');z.classList.remove('spdrop-bad');var raw=e.dataTransfer.getData('application/x-spell');if(!raw)return;var sp;try{sp=JSON.parse(raw)}catch(err){return}var pg=loadPG();if(!pg)return;var zone=z.dataset.spdrop;var isCantrip=sp.level===0;if(zone==='cantrip'){if(!isCantrip)return;if(!pg.cantrips)pg.cantrips=[];if(pg.cantrips.indexOf(sp.name)<0)pg.cantrips.push(sp.name);savePG(pg);render();return}if(zone==='book'){if(isCantrip)return;if(!pg.spBook)pg.spBook=[[],[],[],[],[],[],[],[],[]];var li=Math.max(1,Math.min(9,sp.level||1))-1;var classes=(sp.classes||[]).map(_ttClass).join(', ');var schoolIt=_ttSchool(sp.school||'');pg.spBook[li].push({n:sp.name,p:false,ct:sp.castingTime||'',rg:sp.range||'',cmp:_compStr(sp.components||{}),dur:sp.duration||'',desc:(sp.description||'')+(sp.higherLevels?'\n\nAi livelli superiori: '+sp.higherLevels:''),school:schoolIt,classes:classes,source:sp.source||''});savePG(pg);render();return}});
 
 wrap.addEventListener('change',function(e){var pg=loadPG();if(!pg)return;
-var classKey=e.target.closest('[data-classkey]');if(classKey){var key=classKey.value;var def=_classByKey(key);pg.classKey=key;pg.cls=def?def.label:'';
+var classKey=e.target.closest('[data-classkey]');if(classKey){var key=classKey.value;var def=_classByKey(key);pg.classKey=key;
+  /* Per Personalizzato lasciamo pg.cls vuoto: l'utente lo digiterà nel
+     campo testo che appare a fianco. Per le altre classi sincronizziamo
+     pg.cls all'etichetta del CLASSES. */
+  pg.cls=(def&&def.key&&def.key!=='custom')?def.label:'';
   /* 1) Slot table */
   if(def&&def.slotTable&&SLOT_TABLES[def.slotTable]){if(!pg.slotsTable)pg.slotsTable=[];for(var _i=0;_i<20;_i++){pg.slotsTable[_i]=SLOT_TABLES[def.slotTable][_i].slice()}}
   /* 2) Aggiungi tutti i resource counter mancanti per questa classe */
