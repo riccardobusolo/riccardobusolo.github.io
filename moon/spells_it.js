@@ -401,7 +401,7 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Searing Smite": {
-    name: "Castigo Cocente",
+    name: "Punizione Cocente",
     description: "La prossima volta che colpisci una creatura con un attacco in mischia con un'arma, la tua arma divampa con un'intensità incandescente, e l'attacco infligge 1d6 danni da fuoco aggiuntivi e dà fuoco al bersaglio. All'inizio di ciascuno dei suoi turni, il bersaglio deve effettuare un tiro salvezza Costituzione. Con un fallimento, subisce 1d6 danni da fuoco. Con un successo, l'incantesimo termina.",
     higherLevels: "Il danno extra iniziale aumenta di 1d6 per ogni livello di slot superiore al 1°."
   },
@@ -436,7 +436,7 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Thunderous Smite": {
-    name: "Castigo Tonante",
+    name: "Punizione Tonante",
     description: "La prima volta che colpisci con un attacco in mischia con un'arma durante la durata dell'incantesimo, la tua arma rimbomba di tuono udibile entro 90 metri, e l'attacco infligge 2d6 danni da tuono aggiuntivi. Inoltre, se il bersaglio è una creatura, deve riuscire in un tiro salvezza Forza o essere spinto a 3 metri di distanza da te e abbattuto prono.",
     higherLevels: null
   },
@@ -456,7 +456,7 @@ window.SPELLS_IT = {
     higherLevels: "Il danno iniziale aumenta di 1d12 per ogni livello di slot superiore al 1°."
   },
   "Wrathful Smite": {
-    name: "Castigo Iracondo",
+    name: "Punizione Iraconda",
     description: "La prossima volta che colpisci con un attacco in mischia con un'arma durante la durata dell'incantesimo, l'attacco infligge 1d6 danni psichici aggiuntivi. Inoltre, se il bersaglio è una creatura, deve effettuare un tiro salvezza Saggezza o essere spaventato da te fino al termine dell'incantesimo. Come azione, la creatura può effettuare una prova di Saggezza contro la CD del tiro salvezza del tuo incantesimo per ritrovare la determinazione e terminare l'incantesimo.",
     higherLevels: null
   },
@@ -1168,7 +1168,7 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Staggering Smite": {
-    name: "Castigo Stordente",
+    name: "Punizione Stordente",
     description: "La prossima volta che colpisci una creatura con un attacco in mischia con un'arma durante la durata dell'incantesimo, la tua arma trafigge sia il corpo che la mente, e l'attacco infligge 4d6 danni psichici aggiuntivi al bersaglio. Il bersaglio deve effettuare un tiro salvezza Saggezza. Con un fallimento, ha svantaggio ai tiri per colpire e alle prove di caratteristica, e non può eseguire reazioni, fino alla fine del suo prossimo turno.",
     higherLevels: null
   },
@@ -1207,7 +1207,7 @@ window.SPELLS_IT = {
     higherLevels: null
   },
   "Banishing Smite": {
-    name: "Castigo Bandente",
+    name: "Punizione Bandente",
     description: "La prossima volta che colpisci una creatura con un attacco con un'arma, la tua arma scintilla di forza, e l'attacco infligge 5d10 danni da forza aggiuntivi al bersaglio. Inoltre, se questo attacco riduce il bersaglio a 50 punti ferita o meno, lo bandisci. Se il bersaglio è nativo di un piano di esistenza diverso, scompare e ritorna al suo piano d'origine. Se è nativo del tuo piano, svanisce in un semipiano innocuo ed è incapacitato lì. Quando l'incantesimo termina, il bersaglio riappare nello spazio che ha lasciato.",
     higherLevels: null
   },
