@@ -58,8 +58,12 @@ body.no-custom-cursor{--cur-default:default;--cur-pointer:pointer;--cur-text:tex
    sovrascrivere il cursore drag nativo del browser, ed evita che lampeggi
    il "no-drop" di sistema fuori dalla zona valida. */
 body.sb--global-dragging,body.sb--global-dragging *{cursor:var(--cur-grabbing) !important}
-/* Ghost del pulsante durante il drag: copia floating che segue il cursore. */
-.sb__btn--ghost,.sb__btn--ghost.on{position:fixed;pointer-events:none;z-index:99999;margin:0;background:var(--bg2);border:1px solid transparent !important;box-shadow:0 12px 32px rgba(0,0,0,.55);transform:scale(1.04);opacity:.95;transition:none}
+/* Ghost del pulsante durante il drag: copia floating che segue il cursore.
+   Replica lo stato :hover (bg2 + rl wash, color dim, border subtle). */
+.sb__btn--ghost,.sb__btn--ghost.on{position:fixed;pointer-events:none;z-index:99999;margin:0;background:linear-gradient(var(--rl),var(--rl)) var(--bg2);color:var(--dim) !important;border:1px solid var(--border) !important;box-shadow:0 12px 32px rgba(0,0,0,.55);transform:scale(1.04);opacity:.95;transition:none}
+/* Durante il drag: disabilita l'effetto :hover sugli altri tool della sidebar
+   (eccetto quello attivo .on che mantiene il suo stato). */
+body.sb--global-dragging .sb__btn:not(.on):hover{background:transparent;color:var(--muted);border-color:transparent}
 .sb__btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .sb__label{font-family:var(--mono);font-size:.7rem;letter-spacing:.02em;white-space:nowrap}
 .sb__btn--bottom{margin-top:auto}
