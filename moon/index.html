@@ -790,8 +790,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .sp__conc-tog.on:hover{background:rgba(196,154,50,.18)}
 /* Quando l'incantesimo NON richiede concentrazione: icon visibile ma non interagibile.
    Distingue visivamente da "richiede ma non attiva" (più dim) e "attiva" (oro). */
-.sp__conc-tog.sp__conc-tog--off{opacity:.15;cursor:var(--cur-na);pointer-events:none}
-.sp__conc-tog.sp__conc-tog--off:hover{border-color:var(--border)}
+.sp__conc-tog.sp__conc-tog--off{display:none}
 .sp__lvl-group{margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)}.sp__lvl-group:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
 .sp__lvl-title{font-family:var(--mono);font-size:.68rem;color:var(--gold);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:flex;align-items:center;gap:6px}
 .sp__lvl-title[data-csspcoll],.sp__lvl-title[data-spcoll],.sp__lvl-title[data-prepspcoll],.sp__lvl-title[data-csprepspcoll]{cursor:var(--cur-pointer);user-select:none;border-radius:3px;padding:2px 4px;margin:-2px -4px 1px;transition:background .12s}
