@@ -3670,6 +3670,11 @@ function _spImportPlan(c,levelFilter){
   if(!c.spBook)c.spBook=[[],[],[],[],[],[],[],[],[]];
   /* Duplicate check cross-lingua: usa il nome inglese come chiave. */
   var IT=window.SPELLS_IT||{};
+  /* Ordina alfabeticamente per nome visualizzato nella lingua attiva,
+     così gli incantesimi vengono importati in ordine alfabetico. */
+  var _impLang=(typeof window._spLang==='function')?window._spLang():(localStorage.getItem('cm_spell_lang')==='en'?'en':'it');
+  function _impDn(sp){if(_impLang!=='it')return sp.name;var t=IT[sp.name];return (t&&t.name)?t.name:sp.name}
+  matches.sort(function(a,b){return _impDn(a).localeCompare(_impDn(b),_impLang==='it'?'it':'en',{sensitivity:'base'})});
   var hasCantrip=function(spName){return c.cantrips.some(function(n){if(n===spName)return true;var t=IT[spName];if(t&&t.name===n)return true;return false})};
   var hasInBook=function(bl,spName){return c.spBook[bl].some(function(s){return _spResolveEn(s)===spName})};
   var newCount=0;
