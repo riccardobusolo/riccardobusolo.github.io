@@ -3725,11 +3725,11 @@ function _spImportApply(c,matches){
     var trCmpVal=trCmp(sp.components||{},sp.name);
     var trClsVal=(sp.classes||[]).map(function(cl){return trCls(cl)}).join(', ');
     if(sp.level===0){
-      if(!hasCantrip(sp.name)){c.cantrips.push({n:dispName,nEn:sp.name,p:true,c:!!sp.concentration,r:!!sp.ritual,ct:trCtVal,rg:trRgVal,cmp:trCmpVal,dur:trDurVal,desc:dispDesc+(dispHL?'\n\n'+hlLabel+': '+dispHL:''),school:trSchoolVal,classes:trClsVal,source:sp.source||'',langMigrated:true});added++}
+      if(!hasCantrip(sp.name)){var trDmgT=(lang==='it'&&window.cm_trDmgType)?window.cm_trDmgType(sp.damageType||''):(sp.damageType||'');c.cantrips.push({n:dispName,nEn:sp.name,p:true,c:!!sp.concentration,r:!!sp.ritual,ct:trCtVal,rg:trRgVal,cmp:trCmpVal,dur:trDurVal,desc:dispDesc+(dispHL?'\n\n'+hlLabel+': '+dispHL:''),school:trSchoolVal,classes:trClsVal,source:sp.source||'',atkType:sp.attackType||'',saveAbil:sp.saveAbility||'',dmg:sp.damage||'',dmgType:trDmgT,langMigrated:true});added++}
     }else{
       var bl=sp.level-1;
       if(!hasInBook(bl,sp.name)){
-        c.spBook[bl].push({n:dispName,nEn:sp.name,p:false,c:!!sp.concentration,r:!!sp.ritual,ct:trCtVal,rg:trRgVal,cmp:trCmpVal,dur:trDurVal,desc:dispDesc+(dispHL?'\n\n'+hlLabel+': '+dispHL:''),school:trSchoolVal,classes:trClsVal,source:sp.source||''});
+        var trDmgT2=(lang==='it'&&window.cm_trDmgType)?window.cm_trDmgType(sp.damageType||''):(sp.damageType||'');c.spBook[bl].push({n:dispName,nEn:sp.name,p:false,c:!!sp.concentration,r:!!sp.ritual,ct:trCtVal,rg:trRgVal,cmp:trCmpVal,dur:trDurVal,desc:dispDesc+(dispHL?'\n\n'+hlLabel+': '+dispHL:''),school:trSchoolVal,classes:trClsVal,source:sp.source||'',atkType:sp.attackType||'',saveAbil:sp.saveAbility||'',dmg:sp.damage||'',dmgType:trDmgT2});
         added++;
       }
     }
@@ -4334,7 +4334,7 @@ document.addEventListener('drop',function(e){var z=e.target.closest('[data-spdro
 /* Helper: costruisce l'oggetto incantesimo con tutti i campi tradotti, identico
    al risultato di _spImportApply (auto-import). Riusato sia per book che cantrip.
    Traduce nome+desc+higherLevels via SPELLS_IT se la lingua attiva è italiano. */
-function _buildSpEntry(sp){var isIt=localStorage.getItem('cm_spell_lang')!=='en';var IT=(isIt&&window.SPELLS_IT)?window.SPELLS_IT:{};var trEntry=IT[sp.name]||null;var nameOut=(trEntry&&trEntry.name)?trEntry.name:sp.name;var descOut=(trEntry&&trEntry.description)?trEntry.description:(sp.description||'');var higherOut=(trEntry&&trEntry.higherLevels)?trEntry.higherLevels:(sp.higherLevels||'');var ctOut=(isIt&&window.cm_trCastingTime)?window.cm_trCastingTime(sp.castingTime||''):(sp.castingTime||'');var rgOut=(isIt&&window.cm_trRange)?window.cm_trRange(sp.range||''):(sp.range||'');var durOut=(isIt&&window.cm_trDuration)?window.cm_trDuration(sp.duration||''):(sp.duration||'');var classes=(sp.classes||[]).map(_ttClass).join(', ');var schoolIt=_ttSchool(sp.school||'');return {n:nameOut,nEn:sp.name,p:false,c:!!sp.concentration,r:!!sp.ritual,cActive:false,ct:ctOut,rg:rgOut,cmp:_compStr(sp.components||{}),dur:durOut,desc:descOut+(higherOut?'\n\nAi livelli superiori: '+higherOut:''),school:schoolIt,classes:classes,source:sp.source||'',langMigrated:true}}
+function _buildSpEntry(sp){var isIt=localStorage.getItem('cm_spell_lang')!=='en';var IT=(isIt&&window.SPELLS_IT)?window.SPELLS_IT:{};var trEntry=IT[sp.name]||null;var nameOut=(trEntry&&trEntry.name)?trEntry.name:sp.name;var descOut=(trEntry&&trEntry.description)?trEntry.description:(sp.description||'');var higherOut=(trEntry&&trEntry.higherLevels)?trEntry.higherLevels:(sp.higherLevels||'');var ctOut=(isIt&&window.cm_trCastingTime)?window.cm_trCastingTime(sp.castingTime||''):(sp.castingTime||'');var rgOut=(isIt&&window.cm_trRange)?window.cm_trRange(sp.range||''):(sp.range||'');var durOut=(isIt&&window.cm_trDuration)?window.cm_trDuration(sp.duration||''):(sp.duration||'');var classes=(sp.classes||[]).map(_ttClass).join(', ');var schoolIt=_ttSchool(sp.school||'');var dmgTypeOut=(isIt&&window.cm_trDmgType)?window.cm_trDmgType(sp.damageType||''):(sp.damageType||'');return {n:nameOut,nEn:sp.name,p:false,c:!!sp.concentration,r:!!sp.ritual,cActive:false,ct:ctOut,rg:rgOut,cmp:_compStr(sp.components||{}),dur:durOut,desc:descOut+(higherOut?'\n\nAi livelli superiori: '+higherOut:''),school:schoolIt,classes:classes,source:sp.source||'',atkType:sp.attackType||'',saveAbil:sp.saveAbility||'',dmg:sp.damage||'',dmgType:dmgTypeOut,langMigrated:true}}
 /* Smart routing: se l'utente trascina un trucchetto sulla sezione
    "Conosciuti" (zone="book"), lo smistiamo automaticamente in pg.cantrips.
    Idem per gli spell trascinati sul gruppo Trucchetti — vanno in spBook. */
@@ -4395,6 +4395,7 @@ function _refreshSpSortBtn(){if(!spSortBtn)return;var m=_spSort();var lbl=m==='a
 if(spSortBtn)spSortBtn.addEventListener('click',function(){var modes=['level','alpha','school'];var idx=modes.indexOf(_spSort());var next=modes[(idx+1)%modes.length];localStorage.setItem('cm_spell_sort',next);_refreshSpSortBtn();renSp()});
 /* Traduzione scuola (l'oggetto SPELLS ha i nomi inglesi) */
 function _trSchool(en){if(_spLang()!=='it')return en;var m={Abjuration:'Abiurazione',Conjuration:'Evocazione',Divination:'Divinazione',Enchantment:'Ammaliamento',Evocation:'Invocazione',Illusion:'Illusione',Necromancy:'Necromanzia',Transmutation:'Trasmutazione'};return m[en]||en}
+function _trDmgType(en){if(!en)return '';if(_spLang()!=='it')return en;var m={Acid:'Acido',Bludgeoning:'Contundente',Cold:'Freddo',Fire:'Fuoco',Force:'Forza',Lightning:'Fulmine',Necrotic:'Necrotico',Piercing:'Perforante',Poison:'Veleno',Psychic:'Psichico',Radiant:'Radiante',Slashing:'Tagliente',Thunder:'Tuono'};return m[en]||en}
 /* Conversione piedi → metri secondo la convenzione Asmodee (5ft = 1,5m). */
 function _ftToM(ft){var v=ft/5*1.5;return (v%1===0)?v:v.toFixed(1).replace('.0','').replace('.',',')}
 function _trCastingTime(en){if(_spLang()!=='it'||!en)return en;var m={'Action':'Azione','Bonus Action':'Azione bonus','Reaction':'Reazione','1 minute':'1 minuto','10 minutes':'10 minuti','1 hour':'1 ora','8 hours':'8 ore','12 hours':'12 ore','24 hours':'24 ore'};if(m[en])return m[en];/* "Reaction, which you take ..." */if(en.indexOf('Reaction,')===0)return 'Reazione, '+en.substring('Reaction, '.length);return en}
@@ -4466,7 +4467,7 @@ function _spLocal(s){if(_spLang()==='en')return s;var t=(window.SPELLS_IT||{})[s
 /* Espone le funzioni di traduzione su window per consentirne l'uso da
    altri scope (es. _spImportApply nella PG IIFE) durante l'import dei
    campi dell'incantesimo nella lingua selezionata. */
-window.cm_trSchool=_trSchool;window.cm_trCastingTime=_trCastingTime;window.cm_trRange=_trRange;window.cm_trDuration=_trDuration;window.cm_trComponents=_trComponents;window.cm_spLang=_spLang;
+window.cm_trSchool=_trSchool;window.cm_trCastingTime=_trCastingTime;window.cm_trRange=_trRange;window.cm_trDuration=_trDuration;window.cm_trComponents=_trComponents;window.cm_trDmgType=_trDmgType;window.cm_spLang=_spLang;
 function _refreshSpLangBtn(){if(!spLangBtn)return;var l=_spLang();spLangBtn.textContent=l==='en'?'EN':'IT';spLangBtn.title='Lingua incantesimi: '+(l==='en'?'inglese (clicca per italiano)':'italiano (clicca per inglese)')}_refreshSpLangBtn();
 if(spLangBtn)spLangBtn.addEventListener('click',function(){var l=_spLang();localStorage.setItem('cm_spell_lang',l==='en'?'it':'en');_refreshSpLangBtn();renSp();if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets()});
 var favs=JSON.parse(localStorage.getItem('cm_spfav')||'[]');
