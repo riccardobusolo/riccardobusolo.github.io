@@ -2448,7 +2448,16 @@ function fbInit(){
     auth.onAuthStateChanged(function(u){
       curUser=u;authReady=true;
       refreshAccUI();updateWall();
-      if(u&&accAutoSyncEnabled())_armAutoSync();
+      if(u){
+        /* Auto-sync DOWN: se il cloud ha dati più recenti dell'ultimo sync di questo
+           device, li scarica e ricarica. Altrimenti procede con l'auto-sync UP normale.
+           Ordine importante: il check al cloud deve completare PRIMA di hookare
+           localStorage.setItem (in _armAutoSync), altrimenti una scrittura locale durante
+           il fetch potrebbe scatenare un upload che sovrascrive i dati cloud più recenti. */
+        _accInitialSync(function(){
+          if(accAutoSyncEnabled())_armAutoSync();
+        });
+      }
     });
     return true;
   }catch(e){console.warn('Firebase init failed:',e);fbReady=false;return false}
@@ -2696,6 +2705,38 @@ function accSyncDown(silent){
 }
 document.getElementById('accSyncUp').onclick=function(){accSyncUp(false)};
 document.getElementById('accSyncDown').onclick=function(){accSyncDown(false)};
+
+/* ----- Auto-sync DOWN al login ----- */
+/* Confronta cloud.updatedAt con localStorage.cm_last_sync. Se il cloud è più recente,
+   restituisce i dati locali al cloud e ricarica. Si esegue UNA SOLA volta per sessione
+   (flag _accInitialSyncDone). 'done' viene chiamato sempre (success/skip/error) tranne
+   nel caso di reload imminente. */
+function _accInitialSync(done){
+  if(window._accInitialSyncDone){if(done)done();return}
+  window._accInitialSyncDone=true;
+  if(!fbReady||!curUser){if(done)done();return}
+  db.collection('users').doc(curUser.uid).get().then(function(doc){
+    if(!doc.exists){if(done)done();return}
+    var d=doc.data();
+    if(!d||!d.data||!d.updatedAt){if(done)done();return}
+    var localTs=parseInt(localStorage.getItem('cm_last_sync'))||0;
+    var cloudTs=parseInt(d.updatedAt)||0;
+    if(cloudTs<=localTs){if(done)done();return}
+    /* Cloud più recente → scarica silenziosamente e ricarica.
+       NON chiamiamo done(): la pagina sta per ricaricare, _armAutoSync verrà
+       riarmato dopo il reload tramite il nuovo onAuthStateChanged. */
+    _restoreLocalData(d.data);
+    localStorage.setItem('cm_last_sync',String(Date.now()));
+    /* Banner per dare feedback all'utente prima del reload */
+    try{
+      var b=document.createElement('div');
+      b.style.cssText='position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(196,154,50,.95);color:#0c0c10;padding:10px 18px;border-radius:8px;font-family:var(--mono,monospace);font-size:.85rem;box-shadow:0 4px 18px rgba(0,0,0,.4)';
+      b.textContent='🔄 Dati più recenti dal cloud — sincronizzazione in corso…';
+      document.body.appendChild(b);
+    }catch(_){}
+    setTimeout(function(){location.reload()},900);
+  }).catch(function(err){console.warn('[sync] check iniziale fallito:',err);if(done)done()});
+}
 
 /* ----- Auto-sync (default ON for new users) ----- */
 function accAutoSyncEnabled(){var v=localStorage.getItem('cm_autosync');return v===null?true:v==='1'}
