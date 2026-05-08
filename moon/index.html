@@ -3129,10 +3129,14 @@ document.getElementById('chList').addEventListener('dragend',function(){chDragId
       if(typeof window.pgConfirm==='function')window.pgConfirm('Importazione non disponibile (Scheda PG non inizializzata).',function(){},{title:'Errore',okLabel:'OK'});
       return;
     }
-    var pg=window.cmCreatePGFromChar(c);
-    if(!pg)return;
-    if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets();
-    if(typeof window.pgConfirm==='function')window.pgConfirm('"'+(pg.name||'PG')+'" creato come nuova scheda PG.\nApri lo strumento "Scheda PG" per vederlo.',function(){},{title:'Importato',okLabel:'OK'});
+    var nm=c.name||'questo personaggio';
+    var doImport=function(){
+      var pg=window.cmCreatePGFromChar(c);
+      if(!pg)return;
+      if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets();
+    };
+    if(typeof window.pgConfirm==='function')window.pgConfirm('Importare "'+nm+'" come nuova scheda PG?',doImport,{title:'Importa in scheda PG',okLabel:'Importa'});
+    else if(confirm('Importare "'+nm+'" come nuova scheda PG?'))doImport();
   }
 })();
 (function(){var hw=document.getElementById('winHp'),hb=document.getElementById('hpList').closest('.wb');
