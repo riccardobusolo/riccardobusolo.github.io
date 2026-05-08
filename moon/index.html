@@ -3079,7 +3079,6 @@ document.getElementById('chList').addEventListener('dragend',function(){chDragId
   function doDuplicate(i){
     var src=chars[i];if(!src)return;
     var copy;try{copy=JSON.parse(JSON.stringify(src))}catch(e){return}
-    copy.name=(src.name||'Personaggio')+' (copia)';
     copy.fav=false;copy.archived=false;
     chars.splice(i+1,0,copy);sC();renC();
   }
