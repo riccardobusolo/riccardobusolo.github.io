@@ -3467,7 +3467,9 @@ window.cmCreatePGFromChar=function(c){
   if(!c||typeof c!=='object')return null;
   var pg=newPG();
   pg.id='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
-  ['name','race','cls','subcls','lvl','str','dex','con','intl','wis','cha','ac','init','hp'].forEach(function(k){if(c[k]!==undefined&&c[k]!==null)pg[k]=c[k]});
+  /* classKey/subclassKey servono all'auto-import (slots, risorse, incantesimi);
+     senza di essi il PG resta su 'custom' anche se la label visiva (cls) è valorizzata. */
+  ['name','race','cls','classKey','subcls','subclassKey','lvl','str','dex','con','intl','wis','cha','ac','init','hp'].forEach(function(k){if(c[k]!==undefined&&c[k]!==null)pg[k]=c[k]});
   if(c.hp!=null)pg.hpCur=c.hp;
   if(c.photoFull)pg.photos=[c.photoFull];else if(c.photo)pg.photos=[c.photo];
   var arr=loadAllPGs();arr.push(pg);saveAllPGs(arr);
