@@ -1692,7 +1692,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 <!-- CHARACTERS -->
 <div class="win" id="winChars"><div class="wh"><div class="wh__i"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><div class="wh__t">Personaggi</div><button class="wh__x" data-close="chars">&times;</button></div><div class="wb">
 <div class="hadd" id="chForm">
-<input class="fi" id="chName" placeholder="Nome" style="flex:1"><button class="fb fb--green" id="chAdd">+</button>
+<input class="fi" id="chName" placeholder="Nome" style="flex:1"><button class="fb fb--green" id="chAdd">+</button><button class="fb" id="chLoadJson" type="button" title="Carica personaggio da file JSON"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>
 </div>
 <div class="cf-filters">
 <button class="cf-filter" id="chFilterFav" type="button" title="Mostra solo personaggi preferiti"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> Preferiti</button>
@@ -3051,6 +3051,37 @@ window.cmAddCharFromPG=function(pg){
 };
 document.getElementById('chAdd').onclick=addChar;
 document.getElementById('chName').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();addChar()}};
+/* Carica personaggio da file JSON: pulsante accanto a Nome + */
+(function(){
+  var fileInpLoad=document.createElement('input');
+  fileInpLoad.type='file';fileInpLoad.accept='application/json,.json';fileInpLoad.style.display='none';
+  document.body.appendChild(fileInpLoad);
+  document.getElementById('chLoadJson').onclick=function(){fileInpLoad.click()};
+  fileInpLoad.addEventListener('change',function(){
+    var f=fileInpLoad.files&&fileInpLoad.files[0];if(!f)return;
+    var fr=new FileReader();
+    fr.onload=function(){
+      var data;try{data=JSON.parse(fr.result)}catch(e){
+        if(typeof window.pgConfirm==='function')window.pgConfirm('File JSON non valido.',function(){},{title:'Errore caricamento',okLabel:'OK'});
+        else alert('File JSON non valido.');
+        fileInpLoad.value='';return;
+      }
+      var toAdd=Array.isArray(data)?data:[data];var added=0;
+      toAdd.forEach(function(c){
+        if(!c||typeof c!=='object')return;
+        if(typeof c.name!=='string'&&typeof c.race!=='string'&&typeof c.cls!=='string')return;
+        c.fav=false;c.archived=false;
+        chars.push(c);added++;
+      });
+      sC();renC();
+      var msg=added>0?('Aggiunto '+added+' personagg'+(added===1?'io':'i')+'.'):'Nessun personaggio valido trovato nel file.';
+      if(typeof window.pgConfirm==='function')window.pgConfirm(msg,function(){},{title:added>0?'Importazione completata':'Errore',okLabel:'OK'});
+      fileInpLoad.value='';
+    };
+    fr.onerror=function(){fileInpLoad.value='';alert('Errore di lettura del file.')};
+    fr.readAsText(f);
+  });
+})();
 /* Filtri Personaggi: Preferiti / Personaggi / Archiviati. Mutuamente esclusivi:
    click su uno disattiva gli altri. Almeno uno è sempre attivo (default Personaggi). */
 ['chFilterFav','chFilterAll','chFilterArch'].forEach(function(id){var b=document.getElementById(id);if(b)b.onclick=function(){if(b.classList.contains('on'))return;document.querySelectorAll('.cf-filter').forEach(function(x){x.classList.remove('on')});b.classList.add('on');renC()}});
@@ -3127,11 +3158,9 @@ document.getElementById('chList').addEventListener('dragend',function(){chDragId
     '<button class="ch-popmenu__item" data-chact="archive" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M3 11 L3 21 L21 21 L21 11"/><line x1="12" y1="3" x2="12" y2="13"/><polyline points="9 9 12 13 15 9"/></svg><span class="ch-popmenu__arch-lbl">Archivia</span></button>'+
     '<div class="ch-popmenu__sep"></div>'+
     '<button class="ch-popmenu__item" data-chact="download" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Scarica personaggio</button>'+
-    '<button class="ch-popmenu__item" data-chact="upload" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Carica personaggio…</button>'+
     '<div class="ch-popmenu__sep"></div>'+
     '<button class="ch-popmenu__item ch-popmenu__item--danger" data-chact="del" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Elimina</button>';
   document.body.appendChild(pop);
-  var fileInp=document.createElement('input');fileInp.type='file';fileInp.accept='application/json,.json';fileInp.style.display='none';document.body.appendChild(fileInp);
   var curIdx=-1;
   window.openCharPopMenu=function(idx,anchor){
     curIdx=idx;var c=chars[idx];
@@ -3156,7 +3185,6 @@ document.getElementById('chList').addEventListener('dragend',function(){chDragId
   pop.addEventListener('click',function(e){
     var btn=e.target.closest('[data-chact]');if(!btn)return;
     var act=btn.dataset.chact;var idx=curIdx;closePop();
-    if(act==='upload'){fileInp.click();return}
     if(idx<0||!chars[idx])return;
     if(act==='dup')doDuplicate(idx);
     else if(act==='topg')doImportToPG(idx);
@@ -3186,31 +3214,6 @@ document.getElementById('chList').addEventListener('dragend',function(){chDragId
     document.body.appendChild(a);a.click();
     setTimeout(function(){URL.revokeObjectURL(url);a.remove()},100);
   }
-  fileInp.addEventListener('change',function(){
-    var f=fileInp.files&&fileInp.files[0];if(!f)return;
-    var fr=new FileReader();
-    fr.onload=function(){
-      var data;try{data=JSON.parse(fr.result)}catch(e){
-        if(typeof window.pgConfirm==='function')window.pgConfirm('File JSON non valido.',function(){},{title:'Errore caricamento',okLabel:'OK'});
-        else alert('File JSON non valido.');
-        fileInp.value='';return;
-      }
-      var toAdd=Array.isArray(data)?data:[data];var added=0;
-      toAdd.forEach(function(c){
-        if(!c||typeof c!=='object')return;
-        /* Sanity: deve avere almeno uno dei campi tipici di un personaggio */
-        if(typeof c.name!=='string'&&typeof c.race!=='string'&&typeof c.cls!=='string')return;
-        c.fav=false;c.archived=false;
-        chars.push(c);added++;
-      });
-      sC();renC();
-      var msg=added>0?('Aggiunto '+added+' personagg'+(added===1?'io':'i')+'.'):'Nessun personaggio valido trovato nel file.';
-      if(typeof window.pgConfirm==='function')window.pgConfirm(msg,function(){},{title:added>0?'Importazione completata':'Errore',okLabel:'OK'});
-      fileInp.value='';
-    };
-    fr.onerror=function(){fileInp.value='';alert('Errore di lettura del file.')};
-    fr.readAsText(f);
-  });
   function doImportToPG(i){
     var c=chars[i];if(!c)return;
     if(typeof window.cmCreatePGFromChar!=='function'){
