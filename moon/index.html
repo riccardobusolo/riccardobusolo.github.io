@@ -749,11 +749,10 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .pg__atk-dmg-row{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
 .pg__atk-dmg-row .pg__inp{padding:3px 4px;font-size:.64rem;min-height:0}
 /* Mod personalizzato per riga di danno: input numerico con segno (es. +1, -2).
-   Si somma cumulativamente al tiro per colpire (atk e spell) e ai danni della
-   riga (solo per atk; per spell il danno NON viene modificato). */
-.pg__atk-dmg-mod{flex-shrink:0;width:42px;padding:3px 4px;text-align:center;font-family:var(--mono);font-size:.64rem;font-weight:600;color:var(--gold);min-height:0}
-.pg__atk-dmg-mod::placeholder{color:rgba(196,154,50,.35);font-weight:500}
-.pg__atk-dmg-mod:focus{border-color:rgba(196,154,50,.5);background:rgba(196,154,50,.04)}
+   Stile coerente con gli altri input della riga (formula/tipo): bordo var(--border),
+   testo var(--dim), oro su focus (ereditato da .pg__inp--sm). */
+.pg__atk-dmg-mod{flex-shrink:0;width:42px;text-align:center}
+.pg__atk-dmg-mod::placeholder{color:var(--muted)}
 .pg__atk-dmg-del{width:18px;height:18px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:all .12s}
 .pg__atk-dmg-del:hover{background:var(--rl);color:var(--red);border-color:var(--rb)}
 .pg__atk-dmg-del svg{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
