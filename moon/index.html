@@ -2104,6 +2104,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 <h4 class="setpanel__h4">📚 Manuali (Espansioni)</h4>
 <div class="setpanel__themegrp">
 <button class="setpanel__themebtn" data-book="tasha" title="Mostra/nascondi gli incantesimi di Tasha's Cauldron of Everything"><span class="setpanel__themelbl">Tasha's Cauldron of Everything</span></button>
+<button class="setpanel__themebtn" data-book="xan" title="Mostra/nascondi gli incantesimi di Xanathar's Guide to Everything"><span class="setpanel__themelbl">Xanathar's Guide to Everything</span></button>
 <button class="setpanel__themebtn" data-book="cm" title="Mostra/nascondi gli incantesimi del manuale Crooked Moon"><span class="setpanel__themelbl">The Crooked Moon</span></button>
 </div>
 <div class="setpanel__hint">Il Player's Handbook è sempre attivo. Disattiva un'espansione per nascondere i suoi incantesimi dallo strumento Incantesimi e dal filtro Manuali.</div>
@@ -2336,20 +2337,24 @@ var origSetOpenEd=setOpen;setOpen=function(){origSetOpenEd();refreshEdition()};
 window.cmBookEnabled=function(source){
   if(!source||source==="Player's Handbook")return true;
   if(source==="Tasha's Cauldron of Everything")return localStorage.getItem('cm_book_tasha')!=='off';
+  if(source==="Xanathar's Guide to Everything")return localStorage.getItem('cm_book_xan')!=='off';
   if(source==="The Crooked Moon")return localStorage.getItem('cm_book_cm')!=='off';
   return true;
 };
 function refreshBooks(){
   var taOn=localStorage.getItem('cm_book_tasha')!=='off';
+  var xaOn=localStorage.getItem('cm_book_xan')!=='off';
   var cmOn=localStorage.getItem('cm_book_cm')!=='off';
   var btnTa=document.querySelector('.setpanel__themebtn[data-book="tasha"]');
+  var btnXa=document.querySelector('.setpanel__themebtn[data-book="xan"]');
   var btnCm=document.querySelector('.setpanel__themebtn[data-book="cm"]');
   if(btnTa)btnTa.classList.toggle('on',taOn);
+  if(btnXa)btnXa.classList.toggle('on',xaOn);
   if(btnCm)btnCm.classList.toggle('on',cmOn);
 }
 refreshBooks();
 document.querySelectorAll('.setpanel__themebtn[data-book]').forEach(function(b){b.onclick=function(){
-  var bk=b.dataset.book;var key=bk==='tasha'?'cm_book_tasha':bk==='cm'?'cm_book_cm':null;if(!key)return;
+  var bk=b.dataset.book;var key=bk==='tasha'?'cm_book_tasha':bk==='xan'?'cm_book_xan':bk==='cm'?'cm_book_cm':null;if(!key)return;
   var cur=localStorage.getItem(key)!=='off';
   if(cur)localStorage.setItem(key,'off');else localStorage.removeItem(key);
   refreshBooks();
