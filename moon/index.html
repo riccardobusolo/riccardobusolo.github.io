@@ -3030,7 +3030,7 @@ document.getElementById('chList').addEventListener('dragend',function(){chDragId
 /* === Char actions popup menu (pulsante "⋮" su ogni riga personaggio) ===
    Sostituisce i bottoni inline Archivia/Elimina con un menu unico che
    espone 6 azioni: Duplica, Importa in scheda PG, Archivia/Disarchivia,
-   Scarica (JSON), Carica personaggio…, Elimina. */
+   Scarica personaggio, Carica personaggio…, Elimina. */
 (function(){
   var pop=document.createElement('div');pop.id='chPopMenu';pop.className='ch-popmenu';
   pop.innerHTML=
@@ -3038,7 +3038,7 @@ document.getElementById('chList').addEventListener('dragend',function(){chDragId
     '<button class="ch-popmenu__item" data-chact="topg" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>Importa in scheda PG</button>'+
     '<button class="ch-popmenu__item" data-chact="archive" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M3 11 L3 21 L21 21 L21 11"/><line x1="12" y1="3" x2="12" y2="13"/><polyline points="9 9 12 13 15 9"/></svg><span class="ch-popmenu__arch-lbl">Archivia</span></button>'+
     '<div class="ch-popmenu__sep"></div>'+
-    '<button class="ch-popmenu__item" data-chact="download" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Scarica (JSON)</button>'+
+    '<button class="ch-popmenu__item" data-chact="download" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Scarica personaggio</button>'+
     '<button class="ch-popmenu__item" data-chact="upload" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Carica personaggio…</button>'+
     '<div class="ch-popmenu__sep"></div>'+
     '<button class="ch-popmenu__item ch-popmenu__item--danger" data-chact="del" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Elimina</button>';
