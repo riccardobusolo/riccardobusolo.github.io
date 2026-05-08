@@ -523,7 +523,10 @@ body.sb--global-dragging .sb__btn:not(.on):hover{background:transparent;color:va
 @container pgsheet (max-width:540px){.pg__pgsel-btn{max-width:120px}}
 .pg__tabs{display:flex;gap:0;margin-bottom:6px;border-radius:6px;overflow:hidden;border:1px solid var(--border)}
 .pg__tab{flex:1 1 auto;padding:6px 4px;font-family:var(--mono);font-size:.78rem;text-align:center;cursor:var(--cur-pointer);background:var(--bg3);color:var(--muted);border:none;transition:all .15s;border-right:1px solid var(--border);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg__tab:last-child{border-right:none}.pg__tab:hover{color:var(--text);background:var(--bg)}.pg__tab--on{color:var(--gold);background:var(--bg);font-weight:600}
-.pg__menu{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;padding:0;line-height:0}.pg__menu:hover{background:var(--rl);color:var(--gold);border-color:rgba(196,154,50,.4)}.pg__menu svg{display:block;fill:currentColor}
+/* .pg__menu: stessa altezza/border/radius di .pg__tabs (la barra a fianco) per
+   un allineamento visivo perfetto. La cross-size stretch non serve: ricalcolerebbe
+   in base al sibling più alto (es. il dropdown PG selector). */
+.pg__menu{height:31px;width:31px;box-sizing:border-box;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;padding:0;line-height:0}.pg__menu:hover{background:var(--rl);color:var(--gold);border-color:rgba(196,154,50,.4)}.pg__menu svg{display:block;fill:currentColor}
 .pg__page{display:none}.pg__page--on{display:flex;flex-direction:column;gap:5px}
 .pg__sheet{display:flex;gap:5px;flex-wrap:wrap;align-items:flex-start;container-type:inline-size;container-name:pgsheet;width:100%}
 .pg__col{display:flex;flex-direction:column;gap:5px;flex:1 1 240px;min-width:0}
