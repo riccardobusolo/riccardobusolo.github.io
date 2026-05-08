@@ -3511,6 +3511,44 @@ function deletePG(id){var arr=loadAllPGs().filter(function(p){return p.id!==id})
 window._cmPgLoad=loadPG;window._cmPgSave=savePG;
 window.pgConfirm=pgConfirm;function pgConfirm(msg,onOk,opts){opts=opts||{};var ov=document.getElementById('cfOv'),md=document.getElementById('cfMd');document.getElementById('cfTitle').textContent=opts.title||'Conferma';document.getElementById('cfMsg').textContent=msg;document.getElementById('cfOk').textContent=opts.okLabel||'Elimina';document.getElementById('cfCancel').textContent=opts.cancelLabel||'Annulla';ov.classList.add('on');md.classList.add('on');function clean(){ov.classList.remove('on');md.classList.remove('on');document.getElementById('cfOk').onclick=null;document.getElementById('cfCancel').onclick=null;ov.onclick=null;document.removeEventListener('keydown',kd)}function kd(e){if(e.key==='Escape')clean();else if(e.key==='Enter'){clean();if(onOk)onOk()}}document.getElementById('cfOk').onclick=function(){clean();if(onOk)onOk()};document.getElementById('cfCancel').onclick=clean;ov.onclick=clean;document.addEventListener('keydown',kd);setTimeout(function(){document.getElementById('cfOk').focus()},80)}
 function createNewPG(){var pg=newPG();pg.id='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);if(!pg.name)pg.name='Nuovo PG';var arr=loadAllPGs();arr.push(pg);saveAllPGs(arr);setCurrentPGId(pg.id);return pg}
+/* _pgTriggerLoadJson: apre un file picker e importa un PG da JSON.
+   Validazione minima (deve avere almeno name/race/cls/lvl). Lo nuovo PG
+   viene aggiunto e impostato come corrente, poi render(). */
+var _pgFileInp=null;
+function _pgTriggerLoadJson(){
+  if(!_pgFileInp){
+    _pgFileInp=document.createElement('input');
+    _pgFileInp.type='file';_pgFileInp.accept='application/json,.json';_pgFileInp.style.display='none';
+    document.body.appendChild(_pgFileInp);
+    _pgFileInp.addEventListener('change',function(){
+      var f=_pgFileInp.files&&_pgFileInp.files[0];if(!f)return;
+      var fr=new FileReader();
+      fr.onload=function(){
+        var data;try{data=JSON.parse(fr.result)}catch(e){
+          if(typeof window.pgConfirm==='function')window.pgConfirm('File JSON non valido.',function(){},{title:'Errore caricamento',okLabel:'OK'});
+          else alert('File JSON non valido.');
+          _pgFileInp.value='';return;
+        }
+        var toAdd=Array.isArray(data)?data:[data];var added=0;var lastId=null;
+        toAdd.forEach(function(p){
+          if(!p||typeof p!=='object')return;
+          if(typeof p.name!=='string'&&typeof p.race!=='string'&&typeof p.cls!=='string'&&typeof p.lvl!=='number')return;
+          /* Genera nuovo id per evitare collisioni con PG esistenti */
+          p.id='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+          var arr=loadAllPGs();arr.push(p);saveAllPGs(arr);
+          lastId=p.id;added++;
+        });
+        if(added>0&&lastId){setCurrentPGId(lastId);render()}
+        var msg=added>0?('Importato '+added+' personagg'+(added===1?'io':'i')+' nella Scheda PG.'):'Nessun personaggio valido trovato nel file.';
+        if(typeof window.pgConfirm==='function')window.pgConfirm(msg,function(){},{title:added>0?'Importazione completata':'Errore',okLabel:'OK'});
+        _pgFileInp.value='';
+      };
+      fr.onerror=function(){_pgFileInp.value='';alert('Errore di lettura del file.')};
+      fr.readAsText(f);
+    });
+  }
+  _pgFileInp.click();
+}
 document.getElementById('csheetBody').addEventListener('change',function(e){if(csIdx===null)return;var inp=e.target.closest('[data-cspphinp]');if(!inp)return;var files=Array.from(inp.files||[]);if(!files.length)return;if(!chars[csIdx].photos)chars[csIdx].photos=[];var CS_PHOTO_MAX=2;var freeSlots=CS_PHOTO_MAX-chars[csIdx].photos.length;if(freeSlots<=0){alert('Limite di '+CS_PHOTO_MAX+' foto per personaggio raggiunto. Elimina una foto esistente per aggiungerne una nuova.');inp.value='';return}var imgFiles=files.filter(function(f){return f.type&&f.type.indexOf('image/')===0});if(imgFiles.length>freeSlots){alert('Puoi caricare solo '+freeSlots+' foto in più (limite '+CS_PHOTO_MAX+' per PG). Le prime '+freeSlots+' verranno aggiunte.')}var toLoad=imgFiles.slice(0,freeSlots);if(toLoad.length===0){inp.value='';return}var wasEmpty=chars[csIdx].photos.length===0;Promise.all(toLoad.map(function(f){return _compressImg(f,800,0.72)})).then(function(urls){chars[csIdx].photos=chars[csIdx].photos.concat(urls).slice(0,CS_PHOTO_MAX);function done(){sC();openSheet(csIdx);if(typeof window._chRenC==='function')window._chRenC()}if(wasEmpty&&chars[csIdx].photos.length>0&&typeof window._chSyncAvatarFromGallery==='function'){window._chSyncAvatarFromGallery(csIdx,done)}else{done()}}).catch(function(err){alert('Errore caricamento immagine: '+err.message)});inp.value='';});document.getElementById('csheetBody').addEventListener('click',function(e){var del=e.target.closest('[data-cspphdel]');if(del&&csIdx!==null){e.stopPropagation();var pdi=parseInt(del.dataset.cspphdel);chars[csIdx].photos.splice(pdi,1);if(pdi===0&&typeof window._chSyncAvatarFromGallery==='function'){window._chSyncAvatarFromGallery(csIdx,function(){sC();openSheet(csIdx);if(typeof window._chRenC==='function')window._chRenC()})}else{sC();openSheet(csIdx);if(typeof window._chRenC==='function')window._chRenC()}return}var clk=e.target.closest('[data-cspphclick]');if(clk&&csIdx!==null){openCsPhotoLightbox(parseInt(clk.dataset.cspphclick),csIdx);return}});
 function newPG(){var st=[];for(var i=0;i<20;i++){st.push([0,0,0,0,0,0,0,0,0])}return{name:'',race:'',cls:'',classKey:'custom',subcls:'',subclassKey:'custom',align:'',bg:'',lvl:1,xp:0,str:10,dex:10,con:10,intl:10,wis:10,cha:10,ac:10,hp:10,hpCur:10,hpTemp:0,init:0,speed:9,speedUnit:'m',hitDie:8,hitDiceLeft:1,insp:0,profs:{},dsc:{s:0,f:0},notes:'',traits:'',ideals:'',bonds:'',flaws:'',features:'',langs:'',equip:'',backstory:'',slotsTable:st,slotsCurrent:[0,0,0,0,0,0,0,0,0],hiddenSlots:[false,false,false,false,false,false,false,false,false],prepSpells:[],spAbil:'cha',spConc:'',spConcDc:10,spDcBonus:0,spAtkBonus:0,cantrips:[],spBook:[[],[],[],[],[],[],[],[],[]],photos:[],appearance:{age:'',height:'',weight:'',eyes:'',hair:'',skin:'',marks:''}}}
 /* Helper esposto su window: crea una nuova scheda PG popolando i campi
@@ -4100,7 +4138,9 @@ delete c.slots;delete c.slotsMax;delete c.slotsUsedTable;
 var pgSelH='<div class="pg__pgsel"><button class="pg__pgsel-btn" data-pgseltog="1" title="Cambia personaggio"><span class="pg__pgsel-lbl">'+esc(c.name||'(senza nome)')+'</span><span class="pg__pgsel-caret">\u25BE</span></button>';
 pgSelH+='<div class="pg__pgsel-menu">';
 allPgs.forEach(function(p){var isCur=p.id===c.id;pgSelH+='<div class="pg__pgsel-item'+(isCur?' on':'')+'"><button class="pg__pgsel-name" data-pgselect="'+p.id+'">'+(isCur?'\u2713 ':'')+esc(p.name||'(senza nome)')+(p.cls?' <span class="pg__pgsel-cls">'+esc(p.cls)+(p.lvl?' '+p.lvl:'')+'</span>':'')+'</button><button class="pg__pgsel-del" data-pgdel="'+p.id+'" title="Elimina"><svg viewBox="0 0 24 24" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div>'});
-pgSelH+='<button class="pg__pgsel-new" data-pgnew="1">+ Nuovo Personaggio</button></div></div>';
+pgSelH+='<button class="pg__pgsel-new" data-pgnew="1">+ Nuovo Personaggio</button>';
+pgSelH+='<button class="pg__pgsel-new" data-pgloadjson="1" title="Importa un personaggio da file JSON"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Carica da JSON</button>';
+pgSelH+='</div></div>';
 var tabs='<div class="pg__tabwrap">'+pgSelH+'<div class="pg__tabs"><button class="pg__tab'+(curTab==='scheda'?' pg__tab--on':'')+'" data-pgtab="scheda">\uD83D\uDCCB Scheda</button><button class="pg__tab'+(curTab==='spells'?' pg__tab--on':'')+'" data-pgtab="spells">\u2728 Incantesimi</button><button class="pg__tab'+(curTab==='info'?' pg__tab--on':'')+'" data-pgtab="info">\uD83D\uDCDC Informazioni</button><button class="pg__tab'+(curTab==='notes'?' pg__tab--on':'')+'" data-pgtab="notes">\uD83D\uDCDD Note</button></div><button class="pg__menu" data-pgmenu="1" title="Altre opzioni" type="button"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="3" r="1.6"/><circle cx="8" cy="8" r="1.6"/><circle cx="8" cy="13" r="1.6"/></svg></button></div>';
 /* === TAB 1: SCHEDA === */
 /* Migrazione: se non c'\u00e8 classKey, prova a derivarlo da c.cls (vecchio
@@ -4420,6 +4460,7 @@ var pgseltog=e.target.closest('[data-pgseltog]');if(pgseltog){e.stopPropagation(
 var pgselect=e.target.closest('[data-pgselect]');if(pgselect){setCurrentPGId(pgselect.dataset.pgselect);render();return}
 var pgdel=e.target.closest('[data-pgdel]');if(pgdel){e.stopPropagation();var did=pgdel.dataset.pgdel;var dp=loadAllPGs().filter(function(p){return p.id===did})[0];var dn=dp&&dp.name?dp.name:'questo personaggio';pgConfirm('Eliminare definitivamente "'+dn+'"?\nL\'azione \u00e8 irreversibile.',function(){deletePG(did);render()},{title:'Elimina personaggio',okLabel:'Elimina'});return}
 var pgnew=e.target.closest('[data-pgnew]');if(pgnew){createNewPG();render();return}
+var pgLoadJson=e.target.closest('[data-pgloadjson]');if(pgLoadJson){e.stopPropagation();_pgTriggerLoadJson();return}
 var pg=loadPG();if(!pg)return;
 var hdClick=e.target.closest('[data-nf="hitDie"]');if(hdClick){var dies=[6,8,10,12];var ci=dies.indexOf(pg.hitDie||8);pg.hitDie=dies[(ci+1)%4];savePG(pg);render();return}var pgRollIni=e.target.closest('[data-pgrollinit]');if(pgRollIni){var dexMod=pgMod(pg.dex);if(pg.initBonus==null)pg.initBonus=(pg.init||0)-dexMod;var total=dexMod+pg.initBonus;var roll=rollD(20);var sum=roll+total;window._pgLastAbResult='<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:-.15em"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg> Iniziativa: <strong>'+roll+'</strong> '+(total>=0?'+':'')+total+' = <strong style="color:var(--gold)">'+sum+'</strong>';window._pgLastAbAnim=true;window._pgLastAbClass=roll===20?'pg__roll-row--crit':roll===1?'pg__roll-row--fail':'pg__roll-row--hit';render();return}var pgEditIniB=e.target.closest('[data-pgeditinitbonus]');if(pgEditIniB){if(pg.initBonus==null)pg.initBonus=(pg.init||0)-pgMod(pg.dex);var inp=document.createElement('input');inp.type='number';inp.value=pg.initBonus;inp.className='pg__inp--inline pg__cstat-val';inp.style.width='4ch';pgEditIniB.replaceWith(inp);inp.focus();inp.select();var done=false;function commit(){if(done)return;done=true;var v=parseInt(inp.value);if(isNaN(v))v=0;var pg2=loadPG();pg2.initBonus=v;savePG(pg2);render()}inp.onblur=commit;inp.onkeydown=function(ev){if(ev.key==='Enter'){ev.preventDefault();commit()}else if(ev.key==='Escape'){done=true;render()}};return}
 var uToggle=e.target.closest('[data-toggleunit]');if(uToggle){var oldUnit=pg.speedUnit||'m';var spd=pg.speed||9;if(oldUnit==='m'){pg.speed=Math.round(spd/1.5*5);pg.speedUnit='ft'}else{pg.speed=Math.round(spd/5*1.5);pg.speedUnit='m'}savePG(pg);render();return}
