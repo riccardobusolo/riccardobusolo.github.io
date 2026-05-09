@@ -1566,8 +1566,35 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spe__atk-sep{color:var(--border);opacity:.7}
 /* Modalità modifica catalogo: input editabili sostituiscono testo statico.
    Attivata dal pulsante "✏ Modifica" in alto. Salvataggio automatico in
-   localStorage (cm_sp_overrides) e applicazione live alle SPELLS in memoria. */
+   localStorage (cm_sp_overrides) e applicazione live alle SPELLS in memoria.
+   In edit mode tutte le card sono pre-aperte e il body si dispone in due
+   colonne IT|EN. Ogni card è bordata sul lato sinistro con il colore del
+   manuale di provenienza per individuazione rapida. */
 .spe.spe--editing{outline:1px dashed rgba(196,154,50,.4);outline-offset:2px}
+.spe.spe--editing .spe__det{display:block!important}
+.spe.spe--editing .spe__head{cursor:default}
+/* Source color coding: bordo sinistro 3px + alone discreto sopra */
+.spe.spe--src-phb{border-left:3px solid #5b8def;box-shadow:inset 4px 0 0 -2px rgba(91,141,239,.12)}
+.spe.spe--src-xgte{border-left:3px solid #4a9a5a;box-shadow:inset 4px 0 0 -2px rgba(74,154,90,.12)}
+.spe.spe--src-tashas{border-left:3px solid #b870e0;box-shadow:inset 4px 0 0 -2px rgba(184,112,224,.12)}
+.spe.spe--src-tcm{border-left:3px solid #c89070;box-shadow:inset 4px 0 0 -2px rgba(200,144,112,.12)}
+.spe.spe--src-other{border-left:3px solid var(--gold);box-shadow:inset 4px 0 0 -2px rgba(196,154,50,.12)}
+/* Etichetta del manuale colorata in edit mode */
+.spe.spe--editing.spe--src-phb .spe__src{color:#5b8def;border-color:rgba(91,141,239,.32);background:rgba(91,141,239,.08)}
+.spe.spe--editing.spe--src-xgte .spe__src{color:#4a9a5a;border-color:rgba(74,154,90,.32);background:rgba(74,154,90,.08)}
+.spe.spe--editing.spe--src-tashas .spe__src{color:#b870e0;border-color:rgba(184,112,224,.32);background:rgba(184,112,224,.08)}
+.spe.spe--editing.spe--src-tcm .spe__src{color:#c89070;border-color:rgba(200,144,112,.32);background:rgba(200,144,112,.08)}
+/* Layout a due colonne IT|EN per descrizione e livelli superiori */
+.spe-ed-2col{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.spe-ed-2col .spe-ed-row{margin:0}
+.spe-ed-col-head{display:flex;align-items:center;gap:6px;margin-bottom:4px;padding:3px 6px;border-radius:3px;background:rgba(196,154,50,.05);border:1px solid var(--border);font-family:var(--mono);font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.spe-ed-col-head--it{color:#4a9a5a;border-color:rgba(74,154,90,.25);background:rgba(74,154,90,.05)}
+.spe-ed-col-head--en{color:#5b8def;border-color:rgba(91,141,239,.25);background:rgba(91,141,239,.05)}
+.spe-ed-col-head b{color:inherit}
+/* Doppio nome IT|EN nell'header */
+.spe__name-pair{display:flex;flex-direction:column;line-height:1.15;flex:1;overflow:hidden;min-width:0}
+.spe__name-pair .spe__name{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spe__name-pair .spe__name-en{font-size:.66rem;color:var(--muted);font-weight:400;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .spe-ed-row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin:4px 0 8px;padding:6px 8px;border-radius:4px;background:rgba(196,154,50,.05);border:1px solid rgba(196,154,50,.22)}
 .spe-ed-fld{display:flex;flex-direction:column;gap:3px;flex:1;min-width:90px}
 .spe-ed-fld--narrow{flex:0 0 90px}
@@ -5103,6 +5130,8 @@ return true});
 var _sortMode=_spSort();
 filtered.sort(function(a,b){
   var aL=_spLocal(a),bL=_spLocal(b);
+  /* In modalità modifica: ordinamento alfabetico forzato sul nome italiano */
+  if(_spEditMode)return aL.name.localeCompare(bL.name);
   if(_sortMode==='alpha')return aL.name.localeCompare(bL.name);
   if(_sortMode==='school'){var sa=_trSchool(a.school),sb=_trSchool(b.school);return sa.localeCompare(sb)||a.level-b.level||aL.name.localeCompare(bL.name)}
   /* default 'level': livello crescente, poi nome */
@@ -5113,22 +5142,30 @@ spCount.textContent=countTxt;
 spList.innerHTML='';
 if(!SP.length){spList.innerHTML='<div style="text-align:center;padding:30px 10px;font-family:var(--mono);font-size:.62rem;color:var(--muted)">Database non trovato.<br>Assicurati che <b>spells.js</b> sia nella stessa cartella.</div>';return}
 if(!filtered.length){spList.innerHTML='<div style="text-align:center;padding:20px;font-family:var(--mono);font-size:.6rem;color:var(--muted)">'+(favMode?'Nessun preferito':'Nessun risultato')+'</div>';return}
-filtered.forEach(function(rawS){var s=_spLocal(rawS);var d=document.createElement('div');d.className='spe'+(_spEditMode?' spe--editing':'');
+filtered.forEach(function(rawS){
+/* Recupero diretto della versione IT senza dipendere dallo stato di lingua
+   corrente: replichiamo la logica di _spLocal sulla mappa SPELLS_IT così la
+   colonna sinistra è SEMPRE in italiano anche se la lingua attiva è EN. */
+var sIt;(function(){var IT=window.SPELLS_IT||{};var t=IT[rawS.name];if(t){sIt={};for(var k in rawS)if(rawS.hasOwnProperty(k))sIt[k]=rawS[k];if(t.name)sIt.name=t.name;if(t.description)sIt.description=t.description;if(t.higherLevels!==undefined)sIt.higherLevels=t.higherLevels}else{sIt=rawS}})();
+var s=_spEditMode?sIt:_spLocal(rawS);
+/* Source slug per il color coding (uso un mapping esplicito per leggibilità) */
+var srcSlug=rawS.source==="Player's Handbook"?'phb':rawS.source==="Xanathar's Guide to Everything"?'xgte':rawS.source==="Tasha's Cauldron of Everything"?'tashas':rawS.source==='The Crooked Moon'?'tcm':'other';
+var d=document.createElement('div');d.className='spe'+(_spEditMode?' spe--editing':'')+' spe--src-'+srcSlug;
 var fav=isFav(rawS.name);
 var lvlTxt=s.level===0?'T':s.level+'\u00b0';
 var tags='';if(s.concentration)tags+='<span class="spe__tag spe__tag--c" title="Concentrazione">C</span>';if(s.ritual)tags+='<span class="spe__tag spe__tag--r" title="Rituale">R</span>';
 var clsH=s.classes.map(function(c){return'<span class="spe__cl">'+c+'</span>'}).join('');
-var srcLbl=s.source==="Player's Handbook"?'PHB':s.source==="Tasha's Cauldron of Everything"?"Tasha's":s.source;
+var srcLbl=rawS.source==="Player's Handbook"?'PHB':rawS.source==="Tasha's Cauldron of Everything"?"Tasha's":rawS.source==='The Crooked Moon'?'TCM':rawS.source==="Xanathar's Guide to Everything"?'XGtE':rawS.source;
 var nameAttr=rawS.name.replace(/"/g,'&quot;');
 /* Determina se questo spell ha un override salvato (per il pulsante "Ripristina") */
 var hasOv=!!_spOvFor(rawS.name);
 /* Sezione ATTACCO/DANNO + DESCRIZIONE: due rami — read-only (default) o
-   editor (modalità modifica). In modalità modifica i textarea contengono
-   il testo nella lingua attualmente selezionata; il salvataggio aggiorna
-   l'oggetto live e localStorage. */
+   editor (modalità modifica). In modalità modifica usiamo il layout 2-col
+   IT|EN per descrizioni e livelli superiori; il configuratore attacco è
+   condiviso (i campi sono language-agnostic). */
 var atkH='',descH='',higherH='';
 if(_spEditMode){
-  /* === Editor: configuratore attacco === */
+  /* === Editor: configuratore attacco (condiviso, language-agnostic) === */
   var atkType=rawS.attackType||'';
   var saveAb=rawS.saveAbility||'';
   var dmg=rawS.damage||'';
@@ -5139,7 +5176,7 @@ if(_spEditMode){
     '<option value="atk"'+(atkType==='atk'?' selected':'')+'>Attacco</option>'+
     '<option value="save"'+(atkType==='save'?' selected':'')+'>Salvezza</option>';
   var saveOpts=SAVE_ABS.map(function(p){return'<option value="'+p[0]+'"'+(saveAb===p[0]?' selected':'')+'>'+p[1]+'</option>'}).join('');
-  var dmgTOpts=DMG_TYPES.map(function(t){return'<option value="'+t+'"'+(dmgT===t?' selected':'')+'>'+(t===''?'—':(_spLang()==='it'&&window.cm_trDmgType?window.cm_trDmgType(t):t))+'</option>'}).join('');
+  var dmgTOpts=DMG_TYPES.map(function(t){return'<option value="'+t+'"'+(dmgT===t?' selected':'')+'>'+(t===''?'—':window.cm_trDmgType?window.cm_trDmgType(t):t)+'</option>'}).join('');
   var saveStyle=atkType==='save'?'':'display:none';
   atkH='<div class="spe-ed-row">'+
     '<div class="spe-ed-fld spe-ed-fld--narrow"><span class="spe-ed-lbl">Tipo</span><select class="spe-ed-sel" data-spedfld="attackType" data-spedname="'+nameAttr+'">'+atkOpts+'</select></div>'+
@@ -5148,13 +5185,32 @@ if(_spEditMode){
     '<div class="spe-ed-fld"><span class="spe-ed-lbl">Tipo danno</span><select class="spe-ed-sel" data-spedfld="damageType" data-spedname="'+nameAttr+'">'+dmgTOpts+'</select></div>'+
     '<div class="spe-ed-fld" style="flex:0 0 auto"><span class="spe-ed-lbl">&nbsp;</span><button class="spe-ed-reset" data-spedreset="'+nameAttr+'"'+(hasOv?'':' disabled')+' title="Ripristina i valori originali del catalogo per questo incantesimo">Ripristina</button></div>'+
   '</div>';
-  /* === Editor: descrizione === */
-  /* Salvataggio per lingua: SPELLS_IT[name].description per IT, SPELLS[i].description per EN */
-  var descVal=(s.description||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  var langSuffix=_spLang()==='it'?'_it':'_en';
-  descH='<div class="spe-ed-row" style="flex-direction:column;align-items:stretch;gap:4px"><div style="display:flex;align-items:center;gap:8px"><span class="spe-ed-lbl">'+(_spLang()==='it'?'Descrizione (italiano)':'Description (English)')+'</span><span class="spe-ed-saved" data-spedsaved="desc">✓ Salvato</span></div><textarea class="spe-ed-ta" data-spedfld="description'+langSuffix+'" data-spedname="'+nameAttr+'">'+descVal+'</textarea></div>';
-  var higherVal=(s.higherLevels||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  higherH='<div class="spe-ed-row" style="flex-direction:column;align-items:stretch;gap:4px"><div style="display:flex;align-items:center;gap:8px"><span class="spe-ed-lbl">'+(_spLang()==='it'?'Ai livelli superiori (italiano)':'At Higher Levels (English)')+'</span><span class="spe-ed-saved" data-spedsaved="higher">✓ Salvato</span></div><textarea class="spe-ed-ta spe-ed-ta--higher" placeholder="(vuoto se non applicabile)" data-spedfld="higherLevels'+langSuffix+'" data-spedname="'+nameAttr+'">'+higherVal+'</textarea></div>';
+  /* === Editor: descrizione e livelli superiori in due colonne IT|EN === */
+  function _esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  var descIt=_esc(sIt.description||'');
+  var descEn=_esc(rawS.description||'');
+  var higherIt=_esc(sIt.higherLevels||'');
+  var higherEn=_esc(rawS.higherLevels||'');
+  descH='<div class="spe-ed-2col">'+
+    '<div>'+
+      '<div class="spe-ed-col-head spe-ed-col-head--it"><b>IT</b> Descrizione (italiano)<span class="spe-ed-saved" data-spedsaved="desc-it">✓ Salvato</span></div>'+
+      '<textarea class="spe-ed-ta" data-spedfld="description_it" data-spedname="'+nameAttr+'">'+descIt+'</textarea>'+
+    '</div>'+
+    '<div>'+
+      '<div class="spe-ed-col-head spe-ed-col-head--en"><b>EN</b> Description (English)<span class="spe-ed-saved" data-spedsaved="desc-en">✓ Salvato</span></div>'+
+      '<textarea class="spe-ed-ta" data-spedfld="description_en" data-spedname="'+nameAttr+'">'+descEn+'</textarea>'+
+    '</div>'+
+  '</div>';
+  higherH='<div class="spe-ed-2col">'+
+    '<div>'+
+      '<div class="spe-ed-col-head spe-ed-col-head--it"><b>IT</b> Ai livelli superiori<span class="spe-ed-saved" data-spedsaved="higher-it">✓ Salvato</span></div>'+
+      '<textarea class="spe-ed-ta spe-ed-ta--higher" placeholder="(vuoto se non applicabile)" data-spedfld="higherLevels_it" data-spedname="'+nameAttr+'">'+higherIt+'</textarea>'+
+    '</div>'+
+    '<div>'+
+      '<div class="spe-ed-col-head spe-ed-col-head--en"><b>EN</b> At Higher Levels<span class="spe-ed-saved" data-spedsaved="higher-en">✓ Salvato</span></div>'+
+      '<textarea class="spe-ed-ta spe-ed-ta--higher" placeholder="(empty if not applicable)" data-spedfld="higherLevels_en" data-spedname="'+nameAttr+'">'+higherEn+'</textarea>'+
+    '</div>'+
+  '</div>';
 }else{
   /* === Read-only: configuratore attacco (mostrato solo se valorizzato) === */
   if(s.attackType){
@@ -5180,7 +5236,11 @@ if(_spEditMode){
   descH='<div class="spe__desc">'+s.description+'</div>';
   higherH=s.higherLevels?'<div class="spe__higher"><b>'+(_spLang()==='it'?'Ai livelli superiori:':'At Higher Levels:')+'</b> '+s.higherLevels+'</div>':'';
 }
-d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+nameAttr+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+nameAttr+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+descH+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
+/* In edit mode mostro entrambi i nomi (IT a sx, EN sotto come sub-text) */
+var nameH=_spEditMode
+  ? '<div class="spe__name-pair"><span class="spe__name">'+sIt.name+'</span>'+(sIt.name!==rawS.name?'<span class="spe__name-en">'+rawS.name+'</span>':'')+'</div>'
+  : '<span class="spe__name">'+s.name+'</span>';
+d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+nameAttr+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+nameAttr+'">'+(fav?'\u2605':'\u2606')+'</button>'+nameH+'<span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+descH+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
 spList.appendChild(d)})}
 spList.addEventListener('click',function(e){
   var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}
