@@ -2071,76 +2071,92 @@ window.SPELLS_IT = {
 
   // --- CANTRIPS ---
   "Blood Bolt": {
+    name: "Dardo di Sangue",
     description: "Scagli un dardo contorto di sangue contro una creatura entro la gittata. Esegui un attacco a distanza con incantesimo contro il bersaglio. Se colpisci, il bersaglio subisce 1d6 danni necrotici, e tu ottieni un numero di punti ferita temporanei pari al tuo Bonus di Competenza.",
     higherLevels: "Potenziamento Trucchetto. Il danno aumenta di 1d6 al raggiungimento dei livelli 5 (2d6), 11 (3d6) e 17 (4d6)."
   },
   "Dissolution": {
+    name: "Dissoluzione",
     description: "Tocchi una creatura o un oggetto non magico e scomponi la sostanza del bersaglio nei suoi componenti più fondamentali. Esegui un attacco in mischia con incantesimo. Se colpisci, il bersaglio subisce 1d8 danni da forza, e la sua CA è ridotta di 1 contro il prossimo tiro per colpire effettuato contro di esso prima della fine del tuo prossimo turno.",
     higherLevels: "Potenziamento Trucchetto. Il danno aumenta di 1d8 al raggiungimento dei livelli 5 (2d8), 11 (3d8) e 17 (4d8)."
   },
   "Eye Burn": {
+    name: "Bruciaocchi",
     description: "Pungi gli occhi di una creatura che ti sta attaccando. Il bersaglio deve effettuare un tiro salvezza Costituzione (una creatura con Vista Cieca o Immunità alla condizione accecato ha automaticamente successo). Con un tiro salvezza fallito, il bersaglio ha la condizione accecato fino alla fine del turno. Con un tiro salvezza riuscito, deve sottrarre 1d4 dal tiro per colpire scatenante. Il bersaglio ha automaticamente successo nei tiri salvezza contro i tuoi successivi lanci di questo incantesimo per 24 ore.",
     higherLevels: null,
     materialDesc: "una macchia di canfora"
   },
   "Mysterious Presence": {
+    name: "Presenza Misteriosa",
     description: "Tocchi una creatura consenziente e ne avvolgi la presenza. Fino al termine dell'incantesimo, le altre creature devono sottrarre 1d4 da qualsiasi prova di Saggezza (Intuizione o Percezione) effettuata contro il bersaglio.",
     higherLevels: null
   },
 
   // --- LEVEL 1 ---
   "Ancestral Communion": {
+    name: "Comunione Ancestrale",
     description: "Invochi la saggezza dei tuoi antenati per ottenere intuizione nelle tue prove. Quando lanci l'incantesimo, e all'inizio di ciascuno dei tuoi turni per la durata, ottieni Ispirazione Eroica se non ce l'hai già.",
     higherLevels: null
   },
   "Captivate Undead": {
+    name: "Affascinare Non Morto",
     description: "Usurpi l'energia negativa che anima una creatura non morta che puoi vedere entro la gittata, tentando di prenderne il controllo. Il bersaglio deve effettuare un tiro salvezza Carisma. Con un tiro salvezza fallito, per la durata, il bersaglio ha la condizione ammaliato (ignorando qualsiasi Immunità a tale condizione), ed è amichevole nei tuoi confronti. Con un tiro salvezza riuscito, il bersaglio ha svantaggio al prossimo tiro per colpire effettuato contro di te prima dell'inizio del tuo prossimo turno. Se tu o uno dei tuoi alleati danneggia il bersaglio o lo costringe a effettuare un tiro salvezza, l'incantesimo termina.",
     higherLevels: "Puoi bersagliare una creatura aggiuntiva per ogni livello di slot superiore al 1°.",
     materialDesc: "un pizzico di polvere di ossa"
   },
   "Devil's Due": {
+    name: "Tributo del Diavolo",
     description: "Assorbi una misura della sofferenza di una creatura e della sua essenza vitale che si sta dissipando. Spendi e tira un Dado dei Punti Ferita. Recuperi un numero di punti ferita pari al numero ottenuto più il tuo modificatore di caratteristica da incantatore. Se la creatura ha subito danni da un colpo critico, raddoppia il numero di punti ferita che recuperi.",
     higherLevels: "Puoi spendere un Dado dei Punti Ferita aggiuntivo per ogni livello di slot superiore al 1°.",
     materialDesc: "un grumo di pece"
   },
   "Hungering Blade": {
+    name: "Lama Famelica",
     description: "Imbevi un'arma che impugni, o i tuoi attacchi senz'armi, di voracissima energia negativa. Per la durata, quando colpisci una creatura con un attacco usando l'arma potenziata o un attacco senz'armi per la prima volta in un turno, il bersaglio subisce danni necrotici pari al tuo modificatore di caratteristica da incantatore, e tu ottieni un numero di punti ferita temporanei pari ai danni necrotici inflitti.",
     higherLevels: null
   },
 
   // --- LEVEL 2 ---
   "Blood Sacrifice": {
+    name: "Sacrificio di Sangue",
     description: "Sacrifichi una porzione della tua forza vitale per migliorare il tuo potere magico. Quando lanci questo incantesimo, subisci 1d6 danni necrotici, che non possono essere ridotti o prevenuti in alcun modo. Per la durata, quando lanci un incantesimo che infligge danni, un bersaglio dell'incantesimo (a tua scelta) subisce 1d6 danni aggiuntivi dello stesso tipo di quello normale dell'incantesimo (a tua scelta se ce ne sono più di uno).",
     higherLevels: "Sia i danni che subisci sia i danni extra inflitti dai tuoi incantesimi aumentano di 1d6 per ogni livello di slot superiore al 2°.",
     materialDesc: "una goccia del tuo stesso sangue"
   },
   "Chain of Conviction": {
+    name: "Catena della Convinzione",
     description: "Scagli una catena spettrale e seghettata contro una creatura che puoi vedere entro la gittata. Il bersaglio effettua un tiro salvezza Forza. Con un tiro salvezza fallito, il bersaglio subisce 2d6 danni da forza, viene tirato fino a 9 metri verso di te ed è vincolato dalla catena. Mentre è vincolato dalla catena, la creatura è legata a te e non può muoversi né teletrasportarsi in uno spazio a più di 9 metri da te, e tu hai vantaggio ai tiri per colpire effettuati contro la creatura. Con un tiro salvezza riuscito, il bersaglio subisce solo metà danno. Il bersaglio vincolato ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l'incantesimo su di sé con un successo. Se sei più di 9 metri lontano dal bersaglio, l'incantesimo termina.",
     higherLevels: "Il danno aumenta di 1d6 per ogni livello di slot superiore al 2°."
   },
   "Chorus of the Lost": {
+    name: "Coro dei Perduti",
     description: "Evochi il canto sinistro e i lamenti delle anime perdute da un punto che puoi vedere entro la gittata. Ogni creatura in una sfera di 4,5 metri di raggio centrata lì deve effettuare un tiro salvezza Saggezza. Con un tiro salvezza fallito, il bersaglio subisce 2d6 danni psichici e ha la condizione spaventato per la durata. Con un tiro salvezza riuscito, subisce metà danno e ha la condizione spaventato fino alla fine del suo prossimo turno. Un bersaglio spaventato ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l'incantesimo su di sé con un successo.",
     higherLevels: "Il danno aumenta di 1d6 per ogni livello di slot superiore al 2°.",
     materialDesc: "una campanella d'argento del valore di almeno 10 mo"
   },
   "Harrowing Ballad": {
+    name: "Ballata Straziante",
     description: "Infliggi un canto che erode la mente a una creatura che puoi vedere entro la gittata. Se la creatura ha Intelligenza 4 o superiore, deve riuscire in un tiro salvezza Intelligenza o avere la condizione ammaliato per la durata. Mentre è ammaliata in questo modo, il bersaglio è colpito da una ballata che si ripete rapidamente che solo lui può sentire; subisce 1d6 danni psichici all'inizio di ciascuno dei suoi turni e ha svantaggio alle prove di Saggezza (Percezione) e ai tiri salvezza Costituzione effettuati per mantenere la concentrazione. Il bersaglio ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l'incantesimo con un successo.",
     higherLevels: "Il danno aumenta di 1d6 per ogni livello di slot superiore al 2°."
   },
   "Sanguine Secrets": {
+    name: "Segreti Sanguigni",
     description: "Attingi conoscenza tramite il potere del sangue su una creatura che puoi vedere entro la gittata. Apprendi specie e tipo di creatura del bersaglio, i suoi punti ferita attuali e qualsiasi condizione che lo affligge. Apprendi anche se ha qualcuna delle seguenti caratteristiche e, in tal caso, quali sono: Vulnerabilità, Resistenza o Immunità a danni o condizioni. Inoltre, la prossima prova di caratteristica o tiro per colpire che effettui contro il bersaglio prima della fine del tuo prossimo turno ha vantaggio.",
     higherLevels: null,
     materialDesc: "una goccia di sangue, che l'incantesimo consuma"
   },
   "Summer Winds": {
+    name: "Venti d’Estate",
     description: "Scateni un'esplosione di luce e vento in un cono di 4,5 metri. I tuoi alleati nel cono recuperano 2d6 punti ferita. I non morti nel cono che sono ostili nei tuoi confronti devono effettuare un tiro salvezza Costituzione, subendo 2d6 danni radiosi con un fallimento, o metà con un successo.",
     higherLevels: "Il danno e la cura aumentano di 2d6 per ogni livello di slot superiore al 2°."
   },
   "Unraveling Whisper": {
+    name: "Sussurro Disgregante",
     description: "Scegli una creatura che puoi vedere entro la gittata e sussurri una frase spaventosa che solo il bersaglio può sentire. Il bersaglio deve effettuare un tiro salvezza Saggezza. Con un tiro salvezza fallito, il bersaglio subisce 2d6 danni psichici e ha la condizione spaventato fino all'inizio del tuo prossimo turno. Con un tiro salvezza riuscito, il bersaglio subisce solo metà danno. Mentre è spaventato in questo modo, la creatura ha Vulnerabilità a tua scelta tra danni contundenti, perforanti o taglienti.",
     higherLevels: "Puoi bersagliare una creatura aggiuntiva per ogni livello di slot superiore al 2°."
   },
   "Veil of the Reaper": {
+    name: "Velo del Mietitore",
     description: "Ti avvolgi in ombre che ti velano tra un colpo e l'altro. Alla fine di qualsiasi turno in cui colpisci una creatura con un tiro per colpire, ottieni la condizione invisibile fino all'inizio del tuo prossimo turno.",
     higherLevels: null,
     materialDesc: "un cartoccio di mais essiccato o paglia di grano"
@@ -2148,97 +2164,117 @@ window.SPELLS_IT = {
 
   // --- LEVEL 3 ---
   "Creeping Rot": {
+    name: "Putrefazione Strisciante",
     description: "Invii viticci di putrefazione nera e grigia contro un bersaglio che puoi vedere entro la gittata. Tre viticci poi balzano da quel bersaglio fino a tre altri bersagli a tua scelta, ognuno dei quali deve trovarsi entro 9 metri dal primo bersaglio. Un bersaglio può essere una creatura o una pianta non magica che non sia una creatura, come un albero o un arbusto. In ogni caso, ognuno può essere bersagliato da un solo viticcio. Un bersaglio che è una creatura deve effettuare un tiro salvezza Costituzione. Con un tiro salvezza fallito, subisce 3d8 danni necrotici e ha la condizione avvelenato per la durata. Con un tiro salvezza riuscito, subisce solo metà danno. Una creatura avvelenata in questo modo subisce 1d8 danni necrotici all'inizio di ciascuno dei suoi turni. Una creatura avvelenata ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l'incantesimo su di sé con un successo. Una creatura Pianta fallisce automaticamente il tiro salvezza iniziale, e una pianta non magica che non sia una creatura semplicemente appassisce e muore.",
     higherLevels: "Un viticcio aggiuntivo balza dal primo bersaglio a un altro bersaglio per ogni livello di slot superiore al 3°."
   },
   "Crimson Harvest": {
+    name: "Mietitura Cremisi",
     description: "Un'onda di sangue si propaga da te in un'emanazione di 4,5 metri. Ogni creatura a tua scelta nell'onda deve effettuare un tiro salvezza Destrezza, subendo 3d10 danni necrotici con un fallimento, o metà con un successo. Se danneggi almeno una creatura di taglia Piccola o superiore, una creatura a tua scelta che puoi vedere all'interno dell'emanazione recupera punti ferita pari a metà del tiro per i danni.",
     higherLevels: "Il danno aumenta di 1d10 per ogni livello di slot superiore al 3°.",
     materialDesc: "una fiala di sangue"
   },
   "Crooked Ward": {
+    name: "Protezione Storta",
     description: "Tocchi una superficie immobile e marchi un simbolo che causa agonia nelle creature contorte. Una sfera invisibile di 9 metri di raggio si espande dal punto che hai toccato. Ogni aberrazione, folletto, immondo, mostruosità o non morto nella sfera ha svantaggio alle prove di caratteristica e ai tiri per colpire. Quando una creatura colpita entra nella sfera per la prima volta in un turno o vi inizia il proprio turno, deve riuscire in un tiro salvezza Saggezza o avere la condizione spaventato fino all'inizio del suo prossimo turno.",
     higherLevels: "Puoi mantenere la concentrazione su questo incantesimo più a lungo se lo lanci usando uno slot di livello 4 (fino a 1 ora) o 5 (fino a 8 ore). Se usi uno slot di livello 6+, l'incantesimo non richiede concentrazione e la durata diventa di 24 ore.",
     materialDesc: "una stella di vimini a cinque punte"
   },
   "Culling Sickle": {
+    name: "Falce della Selezione",
     description: "Crei una falce spettrale che dura per la durata e può colpire i tuoi nemici. La falce appare fluttuando nel tuo spazio e si muove con te. Quando lanci questo incantesimo e come azione bonus in ciascuno dei tuoi turni, puoi dirigerla a volare e colpire una creatura entro 9 metri da te. Esegui un attacco a distanza con incantesimo. Se colpisci, il bersaglio subisce 2d8 danni necrotici, e tu ottieni punti ferita temporanei pari a metà del danno inflitto. Dopo che la falce ha colpito o mancato, ritorna a fluttuare nel tuo spazio.",
     higherLevels: "Il danno aumenta di 1d8 per ogni livello di slot superiore al 3°."
   },
   "Cursed Cacophony": {
+    name: "Cacofonia Maledetta",
     description: "Ti concentri su una creatura familiare che si trova sul tuo stesso piano di esistenza. Il bersaglio deve riuscire in un tiro salvezza Saggezza o essere maledetto per la durata. Una volta che un bersaglio fallisce il proprio tiro salvezza contro questo incantesimo, non puoi bersagliarlo con un lancio rituale dell'incantesimo per 24 ore. Mentre è maledetto, il bersaglio sente una musica inquietante e discordante e ha svantaggio ai Test del D20. La prima volta che il bersaglio fallisce un Test del D20 durante un turno, ripete il tiro salvezza contro questo incantesimo senza vantaggio o svantaggio, terminando anticipatamente l'incantesimo con un successo.",
     higherLevels: null,
     materialDesc: "uno spartito musicale"
   },
   "Harvest Moonglow": {
+    name: "Bagliore della Luna del Raccolto",
     description: "Richiami la luce della luna del raccolto per illuminare una sfera di 6 metri di raggio centrata su un punto entro la gittata. L'area è bagnata in una luce fioca argentea. Le creature e gli oggetti con la condizione invisibile nella luce diventano visibili come immagini traslucide e scintillanti. Quando uno dei tuoi alleati si trova nella luce, può usare un'azione bonus per assorbire parte della luce e ottenere 2d6 punti ferita temporanei.",
     higherLevels: "I punti ferita temporanei aumentano di 1d6 per ogni livello di slot superiore al 3°.",
     materialDesc: "un pezzo di pietra di luna"
   },
   "Isolation": {
+    name: "Isolamento",
     description: "Una creatura che puoi vedere entro la gittata deve riuscire in un tiro salvezza Saggezza o avere la mente avvolta nel terrore di un isolamento totale. Per la durata, tutte le altre creature hanno la condizione invisibile rispetto al bersaglio, attraverso cui il bersaglio non può vedere—neppure con Vista Cieca, Visione del Vero o magia come Vedere Invisibile—e il bersaglio non può percepire altre creature con nessuno dei suoi altri sensi. Il bersaglio si muove attorno alle altre creature, o altrimenti razionalizza il non muoversi attraverso spazi occupati da loro (come percependo una porta come chiusa o come muro se un'altra creatura sta in mezzo). Il bersaglio sente ancora dolore ma non può identificare la fonte di alcuna ferita causata da un'altra creatura. Il bersaglio ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l'incantesimo su di sé con un successo.",
     higherLevels: null,
     materialDesc: "un piccolo cubo di metallo"
   },
   "Martyr": {
+    name: "Martire",
     description: "Tocchi una creatura morta che è morta nell'ultimo minuto e trasferisci la tua essenza vitale in essa. Il bersaglio ritorna in vita con punti ferita pari al tuo totale di punti ferita attuale. Tu scendi immediatamente a 0 punti ferita (cosa che nulla può prevenire) con due tiri salvezza contro morte falliti, e devi immediatamente effettuare un tiro salvezza contro morte. Non puoi recuperare punti ferita o diventare stabile finché non hai effettuato questo tiro salvezza.",
     higherLevels: null,
     materialDesc: "un pugnale del valore di almeno 1 mr"
   },
   "Mist of Mourning": {
+    name: "Nebbia del Lutto",
     description: "Evochi una sottile nebbia che prosciuga gioia e vigore in una sfera di 6 metri di raggio centrata su un punto entro la gittata. Ogni creatura nella nebbia quando appare, o quando si muove nella nebbia per la prima volta in un turno o vi termina il proprio turno, deve riuscire in un tiro salvezza Carisma o essere riempita di profonda malinconia fino alla fine del suo prossimo turno. La velocità di una creatura colpita è dimezzata, ha svantaggio ai tiri per colpire e sottrae 1d8 da tutti i suoi tiri per i danni.",
     higherLevels: null,
     materialDesc: "una fiala di lacrime"
   },
   "Sanctum of the Flock": {
+    name: "Santuario del Gregge",
     description: "Crei una sfera di luce debole e scintillante di 6 metri di raggio centrata su un punto entro la gittata. Tu e un numero di creature a tua scelta fino al tuo modificatore di caratteristica da incantatore (minimo 1 altra creatura) potete assorbire magia rinvigorente dalla sfera. Quando una qualsiasi delle creature scelte termina un riposo lungo nell'area, la sfera svanisce, e quelle creature ottengono 2d10 punti ferita temporanei, e per il resto della durata, hanno vantaggio alle prove di Carisma che usano una delle loro competenze in abilità. Le creature scelte che non terminano un riposo lungo nella sfera non ottengono alcun beneficio.",
     higherLevels: null,
     materialDesc: "argento in polvere del valore di almeno 25 mo, che l'incantesimo consuma"
   },
   "Scarlet Dawn": {
+    name: "Alba Scarlatta",
     description: "Una luce cremisi splende in un cilindro di 6 metri di raggio e 18 metri di altezza centrato su un punto entro la gittata. Ogni creatura in quell'area che non sia un costrutto o un non morto deve effettuare un tiro salvezza Costituzione, subendo 4d10 danni necrotici con un fallimento o metà con un successo. I costrutti e i non morti nell'area recuperano 4d10 punti ferita. Se l'area di questo incantesimo si sovrappone con un'area di oscurità creata da un incantesimo di livello 3 o inferiore, quell'altro incantesimo viene dissolto.",
     higherLevels: "Il danno aumenta di 1d10 e il livello di incantesimo che può essere dissolto aumenta di 1 per ogni livello di slot superiore al 3°."
   },
   "Shadow Drain": {
+    name: "Risucchio d’Ombra",
     description: "Sottrai vitalità e senso del sé attraverso le ombre delle creature vicine in un'emanazione di 4,5 metri originata da te. Quando lanci questo incantesimo, puoi designare creature affinché non vengano colpite. Ogni volta che un'altra creatura entra nell'emanazione o vi inizia il proprio turno, o quando l'emanazione entra nello spazio di una creatura, la creatura deve effettuare un tiro salvezza Carisma. Con un tiro salvezza fallito, la creatura subisce 2d6 danni necrotici e ha svantaggio ai tiri per colpire e alle prove di caratteristica fino alla fine del suo prossimo turno. Con un tiro salvezza riuscito, la creatura subisce solo metà danno. Una creatura effettua questo tiro salvezza solo una volta per turno.",
     higherLevels: "Il danno aumenta di 1d6 per ogni livello di slot superiore al 3°."
   },
 
   // --- LEVEL 4 ---
   "Buried Alive": {
+    name: "Sepolto Vivo",
     description: "Mandi i tuoi nemici nella tomba anche se non sono ancora morti. Una creatura che puoi vedere entro la gittata che si trova in piedi sul terreno deve effettuare un tiro salvezza Forza. Con un tiro salvezza fallito, il terreno si apre e inghiotte il bersaglio, seppellendolo fino a 3 metri di profondità. Mentre è sepolto, il bersaglio ha copertura totale, ha le condizioni afferrato e accecato, e non può respirare. Con un tiro salvezza riuscito, il bersaglio ha la condizione prono, e la sua velocità è 0 fino alla fine del suo prossimo turno. Una creatura sepolta può scavare per uscire dalla tomba usando la sua azione per effettuare una prova di Forza (Atletica) CD 15. Con un successo, scava 1,5 metri più vicino alla superficie. Se ha successo per 5 o più, raggiunge la superficie. Quando la creatura raggiunge la superficie, esce dal terreno con la condizione prono. Il bersaglio riesce automaticamente nel suo tiro salvezza se si trova su qualsiasi spessore di pietra o metallo, o almeno 5 cm di legno.",
     higherLevels: null,
     materialDesc: "un pizzico di terra di tomba"
   },
   "Call of the Wild": {
+    name: "Richiamo Selvaggio",
     description: "Scateni un ululato primordiale che richiama creature minori al tuo comando. Ogni bestia in un'emanazione di 30 metri originata da te quando lanci l'incantesimo deve effettuare un tiro salvezza Saggezza. Con un tiro salvezza fallito, un bersaglio ha la condizione ammaliato, può comprendere i tuoi comandi e li segue nel suo prossimo turno al meglio delle sue capacità. Nei tuoi turni successivi, puoi compiere un'azione magica per impartire un nuovo comando. Con un tiro salvezza riuscito, un bersaglio ha la condizione ammaliato fino all'inizio del tuo prossimo turno, ma non hai alcuna ulteriore capacità di comandarlo. L'ululato è udibile entro 90 metri.",
     higherLevels: null,
     materialDesc: "un pochino di pelo o pelle di animale"
   },
   "Consuming Pyre": {
+    name: "Pira Divorante",
     description: "Fai sì che una creatura che puoi vedere entro la gittata erompa in fiamme consumanti e implacabili. Il bersaglio deve effettuare un tiro salvezza Destrezza. Con un tiro salvezza fallito, il bersaglio subisce 2d8 danni da fuoco e 2d8 danni necrotici o radiosi (scelta al lancio dell'incantesimo), e le fiamme radiose persistono. Con un tiro salvezza riuscito, subisce solo metà danno. Mentre le fiamme persistono, la creatura subisce nuovamente il danno all'inizio di ciascuno dei suoi turni. Il bersaglio, o un'altra creatura a portata di mano del bersaglio, può compiere un'azione per consentire al bersaglio di ripetere il tiro salvezza, terminando l'incantesimo con un successo. Una creatura uccisa dai danni di questo incantesimo viene ridotta in cenere, insieme a qualsiasi equipaggiamento non magico che indossa o trasporta.",
     higherLevels: null
   },
   "Intrusive Despair": {
+    name: "Disperazione Invadente",
     description: "Maledici una creatura entro la gittata, riempiendole la mente di paranoia e disperazione striscianti. Quando il bersaglio compie un'azione di Attaccare o un'azione magica, deve riuscire in un tiro salvezza Saggezza o sprecare la sua azione. Una volta che il bersaglio riesce in tre tiri salvezza contro questo incantesimo, l'incantesimo termina.",
     higherLevels: null,
     materialDesc: "un fiore di tromba del diavolo"
   },
   "Murder of Crows": {
+    name: "Stormo di Corvi",
     description: "Evochi e scateni uno stormo di corvi mortali. Ogni creatura a tua scelta in un cono di 9 metri originato da te effettua un tiro salvezza Destrezza. Con un tiro salvezza fallito, il bersaglio subisce 5d6 danni da forza e ha la condizione accecato. Con un tiro salvezza riuscito, subisce solo metà danno. Una creatura accecata ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l'effetto su di sé con un successo. L'effetto termina anche se la creatura recupera punti ferita. I corvi si disperdono e svaniscono dopo aver colpito.",
     higherLevels: "Il danno aumenta di 1d6 per ogni livello di slot superiore al 4°.",
     materialDesc: "una piuma di corvo"
   },
   "Puppet Master": {
+    name: "Burattinaio",
     description: "Una creatura che puoi vedere entro la gittata deve riuscire in un tiro salvezza Saggezza o avere la condizione ammaliato per la durata. Fili magici di marionetta si attaccano agli arti o al corpo della creatura ammaliata, e deve usare la sua azione nel suo turno per eseguire un attacco in mischia contro una creatura diversa da sé che scegli mentalmente, muovendosi per raggiungere il bersaglio se necessario. Il bersaglio può agire normalmente nel suo turno se non scegli un'altra creatura, o se la creatura non si trova a portata del bersaglio dopo che si è mosso. Il bersaglio ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l'incantesimo su di sé con un successo. Nei tuoi turni successivi, devi compiere un'azione bonus per mantenere il controllo del bersaglio, altrimenti l'incantesimo termina.",
     higherLevels: null,
     materialDesc: "un filo di marionetta"
   },
   "Sacrificial Siphon": {
+    name: "Sifone Sacrificale",
     description: "Tocchi un'altra creatura e imponi una maledizione che drena la vitalità del bersaglio e la trasferisce a te. Il bersaglio deve effettuare un tiro salvezza Carisma. Con un tiro salvezza fallito, il bersaglio è maledetto per la durata. Mentre è maledetto, il bersaglio deve sottrarre 1d4 dai suoi tiri per colpire e dalle prove di caratteristica, e quando il bersaglio subisce danno, puoi compiere una reazione per ottenere 10 punti ferita temporanei. Con un tiro salvezza riuscito, ottieni 5 punti ferita temporanei, e il bersaglio deve sottrarre 1d4 dalle sue prove di caratteristica fino all'inizio del tuo prossimo turno.",
     higherLevels: null
   },
   "Sanctum of the Shepherd": {
+    name: "Santuario del Pastore",
     description: "Crei una sfera di luce debole e scintillante di 6 metri di raggio centrata su un punto entro la gittata. Tu e un numero di creature a tua scelta fino al tuo modificatore di caratteristica da incantatore (minimo 1 altra creatura) potete assorbire magia protettiva dalla sfera. Quando una qualsiasi delle creature scelte termina un riposo lungo nell'area, la sfera svanisce, e quelle creature ottengono un bonus di +1 alla CA per il resto della durata. Le creature scelte che non terminano un riposo lungo nella sfera non ottengono alcun beneficio.",
     higherLevels: null,
     materialDesc: "polvere di adamantio o di diamante del valore di almeno 200 mo, che l'incantesimo consuma"
@@ -2246,16 +2282,19 @@ window.SPELLS_IT = {
 
   // --- LEVEL 5 ---
   "Field of Reaping": {
+    name: "Campo della Mietitura",
     description: "Crei un campo ombroso che miete la forza vitale che si dissipa in un cubo di 9 metri originato da un punto entro la gittata. Una creatura ostile nei tuoi confronti nel campo quando appare, o quando entra nel campo per la prima volta in un turno o vi termina il proprio turno, è maledetta fino alla fine del suo prossimo turno. Mentre è maledetta, la prima volta che la creatura subisce danno durante un turno, subisce 1d6 danni necrotici aggiuntivi, e una creatura a tua scelta all'interno del campo che non sia maledetta da esso recupera punti ferita pari ai danni necrotici subiti.",
     higherLevels: "Il danno aumenta di 1d6 per ogni livello di slot superiore al 5°.",
     materialDesc: "un cartoccio di mais essiccato o pula di grano"
   },
   "Lucky Charm": {
+    name: "Portafortuna",
     description: "Tocchi un oggetto non magico di taglia Minuscola, infondendolo con una porzione della tua fortuna per la durata. Mentre un'altra creatura trasporta l'oggetto, quella creatura ha vantaggio ai Test del D20, e tu hai svantaggio ai Test del D20.",
     higherLevels: null,
     materialDesc: "un quadrifoglio e una scheggia di specchio rotto"
   },
   "Mirrored Agony": {
+    name: "Agonia Riflessa",
     description: "La creatura scatenante effettua un tiro salvezza Saggezza. Con un tiro salvezza fallito, subisce una quantità di danni psichici pari ai danni inflitti al tuo alleato. Con un tiro salvezza riuscito, subisce metà danno.",
     higherLevels: null,
     materialDesc: "uno spillo o un ago"
@@ -2263,6 +2302,7 @@ window.SPELLS_IT = {
 
   // --- LEVEL 6 ---
   "Ghastly Charge": {
+    name: "Carica Spettrale",
     description: "Richiami gli spiriti di cavalieri morti da tempo, che caricano in avanti da te in una linea lunga 27 metri e larga 6 metri, poi svaniscono. Ogni creatura a tua scelta nella linea deve effettuare un tiro salvezza Saggezza. Con un tiro salvezza fallito, un bersaglio subisce 5d12 danni necrotici, ha la condizione spaventato fino all'inizio del tuo prossimo turno, e deve immediatamente usare la sua reazione, se disponibile, per allontanarsi da te il più possibile, usando la rotta più sicura. Con un tiro salvezza riuscito, la creatura subisce solo metà danno.",
     higherLevels: "Il danno aumenta di 1d12 per ogni livello di slot superiore al 6°.",
     materialDesc: "un brandello di stendardo"
