@@ -2608,7 +2608,12 @@ _injectLayBtns();
 (function(){var V={'crooked-moon':1,'sword-coast':1,'dark':1,'light':1};var t=localStorage.getItem('cm_theme')||'light';if(!V[t])t='light';document.documentElement.dataset.theme=t})();
 (function(){var btn=document.getElementById('btnSettings');if(!btn)return;
 /* Apertura/chiusura settings ora gestita dal sistema globale finestre
-   (data-tool="settings", data-close="settings", tog/wm/bm). */
+   (data-tool="settings", data-close="settings", tog/wm/bm). setOpen/setClose
+   restano come no-op chain extension point: il codice esistente li decora
+   per chiamare refreshFs/refreshTheme/refreshEdition/etc. quando il
+   settings si apre, e il click handler sotto li invoca tramite thunk. */
+function setOpen(){}function setClose(){}
+btn.addEventListener('click',function(){setOpen()});
 function refreshFs(){var cur=localStorage.getItem('cm_fontsize')||'m';document.querySelectorAll('[data-fontsize]').forEach(function(b){if(b.dataset.fontsize===cur)b.classList.add('on');else b.classList.remove('on')})}refreshFs();
 document.querySelectorAll('[data-fontsize]').forEach(function(b){b.onclick=function(){var size=b.dataset.fontsize;var FS={s:13,m:16,l:18,xl:22};if(!FS[size])return;localStorage.setItem('cm_fontsize',size);document.documentElement.style.fontSize=FS[size]+'px';refreshFs()}});
 var _logoMap={'crooked-moon':'img/crest.webp','sword-coast':'img/Logo_Dungeon_Desk_gold.svg','dark':'img/Logo_Dungeon_Desk_white.svg','light':'img/Logo_Dungeon_Desk_black.svg'};
@@ -2745,7 +2750,7 @@ function _renderToolList(){var list=document.getElementById('setToolList');if(!l
 var _toolList=document.getElementById('setToolList');if(_toolList){_toolList.addEventListener('click',function(e){var b=e.target.closest('.setpanel__toolbtn[data-toolkey]');if(!b)return;var k=b.dataset.toolkey;var hidden=_getHiddenTools();var i=hidden.indexOf(k);if(i>=0)hidden.splice(i,1);else hidden.push(k);_setHiddenTools(hidden);_applyToolHide();_renderToolList()})}
 var origSetOpen3=setOpen;setOpen=function(){origSetOpen3();_renderToolList()};
 _applyToolHide();
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&panel.classList.contains('on'))setClose()});
+/* keydown handler rimosso: settings ora è una finestra .win e non si chiude su Esc */
 /* Chiavi escluse dal backup esportato: flag privati o ephemeral.
    cm_dm = dev mode segreto. cm_last_sync = timestamp transitorio. */
 var BACKUP_EXCLUDE={'cm_dm':1,'cm_last_sync':1};
