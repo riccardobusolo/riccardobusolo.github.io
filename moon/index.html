@@ -79,7 +79,7 @@ body.no-custom-cursor{--cur-default:default;--cur-pointer:pointer;--cur-text:tex
    drop-shadow dorata. Pulse e glow viaggiano su due animazioni separate:
    il pulse si esaurisce in 0.65s, il glow dura 0.95s (300ms extra di
    fade-out morbido). Tutte le drop-shadow sono cappate al 70% di opacità. */
-.sb__logo--burst{animation:sbLogoPulse .65s cubic-bezier(.34,1.56,.64,1),sbLogoGlow .95s cubic-bezier(.16,1,.3,1)}
+.sb__logo--burst{animation:sbLogoPulse .65s cubic-bezier(.34,1.56,.64,1) forwards,sbLogoGlow .95s cubic-bezier(.16,1,.3,1) forwards}
 @keyframes sbLogoPulse{
   0%  {transform:scale(1) rotate(0deg)}
   18% {transform:scale(.92) rotate(-3deg)}
@@ -2529,6 +2529,16 @@ function refreshLogo(){var cur=localStorage.getItem('cm_theme')||'light';var img
     for(var i=0;i<28;i++){
       (function(i){setTimeout(function(){spark(cx,cy)},i*8)})(i);
     }
+  });
+  /* Quando il glow termina (è la più lunga delle due animazioni del burst),
+     rimuoviamo la classe --burst. Senza questo passaggio l'animazione finisce
+     con forwards "agganciata" al valore di hover (drop-shadow 6px) e poi
+     snappa direttamente al valore statico senza usare la transition.
+     Rimuovendo la classe il filter torna sotto il controllo dei selettori
+     statici (.sb__logo / :hover) e il cambio di valore (es. mouse fuori →
+     filter:none) attiva la transition .15s in modo morbido. */
+  logo.addEventListener('animationend',function(e){
+    if(e.animationName==='sbLogoGlow')logo.classList.remove('sb__logo--burst');
   });
 })();
 function refreshTheme(){var cur=localStorage.getItem('cm_theme')||'light';document.querySelectorAll('[data-theme][class*="setpanel__themebtn"]').forEach(function(b){if(b.dataset.theme===cur)b.classList.add('on');else b.classList.remove('on')})}refreshTheme();
