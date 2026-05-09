@@ -108,8 +108,12 @@ body.no-custom-cursor{--cur-default:default;--cur-pointer:pointer;--cur-text:tex
   100%{opacity:1}
 }
 @keyframes sbSparkFly{
-  0%  {transform:translate(0,0) scale(.2);opacity:1}
-  10% {transform:translate(0,0) scale(1.2);opacity:1}
+  /* scale parte da 0 (invisibile assoluto) e cresce mentre la scintilla
+     si è GIÀ allontanata dal centro: al 20% è al picco di scala 1.0 ma è
+     già al 18% del tragitto verso (--dx,--dy). Così la sovrapposizione
+     centrale di 28 scintille non genera un alone bianco al centro del logo. */
+  0%  {transform:translate(0,0) scale(0);opacity:1}
+  20% {transform:translate(calc(var(--dx)*.18),calc(var(--dy)*.18)) scale(1);opacity:1}
   85% {opacity:1}
   100%{transform:translate(var(--dx),var(--dy)) scale(.25);opacity:0}
 }
