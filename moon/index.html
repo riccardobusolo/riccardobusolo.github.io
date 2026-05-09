@@ -1591,6 +1591,16 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spe-ed-col-head--it{color:#4a9a5a;border-color:rgba(74,154,90,.25);background:rgba(74,154,90,.05)}
 .spe-ed-col-head--en{color:#5b8def;border-color:rgba(91,141,239,.25);background:rgba(91,141,239,.05)}
 .spe-ed-col-head b{color:inherit}
+/* Indicatore rosso "modificato" + pulsante Ripristina inline. Visibili
+   nel head di ogni card che ha override locali (sia in read-only che in
+   edit mode) per evidenziare immediatamente quali incantesimi sono stati
+   personalizzati. */
+.spe__ovbadge{display:inline-flex;align-items:center;gap:5px;margin-left:6px;padding:2px 8px;border-radius:11px;background:rgba(200,40,40,.16);border:1px solid rgba(220,60,60,.6);color:#e54a4a;font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;flex-shrink:0;line-height:1.4}
+.spe__ovbadge::before{content:'';width:7px;height:7px;border-radius:50%;background:#e54a4a;box-shadow:0 0 5px rgba(229,74,74,.85),0 0 10px rgba(229,74,74,.45);flex-shrink:0;animation:spOvPulse 1.6s ease-in-out infinite}
+@keyframes spOvPulse{0%,100%{opacity:1}50%{opacity:.55}}
+.spe__ovreset{margin-left:4px;padding:2px 8px;border-radius:3px;background:transparent;border:1px solid rgba(220,60,60,.5);color:#e54a4a;font-family:var(--mono);font-size:.56rem;cursor:var(--cur-pointer);text-transform:uppercase;letter-spacing:.05em;line-height:1.4;transition:all .12s;flex-shrink:0;font-weight:600}
+.spe__ovreset:hover{background:rgba(200,40,40,.18);border-color:#e54a4a;color:#ff6464}
+.spe__ovreset:active{transform:scale(.96)}
 /* Doppio nome IT|EN nell'header */
 .spe__name-pair{display:flex;flex-direction:column;line-height:1.15;flex:1;overflow:hidden;min-width:0}
 .spe__name-pair .spe__name{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -4960,6 +4970,55 @@ function _spOvSet(name,field,val){
   _spOvSave(o);
 }
 function _spOvDel(name){var o=_spOvLoad();if(o[name]){delete o[name];_spOvSave(o)}}
+/* === Snapshot dei valori originali ===
+   Per ogni incantesimo che riceve un override, conserviamo in memoria una
+   copia dei suoi valori originali (presi dal catalogo PRIMA della mutazione).
+   Questo permette di ripristinare i valori senza dover ricaricare la pagina. */
+var _spOrig={};
+function _spFindSp(name){for(var i=0;i<SP.length;i++){if(SP[i].name===name)return SP[i]}return null}
+function _spSnapshot(name){
+  if(_spOrig[name])return;
+  var sp=_spFindSp(name);if(!sp)return;
+  var IT=window.SPELLS_IT||{};
+  var it=IT[name]||null;
+  _spOrig[name]={
+    attackType:sp.attackType,
+    saveAbility:sp.saveAbility,
+    damage:sp.damage,
+    damageType:sp.damageType,
+    description_en:sp.description,
+    higherLevels_en:sp.higherLevels,
+    /* Per IT: snapshot solo dei campi che possiamo modificare */
+    it_existed:!!it,
+    description_it:it?it.description:undefined,
+    higherLevels_it:it?it.higherLevels:undefined
+  };
+}
+/* Ripristina i valori originali per un incantesimo dalla snapshot in memoria
+   + cancella l'override da localStorage. NON re-renderizza (lo fa il chiamante).
+   Restituisce true se qualcosa è stato ripristinato. */
+function _spRestore(name){
+  var sp=_spFindSp(name);
+  var o=_spOrig[name];
+  if(o&&sp){
+    sp.attackType=o.attackType;
+    sp.saveAbility=o.saveAbility;
+    sp.damage=o.damage;
+    sp.damageType=o.damageType;
+    sp.description=o.description_en;
+    sp.higherLevels=o.higherLevels_en;
+    var IT=window.SPELLS_IT||{};
+    if(IT[name]){
+      if(o.description_it===undefined)delete IT[name].description;
+      else IT[name].description=o.description_it;
+      if(o.higherLevels_it===undefined)delete IT[name].higherLevels;
+      else IT[name].higherLevels=o.higherLevels_it;
+    }
+    delete _spOrig[name];
+  }
+  _spOvDel(name);
+  return!!o;
+}
 /* Applica gli override salvati all'oggetto SPELLS in memoria + a SPELLS_IT.
    Chiamata una volta al boot e ad ogni modifica per mantenere la coerenza
    tra catalogo, scheda PG e ogni altro componente che legge SPELLS. */
@@ -4968,9 +5027,10 @@ function _spApplyOverrides(){
   var IT=window.SPELLS_IT||{};
   for(var name in o){if(!o.hasOwnProperty(name))continue;
     var ov=o[name];
-    /* Trova lo spell canonico per nome (chiavi: nome inglese) */
-    var sp=null;for(var i=0;i<SP.length;i++){if(SP[i].name===name){sp=SP[i];break}}
+    var sp=_spFindSp(name);
     if(!sp)continue;
+    /* Snapshot PRIMA di mutare: garantisce reversibilità senza reload */
+    _spSnapshot(name);
     /* Campi attacco/danno: applicati direttamente all'oggetto SPELLS */
     if('attackType' in ov)sp.attackType=ov.attackType;
     if('saveAbility' in ov)sp.saveAbility=ov.saveAbility;
@@ -5155,7 +5215,7 @@ var fav=isFav(rawS.name);
 var lvlTxt=s.level===0?'T':s.level+'\u00b0';
 var tags='';if(s.concentration)tags+='<span class="spe__tag spe__tag--c" title="Concentrazione">C</span>';if(s.ritual)tags+='<span class="spe__tag spe__tag--r" title="Rituale">R</span>';
 var clsH=s.classes.map(function(c){return'<span class="spe__cl">'+c+'</span>'}).join('');
-var srcLbl=rawS.source==="Player's Handbook"?'PHB':rawS.source==="Tasha's Cauldron of Everything"?"Tasha's":rawS.source==='The Crooked Moon'?'TCM':rawS.source==="Xanathar's Guide to Everything"?'XGtE':rawS.source;
+var srcLbl=rawS.source==="Player's Handbook"?'Player':rawS.source==="Tasha's Cauldron of Everything"?'Tasha':rawS.source==='The Crooked Moon'?'Crooked':rawS.source==="Xanathar's Guide to Everything"?'Xhanatar':rawS.source;
 var nameAttr=rawS.name.replace(/"/g,'&quot;');
 /* Determina se questo spell ha un override salvato (per il pulsante "Ripristina") */
 var hasOv=!!_spOvFor(rawS.name);
@@ -5183,7 +5243,6 @@ if(_spEditMode){
     '<div class="spe-ed-fld spe-ed-fld--narrow" data-spedsave style="'+saveStyle+'"><span class="spe-ed-lbl">TS</span><select class="spe-ed-sel" data-spedfld="saveAbility" data-spedname="'+nameAttr+'">'+saveOpts+'</select></div>'+
     '<div class="spe-ed-fld spe-ed-fld--narrow"><span class="spe-ed-lbl">Danno</span><input class="spe-ed-in" type="text" placeholder="es. 3d6" data-spedfld="damage" data-spedname="'+nameAttr+'" value="'+(dmg.replace(/"/g,'&quot;'))+'"></div>'+
     '<div class="spe-ed-fld"><span class="spe-ed-lbl">Tipo danno</span><select class="spe-ed-sel" data-spedfld="damageType" data-spedname="'+nameAttr+'">'+dmgTOpts+'</select></div>'+
-    '<div class="spe-ed-fld" style="flex:0 0 auto"><span class="spe-ed-lbl">&nbsp;</span><button class="spe-ed-reset" data-spedreset="'+nameAttr+'"'+(hasOv?'':' disabled')+' title="Ripristina i valori originali del catalogo per questo incantesimo">Ripristina</button></div>'+
   '</div>';
   /* === Editor: descrizione e livelli superiori in due colonne IT|EN === */
   function _esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -5240,7 +5299,14 @@ if(_spEditMode){
 var nameH=_spEditMode
   ? '<div class="spe__name-pair"><span class="spe__name">'+sIt.name+'</span>'+(sIt.name!==rawS.name?'<span class="spe__name-en">'+rawS.name+'</span>':'')+'</div>'
   : '<span class="spe__name">'+s.name+'</span>';
-d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+nameAttr+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+nameAttr+'">'+(fav?'\u2605':'\u2606')+'</button>'+nameH+'<span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+descH+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
+/* Badge rosso + pulsante Ripristina inline: visibili sempre (read-only e
+   edit mode) quando questo incantesimo ha override locali. Il pulsante
+   condivide il data-attr "data-spedreset" con il vecchio handler. */
+var ovIndicatorH=hasOv
+  ? '<span class="spe__ovbadge" title="Hai modificato manualmente questo incantesimo">Modificato</span>'+
+    '<button class="spe__ovreset" data-spedreset="'+nameAttr+'" title="Annulla le tue modifiche e ripristina i valori originali del catalogo">\u21BB Ripristina</button>'
+  : '';
+d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+nameAttr+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+nameAttr+'">'+(fav?'\u2605':'\u2606')+'</button>'+nameH+'<span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div>'+ovIndicatorH+'</div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+descH+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
 spList.appendChild(d)})}
 spList.addEventListener('click',function(e){
   var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}
@@ -5252,11 +5318,9 @@ spList.addEventListener('click',function(e){
     e.stopPropagation();
     var nm=rstBtn.getAttribute('data-spedreset');
     if(confirm('Ripristinare i valori originali del catalogo per "'+nm+'"?\nLe tue modifiche personali a questo incantesimo verranno cancellate.')){
-      _spOvDel(nm);
+      _spRestore(nm);
       _spEdRefreshCount();
-      /* Per ripristinare davvero i valori originali bisognerebbe riavere la copia
-         pristina del catalogo. Per semplicità invitiamo l'utente a ricaricare la pagina. */
-      alert('Modifiche cancellate da localStorage. Ricarica la pagina per rivedere i valori originali del catalogo.');
+      if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets();
       renSp();
     }
     return;
@@ -5287,6 +5351,8 @@ function _spEdHandle(target){
   /* Trova lo spell canonico per nome */
   var sp=null;for(var i=0;i<SP.length;i++){if(SP[i].name===name){sp=SP[i];break}}
   if(!sp)return;
+  /* Snapshot dei valori originali PRIMA di mutare: garantisce ripristino senza reload */
+  _spSnapshot(name);
   if(fld==='attackType'){
     sp.attackType=val;_spOvSet(name,'attackType',val);
     /* Mostra/nascondi il campo "TS" in base al tipo */
@@ -5313,9 +5379,16 @@ function _spEdHandle(target){
   }else if(fld==='higherLevels_en'){
     sp.higherLevels=val;_spOvSet(name,'higherLevels_en',val);
   }
-  /* Abilita il pulsante "Ripristina" della stessa card (ora ha override) */
+  /* Mostra il badge "Modificato" + pulsante Ripristina nella head, se non già presente.
+     (renSp() lo include solo per le card che avevano già override al render: dopo
+     la prima modifica iniettiamo l'indicatore senza re-renderizzare l'intera lista
+     per evitare di perdere il focus dal textarea.) */
   var spe=target.closest('.spe');
-  if(spe){var rb=spe.querySelector('[data-spedreset]');if(rb)rb.disabled=false}
+  if(spe&&!spe.querySelector('.spe__ovbadge')){
+    var head=spe.querySelector('.spe__head');
+    var nm=name.replace(/"/g,'&quot;');
+    if(head)head.insertAdjacentHTML('beforeend','<span class="spe__ovbadge" title="Hai modificato manualmente questo incantesimo">Modificato</span><button class="spe__ovreset" data-spedreset="'+nm+'" title="Annulla le tue modifiche e ripristina i valori originali del catalogo">↻ Ripristina</button>');
+  }
   _spEdFlashSaved(target);
   /* Aggiorna il badge "X incantesimi modificati" + abilita pulsanti export/reset */
   _spEdRefreshCount();
@@ -5356,10 +5429,12 @@ if(spEditDoneBtn)spEditDoneBtn.addEventListener('click',function(){
   _spEditMode=false;_spRefreshEditBtn();renSp();
 });
 if(spEditResetAllBtn)spEditResetAllBtn.addEventListener('click',function(){
-  if(confirm('Cancellare TUTTE le tue modifiche personali al catalogo incantesimi?\nLe override salvate in localStorage saranno rimosse.\n\nNota: per rivedere i valori originali servirà ricaricare la pagina.')){
+  if(confirm('Cancellare TUTTE le tue modifiche personali al catalogo incantesimi?\nLe override salvate in localStorage saranno rimosse e tutti gli incantesimi torneranno ai valori originali.')){
+    /* Restore in-memory + clear localStorage senza reload */
+    Object.keys(_spOrig).forEach(function(n){_spRestore(n)});
     try{localStorage.removeItem('cm_sp_overrides')}catch(e){}
     _spEdRefreshCount();
-    alert('Override rimossi. Ricarica la pagina per vedere i valori originali del catalogo.');
+    if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets();
     renSp();
   }
 });
