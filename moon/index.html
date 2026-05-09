@@ -87,13 +87,18 @@ body.no-custom-cursor{--cur-default:default;--cur-pointer:pointer;--cur-text:tex
   72% {transform:scale(1.02) rotate(-1deg)}
   100%{transform:scale(1) rotate(0deg)}
 }
+/* I keyframe 0% e 100% sono allineati al valore di .sb__logo:hover
+   (drop-shadow 6px). In questo modo: (a) se l'utente sta hoverando al click
+   l'animazione parte dallo stesso valore senza snap, (b) quando finisce e lo
+   stato statico riprende il controllo (sempre :hover, dato che il puntatore
+   è ancora sul logo), il valore è già quello giusto e non c'è transizione
+   visibile. Il "buco" antiestetico tra fine animazione e ripresa del glow
+   d'hover è eliminato. */
 @keyframes sbLogoGlow{
-  0%  {filter:none}
-  12% {filter:drop-shadow(0 0 4px color-mix(in srgb,var(--gold) 70%,transparent))}
-  31% {filter:drop-shadow(0 0 18px color-mix(in srgb,var(--gold) 70%,transparent)) drop-shadow(0 0 36px color-mix(in srgb,var(--gold) 70%,transparent))}
-  50% {filter:drop-shadow(0 0 12px color-mix(in srgb,var(--gold) 70%,transparent))}
-  68% {filter:drop-shadow(0 0 6px color-mix(in srgb,var(--gold) 70%,transparent))}
-  100%{filter:none}
+  0%  {filter:drop-shadow(0 0 6px color-mix(in srgb,var(--gold) 70%,transparent))}
+  30% {filter:drop-shadow(0 0 18px color-mix(in srgb,var(--gold) 70%,transparent)) drop-shadow(0 0 36px color-mix(in srgb,var(--gold) 70%,transparent))}
+  55% {filter:drop-shadow(0 0 12px color-mix(in srgb,var(--gold) 70%,transparent))}
+  100%{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--gold) 70%,transparent))}
 }
 /* Scintilla volante: posizionata fixed, parte dal centro del logo e si
    irradia verso un offset (--dx,--dy) random scalando e svanendo.
