@@ -383,31 +383,47 @@ body.sb--global-dragging .sb__btn:not(.on):hover{background:transparent;color:va
 .wh__menu-grp .wh__menu-btn svg{width:18px;height:14px}
 .wh{position:relative}
 
-/* Scrollbar nativa nascosta su .wb e altri contenitori scrollabili: la
-   sostituiamo con un thumb DOM custom (.csb-thumb) gestito da JS. Il
-   browser ignora cursor su ::-webkit-scrollbar*, quindi l'unico modo per
-   avere un cursore custom sulla scrollbar è renderizzarla noi. */
+/* Scrollbar custom: track + thumb DOM al posto di quella nativa, perché
+   il browser ignora `cursor` sui pseudo ::-webkit-scrollbar*.
+   Struttura: .csb-track (binario visibile, position:absolute ancorato al
+   bordo destro del viewport) > .csb-thumb (cursore di scroll dentro al
+   track, posizionato in base a scrollTop/scrollHeight). */
 .wb{flex:1;overflow:hidden auto;padding:7px;position:relative;scrollbar-width:none;scrollbar-color:transparent transparent}.wb::-webkit-scrollbar{display:none;width:0;height:0}.wb::-webkit-scrollbar-thumb{display:none}
-/* Thumb custom: position:absolute dentro al contenitore scrollabile.
-   Top e height vengono aggiornati da JS in base a scrollTop/scrollHeight.
-   left = scrollLeft + clientWidth - 9 mantiene il thumb visualmente
-   ancorato al bordo destro del viewport anche se il contenuto scorre. */
 .csb-host{scrollbar-width:none}
 .csb-host::-webkit-scrollbar{display:none;width:0;height:0}
 .csb-host::-webkit-scrollbar-thumb,.csb-host::-webkit-scrollbar-track{display:none}
-.csb-thumb{position:absolute;width:6px;border-radius:3px;background:rgba(140,30,30,.18);z-index:5;cursor:var(--cur-grab);transition:background .15s,opacity .25s;display:none;pointer-events:auto;will-change:top,left,height}
-.csb-thumb:hover{background:rgba(140,30,30,.4)}
-.csb-thumb.csb-thumb--active,.csb-thumb:active{background:rgba(140,30,30,.6);cursor:var(--cur-grabbing)}
+/* Track: posizionato dal JS — top=scrollTop, left=scrollLeft+clientWidth-10,
+   height=clientHeight. Sta sempre ancorato al bordo destro del viewport
+   anche se il contenuto scorre (compensiamo con scrollTop/scrollLeft). */
+.csb-track{position:absolute;width:8px;background:rgba(140,30,30,.06);border-radius:4px;z-index:4;display:none;pointer-events:auto;will-change:top,left,height}
+.csb-track:hover{background:rgba(140,30,30,.1)}
+/* Thumb: position:absolute dentro al track. top relativo al track =
+   scrollRatio * (clientHeight - thumbHeight). */
+.csb-thumb{position:absolute;left:1px;width:6px;border-radius:3px;background:rgba(140,30,30,.32);cursor:var(--cur-grab);transition:background .15s;will-change:top,height}
+.csb-thumb:hover{background:rgba(140,30,30,.5)}
+.csb-thumb.csb-thumb--active,.csb-thumb:active{background:rgba(140,30,30,.7);cursor:var(--cur-grabbing)}
 body.csb-dragging,body.csb-dragging *{cursor:var(--cur-grabbing)!important;user-select:none}
-:root[data-theme="sword-coast"] .csb-thumb{background:rgba(122,90,37,.3)}
-:root[data-theme="sword-coast"] .csb-thumb:hover{background:rgba(122,90,37,.5)}
-:root[data-theme="sword-coast"] .csb-thumb.csb-thumb--active,:root[data-theme="sword-coast"] .csb-thumb:active{background:rgba(122,90,37,.7)}
-:root[data-theme="dark"] .csb-thumb{background:rgba(255,255,255,.18)}
-:root[data-theme="dark"] .csb-thumb:hover{background:rgba(255,255,255,.35)}
-:root[data-theme="dark"] .csb-thumb.csb-thumb--active,:root[data-theme="dark"] .csb-thumb:active{background:rgba(255,255,255,.5)}
-:root[data-theme="light"] .csb-thumb{background:rgba(0,0,0,.18)}
-:root[data-theme="light"] .csb-thumb:hover{background:rgba(0,0,0,.35)}
-:root[data-theme="light"] .csb-thumb.csb-thumb--active,:root[data-theme="light"] .csb-thumb:active{background:rgba(0,0,0,.5)}
+/* Riserva padding-right per il track così il contenuto non lo overlappa.
+   Solo per .wb, .epick__grid, .cpick__list, etc che hanno padding piccolo
+   o nullo. Gli altri (.helpMd__body con 22px, .setpanel__body con 18px)
+   hanno già spazio sufficiente. */
+.wb.csb-host,.epick__grid.csb-host,.cpick__list.csb-host,.mpx__sb-list.csb-host,.mp__sb-list.csb-host,.cc__hist.csb-host,.tm-right.csb-host,.sp__list-scroll.csb-host,.sp__prep-list.csb-host,.sp-md__body.csb-host,.spf__drop.csb-host,.mp__autocomp.csb-host,.pg__pgsel-menu.csb-host,.pg__cls-dd-panel.csb-host,.mpx-pinpop__emojis.csb-host,.ch-popmenu.csb-host,.rs__view.csb-host{padding-right:12px}
+/* Theme variants */
+:root[data-theme="sword-coast"] .csb-track{background:rgba(122,90,37,.08)}
+:root[data-theme="sword-coast"] .csb-track:hover{background:rgba(122,90,37,.14)}
+:root[data-theme="sword-coast"] .csb-thumb{background:rgba(122,90,37,.4)}
+:root[data-theme="sword-coast"] .csb-thumb:hover{background:rgba(122,90,37,.6)}
+:root[data-theme="sword-coast"] .csb-thumb.csb-thumb--active,:root[data-theme="sword-coast"] .csb-thumb:active{background:rgba(122,90,37,.8)}
+:root[data-theme="dark"] .csb-track{background:rgba(255,255,255,.05)}
+:root[data-theme="dark"] .csb-track:hover{background:rgba(255,255,255,.09)}
+:root[data-theme="dark"] .csb-thumb{background:rgba(255,255,255,.22)}
+:root[data-theme="dark"] .csb-thumb:hover{background:rgba(255,255,255,.4)}
+:root[data-theme="dark"] .csb-thumb.csb-thumb--active,:root[data-theme="dark"] .csb-thumb:active{background:rgba(255,255,255,.55)}
+:root[data-theme="light"] .csb-track{background:rgba(0,0,0,.05)}
+:root[data-theme="light"] .csb-track:hover{background:rgba(0,0,0,.09)}
+:root[data-theme="light"] .csb-thumb{background:rgba(0,0,0,.22)}
+:root[data-theme="light"] .csb-thumb:hover{background:rgba(0,0,0,.4)}
+:root[data-theme="light"] .csb-thumb.csb-thumb--active,:root[data-theme="light"] .csb-thumb:active{background:rgba(0,0,0,.55)}
 .empty{display:none;align-items:flex-end;justify-content:center;padding-bottom:40px;z-index:0;position:absolute;inset:0}
 .empty__text{font-family:var(--mono);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;background:rgba(10,10,15,.7);padding:6px 16px;border-radius:5px}
 .fi{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-family:var(--mono);font-size:.75rem;color:var(--text);outline:none;transition:border-color .2s;width:100%}.fi:focus{border-color:var(--rb)}.fi::placeholder{color:var(--muted)}
@@ -6328,53 +6344,52 @@ document.addEventListener('keydown',function(e){
    controllabile via CSS (cursor:var(--cur-grab/grabbing)).
 
    Approccio (in-place):
-   - Il thumb è inserito DENTRO l'elemento scrollabile come figlio
-     position:absolute. Per ancorarlo visualmente al bordo destro del
-     viewport indipendentemente dalla scroll position, calcoliamo:
-       top  = scrollTop  + scrollRatio * (clientHeight - thumbHeight)
-       left = scrollLeft + clientWidth - 9
-     Così il thumb "scrolla con il contenuto" ma il JS lo riposiziona
-     ad ogni scroll/resize/mutation per mantenerlo dove vogliamo.
-   - L'elemento scrollabile riceve `position:relative` (via CSS) e
-     `scrollbar-width:none` per nascondere la scrollbar nativa.
-   - Il drag del thumb mappa il delta mouse Y al delta scrollTop in
-     proporzione di maxScroll/maxThumbY. Durante il drag il body riceve
-     `csb-dragging` per forzare il cursore grabbing su tutto. */
+   - track + thumb DOM inseriti DENTRO l'elemento scrollabile.
+     Track: position:absolute ancorato visivamente al bordo destro del
+       viewport — top=scrollTop, left=scrollLeft+clientWidth-10,
+       height=clientHeight. Compensa scrollTop/scrollLeft così resta
+       fisso visivamente anche se il contenuto scorre.
+     Thumb: position:absolute dentro al track, top=scrollRatio*maxThumbY,
+       height=thumbH. Niente compensazione scrollTop perché è relativo
+       al track (che è già "sticky" via la sua compensazione).
+   - L'elemento scrollabile riceve `position:relative` e `padding-right`
+     riservato (via CSS .wb.csb-host etc) per evitare overlap col track.
+   - Drag del thumb: delta mouse Y → delta scrollTop in proporzione di
+     maxScroll/maxThumbY. Body riceve `csb-dragging` durante il drag. */
 (function(){
   if(!document.body)return;
-  /* Lista dei contenitori scrollabili più visibili nell'app. Aggiungi qui
-     altri selettori se compaiono nuove scrollbar con cursore di sistema. */
   var TARGETS='.wb,.helpMd__body,.setpanel__body,.epick__grid,.sp-md__body,.ppolMd__body,.cpick__list,.cc__hist,.mpx__sb-list,.mp__sb-list,.sp__list-scroll,.sp__prep-list,.spf__drop,.mp__autocomp,.pg__pgsel-menu,.pg__cls-dd-panel,.mpx-pinpop__emojis,.ch-popmenu,.tm-right,.rs__view,.rsmn-md,.rsdraw-md';
-  var thumbs=new WeakMap();
-  function update(el,thumb){
-    if(!el.isConnected){thumb.style.display='none';return}
-    /* Se il thumb è stato rimosso (es. innerHTML rebuild dei contenuti),
-       lo re-ancoriamo. È idempotente — se è già lì, no-op. */
-    if(thumb.parentElement!==el)el.appendChild(thumb);
+  var bars=new WeakMap();
+  function update(el,track,thumb){
+    if(!el.isConnected){track.style.display='none';return}
+    /* Se il track è stato rimosso (es. innerHTML rebuild), lo re-ancoriamo. */
+    if(track.parentElement!==el)el.appendChild(track);
     var sH=el.scrollHeight,cH=el.clientHeight,cW=el.clientWidth;
-    if(sH<=cH+1||cH===0||cW===0){thumb.style.display='none';return}
-    /* Hide se l'elemento o un suo antenato è display:none */
-    if(el.offsetParent===null&&getComputedStyle(el).position!=='fixed'){thumb.style.display='none';return}
+    if(sH<=cH+1||cH===0||cW===0){track.style.display='none';return}
+    if(el.offsetParent===null&&getComputedStyle(el).position!=='fixed'){track.style.display='none';return}
     var thumbH=Math.max(cH*cH/sH,24);
     var maxScroll=sH-cH;
     var maxThumbY=cH-thumbH;
     var scrollRatio=maxScroll>0?(el.scrollTop/maxScroll):0;
-    thumb.style.display='block';
-    thumb.style.top=(el.scrollTop+scrollRatio*maxThumbY)+'px';
-    thumb.style.left=(el.scrollLeft+cW-9)+'px';
+    track.style.display='block';
+    track.style.top=el.scrollTop+'px';
+    track.style.left=(el.scrollLeft+cW-10)+'px';
+    track.style.height=cH+'px';
+    thumb.style.top=(scrollRatio*maxThumbY)+'px';
     thumb.style.height=thumbH+'px';
   }
   function setup(el){
-    if(thumbs.has(el))return;
+    if(bars.has(el))return;
     el.classList.add('csb-host');
-    /* Garantisce un positioning context per il thumb. Se l'elemento è
-       già position:relative/absolute/fixed/sticky non lo tocchiamo. */
     var pos=getComputedStyle(el).position;
     if(pos==='static')el.style.position='relative';
+    var track=document.createElement('div');
+    track.className='csb-track';
     var thumb=document.createElement('div');
     thumb.className='csb-thumb';
-    el.appendChild(thumb);
-    thumbs.set(el,thumb);
+    track.appendChild(thumb);
+    el.appendChild(track);
+    bars.set(el,{track:track,thumb:thumb});
     var dragging=false,startY=0,startScroll=0;
     thumb.addEventListener('mousedown',function(e){
       if(e.button!==0)return;
@@ -6382,6 +6397,20 @@ document.addEventListener('keydown',function(e){
       dragging=true;startY=e.clientY;startScroll=el.scrollTop;
       thumb.classList.add('csb-thumb--active');
       document.body.classList.add('csb-dragging');
+    });
+    /* Click sul track (fuori dal thumb): page-scroll verso il punto cliccato */
+    track.addEventListener('mousedown',function(e){
+      if(e.target===thumb||e.button!==0)return;
+      e.preventDefault();
+      var trackRect=track.getBoundingClientRect();
+      var clickY=e.clientY-trackRect.top;
+      var sH=el.scrollHeight,cH=el.clientHeight;
+      var thumbH=Math.max(cH*cH/sH,24);
+      var maxScroll=sH-cH,maxThumbY=cH-thumbH;
+      if(maxThumbY<=0||maxScroll<=0)return;
+      /* Centra il thumb sul punto cliccato */
+      var targetThumbY=Math.max(0,Math.min(maxThumbY,clickY-thumbH/2));
+      el.scrollTo({top:(targetThumbY/maxThumbY)*maxScroll,behavior:'smooth'});
     });
     function onMove(e){
       if(!dragging)return;
@@ -6399,29 +6428,23 @@ document.addEventListener('keydown',function(e){
     }
     document.addEventListener('mousemove',onMove);
     document.addEventListener('mouseup',onUp);
-    el.addEventListener('scroll',function(){update(el,thumb)},{passive:true});
+    el.addEventListener('scroll',function(){update(el,track,thumb)},{passive:true});
     if(window.ResizeObserver){
-      var ro=new ResizeObserver(function(){update(el,thumb)});
+      var ro=new ResizeObserver(function(){update(el,track,thumb)});
       ro.observe(el);
-      Array.prototype.forEach.call(el.children,function(c){if(c!==thumb)ro.observe(c)});
+      Array.prototype.forEach.call(el.children,function(c){if(c!==track)ro.observe(c)});
     }
-    /* MutationObserver per cambiamenti di contenuto (childList) — il
-       resize di elementi è già coperto da ResizeObserver. Non osserviamo
-       attributes per evitare feedback loop con le nostre stesse style
-       changes sul thumb (subtree includerebbe il thumb stesso). */
     if(window.MutationObserver){
       new MutationObserver(function(muts){
-        for(var i=0;i<muts.length;i++){if(muts[i].target!==thumb){update(el,thumb);return}}
+        for(var i=0;i<muts.length;i++){var t=muts[i].target;if(t!==track&&t!==thumb&&!track.contains(t)){update(el,track,thumb);return}}
       }).observe(el,{childList:true,subtree:true,characterData:true});
     }
-    update(el,thumb);
+    update(el,track,thumb);
   }
   function setupAll(root){
     try{(root||document).querySelectorAll(TARGETS).forEach(setup)}catch(e){}
   }
   setupAll();
-  /* Watch per elementi aggiunti dinamicamente (modali aperte, finestre,
-     dropdown, popup, ecc). Match anche su discendenti aggiunti. */
   if(window.MutationObserver){
     new MutationObserver(function(muts){
       muts.forEach(function(m){
@@ -6433,11 +6456,9 @@ document.addEventListener('keydown',function(e){
       });
     }).observe(document.body,{childList:true,subtree:true});
   }
-  /* Re-update tutti i thumb su window resize (gestisce cambi di clientHeight/Width
-     che ResizeObserver per qualche reason non sempre cattura per finestre flex). */
   window.addEventListener('resize',function(){
     document.querySelectorAll('.csb-host').forEach(function(el){
-      var t=thumbs.get(el);if(t)update(el,t);
+      var b=bars.get(el);if(b)update(el,b.track,b.thumb);
     });
   });
 })();
