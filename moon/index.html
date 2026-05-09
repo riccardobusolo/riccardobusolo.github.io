@@ -100,7 +100,10 @@ body.no-custom-cursor{--cur-default:default;--cur-pointer:pointer;--cur-text:tex
 :root[data-theme="dark"] .sb__logo:hover{filter:drop-shadow(0 0 6px rgba(255,255,255,.7))}
 :root[data-theme="light"] .sb__logo{filter:drop-shadow(0 0 0 rgba(0,0,0,0))}
 :root[data-theme="light"] .sb__logo:hover{filter:drop-shadow(0 0 6px rgba(0,0,0,.7))}
-:root[data-theme="sword-coast"] .sb__logo,:root[data-theme="dark"] .sb__logo,:root[data-theme="light"] .sb__logo{opacity:1;padding:8px 4px;width:80%}
+:root[data-theme="sword-coast"] .sb__logo,:root[data-theme="dark"] .sb__logo,:root[data-theme="light"] .sb__logo{opacity:1;padding:8px 4px;width:90%}
+/* Tema Crooked Moon: nessuna animazione logo (hover glow + click burst). */
+:root[data-theme="crooked-moon"] .sb__logo:hover{filter:drop-shadow(0 0 0 rgba(196,154,50,0))}
+:root[data-theme="crooked-moon"] .sb__logo--burst{animation:none}
 /* Animazione pulse + glow al click. Lo scale-up "elastico" (cubic-bezier
    con overshoot) dà una sensazione di pop magico, accompagnato da un'aura
    drop-shadow dorata. Pulse e glow viaggiano su due animazioni separate:
@@ -2639,6 +2642,8 @@ function refreshLogo(){var cur=localStorage.getItem('cm_theme')||'light';var img
     setTimeout(function(){if(r.parentNode)r.parentNode.removeChild(r)},800);
   }
   logo.addEventListener('click',function(){
+    /* Crooked Moon: niente animazione/effetti, logo statico */
+    if(document.documentElement.dataset.theme==='crooked-moon')return;
     /* Restart dell'animazione anche se cliccata in rapida successione */
     logo.classList.remove('sb__logo--burst');
     void logo.offsetWidth;
