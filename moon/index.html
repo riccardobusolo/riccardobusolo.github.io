@@ -1555,6 +1555,15 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spe__det{display:none;padding-top:8px;margin-top:8px;border-top:1px solid var(--border)}.spe.spe--open .spe__det{display:block}
 .spe__grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:8px}
 .spe__prop{font-family:var(--mono);font-size:.68rem}.spe__prop b{color:var(--dim)}.spe__prop span{color:var(--muted)}
+/* Configuratore attacco/danno read-only mostrato sotto la griglia delle proprietà
+   quando l'incantesimo ha attackType configurato. */
+.spe__atk{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 8px;padding:5px 8px;border-radius:4px;background:rgba(196,154,50,.04);border:1px solid rgba(196,154,50,.18);font-family:var(--mono);font-size:.66rem}
+.spe__atk-kind{font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:.6rem}
+.spe__atk-kind--atk{color:#a89b6f}
+.spe__atk-kind--save{color:#c89070}
+.spe__atk-dmg{color:var(--text);font-weight:600}
+.spe__atk-type{color:var(--gold);font-style:italic}
+.spe__atk-sep{color:var(--border);opacity:.7}
 .spe__desc{font-size:.78rem;color:var(--dim);line-height:1.5;margin-top:6px}
 .spe__higher{font-size:.72rem;color:var(--muted);line-height:1.4;margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-style:italic}
 .spe__foot{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px;align-items:center}
@@ -5035,7 +5044,29 @@ var tags='';if(s.concentration)tags+='<span class="spe__tag spe__tag--c" title="
 var clsH=s.classes.map(function(c){return'<span class="spe__cl">'+c+'</span>'}).join('');
 var srcLbl=s.source==="Player's Handbook"?'PHB':s.source==="Tasha's Cauldron of Everything"?"Tasha's":s.source;
 var higherH=s.higherLevels?'<div class="spe__higher"><b>'+(_spLang()==='it'?'Ai livelli superiori:':'At Higher Levels:')+'</b> '+s.higherLevels+'</div>':'';
-d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+rawS.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+rawS.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div><div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
+/* Configuratore attacco read-only: mostrato solo se attackType è impostato */
+var atkH='';
+if(s.attackType){
+  var SAVE_LBL_LOCAL=_spLang()==='it'
+    ? {Strength:'Forza',Dexterity:'Destrezza',Constitution:'Costituzione',Intelligence:'Intelligenza',Wisdom:'Saggezza',Charisma:'Carisma',str:'Forza',dex:'Destrezza',con:'Costituzione',intl:'Intelligenza',wis:'Saggezza',cha:'Carisma'}
+    : {Strength:'Strength',Dexterity:'Dexterity',Constitution:'Constitution',Intelligence:'Intelligence',Wisdom:'Wisdom',Charisma:'Charisma',str:'Strength',dex:'Dexterity',con:'Constitution',intl:'Intelligence',wis:'Wisdom',cha:'Charisma'};
+  var atkParts=[];
+  if(s.attackType==='atk'){
+    atkParts.push('<span class="spe__atk-kind spe__atk-kind--atk">'+(_spLang()==='it'?'Attacco':'Attack')+'</span>');
+  }else if(s.attackType==='save'){
+    var saLbl=SAVE_LBL_LOCAL[s.saveAbility]||s.saveAbility||'?';
+    atkParts.push('<span class="spe__atk-kind spe__atk-kind--save">'+(_spLang()==='it'?'TS':'Save')+': '+saLbl+'</span>');
+  }
+  if(s.damage){atkParts.push('<span class="spe__atk-dmg">'+s.damage+'</span>')}
+  if(s.damageType){
+    var dt=(_spLang()==='it'&&window.cm_trDmgType)?window.cm_trDmgType(s.damageType):s.damageType;
+    atkParts.push('<span class="spe__atk-type">'+dt+'</span>');
+  }
+  if(atkParts.length){
+    atkH='<div class="spe__atk">'+atkParts.join('<span class="spe__atk-sep">·</span>')+'</div>';
+  }
+}
+d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+rawS.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+rawS.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+'<div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
 spList.appendChild(d)})}
 spList.addEventListener('click',function(e){var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}if(e.target.closest('.spe__drag'))return;var spe=e.target.closest('.spe');if(spe)spe.classList.toggle('spe--open')});
 spSearch.addEventListener('input',renSp);
