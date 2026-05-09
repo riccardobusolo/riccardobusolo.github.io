@@ -71,7 +71,12 @@ body.no-custom-cursor{--cur-default:default;--cur-pointer:pointer;--cur-text:tex
 
 .app{position:fixed;inset:0;background:var(--bg);display:flex;opacity:0;pointer-events:none;transition:opacity .6s .2s;z-index:1;font-family:var(--font)}.app.on{opacity:1;pointer-events:all}
 .sb{width:164px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:12px 8px;gap:2px;z-index:100;flex-shrink:0}
-.sb__logo{width:100%;height:auto;border-radius:8px;margin:0 auto 14px;display:block;opacity:.85;padding:0 4px;cursor:var(--cur-pointer);transition:filter .15s;-webkit-user-drag:none;user-select:none}
+/* Stato base: drop-shadow esplicito a zero (NON "none") in modo che la
+   transition tra non-hover e :hover interpoli effettivamente i parametri
+   del filtro invece di fare snap. Il "drop-shadow(0 0 0 transparent)" è
+   un'aura a raggio zero e colore trasparente — visivamente identica a
+   "none", ma transizionabile. Durata .35s ease-out: morbida ma rapida. */
+.sb__logo{width:100%;height:auto;border-radius:8px;margin:0 auto 14px;display:block;opacity:.85;padding:0 4px;cursor:var(--cur-pointer);filter:drop-shadow(0 0 0 transparent);transition:filter .35s ease-out;-webkit-user-drag:none;user-select:none}
 .sb__logo:hover{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--gold) 70%,transparent))}
 :root[data-theme="sword-coast"] .sb__logo,:root[data-theme="dark"] .sb__logo,:root[data-theme="light"] .sb__logo{opacity:1;padding:8px 4px}
 /* Animazione pulse + glow al click. Lo scale-up "elastico" (cubic-bezier
