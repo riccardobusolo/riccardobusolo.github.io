@@ -2535,15 +2535,28 @@ function refreshLogo(){var cur=localStorage.getItem('cm_theme')||'light';var img
       (function(i){setTimeout(function(){spark(cx,cy)},i*8)})(i);
     }
   });
-  /* Quando il glow termina (è la più lunga delle due animazioni del burst),
-     rimuoviamo la classe --burst. Senza questo passaggio l'animazione finisce
-     con forwards "agganciata" al valore di hover (drop-shadow 6px) e poi
-     snappa direttamente al valore statico senza usare la transition.
-     Rimuovendo la classe il filter torna sotto il controllo dei selettori
-     statici (.sb__logo / :hover) e il cambio di valore (es. mouse fuori →
-     filter:none) attiva la transition .15s in modo morbido. */
+  /* Al termine dell'animazione del glow forziamo manualmente l'attivazione
+     della CSS transition. Solo rimuovere la classe non basta: i browser non
+     scatenano in modo affidabile la transition quando il valore del filter
+     cambia per "rimozione di animazione con forwards" (è una zona grigia
+     della spec). Workaround:
+       1. Cattura il valore "agganciato" dal forwards.
+       2. Settalo inline (sopravvive alla rimozione della classe).
+       3. Rimuovi la classe (animazione via, cascade risolve a hover/non-hover).
+       4. Su requestAnimationFrame azzera l'inline. A questo punto è una
+          state-change CSS pulita (inline -> cascade) e la transition .35s
+          parte in modo affidabile. */
   logo.addEventListener('animationend',function(e){
-    if(e.animationName==='sbLogoGlow')logo.classList.remove('sb__logo--burst');
+    if(e.animationName!=='sbLogoGlow')return;
+    var held=getComputedStyle(logo).filter;
+    logo.style.filter=held;
+    logo.classList.remove('sb__logo--burst');
+    /* doppio rAF per garantire che l'inline sia "cementato" prima di azzerarlo */
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        logo.style.filter='';
+      });
+    });
   });
 })();
 function refreshTheme(){var cur=localStorage.getItem('cm_theme')||'light';document.querySelectorAll('[data-theme][class*="setpanel__themebtn"]').forEach(function(b){if(b.dataset.theme===cur)b.classList.add('on');else b.classList.remove('on')})}refreshTheme();
