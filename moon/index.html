@@ -383,18 +383,7 @@ body.sb--global-dragging .sb__btn:not(.on):hover{background:transparent;color:va
 .wh__menu-grp .wh__menu-btn svg{width:18px;height:14px}
 .wh{position:relative}
 
-/* Scrollbar nativa nascosta: la sostituiamo con un thumb DOM custom
-   (.wb-thumb) gestito via JS, così il cursore è completamente
-   controllabile via CSS (grab/grabbing) e non subiamo il cursore nativo
-   di sistema imposto dal browser sulle scrollbar. */
-.wb{flex:1;overflow:hidden auto;padding:7px;scrollbar-width:none}
-.wb::-webkit-scrollbar{display:none;width:0;height:0}
-/* Thumb custom: position:fixed posizionato dal JS in base al rect di .wb.
-   Non scrolla con il contenuto, segue la finestra che lo contiene. */
-.wb-thumb{position:fixed;width:6px;border-radius:3px;background:rgba(140,30,30,.22);z-index:1000;cursor:var(--cur-grab);transition:background .12s,opacity .25s;display:none;will-change:transform,top,height}
-.wb-thumb:hover{background:rgba(140,30,30,.42)}
-.wb-thumb--active,.wb-thumb:active{background:rgba(140,30,30,.6);cursor:var(--cur-grabbing)}
-body.wb-thumb-dragging,body.wb-thumb-dragging *{cursor:var(--cur-grabbing)!important;user-select:none}
+.wb{flex:1;overflow:hidden auto;padding:7px;scrollbar-width:thin;scrollbar-color:rgba(140,30,30,.12) transparent}.wb::-webkit-scrollbar{width:4px}.wb::-webkit-scrollbar-thumb{background:rgba(140,30,30,.15);border-radius:2px}
 .empty{display:none;align-items:flex-end;justify-content:center;padding-bottom:40px;z-index:0;position:absolute;inset:0}
 .empty__text{font-family:var(--mono);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;background:rgba(10,10,15,.7);padding:6px 16px;border-radius:5px}
 .fi{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-family:var(--mono);font-size:.75rem;color:var(--text);outline:none;transition:border-color .2s;width:100%}.fi:focus{border-color:var(--rb)}.fi::placeholder{color:var(--muted)}
@@ -6306,85 +6295,6 @@ document.addEventListener('keydown',function(e){
     document.querySelectorAll('.pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')});
   }
 });
-})();
-/* === SCROLLBAR CUSTOM PER .wb (window body) =================================
-   Sostituisce la scrollbar nativa con un thumb DOM in position:fixed, così
-   il cursore è completamente controllabile via CSS (grab/grabbing). Per ogni
-   .wb crea un .wb-thumb posizionato sul bordo destro tramite getBoundingClientRect.
-   Un loop requestAnimationFrame aggiorna la posizione/dimensione del thumb a
-   60fps così che segua window-drag, resize, e modifiche al contenuto senza
-   bisogno di hook specifici nel codice di drag delle finestre. */
-(function(){
-  if(!document.body)return;
-  var thumbs=new Map();
-  function update(wb,thumb){
-    var rect=wb.getBoundingClientRect();
-    if(rect.width<=0||rect.height<=0){thumb.style.display='none';return}
-    var sH=wb.scrollHeight,cH=wb.clientHeight;
-    if(sH<=cH+1){thumb.style.display='none';return}
-    thumb.style.display='block';
-    var thumbH=Math.max(cH*(cH/sH),24);
-    var maxScroll=sH-cH;
-    var maxThumbY=cH-thumbH;
-    var scrollRatio=wb.scrollTop/maxScroll;
-    /* Thumb 6px dal bordo destro di wb */
-    thumb.style.left=(rect.right-10)+'px';
-    thumb.style.top=(rect.top+scrollRatio*maxThumbY)+'px';
-    thumb.style.height=thumbH+'px';
-  }
-  function setup(wb){
-    if(thumbs.has(wb))return;
-    var thumb=document.createElement('div');
-    thumb.className='wb-thumb';
-    document.body.appendChild(thumb);
-    thumbs.set(wb,thumb);
-    /* Drag-to-scroll del thumb */
-    var dragging=false,startY=0,startScroll=0;
-    thumb.addEventListener('mousedown',function(e){
-      e.preventDefault();e.stopPropagation();
-      dragging=true;startY=e.clientY;startScroll=wb.scrollTop;
-      thumb.classList.add('wb-thumb--active');
-      document.body.classList.add('wb-thumb-dragging');
-    });
-    function onMouseMove(e){
-      if(!dragging)return;
-      var sH=wb.scrollHeight,cH=wb.clientHeight;
-      var thumbH=Math.max(cH*(cH/sH),24);
-      var maxThumbY=cH-thumbH;
-      var maxScroll=sH-cH;
-      if(maxThumbY<=0||maxScroll<=0)return;
-      var dy=e.clientY-startY;
-      wb.scrollTop=startScroll+(dy/maxThumbY)*maxScroll;
-    }
-    function onMouseUp(){
-      if(!dragging)return;
-      dragging=false;
-      thumb.classList.remove('wb-thumb--active');
-      document.body.classList.remove('wb-thumb-dragging');
-    }
-    document.addEventListener('mousemove',onMouseMove);
-    document.addEventListener('mouseup',onMouseUp);
-    wb.addEventListener('scroll',function(){update(wb,thumb)});
-    update(wb,thumb);
-  }
-  /* Setup .wb già presenti + watch per quelle aggiunte dinamicamente */
-  document.querySelectorAll('.wb').forEach(setup);
-  if(window.MutationObserver){
-    new MutationObserver(function(muts){
-      muts.forEach(function(m){
-        m.addedNodes.forEach(function(n){
-          if(n.nodeType!==1)return;
-          if(n.classList&&n.classList.contains('wb'))setup(n);
-          if(n.querySelectorAll){
-            n.querySelectorAll('.wb').forEach(setup);
-          }
-        });
-      });
-    }).observe(document.body,{childList:true,subtree:true});
-  }
-  /* rAF loop: aggiorna tutti i thumb a 60fps (gestisce window-drag/resize) */
-  function tick(){thumbs.forEach(update);requestAnimationFrame(tick)}
-  requestAnimationFrame(tick);
 })();
 </script>
 </body>
