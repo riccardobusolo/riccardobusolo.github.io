@@ -1593,7 +1593,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spe__cl{font-family:var(--mono);font-size:.6rem;padding:2px 7px;border-radius:3px;background:var(--rl);border:1px solid var(--rb);color:var(--red)}
 .spe__src{font-family:var(--mono);font-size:.56rem;padding:2px 7px;border-radius:3px;background:rgba(100,100,120,.1);border:1px solid rgba(100,100,120,.15);color:var(--muted);margin-left:auto}
 /* Color coding per manuale: bordo sinistro 3px + tag manuale dello stesso
-   colore (PHB blu, Tasha viola, Xhanatar oro/giallo, Crooked rosso). Le
+   colore (PHB blu, Tasha viola, Xanathar oro/giallo, Crooked rosso). Le
    tonalità sono scelte per integrarsi col tema dark senza saturare troppo. */
 .spe.spe--src-phb{border-left:3px solid #5b8def}
 .spe.spe--src-tashas{border-left:3px solid #b870e0}
@@ -5115,8 +5115,8 @@ var fav=isFav(rawS.name);
 var lvlTxt=s.level===0?'T':s.level+'\u00b0';
 var tags='';if(s.concentration)tags+='<span class="spe__tag spe__tag--c" title="Concentrazione">C</span>';if(s.ritual)tags+='<span class="spe__tag spe__tag--r" title="Rituale">R</span>';
 var clsH=s.classes.map(function(c){return'<span class="spe__cl">'+c+'</span>'}).join('');
-/* Etichetta breve del manuale (Player / Tasha / Xhanatar / Crooked) */
-var srcLbl=rawS.source==="Player's Handbook"?'PHB':rawS.source==="Tasha's Cauldron of Everything"?'Tasha':rawS.source==="Xanathar's Guide to Everything"?'Xhanatar':rawS.source==='The Crooked Moon'?'Crooked':rawS.source;
+/* Etichetta breve del manuale (Player / Tasha / Xanathar / Crooked) */
+var srcLbl=rawS.source==="Player's Handbook"?'PHB':rawS.source==="Tasha's Cauldron of Everything"?'Tasha':rawS.source==="Xanathar's Guide to Everything"?'Xanathar':rawS.source==='The Crooked Moon'?'Crooked':rawS.source;
 /* Nome alternativo nell'altra lingua, mostrato in piccolo tra parentesi
    accanto al titolo. Solo se differisce dalla lingua primaria. */
 var _itEntry=(window.SPELLS_IT||{})[rawS.name];
