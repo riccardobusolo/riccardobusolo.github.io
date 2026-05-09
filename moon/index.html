@@ -1612,6 +1612,11 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spe-ed-lbl{font-family:var(--mono);font-size:.56rem;color:var(--gold);text-transform:uppercase;letter-spacing:.06em}
 .spe-ed-in,.spe-ed-sel,.spe-ed-ta{font-family:var(--mono);font-size:.66rem;background:rgba(20,18,16,.5);border:1px solid rgba(196,154,50,.3);border-radius:3px;color:var(--text);padding:4px 6px;outline:none;transition:border-color .15s,background .15s;width:100%;box-sizing:border-box;min-width:0}
 .spe-ed-in:focus,.spe-ed-sel:focus,.spe-ed-ta:focus{border-color:var(--gold);background:rgba(196,154,50,.08)}
+/* Le opzioni del <select> sono renderizzate dall'OS con sfondo bianco di
+   default: senza color/background espliciti diventano bianco-su-bianco nel
+   tema dark. Forza colore dark sia sull'opzione standard che su quella selezionata. */
+.spe-ed-sel option{background:var(--bg2);color:var(--text)}
+.spe-ed-sel option:checked,.spe-ed-sel option:hover{background:var(--gold);color:var(--bg)}
 /* Textarea: nessun resize handle, nessun overflow interno (l'altezza viene
    adattata via JS per mostrare sempre l'intero testo). overflow:hidden previene
    anche la "cattura" della rotellina che bloccava lo scroll della lista. */
