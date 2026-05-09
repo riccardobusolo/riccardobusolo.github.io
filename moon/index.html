@@ -37,6 +37,11 @@ button:disabled,input:disabled,select:disabled,textarea:disabled,[disabled],[ari
    cursore "grabbing" su tutto il documento (sovrascrive il cursore di
    default del drag-and-drop nativo HTML5). */
 body.sp-dragging,body.sp-dragging *{cursor:var(--cur-grabbing)!important}
+/* Tentativo di forzare cursore custom sulle scrollbar (webkit). Le scrollbar
+   sono renderizzate dal browser/OS e il cursor su di esse è in larga parte
+   incontrollabile via CSS, ma su alcune build di Chrome/Edge i pseudo
+   ::-webkit-scrollbar* rispettano almeno la cursor declaration di base. */
+::-webkit-scrollbar,::-webkit-scrollbar-track,::-webkit-scrollbar-thumb,::-webkit-scrollbar-corner,::-webkit-resizer,::-webkit-scrollbar-button{cursor:var(--cur-default)}
 /* Ghost del drag: badge compatto con solo il nome dell'incantesimo,
    posizionato sotto la "manina" tramite setDragImage. Renderizzato in
    posizione off-screen prima del drag (necessario per il snapshot del
@@ -5018,6 +5023,22 @@ document.addEventListener('dragend',function(){
    l'errore "Tipo non compatibile" che bloccava il drop sulla sezione
    "Conosciuti" quando l'utente non centrava il piccolo gruppo Trucchetti. */
 document.addEventListener('dragover',function(e){var z=e.target.closest('[data-spdrop]');if(!z)return;e.preventDefault();e.dataTransfer.dropEffect='copy';document.querySelectorAll('.spdrop-over,.spdrop-bad').forEach(function(el){if(el!==z){el.classList.remove('spdrop-over');el.classList.remove('spdrop-bad')}});z.classList.add('spdrop-over');z.classList.remove('spdrop-bad')});
+/* Fallback dragover/drop: durante il drag di un incantesimo (body.sp-dragging)
+   permettiamo il drop su TUTTO il documento, anche fuori dalle [data-spdrop].
+   Senza questo fallback il browser mostra il cursore nativo "not-allowed"
+   (il "teschietto") sulle aree non target. Le zone reali continuano a
+   gestire il drop coi loro handler dedicati. */
+document.addEventListener('dragover',function(e){
+  if(!document.body.classList.contains('sp-dragging'))return;
+  if(e.target.closest('[data-spdrop]'))return;
+  e.preventDefault();
+  if(e.dataTransfer)e.dataTransfer.dropEffect='copy';
+});
+document.addEventListener('drop',function(e){
+  if(!document.body.classList.contains('sp-dragging'))return;
+  if(e.target.closest('[data-spdrop]'))return;
+  e.preventDefault();
+});
 document.addEventListener('dragleave',function(e){var z=e.target.closest('[data-spdrop]');if(!z)return;var rt=e.relatedTarget;if(!rt||!z.contains(rt)){z.classList.remove('spdrop-over');z.classList.remove('spdrop-bad')}});
 document.addEventListener('drop',function(e){var z=e.target.closest('[data-spdrop]');if(!z)return;e.preventDefault();z.classList.remove('spdrop-over');z.classList.remove('spdrop-bad');var raw=e.dataTransfer.getData('application/x-spell');if(!raw)return;var sp;try{sp=JSON.parse(raw)}catch(err){return}var pg=loadPG();if(!pg)return;var zone=z.dataset.spdrop;var isCantrip=sp.level===0;
 /* Helper: costruisce l'oggetto incantesimo con tutti i campi tradotti, identico
