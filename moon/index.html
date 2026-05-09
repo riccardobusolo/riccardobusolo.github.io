@@ -376,15 +376,15 @@ body.cc-dragging-dot,body.cc-dragging-dot *{cursor:grabbing!important;user-selec
 .main{flex:1;background:var(--bg);padding:0;overflow:visible;position:relative}
 .main::before{content:'';position:absolute;inset:0;background:url('img/sigil.webp') center center / auto 50% no-repeat;opacity:.2;z-index:0;pointer-events:none}
 .win{background:var(--bg2);display:none;flex-direction:column;overflow:hidden;position:absolute;z-index:10;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.18);border:1px solid var(--border);min-width:280px;min-height:200px;max-height:calc(100vh - 20px)}.win.on{display:flex}.win.win-over{outline:2px dashed var(--gold);outline-offset:-2px}.win.win--focus{z-index:20}
-.win__rz{position:absolute;z-index:5}
-.win__rz--n{top:-5px;left:14px;right:14px;height:10px;cursor:var(--cur-ns)}
-.win__rz--s{bottom:-5px;left:14px;right:14px;height:10px;cursor:var(--cur-ns)}
-.win__rz--w{left:-5px;top:14px;bottom:14px;width:10px;cursor:var(--cur-ew)}
-.win__rz--e{right:-5px;top:14px;bottom:14px;width:10px;cursor:var(--cur-ew)}
-.win__rz--nw{top:-6px;left:-6px;width:16px;height:16px;cursor:var(--cur-nwse)}
-.win__rz--ne{top:-6px;right:-6px;width:16px;height:16px;cursor:var(--cur-nesw)}
-.win__rz--sw{bottom:-6px;left:-6px;width:16px;height:16px;cursor:var(--cur-nesw)}
-.win__rz--se{bottom:-6px;right:-6px;width:16px;height:16px;cursor:var(--cur-nwse)}
+/* Resize handles: position:fixed così escono dal overflow:hidden di .win.
+   Posizione/dimensione settati via JS (vedi rzSync) in base al rect della
+   finestra associata. Geometria: 10px fuori + 5px dentro sui bordi,
+   20x20 (10 fuori + 10 dentro) sugli angoli. */
+.win__rz{position:fixed;z-index:5;display:none}
+.win__rz--n,.win__rz--s{cursor:var(--cur-ns)}
+.win__rz--w,.win__rz--e{cursor:var(--cur-ew)}
+.win__rz--nw,.win__rz--se{cursor:var(--cur-nwse)}
+.win__rz--ne,.win__rz--sw{cursor:var(--cur-nesw)}
 .win__rz--se::after{display:none}
 .win__rz--se:hover::after{display:none}
 .wh{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0;cursor:var(--cur-grab)}.wh:active{cursor:var(--cur-grabbing)}
@@ -6723,6 +6723,53 @@ document.addEventListener('keydown',function(e){
       var b=bars.get(el);if(b)update(el,b.track,b.thumb);
     });
   });
+})();
+/* === RESIZE HANDLES SYNC =====================================================
+   I .win__rz hanno position:fixed (per uscire dal overflow:hidden di .win)
+   quindi devono essere riposizionati ad ogni frame in base al rect della
+   finestra che li contiene. Geometria:
+   - Bordi (n/s/e/w): 10px FUORI + 5px dentro → strip 15px, 14px riservati
+     agli angoli
+   - Angoli (nw/ne/sw/se): 20×20 (10 fuori + 10 dentro)
+   Costanti modificabili qui sotto. */
+(function(){
+  if(!document.body)return;
+  var OUT=10;       /* px fuori dal bordo (edges + corners) */
+  var IN=5;         /* px dentro la finestra (edges) */
+  var CORNER_IN=10; /* px dentro la finestra (corners) */
+  var GAP=14;       /* riserva agli angoli sui bordi */
+  var STRIP=OUT+IN;             /* spessore strip bordi: 15 */
+  var CORNER=OUT+CORNER_IN;     /* lato angolo: 20 */
+  function syncWin(win){
+    var handles=win.querySelectorAll('.win__rz');
+    if(!handles.length)return;
+    var rect=win.getBoundingClientRect();
+    /* Se la finestra è display:none o non visibile, getBoundingClientRect
+       ritorna 0×0 — nascondi i handle. */
+    if(rect.width===0||rect.height===0||!win.classList.contains('on')){
+      handles.forEach(function(rh){rh.style.display='none'});
+      return;
+    }
+    handles.forEach(function(rh){
+      var s=rh.style;s.display='block';
+      var dir=rh.dataset.rdir;
+      if(dir==='n'){s.left=(rect.left+GAP)+'px';s.top=(rect.top-OUT)+'px';s.width=Math.max(0,rect.width-GAP*2)+'px';s.height=STRIP+'px';}
+      else if(dir==='s'){s.left=(rect.left+GAP)+'px';s.top=(rect.bottom-IN)+'px';s.width=Math.max(0,rect.width-GAP*2)+'px';s.height=STRIP+'px';}
+      else if(dir==='w'){s.left=(rect.left-OUT)+'px';s.top=(rect.top+GAP)+'px';s.width=STRIP+'px';s.height=Math.max(0,rect.height-GAP*2)+'px';}
+      else if(dir==='e'){s.left=(rect.right-IN)+'px';s.top=(rect.top+GAP)+'px';s.width=STRIP+'px';s.height=Math.max(0,rect.height-GAP*2)+'px';}
+      else if(dir==='nw'){s.left=(rect.left-OUT)+'px';s.top=(rect.top-OUT)+'px';s.width=CORNER+'px';s.height=CORNER+'px';}
+      else if(dir==='ne'){s.left=(rect.right-CORNER_IN)+'px';s.top=(rect.top-OUT)+'px';s.width=CORNER+'px';s.height=CORNER+'px';}
+      else if(dir==='sw'){s.left=(rect.left-OUT)+'px';s.top=(rect.bottom-CORNER_IN)+'px';s.width=CORNER+'px';s.height=CORNER+'px';}
+      else if(dir==='se'){s.left=(rect.right-CORNER_IN)+'px';s.top=(rect.bottom-CORNER_IN)+'px';s.width=CORNER+'px';s.height=CORNER+'px';}
+    });
+  }
+  function syncAll(){document.querySelectorAll('.win').forEach(syncWin)}
+  /* rAF loop continuo: ad ogni frame riallinea i handle al rect della
+     finestra. È cheap (getBoundingClientRect dopo layout = no reflow,
+     pochi style sets) e copre TUTTI i casi senza hook specifici nel
+     codice di drag/resize/layout. */
+  function tick(){syncAll();requestAnimationFrame(tick)}
+  requestAnimationFrame(tick);
 })();
 </script>
 </body>
