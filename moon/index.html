@@ -1582,6 +1582,19 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spe__foot{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px;align-items:center}
 .spe__cl{font-family:var(--mono);font-size:.6rem;padding:2px 7px;border-radius:3px;background:var(--rl);border:1px solid var(--rb);color:var(--red)}
 .spe__src{font-family:var(--mono);font-size:.56rem;padding:2px 7px;border-radius:3px;background:rgba(100,100,120,.1);border:1px solid rgba(100,100,120,.15);color:var(--muted);margin-left:auto}
+/* Color coding per manuale: bordo sinistro 3px + tag manuale dello stesso
+   colore (PHB blu, Tasha viola, Xhanatar oro/giallo, Crooked rosso). Le
+   tonalità sono scelte per integrarsi col tema dark senza saturare troppo. */
+.spe.spe--src-phb{border-left:3px solid #5b8def}
+.spe.spe--src-tashas{border-left:3px solid #b870e0}
+.spe.spe--src-xgte{border-left:3px solid #d4af37}
+.spe.spe--src-tcm{border-left:3px solid #c8403d}
+.spe.spe--src-phb .spe__src{color:#5b8def;border-color:rgba(91,141,239,.4);background:rgba(91,141,239,.1)}
+.spe.spe--src-tashas .spe__src{color:#b870e0;border-color:rgba(184,112,224,.4);background:rgba(184,112,224,.1)}
+.spe.spe--src-xgte .spe__src{color:#d4af37;border-color:rgba(212,175,55,.4);background:rgba(212,175,55,.1)}
+.spe.spe--src-tcm .spe__src{color:#c8403d;border-color:rgba(200,64,61,.4);background:rgba(200,64,61,.1)}
+/* Nome alternativo (nell'altra lingua) accanto al titolo, in piccolo */
+.spe__name-alt{font-size:.62rem;color:var(--muted);font-weight:400;font-family:var(--mono);letter-spacing:.02em;margin-left:2px}
 
 .cc__toggle{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;flex-shrink:0}
 .cc__toggle-label{font-family:var(--mono);font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
@@ -5056,12 +5069,24 @@ spCount.textContent=countTxt;
 spList.innerHTML='';
 if(!SP.length){spList.innerHTML='<div style="text-align:center;padding:30px 10px;font-family:var(--mono);font-size:.62rem;color:var(--muted)">Database non trovato.<br>Assicurati che <b>spells.js</b> sia nella stessa cartella.</div>';return}
 if(!filtered.length){spList.innerHTML='<div style="text-align:center;padding:20px;font-family:var(--mono);font-size:.6rem;color:var(--muted)">'+(favMode?'Nessun preferito':'Nessun risultato')+'</div>';return}
-filtered.forEach(function(rawS){var s=_spLocal(rawS);var d=document.createElement('div');d.className='spe';
+filtered.forEach(function(rawS){var s=_spLocal(rawS);var d=document.createElement('div');
+/* Source slug per il color coding (bordo sinistro + tag manuale colorato) */
+var srcSlug=rawS.source==="Player's Handbook"?'phb':rawS.source==="Tasha's Cauldron of Everything"?'tashas':rawS.source==="Xanathar's Guide to Everything"?'xgte':rawS.source==='The Crooked Moon'?'tcm':'other';
+d.className='spe spe--src-'+srcSlug;
 var fav=isFav(rawS.name);
 var lvlTxt=s.level===0?'T':s.level+'\u00b0';
 var tags='';if(s.concentration)tags+='<span class="spe__tag spe__tag--c" title="Concentrazione">C</span>';if(s.ritual)tags+='<span class="spe__tag spe__tag--r" title="Rituale">R</span>';
 var clsH=s.classes.map(function(c){return'<span class="spe__cl">'+c+'</span>'}).join('');
-var srcLbl=s.source==="Player's Handbook"?'PHB':s.source==="Tasha's Cauldron of Everything"?"Tasha's":s.source;
+/* Etichetta breve del manuale (Player / Tasha / Xhanatar / Crooked) */
+var srcLbl=rawS.source==="Player's Handbook"?'PHB':rawS.source==="Tasha's Cauldron of Everything"?'Tasha':rawS.source==="Xanathar's Guide to Everything"?'Xhanatar':rawS.source==='The Crooked Moon'?'Crooked':rawS.source;
+/* Nome alternativo nell'altra lingua, mostrato in piccolo tra parentesi
+   accanto al titolo. Solo se differisce dalla lingua primaria. */
+var _itEntry=(window.SPELLS_IT||{})[rawS.name];
+var enName=rawS.name;
+var itName=(_itEntry&&_itEntry.name)?_itEntry.name:rawS.name;
+var primaryName=_spLang()==='it'?itName:enName;
+var altName=_spLang()==='it'?enName:itName;
+var nameH='<span class="spe__name">'+primaryName+(altName!==primaryName?' <span class="spe__name-alt">('+altName+')</span>':'')+'</span>';
 var higherH=s.higherLevels?'<div class="spe__higher"><b>'+(_spLang()==='it'?'Ai livelli superiori:':'At Higher Levels:')+'</b> '+s.higherLevels+'</div>':'';
 /* Configuratore attacco read-only: mostrato solo se attackType è impostato */
 var atkH='';
@@ -5085,7 +5110,7 @@ if(s.attackType){
     atkH='<div class="spe__atk">'+atkParts.join('<span class="spe__atk-sep">·</span>')+'</div>';
   }
 }
-d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+rawS.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+rawS.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+'<div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
+d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+rawS.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+rawS.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button>'+nameH+'<span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+'<div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
 spList.appendChild(d)})}
 spList.addEventListener('click',function(e){var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}if(e.target.closest('.spe__drag'))return;var spe=e.target.closest('.spe');if(spe)spe.classList.toggle('spe--open')});
 spSearch.addEventListener('input',renSp);
