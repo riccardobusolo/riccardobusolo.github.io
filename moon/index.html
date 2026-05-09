@@ -1142,8 +1142,10 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spf__opt{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:4px;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.68rem;color:var(--dim);transition:background .1s;white-space:nowrap}.spf__opt:hover{background:var(--rl)}
 .spf__chk{width:15px;height:15px;border-radius:3px;border:1.5px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;font-size:.5rem;color:transparent}.spf__opt--sel .spf__chk{border-color:var(--gold);background:rgba(196,154,50,.15);color:var(--gold)}
 /* Pulsanti "icona" (solo simbolo): padding stretto e quadrati per stare
-   in proporzione coi pulsanti testuali. Mantengono altezza 32px. */
-#spFav{padding:0;width:32px;font-size:.95rem}
+   in proporzione coi pulsanti testuali. Mantengono altezza 32px.
+   Il primo del gruppo "destro" (#spFav) ha margin-left:auto per spingere
+   sé stesso e tutti i pulsanti successivi al lato destro della toolbar. */
+#spFav{padding:0;width:32px;font-size:.95rem;margin-left:auto}
 #spSortBtn{padding:0 10px;letter-spacing:.04em}
 .spf__fav--flag{padding:0;width:38px}
 .spf__fav--flag svg{display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.25);transition:transform .15s}
