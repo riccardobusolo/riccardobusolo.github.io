@@ -86,8 +86,20 @@ body.no-custom-cursor{--cur-default:default;--cur-pointer:pointer;--cur-text:tex
    del filtro invece di fare snap. Il "drop-shadow(0 0 0 transparent)" è
    un'aura a raggio zero e colore trasparente — visivamente identica a
    "none", ma transizionabile. Durata .35s ease-out: morbida ma rapida. */
-.sb__logo{width:100%;height:auto;border-radius:8px;margin:0 auto 14px;display:block;opacity:.85;padding:0 4px;cursor:var(--cur-pointer);filter:drop-shadow(0 0 0 transparent);transition:filter .22s var(--ease);-webkit-user-drag:none;user-select:none}
-.sb__logo:hover{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--gold) 70%,transparent))}
+/* will-change:filter pre-crea il compositor layer cosi' al primo hover il
+   browser non spende ~200-400ms a creare il layer e rasterizzare l'SVG col
+   filtro. Senza questo hint, c'è un delay percepibile prima che il glow
+   appaia. Inoltre rgba al posto di color-mix() — le interpolazioni di
+   color-mix tra transparent e color sono in alcuni casi più lente a
+   risolversi nel main thread. */
+.sb__logo{width:100%;height:auto;border-radius:8px;margin:0 auto 14px;display:block;opacity:.85;padding:0 4px;cursor:var(--cur-pointer);filter:drop-shadow(0 0 0 rgba(196,154,50,0));transition:filter .22s var(--ease);-webkit-user-drag:none;user-select:none;will-change:filter}
+.sb__logo:hover{filter:drop-shadow(0 0 6px rgba(196,154,50,.7))}
+:root[data-theme="sword-coast"] .sb__logo{filter:drop-shadow(0 0 0 rgba(122,90,37,0))}
+:root[data-theme="sword-coast"] .sb__logo:hover{filter:drop-shadow(0 0 6px rgba(122,90,37,.7))}
+:root[data-theme="dark"] .sb__logo{filter:drop-shadow(0 0 0 rgba(255,255,255,0))}
+:root[data-theme="dark"] .sb__logo:hover{filter:drop-shadow(0 0 6px rgba(255,255,255,.7))}
+:root[data-theme="light"] .sb__logo{filter:drop-shadow(0 0 0 rgba(0,0,0,0))}
+:root[data-theme="light"] .sb__logo:hover{filter:drop-shadow(0 0 6px rgba(0,0,0,.7))}
 :root[data-theme="sword-coast"] .sb__logo,:root[data-theme="dark"] .sb__logo,:root[data-theme="light"] .sb__logo{opacity:1;padding:8px 4px}
 /* Animazione pulse + glow al click. Lo scale-up "elastico" (cubic-bezier
    con overshoot) dà una sensazione di pop magico, accompagnato da un'aura
