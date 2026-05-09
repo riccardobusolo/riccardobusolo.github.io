@@ -1564,6 +1564,32 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spe__atk-dmg{color:var(--text);font-weight:600}
 .spe__atk-type{color:var(--gold);font-style:italic}
 .spe__atk-sep{color:var(--border);opacity:.7}
+/* Modalità modifica catalogo: input editabili sostituiscono testo statico.
+   Attivata dal pulsante "✏ Modifica" in alto. Salvataggio automatico in
+   localStorage (cm_sp_overrides) e applicazione live alle SPELLS in memoria. */
+.spe.spe--editing{outline:1px dashed rgba(196,154,50,.4);outline-offset:2px}
+.spe-ed-row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin:4px 0 8px;padding:6px 8px;border-radius:4px;background:rgba(196,154,50,.05);border:1px solid rgba(196,154,50,.22)}
+.spe-ed-fld{display:flex;flex-direction:column;gap:3px;flex:1;min-width:90px}
+.spe-ed-fld--narrow{flex:0 0 90px}
+.spe-ed-fld--full{flex:1 1 100%}
+.spe-ed-lbl{font-family:var(--mono);font-size:.56rem;color:var(--gold);text-transform:uppercase;letter-spacing:.06em}
+.spe-ed-in,.spe-ed-sel,.spe-ed-ta{font-family:var(--mono);font-size:.66rem;background:rgba(20,18,16,.5);border:1px solid rgba(196,154,50,.3);border-radius:3px;color:var(--text);padding:4px 6px;outline:none;transition:border-color .15s,background .15s;width:100%;box-sizing:border-box;min-width:0}
+.spe-ed-in:focus,.spe-ed-sel:focus,.spe-ed-ta:focus{border-color:var(--gold);background:rgba(196,154,50,.08)}
+.spe-ed-ta{font-size:.74rem;font-family:inherit;resize:vertical;min-height:64px;line-height:1.45;color:var(--dim);white-space:pre-wrap}
+.spe-ed-ta--higher{min-height:42px;font-size:.72rem;font-style:italic;color:var(--muted)}
+.spe-ed-mini{font-family:var(--mono);font-size:.56rem;color:var(--muted);margin-left:6px;opacity:.7}
+.spe-ed-reset{font-family:var(--mono);font-size:.56rem;background:transparent;border:1px solid var(--border);border-radius:3px;color:var(--muted);padding:3px 8px;cursor:var(--cur-pointer);transition:all .12s;text-transform:uppercase;letter-spacing:.05em}
+.spe-ed-reset:hover{border-color:var(--red);color:var(--red);background:var(--rl)}
+.spe-ed-reset:disabled{opacity:.35;cursor:not-allowed}
+.spe-ed-saved{display:inline-block;font-family:var(--mono);font-size:.54rem;color:#4a9a5a;text-transform:uppercase;letter-spacing:.05em;opacity:0;transition:opacity .25s;margin-left:8px}
+.spe-ed-saved.spe-ed-saved--show{opacity:1}
+/* Banner globale modalità modifica */
+.spe-ed-banner{display:none;margin-bottom:8px;padding:7px 10px;border-radius:4px;background:rgba(196,154,50,.08);border:1px solid rgba(196,154,50,.32);color:var(--dim);font-family:var(--mono);font-size:.64rem;line-height:1.45;align-items:center;gap:10px;flex-wrap:wrap}
+.spe-ed-banner.spe-ed-banner--on{display:flex}
+.spe-ed-banner b{color:var(--gold);font-weight:700}
+.spe-ed-banner button{font-family:var(--mono);font-size:.58rem;padding:4px 9px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);text-transform:uppercase;letter-spacing:.04em;transition:all .12s}
+.spe-ed-banner button:hover{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.06)}
+.spe-ed-banner button.spe-ed-banner-btn--danger:hover{border-color:var(--red);color:var(--red);background:var(--rl)}
 .spe__desc{font-size:.78rem;color:var(--dim);line-height:1.5;margin-top:6px}
 .spe__higher{font-size:.72rem;color:var(--muted);line-height:1.4;margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-style:italic}
 .spe__foot{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px;align-items:center}
@@ -1756,8 +1782,10 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 <button class="spf__fav" id="spFav" title="Mostra preferiti">★</button>
 <button class="spf__fav" id="spSortBtn" title="Ordina la lista" style="font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.5px">↕ Liv</button>
 <button class="spf__fav" id="spLangBtn" title="Cambia lingua incantesimi (italiano / inglese)" style="font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.5px">IT</button>
+<button class="spf__fav" id="spEditBtn" title="Modalità modifica: rendi temporaneamente editabili descrizioni e configuratore d'attacco. Le modifiche si salvano automaticamente." style="font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.5px">✏ Modifica</button>
 </div>
 <div class="spcount" id="spCount"></div>
+<div class="spe-ed-banner" id="spEditBanner"><span><b>Modalità modifica attiva.</b> Clicca un incantesimo per espanderlo, poi correggi attacco/danno e descrizioni. Le modifiche si salvano automaticamente.</span><span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button id="spEditResetAll" class="spe-ed-banner-btn--danger" title="Azzera tutte le modifiche personali e ripristina i valori originali del catalogo">Ripristina tutto</button><button id="spEditDone">Esci</button></span></div>
 <div class="splist" id="spList"></div>
 </div></div>
 
@@ -4884,7 +4912,53 @@ render()})();
 /* SPELLS */
 (function(){
 var SP=(typeof SPELLS!=='undefined')?SPELLS:[];
-var spSearch=document.getElementById('spSearch'),spList=document.getElementById('spList'),spCount=document.getElementById('spCount'),spFavBtn=document.getElementById('spFav'),spLangBtn=document.getElementById('spLangBtn'),spSortBtn=document.getElementById('spSortBtn');
+var spSearch=document.getElementById('spSearch'),spList=document.getElementById('spList'),spCount=document.getElementById('spCount'),spFavBtn=document.getElementById('spFav'),spLangBtn=document.getElementById('spLangBtn'),spSortBtn=document.getElementById('spSortBtn'),spEditBtn=document.getElementById('spEditBtn'),spEditBanner=document.getElementById('spEditBanner'),spEditDoneBtn=document.getElementById('spEditDone'),spEditResetAllBtn=document.getElementById('spEditResetAll');
+/* === MODALITÀ MODIFICA CATALOGO ============================================
+   Permette di correggere a mano i campi degli incantesimi (attacco, danno,
+   descrizioni) e salvarli come override personali. Gli override sono salvati
+   in localStorage.cm_sp_overrides come { name: { field: value, ... } } e
+   applicati live agli oggetti SPELLS al boot e ad ogni modifica. I campi
+   testuali (description, higherLevels) sono salvati per lingua: la versione
+   IT va in SPELLS_IT[name], quella EN nell'oggetto SPELLS canonico. */
+var _spEditMode=false;
+function _spOvLoad(){try{return JSON.parse(localStorage.getItem('cm_sp_overrides')||'{}')||{}}catch(e){return{}}}
+function _spOvSave(o){try{localStorage.setItem('cm_sp_overrides',JSON.stringify(o))}catch(e){}}
+function _spOvFor(name){var o=_spOvLoad();return o[name]||null}
+function _spOvSet(name,field,val){
+  var o=_spOvLoad();
+  if(!o[name])o[name]={};
+  o[name][field]=val;
+  _spOvSave(o);
+}
+function _spOvDel(name){var o=_spOvLoad();if(o[name]){delete o[name];_spOvSave(o)}}
+/* Applica gli override salvati all'oggetto SPELLS in memoria + a SPELLS_IT.
+   Chiamata una volta al boot e ad ogni modifica per mantenere la coerenza
+   tra catalogo, scheda PG e ogni altro componente che legge SPELLS. */
+function _spApplyOverrides(){
+  var o=_spOvLoad();
+  var IT=window.SPELLS_IT||{};
+  for(var name in o){if(!o.hasOwnProperty(name))continue;
+    var ov=o[name];
+    /* Trova lo spell canonico per nome (chiavi: nome inglese) */
+    var sp=null;for(var i=0;i<SP.length;i++){if(SP[i].name===name){sp=SP[i];break}}
+    if(!sp)continue;
+    /* Campi attacco/danno: applicati direttamente all'oggetto SPELLS */
+    if('attackType' in ov)sp.attackType=ov.attackType;
+    if('saveAbility' in ov)sp.saveAbility=ov.saveAbility;
+    if('damage' in ov)sp.damage=ov.damage;
+    if('damageType' in ov)sp.damageType=ov.damageType;
+    /* Descrizione/livelli superiori per lingua */
+    if('description_en' in ov)sp.description=ov.description_en;
+    if('higherLevels_en' in ov)sp.higherLevels=ov.higherLevels_en;
+    if('description_it' in ov||'higherLevels_it' in ov){
+      if(!IT[name])IT[name]={};
+      if('description_it' in ov)IT[name].description=ov.description_it;
+      if('higherLevels_it' in ov)IT[name].higherLevels=ov.higherLevels_it;
+    }
+  }
+  window.SPELLS_IT=IT;
+}
+_spApplyOverrides();
 /* Ordinamento: 'level' (default) | 'alpha' | 'school'. Ciclico. */
 function _spSort(){var s=localStorage.getItem('cm_spell_sort');return(s==='alpha'||s==='school')?s:'level'}
 function _refreshSpSortBtn(){if(!spSortBtn)return;var m=_spSort();var lbl=m==='alpha'?'↕ A-Z':m==='school'?'↕ Scuola':'↕ Liv';var hint=m==='alpha'?'nome (A-Z)':m==='school'?'scuola di magia':'livello';spSortBtn.textContent=lbl;spSortBtn.title='Ordinato per '+hint+' — clicca per cambiare'}_refreshSpSortBtn();
@@ -5037,38 +5111,181 @@ spCount.textContent=countTxt;
 spList.innerHTML='';
 if(!SP.length){spList.innerHTML='<div style="text-align:center;padding:30px 10px;font-family:var(--mono);font-size:.62rem;color:var(--muted)">Database non trovato.<br>Assicurati che <b>spells.js</b> sia nella stessa cartella.</div>';return}
 if(!filtered.length){spList.innerHTML='<div style="text-align:center;padding:20px;font-family:var(--mono);font-size:.6rem;color:var(--muted)">'+(favMode?'Nessun preferito':'Nessun risultato')+'</div>';return}
-filtered.forEach(function(rawS){var s=_spLocal(rawS);var d=document.createElement('div');d.className='spe';
+filtered.forEach(function(rawS){var s=_spLocal(rawS);var d=document.createElement('div');d.className='spe'+(_spEditMode?' spe--editing':'');
 var fav=isFav(rawS.name);
 var lvlTxt=s.level===0?'T':s.level+'\u00b0';
 var tags='';if(s.concentration)tags+='<span class="spe__tag spe__tag--c" title="Concentrazione">C</span>';if(s.ritual)tags+='<span class="spe__tag spe__tag--r" title="Rituale">R</span>';
 var clsH=s.classes.map(function(c){return'<span class="spe__cl">'+c+'</span>'}).join('');
 var srcLbl=s.source==="Player's Handbook"?'PHB':s.source==="Tasha's Cauldron of Everything"?"Tasha's":s.source;
-var higherH=s.higherLevels?'<div class="spe__higher"><b>'+(_spLang()==='it'?'Ai livelli superiori:':'At Higher Levels:')+'</b> '+s.higherLevels+'</div>':'';
-/* Configuratore attacco read-only: mostrato solo se attackType è impostato */
-var atkH='';
-if(s.attackType){
-  var SAVE_LBL_LOCAL=_spLang()==='it'
-    ? {Strength:'Forza',Dexterity:'Destrezza',Constitution:'Costituzione',Intelligence:'Intelligenza',Wisdom:'Saggezza',Charisma:'Carisma',str:'Forza',dex:'Destrezza',con:'Costituzione',intl:'Intelligenza',wis:'Saggezza',cha:'Carisma'}
-    : {Strength:'Strength',Dexterity:'Dexterity',Constitution:'Constitution',Intelligence:'Intelligence',Wisdom:'Wisdom',Charisma:'Charisma',str:'Strength',dex:'Dexterity',con:'Constitution',intl:'Intelligence',wis:'Wisdom',cha:'Charisma'};
-  var atkParts=[];
-  if(s.attackType==='atk'){
-    atkParts.push('<span class="spe__atk-kind spe__atk-kind--atk">'+(_spLang()==='it'?'Attacco':'Attack')+'</span>');
-  }else if(s.attackType==='save'){
-    var saLbl=SAVE_LBL_LOCAL[s.saveAbility]||s.saveAbility||'?';
-    atkParts.push('<span class="spe__atk-kind spe__atk-kind--save">'+(_spLang()==='it'?'TS':'Save')+': '+saLbl+'</span>');
+var nameAttr=rawS.name.replace(/"/g,'&quot;');
+/* Determina se questo spell ha un override salvato (per il pulsante "Ripristina") */
+var hasOv=!!_spOvFor(rawS.name);
+/* Sezione ATTACCO/DANNO + DESCRIZIONE: due rami — read-only (default) o
+   editor (modalità modifica). In modalità modifica i textarea contengono
+   il testo nella lingua attualmente selezionata; il salvataggio aggiorna
+   l'oggetto live e localStorage. */
+var atkH='',descH='',higherH='';
+if(_spEditMode){
+  /* === Editor: configuratore attacco === */
+  var atkType=rawS.attackType||'';
+  var saveAb=rawS.saveAbility||'';
+  var dmg=rawS.damage||'';
+  var dmgT=rawS.damageType||'';
+  var DMG_TYPES=['','Acid','Bludgeoning','Cold','Fire','Force','Lightning','Necrotic','Piercing','Poison','Psychic','Radiant','Slashing','Thunder'];
+  var SAVE_ABS=[['','—'],['Strength','Forza'],['Dexterity','Destrezza'],['Constitution','Costituzione'],['Intelligence','Intelligenza'],['Wisdom','Saggezza'],['Charisma','Carisma']];
+  var atkOpts='<option value=""'+(atkType===''?' selected':'')+'>—</option>'+
+    '<option value="atk"'+(atkType==='atk'?' selected':'')+'>Attacco</option>'+
+    '<option value="save"'+(atkType==='save'?' selected':'')+'>Salvezza</option>';
+  var saveOpts=SAVE_ABS.map(function(p){return'<option value="'+p[0]+'"'+(saveAb===p[0]?' selected':'')+'>'+p[1]+'</option>'}).join('');
+  var dmgTOpts=DMG_TYPES.map(function(t){return'<option value="'+t+'"'+(dmgT===t?' selected':'')+'>'+(t===''?'—':(_spLang()==='it'&&window.cm_trDmgType?window.cm_trDmgType(t):t))+'</option>'}).join('');
+  var saveStyle=atkType==='save'?'':'display:none';
+  atkH='<div class="spe-ed-row">'+
+    '<div class="spe-ed-fld spe-ed-fld--narrow"><span class="spe-ed-lbl">Tipo</span><select class="spe-ed-sel" data-spedfld="attackType" data-spedname="'+nameAttr+'">'+atkOpts+'</select></div>'+
+    '<div class="spe-ed-fld spe-ed-fld--narrow" data-spedsave style="'+saveStyle+'"><span class="spe-ed-lbl">TS</span><select class="spe-ed-sel" data-spedfld="saveAbility" data-spedname="'+nameAttr+'">'+saveOpts+'</select></div>'+
+    '<div class="spe-ed-fld spe-ed-fld--narrow"><span class="spe-ed-lbl">Danno</span><input class="spe-ed-in" type="text" placeholder="es. 3d6" data-spedfld="damage" data-spedname="'+nameAttr+'" value="'+(dmg.replace(/"/g,'&quot;'))+'"></div>'+
+    '<div class="spe-ed-fld"><span class="spe-ed-lbl">Tipo danno</span><select class="spe-ed-sel" data-spedfld="damageType" data-spedname="'+nameAttr+'">'+dmgTOpts+'</select></div>'+
+    '<div class="spe-ed-fld" style="flex:0 0 auto"><span class="spe-ed-lbl">&nbsp;</span><button class="spe-ed-reset" data-spedreset="'+nameAttr+'"'+(hasOv?'':' disabled')+' title="Ripristina i valori originali del catalogo per questo incantesimo">Ripristina</button></div>'+
+  '</div>';
+  /* === Editor: descrizione === */
+  /* Salvataggio per lingua: SPELLS_IT[name].description per IT, SPELLS[i].description per EN */
+  var descVal=(s.description||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var langSuffix=_spLang()==='it'?'_it':'_en';
+  descH='<div class="spe-ed-row" style="flex-direction:column;align-items:stretch;gap:4px"><div style="display:flex;align-items:center;gap:8px"><span class="spe-ed-lbl">'+(_spLang()==='it'?'Descrizione (italiano)':'Description (English)')+'</span><span class="spe-ed-saved" data-spedsaved="desc">✓ Salvato</span></div><textarea class="spe-ed-ta" data-spedfld="description'+langSuffix+'" data-spedname="'+nameAttr+'">'+descVal+'</textarea></div>';
+  var higherVal=(s.higherLevels||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  higherH='<div class="spe-ed-row" style="flex-direction:column;align-items:stretch;gap:4px"><div style="display:flex;align-items:center;gap:8px"><span class="spe-ed-lbl">'+(_spLang()==='it'?'Ai livelli superiori (italiano)':'At Higher Levels (English)')+'</span><span class="spe-ed-saved" data-spedsaved="higher">✓ Salvato</span></div><textarea class="spe-ed-ta spe-ed-ta--higher" placeholder="(vuoto se non applicabile)" data-spedfld="higherLevels'+langSuffix+'" data-spedname="'+nameAttr+'">'+higherVal+'</textarea></div>';
+}else{
+  /* === Read-only: configuratore attacco (mostrato solo se valorizzato) === */
+  if(s.attackType){
+    var SAVE_LBL_LOCAL=_spLang()==='it'
+      ? {Strength:'Forza',Dexterity:'Destrezza',Constitution:'Costituzione',Intelligence:'Intelligenza',Wisdom:'Saggezza',Charisma:'Carisma',str:'Forza',dex:'Destrezza',con:'Costituzione',intl:'Intelligenza',wis:'Saggezza',cha:'Carisma'}
+      : {Strength:'Strength',Dexterity:'Dexterity',Constitution:'Constitution',Intelligence:'Intelligence',Wisdom:'Wisdom',Charisma:'Charisma',str:'Strength',dex:'Dexterity',con:'Constitution',intl:'Intelligence',wis:'Wisdom',cha:'Charisma'};
+    var atkParts=[];
+    if(s.attackType==='atk'){
+      atkParts.push('<span class="spe__atk-kind spe__atk-kind--atk">'+(_spLang()==='it'?'Attacco':'Attack')+'</span>');
+    }else if(s.attackType==='save'){
+      var saLbl=SAVE_LBL_LOCAL[s.saveAbility]||s.saveAbility||'?';
+      atkParts.push('<span class="spe__atk-kind spe__atk-kind--save">'+(_spLang()==='it'?'TS':'Save')+': '+saLbl+'</span>');
+    }
+    if(s.damage){atkParts.push('<span class="spe__atk-dmg">'+s.damage+'</span>')}
+    if(s.damageType){
+      var dt=(_spLang()==='it'&&window.cm_trDmgType)?window.cm_trDmgType(s.damageType):s.damageType;
+      atkParts.push('<span class="spe__atk-type">'+dt+'</span>');
+    }
+    if(atkParts.length){
+      atkH='<div class="spe__atk">'+atkParts.join('<span class="spe__atk-sep">·</span>')+'</div>';
+    }
   }
-  if(s.damage){atkParts.push('<span class="spe__atk-dmg">'+s.damage+'</span>')}
-  if(s.damageType){
-    var dt=(_spLang()==='it'&&window.cm_trDmgType)?window.cm_trDmgType(s.damageType):s.damageType;
-    atkParts.push('<span class="spe__atk-type">'+dt+'</span>');
-  }
-  if(atkParts.length){
-    atkH='<div class="spe__atk">'+atkParts.join('<span class="spe__atk-sep">·</span>')+'</div>';
-  }
+  descH='<div class="spe__desc">'+s.description+'</div>';
+  higherH=s.higherLevels?'<div class="spe__higher"><b>'+(_spLang()==='it'?'Ai livelli superiori:':'At Higher Levels:')+'</b> '+s.higherLevels+'</div>':'';
 }
-d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+rawS.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+rawS.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+'<div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
+d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+nameAttr+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+nameAttr+'">'+(fav?'\u2605':'\u2606')+'</button><span class="spe__name">'+s.name+'</span><span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+descH+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
 spList.appendChild(d)})}
-spList.addEventListener('click',function(e){var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}if(e.target.closest('.spe__drag'))return;var spe=e.target.closest('.spe');if(spe)spe.classList.toggle('spe--open')});
+spList.addEventListener('click',function(e){
+  var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}
+  if(e.target.closest('.spe__drag'))return;
+  /* Pulsante "Ripristina" del singolo incantesimo (controllato PRIMA del bail-out
+     editor, perché la classe .spe-ed-reset matcherebbe anche il filtro generale) */
+  var rstBtn=e.target.closest('[data-spedreset]');
+  if(rstBtn){
+    e.stopPropagation();
+    var nm=rstBtn.getAttribute('data-spedreset');
+    if(confirm('Ripristinare i valori originali del catalogo per "'+nm+'"?\nLe tue modifiche personali a questo incantesimo verranno cancellate.')){
+      _spOvDel(nm);
+      /* Per ripristinare davvero i valori originali bisognerebbe riavere la copia
+         pristina del catalogo. Per semplicità invitiamo l'utente a ricaricare la pagina. */
+      alert('Modifiche cancellate da localStorage. Ricarica la pagina per rivedere i valori originali del catalogo.');
+      renSp();
+    }
+    return;
+  }
+  /* In modalità modifica, evita di chiudere la card cliccando su un campo o sulla riga editor */
+  if(_spEditMode&&e.target.closest('.spe-ed-row,.spe-ed-in,.spe-ed-sel,.spe-ed-ta'))return;
+  var spe=e.target.closest('.spe');if(spe)spe.classList.toggle('spe--open')
+});
+/* === HANDLERS modalità modifica: input/change persistono nelle SPELLS in memoria + localStorage ============== */
+function _spEdFlashSaved(input){
+  /* Mostra brevemente il badge "✓ Salvato" accanto al campo modificato */
+  var row=input.closest('.spe-ed-row');if(!row)return;
+  var key=input.getAttribute('data-spedfld')||'';
+  var savedSel=key.indexOf('description')===0?'[data-spedsaved=\"desc\"]':key.indexOf('higherLevels')===0?'[data-spedsaved=\"higher\"]':null;
+  var badge=savedSel?row.querySelector(savedSel):row.querySelector('.spe-ed-saved');
+  if(!badge){/* Per attacco/danno: crea un badge volatile in fondo alla riga */
+    badge=document.createElement('span');badge.className='spe-ed-saved';badge.textContent='✓ Salvato';row.appendChild(badge);
+    setTimeout(function(){if(badge.parentNode)badge.parentNode.removeChild(badge)},1200);
+  }
+  badge.classList.add('spe-ed-saved--show');
+  clearTimeout(badge._spedT);badge._spedT=setTimeout(function(){badge.classList.remove('spe-ed-saved--show')},900);
+}
+function _spEdHandle(target){
+  var name=target.getAttribute('data-spedname');
+  var fld=target.getAttribute('data-spedfld');
+  if(!name||!fld)return;
+  var val=target.value;
+  /* Trova lo spell canonico per nome */
+  var sp=null;for(var i=0;i<SP.length;i++){if(SP[i].name===name){sp=SP[i];break}}
+  if(!sp)return;
+  if(fld==='attackType'){
+    sp.attackType=val;_spOvSet(name,'attackType',val);
+    /* Mostra/nascondi il campo "TS" in base al tipo */
+    var row=target.closest('.spe-ed-row');var saveFld=row?row.querySelector('[data-spedsave]'):null;
+    if(saveFld)saveFld.style.display=val==='save'?'':'none';
+  }else if(fld==='saveAbility'){
+    sp.saveAbility=val;_spOvSet(name,'saveAbility',val);
+  }else if(fld==='damage'){
+    sp.damage=val;_spOvSet(name,'damage',val);
+  }else if(fld==='damageType'){
+    sp.damageType=val;_spOvSet(name,'damageType',val);
+  }else if(fld==='description_it'){
+    var IT=window.SPELLS_IT||(window.SPELLS_IT={});
+    if(!IT[name])IT[name]={};
+    IT[name].description=val;
+    _spOvSet(name,'description_it',val);
+  }else if(fld==='description_en'){
+    sp.description=val;_spOvSet(name,'description_en',val);
+  }else if(fld==='higherLevels_it'){
+    var IT2=window.SPELLS_IT||(window.SPELLS_IT={});
+    if(!IT2[name])IT2[name]={};
+    IT2[name].higherLevels=val;
+    _spOvSet(name,'higherLevels_it',val);
+  }else if(fld==='higherLevels_en'){
+    sp.higherLevels=val;_spOvSet(name,'higherLevels_en',val);
+  }
+  /* Abilita il pulsante "Ripristina" della stessa card (ora ha override) */
+  var spe=target.closest('.spe');
+  if(spe){var rb=spe.querySelector('[data-spedreset]');if(rb)rb.disabled=false}
+  _spEdFlashSaved(target);
+  /* Notifica le altre schede (PG sheet, csheet) per re-render */
+  if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets();
+}
+spList.addEventListener('input',function(e){
+  var t=e.target;if(t.matches('.spe-ed-in,.spe-ed-ta'))_spEdHandle(t);
+});
+spList.addEventListener('change',function(e){
+  var t=e.target;if(t.matches('.spe-ed-sel'))_spEdHandle(t);
+});
+/* === Toggle modalità modifica =============================================== */
+function _spRefreshEditBtn(){
+  if(!spEditBtn)return;
+  spEditBtn.classList.toggle('spf__fav--on',_spEditMode);
+  spEditBtn.textContent=_spEditMode?'✓ Modifica':'✏ Modifica';
+  if(spEditBanner)spEditBanner.classList.toggle('spe-ed-banner--on',_spEditMode);
+}
+_spRefreshEditBtn();
+if(spEditBtn)spEditBtn.addEventListener('click',function(){
+  _spEditMode=!_spEditMode;
+  _spRefreshEditBtn();
+  renSp();
+});
+if(spEditDoneBtn)spEditDoneBtn.addEventListener('click',function(){
+  _spEditMode=false;_spRefreshEditBtn();renSp();
+});
+if(spEditResetAllBtn)spEditResetAllBtn.addEventListener('click',function(){
+  if(confirm('Cancellare TUTTE le tue modifiche personali al catalogo incantesimi?\nLe override salvate in localStorage saranno rimosse.\n\nNota: per rivedere i valori originali servirà ricaricare la pagina.')){
+    try{localStorage.removeItem('cm_sp_overrides')}catch(e){}
+    alert('Override rimossi. Ricarica la pagina per vedere i valori originali del catalogo.');
+    renSp();
+  }
+});
 spSearch.addEventListener('input',renSp);
 renSp()})();
 /* FIRE */
