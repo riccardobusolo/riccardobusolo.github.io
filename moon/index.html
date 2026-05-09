@@ -383,7 +383,31 @@ body.sb--global-dragging .sb__btn:not(.on):hover{background:transparent;color:va
 .wh__menu-grp .wh__menu-btn svg{width:18px;height:14px}
 .wh{position:relative}
 
-.wb{flex:1;overflow:hidden auto;padding:7px;scrollbar-width:thin;scrollbar-color:rgba(140,30,30,.12) transparent}.wb::-webkit-scrollbar{width:4px}.wb::-webkit-scrollbar-thumb{background:rgba(140,30,30,.15);border-radius:2px}
+/* Scrollbar nativa nascosta su .wb e altri contenitori scrollabili: la
+   sostituiamo con un thumb DOM custom (.csb-thumb) gestito da JS. Il
+   browser ignora cursor su ::-webkit-scrollbar*, quindi l'unico modo per
+   avere un cursore custom sulla scrollbar è renderizzarla noi. */
+.wb{flex:1;overflow:hidden auto;padding:7px;position:relative;scrollbar-width:none;scrollbar-color:transparent transparent}.wb::-webkit-scrollbar{display:none;width:0;height:0}.wb::-webkit-scrollbar-thumb{display:none}
+/* Thumb custom: position:absolute dentro al contenitore scrollabile.
+   Top e height vengono aggiornati da JS in base a scrollTop/scrollHeight.
+   left = scrollLeft + clientWidth - 9 mantiene il thumb visualmente
+   ancorato al bordo destro del viewport anche se il contenuto scorre. */
+.csb-host{scrollbar-width:none}
+.csb-host::-webkit-scrollbar{display:none;width:0;height:0}
+.csb-host::-webkit-scrollbar-thumb,.csb-host::-webkit-scrollbar-track{display:none}
+.csb-thumb{position:absolute;width:6px;border-radius:3px;background:rgba(140,30,30,.18);z-index:5;cursor:var(--cur-grab);transition:background .15s,opacity .25s;display:none;pointer-events:auto;will-change:top,left,height}
+.csb-thumb:hover{background:rgba(140,30,30,.4)}
+.csb-thumb.csb-thumb--active,.csb-thumb:active{background:rgba(140,30,30,.6);cursor:var(--cur-grabbing)}
+body.csb-dragging,body.csb-dragging *{cursor:var(--cur-grabbing)!important;user-select:none}
+:root[data-theme="sword-coast"] .csb-thumb{background:rgba(122,90,37,.3)}
+:root[data-theme="sword-coast"] .csb-thumb:hover{background:rgba(122,90,37,.5)}
+:root[data-theme="sword-coast"] .csb-thumb.csb-thumb--active,:root[data-theme="sword-coast"] .csb-thumb:active{background:rgba(122,90,37,.7)}
+:root[data-theme="dark"] .csb-thumb{background:rgba(255,255,255,.18)}
+:root[data-theme="dark"] .csb-thumb:hover{background:rgba(255,255,255,.35)}
+:root[data-theme="dark"] .csb-thumb.csb-thumb--active,:root[data-theme="dark"] .csb-thumb:active{background:rgba(255,255,255,.5)}
+:root[data-theme="light"] .csb-thumb{background:rgba(0,0,0,.18)}
+:root[data-theme="light"] .csb-thumb:hover{background:rgba(0,0,0,.35)}
+:root[data-theme="light"] .csb-thumb.csb-thumb--active,:root[data-theme="light"] .csb-thumb:active{background:rgba(0,0,0,.5)}
 .empty{display:none;align-items:flex-end;justify-content:center;padding-bottom:40px;z-index:0;position:absolute;inset:0}
 .empty__text{font-family:var(--mono);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;background:rgba(10,10,15,.7);padding:6px 16px;border-radius:5px}
 .fi{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-family:var(--mono);font-size:.75rem;color:var(--text);outline:none;transition:border-color .2s;width:100%}.fi:focus{border-color:var(--rb)}.fi::placeholder{color:var(--muted)}
@@ -6295,6 +6319,127 @@ document.addEventListener('keydown',function(e){
     document.querySelectorAll('.pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')});
   }
 });
+})();
+/* === SCROLLBAR CUSTOM CON CURSORE CONTROLLABILE =============================
+   Il browser ignora la proprietà `cursor` sui pseudo ::-webkit-scrollbar*,
+   quindi sopra la scrollbar nativa appare il cursore di sistema invece di
+   quello custom dell'app. Soluzione: nascondere la scrollbar nativa e
+   sostituirla con un thumb DOM (.csb-thumb) che è completamente
+   controllabile via CSS (cursor:var(--cur-grab/grabbing)).
+
+   Approccio (in-place):
+   - Il thumb è inserito DENTRO l'elemento scrollabile come figlio
+     position:absolute. Per ancorarlo visualmente al bordo destro del
+     viewport indipendentemente dalla scroll position, calcoliamo:
+       top  = scrollTop  + scrollRatio * (clientHeight - thumbHeight)
+       left = scrollLeft + clientWidth - 9
+     Così il thumb "scrolla con il contenuto" ma il JS lo riposiziona
+     ad ogni scroll/resize/mutation per mantenerlo dove vogliamo.
+   - L'elemento scrollabile riceve `position:relative` (via CSS) e
+     `scrollbar-width:none` per nascondere la scrollbar nativa.
+   - Il drag del thumb mappa il delta mouse Y al delta scrollTop in
+     proporzione di maxScroll/maxThumbY. Durante il drag il body riceve
+     `csb-dragging` per forzare il cursore grabbing su tutto. */
+(function(){
+  if(!document.body)return;
+  /* Lista dei contenitori scrollabili più visibili nell'app. Aggiungi qui
+     altri selettori se compaiono nuove scrollbar con cursore di sistema. */
+  var TARGETS='.wb,.helpMd__body,.setpanel__body,.epick__grid,.sp-md__body,.ppolMd__body,.cpick__list,.cc__hist,.mpx__sb-list,.mp__sb-list,.sp__list-scroll,.sp__prep-list,.spf__drop,.mp__autocomp,.pg__pgsel-menu,.pg__cls-dd-panel,.mpx-pinpop__emojis,.ch-popmenu,.tm-right,.rs__view,.rsmn-md,.rsdraw-md';
+  var thumbs=new WeakMap();
+  function update(el,thumb){
+    if(!el.isConnected){thumb.style.display='none';return}
+    /* Se il thumb è stato rimosso (es. innerHTML rebuild dei contenuti),
+       lo re-ancoriamo. È idempotente — se è già lì, no-op. */
+    if(thumb.parentElement!==el)el.appendChild(thumb);
+    var sH=el.scrollHeight,cH=el.clientHeight,cW=el.clientWidth;
+    if(sH<=cH+1||cH===0||cW===0){thumb.style.display='none';return}
+    /* Hide se l'elemento o un suo antenato è display:none */
+    if(el.offsetParent===null&&getComputedStyle(el).position!=='fixed'){thumb.style.display='none';return}
+    var thumbH=Math.max(cH*cH/sH,24);
+    var maxScroll=sH-cH;
+    var maxThumbY=cH-thumbH;
+    var scrollRatio=maxScroll>0?(el.scrollTop/maxScroll):0;
+    thumb.style.display='block';
+    thumb.style.top=(el.scrollTop+scrollRatio*maxThumbY)+'px';
+    thumb.style.left=(el.scrollLeft+cW-9)+'px';
+    thumb.style.height=thumbH+'px';
+  }
+  function setup(el){
+    if(thumbs.has(el))return;
+    el.classList.add('csb-host');
+    /* Garantisce un positioning context per il thumb. Se l'elemento è
+       già position:relative/absolute/fixed/sticky non lo tocchiamo. */
+    var pos=getComputedStyle(el).position;
+    if(pos==='static')el.style.position='relative';
+    var thumb=document.createElement('div');
+    thumb.className='csb-thumb';
+    el.appendChild(thumb);
+    thumbs.set(el,thumb);
+    var dragging=false,startY=0,startScroll=0;
+    thumb.addEventListener('mousedown',function(e){
+      if(e.button!==0)return;
+      e.preventDefault();e.stopPropagation();
+      dragging=true;startY=e.clientY;startScroll=el.scrollTop;
+      thumb.classList.add('csb-thumb--active');
+      document.body.classList.add('csb-dragging');
+    });
+    function onMove(e){
+      if(!dragging)return;
+      var sH=el.scrollHeight,cH=el.clientHeight;
+      var thumbH=Math.max(cH*cH/sH,24);
+      var maxThumbY=cH-thumbH,maxScroll=sH-cH;
+      if(maxThumbY<=0||maxScroll<=0)return;
+      el.scrollTop=startScroll+((e.clientY-startY)/maxThumbY)*maxScroll;
+    }
+    function onUp(){
+      if(!dragging)return;
+      dragging=false;
+      thumb.classList.remove('csb-thumb--active');
+      document.body.classList.remove('csb-dragging');
+    }
+    document.addEventListener('mousemove',onMove);
+    document.addEventListener('mouseup',onUp);
+    el.addEventListener('scroll',function(){update(el,thumb)},{passive:true});
+    if(window.ResizeObserver){
+      var ro=new ResizeObserver(function(){update(el,thumb)});
+      ro.observe(el);
+      Array.prototype.forEach.call(el.children,function(c){if(c!==thumb)ro.observe(c)});
+    }
+    /* MutationObserver per cambiamenti di contenuto (childList) — il
+       resize di elementi è già coperto da ResizeObserver. Non osserviamo
+       attributes per evitare feedback loop con le nostre stesse style
+       changes sul thumb (subtree includerebbe il thumb stesso). */
+    if(window.MutationObserver){
+      new MutationObserver(function(muts){
+        for(var i=0;i<muts.length;i++){if(muts[i].target!==thumb){update(el,thumb);return}}
+      }).observe(el,{childList:true,subtree:true,characterData:true});
+    }
+    update(el,thumb);
+  }
+  function setupAll(root){
+    try{(root||document).querySelectorAll(TARGETS).forEach(setup)}catch(e){}
+  }
+  setupAll();
+  /* Watch per elementi aggiunti dinamicamente (modali aperte, finestre,
+     dropdown, popup, ecc). Match anche su discendenti aggiunti. */
+  if(window.MutationObserver){
+    new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        m.addedNodes.forEach(function(n){
+          if(n.nodeType!==1)return;
+          if(n.matches&&n.matches(TARGETS))setup(n);
+          if(n.querySelectorAll)setupAll(n);
+        });
+      });
+    }).observe(document.body,{childList:true,subtree:true});
+  }
+  /* Re-update tutti i thumb su window resize (gestisce cambi di clientHeight/Width
+     che ResizeObserver per qualche reason non sempre cattura per finestre flex). */
+  window.addEventListener('resize',function(){
+    document.querySelectorAll('.csb-host').forEach(function(el){
+      var t=thumbs.get(el);if(t)update(el,t);
+    });
+  });
 })();
 </script>
 </body>
