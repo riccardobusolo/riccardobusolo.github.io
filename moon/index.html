@@ -5077,68 +5077,101 @@ function _compStr(c){if(!c)return '';var p=[];if(c.verbal)p.push('V');if(c.somat
 function _ttClass(en){var m={Wizard:'Mago',Sorcerer:'Stregone',Cleric:'Chierico',Druid:'Druido',Bard:'Bardo',Warlock:'Warlock',Paladin:'Paladino',Ranger:'Ranger',Artificer:'Artefice'};return m[en]||en}
 function _ttSchool(en){var m={Abjuration:'Abiurazione',Conjuration:'Evocazione',Divination:'Divinazione',Enchantment:'Ammaliamento',Evocation:'Invocazione',Illusion:'Illusione',Necromancy:'Necromanzia',Transmutation:'Trasmutazione'};return m[en]||en}
 var _dragSpLvl=null;
-document.addEventListener('dragstart',function(e){
-  var dh=e.target.closest('[data-spdrag]');if(!dh)return;
-  var nm=dh.dataset.spdrag;
-  if(typeof SPELLS==='undefined')return;
-  var sp=null;for(var i=0;i<SPELLS.length;i++){if(SPELLS[i].name===nm){sp=SPELLS[i];break}}
-  if(!sp)return;
-  _dragSpLvl=sp.level||0;
-  e.dataTransfer.setData('application/x-spell',JSON.stringify(sp));
-  e.dataTransfer.setData('text/plain',sp.name);
-  e.dataTransfer.effectAllowed='copy';
-  /* Drag image personalizzata: badge compatto col solo nome (in italiano se
-     disponibile, altrimenti fallback al nome inglese). Il browser fa lo
-     snapshot dell'elemento al dragstart, poi possiamo rimuoverlo. */
-  var IT=window.SPELLS_IT||{};
-  var displayName=(IT[sp.name]&&IT[sp.name].name)?IT[sp.name].name:sp.name;
-  var ghost=document.createElement('div');
-  ghost.className='sp-drag-ghost';
-  ghost.textContent=displayName;
-  document.body.appendChild(ghost);
-  /* Offset (12,10) posiziona il badge poco sotto-destra rispetto al cursore */
-  if(e.dataTransfer.setDragImage)e.dataTransfer.setDragImage(ghost,12,10);
-  setTimeout(function(){if(ghost.parentNode)ghost.parentNode.removeChild(ghost)},0);
-  /* Forza cursore "grabbing" su tutto il documento per la durata del drag */
-  document.body.classList.add('sp-dragging');
-});
-document.addEventListener('dragend',function(){
-  _dragSpLvl=null;
-  document.querySelectorAll('.spdrop-over,.spdrop-bad').forEach(function(el){el.classList.remove('spdrop-over');el.classList.remove('spdrop-bad')});
-  document.body.classList.remove('sp-dragging');
-});
-/* Compatibilità drop: ora sempre permessa. Il drop handler smista
-   automaticamente cantrip→pg.cantrips e spell→pg.spBook[level-1] in base
-   al livello dell'incantesimo, indipendentemente dalla zone. Questo evita
-   l'errore "Tipo non compatibile" che bloccava il drop sulla sezione
-   "Conosciuti" quando l'utente non centrava il piccolo gruppo Trucchetti. */
-document.addEventListener('dragover',function(e){var z=e.target.closest('[data-spdrop]');if(!z)return;e.preventDefault();e.dataTransfer.dropEffect='copy';document.querySelectorAll('.spdrop-over,.spdrop-bad').forEach(function(el){if(el!==z){el.classList.remove('spdrop-over');el.classList.remove('spdrop-bad')}});z.classList.add('spdrop-over');z.classList.remove('spdrop-bad')});
-/* Fallback dragover/drop: durante il drag di un incantesimo (body.sp-dragging)
-   permettiamo il drop su TUTTO il documento, anche fuori dalle [data-spdrop].
-   Senza questo fallback il browser mostra il cursore nativo "not-allowed"
-   (il "teschietto") sulle aree non target. Le zone reali continuano a
-   gestire il drop coi loro handler dedicati. */
-document.addEventListener('dragover',function(e){
-  if(!document.body.classList.contains('sp-dragging'))return;
-  if(e.target.closest('[data-spdrop]'))return;
-  e.preventDefault();
-  if(e.dataTransfer)e.dataTransfer.dropEffect='copy';
-});
-document.addEventListener('drop',function(e){
-  if(!document.body.classList.contains('sp-dragging'))return;
-  if(e.target.closest('[data-spdrop]'))return;
-  e.preventDefault();
-});
-document.addEventListener('dragleave',function(e){var z=e.target.closest('[data-spdrop]');if(!z)return;var rt=e.relatedTarget;if(!rt||!z.contains(rt)){z.classList.remove('spdrop-over');z.classList.remove('spdrop-bad')}});
-document.addEventListener('drop',function(e){var z=e.target.closest('[data-spdrop]');if(!z)return;e.preventDefault();z.classList.remove('spdrop-over');z.classList.remove('spdrop-bad');var raw=e.dataTransfer.getData('application/x-spell');if(!raw)return;var sp;try{sp=JSON.parse(raw)}catch(err){return}var pg=loadPG();if(!pg)return;var zone=z.dataset.spdrop;var isCantrip=sp.level===0;
 /* Helper: costruisce l'oggetto incantesimo con tutti i campi tradotti, identico
-   al risultato di _spImportApply (auto-import). Riusato sia per book che cantrip.
-   Traduce nome+desc+higherLevels via SPELLS_IT se la lingua attiva è italiano. */
+   al risultato di _spImportApply (auto-import). Traduce nome+desc+higherLevels
+   via SPELLS_IT se la lingua attiva è italiano. */
 function _buildSpEntry(sp){var isIt=localStorage.getItem('cm_spell_lang')!=='en';var IT=(isIt&&window.SPELLS_IT)?window.SPELLS_IT:{};var trEntry=IT[sp.name]||null;var nameOut=(trEntry&&trEntry.name)?trEntry.name:sp.name;var descOut=(trEntry&&trEntry.description)?trEntry.description:(sp.description||'');var higherOut=(trEntry&&trEntry.higherLevels)?trEntry.higherLevels:(sp.higherLevels||'');var ctOut=(isIt&&window.cm_trCastingTime)?window.cm_trCastingTime(sp.castingTime||''):(sp.castingTime||'');var rgOut=(isIt&&window.cm_trRange)?window.cm_trRange(sp.range||''):(sp.range||'');var durOut=(isIt&&window.cm_trDuration)?window.cm_trDuration(sp.duration||''):(sp.duration||'');var classes=(sp.classes||[]).map(_ttClass).join(', ');var schoolIt=_ttSchool(sp.school||'');var dmgTypeOut=(isIt&&window.cm_trDmgType)?window.cm_trDmgType(sp.damageType||''):(sp.damageType||'');return {n:nameOut,nEn:sp.name,p:false,c:!!sp.concentration,r:!!sp.ritual,cActive:false,ct:ctOut,rg:rgOut,cmp:_compStr(sp.components||{}),dur:durOut,desc:descOut+(higherOut?'\n\nAi livelli superiori: '+higherOut:''),school:schoolIt,classes:classes,source:sp.source||'',atkType:sp.attackType||'',saveAbil:sp.saveAbility||'',dmg:sp.damage||'',dmgType:dmgTypeOut,langMigrated:true}}
-/* Smart routing: se l'utente trascina un trucchetto sulla sezione
-   "Conosciuti" (zone="book"), lo smistiamo automaticamente in pg.cantrips.
-   Idem per gli spell trascinati sul gruppo Trucchetti — vanno in spBook. */
-if(isCantrip){if(!pg.cantrips)pg.cantrips=[];var dup=pg.cantrips.some(function(it){var nm=(typeof it==='string')?it:(it&&(it.nEn||it.n));return nm===sp.name});if(!dup)pg.cantrips.push(_buildSpEntry(sp));savePG(pg);render();return}if(!pg.spBook)pg.spBook=[[],[],[],[],[],[],[],[],[]];var li=Math.max(1,Math.min(9,sp.level||1))-1;var dupB=pg.spBook[li].some(function(s){return s&&(s.nEn===sp.name||s.n===sp.name)});if(!dupB)pg.spBook[li].push(_buildSpEntry(sp));savePG(pg);render();return});
+function _applySpellDrop(sp){
+  var pg=loadPG();if(!pg)return;
+  var isCantrip=sp.level===0;
+  if(isCantrip){
+    if(!pg.cantrips)pg.cantrips=[];
+    var dup=pg.cantrips.some(function(it){var nm=(typeof it==='string')?it:(it&&(it.nEn||it.n));return nm===sp.name});
+    if(!dup)pg.cantrips.push(_buildSpEntry(sp));
+  }else{
+    if(!pg.spBook)pg.spBook=[[],[],[],[],[],[],[],[],[]];
+    var li=Math.max(1,Math.min(9,sp.level||1))-1;
+    var dupB=pg.spBook[li].some(function(s){return s&&(s.nEn===sp.name||s.n===sp.name)});
+    if(!dupB)pg.spBook[li].push(_buildSpEntry(sp));
+  }
+  savePG(pg);render();
+}
+/* Drag dell'incantesimo basato su MOUSE EVENTS (non HTML5 drag-and-drop)
+   per controllo TOTALE del cursore: durante il drag il body riceve la
+   classe `sp-dragging` che forza var(--cur-grabbing) ovunque, senza
+   interferenze del cursore di sistema (copy/no-drop/teschietto) tipico
+   del native D&D che il browser sovrascrive di sua iniziativa.
+   Threshold di 4px tra mousedown e prima mousemove confermata: sotto la
+   soglia trattiamo come click (no drag), sopra avviamo il drag con ghost.
+   Drop zone rilevata via document.elementFromPoint sul .closest [data-spdrop]
+   (il ghost viene temporaneamente nascosto durante il check così non
+   maschera la zona sotto). */
+(function(){
+  var startSp=null,startX=0,startY=0,dragging=false,dragGhost=null,hoveredZone=null;
+  var THRESHOLD=4;
+  document.addEventListener('mousedown',function(e){
+    if(e.button!==0)return;
+    var dh=e.target.closest('[data-spdrag]');if(!dh)return;
+    var nm=dh.dataset.spdrag;
+    if(typeof SPELLS==='undefined')return;
+    var sp=null;for(var i=0;i<SPELLS.length;i++){if(SPELLS[i].name===nm){sp=SPELLS[i];break}}
+    if(!sp)return;
+    /* preventDefault per impedire selezione testo durante il drag */
+    e.preventDefault();
+    startSp=sp;startX=e.clientX;startY=e.clientY;dragging=false;
+    document.addEventListener('mousemove',onMove);
+    document.addEventListener('mouseup',onUp);
+  });
+  function onMove(e){
+    if(!startSp)return;
+    if(!dragging){
+      var dx=e.clientX-startX,dy=e.clientY-startY;
+      if(dx*dx+dy*dy<THRESHOLD*THRESHOLD)return;
+      /* Soglia superata: avvia drag effettivo */
+      dragging=true;
+      _dragSpLvl=startSp.level||0;
+      var IT=window.SPELLS_IT||{};
+      var displayName=(IT[startSp.name]&&IT[startSp.name].name)?IT[startSp.name].name:startSp.name;
+      dragGhost=document.createElement('div');
+      dragGhost.className='sp-drag-ghost';
+      dragGhost.textContent=displayName;
+      dragGhost.style.cssText='position:fixed;pointer-events:none;z-index:99999;top:'+(e.clientY+10)+'px;left:'+(e.clientX+12)+'px';
+      document.body.appendChild(dragGhost);
+      document.body.classList.add('sp-dragging');
+    }
+    if(dragGhost){
+      dragGhost.style.left=(e.clientX+12)+'px';
+      dragGhost.style.top=(e.clientY+10)+'px';
+    }
+    /* Trova drop zone sotto al cursore. Nascondi ghost durante il
+       check per non oscurarla (è position:fixed vicino al cursore). */
+    if(dragGhost)dragGhost.style.display='none';
+    var el=document.elementFromPoint(e.clientX,e.clientY);
+    if(dragGhost)dragGhost.style.display='block';
+    var z=el?el.closest('[data-spdrop]'):null;
+    if(z!==hoveredZone){
+      if(hoveredZone){hoveredZone.classList.remove('spdrop-over');hoveredZone.classList.remove('spdrop-bad')}
+      hoveredZone=z;
+      if(z)z.classList.add('spdrop-over');
+    }
+  }
+  function onUp(e){
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+    if(!startSp)return;
+    var sp=startSp,z=hoveredZone,wasDragging=dragging;
+    /* Cleanup */
+    if(dragGhost&&dragGhost.parentNode)dragGhost.parentNode.removeChild(dragGhost);
+    dragGhost=null;
+    if(hoveredZone){hoveredZone.classList.remove('spdrop-over');hoveredZone.classList.remove('spdrop-bad')}
+    document.querySelectorAll('.spdrop-over,.spdrop-bad').forEach(function(el){el.classList.remove('spdrop-over');el.classList.remove('spdrop-bad')});
+    hoveredZone=null;
+    document.body.classList.remove('sp-dragging');
+    startSp=null;dragging=false;_dragSpLvl=null;
+    /* Drop solo se è stato un drag effettivo (oltre threshold) e su zona valida */
+    if(wasDragging&&z)_applySpellDrop(sp);
+  }
+})();
 
 wrap.addEventListener('change',function(e){var pg=loadPG();if(!pg)return;
 var classKey=e.target.closest('[data-classkey]');if(classKey){var key=classKey.value;var def=_classByKey(key);pg.classKey=key;
@@ -5388,7 +5421,7 @@ if(s.attackType){
     atkH='<div class="spe__atk">'+atkParts.join('<span class="spe__atk-sep">·</span>')+'</div>';
   }
 }
-d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+rawS.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+rawS.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button>'+nameH+'<span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+'<div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
+d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="false" data-spdrag="'+rawS.name.replace(/"/g,'&quot;')+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+rawS.name.replace(/"/g,'&quot;')+'">'+(fav?'\u2605':'\u2606')+'</button>'+nameH+'<span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div></div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+'<div class="spe__desc">'+s.description+'</div>'+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
 spList.appendChild(d)})}
 spList.addEventListener('click',function(e){var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}if(e.target.closest('.spe__drag'))return;var spe=e.target.closest('.spe');if(spe)spe.classList.toggle('spe--open')});
 spSearch.addEventListener('input',renSp);
