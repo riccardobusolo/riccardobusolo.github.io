@@ -71,8 +71,34 @@ body.no-custom-cursor{--cur-default:default;--cur-pointer:pointer;--cur-text:tex
 
 .app{position:fixed;inset:0;background:var(--bg);display:flex;opacity:0;pointer-events:none;transition:opacity .6s .2s;z-index:1;font-family:var(--font)}.app.on{opacity:1;pointer-events:all}
 .sb{width:164px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:12px 8px;gap:2px;z-index:100;flex-shrink:0}
-.sb__logo{width:100%;height:auto;border-radius:8px;margin:0 auto 14px;display:block;opacity:.85;padding:0 4px}
+.sb__logo{width:100%;height:auto;border-radius:8px;margin:0 auto 14px;display:block;opacity:.85;padding:0 4px;cursor:var(--cur-pointer);transition:filter .15s;-webkit-user-drag:none;user-select:none}
+.sb__logo:hover{filter:drop-shadow(0 0 6px var(--gold))}
 :root[data-theme="sword-coast"] .sb__logo,:root[data-theme="dark"] .sb__logo,:root[data-theme="light"] .sb__logo{opacity:1;padding:8px 4px}
+/* Animazione pulse + glow al click. Lo scale-up "elastico" (cubic-bezier
+   con overshoot) dà una sensazione di pop magico, accompagnato da un'aura
+   drop-shadow dorata che si gonfia e svanisce. */
+.sb__logo--burst{animation:sbLogoPulse .65s cubic-bezier(.34,1.56,.64,1)}
+@keyframes sbLogoPulse{
+  0%  {transform:scale(1) rotate(0deg);filter:none}
+  18% {transform:scale(.92) rotate(-3deg);filter:drop-shadow(0 0 4px var(--gold))}
+  45% {transform:scale(1.18) rotate(2deg);filter:drop-shadow(0 0 18px var(--gold)) drop-shadow(0 0 36px var(--gold))}
+  72% {transform:scale(1.02) rotate(-1deg);filter:drop-shadow(0 0 12px var(--gold))}
+  100%{transform:scale(1) rotate(0deg);filter:none}
+}
+/* Scintilla volante: posizionata fixed, parte dal centro del logo e si
+   irradia verso un offset (--dx,--dy) random scalando e svanendo. */
+.sb__spark{position:fixed;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold),0 0 14px var(--gold),0 0 22px var(--gold);pointer-events:none;z-index:99999;will-change:transform,opacity;animation:sbSpark 900ms cubic-bezier(.16,1,.3,1) forwards;opacity:0}
+@keyframes sbSpark{
+  0%  {transform:translate(0,0) scale(.2);opacity:0}
+  8%  {transform:translate(0,0) scale(1.2);opacity:1}
+  100%{transform:translate(var(--dx),var(--dy)) scale(.25);opacity:0}
+}
+/* Anello d'onda che si espande dal logo (un singolo "shock-ring") */
+.sb__shockring{position:fixed;border-radius:50%;border:2px solid var(--gold);pointer-events:none;z-index:99998;will-change:transform,opacity,border-width;animation:sbShockring 700ms cubic-bezier(.22,.61,.36,1) forwards;opacity:0}
+@keyframes sbShockring{
+  0%  {transform:translate(-50%,-50%) scale(.4);opacity:.85;border-width:3px}
+  100%{transform:translate(-50%,-50%) scale(1.8);opacity:0;border-width:1px}
+}
 .sb__sep{height:1px;background:var(--border);margin:6px 4px}
 .sb__btn{width:100%;padding:10px 12px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:var(--cur-pointer);display:flex;align-items:center;gap:10px;transition:all .2s;text-align:left}.sb__btn:hover{background:var(--rl);color:var(--dim);border-color:var(--border)}.sb__btn.on{background:var(--rl);color:var(--red);border-color:var(--rb)}
 .sb__btn--drag{opacity:.15;transform:scale(.88);transition:all .2s var(--ease)}
@@ -2430,6 +2456,51 @@ function refreshFs(){var cur=localStorage.getItem('cm_fontsize')||'m';document.q
 document.querySelectorAll('[data-fontsize]').forEach(function(b){b.onclick=function(){var size=b.dataset.fontsize;var FS={s:13,m:16,l:18,xl:22};if(!FS[size])return;localStorage.setItem('cm_fontsize',size);document.documentElement.style.fontSize=FS[size]+'px';refreshFs()}});
 var _logoMap={'crooked-moon':'img/crest.webp','sword-coast':'img/Logo_Dungeon_Desk_gold.svg','dark':'img/Logo_Dungeon_Desk_white.svg','light':'img/Logo_Dungeon_Desk_black.svg'};
 function refreshLogo(){var cur=localStorage.getItem('cm_theme')||'light';var img=document.getElementById('sbLogo');var src=_logoMap[cur]||_logoMap['light'];if(img&&img.getAttribute('src')!==src)img.src=src}refreshLogo();
+/* Click sul logo: scatena un effetto "pop magico" — il logo pulsa con un'aura
+   dorata, un anello d'onda si espande dal centro, e ~28 scintille dorate del
+   colore del tema corrente si irradiano in tutte le direzioni con un'animazione
+   ease-out elastica. Tutto il color-coding usa var(--gold), quindi l'effetto
+   si adatta automaticamente al tema. */
+(function(){
+  var logo=document.getElementById('sbLogo');if(!logo)return;
+  function spark(cx,cy){
+    var sp=document.createElement('div');sp.className='sb__spark';
+    var angle=Math.random()*Math.PI*2;
+    var dist=70+Math.random()*130;
+    var dx=Math.cos(angle)*dist;
+    var dy=Math.sin(angle)*dist;
+    var size=3+Math.random()*5;
+    sp.style.left=(cx-size/2)+'px';
+    sp.style.top=(cy-size/2)+'px';
+    sp.style.width=size+'px';sp.style.height=size+'px';
+    sp.style.setProperty('--dx',dx.toFixed(1)+'px');
+    sp.style.setProperty('--dy',dy.toFixed(1)+'px');
+    sp.style.animationDuration=(700+Math.random()*450)+'ms';
+    document.body.appendChild(sp);
+    setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp)},1300);
+  }
+  function shockring(cx,cy,size){
+    var r=document.createElement('div');r.className='sb__shockring';
+    r.style.left=cx+'px';r.style.top=cy+'px';
+    r.style.width=size+'px';r.style.height=size+'px';
+    document.body.appendChild(r);
+    setTimeout(function(){if(r.parentNode)r.parentNode.removeChild(r)},800);
+  }
+  logo.addEventListener('click',function(){
+    /* Restart dell'animazione anche se cliccata in rapida successione */
+    logo.classList.remove('sb__logo--burst');
+    void logo.offsetWidth;
+    logo.classList.add('sb__logo--burst');
+    var rect=logo.getBoundingClientRect();
+    var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+    /* Anello d'onda */
+    shockring(cx,cy,Math.max(rect.width,rect.height)*1.3);
+    /* Burst di scintille — densità 28 con piccolo jitter sul timing iniziale */
+    for(var i=0;i<28;i++){
+      (function(i){setTimeout(function(){spark(cx,cy)},i*8)})(i);
+    }
+  });
+})();
 function refreshTheme(){var cur=localStorage.getItem('cm_theme')||'light';document.querySelectorAll('[data-theme][class*="setpanel__themebtn"]').forEach(function(b){if(b.dataset.theme===cur)b.classList.add('on');else b.classList.remove('on')})}refreshTheme();
 document.querySelectorAll('.setpanel__themebtn[data-theme]').forEach(function(b){b.onclick=function(){var t=b.dataset.theme;var V={'crooked-moon':1,'sword-coast':1,'dark':1,'light':1};if(!V[t])return;localStorage.setItem('cm_theme',t);document.documentElement.dataset.theme=t;refreshTheme();refreshLogo();if(typeof window._refreshDieC==='function')window._refreshDieC();if(t==='crooked-moon'&&typeof window._cmRedrawMask==='function'){setTimeout(window._cmRedrawMask,30)}}});
 /* Edizione D&D 5e: filtra il dropdown classi. Default '2024'. */
