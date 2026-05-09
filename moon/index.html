@@ -1612,8 +1612,20 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spe-ed-lbl{font-family:var(--mono);font-size:.56rem;color:var(--gold);text-transform:uppercase;letter-spacing:.06em}
 .spe-ed-in,.spe-ed-sel,.spe-ed-ta{font-family:var(--mono);font-size:.66rem;background:rgba(20,18,16,.5);border:1px solid rgba(196,154,50,.3);border-radius:3px;color:var(--text);padding:4px 6px;outline:none;transition:border-color .15s,background .15s;width:100%;box-sizing:border-box;min-width:0}
 .spe-ed-in:focus,.spe-ed-sel:focus,.spe-ed-ta:focus{border-color:var(--gold);background:rgba(196,154,50,.08)}
-.spe-ed-ta{font-size:.74rem;font-family:inherit;resize:vertical;min-height:64px;line-height:1.45;color:var(--dim);white-space:pre-wrap}
-.spe-ed-ta--higher{min-height:42px;font-size:.72rem;font-style:italic;color:var(--muted)}
+/* Textarea: nessun resize handle, nessun overflow interno (l'altezza viene
+   adattata via JS per mostrare sempre l'intero testo). overflow:hidden previene
+   anche la "cattura" della rotellina che bloccava lo scroll della lista. */
+.spe-ed-ta{font-size:.74rem;font-family:inherit;resize:none;overflow-y:hidden;min-height:32px;line-height:1.5;color:var(--dim);white-space:pre-wrap}
+.spe-ed-ta--higher{min-height:30px;font-size:.72rem;font-style:italic;color:var(--muted)}
+/* Header di sezione manuale (mostrato in edit mode tra un gruppo e l'altro) */
+.spe-ed-section-hdr{display:flex;align-items:center;gap:8px;margin:14px 4px 6px;padding:7px 12px;font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;border-radius:5px;border-left:3px solid currentColor;background:rgba(196,154,50,.06)}
+.spe-ed-section-hdr:first-child{margin-top:4px}
+.spe-ed-section-hdr-cnt{font-weight:400;font-size:.6rem;letter-spacing:.04em;opacity:.75}
+.spe-ed-section-hdr--player{color:#5b8def;background:rgba(91,141,239,.08);border-color:#5b8def}
+.spe-ed-section-hdr--xgte{color:#4a9a5a;background:rgba(74,154,90,.08);border-color:#4a9a5a}
+.spe-ed-section-hdr--tashas{color:#b870e0;background:rgba(184,112,224,.08);border-color:#b870e0}
+.spe-ed-section-hdr--tcm{color:#c89070;background:rgba(200,144,112,.08);border-color:#c89070}
+.spe-ed-section-hdr--other{color:var(--gold);background:rgba(196,154,50,.08);border-color:var(--gold)}
 .spe-ed-mini{font-family:var(--mono);font-size:.56rem;color:var(--muted);margin-left:6px;opacity:.7}
 .spe-ed-reset{font-family:var(--mono);font-size:.56rem;background:transparent;border:1px solid var(--border);border-radius:3px;color:var(--muted);padding:3px 8px;cursor:var(--cur-pointer);transition:all .12s;text-transform:uppercase;letter-spacing:.05em}
 .spe-ed-reset:hover{border-color:var(--red);color:var(--red);background:var(--rl)}
@@ -5188,10 +5200,17 @@ if(fLvl.length&&fLvl.indexOf(s.level)<0)return false;
 if(fSrc.length&&fSrc.indexOf(s.source)<0)return false;
 return true});
 var _sortMode=_spSort();
+/* Ordine manuali in edit mode: Player → Tasha → Xhanatar → Crooked → altri.
+   In edit mode l'ordinamento è (manuale, nome-IT) per processare un manuale
+   alla volta dall'A alla Z. */
+var _SP_SRC_ORDER={"Player's Handbook":0,"Tasha's Cauldron of Everything":1,"Xanathar's Guide to Everything":2,"The Crooked Moon":3};
 filtered.sort(function(a,b){
   var aL=_spLocal(a),bL=_spLocal(b);
-  /* In modalità modifica: ordinamento alfabetico forzato sul nome italiano */
-  if(_spEditMode)return aL.name.localeCompare(bL.name);
+  if(_spEditMode){
+    var ax=_SP_SRC_ORDER[a.source];if(ax===undefined)ax=99;
+    var bx=_SP_SRC_ORDER[b.source];if(bx===undefined)bx=99;
+    return ax-bx||aL.name.localeCompare(bL.name);
+  }
   if(_sortMode==='alpha')return aL.name.localeCompare(bL.name);
   if(_sortMode==='school'){var sa=_trSchool(a.school),sb=_trSchool(b.school);return sa.localeCompare(sb)||a.level-b.level||aL.name.localeCompare(bL.name)}
   /* default 'level': livello crescente, poi nome */
@@ -5202,7 +5221,22 @@ spCount.textContent=countTxt;
 spList.innerHTML='';
 if(!SP.length){spList.innerHTML='<div style="text-align:center;padding:30px 10px;font-family:var(--mono);font-size:.62rem;color:var(--muted)">Database non trovato.<br>Assicurati che <b>spells.js</b> sia nella stessa cartella.</div>';return}
 if(!filtered.length){spList.innerHTML='<div style="text-align:center;padding:20px;font-family:var(--mono);font-size:.6rem;color:var(--muted)">'+(favMode?'Nessun preferito':'Nessun risultato')+'</div>';return}
+/* In edit mode pre-calcoliamo i conteggi per ogni manuale per stamparli nei
+   header di sezione, e tracciamo prevSrc per inserire un divisore quando
+   passiamo da un manuale al successivo. */
+var _spEdSectionCounts={};
+if(_spEditMode){filtered.forEach(function(s){_spEdSectionCounts[s.source]=(_spEdSectionCounts[s.source]||0)+1})}
+var _spEdPrevSrc=null;
 filtered.forEach(function(rawS){
+if(_spEditMode&&rawS.source!==_spEdPrevSrc){
+  var hdrSlug=rawS.source==="Player's Handbook"?'player':rawS.source==="Tasha's Cauldron of Everything"?'tashas':rawS.source==="Xanathar's Guide to Everything"?'xgte':rawS.source==='The Crooked Moon'?'tcm':'other';
+  var hdrLbl=rawS.source==="Player's Handbook"?'Player':rawS.source==="Tasha's Cauldron of Everything"?'Tasha':rawS.source==="Xanathar's Guide to Everything"?'Xhanatar':rawS.source==='The Crooked Moon'?'Crooked':rawS.source;
+  var hdr=document.createElement('div');
+  hdr.className='spe-ed-section-hdr spe-ed-section-hdr--'+hdrSlug;
+  hdr.innerHTML='<span>'+hdrLbl+'</span><span class="spe-ed-section-hdr-cnt">'+(_spEdSectionCounts[rawS.source]||0)+' incantesim'+((_spEdSectionCounts[rawS.source]||0)===1?'o':'i')+'</span>';
+  spList.appendChild(hdr);
+  _spEdPrevSrc=rawS.source;
+}
 /* Recupero diretto della versione IT senza dipendere dallo stato di lingua
    corrente: replichiamo la logica di _spLocal sulla mappa SPELLS_IT così la
    colonna sinistra è SEMPRE in italiano anche se la lingua attiva è EN. */
@@ -5307,7 +5341,21 @@ var ovIndicatorH=hasOv
     '<button class="spe__ovreset" data-spedreset="'+nameAttr+'" title="Annulla le tue modifiche e ripristina i valori originali del catalogo">\u21BB Ripristina</button>'
   : '';
 d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+nameAttr+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+nameAttr+'">'+(fav?'\u2605':'\u2606')+'</button>'+nameH+'<span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div>'+ovIndicatorH+'</div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+descH+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
-spList.appendChild(d)})}
+spList.appendChild(d)});
+/* Auto-grow di tutti i textarea editor in modalità modifica: ogni textarea
+   si adatta al testo per mostrare l'intero contenuto senza scroll interno.
+   requestAnimationFrame per rimandare al prossimo frame: i textarea sono
+   appena stati attaccati al DOM e necessitano del layout per scrollHeight. */
+if(_spEditMode){requestAnimationFrame(_spEdAutosizeAll)}
+}
+function _spEdAutosize(ta){
+  if(!ta||ta.tagName!=='TEXTAREA')return;
+  ta.style.height='auto';
+  ta.style.height=ta.scrollHeight+'px';
+}
+function _spEdAutosizeAll(){
+  spList.querySelectorAll('.spe-ed-ta').forEach(_spEdAutosize);
+}
 spList.addEventListener('click',function(e){
   var star=e.target.closest('.spe__star');if(star){e.stopPropagation();togFav(star.dataset.fav);return}
   if(e.target.closest('.spe__drag'))return;
@@ -5396,7 +5444,7 @@ function _spEdHandle(target){
   if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets();
 }
 spList.addEventListener('input',function(e){
-  var t=e.target;if(t.matches('.spe-ed-in,.spe-ed-ta'))_spEdHandle(t);
+  var t=e.target;if(t.matches('.spe-ed-in,.spe-ed-ta')){_spEdHandle(t);if(t.classList.contains('spe-ed-ta'))_spEdAutosize(t)}
 });
 spList.addEventListener('change',function(e){
   var t=e.target;if(t.matches('.spe-ed-sel'))_spEdHandle(t);
