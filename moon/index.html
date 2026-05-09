@@ -398,11 +398,13 @@ body.sb--global-dragging .sb__btn:not(.on):hover{background:transparent;color:va
 .csb-track{position:absolute;width:8px;background:rgba(140,30,30,.06);border-radius:4px;z-index:4;display:none;pointer-events:auto;will-change:top,left,height}
 .csb-track:hover{background:rgba(140,30,30,.1)}
 /* Thumb: position:absolute dentro al track. top relativo al track =
-   scrollRatio * (clientHeight - thumbHeight). */
-.csb-thumb{position:absolute;left:1px;width:6px;border-radius:3px;background:rgba(140,30,30,.32);cursor:var(--cur-grab);transition:background .15s;will-change:top,height}
+   scrollRatio * (trackHeight - thumbHeight). Cursore pointer (--cur-pointer)
+   sia in hover che durante drag, perché grab/grabbing dà un'indicazione
+   di "drag-and-drop" che non si addice al gesto di scroll. */
+.csb-thumb{position:absolute;left:1px;width:6px;border-radius:3px;background:rgba(140,30,30,.32);cursor:var(--cur-pointer);transition:background .15s;will-change:top,height}
 .csb-thumb:hover{background:rgba(140,30,30,.5)}
-.csb-thumb.csb-thumb--active,.csb-thumb:active{background:rgba(140,30,30,.7);cursor:var(--cur-grabbing)}
-body.csb-dragging,body.csb-dragging *{cursor:var(--cur-grabbing)!important;user-select:none}
+.csb-thumb.csb-thumb--active,.csb-thumb:active{background:rgba(140,30,30,.7);cursor:var(--cur-pointer)}
+body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-select:none}
 /* Riserva padding-right per il track così il contenuto non lo overlappa.
    Solo per .wb, .epick__grid, .cpick__list, etc che hanno padding piccolo
    o nullo. Gli altri (.helpMd__body con 22px, .setpanel__body con 18px)
@@ -6360,6 +6362,9 @@ document.addEventListener('keydown',function(e){
   if(!document.body)return;
   var TARGETS='.wb,.helpMd__body,.setpanel__body,.epick__grid,.sp-md__body,.ppolMd__body,.cpick__list,.cc__hist,.mpx__sb-list,.mp__sb-list,.sp__list-scroll,.sp__prep-list,.spf__drop,.mp__autocomp,.pg__pgsel-menu,.pg__cls-dd-panel,.mpx-pinpop__emojis,.ch-popmenu,.tm-right,.rs__view,.rsmn-md,.rsdraw-md';
   var bars=new WeakMap();
+  /* Inset del track dai bordi top/bottom del viewport scrollabile, così
+     non sembra "incollato" all'header sopra o al bordo sotto. */
+  var TRACK_INSET=6;
   function update(el,track,thumb){
     if(!el.isConnected){track.style.display='none';return}
     /* Se il track è stato rimosso (es. innerHTML rebuild), lo re-ancoriamo. */
@@ -6367,14 +6372,16 @@ document.addEventListener('keydown',function(e){
     var sH=el.scrollHeight,cH=el.clientHeight,cW=el.clientWidth;
     if(sH<=cH+1||cH===0||cW===0){track.style.display='none';return}
     if(el.offsetParent===null&&getComputedStyle(el).position!=='fixed'){track.style.display='none';return}
-    var thumbH=Math.max(cH*cH/sH,24);
+    var trackH=Math.max(cH-2*TRACK_INSET,24);
+    var thumbH=Math.max(trackH*cH/sH,24);
+    if(thumbH>=trackH){track.style.display='none';return}
     var maxScroll=sH-cH;
-    var maxThumbY=cH-thumbH;
+    var maxThumbY=trackH-thumbH;
     var scrollRatio=maxScroll>0?(el.scrollTop/maxScroll):0;
     track.style.display='block';
-    track.style.top=el.scrollTop+'px';
+    track.style.top=(el.scrollTop+TRACK_INSET)+'px';
     track.style.left=(el.scrollLeft+cW-10)+'px';
-    track.style.height=cH+'px';
+    track.style.height=trackH+'px';
     thumb.style.top=(scrollRatio*maxThumbY)+'px';
     thumb.style.height=thumbH+'px';
   }
@@ -6405,18 +6412,19 @@ document.addEventListener('keydown',function(e){
       var trackRect=track.getBoundingClientRect();
       var clickY=e.clientY-trackRect.top;
       var sH=el.scrollHeight,cH=el.clientHeight;
-      var thumbH=Math.max(cH*cH/sH,24);
-      var maxScroll=sH-cH,maxThumbY=cH-thumbH;
+      var trackH=Math.max(cH-2*TRACK_INSET,24);
+      var thumbH=Math.max(trackH*cH/sH,24);
+      var maxScroll=sH-cH,maxThumbY=trackH-thumbH;
       if(maxThumbY<=0||maxScroll<=0)return;
-      /* Centra il thumb sul punto cliccato */
       var targetThumbY=Math.max(0,Math.min(maxThumbY,clickY-thumbH/2));
       el.scrollTo({top:(targetThumbY/maxThumbY)*maxScroll,behavior:'smooth'});
     });
     function onMove(e){
       if(!dragging)return;
       var sH=el.scrollHeight,cH=el.clientHeight;
-      var thumbH=Math.max(cH*cH/sH,24);
-      var maxThumbY=cH-thumbH,maxScroll=sH-cH;
+      var trackH=Math.max(cH-2*TRACK_INSET,24);
+      var thumbH=Math.max(trackH*cH/sH,24);
+      var maxThumbY=trackH-thumbH,maxScroll=sH-cH;
       if(maxThumbY<=0||maxScroll<=0)return;
       el.scrollTop=startScroll+((e.clientY-startY)/maxThumbY)*maxScroll;
     }
