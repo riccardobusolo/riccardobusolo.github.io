@@ -279,6 +279,9 @@ body.cc-dragging-dot,body.cc-dragging-dot *{cursor:grabbing!important;user-selec
 .acc__inp:focus{border-color:rgba(196,154,50,.5)}
 .acc__inp::placeholder{color:var(--muted)}
 .acc__btnrow{display:flex;gap:.3125rem}
+/* Account window body: padding + sezioni stackate verticalmente in righe */
+.acc__wb{padding:14px;display:flex;flex-direction:column;gap:14px}
+.acc__wb .setpanel__sec{gap:.4rem}
 .acc__btnrow .setpanel__btn{flex:1;justify-content:center;text-align:center}
 .acc__btn--primary{background:rgba(196,154,50,.12);border-color:rgba(196,154,50,.4);color:var(--gold)}
 .acc__btn--primary:hover{background:rgba(196,154,50,.22)!important;border-color:rgba(196,154,50,.6)!important}
@@ -1882,7 +1885,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 <button class="sb__btn" data-tool="map" id="btnMap"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="17" r="2.5"/><line x1="8" y1="7" x2="15.5" y2="7"/><line x1="7" y1="8" x2="11" y2="14.5"/><line x1="17" y1="9" x2="13" y2="14.5"/></svg><span class="sb__label">Appunti</span></button>
 <button class="sb__btn" data-tool="res" id="btnRes"><svg viewBox="0 0 24 24"><path d="M2 3h7a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-7a4 4 0 00-4 4v14a3 3 0 013-3h8z"/></svg><span class="sb__label">Risorse</span></button>
 <button class="sb__btn" data-tool="maps" id="btnMaps"><svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span class="sb__label">Mappe</span></button>
-<button class="sb__btn sb__btn--bottom" id="btnAccount"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="sb__label">Account</span></button>
+<button class="sb__btn sb__btn--bottom" id="btnAccount" data-tool="account"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="sb__label">Account</span></button>
 <button class="sb__btn" id="btnSettings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="sb__label">Impostazioni</span></button>
 </div>
 
@@ -2308,9 +2311,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 </div>
 
 
-<div class="setpanel" id="accPanel">
-<div class="setpanel__head"><div class="setpanel__title"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Account</span></div><button class="setpanel__close" id="accPanelClose">&times;</button></div>
-<div class="setpanel__body" id="accPanelBody">
+<div class="win" id="winAccount"><div class="wh"><div class="wh__i"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="wh__t">Account</div><button class="wh__x" data-close="account">&times;</button></div><div class="wb acc__wb">
 <section class="setpanel__sec acc__loggedin" style="display:none">
 <h4 class="setpanel__h4">👤 Profilo</h4>
 <div class="setpanel__info"><span class="setpanel__lbl">Email</span><span class="setpanel__val" id="accUserEmail">—</span></div>
@@ -2341,8 +2342,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 <h4 class="setpanel__h4">⚙️ Configurazione</h4>
 <div class="acc__info">Firebase non è configurato. L'app non può funzionare senza un backend account.</div>
 </section>
-</div>
-</div>
+</div></div>
 
 <div class="setpanel" id="setPanel">
 <div class="setpanel__head"><div class="setpanel__title"><svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Impostazioni</span></div><button class="setpanel__close" id="setPanelClose">&times;</button></div>
@@ -2526,8 +2526,8 @@ pin.oninput=function(){if(pin.value.toLowerCase().trim()==='moon'){pin.disabled=
 pin.onkeydown=function(e){if(e.key==='Enter'){var v=pin.value.toLowerCase().trim();if(v&&v!=='moon'){pin.parentElement.classList.add('pw');setTimeout(function(){pin.parentElement.classList.remove('pw')},350);pin.value=''}}};
 
 /* Windows */
-var wm={dice:'winDice',chars:'winChars',hp:'winHp',timer:'winTimer',calc:'winCalc',spells:'winSpells',sound:'winSound',sheet:'winSheet',map:'winMap',res:'winRes',maps:'winMaps',csheet:'winCsheet'};
-var bm={dice:'btnDice',chars:'btnChars',hp:'btnHp',timer:'btnTimer',calc:'btnCalc',spells:'btnSpells',sound:'btnSound',sheet:'btnSheet',map:'btnMap',res:'btnRes',maps:'btnMaps'};
+var wm={dice:'winDice',chars:'winChars',hp:'winHp',timer:'winTimer',calc:'winCalc',spells:'winSpells',sound:'winSound',sheet:'winSheet',map:'winMap',res:'winRes',maps:'winMaps',csheet:'winCsheet',account:'winAccount'};
+var bm={dice:'btnDice',chars:'btnChars',hp:'btnHp',timer:'btnTimer',calc:'btnCalc',spells:'btnSpells',sound:'btnSound',sheet:'btnSheet',map:'btnMap',res:'btnRes',maps:'btnMaps',account:'btnAccount'};
 var op=JSON.parse(localStorage.getItem('cm_o')||'[]').filter(function(k){return wm[k]&&k!=='csheet'});
 var winPos=JSON.parse(localStorage.getItem('cm_wp')||'{}');
 var winZ=30;
@@ -2774,18 +2774,15 @@ document.addEventListener('webkitfullscreenchange',function(){_updateFsLabel();i
 /* === Account panel + Auth Wall === */
 (function(){
 'use strict';
-var btn=document.getElementById('btnAccount'),panel=document.getElementById('accPanel'),closeBtn=document.getElementById('accPanelClose');
-var setPanel=document.getElementById('setPanel'),setBtn=document.getElementById('btnSettings');
+var btn=document.getElementById('btnAccount');
 var wall=document.getElementById('authWall'),appEl=document.getElementById('app');
-if(!btn||!panel||!wall)return;
+if(!btn||!wall)return;
 
-/* ----- Account panel open/close ----- */
-function accOpen(){if(setPanel&&setPanel.classList.contains('on')){setPanel.classList.remove('on');setBtn.classList.remove('on')}panel.classList.add('on');btn.classList.add('on');refreshAccUI()}
-function accClose(){panel.classList.remove('on');btn.classList.remove('on')}
-btn.onclick=function(){if(panel.classList.contains('on'))accClose();else accOpen()};
-closeBtn.onclick=accClose;
-if(setBtn){var origSetClick=setBtn.onclick;setBtn.onclick=function(e){if(panel.classList.contains('on'))accClose();if(origSetClick)return origSetClick.call(this,e)}}
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&panel.classList.contains('on'))accClose()});
+/* ----- Account window: refresh UI ad ogni click sul btn ------
+   L'apertura/chiusura della finestra .win è gestita dal sistema globale
+   delle finestre (tog/wm/bm + data-tool="account" + data-close="account").
+   Qui basta mantenere refreshAccUI in sync con lo stato auth. */
+btn.addEventListener('click',function(){if(typeof refreshAccUI==='function')refreshAccUI()});
 
 /* ----- Generic message setter (works for acc__msg, authwall__msg, dlcdMd__msg) ----- */
 function setMsg(id,txt,kind){var m=document.getElementById(id);if(!m)return;m.textContent=txt||'';var base=(m.className||'').split(' ')[0];if(!base)return;m.className=base+(kind?' '+base+'--'+kind:'')}
