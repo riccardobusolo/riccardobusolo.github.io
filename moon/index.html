@@ -46,8 +46,13 @@ body.sp-dragging,body.sp-dragging *{cursor:var(--cur-grabbing)!important}
    posizionato sotto la "manina" tramite setDragImage. Renderizzato in
    posizione off-screen prima del drag (necessario per il snapshot del
    browser), rimosso subito dopo il dragstart. */
-.sp-drag-ghost{position:absolute;top:-1000px;left:-1000px;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;background:var(--bg2);border:1px solid var(--gold);border-radius:6px;font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--gold);white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.55);pointer-events:none;letter-spacing:.02em}
-.sp-drag-ghost::before{content:'⠿';opacity:.7;font-size:.85rem;line-height:1}
+/* Ghost del drag: badge col nome dell'incantesimo. Position settata da
+   JS via inline style; il transform translateX(-50%) centra
+   orizzontalmente il badge sotto al cursore. ::before replica esattamente
+   l'icona maniglia di .spe__drag (⠿ a 0.9rem, color muted, opacity .45,
+   letter-spacing 2px) per consistenza visiva. */
+.sp-drag-ghost{position:fixed;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;background:var(--bg2);border:1px solid var(--gold);border-radius:6px;font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--gold);white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.55);pointer-events:none;letter-spacing:.02em;transform:translateX(-50%);z-index:99999}
+.sp-drag-ghost::before{content:'⠿';color:var(--muted);font-size:.9rem;line-height:1;letter-spacing:2px;opacity:.45}
 /* Le immagini sono draggable=true di default in HTML; disabilita user-drag per
    evitare il flash della "manina drag" di sistema (es. sullo sfondo Sword Coast). */
 img{-webkit-user-drag:none;user-drag:none}
@@ -5135,13 +5140,17 @@ function _applySpellDrop(sp){
       dragGhost=document.createElement('div');
       dragGhost.className='sp-drag-ghost';
       dragGhost.textContent=displayName;
-      dragGhost.style.cssText='position:fixed;pointer-events:none;z-index:99999;top:'+(e.clientY+10)+'px;left:'+(e.clientX+12)+'px';
+      /* Position: left=clientX (centrato orizzontalmente via translateX(-50%)
+         in CSS), top=clientY+22 (sotto al cursore, oltre la manina 32x32
+         con hotspot 14,14 — punta a y=14, manina si estende fino a y=18) */
+      dragGhost.style.left=e.clientX+'px';
+      dragGhost.style.top=(e.clientY+22)+'px';
       document.body.appendChild(dragGhost);
       document.body.classList.add('sp-dragging');
     }
     if(dragGhost){
-      dragGhost.style.left=(e.clientX+12)+'px';
-      dragGhost.style.top=(e.clientY+10)+'px';
+      dragGhost.style.left=e.clientX+'px';
+      dragGhost.style.top=(e.clientY+22)+'px';
     }
     /* Trova drop zone sotto al cursore. Nascondi ghost durante il
        check per non oscurarla (è position:fixed vicino al cursore). */
