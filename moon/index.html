@@ -1006,6 +1006,11 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
    nella lista dei preparati. Coerente con la palette esistente. */
 .sp__item--prep .sp__name{color:var(--gold);font-weight:600}
 .sp__item--prep .sp__grip{color:var(--gold);opacity:.85}
+/* Override degli input.pg__inp dentro a .sp__item per matchare la dimensione
+   del .sp__name (usato nel PG sheet); il csheet di Personaggi usa input
+   editabili invece di div click-to-edit, ma visivamente devono coincidere. */
+.sp__item input.pg__inp{font-size:.68rem;padding:2px 7px;min-height:0;text-align:left;line-height:1.4;font-weight:400}
+.sp__item--prep input.pg__inp{color:var(--gold);font-weight:600}
 /* Ghost durante il drag: clone leggermente trasparente che segue il cursore */
 .sp__item--ghost{position:fixed;z-index:99999;pointer-events:none;background:var(--bg2);border:1px solid var(--gold);border-radius:4px;padding:2px 4px;box-shadow:0 6px 18px rgba(0,0,0,.5);opacity:.92}
 .sp__item--dragging{opacity:.2}
