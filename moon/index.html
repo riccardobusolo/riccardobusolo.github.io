@@ -1137,6 +1137,9 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spf__opt{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:4px;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.68rem;color:var(--dim);transition:background .1s;white-space:nowrap}.spf__opt:hover{background:var(--rl)}
 .spf__chk{width:15px;height:15px;border-radius:3px;border:1.5px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;font-size:.5rem;color:transparent}.spf__opt--sel .spf__chk{border-color:var(--gold);background:rgba(196,154,50,.15);color:var(--gold)}
 .spf__fav{font-size:.9rem;padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:var(--cur-pointer);transition:all .15s;line-height:1}.spf__fav:hover{border-color:var(--gold);color:var(--gold)}.spf__fav--on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.1)}
+.spf__fav--flag{padding:5px 7px;display:inline-flex;align-items:center;justify-content:center;line-height:0}
+.spf__fav--flag svg{display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.25);transition:transform .15s}
+.spf__fav--flag:hover svg{transform:scale(1.08)}
 .spe__star{background:none;border:none;font-size:.88rem;cursor:var(--cur-pointer);color:var(--muted);padding:0 2px;transition:all .15s;line-height:1;flex-shrink:0;opacity:.4}.spe__star:hover{color:var(--gold);opacity:1;transform:scale(1.2)}.spe__star--on{color:var(--gold);opacity:1}
 .spcount{font-family:var(--mono);font-size:.66rem;color:var(--muted);margin-bottom:6px}
 .splist{display:flex;flex-direction:column;gap:3px}
@@ -1755,7 +1758,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 <div class="spf__ms" id="msSource"><button class="spf__btn">Manuali <span class="spf__cnt"></span></button><div class="spf__drop"></div></div>
 <button class="spf__fav" id="spFav" title="Mostra preferiti">★</button>
 <button class="spf__fav" id="spSortBtn" title="Ordina la lista" style="font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.5px">↕ Liv</button>
-<button class="spf__fav" id="spLangBtn" title="Cambia lingua incantesimi (italiano / inglese)" style="font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.5px">IT</button>
+<button class="spf__fav spf__fav--flag" id="spLangBtn" title="Cambia lingua incantesimi (italiano / inglese)"><svg viewBox="0 0 24 16" width="22" height="14" xmlns="http://www.w3.org/2000/svg"><rect x="0" width="8" height="16" fill="#009246"/><rect x="8" width="8" height="16" fill="#fff"/><rect x="16" width="8" height="16" fill="#ce2b37"/></svg></button>
 </div>
 <div class="spcount" id="spCount"></div>
 <div class="splist" id="spList"></div>
@@ -4964,7 +4967,13 @@ function _spLocal(s){if(_spLang()==='en')return s;var t=(window.SPELLS_IT||{})[s
    altri scope (es. _spImportApply nella PG IIFE) durante l'import dei
    campi dell'incantesimo nella lingua selezionata. */
 window.cm_trSchool=_trSchool;window.cm_trCastingTime=_trCastingTime;window.cm_trRange=_trRange;window.cm_trDuration=_trDuration;window.cm_trComponents=_trComponents;window.cm_trDmgType=_trDmgType;window.cm_spLang=_spLang;
-function _refreshSpLangBtn(){if(!spLangBtn)return;var l=_spLang();spLangBtn.textContent=l==='en'?'EN':'IT';spLangBtn.title='Lingua incantesimi: '+(l==='en'?'inglese (clicca per italiano)':'italiano (clicca per inglese)')}_refreshSpLangBtn();
+/* Bandiere SVG inline: italiana (3 fasce verticali verde/bianco/rosso) e
+   britannica (Union Jack semplificata — diagonali bianche/rosse + croce
+   bianca/rossa su sfondo blu). Disegnate alla stessa dimensione viewport
+   per essere intercambiabili. */
+var SVG_FLAG_IT='<svg viewBox="0 0 24 16" width="22" height="14" xmlns="http://www.w3.org/2000/svg"><rect x="0" width="8" height="16" fill="#009246"/><rect x="8" width="8" height="16" fill="#fff"/><rect x="16" width="8" height="16" fill="#ce2b37"/></svg>';
+var SVG_FLAG_UK='<svg viewBox="0 0 60 30" width="22" height="14" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="30" fill="#012169"/><line x1="0" y1="0" x2="60" y2="30" stroke="#fff" stroke-width="6"/><line x1="60" y1="0" x2="0" y2="30" stroke="#fff" stroke-width="6"/><line x1="0" y1="0" x2="60" y2="30" stroke="#C8102E" stroke-width="2"/><line x1="60" y1="0" x2="0" y2="30" stroke="#C8102E" stroke-width="2"/><rect x="25" width="10" height="30" fill="#fff"/><rect y="10" width="60" height="10" fill="#fff"/><rect x="27" width="6" height="30" fill="#C8102E"/><rect y="12" width="60" height="6" fill="#C8102E"/></svg>';
+function _refreshSpLangBtn(){if(!spLangBtn)return;var l=_spLang();spLangBtn.innerHTML=l==='en'?SVG_FLAG_UK:SVG_FLAG_IT;spLangBtn.title='Lingua incantesimi: '+(l==='en'?'inglese (clicca per italiano)':'italiano (clicca per inglese)')}_refreshSpLangBtn();
 if(spLangBtn)spLangBtn.addEventListener('click',function(){var l=_spLang();localStorage.setItem('cm_spell_lang',l==='en'?'it':'en');_refreshSpLangBtn();renSp();if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets()});
 var favs=JSON.parse(localStorage.getItem('cm_spfav')||'[]');
 var favMode=false;
