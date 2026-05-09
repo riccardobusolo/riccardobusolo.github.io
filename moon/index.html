@@ -5142,17 +5142,16 @@ function _applySpellDrop(sp){
       dragGhost.textContent=displayName;
       /* Position: la maniglia (::before) cade direttamente sotto al cursore.
          X: left = clientX - 18 (= padding-left 11 + icon-half ~7).
-         Y: cursore grabbing è SVG 20x20 con hotspot 14,14, quindi la manina
-         si estende fino a clientY+6 (non +18 come una 32x32). Top = clientY
-         posiziona il badge appena sotto la manina senza gap percepibile. */
+         Y: top = clientY - 10 colloca il centro verticale dell'icona
+         (badge.top + ~11) circa al punto cursore (hotspot grabbing). */
       dragGhost.style.left=(e.clientX-18)+'px';
-      dragGhost.style.top=e.clientY+'px';
+      dragGhost.style.top=(e.clientY-10)+'px';
       document.body.appendChild(dragGhost);
       document.body.classList.add('sp-dragging');
     }
     if(dragGhost){
       dragGhost.style.left=(e.clientX-18)+'px';
-      dragGhost.style.top=e.clientY+'px';
+      dragGhost.style.top=(e.clientY-10)+'px';
     }
     /* Trova drop zone sotto al cursore. Nascondi ghost durante il
        check per non oscurarla (è position:fixed vicino al cursore). */
