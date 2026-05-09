@@ -1129,15 +1129,23 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 
 
 /* SPELLS */
-.spf{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap;align-items:flex-start}
+.spf{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center}
 .spf__ms{position:relative;flex-shrink:0}
-.spf__btn{font-family:var(--mono);font-size:.68rem;padding:7px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--dim);cursor:var(--cur-pointer);white-space:nowrap;display:flex;align-items:center;gap:4px;transition:all .15s}.spf__btn:hover{border-color:var(--bh);color:var(--text)}.spf__btn--on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.06)}
+/* Tutti i pulsanti della toolbar hanno la stessa altezza, font, padding,
+   border-radius. I pulsanti "icona" (star, sort, flag) hanno padding più
+   stretto sui lati per restare proporzionati. */
+.spf__btn,.spf__fav{height:32px;padding:0 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--dim);cursor:var(--cur-pointer);font-family:var(--mono);font-size:.68rem;font-weight:500;letter-spacing:.02em;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;white-space:nowrap;box-sizing:border-box;line-height:1}
+.spf__btn:hover,.spf__fav:hover{border-color:var(--bh);color:var(--text)}
+.spf__btn--on,.spf__fav--on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.06)}
 .spf__cnt{font-size:.56rem;background:var(--gold);color:var(--bg);border-radius:8px;padding:0 4px;min-width:14px;text-align:center;font-weight:700;display:none}.spf__cnt--on{display:inline}
 .spf__drop{display:none;position:absolute;top:100%;left:0;margin-top:4px;background:var(--bg2);border:1px solid var(--bh);border-radius:6px;padding:4px;min-width:140px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.4);max-height:220px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(140,30,30,.12) transparent}.spf__drop--on{display:block}
 .spf__opt{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:4px;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.68rem;color:var(--dim);transition:background .1s;white-space:nowrap}.spf__opt:hover{background:var(--rl)}
 .spf__chk{width:15px;height:15px;border-radius:3px;border:1.5px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;font-size:.5rem;color:transparent}.spf__opt--sel .spf__chk{border-color:var(--gold);background:rgba(196,154,50,.15);color:var(--gold)}
-.spf__fav{font-size:.9rem;padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:var(--cur-pointer);transition:all .15s;line-height:1}.spf__fav:hover{border-color:var(--gold);color:var(--gold)}.spf__fav--on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.1)}
-.spf__fav--flag{padding:5px 7px;display:inline-flex;align-items:center;justify-content:center;line-height:0}
+/* Pulsanti "icona" (solo simbolo): padding stretto e quadrati per stare
+   in proporzione coi pulsanti testuali. Mantengono altezza 32px. */
+#spFav{padding:0;width:32px;font-size:.95rem}
+#spSortBtn{padding:0 10px;letter-spacing:.04em}
+.spf__fav--flag{padding:0;width:38px}
 .spf__fav--flag svg{display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.25);transition:transform .15s}
 .spf__fav--flag:hover svg{transform:scale(1.08)}
 .spe__star{background:none;border:none;font-size:.88rem;cursor:var(--cur-pointer);color:var(--muted);padding:0 2px;transition:all .15s;line-height:1;flex-shrink:0;opacity:.4}.spe__star:hover{color:var(--gold);opacity:1;transform:scale(1.2)}.spe__star--on{color:var(--gold);opacity:1}
@@ -1757,7 +1765,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 <div class="spf__ms" id="msLevel"><button class="spf__btn">Livello <span class="spf__cnt"></span></button><div class="spf__drop"></div></div>
 <div class="spf__ms" id="msSource"><button class="spf__btn">Manuali <span class="spf__cnt"></span></button><div class="spf__drop"></div></div>
 <button class="spf__fav" id="spFav" title="Mostra preferiti">★</button>
-<button class="spf__fav" id="spSortBtn" title="Ordina la lista" style="font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.5px">↕ Liv</button>
+<button class="spf__fav" id="spSortBtn" title="Ordina la lista">↕ Liv</button>
 <button class="spf__fav spf__fav--flag" id="spLangBtn" title="Cambia lingua incantesimi (italiano / inglese)"><svg viewBox="0 0 24 16" width="22" height="14" xmlns="http://www.w3.org/2000/svg"><rect x="0" width="8" height="16" fill="#009246"/><rect x="8" width="8" height="16" fill="#fff"/><rect x="16" width="8" height="16" fill="#ce2b37"/></svg></button>
 </div>
 <div class="spcount" id="spCount"></div>
