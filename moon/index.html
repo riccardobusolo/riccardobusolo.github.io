@@ -1626,6 +1626,16 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spe-ed-section-hdr--tashas{color:#b870e0;background:rgba(184,112,224,.08);border-color:#b870e0}
 .spe-ed-section-hdr--tcm{color:#c89070;background:rgba(200,144,112,.08);border-color:#c89070}
 .spe-ed-section-hdr--other{color:var(--gold);background:rgba(196,154,50,.08);border-color:var(--gold)}
+/* Editor proprietà completo: checkbox, classi, layout compatto */
+.spe-ed-cb{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:3px;border:1px solid var(--border);background:rgba(20,18,16,.4);font-family:var(--mono);font-size:.62rem;color:var(--dim);cursor:var(--cur-pointer);transition:all .12s;line-height:1.2;user-select:none;white-space:nowrap}
+.spe-ed-cb:hover{border-color:rgba(196,154,50,.4);color:var(--text)}
+.spe-ed-cb input[type="checkbox"]{margin:0;cursor:var(--cur-pointer);accent-color:var(--gold)}
+.spe-ed-cb-on{border-color:rgba(196,154,50,.6);color:var(--gold);background:rgba(196,154,50,.12)}
+.spe-ed-cls-grid{display:flex;flex-wrap:wrap;gap:4px;flex:1}
+.spe-ed-row--head{margin-bottom:4px;padding:5px 8px;background:rgba(91,141,239,.04);border-color:rgba(91,141,239,.18)}
+.spe-ed-row--head .spe-ed-lbl{color:#5b8def}
+.spe-ed-row--cmp{padding:5px 8px}
+.spe-ed-row-title{font-family:var(--mono);font-size:.56rem;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;font-weight:700;flex:0 0 100%;margin-bottom:2px;display:block}
 .spe-ed-mini{font-family:var(--mono);font-size:.56rem;color:var(--muted);margin-left:6px;opacity:.7}
 .spe-ed-reset{font-family:var(--mono);font-size:.56rem;background:transparent;border:1px solid var(--border);border-radius:3px;color:var(--muted);padding:3px 8px;cursor:var(--cur-pointer);transition:all .12s;text-transform:uppercase;letter-spacing:.05em}
 .spe-ed-reset:hover{border-color:var(--red);color:var(--red);background:var(--rl)}
@@ -4993,17 +5003,39 @@ function _spSnapshot(name){
   var sp=_spFindSp(name);if(!sp)return;
   var IT=window.SPELLS_IT||{};
   var it=IT[name]||null;
+  var c=sp.components||{};
   _spOrig[name]={
+    /* Identità */
+    level:sp.level,
+    school:sp.school,
+    source:sp.source,
+    name_en:sp.name,
+    name_it:it?it.name:undefined,
+    /* Meccanica */
+    concentration:!!sp.concentration,
+    ritual:!!sp.ritual,
+    castingTime:sp.castingTime,
+    range:sp.range,
+    duration:sp.duration,
+    /* Componenti */
+    verbal:!!c.verbal,
+    somatic:!!c.somatic,
+    material:!!c.material,
+    materialDesc:c.materialDesc,
+    materialDesc_it:it?it.materialDesc:undefined,
+    /* Classi (clone) */
+    classes:sp.classes?sp.classes.slice():[],
+    /* Combat */
     attackType:sp.attackType,
     saveAbility:sp.saveAbility,
     damage:sp.damage,
     damageType:sp.damageType,
+    /* Descrizioni */
     description_en:sp.description,
-    higherLevels_en:sp.higherLevels,
-    /* Per IT: snapshot solo dei campi che possiamo modificare */
-    it_existed:!!it,
     description_it:it?it.description:undefined,
-    higherLevels_it:it?it.higherLevels:undefined
+    higherLevels_en:sp.higherLevels,
+    higherLevels_it:it?it.higherLevels:undefined,
+    it_existed:!!it
   };
 }
 /* Ripristina i valori originali per un incantesimo dalla snapshot in memoria
@@ -5013,14 +5045,39 @@ function _spRestore(name){
   var sp=_spFindSp(name);
   var o=_spOrig[name];
   if(o&&sp){
+    /* Identità + meccanica */
+    sp.level=o.level;
+    sp.school=o.school;
+    sp.source=o.source;
+    sp.name=o.name_en;
+    sp.concentration=o.concentration;
+    sp.ritual=o.ritual;
+    sp.castingTime=o.castingTime;
+    sp.range=o.range;
+    sp.duration=o.duration;
+    /* Componenti */
+    if(!sp.components)sp.components={};
+    sp.components.verbal=o.verbal;
+    sp.components.somatic=o.somatic;
+    sp.components.material=o.material;
+    sp.components.materialDesc=o.materialDesc;
+    /* Classi */
+    sp.classes=(o.classes||[]).slice();
+    /* Combat */
     sp.attackType=o.attackType;
     sp.saveAbility=o.saveAbility;
     sp.damage=o.damage;
     sp.damageType=o.damageType;
+    /* Descrizioni */
     sp.description=o.description_en;
     sp.higherLevels=o.higherLevels_en;
+    /* IT */
     var IT=window.SPELLS_IT||{};
     if(IT[name]){
+      if(o.name_it===undefined)delete IT[name].name;
+      else IT[name].name=o.name_it;
+      if(o.materialDesc_it===undefined)delete IT[name].materialDesc;
+      else IT[name].materialDesc=o.materialDesc_it;
       if(o.description_it===undefined)delete IT[name].description;
       else IT[name].description=o.description_it;
       if(o.higherLevels_it===undefined)delete IT[name].higherLevels;
@@ -5043,7 +5100,28 @@ function _spApplyOverrides(){
     if(!sp)continue;
     /* Snapshot PRIMA di mutare: garantisce reversibilità senza reload */
     _spSnapshot(name);
-    /* Campi attacco/danno: applicati direttamente all'oggetto SPELLS */
+    /* Identità + meccanica */
+    if('level' in ov)sp.level=ov.level;
+    if('school' in ov)sp.school=ov.school;
+    if('source' in ov)sp.source=ov.source;
+    /* name_en NON viene applicato live (manterrebbe il lookup key originale);
+       sarà l'export JSON a riportare la rinomina nel codice sorgente */
+    if('concentration' in ov)sp.concentration=!!ov.concentration;
+    if('ritual' in ov)sp.ritual=!!ov.ritual;
+    if('castingTime' in ov)sp.castingTime=ov.castingTime;
+    if('range' in ov)sp.range=ov.range;
+    if('duration' in ov)sp.duration=ov.duration;
+    /* Componenti */
+    if('verbal' in ov||'somatic' in ov||'material' in ov||'materialDesc' in ov){
+      if(!sp.components)sp.components={};
+      if('verbal' in ov)sp.components.verbal=!!ov.verbal;
+      if('somatic' in ov)sp.components.somatic=!!ov.somatic;
+      if('material' in ov)sp.components.material=!!ov.material;
+      if('materialDesc' in ov)sp.components.materialDesc=ov.materialDesc;
+    }
+    /* Classi */
+    if('classes' in ov)sp.classes=(ov.classes||[]).slice();
+    /* Attacco/danno */
     if('attackType' in ov)sp.attackType=ov.attackType;
     if('saveAbility' in ov)sp.saveAbility=ov.saveAbility;
     if('damage' in ov)sp.damage=ov.damage;
@@ -5051,10 +5129,14 @@ function _spApplyOverrides(){
     /* Descrizione/livelli superiori per lingua */
     if('description_en' in ov)sp.description=ov.description_en;
     if('higherLevels_en' in ov)sp.higherLevels=ov.higherLevels_en;
-    if('description_it' in ov||'higherLevels_it' in ov){
+    /* Campi IT (gestiti tramite SPELLS_IT keyed sulla nome EN originale) */
+    var anyIt=('name_it' in ov)||('description_it' in ov)||('higherLevels_it' in ov)||('materialDesc_it' in ov);
+    if(anyIt){
       if(!IT[name])IT[name]={};
+      if('name_it' in ov)IT[name].name=ov.name_it;
       if('description_it' in ov)IT[name].description=ov.description_it;
       if('higherLevels_it' in ov)IT[name].higherLevels=ov.higherLevels_it;
+      if('materialDesc_it' in ov)IT[name].materialDesc=ov.materialDesc_it;
     }
   }
   window.SPELLS_IT=IT;
@@ -5259,6 +5341,57 @@ var hasOv=!!_spOvFor(rawS.name);
    condiviso (i campi sono language-agnostic). */
 var atkH='',descH='',higherH='';
 if(_spEditMode){
+  /* === Editor: identità (livello, scuola, sorgente, conc/ritual, nomi IT/EN) === */
+  var SCHOOLS=['Abjuration','Conjuration','Divination','Enchantment','Evocation','Illusion','Necromancy','Transmutation'];
+  var SCHOOLS_IT={Abjuration:'Abiurazione',Conjuration:'Evocazione',Divination:'Divinazione',Enchantment:'Ammaliamento',Evocation:'Invocazione',Illusion:'Illusione',Necromancy:'Necromanzia',Transmutation:'Trasmutazione'};
+  var SOURCES=["Player's Handbook","Tasha's Cauldron of Everything","Xanathar's Guide to Everything","The Crooked Moon"];
+  var SRC_LBL_MAP={"Player's Handbook":'Player',"Tasha's Cauldron of Everything":'Tasha',"Xanathar's Guide to Everything":'Xhanatar',"The Crooked Moon":'Crooked'};
+  var ALL_CLASSES=['Artificer','Bard','Cleric','Druid','Paladin','Ranger','Sorcerer','Warlock','Wizard'];
+  /* Build option strings */
+  function _opt(v,sel,lbl){return'<option value="'+String(v).replace(/"/g,'&quot;')+'"'+(String(v)===String(sel)?' selected':'')+'>'+(lbl||v)+'</option>'}
+  var lvlOpts='';for(var lv=0;lv<=9;lv++){lvlOpts+=_opt(lv,rawS.level||0,lv===0?'Trucchetto':lv+'\u00b0 livello')}
+  var schOpts=SCHOOLS.map(function(s){return _opt(s,rawS.school,s+(_spLang()==='it'?' ('+SCHOOLS_IT[s]+')':''))}).join('');
+  var srcOpts=SOURCES.map(function(s){return _opt(s,rawS.source,SRC_LBL_MAP[s])}).join('');
+  /* Identità: livello + scuola + sorgente + concentrazione + rituale */
+  var ovEn=_spOvFor(rawS.name)||{};
+  var nameEnVal=(ovEn.name_en!==undefined?ovEn.name_en:rawS.name).replace(/"/g,'&quot;');
+  var nameItVal=((sIt&&sIt.name)||rawS.name).replace(/"/g,'&quot;');
+  var propsH='<div class="spe-ed-row"><span class="spe-ed-row-title">Identità</span>'+
+    '<div class="spe-ed-fld spe-ed-fld--narrow"><span class="spe-ed-lbl">Livello</span><select class="spe-ed-sel" data-spedfld="level" data-spedname="'+nameAttr+'">'+lvlOpts+'</select></div>'+
+    '<div class="spe-ed-fld"><span class="spe-ed-lbl">Scuola</span><select class="spe-ed-sel" data-spedfld="school" data-spedname="'+nameAttr+'">'+schOpts+'</select></div>'+
+    '<div class="spe-ed-fld"><span class="spe-ed-lbl">Manuale</span><select class="spe-ed-sel" data-spedfld="source" data-spedname="'+nameAttr+'">'+srcOpts+'</select></div>'+
+    '<label class="spe-ed-cb'+(rawS.concentration?' spe-ed-cb-on':'')+'"><input type="checkbox" data-spedfld="concentration" data-spedname="'+nameAttr+'"'+(rawS.concentration?' checked':'')+'> Concentrazione</label>'+
+    '<label class="spe-ed-cb'+(rawS.ritual?' spe-ed-cb-on':'')+'"><input type="checkbox" data-spedfld="ritual" data-spedname="'+nameAttr+'"'+(rawS.ritual?' checked':'')+'> Rituale</label>'+
+  '</div>';
+  /* Nomi IT|EN */
+  propsH+='<div class="spe-ed-row spe-ed-row--head"><span class="spe-ed-row-title">Nome</span>'+
+    '<div class="spe-ed-fld"><span class="spe-ed-lbl">Italiano</span><input class="spe-ed-in" type="text" data-spedfld="name_it" data-spedname="'+nameAttr+'" value="'+nameItVal+'"></div>'+
+    '<div class="spe-ed-fld"><span class="spe-ed-lbl">English</span><input class="spe-ed-in" type="text" data-spedfld="name_en" data-spedname="'+nameAttr+'" value="'+nameEnVal+'"></div>'+
+  '</div>';
+  /* Lancio / raggio / durata */
+  var ctVal=(rawS.castingTime||'').replace(/"/g,'&quot;');
+  var rgVal=(rawS.range||'').replace(/"/g,'&quot;');
+  var durVal=(rawS.duration||'').replace(/"/g,'&quot;');
+  propsH+='<div class="spe-ed-row"><span class="spe-ed-row-title">Lancio · Raggio · Durata</span>'+
+    '<div class="spe-ed-fld"><span class="spe-ed-lbl">Tempo di lancio</span><input class="spe-ed-in" type="text" placeholder="es. Action, Bonus Action, 1 minute..." data-spedfld="castingTime" data-spedname="'+nameAttr+'" value="'+ctVal+'"></div>'+
+    '<div class="spe-ed-fld"><span class="spe-ed-lbl">Raggio</span><input class="spe-ed-in" type="text" placeholder="es. Self, Touch, 60 feet..." data-spedfld="range" data-spedname="'+nameAttr+'" value="'+rgVal+'"></div>'+
+    '<div class="spe-ed-fld"><span class="spe-ed-lbl">Durata</span><input class="spe-ed-in" type="text" placeholder="es. Instantaneous, Concentration, up to 1 minute..." data-spedfld="duration" data-spedname="'+nameAttr+'" value="'+durVal+'"></div>'+
+  '</div>';
+  /* Componenti */
+  var cmp=rawS.components||{};
+  var matVal=(cmp.materialDesc||'').replace(/"/g,'&quot;');
+  var matItVal=((sIt&&sIt.components&&sIt.components.materialDesc)||(window.SPELLS_IT&&window.SPELLS_IT[rawS.name]&&window.SPELLS_IT[rawS.name].materialDesc)||'').replace(/"/g,'&quot;');
+  propsH+='<div class="spe-ed-row spe-ed-row--cmp"><span class="spe-ed-row-title">Componenti</span>'+
+    '<label class="spe-ed-cb'+(cmp.verbal?' spe-ed-cb-on':'')+'"><input type="checkbox" data-spedfld="verbal" data-spedname="'+nameAttr+'"'+(cmp.verbal?' checked':'')+'> V (verbale)</label>'+
+    '<label class="spe-ed-cb'+(cmp.somatic?' spe-ed-cb-on':'')+'"><input type="checkbox" data-spedfld="somatic" data-spedname="'+nameAttr+'"'+(cmp.somatic?' checked':'')+'> S (somatica)</label>'+
+    '<label class="spe-ed-cb'+(cmp.material?' spe-ed-cb-on':'')+'"><input type="checkbox" data-spedfld="material" data-spedname="'+nameAttr+'"'+(cmp.material?' checked':'')+'> M (materiale)</label>'+
+    '<div class="spe-ed-fld" style="flex:1 1 200px"><span class="spe-ed-lbl">Materiale (English)</span><input class="spe-ed-in" type="text" placeholder="es. a pinch of dust" data-spedfld="materialDesc" data-spedname="'+nameAttr+'" value="'+matVal+'"></div>'+
+    '<div class="spe-ed-fld" style="flex:1 1 200px"><span class="spe-ed-lbl">Materiale (italiano)</span><input class="spe-ed-in" type="text" placeholder="es. un pizzico di polvere" data-spedfld="materialDesc_it" data-spedname="'+nameAttr+'" value="'+matItVal+'"></div>'+
+  '</div>';
+  /* Classi */
+  var spClasses=rawS.classes||[];
+  var clsBoxes=ALL_CLASSES.map(function(c){var on=spClasses.indexOf(c)>=0;return '<label class="spe-ed-cb'+(on?' spe-ed-cb-on':'')+'"><input type="checkbox" data-spedfld="class" data-spedclass="'+c+'" data-spedname="'+nameAttr+'"'+(on?' checked':'')+'> '+c+'</label>'}).join('');
+  propsH+='<div class="spe-ed-row"><span class="spe-ed-row-title">Classi</span><div class="spe-ed-cls-grid">'+clsBoxes+'</div></div>';
   /* === Editor: configuratore attacco (condiviso, language-agnostic) === */
   var atkType=rawS.attackType||'';
   var saveAb=rawS.saveAbility||'';
@@ -5340,7 +5473,7 @@ var ovIndicatorH=hasOv
   ? '<span class="spe__ovbadge" title="Hai modificato manualmente questo incantesimo">Modificato</span>'+
     '<button class="spe__ovreset" data-spedreset="'+nameAttr+'" title="Annulla le tue modifiche e ripristina i valori originali del catalogo">\u21BB Ripristina</button>'
   : '';
-d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+nameAttr+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+nameAttr+'">'+(fav?'\u2605':'\u2606')+'</button>'+nameH+'<span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div>'+ovIndicatorH+'</div><div class="spe__det"><div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>'+atkH+descH+higherH+'<div class="spe__foot">'+clsH+'<span class="spe__src">'+srcLbl+'</span></div></div>';
+d.innerHTML='<div class="spe__head"><span class="spe__drag" draggable="true" data-spdrag="'+nameAttr+'" title="Trascina nel libro incantesimi della scheda PG">\u283F</span><span class="spe__lvl">'+lvlTxt+'</span><button class="spe__star'+(fav?' spe__star--on':'')+'" data-fav="'+nameAttr+'">'+(fav?'\u2605':'\u2606')+'</button>'+nameH+'<span class="spe__school">'+_trSchool(s.school)+'</span><div class="spe__tags">'+tags+'</div>'+ovIndicatorH+'</div><div class="spe__det">'+(_spEditMode?propsH:'<div class="spe__grid"><span class="spe__prop"><b>'+(_spLang()==='it'?'Lancio':'Casting')+'</b> <span>'+_trCastingTime(s.castingTime)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Raggio':'Range')+'</b> <span>'+_trRange(s.range)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Durata':'Duration')+'</b> <span>'+_trDuration(s.duration)+'</span></span><span class="spe__prop"><b>'+(_spLang()==='it'?'Componenti':'Components')+'</b> <span>'+_trComponents(s.components,rawS.name)+'</span></span></div>')+atkH+descH+higherH+'<div class="spe__foot">'+(_spEditMode?'':clsH)+'<span class="spe__src">'+srcLbl+'</span></div></div>';
 spList.appendChild(d)});
 /* Auto-grow di tutti i textarea editor in modalità modifica: ogni textarea
    si adatta al testo per mostrare l'intero contenuto senza scroll interno.
@@ -5395,38 +5528,64 @@ function _spEdHandle(target){
   var name=target.getAttribute('data-spedname');
   var fld=target.getAttribute('data-spedfld');
   if(!name||!fld)return;
-  var val=target.value;
-  /* Trova lo spell canonico per nome */
-  var sp=null;for(var i=0;i<SP.length;i++){if(SP[i].name===name){sp=SP[i];break}}
+  /* Trova lo spell canonico (per nome originale) */
+  var sp=_spFindSp(name);
   if(!sp)return;
   /* Snapshot dei valori originali PRIMA di mutare: garantisce ripristino senza reload */
   _spSnapshot(name);
-  if(fld==='attackType'){
+  /* Valore: per checkbox usiamo .checked, per il resto .value */
+  var val=target.type==='checkbox'?!!target.checked:target.value;
+  /* IT helper */
+  function _it(){var IT=window.SPELLS_IT||(window.SPELLS_IT={});if(!IT[name])IT[name]={};return IT[name]}
+  /* === Identità === */
+  if(fld==='level'){var lv=parseInt(val,10);if(isNaN(lv))lv=0;sp.level=lv;_spOvSet(name,'level',lv);}
+  else if(fld==='school'){sp.school=val;_spOvSet(name,'school',val);}
+  else if(fld==='source'){sp.source=val;_spOvSet(name,'source',val);}
+  else if(fld==='name_it'){_it().name=val;_spOvSet(name,'name_it',val);}
+  else if(fld==='name_en'){/* Non muto sp.name (spezzeria il lookup key); salvo solo l'override */ _spOvSet(name,'name_en',val);}
+  /* === Meccanica === */
+  else if(fld==='concentration'){sp.concentration=!!val;_spOvSet(name,'concentration',!!val);}
+  else if(fld==='ritual'){sp.ritual=!!val;_spOvSet(name,'ritual',!!val);}
+  else if(fld==='castingTime'){sp.castingTime=val;_spOvSet(name,'castingTime',val);}
+  else if(fld==='range'){sp.range=val;_spOvSet(name,'range',val);}
+  else if(fld==='duration'){sp.duration=val;_spOvSet(name,'duration',val);}
+  /* === Componenti === */
+  else if(fld==='verbal'||fld==='somatic'||fld==='material'){
+    if(!sp.components)sp.components={};
+    sp.components[fld]=!!val;
+    _spOvSet(name,fld,!!val);
+  }
+  else if(fld==='materialDesc'){
+    if(!sp.components)sp.components={};
+    sp.components.materialDesc=val;_spOvSet(name,'materialDesc',val);
+  }
+  else if(fld==='materialDesc_it'){_it().materialDesc=val;_spOvSet(name,'materialDesc_it',val);}
+  /* === Classi === */
+  else if(fld==='class'){
+    var cls=target.getAttribute('data-spedclass');
+    if(!cls)return;
+    if(!sp.classes)sp.classes=[];
+    if(val&&sp.classes.indexOf(cls)<0)sp.classes.push(cls);
+    if(!val)sp.classes=sp.classes.filter(function(c){return c!==cls});
+    /* Ordine canonico */
+    var ORD=['Artificer','Bard','Cleric','Druid','Paladin','Ranger','Sorcerer','Warlock','Wizard'];
+    sp.classes.sort(function(a,b){var ai=ORD.indexOf(a),bi=ORD.indexOf(b);if(ai<0)ai=99;if(bi<0)bi=99;return ai-bi||a.localeCompare(b)});
+    _spOvSet(name,'classes',sp.classes.slice());
+  }
+  /* === Combat === */
+  else if(fld==='attackType'){
     sp.attackType=val;_spOvSet(name,'attackType',val);
-    /* Mostra/nascondi il campo "TS" in base al tipo */
     var row=target.closest('.spe-ed-row');var saveFld=row?row.querySelector('[data-spedsave]'):null;
     if(saveFld)saveFld.style.display=val==='save'?'':'none';
-  }else if(fld==='saveAbility'){
-    sp.saveAbility=val;_spOvSet(name,'saveAbility',val);
-  }else if(fld==='damage'){
-    sp.damage=val;_spOvSet(name,'damage',val);
-  }else if(fld==='damageType'){
-    sp.damageType=val;_spOvSet(name,'damageType',val);
-  }else if(fld==='description_it'){
-    var IT=window.SPELLS_IT||(window.SPELLS_IT={});
-    if(!IT[name])IT[name]={};
-    IT[name].description=val;
-    _spOvSet(name,'description_it',val);
-  }else if(fld==='description_en'){
-    sp.description=val;_spOvSet(name,'description_en',val);
-  }else if(fld==='higherLevels_it'){
-    var IT2=window.SPELLS_IT||(window.SPELLS_IT={});
-    if(!IT2[name])IT2[name]={};
-    IT2[name].higherLevels=val;
-    _spOvSet(name,'higherLevels_it',val);
-  }else if(fld==='higherLevels_en'){
-    sp.higherLevels=val;_spOvSet(name,'higherLevels_en',val);
   }
+  else if(fld==='saveAbility'){sp.saveAbility=val;_spOvSet(name,'saveAbility',val);}
+  else if(fld==='damage'){sp.damage=val;_spOvSet(name,'damage',val);}
+  else if(fld==='damageType'){sp.damageType=val;_spOvSet(name,'damageType',val);}
+  /* === Descrizioni === */
+  else if(fld==='description_it'){_it().description=val;_spOvSet(name,'description_it',val);}
+  else if(fld==='description_en'){sp.description=val;_spOvSet(name,'description_en',val);}
+  else if(fld==='higherLevels_it'){_it().higherLevels=val;_spOvSet(name,'higherLevels_it',val);}
+  else if(fld==='higherLevels_en'){sp.higherLevels=val;_spOvSet(name,'higherLevels_en',val);}
   /* Mostra il badge "Modificato" + pulsante Ripristina nella head, se non già presente.
      (renSp() lo include solo per le card che avevano già override al render: dopo
      la prima modifica iniettiamo l'indicatore senza re-renderizzare l'intera lista
@@ -5447,7 +5606,13 @@ spList.addEventListener('input',function(e){
   var t=e.target;if(t.matches('.spe-ed-in,.spe-ed-ta')){_spEdHandle(t);if(t.classList.contains('spe-ed-ta'))_spEdAutosize(t)}
 });
 spList.addEventListener('change',function(e){
-  var t=e.target;if(t.matches('.spe-ed-sel'))_spEdHandle(t);
+  var t=e.target;
+  if(t.matches('.spe-ed-sel'))_spEdHandle(t);
+  else if(t.matches('input[type="checkbox"][data-spedfld]')){
+    /* Toggle visiva del label .spe-ed-cb-on */
+    var lbl=t.closest('.spe-ed-cb');if(lbl)lbl.classList.toggle('spe-ed-cb-on',t.checked);
+    _spEdHandle(t);
+  }
 });
 /* === Conteggio override + aggiornamento del badge "X incantesimi modificati" === */
 function _spEdRefreshCount(){
