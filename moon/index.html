@@ -2338,6 +2338,11 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 <div class="acc__info">Cancella permanentemente tutti i tuoi dati salvati sul cloud. I dati locali in questo browser <strong>non saranno toccati</strong>. Operazione irreversibile.</div>
 <button class="setpanel__btn setpanel__btn--danger" id="accDeleteCloud"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> Cancella tutti i dati cloud</button>
 </section>
+<section class="setpanel__sec acc__loggedout" style="display:none">
+<h4 class="setpanel__h4">🔒 Accesso</h4>
+<div class="acc__info">Non hai effettuato l'accesso. Effettua il login per sincronizzare nel cloud i tuoi dati (personaggi, mappe, foto, note, incantesimi…) e accedere da qualsiasi dispositivo.</div>
+<button class="setpanel__btn" id="accGoLogin"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Accedi o registrati</button>
+</section>
 <section class="setpanel__sec acc__noconfig" style="display:none">
 <h4 class="setpanel__h4">⚙️ Configurazione</h4>
 <div class="acc__info">Firebase non è configurato. L'app non può funzionare senza un backend account.</div>
@@ -2783,6 +2788,13 @@ if(!btn||!wall)return;
    delle finestre (tog/wm/bm + data-tool="account" + data-close="account").
    Qui basta mantenere refreshAccUI in sync con lo stato auth. */
 btn.addEventListener('click',function(){if(typeof refreshAccUI==='function')refreshAccUI()});
+/* "Accedi o registrati" nella sezione loggedOut: esce da dev mode (se
+   attivo) e fa apparire l'auth wall con i form di login/registrazione. */
+var goLoginBtn=document.getElementById('accGoLogin');
+if(goLoginBtn)goLoginBtn.addEventListener('click',function(){
+  localStorage.removeItem('cm_dm');
+  if(typeof updateWall==='function')updateWall();
+});
 
 /* ----- Generic message setter (works for acc__msg, authwall__msg, dlcdMd__msg) ----- */
 function setMsg(id,txt,kind){var m=document.getElementById(id);if(!m)return;m.textContent=txt||'';var base=(m.className||'').split(' ')[0];if(!base)return;m.className=base+(kind?' '+base+'--'+kind:'')}
@@ -3006,10 +3018,12 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&dlcdMd.clas
 /* ----- UI refresh ----- */
 function refreshAccUI(){
   var loggedIn=document.querySelectorAll('.acc__loggedin');
+  var loggedOut=document.querySelectorAll('.acc__loggedout');
   var noConfig=document.querySelectorAll('.acc__noconfig');
-  if(!fbReady){loggedIn.forEach(function(s){s.style.display='none'});noConfig.forEach(function(s){s.style.display=''});return}
+  if(!fbReady){loggedIn.forEach(function(s){s.style.display='none'});loggedOut.forEach(function(s){s.style.display='none'});noConfig.forEach(function(s){s.style.display=''});return}
   noConfig.forEach(function(s){s.style.display='none'});
   if(curUser){
+    loggedOut.forEach(function(s){s.style.display='none'});
     loggedIn.forEach(function(s){s.style.display=''});
     var emailEl=document.getElementById('accUserEmail');if(emailEl)emailEl.textContent=curUser.email||curUser.uid;
     var provEl=document.getElementById('accUserProv');
@@ -3028,6 +3042,7 @@ function refreshAccUI(){
     var auto=document.getElementById('accAutoSync');if(auto)auto.checked=accAutoSyncEnabled();
   }else{
     loggedIn.forEach(function(s){s.style.display='none'});
+    loggedOut.forEach(function(s){s.style.display=''});
   }
 }
 
