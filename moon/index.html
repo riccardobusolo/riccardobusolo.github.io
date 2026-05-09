@@ -1590,6 +1590,8 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spe-ed-banner button{font-family:var(--mono);font-size:.58rem;padding:4px 9px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);text-transform:uppercase;letter-spacing:.04em;transition:all .12s}
 .spe-ed-banner button:hover{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.06)}
 .spe-ed-banner button.spe-ed-banner-btn--danger:hover{border-color:var(--red);color:var(--red);background:var(--rl)}
+.spe-ed-count{font-family:var(--mono);font-size:.58rem;color:var(--gold);background:rgba(196,154,50,.1);border:1px solid rgba(196,154,50,.32);border-radius:3px;padding:3px 8px;letter-spacing:.04em;white-space:nowrap}
+.spe-ed-count.spe-ed-count--zero{color:var(--muted);border-color:var(--border);background:var(--bg3)}
 .spe__desc{font-size:.78rem;color:var(--dim);line-height:1.5;margin-top:6px}
 .spe__higher{font-size:.72rem;color:var(--muted);line-height:1.4;margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-style:italic}
 .spe__foot{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px;align-items:center}
@@ -1785,7 +1787,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 <button class="spf__fav" id="spEditBtn" title="Modalità modifica: rendi temporaneamente editabili descrizioni e configuratore d'attacco. Le modifiche si salvano automaticamente." style="font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.5px">✏ Modifica</button>
 </div>
 <div class="spcount" id="spCount"></div>
-<div class="spe-ed-banner" id="spEditBanner"><span><b>Modalità modifica attiva.</b> Clicca un incantesimo per espanderlo, poi correggi attacco/danno e descrizioni. Le modifiche si salvano automaticamente.</span><span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button id="spEditResetAll" class="spe-ed-banner-btn--danger" title="Azzera tutte le modifiche personali e ripristina i valori originali del catalogo">Ripristina tutto</button><button id="spEditDone">Esci</button></span></div>
+<div class="spe-ed-banner" id="spEditBanner"><span><b>Modalità modifica attiva.</b> Clicca un incantesimo per espanderlo, poi correggi attacco/danno e descrizioni. Le modifiche si salvano automaticamente nel browser. Quando hai finito, esporta il JSON e mandamelo per applicarle al codice sorgente.</span><span style="margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="spe-ed-count" id="spEditCount" title="Numero di incantesimi con override locali">0 incantesimi modificati</span><button id="spEditExport" title="Scarica il JSON con tutte le tue modifiche per renderle permanenti nel codice">📥 Esporta JSON</button><button id="spEditResetAll" class="spe-ed-banner-btn--danger" title="Azzera tutte le modifiche personali e ripristina i valori originali del catalogo">Ripristina tutto</button><button id="spEditDone">Esci</button></span></div>
 <div class="splist" id="spList"></div>
 </div></div>
 
@@ -4912,7 +4914,7 @@ render()})();
 /* SPELLS */
 (function(){
 var SP=(typeof SPELLS!=='undefined')?SPELLS:[];
-var spSearch=document.getElementById('spSearch'),spList=document.getElementById('spList'),spCount=document.getElementById('spCount'),spFavBtn=document.getElementById('spFav'),spLangBtn=document.getElementById('spLangBtn'),spSortBtn=document.getElementById('spSortBtn'),spEditBtn=document.getElementById('spEditBtn'),spEditBanner=document.getElementById('spEditBanner'),spEditDoneBtn=document.getElementById('spEditDone'),spEditResetAllBtn=document.getElementById('spEditResetAll');
+var spSearch=document.getElementById('spSearch'),spList=document.getElementById('spList'),spCount=document.getElementById('spCount'),spFavBtn=document.getElementById('spFav'),spLangBtn=document.getElementById('spLangBtn'),spSortBtn=document.getElementById('spSortBtn'),spEditBtn=document.getElementById('spEditBtn'),spEditBanner=document.getElementById('spEditBanner'),spEditDoneBtn=document.getElementById('spEditDone'),spEditResetAllBtn=document.getElementById('spEditResetAll'),spEditExportBtn=document.getElementById('spEditExport'),spEditCountEl=document.getElementById('spEditCount');
 /* === MODALITÀ MODIFICA CATALOGO ============================================
    Permette di correggere a mano i campi degli incantesimi (attacco, danno,
    descrizioni) e salvarli come override personali. Gli override sono salvati
@@ -5191,6 +5193,7 @@ spList.addEventListener('click',function(e){
     var nm=rstBtn.getAttribute('data-spedreset');
     if(confirm('Ripristinare i valori originali del catalogo per "'+nm+'"?\nLe tue modifiche personali a questo incantesimo verranno cancellate.')){
       _spOvDel(nm);
+      _spEdRefreshCount();
       /* Per ripristinare davvero i valori originali bisognerebbe riavere la copia
          pristina del catalogo. Per semplicità invitiamo l'utente a ricaricare la pagina. */
       alert('Modifiche cancellate da localStorage. Ricarica la pagina per rivedere i valori originali del catalogo.');
@@ -5254,6 +5257,8 @@ function _spEdHandle(target){
   var spe=target.closest('.spe');
   if(spe){var rb=spe.querySelector('[data-spedreset]');if(rb)rb.disabled=false}
   _spEdFlashSaved(target);
+  /* Aggiorna il badge "X incantesimi modificati" + abilita pulsanti export/reset */
+  _spEdRefreshCount();
   /* Notifica le altre schede (PG sheet, csheet) per re-render */
   if(typeof window.cmRerenderSheets==='function')window.cmRerenderSheets();
 }
@@ -5263,12 +5268,23 @@ spList.addEventListener('input',function(e){
 spList.addEventListener('change',function(e){
   var t=e.target;if(t.matches('.spe-ed-sel'))_spEdHandle(t);
 });
+/* === Conteggio override + aggiornamento del badge "X incantesimi modificati" === */
+function _spEdRefreshCount(){
+  if(!spEditCountEl)return;
+  var ovs=_spOvLoad();var n=Object.keys(ovs).length;
+  spEditCountEl.textContent=(n===1?'1 incantesimo modificato':n+' incantesimi modificati');
+  spEditCountEl.classList.toggle('spe-ed-count--zero',n===0);
+  if(spEditExportBtn)spEditExportBtn.disabled=n===0;
+  if(spEditResetAllBtn)spEditResetAllBtn.disabled=n===0;
+}
+_spEdRefreshCount();
 /* === Toggle modalità modifica =============================================== */
 function _spRefreshEditBtn(){
   if(!spEditBtn)return;
   spEditBtn.classList.toggle('spf__fav--on',_spEditMode);
   spEditBtn.textContent=_spEditMode?'✓ Modifica':'✏ Modifica';
   if(spEditBanner)spEditBanner.classList.toggle('spe-ed-banner--on',_spEditMode);
+  if(_spEditMode)_spEdRefreshCount();
 }
 _spRefreshEditBtn();
 if(spEditBtn)spEditBtn.addEventListener('click',function(){
@@ -5282,9 +5298,35 @@ if(spEditDoneBtn)spEditDoneBtn.addEventListener('click',function(){
 if(spEditResetAllBtn)spEditResetAllBtn.addEventListener('click',function(){
   if(confirm('Cancellare TUTTE le tue modifiche personali al catalogo incantesimi?\nLe override salvate in localStorage saranno rimosse.\n\nNota: per rivedere i valori originali servirà ricaricare la pagina.')){
     try{localStorage.removeItem('cm_sp_overrides')}catch(e){}
+    _spEdRefreshCount();
     alert('Override rimossi. Ricarica la pagina per vedere i valori originali del catalogo.');
     renSp();
   }
+});
+/* === Export del JSON delle override (per applicazione manuale al codice sorgente) === */
+if(spEditExportBtn)spEditExportBtn.addEventListener('click',function(){
+  var ovs=_spOvLoad();
+  var n=Object.keys(ovs).length;
+  if(n===0){alert('Nessuna modifica da esportare.');return}
+  /* Aggiungiamo un piccolo header con metadati per facilitare la review */
+  var payload={
+    _meta:{
+      exportedAt:new Date().toISOString(),
+      count:n,
+      app:'Crooked Moon — Spell catalog overrides',
+      note:'Manda questo file all\'assistente per applicare le modifiche permanentemente a moon/spells.js e moon/spells_it.js.'
+    },
+    overrides:ovs
+  };
+  var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  /* Nome file con timestamp per facilità di gestione di più export */
+  var ts=new Date().toISOString().replace(/[:T]/g,'-').slice(0,19);
+  a.download='crooked-moon-spell-overrides-'+ts+'.json';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);a.remove()},100);
 });
 spSearch.addEventListener('input',renSp);
 renSp()})();
