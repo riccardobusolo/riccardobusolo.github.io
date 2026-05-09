@@ -279,9 +279,9 @@ body.cc-dragging-dot,body.cc-dragging-dot *{cursor:grabbing!important;user-selec
 .acc__inp:focus{border-color:rgba(196,154,50,.5)}
 .acc__inp::placeholder{color:var(--muted)}
 .acc__btnrow{display:flex;gap:.3125rem}
-/* Account window body: padding + sezioni stackate verticalmente in righe */
-.acc__wb{padding:14px;display:flex;flex-direction:column;gap:14px}
-.acc__wb .setpanel__sec{gap:.4rem}
+/* Account/Settings window body: padding + sezioni stackate verticalmente in righe */
+.acc__wb,.set__wb{padding:14px;display:flex;flex-direction:column;gap:14px}
+.acc__wb .setpanel__sec,.set__wb .setpanel__sec{gap:.4rem}
 .acc__btnrow .setpanel__btn{flex:1;justify-content:center;text-align:center}
 .acc__btn--primary{background:rgba(196,154,50,.12);border-color:rgba(196,154,50,.4);color:var(--gold)}
 .acc__btn--primary:hover{background:rgba(196,154,50,.22)!important;border-color:rgba(196,154,50,.6)!important}
@@ -1886,7 +1886,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 <button class="sb__btn" data-tool="res" id="btnRes"><svg viewBox="0 0 24 24"><path d="M2 3h7a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-7a4 4 0 00-4 4v14a3 3 0 013-3h8z"/></svg><span class="sb__label">Risorse</span></button>
 <button class="sb__btn" data-tool="maps" id="btnMaps"><svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span class="sb__label">Mappe</span></button>
 <button class="sb__btn sb__btn--bottom" id="btnAccount" data-tool="account"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="sb__label">Account</span></button>
-<button class="sb__btn" id="btnSettings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="sb__label">Impostazioni</span></button>
+<button class="sb__btn" id="btnSettings" data-tool="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="sb__label">Impostazioni</span></button>
 </div>
 
 <div class="main" id="main">
@@ -2349,9 +2349,8 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 </section>
 </div></div>
 
-<div class="setpanel" id="setPanel">
-<div class="setpanel__head"><div class="setpanel__title"><svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Impostazioni</span></div><button class="setpanel__close" id="setPanelClose">&times;</button></div>
-<div class="setpanel__body">
+<div class="win" id="winSettings"><div class="wh"><div class="wh__i"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div><div class="wh__t">Impostazioni</div><button class="wh__x" data-close="settings">&times;</button></div>
+<div class="wb set__wb">
 <section class="setpanel__sec">
 <h4 class="setpanel__h4">💾 Dati</h4>
 <button class="setpanel__btn" id="setExport"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Esporta backup</button>
@@ -2531,8 +2530,8 @@ pin.oninput=function(){if(pin.value.toLowerCase().trim()==='moon'){pin.disabled=
 pin.onkeydown=function(e){if(e.key==='Enter'){var v=pin.value.toLowerCase().trim();if(v&&v!=='moon'){pin.parentElement.classList.add('pw');setTimeout(function(){pin.parentElement.classList.remove('pw')},350);pin.value=''}}};
 
 /* Windows */
-var wm={dice:'winDice',chars:'winChars',hp:'winHp',timer:'winTimer',calc:'winCalc',spells:'winSpells',sound:'winSound',sheet:'winSheet',map:'winMap',res:'winRes',maps:'winMaps',csheet:'winCsheet',account:'winAccount'};
-var bm={dice:'btnDice',chars:'btnChars',hp:'btnHp',timer:'btnTimer',calc:'btnCalc',spells:'btnSpells',sound:'btnSound',sheet:'btnSheet',map:'btnMap',res:'btnRes',maps:'btnMaps',account:'btnAccount'};
+var wm={dice:'winDice',chars:'winChars',hp:'winHp',timer:'winTimer',calc:'winCalc',spells:'winSpells',sound:'winSound',sheet:'winSheet',map:'winMap',res:'winRes',maps:'winMaps',csheet:'winCsheet',account:'winAccount',settings:'winSettings'};
+var bm={dice:'btnDice',chars:'btnChars',hp:'btnHp',timer:'btnTimer',calc:'btnCalc',spells:'btnSpells',sound:'btnSound',sheet:'btnSheet',map:'btnMap',res:'btnRes',maps:'btnMaps',account:'btnAccount',settings:'btnSettings'};
 var op=JSON.parse(localStorage.getItem('cm_o')||'[]').filter(function(k){return wm[k]&&k!=='csheet'});
 var winPos=JSON.parse(localStorage.getItem('cm_wp')||'{}');
 var winZ=30;
@@ -2607,10 +2606,9 @@ _injectLayBtns();
 (function(){var FS={s:13,m:16,l:18,xl:22};var saved=localStorage.getItem('cm_fontsize')||'m';if(!FS[saved])saved='m';document.documentElement.style.fontSize=FS[saved]+'px'})();
 /* Theme: apply at startup */
 (function(){var V={'crooked-moon':1,'sword-coast':1,'dark':1,'light':1};var t=localStorage.getItem('cm_theme')||'light';if(!V[t])t='light';document.documentElement.dataset.theme=t})();
-(function(){var btn=document.getElementById('btnSettings'),panel=document.getElementById('setPanel'),closeBtn=document.getElementById('setPanelClose');if(!btn||!panel)return;
-function setOpen(){panel.classList.add('on');btn.classList.add('on')}function setClose(){panel.classList.remove('on');btn.classList.remove('on')}
-btn.onclick=function(){if(panel.classList.contains('on'))setClose();else setOpen()};
-closeBtn.onclick=setClose;
+(function(){var btn=document.getElementById('btnSettings');if(!btn)return;
+/* Apertura/chiusura settings ora gestita dal sistema globale finestre
+   (data-tool="settings", data-close="settings", tog/wm/bm). */
 function refreshFs(){var cur=localStorage.getItem('cm_fontsize')||'m';document.querySelectorAll('[data-fontsize]').forEach(function(b){if(b.dataset.fontsize===cur)b.classList.add('on');else b.classList.remove('on')})}refreshFs();
 document.querySelectorAll('[data-fontsize]').forEach(function(b){b.onclick=function(){var size=b.dataset.fontsize;var FS={s:13,m:16,l:18,xl:22};if(!FS[size])return;localStorage.setItem('cm_fontsize',size);document.documentElement.style.fontSize=FS[size]+'px';refreshFs()}});
 var _logoMap={'crooked-moon':'img/crest.webp','sword-coast':'img/Logo_Dungeon_Desk_gold.svg','dark':'img/Logo_Dungeon_Desk_white.svg','light':'img/Logo_Dungeon_Desk_black.svg'};
