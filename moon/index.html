@@ -33,6 +33,16 @@ button:disabled,input:disabled,select:disabled,textarea:disabled,[disabled],[ari
    .btn:cursor:var(--cur-pointer) vincono per specificità classe. */
 [draggable="true"]{cursor:var(--cur-grab)}
 [draggable="true"]:active{cursor:var(--cur-grabbing)}
+/* Mentre l'utente sta trascinando un incantesimo dal catalogo, forza il
+   cursore "grabbing" su tutto il documento (sovrascrive il cursore di
+   default del drag-and-drop nativo HTML5). */
+body.sp-dragging,body.sp-dragging *{cursor:var(--cur-grabbing)!important}
+/* Ghost del drag: badge compatto con solo il nome dell'incantesimo,
+   posizionato sotto la "manina" tramite setDragImage. Renderizzato in
+   posizione off-screen prima del drag (necessario per il snapshot del
+   browser), rimosso subito dopo il dragstart. */
+.sp-drag-ghost{position:absolute;top:-1000px;left:-1000px;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;background:var(--bg2);border:1px solid var(--gold);border-radius:6px;font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--gold);white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.55);pointer-events:none;letter-spacing:.02em}
+.sp-drag-ghost::before{content:'⠿';opacity:.7;font-size:.85rem;line-height:1}
 /* Le immagini sono draggable=true di default in HTML; disabilita user-drag per
    evitare il flash della "manina drag" di sistema (es. sullo sfondo Sword Coast). */
 img{-webkit-user-drag:none;user-drag:none}
@@ -4843,8 +4853,36 @@ function _compStr(c){if(!c)return '';var p=[];if(c.verbal)p.push('V');if(c.somat
 function _ttClass(en){var m={Wizard:'Mago',Sorcerer:'Stregone',Cleric:'Chierico',Druid:'Druido',Bard:'Bardo',Warlock:'Warlock',Paladin:'Paladino',Ranger:'Ranger',Artificer:'Artefice'};return m[en]||en}
 function _ttSchool(en){var m={Abjuration:'Abiurazione',Conjuration:'Evocazione',Divination:'Divinazione',Enchantment:'Ammaliamento',Evocation:'Invocazione',Illusion:'Illusione',Necromancy:'Necromanzia',Transmutation:'Trasmutazione'};return m[en]||en}
 var _dragSpLvl=null;
-document.addEventListener('dragstart',function(e){var dh=e.target.closest('[data-spdrag]');if(!dh)return;var nm=dh.dataset.spdrag;if(typeof SPELLS==='undefined')return;var sp=null;for(var i=0;i<SPELLS.length;i++){if(SPELLS[i].name===nm){sp=SPELLS[i];break}}if(!sp)return;_dragSpLvl=sp.level||0;e.dataTransfer.setData('application/x-spell',JSON.stringify(sp));e.dataTransfer.setData('text/plain',sp.name);e.dataTransfer.effectAllowed='copy'});
-document.addEventListener('dragend',function(){_dragSpLvl=null;document.querySelectorAll('.spdrop-over,.spdrop-bad').forEach(function(el){el.classList.remove('spdrop-over');el.classList.remove('spdrop-bad')})});
+document.addEventListener('dragstart',function(e){
+  var dh=e.target.closest('[data-spdrag]');if(!dh)return;
+  var nm=dh.dataset.spdrag;
+  if(typeof SPELLS==='undefined')return;
+  var sp=null;for(var i=0;i<SPELLS.length;i++){if(SPELLS[i].name===nm){sp=SPELLS[i];break}}
+  if(!sp)return;
+  _dragSpLvl=sp.level||0;
+  e.dataTransfer.setData('application/x-spell',JSON.stringify(sp));
+  e.dataTransfer.setData('text/plain',sp.name);
+  e.dataTransfer.effectAllowed='copy';
+  /* Drag image personalizzata: badge compatto col solo nome (in italiano se
+     disponibile, altrimenti fallback al nome inglese). Il browser fa lo
+     snapshot dell'elemento al dragstart, poi possiamo rimuoverlo. */
+  var IT=window.SPELLS_IT||{};
+  var displayName=(IT[sp.name]&&IT[sp.name].name)?IT[sp.name].name:sp.name;
+  var ghost=document.createElement('div');
+  ghost.className='sp-drag-ghost';
+  ghost.textContent=displayName;
+  document.body.appendChild(ghost);
+  /* Offset (12,10) posiziona il badge poco sotto-destra rispetto al cursore */
+  if(e.dataTransfer.setDragImage)e.dataTransfer.setDragImage(ghost,12,10);
+  setTimeout(function(){if(ghost.parentNode)ghost.parentNode.removeChild(ghost)},0);
+  /* Forza cursore "grabbing" su tutto il documento per la durata del drag */
+  document.body.classList.add('sp-dragging');
+});
+document.addEventListener('dragend',function(){
+  _dragSpLvl=null;
+  document.querySelectorAll('.spdrop-over,.spdrop-bad').forEach(function(el){el.classList.remove('spdrop-over');el.classList.remove('spdrop-bad')});
+  document.body.classList.remove('sp-dragging');
+});
 /* Compatibilità drop: ora sempre permessa. Il drop handler smista
    automaticamente cantrip→pg.cantrips e spell→pg.spBook[level-1] in base
    al livello dell'incantesimo, indipendentemente dalla zone. Questo evita
