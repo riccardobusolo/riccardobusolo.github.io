@@ -4636,6 +4636,7 @@ var _pgPop=document.createElement('div');_pgPop.id='pgPopMenu';_pgPop.className=
 _pgPop.innerHTML=
   '<button class="ch-popmenu__item" data-pgact="dup" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Duplica</button>'+
   '<button class="ch-popmenu__item" data-pgact="tochar" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Importa in Personaggi</button>'+
+  '<button class="ch-popmenu__item" data-pgact="download" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Scarica personaggio</button>'+
   '<div class="ch-popmenu__sep"></div>'+
   '<button class="ch-popmenu__item ch-popmenu__item--danger" data-pgact="del" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Elimina</button>';
 document.body.appendChild(_pgPop);
@@ -4663,6 +4664,7 @@ _pgPop.addEventListener('click',function(e){
   var pg=loadPG();if(!pg)return;
   if(act==='dup')_pgDuplicate(pg);
   else if(act==='tochar')_pgImportToChar(pg);
+  else if(act==='download')_pgDownload(pg);
   else if(act==='del')_pgDeleteCurrent(pg);
 });
 function _pgDuplicate(pg){
@@ -4674,6 +4676,15 @@ function _pgDuplicate(pg){
 function _pgDeleteCurrent(pg){
   var dn=pg.name||'questo personaggio';
   pgConfirm('Eliminare definitivamente "'+dn+'"?\nL\'azione è irreversibile.',function(){deletePG(pg.id);render()},{title:'Elimina personaggio',okLabel:'Elimina'});
+}
+function _pgDownload(pg){
+  if(!pg)return;
+  var safe=((pg.name||'personaggio').replace(/[^a-zA-Z0-9_\-]+/g,'_').slice(0,60)||'personaggio');
+  var blob=new Blob([JSON.stringify(pg,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=safe+'.json';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);a.remove()},100);
 }
 function _pgImportToChar(pg){
   if(typeof window.cmAddCharFromPG!=='function'){
