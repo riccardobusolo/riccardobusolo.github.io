@@ -5792,7 +5792,8 @@ function render(){renderSb();if(view==='editor')renderEditor();else renderMap()}
 function setView(v){view=v;document.querySelectorAll('#winMap .mp__vb').forEach(function(b){b.classList.toggle('mp__vb--on',b.dataset.mpv===v)});if(view==='editor')renderEditor();else renderMap()}
 function selectDoc(id){currentId=id;render()}
 /* sidebar handlers */
-document.getElementById('mpList').addEventListener('click',function(e){if(_mpDragSuppressClick){_mpDragSuppressClick=false;return}if(e.target.id==='mpEmpty3'){var d=newDoc();currentId=d.id;view='editor';setView('editor');render();setTimeout(function(){var t=document.getElementById('mpTitle');if(t)t.focus()},80);return}/* Click su cartella → entra dentro */var folderBtn=e.target.closest('[data-mpfolder]');if(folderBtn){enterFolder(folderBtn.dataset.mpfolder);return}/* Click su doc → seleziona per editor */var sel=e.target.closest('[data-mpsel]');if(!sel)return;selectDoc(sel.dataset.mpsel);if(view!=='editor')setView('editor')});
+document.getElementById('mpList').addEventListener('click',function(e){if(_mpDragSuppressClick){_mpDragSuppressClick=false;return}if(e.target.id==='mpEmpty3'){var d=newDoc();currentId=d.id;view='editor';setView('editor');render();setTimeout(function(){var t=document.getElementById('mpTitle');if(t)t.focus()},80);return}/* Cartella: doppio click per entrare; singolo click = nessuna azione
+   (per consentire context menu / drag senza navigare per errore). */var folderBtn=e.target.closest('[data-mpfolder]');if(folderBtn){if(e.detail>=2)enterFolder(folderBtn.dataset.mpfolder);return}/* Click su doc → seleziona per editor */var sel=e.target.closest('[data-mpsel]');if(!sel)return;selectDoc(sel.dataset.mpsel);if(view!=='editor')setView('editor')});
 /* Back button: torna alla cartella superiore */
 document.getElementById('mpBack').addEventListener('click',function(){goUpFolder()});
 /* Nuova cartella: prompt per il nome (vuoto = "Nuova cartella" default) */
