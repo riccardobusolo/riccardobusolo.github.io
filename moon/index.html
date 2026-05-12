@@ -5809,8 +5809,9 @@ document.getElementById('mpList').addEventListener('click',function(e){if(_mpDra
 document.getElementById('mpView').addEventListener('click',function(e){if(e.target.id!=='mpView')return;if(currentId!==null){currentId=null;render()}});
 /* Back button: torna alla cartella superiore */
 document.getElementById('mpBack').addEventListener('click',function(){goUpFolder()});
-/* Nuova cartella: prompt per il nome (vuoto = "Nuova cartella" default) */
-document.getElementById('mpNewFolder').addEventListener('click',function(){var name=prompt('Nome cartella:','Nuova cartella');if(name===null)return;newFolder(name||'Nuova cartella');render()});
+/* Nuova cartella: crea con nome default e seleziona il titolo nell'editor
+   così l'utente può rinominare inline senza dover passare per prompt(). */
+document.getElementById('mpNewFolder').addEventListener('click',function(){var f=newFolder('Nuova cartella');currentId=f.id;render();if(view!=='editor')setView('editor');setTimeout(function(){var t=document.getElementById('mpTitle');if(t){t.focus();t.select()}},80)});
 /* === DRAG & DROP sidebar items ============================================
    Mouse-based drag (non HTML5) per consistency col resto dell'app e
    controllo totale del cursore. Soglia 4px tra mousedown e mousemove
@@ -5906,14 +5907,14 @@ var _mpDragSuppressClick=false;
     var id=_mpCtxItemId;
     hideMenu();
     if(cmd==='open'&&id){var it=findById(id);if(isFolder(it))enterFolder(id);else{selectDoc(id);if(view!=='editor')setView('editor')}}
-    else if(cmd==='rename'&&id){var it=findById(id);if(!it)return;var nm=prompt('Nuovo nome:',it.title||'');if(nm===null)return;renameItem(id,nm)}
+    else if(cmd==='rename'&&id){var it=findById(id);if(!it)return;currentId=id;render();if(view!=='editor')setView('editor');setTimeout(function(){var t=document.getElementById('mpTitle');if(t){t.focus();t.select()}},80)}
     else if(cmd==='cut'&&id){clipboard={action:'cut',ids:[id]};render()}
     else if(cmd==='copy'&&id){clipboard={action:'copy',ids:[id]};render()}
     else if(cmd==='paste'){pasteIntoCurrent()}
     else if(cmd==='paste-into'&&id){var prevFolder=currentFolderId;currentFolderId=id;pasteIntoCurrent();currentFolderId=prevFolder;render()}
     else if(cmd==='delete'&&id){var it=findById(id);if(!it)return;var msg=isFolder(it)?'Eliminare la cartella "'+(it.title||'cartella')+'" e tutto il suo contenuto?':'Eliminare il documento "'+(it.title||'senza titolo')+'"?';if(confirm(msg))deleteItem(id)}
     else if(cmd==='new-doc'){_mpCreateNew()}
-    else if(cmd==='new-folder'){var name=prompt('Nome cartella:','Nuova cartella');if(name===null)return;newFolder(name||'Nuova cartella');render()}
+    else if(cmd==='new-folder'){var f=newFolder('Nuova cartella');currentId=f.id;render();if(view!=='editor')setView('editor');setTimeout(function(){var t=document.getElementById('mpTitle');if(t){t.focus();t.select()}},80)}
   });
   document.addEventListener('keydown',function(e){if(e.key==='Escape')hideMenu()});
   window.addEventListener('scroll',hideMenu,true);
