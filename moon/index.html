@@ -3684,6 +3684,7 @@ function abModEn(score){return Math.floor(((score|0)-10)/2)}
 function fmtModEn(m){return m>=0?'+'+m:''+m}
 function _esRollD20(){var a=1+Math.floor(Math.random()*20);if(esAdv==='adv')return Math.max(a,1+Math.floor(Math.random()*20));if(esAdv==='dis')return Math.min(a,1+Math.floor(Math.random()*20));return a}
 function _esRollAbility(key){var labels={str:'FOR',dex:'DES',con:'COS',intl:'INT',wis:'SAG',cha:'CAR'};if(!labels[key])return;var score=esObj[key]||10;var mod=abModEn(score);var d=_esRollD20();var tot=d+mod;var cls=d===20?'pg__roll-row--crit':d===1?'pg__roll-row--fail':'pg__roll-row--hit';var advLbl=esAdv?' <span style="opacity:.7">('+(esAdv==='adv'?'Vant.':'Svant.')+')</span>':'';esLastRoll={cls:cls,html:'<strong>'+labels[key]+'</strong> &nbsp;d20 = <strong>'+d+'</strong>'+(mod>=0?' +':' ')+mod+' &nbsp;= <strong>'+tot+'</strong>'+advLbl};esAdv=null;if(esObj)openEsheet(enemies.indexOf(esObj))}
+function _esRollInit(){if(!esObj)return;var init=esObj.init||0;var d=_esRollD20();var tot=d+init;var cls=d===20?'pg__roll-row--crit':d===1?'pg__roll-row--fail':'pg__roll-row--hit';var advLbl=esAdv?' <span style="opacity:.7">('+(esAdv==='adv'?'Vant.':'Svant.')+')</span>':'';esLastRoll={cls:cls,html:'<strong>⚡ Iniziativa</strong> &nbsp;d20 = <strong>'+d+'</strong>'+(init>=0?' +':' ')+init+' &nbsp;= <strong>'+tot+'</strong>'+advLbl};esAdv=null;openEsheet(enemies.indexOf(esObj))}
 function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','saves','skills','dmgResist','dmgImmune','dmgVulner','condImmune','senses','languages','cr','notes'].forEach(function(k){if(e[k]==null)e[k]=''});['str','dex','con','intl','wis','cha'].forEach(function(k){if(e[k]==null)e[k]=10});['traits','actions','bonusActions','reactions','legendaryActions'].forEach(function(k){if(!Array.isArray(e[k]))e[k]=[]});/* HP tracking: e.hp = MAX (statblock), e.hpCur = current durante
    combattimento, e.hpTemp = temp HP. Migrazione record legacy:
    se hpCur missing → hpCur = hp. */if(e.hpCur==null)e.hpCur=e.hp||0;if(e.hpTemp==null)e.hpTemp=0}
@@ -3740,7 +3741,7 @@ h+='<div class="pg__cact pg__cact--temp" style="flex:1"><input type="number" id=
 h+='</div>';
 /* Init + Speed (no Riposo lungo per i nemici) */
 h+='<div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap">';
-h+='<div class="pg__cstat" style="padding:2px 5px">⚡<input class="pg__inp--inline" data-ef="init" type="number" value="'+e.init+'" style="width:3ch"></div>';
+h+='<div class="pg__cstat" style="padding:2px 5px"><span data-esrollinit="1" style="cursor:var(--cur-pointer);padding-right:3px" title="Lancia iniziativa (1d20 + bonus)">⚡</span><input class="pg__inp--inline" data-ef="init" type="number" value="'+e.init+'" style="width:3ch"></div>';
 h+='<div class="pg__cstat" style="padding:2px 5px;min-width:0;flex:1">👟<input class="pg__inp--inline" data-ef="speed" value="'+esc(e.speed)+'" placeholder="15 m, volare 45 m" style="text-align:left;width:auto;flex:1;min-width:0"></div>';
 h+='</div>';
 h+='</div>';
@@ -3806,6 +3807,9 @@ document.getElementById('esheetBody').addEventListener('click',function(e){if(!e
    delle classi sui bottoni (no full re-render). */
 var advBtn=e.target.closest('[data-esadv]');
 if(advBtn){e.stopPropagation();var _mode=advBtn.dataset.esadv;esAdv=(esAdv===_mode)?null:_mode;document.querySelectorAll('#esheetBody [data-esadv]').forEach(function(b){b.classList.toggle('on',b.dataset.esadv===esAdv)});return}
+/* Click su ⚡ iniziativa → lancia 1d20 + init bonus */
+var initBtn=e.target.closest('[data-esrollinit]');
+if(initBtn){e.stopPropagation();_esRollInit();return}
 /* Click su caratteristica (.es__ab/.pg__ab) → lancia d20+mod. Skip
    se il target è l'input stesso (per non interferire con l'edit). */
 var abEl=e.target.closest('.es__ab');
