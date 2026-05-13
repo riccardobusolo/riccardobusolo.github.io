@@ -542,11 +542,11 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 /* Slot foto sheet nemico: 64×64 square, click apre hpPhotoPop (context
    'en'). Sostituisce l'emoji nel header. La foto viene compressa a
    200×200 quadrata WebP via processEnImg. */
-.es__photo-slot{width:64px;height:64px;flex-shrink:0;background:var(--bg2);border:1px dashed var(--border);border-radius:8px;overflow:hidden;cursor:var(--cur-pointer);padding:0;transition:all .15s;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.es__photo-slot{width:100px;height:100px;flex-shrink:0;background:var(--bg2);border:1px dashed var(--border);border-radius:10px;overflow:hidden;cursor:var(--cur-pointer);padding:0;transition:all .15s;display:flex;align-items:center;justify-content:center;color:var(--muted)}
 .es__photo-slot:hover{border-color:var(--gold);background:rgba(196,154,50,.06);color:var(--gold);transform:scale(1.03)}
 .es__photo-slot--has{border-style:solid}
 .es__photo-slot img{width:100%;height:100%;object-fit:cover;display:block}
-.es__photo-slot svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.es__photo-slot svg{width:38px;height:38px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .es__hdr-right{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
 .es__name{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--gold);background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:5px 9px;outline:none;width:100%;box-sizing:border-box;transition:border-color .12s}
 .es__name:focus{border-color:var(--gold)}
@@ -3944,7 +3944,7 @@ hpPhotoDropZone.addEventListener('dragleave',function(){this.classList.remove('d
 hpPhotoDropZone.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();this.classList.remove('drag-over');var files=e.dataTransfer&&e.dataTransfer.files;if(!files||!files.length)return;var f=null;for(var k=0;k<files.length;k++){if(files[k].type.startsWith('image/')){f=files[k];break}}if(f){var _fn=photoCtx.type==='en'?processEnImg:processHpImg;_fn(f,function(thumb,full){applyPhoto(thumb,full)})}});
 hpPhotoRm.addEventListener('click',function(){var arr=_pcArr();var i=photoCtx.i;arr[i].photo='';arr[i].photoFull='';if(photoCtx.type==='ch'){if(arr[i].photos&&arr[i].photos.length>0)arr[i].photos.shift();if(arr[i].photos&&arr[i].photos.length>0){_chSyncAvatarFromGallery(i,function(){_pcSave();if(typeof csIdx!=='undefined'&&csIdx===i&&typeof openSheet==='function')openSheet(i)})}else{if(typeof csIdx!=='undefined'&&csIdx===i&&typeof openSheet==='function')openSheet(i);_pcSave()}closePhotoPop();return}_pcSave();closePhotoPop()});
 document.addEventListener('paste',function(e){if(!hpPhotoPop.classList.contains('on')||photoCtx.i<0)return;var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var k=0;k<items.length;k++){if(items[k].type.startsWith('image/')){e.preventDefault();var _fn=photoCtx.type==='en'?processEnImg:processHpImg;_fn(items[k].getAsFile(),function(thumb,full){applyPhoto(thumb,full)});return}}});
-document.addEventListener('click',function(e){if(!e.target.closest('.hr__ppop')&&!e.target.closest('.hr__photo'))closePhotoPop()});
+document.addEventListener('click',function(e){if(!e.target.closest('.hr__ppop')&&!e.target.closest('.hr__photo')&&!e.target.closest('.es__photo-slot'))closePhotoPop()});
 
 /* TIMER */
 var tmD=JSON.parse(localStorage.getItem('cm_timers')||'[{"total":90,"left":90}]');
