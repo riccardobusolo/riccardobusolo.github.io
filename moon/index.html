@@ -503,6 +503,14 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .de--n{animation:ei .25s var(--ease)}@keyframes ei{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
 
 /* CHARACTERS */
+/* Split layout per #winChars: due metà (Personaggi | Nemici) separate
+   da una linea verticale. Override del .wb (che è scrollabile single-col):
+   .wb diventa flex row, ogni metà ha il proprio scroll indipendente. */
+#winChars > .wb{padding:0;display:flex;flex-direction:row;align-items:stretch;overflow:hidden}
+#winChars .win__half{flex:1;min-width:0;padding:7px;display:flex;flex-direction:column;overflow:hidden auto;scrollbar-width:none}
+#winChars .win__half::-webkit-scrollbar{display:none}
+#winChars .win__half+.win__half{border-left:1px solid var(--border)}
+#winChars .win__half-hdr{font-family:var(--mono);font-size:.66rem;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin:0 2px 8px;font-weight:600}
 .cf{display:flex;gap:5px;margin-bottom:5px;flex-wrap:wrap}.cf .fi{flex:1;min-width:0}
 .cf--row2{margin-bottom:14px;justify-content:center}
 .ch__lvl{font-family:var(--mono);font-size:.56rem;color:var(--gold);background:rgba(196,154,50,.08);border:1px solid rgba(196,154,50,.15);padding:1px 5px;border-radius:3px;white-space:nowrap;cursor:var(--cur-pointer);transition:background .12s;display:inline-flex;flex-direction:column;align-items:center;line-height:1.15;text-align:center}.ch__lvl:hover{background:rgba(196,154,50,.18)}
@@ -1970,6 +1978,8 @@ body.mp-sb-dragging .mp__sb-item:not(.on):not(.mp__sb-item--drag):not(.mp__sb-it
 
 <!-- CHARACTERS -->
 <div class="win" id="winChars"><div class="wh"><div class="wh__i"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><div class="wh__t">Personaggi</div><button class="wh__x" data-close="chars">&times;</button></div><div class="wb">
+<div class="win__half">
+<div class="win__half-hdr">Personaggi</div>
 <div class="hadd" id="chForm">
 <input class="fi" id="chName" placeholder="Nome" style="flex:1"><button class="fb fb--green" id="chAdd">+</button><button class="fb" id="chLoadJson" type="button" title="Carica personaggio da file JSON"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>
 </div>
@@ -1979,6 +1989,19 @@ body.mp-sb-dragging .mp__sb-item:not(.on):not(.mp__sb-item--drag):not(.mp__sb-it
 <button class="cf-filter" id="chFilterArch" type="button" title="Mostra solo personaggi archiviati"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 L3 21 L21 21 L21 11"/><line x1="12" y1="3" x2="12" y2="13"/><polyline points="9 9 12 13 15 9"/></svg> Archiviati</button>
 </div>
 <div class="cl" id="chList"></div>
+</div>
+<div class="win__half">
+<div class="win__half-hdr">Nemici</div>
+<div class="hadd" id="enForm">
+<input class="fi" id="enName" placeholder="Nome nemico" style="flex:1"><button class="fb fb--green" id="enAdd">+</button>
+</div>
+<div class="cf-filters">
+<button class="cf-filter" id="enFilterFav" type="button" title="Mostra solo nemici preferiti"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> Preferiti</button>
+<button class="cf-filter on" id="enFilterAll" type="button" title="Mostra tutti i nemici (non archiviati)"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg> Nemici</button>
+<button class="cf-filter" id="enFilterArch" type="button" title="Mostra solo nemici archiviati"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 L3 21 L21 21 L21 11"/><line x1="12" y1="3" x2="12" y2="13"/><polyline points="9 9 12 13 15 9"/></svg> Archiviati</button>
+</div>
+<div class="cl" id="enList"></div>
+</div>
 </div></div>
 
 <!-- COMBATTIMENTO -->
@@ -3545,6 +3568,21 @@ makeDrag(document.getElementById('chList'),function(){return chars},sC,renC,func
   sH();renH();
   return true;
 });renC();
+/* ENEMIES — struttura parallela ai personaggi ma semplificata: ogni
+   nemico ha solo nome/emoji/ac/hp/init/fav/archived. Riusa le classi
+   CSS .ch__* (style identico) ma con attributi dataset diversi
+   (data-eidx invece di data-i) per evitare collisioni coi click
+   handler dei personaggi. */
+var enemies=JSON.parse(localStorage.getItem('cm_enem')||'[]');
+function sE(){localStorage.setItem('cm_enem',JSON.stringify(enemies))}
+function renE(){var el=document.getElementById('enList');if(!el)return;el.innerHTML='';var fFav=document.getElementById('enFilterFav')&&document.getElementById('enFilterFav').classList.contains('on');var fArch=document.getElementById('enFilterArch')&&document.getElementById('enFilterArch').classList.contains('on');var visI=[];enemies.forEach(function(e,i){var isArch=!!e.archived;if(fArch){if(!isArch)return}else if(fFav){if(isArch||!e.fav)return}else{if(isArch)return}visI.push(i)});visI.forEach(function(i){var e=enemies[i];var d=document.createElement('div');d.className='ch'+(e.fav?' fav':'')+(e.archived?' archived':'');d.dataset.eidx=i;d.innerHTML='<span class="ch__emoji" data-eidx="'+i+'">'+(e.emoji||'👹')+'</span><button class="ch__star" data-eidx="'+i+'">'+(e.fav?'★':'☆')+'</button><div class="ch__info"><div class="ch__name" data-eidx="'+i+'">'+esc(e.name)+'</div></div><div class="ch__stats"><div class="ch__shield" data-eidx="'+i+'"><span class="ch__shield-val">'+e.ac+'</span><span class="ch__shield-lbl">CA</span></div><span class="ch__stat" data-eidx="'+i+'" data-f="init">⚡<span class="ch__stat-v">'+(e.init>=0?'+':'')+e.init+'</span></span><span class="ch__stat" data-eidx="'+i+'" data-f="hp">💔<span class="ch__stat-v">'+e.hp+'</span></span></div><button class="ch__menu" data-emenu="'+i+'" type="button"><svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="3" r="1.6"/><circle cx="8" cy="8" r="1.6"/><circle cx="8" cy="13" r="1.6"/></svg></button>';el.appendChild(d)})}
+function addEnemy(){var nm=document.getElementById('enName').value.trim()||'Nemico';enemies.push({name:nm,ac:10,hp:10,init:0,fav:false,archived:false,emoji:'👹'});sE();renE();document.getElementById('enName').value=''}
+document.getElementById('enAdd').onclick=addEnemy;
+document.getElementById('enName').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();addEnemy()}};
+['enFilterFav','enFilterAll','enFilterArch'].forEach(function(id){var b=document.getElementById(id);if(b)b.onclick=function(){if(b.classList.contains('on'))return;['enFilterFav','enFilterAll','enFilterArch'].forEach(function(x){var bx=document.getElementById(x);if(bx)bx.classList.remove('on')});b.classList.add('on');renE()}});
+document.getElementById('enList').onclick=function(e){var star=e.target.closest('.ch__star[data-eidx]');if(star){var i=parseInt(star.dataset.eidx);enemies[i].fav=!enemies[i].fav;sE();renE();return}var menu=e.target.closest('.ch__menu[data-emenu]');if(menu){openEnemyMenu(parseInt(menu.dataset.emenu),menu);return}var emoji=e.target.closest('.ch__emoji[data-eidx]');if(emoji){var i=parseInt(emoji.dataset.eidx);var r=emoji.getBoundingClientRect();var ep=document.getElementById('epick');ep.style.top=r.bottom+4+'px';ep.style.left=Math.min(r.left,window.innerWidth-390)+'px';epCb=function(em){enemies[i].emoji=em;sE();renE()};ep.classList.add('on');return}var shld=e.target.closest('.ch__shield[data-eidx]');if(shld){var i=parseInt(shld.dataset.eidx);var sv=shld.querySelector('.ch__shield-val');var inp=document.createElement('input');inp.className='ied';inp.type='number';inp.value=enemies[i].ac;inp.style.width='3ch';inp.style.height='20px';inp.style.textAlign='center';sv.textContent='';sv.appendChild(inp);inp.focus();inp.select();function dn(){var v=parseInt(inp.value);if(!isNaN(v))enemies[i].ac=v;sE();renE()}inp.onblur=dn;inp.onkeydown=function(ev){if(ev.key==='Enter')dn();if(ev.key==='Escape')renE()};return}var stat=e.target.closest('.ch__stat[data-eidx]');if(stat){var i=parseInt(stat.dataset.eidx),f=stat.dataset.f,old=enemies[i][f];var vEl=stat.querySelector('.ch__stat-v');var inp=document.createElement('input');inp.className='ied';inp.type='number';inp.value=old;inp.style.width=Math.max(3,String(old).length+1)+'ch';vEl.textContent='';vEl.appendChild(inp);inp.focus();inp.select();function dn2(){var v=parseInt(inp.value);if(!isNaN(v))enemies[i][f]=v;sE();renE()}inp.onblur=dn2;inp.onkeydown=function(ev){if(ev.key==='Enter')dn2();if(ev.key==='Escape')renE()};return}var nameEl=e.target.closest('.ch__name[data-eidx]');if(nameEl){var i=parseInt(nameEl.dataset.eidx);var old=enemies[i].name;var inp=document.createElement('input');inp.className='ied';inp.type='text';inp.value=old;inp.style.width='12ch';nameEl.textContent='';nameEl.appendChild(inp);inp.focus();inp.select();function dn3(){var v=inp.value.trim();if(v)enemies[i].name=v;sE();renE()}inp.onblur=dn3;inp.onkeydown=function(ev){if(ev.key==='Enter')dn3();if(ev.key==='Escape')renE()};return}};
+function openEnemyMenu(i,btn){var pop=document.getElementById('enPopMenu');if(!pop){pop=document.createElement('div');pop.id='enPopMenu';pop.className='ch-popmenu';document.body.appendChild(pop);document.addEventListener('click',function(ev){if(pop.classList.contains('on')&&!ev.target.closest('#enPopMenu')&&!ev.target.closest('.ch__menu[data-emenu]'))pop.classList.remove('on')})}var en=enemies[i];pop.innerHTML='<button class="ch-popmenu__item" data-eact="archive" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M3 11 L3 21 L21 21 L21 11"/><line x1="12" y1="3" x2="12" y2="13"/><polyline points="9 9 12 13 15 9"/></svg>'+(en.archived?'Disarchivia':'Archivia')+'</button><div class="ch-popmenu__sep"></div><button class="ch-popmenu__item ch-popmenu__item--danger" data-eact="del" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Elimina</button>';var r=btn.getBoundingClientRect();pop.style.top=(r.bottom+4)+'px';pop.style.left=Math.max(4,Math.min(r.right-180,window.innerWidth-200))+'px';pop.classList.add('on');pop.onclick=function(ev){var item=ev.target.closest('[data-eact]');if(!item)return;var act=item.dataset.eact;pop.classList.remove('on');if(act==='archive'){enemies[i].archived=!enemies[i].archived;sE();renE()}else if(act==='del'){if(confirm('Eliminare "'+enemies[i].name+'"?')){enemies.splice(i,1);sE();renE()}}}}
+renE();
 /* Cross-drag: chars → HP */
 var chDragIdx=null;
 document.getElementById('chList').addEventListener('dragstart',function(e){var row=e.target.closest('[data-idx]');if(row)chDragIdx=parseInt(row.dataset.idx)});
