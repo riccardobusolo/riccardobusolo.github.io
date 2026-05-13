@@ -3691,7 +3691,7 @@ function _esDdField(label,key,val,opts){var isCustom=val&&opts.indexOf(val)<0;va
 var TYPE_OPTS=['Aberrazione','Bestia','Celestiale','Costrutto','Drago','Elementale','Fata','Gigante','Immondo','Melma','Mostruosità','Non Morto','Pianta','Umanoide'];
 var ALIGN_OPTS=['Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale','Neutrale','Caotico Neutrale','Legale Malvagio','Neutrale Malvagio','Caotico Malvagio','Senza Allineamento','Qualsiasi allineamento'];
 var SIZE_OPTS=['Minuscola','Piccola','Media','Grande','Enorme','Mastodontica'];
-var idCells=_esTextField('Nome','name',e.name||'')+_esDdField('Tipo','type',e.type||'',TYPE_OPTS)+_esDdField('Allineamento','alignment',e.alignment||'',ALIGN_OPTS)+_esDdField('Taglia','size',e.size||'',SIZE_OPTS);
+var idCells=_esTextField('Nome','name',e.name||'')+_esTextField('CR','cr',e.cr||'')+_esDdField('Tipo','type',e.type||'',TYPE_OPTS)+_esDdField('Allineamento','alignment',e.alignment||'',ALIGN_OPTS)+_esDdField('Taglia','size',e.size||'',SIZE_OPTS);
 h+='<div class="es__hdr"><div class="es__photo-slot'+(e.photo?' es__photo-slot--has':'')+'" id="esPhotoSlot" title="'+(e.photo?'Clicca per cambiare foto, o trascina nuova foto':'Aggiungi foto (clicca o trascina)')+'">'+photoSlotInner+'</div><div class="es__hdr-right"><div class="pg__row pg__row--id">'+idCells+'</div></div></div>';
 /* === LAYOUT 3-COLONNE pg__sheet/pg__col come scheda PG. Su largh
    stretta wrappa naturalmente (flex:1 1 240px). La sezione Combattimento
@@ -3701,7 +3701,8 @@ h+='<div class="pg__sheet">';
 h+='<div class="pg__col">';
 /* SEZIONE COMBATTIMENTO: layout PG-style — shield CA + barra HP cur/max
    + temp HP, Danno/Cura/Temp inline actions, init+speed, NO Riposo lungo.
-   Stats aggiuntivi (CR, Tipo armatura, Formula PF) in card sotto. */
+   CR è nell'identità (riga in alto), Tipo armatura e Formula PF rimossi
+   (erano solo flavor descrittivi, niente impatto meccanico). */
 var hpMax=e.hp||1;var hpCur=e.hpCur!=null?e.hpCur:hpMax;var hpTemp=e.hpTemp||0;
 var hpPct=Math.max(0,Math.min(100,(hpCur/Math.max(1,hpMax))*100));
 var barCol=hpPct>50?'linear-gradient(90deg,#4a9a5a,#5dbf6f)':hpPct>25?'linear-gradient(90deg,#c49a32,#dab44a)':'linear-gradient(90deg,#c44a4a,#dc5d5d)';
@@ -3721,13 +3722,6 @@ h+='</div>';
 h+='<div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap">';
 h+='<div class="pg__cstat" style="padding:2px 5px">⚡<input class="pg__inp--inline" data-ef="init" type="number" value="'+e.init+'" style="width:3ch"></div>';
 h+='<div class="pg__cstat" style="padding:2px 5px;min-width:0;flex:1">👟<input class="pg__inp--inline" data-ef="speed" value="'+esc(e.speed)+'" placeholder="15 m, volare 45 m" style="text-align:left;width:auto;flex:1;min-width:0"></div>';
-h+='</div>';
-/* Statistiche aggiuntive (CR, Tipo armatura, Formula PF) — wrappa
-   naturalmente in colonna stretta */
-h+='<div class="es__stats" style="margin-top:5px">';
-h+='<div class="es__statcard es__statcard--w"><div class="pg__lbl">CR (Sfida)</div><input class="pg__inp" data-ef="cr" value="'+esc(e.cr)+'" placeholder="es. 21 (33.000 PE)"></div>';
-h+='<div class="es__statcard es__statcard--w"><div class="pg__lbl">Tipo armatura</div><input class="pg__inp" data-ef="acType" value="'+esc(e.acType)+'" placeholder="es. armatura naturale"></div>';
-h+='<div class="es__statcard es__statcard--w"><div class="pg__lbl">Formula PF</div><input class="pg__inp" data-ef="hpDice" value="'+esc(e.hpDice)+'" placeholder="es. 18d10 + 144"></div>';
 h+='</div>';
 h+='</div>';
 h+='<div class="pg__sec"><div class="pg__sec-title">💪 Caratteristiche</div><div class="pg__abs">';
