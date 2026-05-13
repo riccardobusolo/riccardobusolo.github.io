@@ -1238,14 +1238,16 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 
 /* SOUNDBOARD */
 .sboard__bar{display:flex;gap:4px;margin-bottom:8px;align-items:center}
-/* + Aggiungi audio: bottone gold sostituisce la zona drag full-width.
-   Il drag&drop ora funziona su tutta la finestra soundboard. */
-.sboard__add{font-size:.95rem;line-height:1;padding:3px 11px;border-radius:5px;border:1px solid rgba(196,154,50,.45);background:rgba(196,154,50,.1);color:var(--gold);cursor:var(--cur-pointer);transition:all .15s;font-weight:600;font-family:var(--mono)}
+/* + Aggiungi suono: pulsante gold dedicato in riga propria, sopra la
+   barra fav/archivio. Click → apre il file picker; drag su tutta la
+   finestra funziona comunque per il caricamento. */
+.sboard__add{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;font-size:.72rem;line-height:1;padding:8px 12px;border-radius:6px;border:1px solid rgba(196,154,50,.45);background:rgba(196,154,50,.1);color:var(--gold);cursor:var(--cur-pointer);transition:all .15s;font-weight:600;font-family:var(--mono);letter-spacing:.04em;margin-bottom:8px}
 .sboard__add:hover{border-color:var(--gold);background:rgba(196,154,50,.22)}
-.sboard__add:active{transform:scale(.94)}
-/* Feedback drag-over: outline gold dashed sull'intera finestra
-   quando un file audio sta per essere droppato. */
-#winSound.sup--over{outline:2px dashed var(--gold);outline-offset:-6px;background:rgba(196,154,50,.04)}
+.sboard__add:active{transform:scale(.985)}
+/* Feedback drag-over: outline gold dashed SOLO sul body (.wb), non
+   sull'intera finestra — altrimenti il bordo superiore viene coperto
+   dalla barra intestazione (.wh) della .win e diventa invisibile. */
+#winSound.sup--over .wb{outline:2px dashed var(--gold);outline-offset:-4px;background:rgba(196,154,50,.04)}
 .sboard__fb{font-size:.8rem;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:var(--cur-pointer);transition:all .15s;line-height:1}.sboard__fb:hover{border-color:var(--gold);color:var(--gold)}.sboard__fb--on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.1)}
 .sboard__cnt{font-family:var(--mono);font-size:.56rem;color:var(--muted);margin-left:auto}
 .sboard{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:6px}
@@ -2002,7 +2004,8 @@ body.mp-sb-dragging .mp__sb-item:not(.on):not(.mp__sb-item--drag):not(.mp__sb-it
 <!-- SOUNDBOARD -->
 <div class="win" id="winSound"><div class="wh"><div class="wh__i"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></div><div class="wh__t">Soundboard</div><button class="wh__x" data-close="sound">&times;</button></div><div class="wb">
 <input type="file" id="supInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac,.webm" multiple style="display:none">
-<div class="sboard__bar"><button class="sboard__add" id="sbAdd" title="Aggiungi audio (o trascina file nella finestra)">+</button><button class="sboard__fb" id="sbFav" title="Preferiti">★</button><button class="sboard__fb" id="sbArch" title="Archiviati">📦</button><span class="sboard__cnt" id="sbCount"></span></div>
+<button class="sboard__add" id="sbAdd" title="Clicca o trascina file audio nella finestra">+ Aggiungi suono</button>
+<div class="sboard__bar"><button class="sboard__fb" id="sbFav" title="Preferiti">★</button><button class="sboard__fb" id="sbArch" title="Archiviati">📦</button><span class="sboard__cnt" id="sbCount"></span></div>
 <div class="sboard" id="sBoard"></div>
 </div></div>
 
