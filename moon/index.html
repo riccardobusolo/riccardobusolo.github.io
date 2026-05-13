@@ -1237,7 +1237,10 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .sp-md__btn--save{background:rgba(74,154,90,.15);color:#4a9a5a;border-color:rgba(74,154,90,.45)}.sp-md__btn--save:hover{background:rgba(74,154,90,.28);color:#4a9a5a}
 
 /* SOUNDBOARD */
-.sboard__bar{display:flex;gap:4px;margin-bottom:8px;align-items:center}
+/* Allinea la barra filtri della soundboard al pattern .cf-filters di
+   Personaggi: 3 cf-filter mutuamente esclusivi + count text a destra. */
+.sboard__filters{margin:0 0 8px}
+.sboard__filters .sboard__cnt{margin-left:auto;align-self:center}
 /* + Aggiungi suono: pulsante gold dedicato in riga propria, sopra la
    barra fav/archivio. Click → apre il file picker; drag su tutta la
    finestra funziona comunque per il caricamento. */
@@ -1261,7 +1264,6 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .sb__upload-pct{color:var(--gold);font-weight:600;font-size:.66rem;flex-shrink:0;font-variant-numeric:tabular-nums;min-width:36px;text-align:right}
 .sb__upload-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;position:relative}
 .sb__upload-prog{height:100%;background:linear-gradient(90deg,var(--gold) 0%,rgba(220,180,80,1) 100%);width:0%;transition:width .15s linear;box-shadow:0 0 6px rgba(196,154,50,.45);border-radius:3px}
-.sboard__fb{font-size:.8rem;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:var(--cur-pointer);transition:all .15s;line-height:1}.sboard__fb:hover{border-color:var(--gold);color:var(--gold)}.sboard__fb--on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.1)}
 .sboard__cnt{font-family:var(--mono);font-size:.56rem;color:var(--muted);margin-left:auto}
 .sboard{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:6px}
 .spad{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;padding-left:6px;display:flex;flex-direction:column;gap:6px;transition:border-color .2s,opacity .2s;position:relative}.spad:hover{border-color:var(--bh)}.spad--play{border-color:rgba(196,154,50,.3)}.spad--drag{opacity:.25;border-style:dashed}.spad--over{border-color:var(--gold);border-style:dashed}
@@ -2018,7 +2020,12 @@ body.mp-sb-dragging .mp__sb-item:not(.on):not(.mp__sb-item--drag):not(.mp__sb-it
 <div class="win" id="winSound"><div class="wh"><div class="wh__i"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></div><div class="wh__t">Soundboard</div><button class="wh__x" data-close="sound">&times;</button></div><div class="wb">
 <input type="file" id="supInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac,.webm" multiple style="display:none">
 <button class="sboard__add" id="sbAdd" title="Clicca o trascina file audio nella finestra">+ Aggiungi suono</button>
-<div class="sboard__bar"><button class="sboard__fb" id="sbFav" title="Preferiti">★</button><button class="sboard__fb" id="sbArch" title="Archiviati">📦</button><span class="sboard__cnt" id="sbCount"></span></div>
+<div class="cf-filters sboard__filters">
+<button class="cf-filter" id="sbFiltFav" type="button" title="Mostra solo suoni preferiti"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> Preferiti</button>
+<button class="cf-filter on" id="sbFiltAll" type="button" title="Mostra tutti i suoni (non archiviati)"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg> Suoni</button>
+<button class="cf-filter" id="sbFiltArch" type="button" title="Mostra solo suoni archiviati"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 L3 21 L21 21 L21 11"/><line x1="12" y1="3" x2="12" y2="13"/><polyline points="9 9 12 13 15 9"/></svg> Archiviati</button>
+<span class="sboard__cnt" id="sbCount"></span>
+</div>
 <div class="sb__uploads" id="sbUploads"></div>
 <div class="sboard" id="sBoard"></div>
 </div></div>
@@ -3800,7 +3807,10 @@ cRen();
 var SOUNDS_KEY='cm_sounds_list';
 var rafId=null;
 var playing={};
-var showFav=false,showArch=false;
+/* Filtro soundboard: pattern Personaggi (mutuamente esclusivo, sempre
+   uno attivo, default 'all'). Sostituisce le vecchie flag showFav/showArch
+   toggle. Stato: 'all' | 'fav' | 'arch'. */
+var filter='all';
 function _loadSounds(){try{return JSON.parse(localStorage.getItem(SOUNDS_KEY)||'[]')||[]}catch(e){return []}}
 function _saveSounds(arr){try{localStorage.setItem(SOUNDS_KEY,JSON.stringify(arr));return true}catch(e){console.error('saveSounds:',e);return false}}
 var _lastSoundId=0;
@@ -3844,24 +3854,24 @@ function addS(file,cb){
 }
 window.addEventListener('cm:migration:done',function(){if(typeof render==='function')render()});
 var board=document.getElementById('sBoard'),sbCount=document.getElementById('sbCount');
-var sbFavBtn=document.getElementById('sbFav'),sbArchBtn=document.getElementById('sbArch');
-sbFavBtn.addEventListener('click',function(){showFav=!showFav;if(showFav)showArch=false;sbFavBtn.classList.toggle('sboard__fb--on',showFav);sbArchBtn.classList.toggle('sboard__fb--on',showArch);render()});
-sbArchBtn.addEventListener('click',function(){showArch=!showArch;if(showArch)showFav=false;sbArchBtn.classList.toggle('sboard__fb--on',showArch);sbFavBtn.classList.toggle('sboard__fb--on',showFav);render()});
+/* Filtro a 3 stati mutualmente esclusivi (pattern Personaggi line 3484):
+   click su un filter spegne gli altri, almeno uno è sempre on. */
+['sbFiltFav','sbFiltAll','sbFiltArch'].forEach(function(id){var b=document.getElementById(id);if(!b)return;b.onclick=function(){if(b.classList.contains('on'))return;document.querySelectorAll('#winSound .cf-filter').forEach(function(x){x.classList.remove('on')});b.classList.add('on');filter=id==='sbFiltFav'?'fav':id==='sbFiltArch'?'arch':'all';render()}});
 function fmtT(s){if(isNaN(s))s=0;var m=Math.floor(s/60);s=Math.floor(s%60);return m+':'+String(s).padStart(2,'0')}
 function isPlaying(id){return playing[id]&&!playing[id].audio.paused}
 function isPaused(id){return playing[id]&&playing[id].audio.paused}
 function render(){getAll(function(allSounds){
 allSounds.forEach(function(s){if(s.pos===undefined)s.pos=s.date||Date.now();if(s.fav===undefined)s.fav=false;if(s.archived===undefined)s.archived=false});
-var sounds=allSounds.filter(function(s){if(showArch)return s.archived;if(showFav)return s.fav&&!s.archived;return !s.archived});
+var sounds=allSounds.filter(function(s){if(filter==='arch')return s.archived;if(filter==='fav')return s.fav&&!s.archived;return !s.archived});
 sounds.sort(function(a,b){return(a.pos||0)-(b.pos||0)});
 var total=allSounds.filter(function(s){return!s.archived}).length;
 var archN=allSounds.filter(function(s){return s.archived}).length;
 var favN=allSounds.filter(function(s){return s.fav&&!s.archived}).length;
-var label=showArch?'Archiviati: '+archN:showFav?'Preferiti: '+favN:total+' suon'+(total===1?'o':'i');
-if(archN&&!showArch)label+=' ('+archN+' archiviati)';
+var label=filter==='arch'?'Archiviati: '+archN:filter==='fav'?'Preferiti: '+favN:total+' suon'+(total===1?'o':'i');
+if(archN&&filter!=='arch')label+=' ('+archN+' archiviati)';
 sbCount.textContent=label;
 board.innerHTML='';
-if(!sounds.length){board.innerHTML='<div style="text-align:center;padding:16px;font-family:var(--mono);font-size:.58rem;color:var(--muted)">'+(showArch?'Nessun suono archiviato':showFav?'Nessun preferito':'Nessun suono caricato')+'</div>';return}
+if(!sounds.length){board.innerHTML='<div style="text-align:center;padding:16px;font-family:var(--mono);font-size:.58rem;color:var(--muted)">'+(filter==='arch'?'Nessun suono archiviato':filter==='fav'?'Nessun preferito':'Nessun suono caricato')+'</div>';return}
 sounds.forEach(function(s){var isP=isPlaying(s.id),isPa=isPaused(s.id);var d=document.createElement('div');d.className='spad'+(isP?' spad--play':'');d.dataset.sid=s.id;
 var starCls='spad__star'+(s.fav?' spad__star--on':'');
 var archIcon=s.archived?'\uD83D\uDCE4':'\uD83D\uDCE5';
