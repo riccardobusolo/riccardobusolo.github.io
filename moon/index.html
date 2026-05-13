@@ -5791,8 +5791,12 @@ function moveItem(itemId,targetFolderId){if(!canMoveInto(itemId,targetFolderId))
    l'ordine in docs è quello di rendering (no sort in renderSb). */
 function reorderItem(itemId,targetId,above){if(itemId===targetId)return false;var item=findById(itemId);var target=findById(targetId);if(!item||!target)return false;/* Cycle check: una cartella non può finire dentro un suo discendente */if(!canMoveInto(itemId,target.parentId))return false;item.parentId=target.parentId;item.updated=Date.now();var itemIdx=docs.indexOf(item);if(itemIdx>=0)docs.splice(itemIdx,1);var targetIdx=docs.indexOf(target);if(targetIdx<0)targetIdx=docs.length;if(!above)targetIdx++;docs.splice(targetIdx,0,item);save();return true}
 function moveToEndOfFolder(itemId,folderId){if(!canMoveInto(itemId,folderId))return false;var item=findById(itemId);if(!item)return false;item.parentId=folderId;item.updated=Date.now();var idx=docs.indexOf(item);if(idx>=0)docs.splice(idx,1);docs.push(item);save();return true}
-function enterFolder(id){if(id&&!isFolder(findById(id)))return;currentFolderId=id;render()}
-function goUpFolder(){if(!currentFolderId)return;var f=findById(currentFolderId);currentFolderId=f?f.parentId:null;render()}
+/* Navigare DENTRO una cartella svuota la selezione editor — non vogliamo
+   che resti la preview della cartella appena entrata (la lista contenuti
+   è già visibile come "Cartella vuota" o "Nessun documento", il pannello
+   destro deve essere vuoto fino a che l'utente non sceglie un doc). */
+function enterFolder(id){if(id&&!isFolder(findById(id)))return;currentFolderId=id;currentId=null;render()}
+function goUpFolder(){if(!currentFolderId)return;var f=findById(currentFolderId);currentFolderId=f?f.parentId:null;currentId=null;render()}
 function getFolderPath(folderId){var path=[];var cur=folderId;while(cur){var f=findById(cur);if(!f)break;path.unshift(f);cur=f.parentId}return path}
 function deleteItem(id){var it=findById(id);if(!it)return;if(isFolder(it)){var desc=getDescendantIds(id);desc.forEach(function(did){var idx=docs.findIndex(function(d){return d.id===did});if(idx>=0)docs.splice(idx,1)});if(currentId&&desc.indexOf(currentId)>=0)currentId=null}var idx=docs.findIndex(function(d){return d.id===id});if(idx>=0)docs.splice(idx,1);if(currentId===id)currentId=null;if(currentFolderId===id)currentFolderId=it.parentId;save();render()}
 function renameItem(id,newTitle){var it=findById(id);if(!it)return;it.title=newTitle||'';it.updated=Date.now();save();render()}
