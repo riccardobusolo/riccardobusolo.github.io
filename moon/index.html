@@ -1273,7 +1273,11 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .spad__grip{cursor:var(--cur-grab);color:var(--muted);font-size:.7rem;padding:2px 4px;flex-shrink:0;opacity:.35;transition:opacity .15s;user-select:none;line-height:1}.spad__grip:hover{opacity:.8;color:var(--dim)}.spad__grip:active{cursor:var(--cur-grabbing)}
 .spad__star{background:none;border:none;font-size:.7rem;cursor:var(--cur-pointer);color:var(--muted);padding:0 2px;transition:all .15s;line-height:1;flex-shrink:0;opacity:.35}.spad__star:hover{color:var(--gold);opacity:1;transform:scale(1.15)}.spad__star--on{color:var(--gold);opacity:1}
 .spad__emoji{font-size:1.2rem;min-width:22px;text-align:center}
-.spad__img{width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0}
+/* Avatar pad: dimensionato per matchare l'altezza naturale di un head
+   row senza immagine (~24px, dettata dall'emoji 1.2rem + acts 20×20).
+   Così le sezioni con/senza immagine hanno la stessa altezza, e l'avatar
+   è il più grande possibile entro quel vincolo. */
+.spad__img{width:24px;height:24px;border-radius:5px;object-fit:cover;flex-shrink:0}
 .spad__info{flex:1;min-width:0}
 .spad__title{font-family:var(--mono);font-size:.68rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .spad__desc{font-family:var(--mono);font-size:.5rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
