@@ -539,8 +539,14 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
    score, item list dinamica con nome+textarea descrizione. */
 #esheetBody{display:flex;flex-direction:column;gap:6px}
 .es__hdr{display:flex;gap:10px;align-items:center}
-.es__emoji{font-size:1.85rem;cursor:var(--cur-pointer);background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:4px 9px;line-height:1;transition:all .12s;flex-shrink:0}
-.es__emoji:hover{border-color:var(--gold);transform:scale(1.05)}
+/* Slot foto sheet nemico: 64×64 square, click apre hpPhotoPop (context
+   'en'). Sostituisce l'emoji nel header. La foto viene compressa a
+   200×200 quadrata WebP via processEnImg. */
+.es__photo-slot{width:64px;height:64px;flex-shrink:0;background:var(--bg2);border:1px dashed var(--border);border-radius:8px;overflow:hidden;cursor:var(--cur-pointer);padding:0;transition:all .15s;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.es__photo-slot:hover{border-color:var(--gold);background:rgba(196,154,50,.06);color:var(--gold);transform:scale(1.03)}
+.es__photo-slot--has{border-style:solid}
+.es__photo-slot img{width:100%;height:100%;object-fit:cover;display:block}
+.es__photo-slot svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .es__hdr-right{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
 .es__name{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--gold);background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:5px 9px;outline:none;width:100%;box-sizing:border-box;transition:border-color .12s}
 .es__name:focus{border-color:var(--gold)}
@@ -3662,8 +3668,11 @@ function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','s
    se hpCur missing → hpCur = hp. */if(e.hpCur==null)e.hpCur=e.hp||0;if(e.hpTemp==null)e.hpTemp=0}
 function _esSecHTML(label,key,items){var h='<div class="pg__sec"><div class="pg__sec-title">'+label+'<button class="pg__sec-add" data-essec="'+key+'" type="button">+ Aggiungi</button></div>';if(!items.length){h+='<div class="es__empty">Nessun elemento — usa + Aggiungi</div>'}else{h+='<div class="es__items" data-essec="'+key+'">';items.forEach(function(it,i){h+='<div class="es__item" data-esitem="'+i+'"><div class="es__item-row"><input class="es__item-name" data-esfield="name" value="'+esc(it.name||'')+'" placeholder="Nome"><button class="es__item-del" data-esdel="1" type="button" title="Elimina">×</button></div><textarea class="es__item-desc" data-esfield="desc" placeholder="Descrizione, formule, range, costo (es. Costa 2 Azioni)...">'+esc(it.desc||'')+'</textarea></div>'});h+='</div>'}h+='</div>';return h}
 function buildEsheet(e){var h='';
-/* HEADER: emoji + nome + meta (taglia · tipo · allineamento) inline */
-h+='<div class="es__hdr"><button class="es__emoji" id="esEmoji" type="button">'+(e.emoji||'👾')+'</button><div class="es__hdr-right"><input class="es__name" data-ef="name" value="'+esc(e.name||'')+'" placeholder="Nome del mostro"><div class="es__meta"><input class="es__meta-inp" data-ef="size" value="'+esc(e.size)+'" placeholder="Taglia"><span class="es__meta-dot">·</span><input class="es__meta-inp" data-ef="type" value="'+esc(e.type)+'" placeholder="Tipo"><span class="es__meta-dot">·</span><input class="es__meta-inp" data-ef="alignment" value="'+esc(e.alignment)+'" placeholder="Allineamento"></div></div></div>';
+/* HEADER: slot foto + nome + meta (taglia · tipo · allineamento) inline.
+   Lo slot foto sostituisce il vecchio emoji button — click apre hpPhotoPop
+   (context 'en'), upload compresso a 200×200 webp via processEnImg. */
+var photoSlotInner=e.photo?'<img src="'+esc(e.photo)+'" alt="">':'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+h+='<div class="es__hdr"><button class="es__photo-slot'+(e.photo?' es__photo-slot--has':'')+'" id="esPhotoSlot" type="button" title="Clicca per caricare una foto (200×200 webp)">'+photoSlotInner+'</button><div class="es__hdr-right"><input class="es__name" data-ef="name" value="'+esc(e.name||'')+'" placeholder="Nome del mostro"><div class="es__meta"><input class="es__meta-inp" data-ef="size" value="'+esc(e.size)+'" placeholder="Taglia"><span class="es__meta-dot">·</span><input class="es__meta-inp" data-ef="type" value="'+esc(e.type)+'" placeholder="Tipo"><span class="es__meta-dot">·</span><input class="es__meta-inp" data-ef="alignment" value="'+esc(e.alignment)+'" placeholder="Allineamento"></div></div></div>';
 /* === LAYOUT 3-COLONNE pg__sheet/pg__col come scheda PG. Su largh
    stretta wrappa naturalmente (flex:1 1 240px). La sezione Combattimento
    sta dentro la COL 1 insieme a Caratteristiche / Difese / Sensi. */
@@ -3748,7 +3757,9 @@ var admg=e.target.closest('[data-eapplydmg]');if(admg){var inp=document.getEleme
 var aheal=e.target.closest('[data-eapplyheal]');if(aheal){var inp=document.getElementById('esHealIn');var hp=Math.abs(parseInt(inp.value)||1);if(esObj.hpCur==null)esObj.hpCur=esObj.hp;esObj.hpCur=Math.min(esObj.hp||0,esObj.hpCur+hp);sE();renE();openEsheet(enemies.indexOf(esObj));return}
 /* Imposta PF temporanei (non si sommano, sostituiscono come da regole D&D) */
 var atmp=e.target.closest('[data-eapplytmp]');if(atmp){var inp=document.getElementById('esTmpIn');var t=Math.abs(parseInt(inp.value)||0);esObj.hpTemp=Math.max(esObj.hpTemp||0,t);sE();renE();openEsheet(enemies.indexOf(esObj));return}
-if(e.target.id==='esEmoji'||e.target.closest('#esEmoji')){var btn=document.getElementById('esEmoji');var r=btn.getBoundingClientRect();var ep=document.getElementById('epick');ep.style.top=r.bottom+4+'px';ep.style.left=Math.min(r.left,window.innerWidth-390)+'px';epCb=function(em){esObj.emoji=em;sE();renE();btn.textContent=em};ep.classList.add('on');return}var add=e.target.closest('.es__add[data-essec]');if(add){var key=add.dataset.essec;if(!Array.isArray(esObj[key]))esObj[key]=[];esObj[key].push({name:'',desc:''});sE();openEsheet(enemies.indexOf(esObj));setTimeout(function(){var items=document.querySelectorAll('.es__items[data-essec="'+key+'"] [data-esitem]');var last=items[items.length-1];if(last){var inp=last.querySelector('.es__item-name');if(inp)inp.focus()}},10);return}var del=e.target.closest('[data-esdel]');if(del){var item=del.closest('[data-esitem]');var sec=del.closest('.es__items[data-essec]');if(item&&sec){var key=sec.dataset.essec;var ii=parseInt(item.dataset.esitem);if(esObj[key]&&esObj[key][ii]!=null){esObj[key].splice(ii,1);sE();openEsheet(enemies.indexOf(esObj))}}return}if(e.target.id==='esheetDel'||e.target.closest('#esheetDel')){var idx=enemies.indexOf(esObj);var nm=esObj.name||'(senza nome)';if(confirm('Eliminare il nemico "'+nm+'"?')){if(idx>=0)enemies.splice(idx,1);sE();renE();closeEsheet()}return}});
+/* Slot foto: apre hpPhotoPop con context 'en' — stesso popup usato dalla
+   foto in lista, ma con processEnImg per resize a 200×200 webp. */
+if(e.target.id==='esPhotoSlot'||e.target.closest('#esPhotoSlot')){var btn=document.getElementById('esPhotoSlot');var idx=enemies.indexOf(esObj);if(idx<0)return;if(hpPhotoPop.classList.contains('on')&&photoCtx.type==='en'&&photoCtx.i===idx){closePhotoPop()}else{openPhotoPop(idx,btn,'en')}return}var add=e.target.closest('.es__add[data-essec]');if(add){var key=add.dataset.essec;if(!Array.isArray(esObj[key]))esObj[key]=[];esObj[key].push({name:'',desc:''});sE();openEsheet(enemies.indexOf(esObj));setTimeout(function(){var items=document.querySelectorAll('.es__items[data-essec="'+key+'"] [data-esitem]');var last=items[items.length-1];if(last){var inp=last.querySelector('.es__item-name');if(inp)inp.focus()}},10);return}var del=e.target.closest('[data-esdel]');if(del){var item=del.closest('[data-esitem]');var sec=del.closest('.es__items[data-essec]');if(item&&sec){var key=sec.dataset.essec;var ii=parseInt(item.dataset.esitem);if(esObj[key]&&esObj[key][ii]!=null){esObj[key].splice(ii,1);sE();openEsheet(enemies.indexOf(esObj))}}return}if(e.target.id==='esheetDel'||e.target.closest('#esheetDel')){var idx=enemies.indexOf(esObj);var nm=esObj.name||'(senza nome)';if(confirm('Eliminare il nemico "'+nm+'"?')){if(idx>=0)enemies.splice(idx,1);sE();renE();closeEsheet()}return}});
 /* Cross-drag: chars → HP */
 var chDragIdx=null;
 document.getElementById('chList').addEventListener('dragstart',function(e){var row=e.target.closest('[data-idx]');if(row)chDragIdx=parseInt(row.dataset.idx)});
@@ -3846,6 +3857,12 @@ hb.addEventListener('drop',function(e){if(chDragIdx===null)return;e.preventDefau
 /* COMBATTIMENTO */
 var hpD=JSON.parse(localStorage.getItem('cm_hp')||'[]');
 hpD.forEach(function(c){if(c.ac==null)c.ac=10;if(c.tmp==null){if(c.hp>c.max){c.tmp=c.hp-c.max;c.hp=c.max}else{c.tmp=0}}if(c.photo==null)c.photo='';if(c.photoFull==null)c.photoFull=c.photo});
+/* Foto nemico: crop quadrato centrato + resize a 200×200 + WebP 0.82.
+   Diverso da processHpImg (chars/HP) che usa max 120 thumb + 400 full
+   con aspect ratio preservato. Qui un singolo dataURL square viene
+   usato sia come thumb che come full (200 è abbastanza per il sheet
+   header 64×64 retina e per la riga 28×28). */
+function processEnImg(file,cb){if(!file||!file.type.startsWith('image/'))return;var reader=new FileReader();reader.onload=function(){var img=new Image();img.onload=function(){var SIZE=200;var sz=Math.min(img.width,img.height);var sx=(img.width-sz)/2,sy=(img.height-sz)/2;var cv=document.createElement('canvas');cv.width=SIZE;cv.height=SIZE;var ctx=cv.getContext('2d');ctx.imageSmoothingQuality='high';ctx.drawImage(img,sx,sy,sz,sz,0,0,SIZE,SIZE);var url=cv.toDataURL('image/webp',0.82);if(url.indexOf('image/webp')<0)url=cv.toDataURL('image/jpeg',0.82);cb(url,url)};img.onerror=function(){};img.src=reader.result};reader.readAsDataURL(file)}
 function processHpImg(file,cb){if(!file||!file.type.startsWith('image/'))return;var reader=new FileReader();reader.onload=function(){var img=new Image();img.onload=function(){
 /* Mantiene aspect ratio originale: l'utente può poi trascinare per posizionare
    la porzione visibile nella miniatura quadrata della barra (object-fit:cover). */
@@ -3902,7 +3919,8 @@ document.getElementById('cremindOv').onclick=function(){document.getElementById(
 /* PHOTO AVATAR */
 var hpPhotoInput=document.getElementById('hpPhotoInput'),hpPhotoPop=document.getElementById('hpPhotoPop'),hpPhotoDropZone=document.getElementById('hpPhotoDropZone'),hpPhotoRm=document.getElementById('hpPhotoRm'),hpPhotoPreview=document.getElementById('hpPhotoPreview'),hpPhotoPreviewImg=document.getElementById('hpPhotoPreviewImg'),photoCtx={type:null,i:-1};
 function _pcArr(){return photoCtx.type==='ch'?chars:photoCtx.type==='en'?enemies:hpD}
-function _pcSave(){if(photoCtx.type==='ch'){sC();renC()}else if(photoCtx.type==='en'){sE();renE()}else{sH();renH()}}
+function _pcSave(){if(photoCtx.type==='ch'){sC();renC()}else if(photoCtx.type==='en'){sE();renE();/* Se la sheet del nemico modificato è aperta, ri-renderizzala
+     per mostrare la nuova foto/photo offset nel slot del header. */if(typeof esObj!=='undefined'&&esObj===enemies[photoCtx.i]&&typeof openEsheet==='function')openEsheet(photoCtx.i)}else{sH();renH()}}
 function closePhotoPop(){hpPhotoPop.classList.remove('on')}
 function openPhotoPop(idx,anchor,type){photoCtx.type=type||'hp';photoCtx.i=idx;var arr=_pcArr();var r=anchor.getBoundingClientRect();hpPhotoPop.style.top=r.bottom+4+'px';hpPhotoPop.style.left=Math.min(r.left,window.innerWidth-220)+'px';var hasP=!!arr[idx].photo;hpPhotoRm.className='hr__ppop-rm'+(hasP?' on':'');hpPhotoPreview.className='hr__ppop-preview'+(hasP?' on':'');var posHint=document.getElementById('hpPhotoPosHint');if(posHint)posHint.style.display=hasP?'block':'none';if(hasP){hpPhotoPreviewImg.src=arr[idx].photoFull||arr[idx].photo;var ox=arr[idx].photoOffsetX!=null?arr[idx].photoOffsetX:50;var oy=arr[idx].photoOffsetY!=null?arr[idx].photoOffsetY:50;hpPhotoPreviewImg.style.objectPosition=ox+'% '+oy+'%'}hpPhotoPop.classList.add('on')}
 /* Drag-to-position: clicca e trascina la foto preview per riposizionarla.
@@ -3920,12 +3938,12 @@ function applyPhoto(thumb,full){var arr=_pcArr();var i=photoCtx.i;arr[i].photo=t
 document.getElementById('hpList').addEventListener('click',function(e){var ph=e.target.closest('.hr__photo');if(!ph)return;var idx=parseInt(ph.dataset.i);if(hpPhotoPop.classList.contains('on')&&photoCtx.type==='hp'&&photoCtx.i===idx){closePhotoPop();return}openPhotoPop(idx,ph,'hp')});
 document.getElementById('chList').addEventListener('click',function(e){var ph=e.target.closest('.hr__photo');if(!ph)return;e.stopPropagation();var idx=parseInt(ph.dataset.i);if(hpPhotoPop.classList.contains('on')&&photoCtx.type==='ch'&&photoCtx.i===idx){closePhotoPop();return}openPhotoPop(idx,ph,'ch')});
 hpPhotoDropZone.addEventListener('click',function(){hpPhotoInput.value='';hpPhotoInput.click()});
-hpPhotoInput.addEventListener('change',function(){if(!this.files.length||photoCtx.i<0)return;processHpImg(this.files[0],function(thumb,full){applyPhoto(thumb,full)})});
+hpPhotoInput.addEventListener('change',function(){if(!this.files.length||photoCtx.i<0)return;var _fn=photoCtx.type==='en'?processEnImg:processHpImg;_fn(this.files[0],function(thumb,full){applyPhoto(thumb,full)})});
 hpPhotoDropZone.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();this.classList.add('drag-over')});
 hpPhotoDropZone.addEventListener('dragleave',function(){this.classList.remove('drag-over')});
-hpPhotoDropZone.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();this.classList.remove('drag-over');var files=e.dataTransfer&&e.dataTransfer.files;if(!files||!files.length)return;var f=null;for(var k=0;k<files.length;k++){if(files[k].type.startsWith('image/')){f=files[k];break}}if(f)processHpImg(f,function(thumb,full){applyPhoto(thumb,full)})});
+hpPhotoDropZone.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();this.classList.remove('drag-over');var files=e.dataTransfer&&e.dataTransfer.files;if(!files||!files.length)return;var f=null;for(var k=0;k<files.length;k++){if(files[k].type.startsWith('image/')){f=files[k];break}}if(f){var _fn=photoCtx.type==='en'?processEnImg:processHpImg;_fn(f,function(thumb,full){applyPhoto(thumb,full)})}});
 hpPhotoRm.addEventListener('click',function(){var arr=_pcArr();var i=photoCtx.i;arr[i].photo='';arr[i].photoFull='';if(photoCtx.type==='ch'){if(arr[i].photos&&arr[i].photos.length>0)arr[i].photos.shift();if(arr[i].photos&&arr[i].photos.length>0){_chSyncAvatarFromGallery(i,function(){_pcSave();if(typeof csIdx!=='undefined'&&csIdx===i&&typeof openSheet==='function')openSheet(i)})}else{if(typeof csIdx!=='undefined'&&csIdx===i&&typeof openSheet==='function')openSheet(i);_pcSave()}closePhotoPop();return}_pcSave();closePhotoPop()});
-document.addEventListener('paste',function(e){if(!hpPhotoPop.classList.contains('on')||photoCtx.i<0)return;var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var k=0;k<items.length;k++){if(items[k].type.startsWith('image/')){e.preventDefault();processHpImg(items[k].getAsFile(),function(thumb,full){applyPhoto(thumb,full)});return}}});
+document.addEventListener('paste',function(e){if(!hpPhotoPop.classList.contains('on')||photoCtx.i<0)return;var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var k=0;k<items.length;k++){if(items[k].type.startsWith('image/')){e.preventDefault();var _fn=photoCtx.type==='en'?processEnImg:processHpImg;_fn(items[k].getAsFile(),function(thumb,full){applyPhoto(thumb,full)});return}}});
 document.addEventListener('click',function(e){if(!e.target.closest('.hr__ppop')&&!e.target.closest('.hr__photo'))closePhotoPop()});
 
 /* TIMER */
