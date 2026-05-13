@@ -3875,7 +3875,15 @@ board.innerHTML='';
 if(!sounds.length){board.innerHTML='<div style="text-align:center;padding:16px;font-family:var(--mono);font-size:.58rem;color:var(--muted)">'+(filter==='arch'?'Nessun suono archiviato':filter==='fav'?'Nessun preferito':'Nessun suono caricato')+'</div>';return}
 sounds.forEach(function(s){var isP=isPlaying(s.id),isPa=isPaused(s.id);var d=document.createElement('div');d.className='spad'+(isP?' spad--play':'');d.dataset.sid=s.id;
 var starCls='spad__star'+(s.fav?' spad__star--on':'');
-var archIcon=s.archived?'\uD83D\uDCE4':'\uD83D\uDCE5';
+/* Icone archive/unarchive coerenti col resto dell'app:
+   - Archivia (non archiviato): box + arrow DOWN (stessa del filtro
+     "Archiviati" .cf-filter + del menu Personaggi data-chact="archive")
+   - Ripristina (archiviato): tray + arrow UP (stessa di accSyncUp,
+     usata come "upload/de-archivia" altrove)
+   Ereditano stroke:currentColor da .spad__ab svg. */
+var archIcon=s.archived
+  ?'<svg viewBox="0 0 24 24" width="12" height="12"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
+  :'<svg viewBox="0 0 24 24" width="12" height="12"><path d="M3 11 L3 21 L21 21 L21 11"/><line x1="12" y1="3" x2="12" y2="13"/><polyline points="9 9 12 13 15 9"/></svg>';
 var archTitle=s.archived?'Ripristina':'Archivia';
 d.innerHTML='<div class="spad__head"><span class="spad__grip" data-grip="'+s.id+'">\u2630</span><button class="'+starCls+'" data-sfav="'+s.id+'">'+(s.fav?'\u2605':'\u2606')+'</button>'+(s.img?'<img class="spad__img" src="'+s.img+'">':'<span class="spad__emoji">'+s.emoji+'</span>')+'<div class="spad__info"><div class="spad__title">'+s.title+'</div>'+(s.desc?'<div class="spad__desc">'+s.desc+'</div>':'')+'</div><div class="spad__acts"><button class="spad__ab" data-sarch="'+s.id+'" title="'+archTitle+'">'+archIcon+'</button><button class="spad__ab" data-edit="'+s.id+'" title="Modifica"><svg viewBox="0 0 24 24" width="12" height="12"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button><button class="spad__ab" data-del="'+s.id+'" title="Elimina"><svg viewBox="0 0 24 24" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div></div><div class="spad__bar" data-seek="'+s.id+'"><div class="spad__prog" data-prog="'+s.id+'"></div></div><div class="spad__ctrls"><button class="spad__btn spad__btn--play'+(isP?' spad__btn--pause':'')+'" data-play="'+s.id+'">'+(isP?'\u275A\u275A':'\u25B6')+'</button><button class="spad__btn" data-restart="'+s.id+'" title="Ricomincia">\u21BB</button><button class="spad__btn'+(s.loop?' spad__btn--on':'')+'" data-loop="'+s.id+'" title="Loop" style="font-size:1.05rem;line-height:1;padding-bottom:1px">\u221E</button><span class="spad__time" data-time="'+s.id+'">0:00 / 0:00</span><div class="spad__volw"><svg class="spad__vicon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg><input type="range" class="spad__vol" data-vol="'+s.id+'" min="0" max="100" value="'+Math.round((s.vol||0.8)*100)+'"></div></div>';
 board.appendChild(d)});volFillAll();tickAll()})}
