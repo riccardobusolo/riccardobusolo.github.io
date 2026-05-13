@@ -112,6 +112,17 @@ function upload(input, opts){
     var xhr = new XMLHttpRequest();
     xhr.open('POST', endpointFor(resourceType), true);
     xhr.timeout = UPLOAD_TIMEOUT_MS;
+    /* Progress callback opzionale: invocato durante l'upload con
+       (ratio[0..1], loaded, total). Solo se lengthComputable è true
+       (il server deve sapere la dimensione del body). Permette agli
+       UI caller di mostrare una barra di progresso live. */
+    if(typeof opts.onProgress === 'function'){
+      xhr.upload.onprogress = function(e){
+        if(e.lengthComputable){
+          try{ opts.onProgress(e.loaded/e.total, e.loaded, e.total); }catch(_){}
+        }
+      };
+    }
     xhr.onload = function(){
       if(xhr.status >= 200 && xhr.status < 300){
         try{

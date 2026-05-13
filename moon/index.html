@@ -1248,6 +1248,19 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
    sull'intera finestra — altrimenti il bordo superiore viene coperto
    dalla barra intestazione (.wh) della .win e diventa invisibile. */
 #winSound.sup--over .wb{outline:2px dashed var(--gold);outline-offset:-4px;background:rgba(196,154,50,.04)}
+/* Container per le righe di upload in corso. Vuoto = nascosto (no gap). */
+.sb__uploads{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.sb__uploads:empty{display:none}
+/* Riga di upload: appare immediatamente al drop/pick, mostra nome del
+   file + percentuale + barra di progresso che cresce in tempo reale.
+   Sparisce automaticamente quando l'upload completa o fallisce. */
+.sb__upload-row{padding:8px 10px;border:1px solid rgba(196,154,50,.35);background:rgba(196,154,50,.06);border-radius:6px;animation:sbUpFadeIn .2s var(--ease)}
+@keyframes sbUpFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.sb__upload-info{display:flex;align-items:center;gap:8px;font-family:var(--mono);margin-bottom:6px}
+.sb__upload-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dim);font-size:.66rem}
+.sb__upload-pct{color:var(--gold);font-weight:600;font-size:.66rem;flex-shrink:0;font-variant-numeric:tabular-nums;min-width:36px;text-align:right}
+.sb__upload-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;position:relative}
+.sb__upload-prog{height:100%;background:linear-gradient(90deg,var(--gold) 0%,rgba(220,180,80,1) 100%);width:0%;transition:width .15s linear;box-shadow:0 0 6px rgba(196,154,50,.45);border-radius:3px}
 .sboard__fb{font-size:.8rem;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:var(--cur-pointer);transition:all .15s;line-height:1}.sboard__fb:hover{border-color:var(--gold);color:var(--gold)}.sboard__fb--on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.1)}
 .sboard__cnt{font-family:var(--mono);font-size:.56rem;color:var(--muted);margin-left:auto}
 .sboard{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:6px}
@@ -2006,6 +2019,7 @@ body.mp-sb-dragging .mp__sb-item:not(.on):not(.mp__sb-item--drag):not(.mp__sb-it
 <input type="file" id="supInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac,.webm" multiple style="display:none">
 <button class="sboard__add" id="sbAdd" title="Clicca o trascina file audio nella finestra">+ Aggiungi suono</button>
 <div class="sboard__bar"><button class="sboard__fb" id="sbFav" title="Preferiti">★</button><button class="sboard__fb" id="sbArch" title="Archiviati">📦</button><span class="sboard__cnt" id="sbCount"></span></div>
+<div class="sb__uploads" id="sbUploads"></div>
 <div class="sboard" id="sBoard"></div>
 </div></div>
 
@@ -3798,13 +3812,33 @@ function delS(id,cb){_saveSounds(_loadSounds().filter(function(s){return s.id!==
 function addS(file,cb){
   if(!window.cmCloud||!cmCloud.isConfigured()){alert('Cloudinary non configurato \u2014 impossibile caricare audio.');if(cb)cb();return}
   var title=file.name.replace(/\.[^.]+$/,'');
-  cmCloud.upload(file,{resourceType:'video'}).then(function(res){
+  /* Crea row placeholder con barra di progresso live. Inserita in
+     #sbUploads (separato da #sBoard cos\u00EC non viene wiped dal render).
+     Mostrata immediatamente all'avvio dell'upload, rimossa quando
+     l'upload completa o fallisce. Una row per file in upload \u2014 pi\u00F9
+     upload paralleli = pi\u00F9 row. */
+  var uploadsEl=document.getElementById('sbUploads');
+  var row=document.createElement('div');row.className='sb__upload-row';
+  var info=document.createElement('div');info.className='sb__upload-info';
+  var nameEl=document.createElement('span');nameEl.className='sb__upload-name';nameEl.textContent=title;
+  var pctEl=document.createElement('span');pctEl.className='sb__upload-pct';pctEl.textContent='0%';
+  info.appendChild(nameEl);info.appendChild(pctEl);
+  var bar=document.createElement('div');bar.className='sb__upload-bar';
+  var prog=document.createElement('div');prog.className='sb__upload-prog';
+  bar.appendChild(prog);row.appendChild(info);row.appendChild(bar);
+  if(uploadsEl)uploadsEl.appendChild(row);
+  function updateProg(ratio){var pct=Math.max(0,Math.min(100,Math.round(ratio*100)));prog.style.width=pct+'%';pctEl.textContent=pct+'%'}
+  function cleanupRow(){if(row&&row.parentNode)row.parentNode.removeChild(row)}
+  cmCloud.upload(file,{resourceType:'video',onProgress:updateProg}).then(function(res){
+    updateProg(1);
     var rec={id:_nextSoundId(),name:file.name,title:title,desc:'',emoji:'\uD83C\uDFB5',img:'',type:file.type,size:file.size,data:res.url,publicId:res.publicId||null,loop:false,vol:0.8,pos:Date.now(),fav:false,archived:false};
     var arr=_loadSounds();arr.push(rec);_saveSounds(arr);
+    cleanupRow();
     if(cb)cb();
   }).catch(function(e){
     console.error('[cmCloud] sound upload fallito:',e.message);
     alert('Errore caricamento audio "'+title+'": '+e.message);
+    cleanupRow();
     if(cb)cb();
   });
 }
