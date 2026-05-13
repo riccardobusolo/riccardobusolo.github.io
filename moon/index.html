@@ -1237,8 +1237,15 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .sp-md__btn--save{background:rgba(74,154,90,.15);color:#4a9a5a;border-color:rgba(74,154,90,.45)}.sp-md__btn--save:hover{background:rgba(74,154,90,.28);color:#4a9a5a}
 
 /* SOUNDBOARD */
-.sup{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:18px;border:2px dashed var(--border);border-radius:8px;cursor:var(--cur-pointer);transition:all .2s;margin-bottom:10px;min-height:60px}.sup:hover,.sup--over{border-color:var(--gold);background:rgba(196,154,50,.04)}.sup__icon{font-size:1.2rem}.sup__text{font-family:var(--mono);font-size:.56rem;color:var(--muted);text-align:center}
 .sboard__bar{display:flex;gap:4px;margin-bottom:8px;align-items:center}
+/* + Aggiungi audio: bottone gold sostituisce la zona drag full-width.
+   Il drag&drop ora funziona su tutta la finestra soundboard. */
+.sboard__add{font-size:.95rem;line-height:1;padding:3px 11px;border-radius:5px;border:1px solid rgba(196,154,50,.45);background:rgba(196,154,50,.1);color:var(--gold);cursor:var(--cur-pointer);transition:all .15s;font-weight:600;font-family:var(--mono)}
+.sboard__add:hover{border-color:var(--gold);background:rgba(196,154,50,.22)}
+.sboard__add:active{transform:scale(.94)}
+/* Feedback drag-over: outline gold dashed sull'intera finestra
+   quando un file audio sta per essere droppato. */
+#winSound.sup--over{outline:2px dashed var(--gold);outline-offset:-6px;background:rgba(196,154,50,.04)}
 .sboard__fb{font-size:.8rem;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:var(--cur-pointer);transition:all .15s;line-height:1}.sboard__fb:hover{border-color:var(--gold);color:var(--gold)}.sboard__fb--on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,50,.1)}
 .sboard__cnt{font-family:var(--mono);font-size:.56rem;color:var(--muted);margin-left:auto}
 .sboard{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:6px}
@@ -1994,8 +2001,8 @@ body.mp-sb-dragging .mp__sb-item:not(.on):not(.mp__sb-item--drag):not(.mp__sb-it
 
 <!-- SOUNDBOARD -->
 <div class="win" id="winSound"><div class="wh"><div class="wh__i"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></div><div class="wh__t">Soundboard</div><button class="wh__x" data-close="sound">&times;</button></div><div class="wb">
-<div class="sup" id="supZone"><span class="sup__icon">🎵</span><span class="sup__text">Trascina audio o clicca per caricare</span><input type="file" id="supInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac,.webm" multiple style="display:none"></div>
-<div class="sboard__bar"><button class="sboard__fb" id="sbFav" title="Preferiti">★</button><button class="sboard__fb" id="sbArch" title="Archiviati">📦</button><span class="sboard__cnt" id="sbCount"></span></div>
+<input type="file" id="supInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac,.webm" multiple style="display:none">
+<div class="sboard__bar"><button class="sboard__add" id="sbAdd" title="Aggiungi audio (o trascina file nella finestra)">+</button><button class="sboard__fb" id="sbFav" title="Preferiti">★</button><button class="sboard__fb" id="sbArch" title="Archiviati">📦</button><span class="sboard__cnt" id="sbCount"></span></div>
 <div class="sboard" id="sBoard"></div>
 </div></div>
 
@@ -3830,12 +3837,17 @@ function stopS(id){var p=playing[id];if(p){p.audio.pause();p.audio.currentTime=0
 function stopAll(){for(var k in playing){var p=playing[k];if(p){p.audio.pause();p.audio.currentTime=0;if(p.objUrl)URL.revokeObjectURL(p.objUrl)}}playing={};render()}
 function renderPad(id){var el=board.querySelector('[data-sid="'+id+'"]');if(!el)return;var isP=isPlaying(id);el.classList.toggle('spad--play',isP);var btn=el.querySelector('[data-play="'+id+'"]');if(btn){btn.classList.toggle('spad__btn--pause',isP);btn.textContent=isP?'\u275A\u275A':'\u25B6'}}
 /* Upload */
-var sup=document.getElementById('supZone'),sIn=document.getElementById('supInput');
-sup.addEventListener('click',function(e){if(e.target===sIn)return;e.preventDefault();e.stopPropagation();sIn.click()});
+var sIn=document.getElementById('supInput'),sbAdd=document.getElementById('sbAdd'),winSound=document.getElementById('winSound');
+/* Pulsante + apre il file picker */
+sbAdd.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();sIn.click()});
 sIn.addEventListener('change',function(){if(!sIn.files.length)return;var p=sIn.files.length,done=0;Array.from(sIn.files).forEach(function(f){addS(f,function(){done++;if(done>=p){render();sIn.value=''}})})});
-sup.addEventListener('dragover',function(e){e.preventDefault();sup.classList.add('sup--over')});
-sup.addEventListener('dragleave',function(){sup.classList.remove('sup--over')});
-sup.addEventListener('drop',function(e){e.preventDefault();sup.classList.remove('sup--over');if(!e.dataTransfer.files.length)return;var p=e.dataTransfer.files.length,done=0;Array.from(e.dataTransfer.files).forEach(function(f){addS(f,function(){done++;if(done>=p)render()})})});
+/* Drag & drop su TUTTA la finestra soundboard (non più una zona dedicata).
+   Il check sui types previene il preventDefault inutile per drag non-file
+   (es. trascinamento di un pad per riordino, che usa mousedown comunque). */
+function _sbHasFiles(e){if(!e.dataTransfer||!e.dataTransfer.types)return false;var t=e.dataTransfer.types;for(var i=0;i<t.length;i++){if(t[i]==='Files')return true}return false}
+winSound.addEventListener('dragover',function(e){if(!_sbHasFiles(e))return;e.preventDefault();winSound.classList.add('sup--over')});
+winSound.addEventListener('dragleave',function(e){/* dragleave fira anche entrando in un figlio: ignora se il nuovo target è ancora dentro winSound */if(e.relatedTarget&&winSound.contains(e.relatedTarget))return;winSound.classList.remove('sup--over')});
+winSound.addEventListener('drop',function(e){winSound.classList.remove('sup--over');if(!e.dataTransfer||!e.dataTransfer.files.length)return;/* Filtra solo file audio (estensione o mime audio/*) */var files=Array.from(e.dataTransfer.files).filter(function(f){return(f.type&&f.type.indexOf('audio/')===0)||/\.(mp3|wav|ogg|m4a|flac|aac|webm)$/i.test(f.name)});if(!files.length)return;e.preventDefault();var p=files.length,done=0;files.forEach(function(f){addS(f,function(){done++;if(done>=p)render()})})});
 /* Drag reorder */
 var dragId=null,dragEl=null,ghost=null,dragOX=0,dragOY=0,didDrag=false,lastSwap=0;
 board.addEventListener('mousedown',function(e){var grip=e.target.closest('[data-grip]');if(!grip)return;e.preventDefault();dragId=parseInt(grip.dataset.grip);dragEl=grip.closest('.spad');didDrag=false;if(!dragEl)return;var r=dragEl.getBoundingClientRect();dragOX=e.clientX-r.left;dragOY=e.clientY-r.top;ghost=dragEl.cloneNode(true);ghost.classList.add('spad__ghost');ghost.style.width=r.width+'px';ghost.style.left=r.left+'px';ghost.style.top=r.top+'px';document.body.appendChild(ghost);dragEl.classList.add('spad--drag')});
