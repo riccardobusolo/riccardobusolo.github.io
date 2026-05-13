@@ -1602,11 +1602,13 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 /* Item taglated: leggermente trasparente per indicare che è in clipboard cut */
 .mp__sb-item--cut{opacity:.5}
 /* Drop target highlight: cartella sotto cursore (drop-into) o back button
-   (drop-to-parent). Outline dashed dorato + bg tinto, transizione liscia
-   per evitare flash quando il cursore le attraversa rapidamente. */
-.mp__sb-item--drop-over,.mp__sb-back--drop-over{position:relative;z-index:1;transition:background .12s,box-shadow .12s,border-color .12s}
-.mp__sb-item--drop-over{box-shadow:inset 0 0 0 2px var(--gold),0 0 0 2px rgba(196,154,50,.25);background:rgba(196,154,50,.16);border-color:rgba(196,154,50,.6)}
-.mp__sb-back--drop-over{box-shadow:inset 0 0 0 2px var(--gold),0 0 0 2px rgba(196,154,50,.25);background:rgba(196,154,50,.22);border-color:var(--gold);color:var(--gold)}
+   (drop-to-parent). Outline dashed dorato + bg tinto + lieve scale-up
+   per dare il feel "cartella aperta che accoglie il file". Transizione
+   liscia per evitare flash quando il cursore le attraversa rapidamente. */
+.mp__sb-item--drop-over,.mp__sb-back--drop-over{position:relative;z-index:1;transition:background .15s,box-shadow .15s,border-color .15s,transform .15s cubic-bezier(.2,.8,.3,1),color .15s}
+.mp__sb-item--drop-over{box-shadow:inset 0 0 0 2px var(--gold),0 0 0 2px rgba(196,154,50,.3),0 6px 18px rgba(196,154,50,.25);background:rgba(196,154,50,.2);border-color:var(--gold);color:var(--gold);transform:scale(1.025)}
+.mp__sb-item--drop-over .mp__sb-item-folder-ico{transform:scale(1.18);transition:transform .2s cubic-bezier(.2,.8,.3,1);color:var(--gold)}
+.mp__sb-back--drop-over{box-shadow:inset 0 0 0 2px var(--gold),0 0 0 2px rgba(196,154,50,.3),0 6px 14px rgba(196,154,50,.25);background:rgba(196,154,50,.25);border-color:var(--gold);color:var(--gold);transform:scale(1.08)}
 /* Drag&drop reorder stile sidebar tool: item originale dimmato in place
    (è il "slot" di drop) + ghost floating che segue il cursore + slide
    animato dei siblings (FLIP). */
@@ -5811,9 +5813,10 @@ function compressImg(file,cb){if(!file||!file.type||file.type.indexOf('image/')!
 function _renderBreadcrumb(){var pathEl=document.getElementById('mpPath');var backBtn=document.getElementById('mpBack');if(!pathEl)return;if(!currentFolderId){pathEl.textContent='📁 /';if(backBtn)backBtn.style.display='none';return}var path=getFolderPath(currentFolderId);var label=path.map(function(f){return esc(f.title||'(senza nome)')}).join(' / ');pathEl.textContent='📁 '+label;pathEl.title=label;if(backBtn)backBtn.style.display='inline-flex'}
 function renderSb(){var list=document.getElementById('mpList');if(!list)return;_renderBreadcrumb();var q=searchQ.toLowerCase().trim();/* Quando l'utente cerca, mostra tutti gli item che matchano in TUTTO l'albero
    (utile per trovare un doc senza dover navigare). Senza search, mostra solo
-   gli item della cartella corrente. */var pool=q?docs.filter(function(d){return(d.title||'').toLowerCase().indexOf(q)>=0||(d.content||'').toLowerCase().indexOf(q)>=0}):getItemsIn(currentFolderId);/* Ordine: folder prima, doc dopo. Ordine all'interno di ciascun gruppo
-   = ordine naturale nell'array docs (manualmente riordinabile via drag). */var folders=pool.filter(isFolder);var docsArr=pool.filter(function(d){return !isFolder(d)});var filtered=folders.concat(docsArr);if(!filtered.length){list.innerHTML='<div style="text-align:center;padding:14px 6px;color:var(--muted);font-family:var(--mono);font-size:.66rem">'+(q?'Nessun risultato':(currentFolderId?'Cartella vuota.<br><span style="font-size:.6rem">Crea un doc o una cartella qui</span>':'Ancora nessun documento.<br><button class="mp__sb-new" id="mpEmpty3" style="margin-top:10px">+ Crea il primo</button>'))+'</div>';return}var folderIco='<span class="mp__sb-item-folder-ico"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M10 4H2v16h20V6H12l-2-2z"/></svg></span>';var cutIds=(clipboard&&clipboard.action==='cut')?clipboard.ids:[];var h='';filtered.forEach(function(d){var isCut=cutIds.indexOf(d.id)>=0;var classes='mp__sb-item'+(d.id===currentId?' on':'')+(isFolder(d)?' mp__sb-item--folder':'')+(isCut?' mp__sb-item--cut':'');if(isFolder(d)){var childCount=getItemsIn(d.id).length;h+='<button class="'+classes+'" data-mpfolder="'+d.id+'" data-mpitem="'+d.id+'">'+folderIco+'<span class="mp__sb-item-name">'+esc(d.title||'(cartella)')+'</span>'+(childCount?'<span class="mp__sb-item-cnt">'+childCount+'</span>':'')+'</button>'}else{var lc=getLinkCount(d);var img=d.image?'<img class="mp__sb-item-img" src="'+d.image+'" alt="">':'<span class="mp__sb-item-img" style="display:inline-flex;align-items:center;justify-content:center;color:var(--muted)"><svg viewBox="0 0 24 24" width="11" height="11" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--muted)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>';h+='<button class="'+classes+'" data-mpsel="'+d.id+'" data-mpitem="'+d.id+'">'+img+'<span class="mp__sb-item-name">'+esc(d.title||'(senza titolo)')+'</span>'+(lc?'<span class="mp__sb-item-cnt">'+lc+'</span>':'')+'</button>'}});list.innerHTML=h}
-function renderFolderView(v,folder){var children=getItemsIn(folder.id);/* Stessa logica di renderSb: folder prima, doc dopo, ordine naturale. */var folders=children.filter(isFolder);var docsArr=children.filter(function(d){return !isFolder(d)});var sorted=folders.concat(docsArr);var listH='';if(!sorted.length){listH='<div class="mp__folder-empty">Cartella vuota</div>'}else{sorted.forEach(function(c){var fld=isFolder(c);var ico=fld?'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color:var(--gold);flex-shrink:0"><path d="M10 4H2v16h20V6H12l-2-2z"/></svg>':'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';var dataAttr=fld?'data-mpchildfolder':'data-mpchilddoc';listH+='<button class="mp__folder-child" '+dataAttr+'="'+c.id+'" title="'+(fld?'Doppio click per entrare, singolo per selezionare':'Apri documento')+'">'+ico+'<span>'+esc(c.title||(fld?'(cartella)':'(senza titolo)'))+'</span></button>'})}v.innerHTML='<div class="mp__editor mp__folder-view"><input type="text" class="mp__title" id="mpTitle" value="'+esc(folder.title)+'" placeholder="Nome cartella..."><div class="mp__folder-children-lbl">📂 Contenuti</div><div class="mp__folder-children">'+listH+'</div><button class="mp__del" id="mpDelBtn">🗑 Elimina cartella</button></div>'}
+   gli item della cartella corrente. */var pool=q?docs.filter(function(d){return(d.title||'').toLowerCase().indexOf(q)>=0||(d.content||'').toLowerCase().indexOf(q)>=0}):getItemsIn(currentFolderId);/* Ordine: cartelle in alto in ordine ALFABETICO (case-insensitive),
+   poi i doc nell'ordine naturale di docs[] (riordinabili manualmente
+   solo i doc, le cartelle no). */var folders=pool.filter(isFolder).sort(function(a,b){return(a.title||'').localeCompare(b.title||'',undefined,{sensitivity:'base'})});var docsArr=pool.filter(function(d){return !isFolder(d)});var filtered=folders.concat(docsArr);if(!filtered.length){list.innerHTML='<div style="text-align:center;padding:14px 6px;color:var(--muted);font-family:var(--mono);font-size:.66rem">'+(q?'Nessun risultato':(currentFolderId?'Cartella vuota.<br><span style="font-size:.6rem">Crea un doc o una cartella qui</span>':'Ancora nessun documento.<br><button class="mp__sb-new" id="mpEmpty3" style="margin-top:10px">+ Crea il primo</button>'))+'</div>';return}var folderIco='<span class="mp__sb-item-folder-ico"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M10 4H2v16h20V6H12l-2-2z"/></svg></span>';var cutIds=(clipboard&&clipboard.action==='cut')?clipboard.ids:[];var h='';filtered.forEach(function(d){var isCut=cutIds.indexOf(d.id)>=0;var classes='mp__sb-item'+(d.id===currentId?' on':'')+(isFolder(d)?' mp__sb-item--folder':'')+(isCut?' mp__sb-item--cut':'');if(isFolder(d)){var childCount=getItemsIn(d.id).length;h+='<button class="'+classes+'" data-mpfolder="'+d.id+'" data-mpitem="'+d.id+'">'+folderIco+'<span class="mp__sb-item-name">'+esc(d.title||'(cartella)')+'</span>'+(childCount?'<span class="mp__sb-item-cnt">'+childCount+'</span>':'')+'</button>'}else{var lc=getLinkCount(d);var img=d.image?'<img class="mp__sb-item-img" src="'+d.image+'" alt="">':'<span class="mp__sb-item-img" style="display:inline-flex;align-items:center;justify-content:center;color:var(--muted)"><svg viewBox="0 0 24 24" width="11" height="11" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--muted)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>';h+='<button class="'+classes+'" data-mpsel="'+d.id+'" data-mpitem="'+d.id+'">'+img+'<span class="mp__sb-item-name">'+esc(d.title||'(senza titolo)')+'</span>'+(lc?'<span class="mp__sb-item-cnt">'+lc+'</span>':'')+'</button>'}});list.innerHTML=h}
+function renderFolderView(v,folder){var children=getItemsIn(folder.id);/* Stessa logica di renderSb: cartelle alfabetiche in alto, poi doc nell'ordine naturale. */var folders=children.filter(isFolder).sort(function(a,b){return(a.title||'').localeCompare(b.title||'',undefined,{sensitivity:'base'})});var docsArr=children.filter(function(d){return !isFolder(d)});var sorted=folders.concat(docsArr);var listH='';if(!sorted.length){listH='<div class="mp__folder-empty">Cartella vuota</div>'}else{sorted.forEach(function(c){var fld=isFolder(c);var ico=fld?'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color:var(--gold);flex-shrink:0"><path d="M10 4H2v16h20V6H12l-2-2z"/></svg>':'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';var dataAttr=fld?'data-mpchildfolder':'data-mpchilddoc';listH+='<button class="mp__folder-child" '+dataAttr+'="'+c.id+'" title="'+(fld?'Doppio click per entrare, singolo per selezionare':'Apri documento')+'">'+ico+'<span>'+esc(c.title||(fld?'(cartella)':'(senza titolo)'))+'</span></button>'})}v.innerHTML='<div class="mp__editor mp__folder-view"><input type="text" class="mp__title" id="mpTitle" value="'+esc(folder.title)+'" placeholder="Nome cartella..."><div class="mp__folder-children-lbl">📂 Contenuti</div><div class="mp__folder-children">'+listH+'</div><button class="mp__del" id="mpDelBtn">🗑 Elimina cartella</button></div>'}
 function renderEditor(){var v=document.getElementById('mpView');if(!v)return;if(!currentId||!findById(currentId)){/* Nessuna selezione: editor completamente vuoto. */v.innerHTML='';return}var d=findById(currentId);if(isFolder(d)){renderFolderView(v,d);return}var imgInner=d.image?'<img src="'+d.image+'" alt="">':'<svg viewBox="0 0 24 24" width="22" height="22" style="stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;color:var(--muted)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';var rmBtn=d.image?'<button class="mp__img-rm" id="mpImgRm" type="button" title="Rimuovi immagine">×</button>':'';var drawBtn='<button class="mp__img-draw" id="mpDrawBtn" type="button" title="Disegna un\'immagine"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.4-1.4L9 4l-2.5 2.5 7.6 7.6 1.4 1.4z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>Disegna</button>';var imgH='<label class="mp__img'+(d.image?'':' mp__img--empty')+'" id="mpImgZone" title="Clicca, trascina un file o incolla (Ctrl+V) per aggiungere un\'immagine">'+imgInner+'<input type="file" id="mpImgInp" accept="image/*" style="display:none"></label>'+rmBtn+drawBtn;var outH='',inH='';var out=getOutgoing(d);var inc=getIncoming(d);var titles=parseLinks(d.content);titles.forEach(function(t){var match=findByTitle(t);if(match)outH+='<button class="mp__linkpill" data-mpgo="'+match.id+'">↗ '+esc(t)+'</button>';else outH+='<button class="mp__linkpill mp__linkpill--missing" data-mpcreate="'+esc(t)+'">+ '+esc(t)+'</button>'});inc.forEach(function(d2){inH+='<button class="mp__linkpill" data-mpgo="'+d2.id+'">↙ '+esc(d2.title||'(senza titolo)')+'</button>'});v.innerHTML='<div class="mp__editor">'+'<input type="text" class="mp__title" id="mpTitle" value="'+esc(d.title)+'" placeholder="Titolo del documento...">'+'<div class="mp__imgrow">'+imgH+'</div>'+'<div class="mp__content-wrap"><textarea class="mp__content" id="mpContent" placeholder="Scrivi qui il contenuto del documento... usa /Titolo per linkare ad altri" spellcheck="false">'+esc(d.content)+'</textarea><div class="mp__content-mirror" id="mpContentMirror"></div><div class="mp__autocomp" id="mpAutocomp"></div></div>'+'<div class="mp__linksec"><span class="mp__linksec-lbl">Link uscenti</span>'+(outH||'<span style="color:var(--muted);font-family:var(--mono);font-size:.66rem">nessuno</span>')+'</div>'+'<div class="mp__linksec"><span class="mp__linksec-lbl">Backlink</span>'+(inH||'<span style="color:var(--muted);font-family:var(--mono);font-size:.66rem">nessuno</span>')+'</div>'+'<button class="mp__del" id="mpDelBtn">🗑 Elimina documento</button>'+'</div>';if(typeof _mpSyncMirror==='function')_mpSyncMirror();if(typeof _mpInstallImgZoneHandlers==='function')_mpInstallImgZoneHandlers()}
 function renderMap(){var v=document.getElementById('mpView');if(!v)return;/* La mappa concettuale mostra SOLO i doc (no cartelle) della cartella
    corrente. Cambia automaticamente quando l'utente entra/esce da una
@@ -5851,6 +5854,7 @@ var _mpDragSuppressClick=false;
   var startId=null,startX=0,startY=0,dragging=false;
   var dragItem=null,listEl=null,ghost=null;
   var offX=0,offY=0;
+  var isDragFolder=false;   /* true se stiamo trascinando una cartella */
   var hoverFolderEl=null,hoverFolderId=null;
   var hoverBackEl=null,hoverBackId=null;
   var lastSwapAt=0;
@@ -5858,27 +5862,31 @@ var _mpDragSuppressClick=false;
   var SWAP_COOL=90;    /* ms minimi fra due swap consecutivi (anti-flicker) */
   function getList(){if(!listEl||!listEl.isConnected)listEl=document.getElementById('mpList');return listEl}
   function items(){var L=getList();return L?Array.prototype.slice.call(L.querySelectorAll('[data-mpitem]')):[]}
+  function fileItems(){return items().filter(function(el){return !el.dataset.mpfolder})}
   function clearFolderHover(){if(hoverFolderEl){hoverFolderEl.classList.remove('mp__sb-item--drop-over');hoverFolderEl=null;hoverFolderId=null}}
   function clearBackHover(){if(hoverBackEl){hoverBackEl.classList.remove('mp__sb-back--drop-over');hoverBackEl=null;hoverBackId=null}}
   function setFolderHover(el,id){if(hoverFolderEl===el)return;clearFolderHover();hoverFolderEl=el;hoverFolderId=id;el.classList.add('mp__sb-item--drop-over')}
   function setBackHover(el,id){if(hoverBackEl===el)return;clearBackHover();hoverBackEl=el;hoverBackId=id;el.classList.add('mp__sb-back--drop-over')}
-  /* Riscrive l'ordine in docs[] dal DOM corrente: prende SOLO gli slot
-     della cartella corrente e ne riassegna i contenuti nell'ordine del
-     DOM. Item in altre cartelle restano dove sono in docs[]. */
+  /* Riscrive l'ordine in docs[] dal DOM corrente. Le CARTELLE sono
+     ordinate alfabeticamente al render — non vanno salvate. Salviamo
+     SOLO l'ordine dei FILE (non-folder) della cartella corrente,
+     rimpiazzando solo gli slot file di currentFolderId in docs[]. */
   function saveOrderFromDom(){
     var L=getList();if(!L)return;
-    var ids=Array.prototype.slice.call(L.querySelectorAll('[data-mpitem]')).map(function(el){return el.dataset.mpitem});
+    var fileEls=Array.prototype.slice.call(L.querySelectorAll('[data-mpitem]')).filter(function(el){return !el.dataset.mpfolder});
+    var ids=fileEls.map(function(el){return el.dataset.mpitem});
     var byId={};docs.forEach(function(d){byId[d.id]=d});
     var reordered=ids.map(function(id){return byId[id]}).filter(Boolean);
     var k=0;
     for(var i=0;i<docs.length;i++){
-      if(docs[i].parentId===currentFolderId&&k<reordered.length){docs[i]=reordered[k++]}
+      if(docs[i].parentId===currentFolderId&&!isFolder(docs[i])&&k<reordered.length){docs[i]=reordered[k++]}
     }
     save();
   }
   function startDrag(e){
     var r=dragItem.getBoundingClientRect();
     offX=startX-r.left;offY=startY-r.top;
+    isDragFolder=!!dragItem.dataset.mpfolder;
     /* Ghost = clone visibile, position:fixed, segue il cursore al pixel.
        Mantiene larghezza/altezza esatte dell'originale per evitare scatti. */
     var g=dragItem.cloneNode(true);
@@ -5897,43 +5905,48 @@ var _mpDragSuppressClick=false;
   }
   function moveGhost(e){if(ghost){ghost.style.left=(e.clientX-offX)+'px';ghost.style.top=(e.clientY-offY)+'px'}}
   /* Live reorder: trova dove andrebbe inserito dragItem in base alla Y
-     del cursore. Pattern identico al sidebar tool _sbDragMove. */
+     del cursore. SOLO FILE possono essere riordinati: se trascini una
+     cartella, niente reorder (le cartelle sono fisse, ordinate alfabet.
+     al render). I file vengono swappati solo con altri file, mai con
+     cartelle, così le cartelle restano sempre in alto e non si muovono
+     durante il reorder. Pattern identico al sidebar tool _sbDragMove. */
   function liveReorder(e){
+    if(isDragFolder)return;     /* cartelle non si riordinano */
     var L=getList();if(!L)return;
     var lr=L.getBoundingClientRect();
     /* Gate: solo se il cursore è dentro la lista, altrimenti il drag
        "freezа" alla posizione corrente (evita salti se l'utente esce
        dalla lista per puntare al back/header/altro). */
     if(e.clientX<lr.left||e.clientX>lr.right||e.clientY<lr.top||e.clientY>lr.bottom)return;
-    var btns=items();
+    /* SOLO file come candidati swap target (skip cartelle) */
+    var files=fileItems();
     var target=null;
-    for(var i=0;i<btns.length;i++){
-      if(btns[i]===dragItem)continue;
-      var r=btns[i].getBoundingClientRect();
-      if(e.clientY<r.top){target=btns[i];break}
+    for(var i=0;i<files.length;i++){
+      if(files[i]===dragItem)continue;
+      var r=files[i].getBoundingClientRect();
+      if(e.clientY<r.top){target=files[i];break}
       if(e.clientY<r.bottom){
-        var idx=btns.indexOf(dragItem);
-        if(i<idx){target=btns[i];break}
+        var idx=files.indexOf(dragItem);
+        if(i<idx){target=files[i];break}
       }
     }
     /* Verifica se serve effettivamente uno swap */
     var needMove=false;
     if(target){if(target!==dragItem.nextElementSibling)needMove=true}
-    else{if(btns[btns.length-1]!==dragItem)needMove=true}
+    else{if(files[files.length-1]!==dragItem)needMove=true}
     if(!needMove)return;
     /* Anti-flicker: cooldown dopo ogni swap */
     var now=Date.now();
     if(now-lastSwapAt<SWAP_COOL)return;
     lastSwapAt=now;
-    /* FLIP: cattura top di tutti i siblings prima della mutazione */
+    /* FLIP: cattura top dei FILE siblings (le cartelle non si muovono) */
     var oldTops={};
-    btns.forEach(function(b){if(b!==dragItem)oldTops[b.dataset.mpitem]=b.getBoundingClientRect().top});
+    files.forEach(function(b){if(b!==dragItem)oldTops[b.dataset.mpitem]=b.getBoundingClientRect().top});
     if(target)L.insertBefore(dragItem,target);
     else L.appendChild(dragItem);
-    /* FLIP step 2: per ogni sibling spostato, applica translateY inverso
-       istantaneo, force reflow, poi reset — CSS animerà il ritorno. */
-    btns=items();
-    btns.forEach(function(b){
+    /* FLIP step 2: anima il ritorno dei soli file siblings */
+    files=fileItems();
+    files.forEach(function(b){
       if(b===dragItem)return;
       var old=oldTops[b.dataset.mpitem];if(old===undefined)return;
       var dy=old-b.getBoundingClientRect().top;
