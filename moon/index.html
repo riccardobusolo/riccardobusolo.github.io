@@ -421,13 +421,13 @@ body.sb--global-dragging .sb__btn:not(.on):hover{background:transparent;color:va
 /* z-index 6: deve essere sopra .win__rz (z-index 5) altrimenti i resize
    handle sui bordi si "rubano" il cursore quando il mouse passa sulla
    scrollbar. La scrollbar deve sempre vincere nella sua zona visibile. */
-.csb-track{position:absolute;width:8px;background:rgba(140,30,30,.06);border-radius:4px;z-index:6;display:none;pointer-events:auto;cursor:var(--cur-pointer);will-change:top,left,height}
+.csb-track{position:absolute;top:0;left:0;width:8px;background:rgba(140,30,30,.06);border-radius:4px;z-index:6;display:none;pointer-events:auto;cursor:var(--cur-pointer);will-change:transform,height;transition:none}
 .csb-track:hover{background:rgba(140,30,30,.1)}
 /* Thumb: position:absolute dentro al track. top relativo al track =
    scrollRatio * (trackHeight - thumbHeight). Cursore pointer (--cur-pointer)
    sia in hover che durante drag, perché grab/grabbing dà un'indicazione
    di "drag-and-drop" che non si addice al gesto di scroll. */
-.csb-thumb{position:absolute;left:1px;width:6px;border-radius:3px;background:rgba(140,30,30,.32);cursor:var(--cur-pointer);transition:background .15s;will-change:top,height}
+.csb-thumb{position:absolute;left:1px;top:0;width:6px;border-radius:3px;background:rgba(140,30,30,.32);cursor:var(--cur-pointer);transition:background .15s;will-change:transform,height}
 .csb-thumb:hover{background:rgba(140,30,30,.5)}
 .csb-thumb.csb-thumb--active,.csb-thumb:active{background:rgba(140,30,30,.7);cursor:var(--cur-pointer)}
 body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-select:none}
@@ -7215,10 +7215,13 @@ document.addEventListener('keydown',function(e){
     var maxThumbY=trackH-thumbH;
     var scrollRatio=maxScroll>0?(el.scrollTop/maxScroll):0;
     track.style.display='block';
-    track.style.top=(el.scrollTop+TRACK_INSET)+'px';
-    track.style.left=(el.scrollLeft+cW-10)+'px';
+    /* Usa transform invece di top/left: GPU-accelerated, sincronizzato
+       meglio con lo scroll del browser. Riduce il lag percepito durante
+       momentum scroll (touchpad/trackpad) dove gli scroll events arrivano
+       a ~60fps e il vecchio top-based update generava 1 frame di delay. */
+    track.style.transform='translate3d('+(el.scrollLeft+cW-10)+'px,'+(el.scrollTop+TRACK_INSET)+'px,0)';
     track.style.height=trackH+'px';
-    thumb.style.top=(scrollRatio*maxThumbY)+'px';
+    thumb.style.transform='translate3d(0,'+(scrollRatio*maxThumbY)+'px,0)';
     thumb.style.height=thumbH+'px';
   }
   function setup(el){
