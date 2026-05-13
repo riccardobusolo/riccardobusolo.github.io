@@ -5804,9 +5804,10 @@ function render(){renderSb();if(view==='editor')renderEditor();else renderMap()}
 function setView(v){view=v;document.querySelectorAll('#winMap .mp__vb').forEach(function(b){b.classList.toggle('mp__vb--on',b.dataset.mpv===v)});if(view==='editor')renderEditor();else renderMap()}
 function selectDoc(id){currentId=id;render()}
 /* sidebar handlers */
-document.getElementById('mpList').addEventListener('click',function(e){if(_mpDragSuppressClick){_mpDragSuppressClick=false;return}if(e.target.id==='mpEmpty3'){var d=newDoc();currentId=d.id;view='editor';setView('editor');render();setTimeout(function(){var t=document.getElementById('mpTitle');if(t)t.focus()},80);return}/* Cartella: doppio click → entra dentro (currentFolderId).
-   Singolo click → mostra nell'editor la "vista cartella" (titolo
-   modificabile + lista contenuti) settando currentId al folder. */var folderBtn=e.target.closest('[data-mpfolder]');if(folderBtn){if(e.detail>=2){enterFolder(folderBtn.dataset.mpfolder)}else{currentId=folderBtn.dataset.mpfolder;render();if(view!=='editor')setView('editor')}return}/* Click su doc → seleziona per editor */var sel=e.target.closest('[data-mpsel]');if(sel){selectDoc(sel.dataset.mpsel);if(view!=='editor')setView('editor');return}/* Click fuori da un item nella lista → deseleziona (editor vuoto) */if(currentId!==null){currentId=null;render()}});
+document.getElementById('mpList').addEventListener('click',function(e){if(_mpDragSuppressClick){_mpDragSuppressClick=false;return}if(e.target.id==='mpEmpty3'){var d=newDoc();currentId=d.id;view='editor';setView('editor');render();setTimeout(function(){var t=document.getElementById('mpTitle');if(t)t.focus()},80);return}/* Cartella: doppio click → entra dentro (currentFolderId), aggiorna
+   anche la mappa concettuale se in view='map'. Singolo click → solo
+   selezione (currentId al folder), NON switcha view: se sei in mappa
+   resti in mappa, se sei in editor mostri la folder view. */var folderBtn=e.target.closest('[data-mpfolder]');if(folderBtn){if(e.detail>=2){enterFolder(folderBtn.dataset.mpfolder)}else{currentId=folderBtn.dataset.mpfolder;render()}return}/* Click su doc → seleziona per editor (switcha view se non già in editor) */var sel=e.target.closest('[data-mpsel]');if(sel){selectDoc(sel.dataset.mpsel);if(view!=='editor')setView('editor');return}/* Click fuori da un item nella lista → deseleziona (editor vuoto) */if(currentId!==null){currentId=null;render()}});
 /* Click sull'area vuota dell'editor (mpView) → deseleziona pure. */
 document.getElementById('mpView').addEventListener('click',function(e){if(e.target.id!=='mpView')return;if(currentId!==null){currentId=null;render()}});
 /* Back button: torna alla cartella superiore */
