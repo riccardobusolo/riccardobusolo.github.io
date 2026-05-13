@@ -3680,14 +3680,18 @@ function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','s
 function _esSecHTML(label,key,items){var h='<div class="pg__sec"><div class="pg__sec-title">'+label+'<button class="pg__sec-add" data-essec="'+key+'" type="button">+ Aggiungi</button></div>';if(!items.length){h+='<div class="es__empty">Nessun elemento — usa + Aggiungi</div>'}else{h+='<div class="es__items" data-essec="'+key+'">';items.forEach(function(it,i){h+='<div class="es__item" data-esitem="'+i+'"><div class="es__item-row"><input class="es__item-name" data-esfield="name" value="'+esc(it.name||'')+'" placeholder="Nome"><button class="es__item-del" data-esdel="1" type="button" title="Elimina">×</button></div><textarea class="es__item-desc" data-esfield="desc" placeholder="Descrizione, formule, range, costo (es. Costa 2 Azioni)...">'+esc(it.desc||'')+'</textarea></div>'});h+='</div>'}h+='</div>';return h}
 function buildEsheet(e){var h='';
 /* HEADER: slot foto + riga Identità stile pg__row--id (Nome, Tipo,
-   Allineamento, Taglia in quest'ordine). Stesso layout/styling della
-   sezione "Identità" della scheda PG: label assoluta sopra l'input,
-   width dinamica basata sul contenuto, classe --empty per i campi vuoti
-   che si espandono a riempire lo spazio. */
+   Allineamento, Taglia in quest'ordine). Tipo/Allineamento/Taglia
+   sono dropdown stile pg__cls-dd--custom (input + chevron) con
+   "Personalizzato" come prima opzione. Nome resta input semplice. */
 var photoSlotInner=e.photo?'<img src="'+esc(e.photo)+'" alt=""><button class="es__photo-slot-rm" id="esPhotoSlotRm" type="button" title="Rimuovi foto">×</button>':'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
-var idFields=[['Nome','name'],['Tipo','type'],['Allineamento','alignment'],['Taglia','size']];
-var idCells='';
-idFields.forEach(function(f){var v=e[f[1]]||'';var empty=!v;var w=v.length;var lblW=Math.ceil(f[0].length*0.8);var sty='';if(!empty){if(w>=lblW)sty=' style="width:calc('+w+'ch + 10px)"';else sty=' style="width:calc('+lblW+'ch + 10px)"'}idCells+='<div class="pg__field'+(empty?' pg__field--empty':'')+'"><div class="pg__lbl">'+f[0]+'</div><input class="pg__inp pg__inp--sm" data-ef="'+f[1]+'" value="'+esc(v)+'" placeholder="—"'+sty+'></div>'});
+function _esTextField(label,key,val){var empty=!val;var w=val.length;var lblW=Math.ceil(label.length*0.8);var sty=empty?'':' style="width:calc('+Math.max(w,lblW)+'ch + 10px)"';return '<div class="pg__field'+(empty?' pg__field--empty':'')+'"><div class="pg__lbl">'+label+'</div><input class="pg__inp pg__inp--sm" data-ef="'+key+'" value="'+esc(val)+'" placeholder="—"'+sty+'></div>'}
+function _esDdField(label,key,val,opts){var isCustom=val&&opts.indexOf(val)<0;var w=val.length;var lblW=Math.ceil(label.length*0.8);var sty=' style="width:calc('+Math.max(w,lblW)+'ch + 10px)"';var optsHtml='<button class="pg__cls-dd-opt'+(isCustom?' pg__cls-dd-opt--selected':'')+'" data-esddopt="" type="button">Personalizzato</button>';opts.forEach(function(o){var sel=(val===o)?' pg__cls-dd-opt--selected':'';optsHtml+='<button class="pg__cls-dd-opt'+sel+'" data-esddopt="'+esc(o)+'" type="button">'+esc(o)+'</button>'});return '<div class="pg__field"><div class="pg__lbl">'+label+'</div><div class="pg__cls-dd pg__cls-dd--custom" data-esddwrap="'+key+'"><input class="pg__inp pg__inp--sm pg__cls-dd-input" data-ef="'+key+'" value="'+esc(val)+'" placeholder="—"'+sty+'><button class="pg__cls-dd-chev" data-esddbtn type="button" aria-label="Apri dropdown '+label+'">▾</button><div class="pg__cls-dd-panel">'+optsHtml+'</div></div></div>'}
+/* Opzioni D&D 5e (italiano). "Personalizzato" è gestita come opzione
+   speciale data-esddopt="" che svuota il campo per permettere typing. */
+var TYPE_OPTS=['Aberrazione','Bestia','Celestiale','Costrutto','Drago','Elementale','Fata','Gigante','Immondo','Melma','Mostruosità','Non Morto','Pianta','Umanoide'];
+var ALIGN_OPTS=['Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale','Neutrale','Caotico Neutrale','Legale Malvagio','Neutrale Malvagio','Caotico Malvagio','Senza Allineamento','Qualsiasi allineamento'];
+var SIZE_OPTS=['Minuscola','Piccola','Media','Grande','Enorme','Mastodontica'];
+var idCells=_esTextField('Nome','name',e.name||'')+_esDdField('Tipo','type',e.type||'',TYPE_OPTS)+_esDdField('Allineamento','alignment',e.alignment||'',ALIGN_OPTS)+_esDdField('Taglia','size',e.size||'',SIZE_OPTS);
 h+='<div class="es__hdr"><div class="es__photo-slot'+(e.photo?' es__photo-slot--has':'')+'" id="esPhotoSlot" title="'+(e.photo?'Clicca per cambiare foto, o trascina nuova foto':'Aggiungi foto (clicca o trascina)')+'">'+photoSlotInner+'</div><div class="es__hdr-right"><div class="pg__row pg__row--id">'+idCells+'</div></div></div>';
 /* === LAYOUT 3-COLONNE pg__sheet/pg__col come scheda PG. Su largh
    stretta wrappa naturalmente (flex:1 1 240px). La sezione Combattimento
@@ -3762,6 +3766,9 @@ return h}
 function openEsheet(idx){if(idx==null||!enemies[idx])return;esObj=enemies[idx];defaultEnemy(esObj);document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)');document.getElementById('esheetBody').innerHTML=buildEsheet(esObj)}
 function closeEsheet(){esObj=null;var i=op.indexOf('esheet');if(i>=0){op.splice(i,1);sO();rW()}}
 document.getElementById('esheetClose').addEventListener('click',closeEsheet);
+/* Click outside per chiudere i dropdown identità enemy (Tipo/Allineamento/
+   Taglia). Skip se il click è dentro un wrap o un panel di questi dropdown. */
+document.addEventListener('click',function(ev){if(ev.target.closest('[data-esddwrap]')||ev.target.closest('[data-esddopt]'))return;document.querySelectorAll('[data-esddwrap].pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')})});
 /* Drag&drop foto sul slot del header (delegation su #esheetBody) */
 document.getElementById('esheetBody').addEventListener('dragover',function(e){var slot=e.target.closest('#esPhotoSlot');if(!slot)return;e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='copy';slot.classList.add('drag-over')});
 document.getElementById('esheetBody').addEventListener('dragleave',function(e){var slot=e.target.closest('#esPhotoSlot');if(!slot)return;if(e.relatedTarget&&slot.contains(e.relatedTarget))return;slot.classList.remove('drag-over')});
@@ -3777,8 +3784,18 @@ if(['hp','hpCur','hpTemp'].indexOf(ef)>=0){var hpMx=esObj.hp||1;var hpCr=esObj.h
    dinamica basata sulla lunghezza del valore o sulla larghezza della
    label, calcolata ad ogni keystroke. Toggle .pg__field--empty per
    field vuoti che si espandono a riempire lo spazio. */
-if(t.classList&&t.classList.contains('pg__inp')&&t.dataset.ef&&t.closest('.pg__row--id')){var _fld=t.parentElement;var _lbl=_fld&&_fld.querySelector('.pg__lbl');var _lblTxt=_lbl?_lbl.textContent:'';var _lblW=Math.ceil(_lblTxt.length*0.8);var _vw=t.value.length;if(!t.value){_fld.classList.add('pg__field--empty');t.style.width=''}else{_fld.classList.remove('pg__field--empty');t.style.width='calc('+Math.max(_vw,_lblW)+'ch + 10px)'}}});
+if(t.classList&&t.classList.contains('pg__inp')&&t.dataset.ef&&t.closest('.pg__row--id')){var _fld=t.closest('.pg__field');if(_fld){var _lbl=_fld.querySelector('.pg__lbl');var _lblTxt=_lbl?_lbl.textContent:'';var _lblW=Math.ceil(_lblTxt.length*0.8);var _vw=t.value.length;var _isDd=!!t.closest('[data-esddwrap]');if(!_isDd&&!t.value){_fld.classList.add('pg__field--empty');t.style.width=''}else{_fld.classList.remove('pg__field--empty');t.style.width='calc('+Math.max(_vw,_lblW)+'ch + 10px)'}}}});
 document.getElementById('esheetBody').addEventListener('click',function(e){if(!esObj)return;
+/* Toggle dropdown identità (Tipo/Allineamento/Taglia). Chiude tutti gli
+   altri dropdown già aperti, posiziona il panel sotto il wrap intero
+   (input + chev) tramite getBoundingClientRect. */
+var ddBtn=e.target.closest('[data-esddbtn]');
+if(ddBtn){e.stopPropagation();var wrap=ddBtn.closest('[data-esddwrap]');if(!wrap)return;var wasOpen=wrap.classList.contains('pg__cls-dd--open');document.querySelectorAll('.pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')});if(!wasOpen){wrap.classList.add('pg__cls-dd--open');var pnl=wrap.querySelector('.pg__cls-dd-panel');if(pnl){var r=wrap.getBoundingClientRect();pnl.style.top=r.bottom+'px';pnl.style.left=r.left+'px';pnl.style.minWidth=r.width+'px'}}return}
+/* Selezione opzione dropdown: scrive esObj[key]=val, aggiorna input,
+   triggera input event per attivare auto-resize + save, chiude panel.
+   "Personalizzato" (data-esddopt="") svuota il campo e focusa l'input. */
+var ddOpt=e.target.closest('[data-esddopt]');
+if(ddOpt){e.stopPropagation();var wrap2=ddOpt.closest('[data-esddwrap]');if(!wrap2)return;var key=wrap2.dataset.esddwrap;var val=ddOpt.dataset.esddopt||'';esObj[key]=val;sE();renE();var inp=wrap2.querySelector('input[data-ef="'+key+'"]');if(inp){inp.value=val;inp.dispatchEvent(new Event('input',{bubbles:true}));if(!val)inp.focus()}wrap2.classList.remove('pg__cls-dd--open');return}
 /* Applica danno: assorbe prima i PF temporanei, poi sottrae da hpCur */
 var admg=e.target.closest('[data-eapplydmg]');if(admg){var inp=document.getElementById('esDmgIn');var d=Math.abs(parseInt(inp.value)||1);if(esObj.hpTemp>0){var absorbed=Math.min(esObj.hpTemp,d);esObj.hpTemp-=absorbed;d-=absorbed}if(esObj.hpCur==null)esObj.hpCur=esObj.hp;esObj.hpCur-=d;if(esObj.hpCur<0)esObj.hpCur=0;sE();renE();openEsheet(enemies.indexOf(esObj));return}
 /* Applica cura: somma a hpCur, clampato a hpMax */
