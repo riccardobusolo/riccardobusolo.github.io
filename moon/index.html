@@ -574,7 +574,8 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__statcard .pg__inp{padding:2px 4px;min-height:0;font-size:.86rem;text-align:center}
 .es__statcard--w .pg__inp{text-align:left;font-size:.74rem;font-weight:500}
 /* Ability cards: pg__ab base + mod absolute al fondo della card */
-.es__ab{position:relative;padding-bottom:14px !important;cursor:default}
+.es__ab{position:relative;padding-bottom:14px !important;cursor:var(--cur-pointer)}
+.es__ab:hover{border-color:rgba(196,154,50,.4)!important;background:rgba(196,154,50,.06)!important}
 .es__ab .pg__lbl{font-size:.5rem;margin-bottom:1px}
 .es__ab .pg__inp{padding:1px 2px !important;min-height:0 !important;font-size:.86rem !important;font-weight:700}
 .es__ab-mod{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:.66rem;color:var(--gold);font-weight:600;line-height:1;pointer-events:none}
@@ -3675,8 +3676,14 @@ renE();
    data-essec). Il click delegate gestisce: emoji picker, add/del item
    nelle sezioni, delete del nemico intero. */
 var esObj=null;
+/* Stato barra dei tiri (stile PG sheet): esLastRoll memorizza l'ultimo
+   tiro mostrato, esAdv è la modalità ad uso singolo (null|'adv'|'dis')
+   che viene applicata al prossimo tiro e poi resettata. */
+var esLastRoll=null,esAdv=null;
 function abModEn(score){return Math.floor(((score|0)-10)/2)}
 function fmtModEn(m){return m>=0?'+'+m:''+m}
+function _esRollD20(){var a=1+Math.floor(Math.random()*20);if(esAdv==='adv')return Math.max(a,1+Math.floor(Math.random()*20));if(esAdv==='dis')return Math.min(a,1+Math.floor(Math.random()*20));return a}
+function _esRollAbility(key){var labels={str:'FOR',dex:'DES',con:'COS',intl:'INT',wis:'SAG',cha:'CAR'};if(!labels[key])return;var score=esObj[key]||10;var mod=abModEn(score);var d=_esRollD20();var tot=d+mod;var cls=d===20?'pg__roll-row--crit':d===1?'pg__roll-row--fail':'pg__roll-row--hit';var advLbl=esAdv?' <span style="opacity:.7">('+(esAdv==='adv'?'Vant.':'Svant.')+')</span>':'';esLastRoll={cls:cls,html:'<strong>'+labels[key]+'</strong> &nbsp;d20 = <strong>'+d+'</strong>'+(mod>=0?' +':' ')+mod+' &nbsp;= <strong>'+tot+'</strong>'+advLbl};esAdv=null;if(esObj)openEsheet(enemies.indexOf(esObj))}
 function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','saves','skills','dmgResist','dmgImmune','dmgVulner','condImmune','senses','languages','cr','notes'].forEach(function(k){if(e[k]==null)e[k]=''});['str','dex','con','intl','wis','cha'].forEach(function(k){if(e[k]==null)e[k]=10});['traits','actions','bonusActions','reactions','legendaryActions'].forEach(function(k){if(!Array.isArray(e[k]))e[k]=[]});/* HP tracking: e.hp = MAX (statblock), e.hpCur = current durante
    combattimento, e.hpTemp = temp HP. Migrazione record legacy:
    se hpCur missing → hpCur = hp. */if(e.hpCur==null)e.hpCur=e.hp||0;if(e.hpTemp==null)e.hpTemp=0}
@@ -3701,6 +3708,11 @@ var ALIGN_OPTS=['Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale
 var SIZE_OPTS=['Minuscola','Piccola','Media','Grande','Enorme','Mastodontica'];
 var idCells=_esTextField('Nome','name',e.name||'')+_esNumField('CR','cr',e.cr)+_esDdField('Tipo','type',e.type||'',TYPE_OPTS)+_esDdField('Allineamento','alignment',e.alignment||'',ALIGN_OPTS)+_esDdField('Taglia','size',e.size||'',SIZE_OPTS);
 h+='<div class="es__hdr"><div class="es__photo-slot'+(e.photo?' es__photo-slot--has':'')+'" id="esPhotoSlot" title="'+(e.photo?'Clicca per cambiare foto, o trascina nuova foto':'Aggiungi foto (clicca o trascina)')+'">'+photoSlotInner+'</div><div class="es__hdr-right"><div class="pg__row pg__row--id">'+idCells+'</div></div></div>';
+/* Roll row: barra full-width sopra le 3 colonne (stile PG sheet).
+   Mostra l'ultimo tiro d20 + bottoni Vantaggio/Svantaggio. Click su
+   .es__ab/pg__ab (caratteristiche) lancia il d20+mod. */
+var rollCls=esLastRoll?esLastRoll.cls:'';var rollHtml=esLastRoll?esLastRoll.html:'<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:-.15em"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg> Clicca una caratteristica per lanciare un d20';
+h+='<div class="pg__roll-row '+rollCls+'"><div class="pg__roll-row__content">'+rollHtml+'</div><div class="pg__roll-row__advctrls"><button class="pg__roll-row__adv pg__roll-row__adv--adv'+(esAdv==='adv'?' on':'')+'" data-esadv="adv" type="button" title="Tiro con vantaggio (al prossimo d20)">Vant.</button><button class="pg__roll-row__adv pg__roll-row__adv--dis'+(esAdv==='dis'?' on':'')+'" data-esadv="dis" type="button" title="Tiro con svantaggio (al prossimo d20)">Svant.</button></div></div>';
 /* === LAYOUT 3-COLONNE pg__sheet/pg__col come scheda PG. Su largh
    stretta wrappa naturalmente (flex:1 1 240px). La sezione Combattimento
    sta dentro la COL 1 insieme a Caratteristiche / Difese / Sensi. */
@@ -3765,7 +3777,7 @@ h+='<div class="pg__sec"><div class="pg__sec-title">📝 Note</div><textarea cla
 /* ELIMINA */
 h+='<button class="es__del-btn" id="esheetDel" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Elimina nemico</button>';
 return h}
-function openEsheet(idx){if(idx==null||!enemies[idx])return;esObj=enemies[idx];defaultEnemy(esObj);document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)');document.getElementById('esheetBody').innerHTML=buildEsheet(esObj)}
+function openEsheet(idx){if(idx==null||!enemies[idx])return;/* Reset stato roll se cambio nemico (mantiene lastRoll su stesso nemico) */if(esObj!==enemies[idx]){esLastRoll=null;esAdv=null}esObj=enemies[idx];defaultEnemy(esObj);document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)');document.getElementById('esheetBody').innerHTML=buildEsheet(esObj)}
 function closeEsheet(){esObj=null;var i=op.indexOf('esheet');if(i>=0){op.splice(i,1);sO();rW()}}
 document.getElementById('esheetClose').addEventListener('click',closeEsheet);
 /* Click outside per chiudere i dropdown identità enemy (Tipo/Allineamento/
@@ -3790,6 +3802,14 @@ if(['hp','hpCur','hpTemp'].indexOf(ef)>=0){var hpMx=esObj.hp||1;var hpCr=esObj.h
    field vuoti che si espandono a riempire lo spazio. */
 if(t.classList&&t.classList.contains('pg__inp')&&t.dataset.ef&&t.closest('.pg__row--id')&&t.type!=='number'){var _fld=t.closest('.pg__field');if(_fld){var _lbl=_fld.querySelector('.pg__lbl');var _lblTxt=_lbl?_lbl.textContent:'';var _lblW=Math.ceil(_lblTxt.length*0.8);var _vw=t.value.length;var _isDd=!!t.closest('[data-esddwrap]');if(!_isDd&&!t.value){_fld.classList.add('pg__field--empty');t.style.width=''}else{_fld.classList.remove('pg__field--empty');t.style.width='calc('+Math.max(_vw,_lblW)+'ch + 10px)'}}}});
 document.getElementById('esheetBody').addEventListener('click',function(e){if(!esObj)return;
+/* Toggle Vantaggio/Svantaggio per il prossimo tiro. Update inline
+   delle classi sui bottoni (no full re-render). */
+var advBtn=e.target.closest('[data-esadv]');
+if(advBtn){e.stopPropagation();var _mode=advBtn.dataset.esadv;esAdv=(esAdv===_mode)?null:_mode;document.querySelectorAll('#esheetBody [data-esadv]').forEach(function(b){b.classList.toggle('on',b.dataset.esadv===esAdv)});return}
+/* Click su caratteristica (.es__ab/.pg__ab) → lancia d20+mod. Skip
+   se il target è l'input stesso (per non interferire con l'edit). */
+var abEl=e.target.closest('.es__ab');
+if(abEl&&e.target.tagName!=='INPUT'){var _inp=abEl.querySelector('input[data-ef]');if(_inp){var _key=_inp.dataset.ef;if(['str','dex','con','intl','wis','cha'].indexOf(_key)>=0){e.stopPropagation();_esRollAbility(_key);return}}}
 /* Toggle dropdown identità (Tipo/Allineamento/Taglia). Chiude tutti gli
    altri dropdown già aperti, posiziona il panel sotto il wrap intero
    (input + chev) tramite getBoundingClientRect. */
