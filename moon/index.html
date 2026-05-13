@@ -5834,7 +5834,10 @@ function renderMap(){var v=document.getElementById('mpView');if(!v)return;/* La 
    chiamato dentro enterFolder, ottenendo una transizione pulita. */
 var _mpFolderClickTimer=null;
 function _mpCancelFolderClick(){if(_mpFolderClickTimer){clearTimeout(_mpFolderClickTimer);_mpFolderClickTimer=null}}
-function _mpScheduleFolderSelect(fid){_mpCancelFolderClick();_mpFolderClickTimer=setTimeout(function(){_mpFolderClickTimer=null;currentId=fid;render()},104)}
+function _mpScheduleFolderSelect(fid){_mpCancelFolderClick();_mpFolderClickTimer=setTimeout(function(){_mpFolderClickTimer=null;currentId=fid;/* IMPORTANTE: non chiamare render() qui — distruggerebbe via innerHTML
+   il bottone cartella su cui l'utente sta facendo il secondo click del
+   dblclick, e il browser perderebbe il conteggio e.detail. Aggiornare
+   in-place: solo classe .on dei sibling + renderEditor/renderMap a destra. */document.querySelectorAll('#mpList [data-mpitem]').forEach(function(el){el.classList.toggle('on',el.dataset.mpitem===fid)});if(view==='editor')renderEditor();else renderMap()},104)}
 function render(){_mpCancelFolderClick();renderSb();if(view==='editor')renderEditor();else renderMap()}
 function setView(v){view=v;document.querySelectorAll('#winMap .mp__vb').forEach(function(b){b.classList.toggle('mp__vb--on',b.dataset.mpv===v)});if(view==='editor')renderEditor();else renderMap()}
 function selectDoc(id){currentId=id;render()}
