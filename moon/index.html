@@ -7203,8 +7203,11 @@ document.addEventListener('keydown',function(e){
   var TRACK_INSET=6;
   function update(el,track,thumb){
     if(!el.isConnected){track.style.display='none';return}
-    /* Se il track è stato rimosso (es. innerHTML rebuild), lo re-ancoriamo. */
-    if(track.parentElement!==el)el.appendChild(track);
+    var parent=el.parentElement;
+    if(!parent){track.style.display='none';return}
+    /* Se il track è stato rimosso (rare ma può capitare con innerHTML
+       rebuild del parent), lo ri-ancoriamo come sibling di el. */
+    if(track.parentElement!==parent)parent.appendChild(track);
     var sH=el.scrollHeight,cH=el.clientHeight,cW=el.clientWidth;
     if(sH<=cH+1||cH===0||cW===0){track.style.display='none';return}
     if(el.offsetParent===null&&getComputedStyle(el).position!=='fixed'){track.style.display='none';return}
@@ -7214,12 +7217,18 @@ document.addEventListener('keydown',function(e){
     var maxScroll=sH-cH;
     var maxThumbY=trackH-thumbH;
     var scrollRatio=maxScroll>0?(el.scrollTop/maxScroll):0;
+    /* Posiziona il track come sibling di el, dentro al parent.
+       Coordinate del track relative al parent's padding box (non al
+       contenuto scrollabile), così il track NON si muove durante lo
+       scroll. Solo il thumb si aggiorna su scroll, evitando il lag
+       visivo "guida si deposiziona poi torna" che si vedeva quando
+       il track era child del contenitore scrollabile. */
+    var elRect=el.getBoundingClientRect();
+    var parentRect=parent.getBoundingClientRect();
+    var topRel=elRect.top-parentRect.top+TRACK_INSET;
+    var leftRel=elRect.right-parentRect.left-10;
     track.style.display='block';
-    /* Usa transform invece di top/left: GPU-accelerated, sincronizzato
-       meglio con lo scroll del browser. Riduce il lag percepito durante
-       momentum scroll (touchpad/trackpad) dove gli scroll events arrivano
-       a ~60fps e il vecchio top-based update generava 1 frame di delay. */
-    track.style.transform='translate3d('+(el.scrollLeft+cW-10)+'px,'+(el.scrollTop+TRACK_INSET)+'px,0)';
+    track.style.transform='translate3d('+leftRel+'px,'+topRel+'px,0)';
     track.style.height=trackH+'px';
     thumb.style.transform='translate3d(0,'+(scrollRatio*maxThumbY)+'px,0)';
     thumb.style.height=thumbH+'px';
@@ -7227,14 +7236,20 @@ document.addEventListener('keydown',function(e){
   function setup(el){
     if(bars.has(el))return;
     el.classList.add('csb-host');
-    var pos=getComputedStyle(el).position;
-    if(pos==='static')el.style.position='relative';
+    /* Il PARENT di el deve essere position:relative per ospitare il track
+       come absolute sibling. Se è static, lo promuoviamo. */
+    var parent=el.parentElement;
+    if(!parent)return;
+    var pp=getComputedStyle(parent).position;
+    if(pp==='static')parent.style.position='relative';
     var track=document.createElement('div');
     track.className='csb-track';
     var thumb=document.createElement('div');
     thumb.className='csb-thumb';
     track.appendChild(thumb);
-    el.appendChild(track);
+    /* Append track come SIBLING di el (non come child), così non scorre
+       con il contenuto interno di el. */
+    parent.appendChild(track);
     bars.set(el,{track:track,thumb:thumb});
     var dragging=false,startY=0,startScroll=0;
     thumb.addEventListener('mousedown',function(e){
@@ -7275,7 +7290,8 @@ document.addEventListener('keydown',function(e){
     }
     document.addEventListener('mousemove',onMove);
     document.addEventListener('mouseup',onUp);
-    el.addEventListener('scroll',function(){update(el,track,thumb)},{passive:true});
+    var _rafId=0;
+    el.addEventListener('scroll',function(){if(_rafId)return;_rafId=requestAnimationFrame(function(){_rafId=0;update(el,track,thumb)})},{passive:true});
     if(window.ResizeObserver){
       var ro=new ResizeObserver(function(){update(el,track,thumb)});
       ro.observe(el);
