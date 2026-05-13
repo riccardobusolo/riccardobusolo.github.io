@@ -3728,7 +3728,7 @@ h+='<div class="pg__sec"><div class="pg__sec-title">⚔️ Combattimento</div>';
 h+='<div class="pg__combat-top">';
 h+='<div class="pg__shield"><input class="pg__inp--inline" data-ef="ac" type="number" value="'+e.ac+'" style="font-size:1.3rem;font-weight:700;color:var(--gold);width:3ch"><div class="pg__shield-lbl">CA</div></div>';
 h+='<div class="pg__hpblock"><div class="pg__hpbar-info"><span class="pg__hpbar-nums"><span style="color:var(--muted);font-weight:400">💚 </span><input class="pg__inp--inline" data-ef="hpCur" type="number" value="'+hpCur+'" style="font-weight:700;color:var(--text);width:'+Math.max(1,String(hpCur).length)+'ch"><span style="color:var(--muted)"> / </span><input class="pg__inp--inline" data-ef="hp" type="number" value="'+hpMax+'" style="color:var(--dim);width:'+Math.max(1,String(hpMax).length)+'ch"></span><span class="pg__hpbar-tmp"'+(hpTemp>0?'':' style="opacity:.4"')+'>🛡️ <input class="pg__inp--inline" data-ef="hpTemp" type="number" value="'+hpTemp+'" style="color:var(--gold);width:'+Math.max(1,String(hpTemp).length)+'ch"></span></div>';
-h+='<div class="pg__hpbar"><div class="pg__hpbar-fill" style="width:'+hpPct+'%;background:'+barCol+';border-radius:5px"></div></div>';
+h+='<div class="pg__hpbar" data-hpbar="1" title="Clicca o trascina per impostare i PF attuali"><div class="pg__hpbar-fill" style="width:'+hpPct+'%;background:'+barCol+';border-radius:5px"></div></div>';
 h+='</div></div>';
 /* Action row Danno/Cura/Temp */
 h+='<div style="display:flex;gap:3px;margin-bottom:4px;margin-top:5px">';
@@ -3778,6 +3778,12 @@ return h}
 function openEsheet(idx){if(idx==null||!enemies[idx])return;/* Reset stato roll se cambio nemico (mantiene lastRoll su stesso nemico) */if(esObj!==enemies[idx]){esLastRoll=null;esAdv=null}esObj=enemies[idx];defaultEnemy(esObj);document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)');document.getElementById('esheetBody').innerHTML=buildEsheet(esObj)}
 function closeEsheet(){esObj=null;var i=op.indexOf('esheet');if(i>=0){op.splice(i,1);sO();rW()}}
 document.getElementById('esheetClose').addEventListener('click',closeEsheet);
+/* HP bar drag: click o drag sulla barra imposta hpCur in base a posizione X.
+   Pattern identico a scheda PG (line ~5423). Update visivo immediato +
+   final save su mouseup. */
+document.getElementById('esheetBody').addEventListener('mousedown',function(ev){if(!esObj)return;var bar=ev.target.closest('[data-hpbar]');if(!bar)return;ev.preventDefault();ev.stopPropagation();var fill=bar.querySelector('.pg__hpbar-fill');var curInp=document.querySelector('#esheetBody input[data-ef="hpCur"]');var rect=bar.getBoundingClientRect();if(fill)fill.style.transition='none';function setH(e){var pct=Math.max(0,Math.min(100,(e.clientX-rect.left)/rect.width*100));var nc=Math.round(pct*(esObj.hp||1)/100);esObj.hpCur=Math.max(0,Math.min(esObj.hp||0,nc));var hpPc=(esObj.hp||0)>0?esObj.hpCur/esObj.hp*100:0;var col=hpPc>50?'linear-gradient(90deg,#4a9a5a,#5dbf6f)':hpPc>25?'linear-gradient(90deg,#c49a32,#dab44a)':'linear-gradient(90deg,#c44a4a,#dc5d5d)';if(fill){fill.style.width=hpPc+'%';fill.style.background=col}if(curInp)curInp.value=esObj.hpCur}setH(ev);function mv(e){e.preventDefault();setH(e)}function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);if(fill)fill.style.transition='';sE();renE();openEsheet(enemies.indexOf(esObj))}document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up)});
+/* Enter su dmg/heal/temp input → click del bottone corrispondente (come PG). */
+document.getElementById('esheetBody').addEventListener('keydown',function(e){if(e.key!=='Enter')return;var id=e.target.id;var sel=id==='esDmgIn'?'[data-eapplydmg]':id==='esHealIn'?'[data-eapplyheal]':id==='esTmpIn'?'[data-eapplytmp]':null;if(sel){e.preventDefault();var btn=document.querySelector(sel);if(btn)btn.click()}});
 /* Click outside per chiudere i dropdown identità enemy (Tipo/Allineamento/
    Taglia). Skip se il click è dentro un wrap o un panel di questi dropdown. */
 document.addEventListener('click',function(ev){if(ev.target.closest('[data-esddwrap]')||ev.target.closest('[data-esddopt]'))return;document.querySelectorAll('[data-esddwrap].pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')})});
@@ -3825,8 +3831,8 @@ if(ddOpt){e.stopPropagation();var wrap2=ddOpt.closest('[data-esddwrap]');if(!wra
 var admg=e.target.closest('[data-eapplydmg]');if(admg){var inp=document.getElementById('esDmgIn');var d=Math.abs(parseInt(inp.value)||1);if(esObj.hpTemp>0){var absorbed=Math.min(esObj.hpTemp,d);esObj.hpTemp-=absorbed;d-=absorbed}if(esObj.hpCur==null)esObj.hpCur=esObj.hp;esObj.hpCur-=d;if(esObj.hpCur<0)esObj.hpCur=0;sE();renE();openEsheet(enemies.indexOf(esObj));return}
 /* Applica cura: somma a hpCur, clampato a hpMax */
 var aheal=e.target.closest('[data-eapplyheal]');if(aheal){var inp=document.getElementById('esHealIn');var hp=Math.abs(parseInt(inp.value)||1);if(esObj.hpCur==null)esObj.hpCur=esObj.hp;esObj.hpCur=Math.min(esObj.hp||0,esObj.hpCur+hp);sE();renE();openEsheet(enemies.indexOf(esObj));return}
-/* Imposta PF temporanei (non si sommano, sostituiscono come da regole D&D) */
-var atmp=e.target.closest('[data-eapplytmp]');if(atmp){var inp=document.getElementById('esTmpIn');var t=Math.abs(parseInt(inp.value)||0);esObj.hpTemp=Math.max(esObj.hpTemp||0,t);sE();renE();openEsheet(enemies.indexOf(esObj));return}
+/* Aggiunge PF temporanei (additive come scheda PG) */
+var atmp=e.target.closest('[data-eapplytmp]');if(atmp){var inp=document.getElementById('esTmpIn');var t=Math.abs(parseInt(inp.value)||1);esObj.hpTemp=(esObj.hpTemp||0)+t;sE();renE();openEsheet(enemies.indexOf(esObj));return}
 /* Bottone × rimuovi foto: priorità su click slot. */
 var rm=e.target.closest('#esPhotoSlotRm');if(rm){e.stopPropagation();var idx=enemies.indexOf(esObj);if(idx<0)return;esObj.photo=null;esObj.photoFull=null;esObj.photoOffsetX=null;esObj.photoOffsetY=null;sE();renE();openEsheet(idx);return}
 /* Click sullo slot foto: apre direttamente il file picker. photoCtx
