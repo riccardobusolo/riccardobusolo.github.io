@@ -532,47 +532,58 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .ch__shield-lbl{font-family:var(--mono);font-size:.36rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .ch__stat-v{font-family:var(--mono);font-weight:600;font-size:.66rem;color:var(--dim);line-height:1.1}
 /* === SCHEDA NEMICO (winEsheet) =====================================
-   Pannello completo per editare un mostro: header (emoji+nome+tipo),
-   sezioni Combat/Caratteristiche/Difese/Sensi/CR + liste dinamiche
-   Tratti/Azioni/Reazioni/Leggendarie + note libere. Tutti i campi
-   sono freeform per accomodare qualsiasi statblock da manuale. */
-.es__hdr{display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
-.es__emoji{font-size:2rem;cursor:var(--cur-pointer);background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;line-height:1;transition:all .12s}
+   Layout compatto ispirato alla scheda PG. Riusa .pg__sec / .pg__sec-title
+   / .pg__sec-add / .pg__row / .pg__field / .pg__lbl / .pg__inp / .pg__abs
+   / .pg__ab per coerenza visiva con scheda PG. Aggiunge solo gli stili
+   specifici per: header (emoji+nome+meta), modificatori ability sotto
+   score, item list dinamica con nome+textarea descrizione. */
+#esheetBody{display:flex;flex-direction:column;gap:6px}
+.es__hdr{display:flex;gap:10px;align-items:center}
+.es__emoji{font-size:1.85rem;cursor:var(--cur-pointer);background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:4px 9px;line-height:1;transition:all .12s;flex-shrink:0}
 .es__emoji:hover{border-color:var(--gold);transform:scale(1.05)}
-.es__hdr-fields{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0}
-.es__name{font-family:var(--mono);font-size:1.05rem;font-weight:700;color:var(--gold);background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 9px;outline:none}
+.es__hdr-right{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+.es__name{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--gold);background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:5px 9px;outline:none;width:100%;box-sizing:border-box;transition:border-color .12s}
 .es__name:focus{border-color:var(--gold)}
-.es__type-row{display:flex;gap:5px;flex-wrap:wrap}
-.es__type-row .es__inp{flex:1;min-width:110px}
-.es__sec{margin-bottom:12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:9px 10px}
-.es__sec-h{font-family:var(--mono);font-size:.62rem;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:6px}
-.es__field{display:flex;flex-direction:column;gap:3px;margin-bottom:5px}
-.es__field:last-child{margin-bottom:0}
-.es__field--w{flex:2}
-.es__lbl{font-family:var(--mono);font-size:.54rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
-.es__inp{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:5px 7px;color:var(--text);font-family:var(--mono);font-size:.72rem;outline:none;width:100%;box-sizing:border-box;transition:border-color .12s}
-.es__inp:focus{border-color:var(--gold)}
-.es__inp--sm{font-size:.68rem;padding:4px 6px}
-.es__row3{display:flex;gap:6px;margin-bottom:5px}
-.es__row3 .es__field{flex:1;margin-bottom:0}
-.es__abs{display:flex;gap:5px;flex-wrap:wrap}
-.es__ab{flex:1;min-width:60px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:5px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
-.es__ab-lbl{font-family:var(--mono);font-size:.54rem;color:var(--muted);text-transform:uppercase;font-weight:600;letter-spacing:.04em}
-.es__ab-inp{background:transparent;border:none;width:100%;text-align:center;font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--text);outline:none;padding:0}
-.es__ab-mod{font-family:var(--mono);font-size:.68rem;color:var(--gold);font-weight:600}
-.es__add{font-family:var(--mono);font-size:.6rem;color:var(--gold);background:rgba(196,154,50,.08);border:1px solid rgba(196,154,50,.25);border-radius:4px;padding:3px 8px;cursor:var(--cur-pointer);transition:all .12s;line-height:1}
-.es__add:hover{background:rgba(196,154,50,.18);border-color:var(--gold)}
-.es__items{display:flex;flex-direction:column;gap:6px}
-.es__item{display:grid;grid-template-columns:1fr auto;gap:5px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:7px}
-.es__item-name{grid-column:1;background:transparent;border:none;font-family:var(--mono);font-size:.76rem;font-weight:600;color:var(--text);outline:none;padding:2px 0}
-.es__item-name:focus{color:var(--gold)}
-.es__item-del{grid-column:2;width:22px;height:22px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);border-radius:4px;font-size:.85rem;line-height:1;padding:0;display:flex;align-items:center;justify-content:center}
+.es__meta{display:flex;align-items:center;gap:2px}
+.es__meta-inp{flex:1;min-width:0;background:transparent;border:1px solid transparent;border-radius:3px;color:var(--dim);font-family:var(--mono);font-size:.66rem;font-style:italic;padding:2px 4px;outline:none;text-align:center;transition:all .12s}
+.es__meta-inp:hover{border-color:var(--border);background:var(--bg)}
+.es__meta-inp:focus{border-color:var(--gold);background:var(--bg2);color:var(--text);font-style:normal}
+.es__meta-dot{color:var(--muted);font-size:.7rem;line-height:1}
+/* Stat-card row: usa .pg__abs flex wrapping. Cards più stretti per
+   numeri (CA/PF/Init), più larghi per testi (CR/Vel/Armor/HpDice).
+   Override del padding/font-size della .pg__inp per maggior compattezza. */
+.es__stats{display:flex;gap:4px;flex-wrap:wrap}
+.es__statcard{flex:1 1 70px;min-width:62px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 5px;transition:border-color .12s}
+.es__statcard:hover{border-color:var(--bh)}
+.es__statcard--w{flex:2 1 160px;min-width:130px}
+.es__statcard .pg__lbl{margin-bottom:1px;font-size:.5rem;text-align:center}
+.es__statcard--w .pg__lbl{text-align:left}
+.es__statcard .pg__inp{padding:2px 4px;min-height:0;font-size:.86rem;text-align:center}
+.es__statcard--w .pg__inp{text-align:left;font-size:.74rem;font-weight:500}
+/* Ability cards: pg__ab base + mod absolute al fondo della card */
+.es__ab{position:relative;padding-bottom:14px !important;cursor:default}
+.es__ab .pg__lbl{font-size:.5rem;margin-bottom:1px}
+.es__ab .pg__inp{padding:1px 2px !important;min-height:0 !important;font-size:.86rem !important;font-weight:700}
+.es__ab-mod{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:.66rem;color:var(--gold);font-weight:600;line-height:1;pointer-events:none}
+/* Section dinamica: items (tratti/azioni/ecc.) come card compatte */
+.es__empty{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-align:center;padding:4px 0;font-style:italic}
+.es__items{display:flex;flex-direction:column;gap:4px}
+.es__item{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:5px 7px;transition:border-color .12s}
+.es__item:hover{border-color:var(--bh)}
+.es__item-row{display:flex;gap:5px;align-items:center;margin-bottom:3px}
+.es__item-name{flex:1;background:transparent;border:1px solid transparent;font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--text);outline:none;padding:1px 3px;border-radius:3px;transition:all .12s;min-width:0}
+.es__item-name:hover{background:var(--bg3);border-color:var(--border)}
+.es__item-name:focus{background:var(--bg3);border-color:var(--gold);color:var(--gold)}
+.es__item-del{flex-shrink:0;width:18px;height:18px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);border-radius:3px;font-size:.8rem;line-height:1;padding:0;display:flex;align-items:center;justify-content:center;transition:all .12s}
 .es__item-del:hover{color:var(--red);border-color:var(--rb);background:var(--rl)}
-.es__item-desc{grid-column:1/-1;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:5px 7px;color:var(--text);font-family:var(--mono);font-size:.7rem;outline:none;min-height:42px;resize:vertical;line-height:1.4}
+.es__item-desc{width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:4px 6px;color:var(--text);font-family:var(--mono);font-size:.68rem;outline:none;min-height:36px;resize:vertical;line-height:1.4;transition:border-color .12s}
 .es__item-desc:focus{border-color:var(--gold)}
-.es__ta{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:7px;color:var(--text);font-family:var(--mono);font-size:.72rem;outline:none;width:100%;box-sizing:border-box;min-height:70px;resize:vertical;line-height:1.4}
+/* Override defenses/senses input: text fields freeform, allineati a sinistra */
+.es__inp-text{padding:3px 6px !important;min-height:0 !important;font-size:.72rem !important;font-weight:500 !important;text-align:left !important}
+.es__ta{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 8px;color:var(--text);font-family:var(--mono);font-size:.7rem;outline:none;width:100%;box-sizing:border-box;min-height:54px;resize:vertical;line-height:1.4;transition:border-color .12s}
 .es__ta:focus{border-color:var(--gold)}
-.es__del-btn{margin-top:14px;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--rb);color:var(--red);padding:7px 14px;border-radius:5px;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.7rem;transition:all .12s}
+/* Pulsante elimina nemico */
+.es__del-btn{margin-top:8px;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--rb);color:var(--red);padding:5px 11px;border-radius:5px;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.66rem;transition:all .12s}
 .es__del-btn:hover{background:var(--rl)}
 .es__del-btn svg{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .ch__del{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}.ch__del:hover{background:var(--rl);color:var(--red);border-color:var(--rb)}.ch__del svg{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -3647,20 +3658,45 @@ var esObj=null;
 function abModEn(score){return Math.floor(((score|0)-10)/2)}
 function fmtModEn(m){return m>=0?'+'+m:''+m}
 function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','saves','skills','dmgResist','dmgImmune','dmgVulner','condImmune','senses','languages','cr','notes'].forEach(function(k){if(e[k]==null)e[k]=''});['str','dex','con','intl','wis','cha'].forEach(function(k){if(e[k]==null)e[k]=10});['traits','actions','bonusActions','reactions','legendaryActions'].forEach(function(k){if(!Array.isArray(e[k]))e[k]=[]})}
-function _esSecHTML(label,key,icon,items){var h='<div class="es__sec"><div class="es__sec-h"><span>'+icon+' '+label+'</span><button class="es__add" data-essec="'+key+'" type="button">+ Aggiungi</button></div><div class="es__items" data-essec="'+key+'">';items.forEach(function(it,i){h+='<div class="es__item" data-esitem="'+i+'"><input class="es__item-name" data-esfield="name" value="'+esc(it.name||'')+'" placeholder="Nome"><button class="es__item-del" data-esdel="1" type="button" title="Elimina">×</button><textarea class="es__item-desc" data-esfield="desc" placeholder="Descrizione, formule, range...">'+esc(it.desc||'')+'</textarea></div>'});h+='</div></div>';return h}
-function buildEsheet(e){var h='<div class="es__hdr"><button class="es__emoji" id="esEmoji" type="button">'+(e.emoji||'👾')+'</button><div class="es__hdr-fields"><input class="es__name" data-ef="name" value="'+esc(e.name||'')+'" placeholder="Nome del mostro"><div class="es__type-row"><input class="es__inp es__inp--sm" data-ef="size" value="'+esc(e.size)+'" placeholder="Taglia (Piccola, Media, Grande...)"><input class="es__inp es__inp--sm" data-ef="type" value="'+esc(e.type)+'" placeholder="Tipo (Celestiale, Drago...)"><input class="es__inp es__inp--sm" data-ef="alignment" value="'+esc(e.alignment)+'" placeholder="Allineamento"></div></div></div>';
-h+='<div class="es__sec"><div class="es__sec-h">📋 Combattimento</div><div class="es__row3"><div class="es__field"><div class="es__lbl">CA</div><input class="es__inp" data-ef="ac" type="number" value="'+e.ac+'"></div><div class="es__field es__field--w"><div class="es__lbl">Tipo armatura</div><input class="es__inp" data-ef="acType" value="'+esc(e.acType)+'" placeholder="es. armatura naturale, scudo"></div></div><div class="es__row3"><div class="es__field"><div class="es__lbl">PF</div><input class="es__inp" data-ef="hp" type="number" value="'+e.hp+'"></div><div class="es__field es__field--w"><div class="es__lbl">Formula dadi</div><input class="es__inp" data-ef="hpDice" value="'+esc(e.hpDice)+'" placeholder="es. 18d10 + 144"></div></div><div class="es__field"><div class="es__lbl">Velocità</div><input class="es__inp" data-ef="speed" value="'+esc(e.speed)+'" placeholder="es. 15 m, volare 45 m"></div><div class="es__row3" style="margin-top:5px"><div class="es__field"><div class="es__lbl">Iniziativa</div><input class="es__inp" data-ef="init" type="number" value="'+e.init+'"></div><div class="es__field es__field--w"><div class="es__lbl">Sfida (CR)</div><input class="es__inp" data-ef="cr" value="'+esc(e.cr)+'" placeholder="es. 21 (33.000 PE)"></div></div></div>';
-h+='<div class="es__sec"><div class="es__sec-h">⚔ Caratteristiche</div><div class="es__abs">';
-[['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var v=e[a[1]];var m=abModEn(v);h+='<div class="es__ab"><div class="es__ab-lbl">'+a[0]+'</div><input class="es__ab-inp" data-ef="'+a[1]+'" type="number" value="'+v+'"><div class="es__ab-mod">'+fmtModEn(m)+'</div></div>'});
+function _esSecHTML(label,key,items){var h='<div class="pg__sec"><div class="pg__sec-title">'+label+'<button class="pg__sec-add" data-essec="'+key+'" type="button">+ Aggiungi</button></div>';if(!items.length){h+='<div class="es__empty">Nessun elemento — usa + Aggiungi</div>'}else{h+='<div class="es__items" data-essec="'+key+'">';items.forEach(function(it,i){h+='<div class="es__item" data-esitem="'+i+'"><div class="es__item-row"><input class="es__item-name" data-esfield="name" value="'+esc(it.name||'')+'" placeholder="Nome"><button class="es__item-del" data-esdel="1" type="button" title="Elimina">×</button></div><textarea class="es__item-desc" data-esfield="desc" placeholder="Descrizione, formule, range, costo (es. Costa 2 Azioni)...">'+esc(it.desc||'')+'</textarea></div>'});h+='</div>'}h+='</div>';return h}
+function buildEsheet(e){var h='';
+/* HEADER: emoji + nome + meta (taglia · tipo · allineamento) inline */
+h+='<div class="es__hdr"><button class="es__emoji" id="esEmoji" type="button">'+(e.emoji||'👾')+'</button><div class="es__hdr-right"><input class="es__name" data-ef="name" value="'+esc(e.name||'')+'" placeholder="Nome del mostro"><div class="es__meta"><input class="es__meta-inp" data-ef="size" value="'+esc(e.size)+'" placeholder="Taglia"><span class="es__meta-dot">·</span><input class="es__meta-inp" data-ef="type" value="'+esc(e.type)+'" placeholder="Tipo"><span class="es__meta-dot">·</span><input class="es__meta-inp" data-ef="alignment" value="'+esc(e.alignment)+'" placeholder="Allineamento"></div></div></div>';
+/* STAT ROW: CA/PF/Init come card compatte; CR/Vel/Armor/HpDice come card più larghe */
+h+='<div class="es__stats">';
+h+='<div class="es__statcard"><div class="pg__lbl">CA</div><input class="pg__inp" data-ef="ac" type="number" value="'+e.ac+'"></div>';
+h+='<div class="es__statcard"><div class="pg__lbl">PF</div><input class="pg__inp" data-ef="hp" type="number" value="'+e.hp+'"></div>';
+h+='<div class="es__statcard"><div class="pg__lbl">Iniz.</div><input class="pg__inp" data-ef="init" type="number" value="'+e.init+'"></div>';
+h+='<div class="es__statcard es__statcard--w"><div class="pg__lbl">CR (Sfida)</div><input class="pg__inp" data-ef="cr" value="'+esc(e.cr)+'" placeholder="es. 21 (33.000 PE)"></div>';
+h+='</div>';
+h+='<div class="es__stats">';
+h+='<div class="es__statcard es__statcard--w"><div class="pg__lbl">Velocità</div><input class="pg__inp" data-ef="speed" value="'+esc(e.speed)+'" placeholder="es. 15 m, volare 45 m"></div>';
+h+='<div class="es__statcard es__statcard--w"><div class="pg__lbl">Tipo armatura</div><input class="pg__inp" data-ef="acType" value="'+esc(e.acType)+'" placeholder="es. armatura naturale"></div>';
+h+='<div class="es__statcard es__statcard--w"><div class="pg__lbl">Formula PF</div><input class="pg__inp" data-ef="hpDice" value="'+esc(e.hpDice)+'" placeholder="es. 18d10 + 144"></div>';
+h+='</div>';
+/* CARATTERISTICHE: 6 ability score cards riusando .pg__abs / .pg__ab + override per mod */
+h+='<div class="pg__sec"><div class="pg__sec-title">Caratteristiche</div><div class="pg__abs">';
+[['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var v=e[a[1]];var m=abModEn(v);h+='<div class="pg__ab es__ab"><div class="pg__lbl">'+a[0]+'</div><input class="pg__inp" data-ef="'+a[1]+'" type="number" value="'+v+'"><div class="es__ab-mod">'+fmtModEn(m)+'</div></div>'});
 h+='</div></div>';
-h+='<div class="es__sec"><div class="es__sec-h">🛡 Difese</div><div class="es__field"><div class="es__lbl">Tiri salvezza</div><input class="es__inp" data-ef="saves" value="'+esc(e.saves)+'" placeholder="es. Int +14, Sag +14, Car +17"></div><div class="es__field"><div class="es__lbl">Abilità</div><input class="es__inp" data-ef="skills" value="'+esc(e.skills)+'" placeholder="es. Percezione +14, Intuizione +10"></div><div class="es__field"><div class="es__lbl">Resistenze ai danni</div><input class="es__inp" data-ef="dmgResist" value="'+esc(e.dmgResist)+'" placeholder="es. radioso; contundente da attacchi non magici"></div><div class="es__field"><div class="es__lbl">Immunità ai danni</div><input class="es__inp" data-ef="dmgImmune" value="'+esc(e.dmgImmune)+'" placeholder="es. necrotico, veleno"></div><div class="es__field"><div class="es__lbl">Vulnerabilità ai danni</div><input class="es__inp" data-ef="dmgVulner" value="'+esc(e.dmgVulner)+'" placeholder=""></div><div class="es__field"><div class="es__lbl">Immunità alle condizioni</div><input class="es__inp" data-ef="condImmune" value="'+esc(e.condImmune)+'" placeholder="es. affascinato, avvelenato, spaventato"></div></div>';
-h+='<div class="es__sec"><div class="es__sec-h">👁 Sensi e linguaggi</div><div class="es__field"><div class="es__lbl">Sensi</div><input class="es__inp" data-ef="senses" value="'+esc(e.senses)+'" placeholder="es. Percezione passiva 24, vista pura 36 m"></div><div class="es__field"><div class="es__lbl">Linguaggi</div><input class="es__inp" data-ef="languages" value="'+esc(e.languages)+'" placeholder="es. tutti, telepatia 36 m"></div></div>';
-h+=_esSecHTML('Tratti','traits','✨',e.traits);
-h+=_esSecHTML('Azioni','actions','⚔',e.actions);
-h+=_esSecHTML('Azioni Bonus','bonusActions','🎯',e.bonusActions);
-h+=_esSecHTML('Reazioni','reactions','⚡',e.reactions);
-h+=_esSecHTML('Azioni Leggendarie','legendaryActions','👑',e.legendaryActions);
-h+='<div class="es__sec"><div class="es__sec-h">📝 Note</div><textarea class="es__ta" data-ef="notes" placeholder="Note aggiuntive (descrizione, lore, tattiche...)">'+esc(e.notes)+'</textarea></div>';
+/* DIFESE: 2-col .pg__row con field freeform */
+h+='<div class="pg__sec"><div class="pg__sec-title">🛡 Difese</div>';
+h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Tiri salvezza</div><input class="pg__inp es__inp-text" data-ef="saves" value="'+esc(e.saves)+'" placeholder="Int +14, Sag +14..."></div><div class="pg__field"><div class="pg__lbl">Abilità</div><input class="pg__inp es__inp-text" data-ef="skills" value="'+esc(e.skills)+'" placeholder="Percezione +14..."></div></div>';
+h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Resistenze danni</div><input class="pg__inp es__inp-text" data-ef="dmgResist" value="'+esc(e.dmgResist)+'" placeholder="radioso; contundente non magico..."></div><div class="pg__field"><div class="pg__lbl">Immunità danni</div><input class="pg__inp es__inp-text" data-ef="dmgImmune" value="'+esc(e.dmgImmune)+'" placeholder="necrotico, veleno..."></div></div>';
+h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Vulnerabilità danni</div><input class="pg__inp es__inp-text" data-ef="dmgVulner" value="'+esc(e.dmgVulner)+'" placeholder="..."></div><div class="pg__field"><div class="pg__lbl">Immunità condizioni</div><input class="pg__inp es__inp-text" data-ef="condImmune" value="'+esc(e.condImmune)+'" placeholder="affascinato, spaventato..."></div></div>';
+h+='</div>';
+/* SENSI E LINGUAGGI: 2-col */
+h+='<div class="pg__sec"><div class="pg__sec-title">👁 Sensi e linguaggi</div>';
+h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Sensi</div><input class="pg__inp es__inp-text" data-ef="senses" value="'+esc(e.senses)+'" placeholder="Percezione passiva 24, vista pura 36 m..."></div><div class="pg__field"><div class="pg__lbl">Linguaggi</div><input class="pg__inp es__inp-text" data-ef="languages" value="'+esc(e.languages)+'" placeholder="tutti, telepatia 36 m..."></div></div>';
+h+='</div>';
+/* SEZIONI DINAMICHE */
+h+=_esSecHTML('✨ Tratti','traits',e.traits);
+h+=_esSecHTML('⚔ Azioni','actions',e.actions);
+h+=_esSecHTML('🎯 Azioni bonus','bonusActions',e.bonusActions);
+h+=_esSecHTML('⚡ Reazioni','reactions',e.reactions);
+h+=_esSecHTML('👑 Azioni leggendarie','legendaryActions',e.legendaryActions);
+/* NOTE */
+h+='<div class="pg__sec"><div class="pg__sec-title">📝 Note</div><textarea class="es__ta" data-ef="notes" placeholder="Lore, tattiche, comportamenti, contesto...">'+esc(e.notes)+'</textarea></div>';
+/* ELIMINA */
 h+='<button class="es__del-btn" id="esheetDel" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Elimina nemico</button>';
 return h}
 function openEsheet(idx){if(idx==null||!enemies[idx])return;esObj=enemies[idx];defaultEnemy(esObj);document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)');document.getElementById('esheetBody').innerHTML=buildEsheet(esObj)}
