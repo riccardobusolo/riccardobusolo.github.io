@@ -3664,6 +3664,12 @@ function _esSecHTML(label,key,items){var h='<div class="pg__sec"><div class="pg_
 function buildEsheet(e){var h='';
 /* HEADER: emoji + nome + meta (taglia · tipo · allineamento) inline */
 h+='<div class="es__hdr"><button class="es__emoji" id="esEmoji" type="button">'+(e.emoji||'👾')+'</button><div class="es__hdr-right"><input class="es__name" data-ef="name" value="'+esc(e.name||'')+'" placeholder="Nome del mostro"><div class="es__meta"><input class="es__meta-inp" data-ef="size" value="'+esc(e.size)+'" placeholder="Taglia"><span class="es__meta-dot">·</span><input class="es__meta-inp" data-ef="type" value="'+esc(e.type)+'" placeholder="Tipo"><span class="es__meta-dot">·</span><input class="es__meta-inp" data-ef="alignment" value="'+esc(e.alignment)+'" placeholder="Allineamento"></div></div></div>';
+/* === LAYOUT 3-COLONNE pg__sheet/pg__col come scheda PG. Su largh
+   stretta wrappa naturalmente (flex:1 1 240px). La sezione Combattimento
+   sta dentro la COL 1 insieme a Caratteristiche / Difese / Sensi. */
+h+='<div class="pg__sheet">';
+/* COLONNA 1: combattimento, caratteristiche, difese, sensi */
+h+='<div class="pg__col">';
 /* SEZIONE COMBATTIMENTO: layout PG-style — shield CA + barra HP cur/max
    + temp HP, Danno/Cura/Temp inline actions, init+speed, NO Riposo lungo.
    Stats aggiuntivi (CR, Tipo armatura, Formula PF) in card sotto. */
@@ -3687,18 +3693,14 @@ h+='<div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap">';
 h+='<div class="pg__cstat" style="padding:2px 5px">⚡<input class="pg__inp--inline" data-ef="init" type="number" value="'+e.init+'" style="width:3ch"></div>';
 h+='<div class="pg__cstat" style="padding:2px 5px;min-width:0;flex:1">👟<input class="pg__inp--inline" data-ef="speed" value="'+esc(e.speed)+'" placeholder="15 m, volare 45 m" style="text-align:left;width:auto;flex:1;min-width:0"></div>';
 h+='</div>';
-/* Statistiche aggiuntive (CR, Tipo armatura, Formula PF) */
+/* Statistiche aggiuntive (CR, Tipo armatura, Formula PF) — wrappa
+   naturalmente in colonna stretta */
 h+='<div class="es__stats" style="margin-top:5px">';
 h+='<div class="es__statcard es__statcard--w"><div class="pg__lbl">CR (Sfida)</div><input class="pg__inp" data-ef="cr" value="'+esc(e.cr)+'" placeholder="es. 21 (33.000 PE)"></div>';
 h+='<div class="es__statcard es__statcard--w"><div class="pg__lbl">Tipo armatura</div><input class="pg__inp" data-ef="acType" value="'+esc(e.acType)+'" placeholder="es. armatura naturale"></div>';
 h+='<div class="es__statcard es__statcard--w"><div class="pg__lbl">Formula PF</div><input class="pg__inp" data-ef="hpDice" value="'+esc(e.hpDice)+'" placeholder="es. 18d10 + 144"></div>';
 h+='</div>';
 h+='</div>';
-/* === LAYOUT 3-COLONNE pg__sheet/pg__col come scheda PG. Su largh
-   stretta wrappa naturalmente (flex:1 1 240px). ====================== */
-h+='<div class="pg__sheet">';
-/* COLONNA 1: caratteristiche, difese, sensi (info statiche/passive) */
-h+='<div class="pg__col">';
 h+='<div class="pg__sec"><div class="pg__sec-title">💪 Caratteristiche</div><div class="pg__abs">';
 [['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var v=e[a[1]];var m=abModEn(v);h+='<div class="pg__ab es__ab"><div class="pg__lbl">'+a[0]+'</div><input class="pg__inp" data-ef="'+a[1]+'" type="number" value="'+v+'"><div class="es__ab-mod">'+fmtModEn(m)+'</div></div>'});
 h+='</div></div>';
