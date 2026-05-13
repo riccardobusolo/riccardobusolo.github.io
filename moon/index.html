@@ -1601,16 +1601,19 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .mp__sb-item-folder-ico{flex-shrink:0;color:var(--gold);display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px}
 /* Item taglated: leggermente trasparente per indicare che è in clipboard cut */
 .mp__sb-item--cut{opacity:.5}
-/* Drop target highlight durante drag: hover su cartella (per moveInto) o
-   back button (per spostare al parent). Riusato dallo stile sidebar tool. */
-.mp__sb-item--drop-over{outline:2px dashed var(--gold);outline-offset:-2px;background:rgba(196,154,50,.12)}
-.mp__sb-back--drop-over{outline:2px dashed var(--gold);outline-offset:-2px;background:rgba(196,154,50,.18)}
-/* Drag&drop reorder stile sidebar tool: item originale dimmato + ghost
-   floating clone + slide animato dei siblings (FLIP). */
-.mp__sb-item--drag{opacity:.15;transform:scale(.88);transition:all .2s var(--ease)}
-.mp__sb-list--dragging .mp__sb-item:not(.mp__sb-item--drag){transition:all .25s cubic-bezier(.2,.8,.3,1)}
-.mp__sb-item--ghost,.mp__sb-item--ghost.on{position:fixed;pointer-events:none;z-index:99999;margin:0;background:linear-gradient(var(--rl),var(--rl)) var(--bg2);color:var(--dim) !important;border:1px solid var(--border) !important;box-shadow:0 12px 32px rgba(0,0,0,.55);transform:scale(1.04);opacity:.95;transition:none}
-.mp__sb-item--ghost.mp__sb-item--folder,.mp__sb-item--ghost.mp__sb-item--folder.on{color:var(--gold) !important;border-color:rgba(196,154,50,.4) !important}
+/* Drop target highlight: cartella sotto cursore (drop-into) o back button
+   (drop-to-parent). Outline dashed dorato + bg tinto, transizione liscia
+   per evitare flash quando il cursore le attraversa rapidamente. */
+.mp__sb-item--drop-over,.mp__sb-back--drop-over{position:relative;z-index:1;transition:background .12s,box-shadow .12s,border-color .12s}
+.mp__sb-item--drop-over{box-shadow:inset 0 0 0 2px var(--gold),0 0 0 2px rgba(196,154,50,.25);background:rgba(196,154,50,.16);border-color:rgba(196,154,50,.6)}
+.mp__sb-back--drop-over{box-shadow:inset 0 0 0 2px var(--gold),0 0 0 2px rgba(196,154,50,.25);background:rgba(196,154,50,.22);border-color:var(--gold);color:var(--gold)}
+/* Drag&drop reorder stile sidebar tool: item originale dimmato in place
+   (è il "slot" di drop) + ghost floating che segue il cursore + slide
+   animato dei siblings (FLIP). */
+.mp__sb-item--drag{opacity:.2;transform:scale(.92);transition:opacity .18s var(--ease),transform .18s var(--ease)}
+.mp__sb-list--dragging .mp__sb-item:not(.mp__sb-item--drag){transition:transform .22s cubic-bezier(.2,.8,.3,1)}
+.mp__sb-item--ghost{position:fixed;pointer-events:none;z-index:99999;margin:0;background:var(--bg2);box-shadow:0 14px 36px rgba(0,0,0,.6),0 0 0 1px rgba(196,154,50,.35);transform:scale(1.03);opacity:.96;transition:none;will-change:transform,left,top}
+.mp__sb-item--ghost.mp__sb-item--folder{color:var(--gold);border-color:rgba(196,154,50,.5)}
 /* Sidebar nav: back button + breadcrumb del folder corrente. */
 .mp__sb-nav{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--border);min-height:28px}
 .mp__sb-back{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);border-radius:5px;cursor:var(--cur-pointer);transition:all .12s;padding:0}
@@ -5831,105 +5834,78 @@ document.getElementById('mpBack').addEventListener('click',function(){goUpFolder
    così l'utente può rinominare inline senza dover passare per prompt(). */
 document.getElementById('mpNewFolder').addEventListener('click',function(){var f=newFolder('Nuova cartella');currentId=f.id;render();if(view!=='editor')setView('editor');setTimeout(function(){var t=document.getElementById('mpTitle');if(t){t.focus();t.select()}},80)});
 /* === DRAG & DROP sidebar items ============================================
-   Riordino stile sidebar tool (vedi `_sbDragMove` in alto): pointerdown/
-   pointermove/pointerup, item originale dimmato in place (.mp__sb-item--drag),
-   ghost clone floating che segue il cursore, FLIP animation sui siblings
-   durante il reorder. Per spostare un item DENTRO una cartella diversa
-   (cross-folder), hover la cartella nella banda centrale (25%-75% Y) →
-   outline dashed + su drop chiama moveItem. Per uscire dalla cartella
-   corrente, hover sul back button → outline dashed + moveItem al parent. */
+   Rifatto da zero v2. Tre regole semplici:
+   1. Riordino SEMPRE live (no freeze) — gli item scorrono fluidamente,
+      anche quando il cursore passa sopra una cartella. La posizione finale
+      del slot è dove il cursore decide al momento del rilascio.
+   2. Cartelle sotto il cursore si illuminano (box-shadow dorato + bg
+      tinto, transizione CSS .12s liscia) come affordance "drop qui per
+      entrare". Stesso vale per il back button.
+   3. Al rilascio: se cartella o back illuminato → moveItem (override del
+      reorder); altrimenti → salva il nuovo ordine del DOM in docs[].
+   Il reorder è ATTIVO SOLO se il cursore è dentro il rect di #mpList,
+   così non saltella quando esci dalla lista (verso back, header, sidebar
+   destra, ecc.). */
 var _mpDragSuppressClick=false;
 (function(){
-  var listEl=null;
   var startId=null,startX=0,startY=0,dragging=false;
-  var dragItem=null,ghost=null,offX=0,offY=0;
-  var specialKind=null,specialEl=null,specialId=null;
-  var THRESHOLD=5;
+  var dragItem=null,listEl=null,ghost=null;
+  var offX=0,offY=0;
+  var hoverFolderEl=null,hoverFolderId=null;
+  var hoverBackEl=null,hoverBackId=null;
+  var lastSwapAt=0;
+  var THRESHOLD=4;     /* px prima di considerare drag */
+  var SWAP_COOL=90;    /* ms minimi fra due swap consecutivi (anti-flicker) */
   function getList(){if(!listEl||!listEl.isConnected)listEl=document.getElementById('mpList');return listEl}
-  function getItemEls(){var L=getList();return L?Array.from(L.querySelectorAll('[data-mpitem]')):[]}
-  function clearSpecial(){if(specialEl){if(specialKind==='back')specialEl.classList.remove('mp__sb-back--drop-over');else specialEl.classList.remove('mp__sb-item--drop-over')}specialEl=null;specialKind=null;specialId=null}
-  function setSpecial(kind,el,id){if(specialEl===el&&specialKind===kind)return;clearSpecial();specialEl=el;specialKind=kind;specialId=id;if(kind==='back')el.classList.add('mp__sb-back--drop-over');else el.classList.add('mp__sb-item--drop-over')}
-  /* Salva il nuovo ordine del DOM nella docs[] preservando le posizioni
-     degli item che non sono nella cartella corrente (solo gli slot in
-     currentFolderId vengono riassegnati nell'ordine del DOM). */
-  function saveMpListOrder(){
+  function items(){var L=getList();return L?Array.prototype.slice.call(L.querySelectorAll('[data-mpitem]')):[]}
+  function clearFolderHover(){if(hoverFolderEl){hoverFolderEl.classList.remove('mp__sb-item--drop-over');hoverFolderEl=null;hoverFolderId=null}}
+  function clearBackHover(){if(hoverBackEl){hoverBackEl.classList.remove('mp__sb-back--drop-over');hoverBackEl=null;hoverBackId=null}}
+  function setFolderHover(el,id){if(hoverFolderEl===el)return;clearFolderHover();hoverFolderEl=el;hoverFolderId=id;el.classList.add('mp__sb-item--drop-over')}
+  function setBackHover(el,id){if(hoverBackEl===el)return;clearBackHover();hoverBackEl=el;hoverBackId=id;el.classList.add('mp__sb-back--drop-over')}
+  /* Riscrive l'ordine in docs[] dal DOM corrente: prende SOLO gli slot
+     della cartella corrente e ne riassegna i contenuti nell'ordine del
+     DOM. Item in altre cartelle restano dove sono in docs[]. */
+  function saveOrderFromDom(){
     var L=getList();if(!L)return;
-    var newIds=Array.from(L.querySelectorAll('[data-mpitem]')).map(function(el){return el.dataset.mpitem});
+    var ids=Array.prototype.slice.call(L.querySelectorAll('[data-mpitem]')).map(function(el){return el.dataset.mpitem});
     var byId={};docs.forEach(function(d){byId[d.id]=d});
-    var newItems=newIds.map(function(id){return byId[id]}).filter(Boolean);
+    var reordered=ids.map(function(id){return byId[id]}).filter(Boolean);
     var k=0;
     for(var i=0;i<docs.length;i++){
-      if(docs[i].parentId===currentFolderId&&k<newItems.length){docs[i]=newItems[k++]}
+      if(docs[i].parentId===currentFolderId&&k<reordered.length){docs[i]=reordered[k++]}
     }
     save();
   }
-  function cleanup(){
-    if(ghost&&ghost.parentNode)ghost.parentNode.removeChild(ghost);ghost=null;
-    if(dragItem)dragItem.classList.remove('mp__sb-item--drag');
-    var L=getList();if(L)L.classList.remove('mp__sb-list--dragging');
-    document.body.classList.remove('mp-sb-dragging');
-    clearSpecial();
+  function startDrag(e){
+    var r=dragItem.getBoundingClientRect();
+    offX=startX-r.left;offY=startY-r.top;
+    /* Ghost = clone visibile, position:fixed, segue il cursore al pixel.
+       Mantiene larghezza/altezza esatte dell'originale per evitare scatti. */
+    var g=dragItem.cloneNode(true);
+    g.classList.add('mp__sb-item--ghost');
+    g.classList.remove('on');
+    g.style.width=r.width+'px';
+    g.style.height=r.height+'px';
+    g.style.left=(e.clientX-offX)+'px';
+    g.style.top=(e.clientY-offY)+'px';
+    document.body.appendChild(g);
+    ghost=g;
+    dragItem.classList.add('mp__sb-item--drag');
+    var L=getList();if(L)L.classList.add('mp__sb-list--dragging');
+    document.body.classList.add('mp-sb-dragging');
+    dragging=true;
   }
-  function onPointerDown(e){
-    if(e.button!==0)return;
-    if(!e.target.closest('#winMap'))return;
-    var item=e.target.closest('[data-mpitem]');if(!item)return;
-    if(!item.closest('#mpList'))return;
-    startId=item.dataset.mpitem;startX=e.clientX;startY=e.clientY;
-    dragging=false;dragItem=item;
-    document.addEventListener('pointermove',onPointerMove);
-    document.addEventListener('pointerup',onPointerUp);
-    document.addEventListener('pointercancel',onPointerUp);
-  }
-  function onPointerMove(e){
-    if(!startId)return;
-    if(!dragging){
-      var dx=e.clientX-startX,dy=e.clientY-startY;
-      if(Math.abs(dx)<THRESHOLD&&Math.abs(dy)<THRESHOLD)return;
-      /* Start drag: clone ghost ancorato al punto di presa, dimma originale,
-         attiva transizioni siblings + cursor override globale. */
-      var rOrig=dragItem.getBoundingClientRect();
-      offX=startX-rOrig.left;offY=startY-rOrig.top;
-      var g=dragItem.cloneNode(true);
-      g.classList.add('mp__sb-item--ghost');
-      g.classList.remove('on');
-      g.style.width=rOrig.width+'px';
-      g.style.height=rOrig.height+'px';
-      g.style.left=(e.clientX-offX)+'px';
-      g.style.top=(e.clientY-offY)+'px';
-      document.body.appendChild(g);
-      ghost=g;
-      dragItem.classList.add('mp__sb-item--drag');
-      var L=getList();if(L)L.classList.add('mp__sb-list--dragging');
-      document.body.classList.add('mp-sb-dragging');
-      dragging=true;
-    }
-    /* Update ghost position */
-    if(ghost){ghost.style.left=(e.clientX-offX)+'px';ghost.style.top=(e.clientY-offY)+'px'}
-    /* elementFromPoint con ghost nascosto per trovare il vero target */
-    if(ghost)ghost.style.display='none';
-    var elU=document.elementFromPoint(e.clientX,e.clientY);
-    if(ghost)ghost.style.display='';
-    /* Priorità 1: back button → move-to-parent */
-    var bb=elU?elU.closest('#mpBack'):null;
-    if(bb&&currentFolderId){
-      var parentF=findById(currentFolderId);
-      var pid=parentF?parentF.parentId:null;
-      if(canMoveInto(startId,pid)){setSpecial('back',bb,pid);return}
-    }
-    /* Priorità 2: cartella in banda centrale → move-into */
-    var fitem=elU?elU.closest('[data-mpitem][data-mpfolder]'):null;
-    if(fitem&&fitem!==dragItem){
-      var fr=fitem.getBoundingClientRect();
-      var relY=(e.clientY-fr.top)/fr.height;
-      if(relY>0.25&&relY<0.75){
-        var fid=fitem.dataset.mpfolder;
-        if(canMoveInto(startId,fid)){setSpecial('folder',fitem,fid);return}
-      }
-    }
-    /* Nessuna special: clear hover, fai live reorder stile sidebar */
-    clearSpecial();
-    var btns=getItemEls();
+  function moveGhost(e){if(ghost){ghost.style.left=(e.clientX-offX)+'px';ghost.style.top=(e.clientY-offY)+'px'}}
+  /* Live reorder: trova dove andrebbe inserito dragItem in base alla Y
+     del cursore. Pattern identico al sidebar tool _sbDragMove. */
+  function liveReorder(e){
+    var L=getList();if(!L)return;
+    var lr=L.getBoundingClientRect();
+    /* Gate: solo se il cursore è dentro la lista, altrimenti il drag
+       "freezа" alla posizione corrente (evita salti se l'utente esce
+       dalla lista per puntare al back/header/altro). */
+    if(e.clientX<lr.left||e.clientX>lr.right||e.clientY<lr.top||e.clientY>lr.bottom)return;
+    var btns=items();
     var target=null;
     for(var i=0;i<btns.length;i++){
       if(btns[i]===dragItem)continue;
@@ -5940,53 +5916,111 @@ var _mpDragSuppressClick=false;
         if(i<idx){target=btns[i];break}
       }
     }
-    /* Cooldown per evitare flicker su swap rapidi */
-    if(dragItem._swapCool&&Date.now()-dragItem._swapCool<180)return;
+    /* Verifica se serve effettivamente uno swap */
     var needMove=false;
     if(target){if(target!==dragItem.nextElementSibling)needMove=true}
-    else{var last=btns[btns.length-1];if(last!==dragItem)needMove=true}
+    else{if(btns[btns.length-1]!==dragItem)needMove=true}
     if(!needMove)return;
-    /* FLIP: cattura le top di tutti i siblings prima della mutazione */
-    var oldPos={};
-    btns.forEach(function(b){if(b!==dragItem){oldPos[b.dataset.mpitem]=b.getBoundingClientRect().top}});
-    dragItem._swapCool=Date.now();
-    var L=getList();
+    /* Anti-flicker: cooldown dopo ogni swap */
+    var now=Date.now();
+    if(now-lastSwapAt<SWAP_COOL)return;
+    lastSwapAt=now;
+    /* FLIP: cattura top di tutti i siblings prima della mutazione */
+    var oldTops={};
+    btns.forEach(function(b){if(b!==dragItem)oldTops[b.dataset.mpitem]=b.getBoundingClientRect().top});
     if(target)L.insertBefore(dragItem,target);
     else L.appendChild(dragItem);
-    /* FLIP: applica translateY inverso senza transizione, force layout,
-       poi clear transform — CSS .mp__sb-list--dragging anima il ritorno. */
-    btns=getItemEls();
+    /* FLIP step 2: per ogni sibling spostato, applica translateY inverso
+       istantaneo, force reflow, poi reset — CSS animerà il ritorno. */
+    btns=items();
     btns.forEach(function(b){
       if(b===dragItem)return;
-      var old=oldPos[b.dataset.mpitem];if(old===undefined)return;
-      var now=b.getBoundingClientRect().top;
-      var dy2=old-now;if(Math.abs(dy2)<1)return;
+      var old=oldTops[b.dataset.mpitem];if(old===undefined)return;
+      var dy=old-b.getBoundingClientRect().top;
+      if(Math.abs(dy)<1)return;
       b.style.transition='none';
-      b.style.transform='translateY('+dy2+'px)';
-      b.offsetHeight;
+      b.style.transform='translateY('+dy+'px)';
+      /* force reflow */void b.offsetWidth;
       b.style.transition='';
       b.style.transform='';
     });
   }
-  function onPointerUp(e){
+  /* Detecta cartella o back sotto il cursore (con ghost nascosto per non
+     interferire con elementFromPoint), aggiorna i hover state. Riordino
+     e hover sono operazioni indipendenti — entrambe stanno attive. */
+  function updateHover(e){
+    if(ghost)ghost.style.display='none';
+    var elU=document.elementFromPoint(e.clientX,e.clientY);
+    if(ghost)ghost.style.display='';
+    /* Back button */
+    var bb=elU?elU.closest('#mpBack'):null;
+    if(bb&&currentFolderId){
+      var pF=findById(currentFolderId);
+      var pid=pF?pF.parentId:null;
+      if(canMoveInto(startId,pid)){setBackHover(bb,pid)}
+      else clearBackHover();
+    }else clearBackHover();
+    /* Cartella sotto il cursore (qualsiasi Y dentro il rect) */
+    var fit=elU?elU.closest('[data-mpitem][data-mpfolder]'):null;
+    if(fit===dragItem)fit=null;
+    if(fit){
+      var fid=fit.dataset.mpfolder;
+      if(canMoveInto(startId,fid)){setFolderHover(fit,fid)}
+      else clearFolderHover();
+    }else clearFolderHover();
+  }
+  function cleanup(){
+    if(ghost&&ghost.parentNode)ghost.parentNode.removeChild(ghost);ghost=null;
+    if(dragItem)dragItem.classList.remove('mp__sb-item--drag');
+    var L=getList();if(L)L.classList.remove('mp__sb-list--dragging');
+    document.body.classList.remove('mp-sb-dragging');
+    clearFolderHover();
+    clearBackHover();
+  }
+  function onPointerDown(e){
+    if(e.button!==0)return;
+    if(!e.target.closest('#winMap'))return;
+    var it=e.target.closest('[data-mpitem]');if(!it)return;
+    if(!it.closest('#mpList'))return;
+    startId=it.dataset.mpitem;startX=e.clientX;startY=e.clientY;
+    dragItem=it;dragging=false;lastSwapAt=0;
+    document.addEventListener('pointermove',onPointerMove);
+    document.addEventListener('pointerup',onPointerUp);
+    document.addEventListener('pointercancel',onPointerCancel);
+    document.addEventListener('keydown',onKey);
+  }
+  function onPointerMove(e){
+    if(!startId)return;
+    if(!dragging){
+      if(Math.abs(e.clientX-startX)<THRESHOLD&&Math.abs(e.clientY-startY)<THRESHOLD)return;
+      startDrag(e);
+    }
+    moveGhost(e);
+    updateHover(e);
+    liveReorder(e);
+  }
+  function finish(commit){
     document.removeEventListener('pointermove',onPointerMove);
     document.removeEventListener('pointerup',onPointerUp);
-    document.removeEventListener('pointercancel',onPointerUp);
+    document.removeEventListener('pointercancel',onPointerCancel);
+    document.removeEventListener('keydown',onKey);
     if(!dragging){startId=null;dragItem=null;return}
-    var action=specialKind,actionId=specialId;
+    var fId=hoverFolderId,bId=hoverBackId,hadBack=!!hoverBackEl,hadFolder=!!hoverFolderEl;
     cleanup();
-    if(action==='folder'||action==='back'){
-      moveItem(startId,actionId);
-    }else{
-      saveMpListOrder();
+    if(commit){
+      /* Priorità: back > folder > reorder */
+      if(hadBack){moveItem(startId,bId)}
+      else if(hadFolder){moveItem(startId,fId)}
+      else{saveOrderFromDom()}
     }
     render();
     _mpDragSuppressClick=true;
-    /* Safety reset: se il click sintetico non arriva (drop fuori #mpList),
-       libera la suppression entro 100ms così il prossimo click reale passa. */
     setTimeout(function(){_mpDragSuppressClick=false},100);
     startId=null;dragItem=null;dragging=false;
   }
+  function onPointerUp(){finish(true)}
+  function onPointerCancel(){finish(false)}
+  function onKey(e){if(e.key==='Escape'){e.preventDefault();finish(false)}}
   document.addEventListener('pointerdown',onPointerDown);
 })();
 /* === CONTEXT MENU sidebar items + lista vuota =============================
