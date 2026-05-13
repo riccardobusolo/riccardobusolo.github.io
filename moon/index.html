@@ -613,7 +613,10 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .ch__note{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.7rem;cursor:var(--cur-pointer);display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0;padding:0}.ch__note:hover{background:var(--rl);color:var(--gold);border-color:rgba(196,154,50,.3)}.ch__note svg{display:block}.epick{position:fixed;z-index:100;background:var(--bg3);border:1px solid var(--bh);border-radius:10px;padding:10px;display:none;flex-direction:column;gap:6px;box-shadow:0 12px 40px rgba(0,0,0,.5);width:370px}.epick.on{display:flex}
 .epick__search{width:100%;padding:6px 10px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono);font-size:.66rem;outline:none;box-sizing:border-box}.epick__search:focus{border-color:var(--rb)}
 .epick__search::placeholder{color:var(--muted)}
-.epick__grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;overflow-y:auto;overflow-x:hidden;max-height:356px;scrollbar-width:thin;scrollbar-color:rgba(140,30,30,.25) transparent}.epick__grid::-webkit-scrollbar{width:6px}.epick__grid::-webkit-scrollbar-track{background:transparent}.epick__grid::-webkit-scrollbar-thumb{background:rgba(140,30,30,.3);border-radius:3px}.epick__grid::-webkit-scrollbar-thumb:hover{background:rgba(140,30,30,.5)}
+/* Niente styling scrollbar nativo qui: il sistema .csb-host inietta una
+   scrollbar custom (.csb-track/.csb-thumb) e nasconde quella nativa con
+   scrollbar-width:none. Vedi line 415 e TARGETS in line 7196. */
+.epick__grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;overflow-y:auto;overflow-x:hidden;max-height:356px}
 .epick button{aspect-ratio:1;width:100%;border:1px solid var(--border);border-radius:5px;background:var(--bg);cursor:var(--cur-pointer);font-size:1rem;transition:all .12s;display:flex;align-items:center;justify-content:center;padding:0;box-sizing:border-box}.epick button:hover{background:var(--rl);border-color:var(--rb);transform:scale(1.1)}
 .ied{background:var(--bg3);border:1px solid var(--rb);border-radius:4px;padding:2px 4px;font-family:var(--mono);font-size:.72rem;color:var(--text);outline:none;width:3ch;text-align:center;height:22px;box-sizing:border-box}
 
@@ -2588,7 +2591,7 @@ var EMOJIS=[
 {e:'👻',t:'fantasma spirito spettro haunted'},{e:'🧟',t:'zombie morto vivente non morto'},
 {e:'🧛',t:'vampiro dracula sangue non morto'},{e:'🧝',t:'elfo orecchie fate bosco'},
 {e:'🧞',t:'genio djinn desiderio lampada'},{e:'🧙',t:'mago stregone magia incantatore'},
-{e:'🧜',t:'sirena tritone mare acqua'},{e:'👾',t:'orco demone oni mostro'},
+{e:'🧜',t:'sirena tritone mare acqua'},{e:'👹',t:'orco demone oni mostro'},
 {e:'👺',t:'tengu goblin maschera demone'},{e:'👿',t:'diavolo demone male cornuto'},
 {e:'👾',t:'alieno mostro spazio creatura'},{e:'🤖',t:'robot golem automa macchina'},
 {e:'🐲',t:'drago testa fuoco rettile'},{e:'🐉',t:'drago serpente cinese orientale'},
