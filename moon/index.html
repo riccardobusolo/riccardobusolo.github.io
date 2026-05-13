@@ -3841,13 +3841,15 @@ var sIn=document.getElementById('supInput'),sbAdd=document.getElementById('sbAdd
 /* Pulsante + apre il file picker */
 sbAdd.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();sIn.click()});
 sIn.addEventListener('change',function(){if(!sIn.files.length)return;var p=sIn.files.length,done=0;Array.from(sIn.files).forEach(function(f){addS(f,function(){done++;if(done>=p){render();sIn.value=''}})})});
-/* Drag & drop su TUTTA la finestra soundboard (non più una zona dedicata).
-   Il check sui types previene il preventDefault inutile per drag non-file
-   (es. trascinamento di un pad per riordino, che usa mousedown comunque). */
-function _sbHasFiles(e){if(!e.dataTransfer||!e.dataTransfer.types)return false;var t=e.dataTransfer.types;for(var i=0;i<t.length;i++){if(t[i]==='Files')return true}return false}
-winSound.addEventListener('dragover',function(e){if(!_sbHasFiles(e))return;e.preventDefault();winSound.classList.add('sup--over')});
+/* Drag & drop su TUTTA la finestra soundboard. preventDefault SEMPRE
+   su dragenter e dragover (necessario per abilitare il drop nel browser).
+   Il filtering del file avviene nel drop handler. La classe sup--over
+   per il feedback visivo è applicata solo se il drag contiene Files. */
+function _sbHasFiles(e){if(!e.dataTransfer)return false;var t=e.dataTransfer.types;if(!t)return false;if(t.contains)return t.contains('Files');for(var i=0;i<t.length;i++){if(t[i]==='Files')return true}return false}
+winSound.addEventListener('dragenter',function(e){e.preventDefault();if(_sbHasFiles(e))winSound.classList.add('sup--over')});
+winSound.addEventListener('dragover',function(e){e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='copy';if(_sbHasFiles(e))winSound.classList.add('sup--over')});
 winSound.addEventListener('dragleave',function(e){/* dragleave fira anche entrando in un figlio: ignora se il nuovo target è ancora dentro winSound */if(e.relatedTarget&&winSound.contains(e.relatedTarget))return;winSound.classList.remove('sup--over')});
-winSound.addEventListener('drop',function(e){winSound.classList.remove('sup--over');if(!e.dataTransfer||!e.dataTransfer.files.length)return;/* Filtra solo file audio (estensione o mime audio/*) */var files=Array.from(e.dataTransfer.files).filter(function(f){return(f.type&&f.type.indexOf('audio/')===0)||/\.(mp3|wav|ogg|m4a|flac|aac|webm)$/i.test(f.name)});if(!files.length)return;e.preventDefault();var p=files.length,done=0;files.forEach(function(f){addS(f,function(){done++;if(done>=p)render()})})});
+winSound.addEventListener('drop',function(e){e.preventDefault();winSound.classList.remove('sup--over');if(!e.dataTransfer||!e.dataTransfer.files||!e.dataTransfer.files.length)return;/* Filtra solo file audio (estensione o mime audio/*) */var files=Array.from(e.dataTransfer.files).filter(function(f){return(f.type&&f.type.indexOf('audio/')===0)||/\.(mp3|wav|ogg|m4a|flac|aac|webm)$/i.test(f.name)});if(!files.length)return;var p=files.length,done=0;files.forEach(function(f){addS(f,function(){done++;if(done>=p)render()})})});
 /* Drag reorder */
 var dragId=null,dragEl=null,ghost=null,dragOX=0,dragOY=0,didDrag=false,lastSwap=0;
 board.addEventListener('mousedown',function(e){var grip=e.target.closest('[data-grip]');if(!grip)return;e.preventDefault();dragId=parseInt(grip.dataset.grip);dragEl=grip.closest('.spad');didDrag=false;if(!dragEl)return;var r=dragEl.getBoundingClientRect();dragOX=e.clientX-r.left;dragOY=e.clientY-r.top;ghost=dragEl.cloneNode(true);ghost.classList.add('spad__ghost');ghost.style.width=r.width+'px';ghost.style.left=r.left+'px';ghost.style.top=r.top+'px';document.body.appendChild(ghost);dragEl.classList.add('spad--drag')});
