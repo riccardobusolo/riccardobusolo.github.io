@@ -576,24 +576,24 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 /* Ability cards: pg__ab base + mod absolute al fondo della card */
 /* Caratteristiche nemico ora usano puro .pg__ab/.pg__ab-name/.pg__ab-score/
    .pg__ab-mod identico a scheda PG — niente override CSS necessari. */
-/* Tiri salvezza nemico: riga compatta con label FOR/DES/... + modifier
-   effettivo (auto da caratteristica o override) + input override piccolo
-   + dadino cliccabile che tira d20+mod sulla barra dei dadi. Override
-   vuoto = usa auto da caratteristica; numero (anche negativo) sovrascrive.
-   Quando override attivo .es__save-mod--ov colora il mod in oro per
-   feedback visivo immediato. */
-.es__saves{display:flex;flex-direction:column;gap:3px}
-.es__save-row{display:flex;gap:6px;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:3px 6px;transition:border-color .12s}
-.es__save-row:hover{border-color:var(--bh)}
-.es__save-name{flex:0 0 30px;font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--gold);letter-spacing:.04em}
-.es__save-mod{flex:0 0 32px;font-family:var(--mono);font-size:.78rem;font-weight:700;text-align:center;color:var(--text)}
+/* Tiri salvezza nemico: 6 card orizzontali stile .pg__abs/.pg__ab
+   (caratteristiche). Ogni card stack verticale: nome → mod effettivo
+   → input override → dadino. Layout flex:1 distribuisce uniformemente
+   sulla larghezza della colonna 2. Override vuoto = usa auto da
+   caratteristica; numero (anche negativo) sovrascrive. Quando override
+   attivo .es__save-mod--ov colora il mod in oro per feedback visivo. */
+.es__saves{display:flex;gap:3px}
+.es__save{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 2px;text-align:center;transition:border-color .12s;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px}
+.es__save:hover{border-color:var(--bh)}
+.es__save-name{font-family:var(--mono);font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.es__save-mod{font-family:var(--mono);font-size:.84rem;font-weight:700;color:var(--text);line-height:1}
 .es__save-mod--ov{color:var(--gold)}
-.es__save-override{flex:1;min-width:0;width:100%;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:2px 5px;color:var(--text);font-family:var(--mono);font-size:.68rem;outline:none;text-align:center;transition:border-color .12s}
+.es__save-override{width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1px 2px;color:var(--text);font-family:var(--mono);font-size:.64rem;outline:none;text-align:center;transition:border-color .12s;min-width:0}
 .es__save-override:focus{border-color:var(--gold)}
 .es__save-override::placeholder{color:var(--dim);opacity:.55}
-.es__save-die{flex-shrink:0;width:22px;height:22px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);border-radius:4px;display:flex;align-items:center;justify-content:center;padding:0;transition:all .12s}
+.es__save-die{width:22px;height:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);border-radius:4px;display:flex;align-items:center;justify-content:center;padding:0;transition:all .12s}
 .es__save-die:hover{color:var(--gold);border-color:var(--gold);background:rgba(196,154,50,.08)}
-.es__save-die svg{display:block;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;width:13px;height:13px}
+.es__save-die svg{display:block;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;width:12px;height:12px}
 /* Section dinamica: items (tratti/azioni/ecc.) come card compatte */
 .es__empty{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-align:center;padding:4px 0;font-style:italic}
 .es__items{display:flex;flex-direction:column;gap:4px}
@@ -3791,12 +3791,12 @@ h+='</div>';
 h+='</div>';
 /* COLONNA 2: tiri salvezza + tratti + reazioni */
 h+='<div class="pg__col">';
-/* Sezione Tiri salvezza: 6 righe (FOR/DES/COS/INT/SAG/CAR), ognuna con
-   mod effettivo (auto o override), input override (vuoto=auto) e dadino
-   che tira d20+mod sulla roll bar. Mostri speciali (es. mostro con bonus
-   salv. innaturalmente alto) richiedono l'override. */
+/* Sezione Tiri salvezza: 6 card orizzontali (FOR/DES/COS/INT/SAG/CAR)
+   stile .pg__abs/.pg__ab — ognuna stack verticale (nome → mod → input
+   override → dadino). Mostri speciali (con bonus salv. che non derivano
+   dalle caratteristiche) richiedono l'override. */
 h+='<div class="pg__sec"><div class="pg__sec-title">🛡️ Tiri salvezza</div><div class="es__saves">';
-[['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var key=a[1];var lbl=a[0];var ov=(e.savesOverride&&e.savesOverride[key])||'';var isOv=ov!==''&&ov!=='-';var mod=_esSaveMod(key);h+='<div class="es__save-row"><div class="es__save-name">'+lbl+'</div><div class="es__save-mod'+(isOv?' es__save-mod--ov':'')+'" data-essavemod="'+key+'">'+fmtModEn(mod)+'</div><input class="es__save-override" data-essaveov="'+key+'" type="text" inputmode="numeric" value="'+esc(ov)+'" placeholder="auto" maxlength="4" title="Sovrascrivi modificatore (lascia vuoto per auto)"><button class="es__save-die" data-essaveroll="'+key+'" type="button" title="Tira tiro salvezza '+lbl+' (d20+mod)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button></div>'});
+[['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var key=a[1];var lbl=a[0];var ov=(e.savesOverride&&e.savesOverride[key])||'';var isOv=ov!==''&&ov!=='-';var mod=_esSaveMod(key);h+='<div class="es__save"><div class="es__save-name">'+lbl+'</div><div class="es__save-mod'+(isOv?' es__save-mod--ov':'')+'" data-essavemod="'+key+'">'+fmtModEn(mod)+'</div><input class="es__save-override" data-essaveov="'+key+'" type="text" inputmode="numeric" value="'+esc(ov)+'" placeholder="auto" maxlength="4" title="Sovrascrivi modificatore (lascia vuoto per auto)"><button class="es__save-die" data-essaveroll="'+key+'" type="button" title="Tira tiro salvezza '+lbl+' (d20+mod)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button></div>'});
 h+='</div></div>';
 h+=_esSecHTML('✨ Tratti','traits',e.traits);
 h+=_esSecHTML('⚡ Reazioni','reactions',e.reactions);
