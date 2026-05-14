@@ -799,7 +799,11 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
    in font .52rem mono ≈ 56px + padding interno). Placeholder leggermente
    più piccolo del valore digitato (chi inserisce il numero lo vede a font
    pieno .66rem). */
-.pg__coin-amt{flex:0 0 58px;width:58px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0 5px;color:var(--text);font-family:var(--mono);font-size:.66rem;outline:none;transition:border-color .12s;-moz-appearance:textfield;line-height:22px}
+/* text-align: right per allineare visivamente il placeholder/numero al
+   bordo destro dell'input → il gap visivo verso il dropdown corrisponde
+   al gap CSS effettivo (3px), eliminando l'asimmetria percepita causata
+   dallo spazio bianco a destra del testo left-aligned. */
+.pg__coin-amt{flex:0 0 58px;width:58px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0 5px;color:var(--text);font-family:var(--mono);font-size:.66rem;outline:none;transition:border-color .12s;-moz-appearance:textfield;line-height:22px;text-align:right}
 .pg__coin-amt::-webkit-outer-spin-button,.pg__coin-amt::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .pg__coin-amt:focus{border-color:var(--gold)}
 .pg__coin-amt::placeholder{color:var(--muted);text-transform:uppercase;letter-spacing:.03em;font-size:.52rem;font-weight:600;opacity:.75}
