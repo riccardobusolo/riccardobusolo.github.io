@@ -4129,7 +4129,16 @@ h+='</div></div>';
    in un unico .pg__sec separati da divisori sottili. Ogni item è ora
    un dropdown stile Tipo/Allineamento/Taglia con "Personalizzato" in
    cima per valori custom. Opzioni dei manuali D&D 5e (italiano). */
-var DMG_TYPES=['Acido','Contundente','Contundente non magico','Forza','Freddo','Fulmine','Fuoco','Necrotico','Perforante','Perforante non magico','Psichico','Radiante','Taglio','Taglio non magico','Tonante','Veleno'];
+/* Ordine ragionato (non alfabetico) — segue la categorizzazione PHB
+   D&D 5e: prima i 3 fisici (più comuni nelle armi), poi le varianti
+   "non magico" (per mostri tipo lupi mannari), poi elementali, poi
+   magici/mistici. */
+var DMG_TYPES=[
+  'Contundente','Perforante','Taglio',
+  'Contundente non magico','Perforante non magico','Taglio non magico',
+  'Acido','Freddo','Fuoco','Fulmine','Tonante','Veleno',
+  'Forza','Necrotico','Psichico','Radiante'
+];
 var CONDITIONS=['Accecato','Affascinato','Assordato','Avvelenato','Esausto','Imbozzolato','Incapacitato','Invisibile','Paralizzato','Pietrificato','Privo di sensi','Prono','Spaventato','Stordito','Trattenuto'];
 h+='<div class="pg__sec">';
 h+='<div class="pg__sec-title">🛡️ Difese</div>';
