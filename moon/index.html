@@ -577,20 +577,21 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 /* Caratteristiche nemico ora usano puro .pg__ab/.pg__ab-name/.pg__ab-score/
    .pg__ab-mod identico a scheda PG — niente override CSS necessari. */
 /* Tiri salvezza nemico: 6 card orizzontali stile .pg__abs/.pg__ab
-   (caratteristiche). Ogni card stack verticale: nome → mod effettivo
-   → input override → dadino. Layout flex:1 distribuisce uniformemente
-   sulla larghezza della colonna 2. Override vuoto = usa auto da
-   caratteristica; numero (anche negativo) sovrascrive. Quando override
-   attivo .es__save-mod--ov colora il mod in oro per feedback visivo. */
+   (caratteristiche). Ogni card stack verticale: nome → mod cliccabile
+   → dadino. Layout flex:1 distribuisce uniformemente sulla larghezza
+   della colonna 2. Click sul mod apre un input inline che accetta
+   2 cifre (con segno opzionale): scrivi il numero, blur/Enter conferma
+   override; svuota e conferma per tornare in auto. Override attivo
+   colora il mod in oro per feedback visivo. */
 .es__saves{display:flex;gap:3px}
 .es__save{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 2px;text-align:center;transition:border-color .12s;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px}
 .es__save:hover{border-color:var(--bh)}
 .es__save-name{font-family:var(--mono);font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.es__save-mod{font-family:var(--mono);font-size:.84rem;font-weight:700;color:var(--text);line-height:1}
+.es__save-mod{font-family:var(--mono);font-size:.7rem;font-weight:600;color:var(--text);line-height:1;cursor:var(--cur-pointer);padding:1px 4px;border-radius:3px;border:1px solid transparent;transition:all .12s;min-width:24px}
+.es__save-mod:hover{background:var(--bg);border-color:var(--border);color:var(--gold)}
 .es__save-mod--ov{color:var(--gold)}
-.es__save-override{width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1px 2px;color:var(--text);font-family:var(--mono);font-size:.64rem;outline:none;text-align:center;transition:border-color .12s;min-width:0}
-.es__save-override:focus{border-color:var(--gold)}
-.es__save-override::placeholder{color:var(--dim);opacity:.55}
+.es__save-edit{width:40px;background:var(--bg);border:1px solid var(--gold);border-radius:3px;padding:1px 2px;color:var(--text);font-family:var(--mono);font-size:.7rem;font-weight:600;outline:none;text-align:center;line-height:1}
+.es__save-edit::placeholder{color:var(--dim);opacity:.55}
 .es__save-die{width:22px;height:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);border-radius:4px;display:flex;align-items:center;justify-content:center;padding:0;transition:all .12s}
 .es__save-die:hover{color:var(--gold);border-color:var(--gold);background:rgba(196,154,50,.08)}
 .es__save-die svg{display:block;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;width:12px;height:12px}
@@ -3792,11 +3793,12 @@ h+='</div>';
 /* COLONNA 2: tiri salvezza + tratti + reazioni */
 h+='<div class="pg__col">';
 /* Sezione Tiri salvezza: 6 card orizzontali (FOR/DES/COS/INT/SAG/CAR)
-   stile .pg__abs/.pg__ab — ognuna stack verticale (nome → mod → input
-   override → dadino). Mostri speciali (con bonus salv. che non derivano
-   dalle caratteristiche) richiedono l'override. */
+   stile .pg__abs/.pg__ab — ognuna stack verticale (nome → mod cliccabile
+   → dadino). Mostri speciali (con bonus salv. che non derivano dalle
+   caratteristiche) → click sul mod apre input inline che accetta 2 cifre
+   con segno opzionale e sovrascrive il valore auto. */
 h+='<div class="pg__sec"><div class="pg__sec-title">🛡️ Tiri salvezza</div><div class="es__saves">';
-[['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var key=a[1];var lbl=a[0];var ov=(e.savesOverride&&e.savesOverride[key])||'';var isOv=ov!==''&&ov!=='-';var mod=_esSaveMod(key);h+='<div class="es__save"><div class="es__save-name">'+lbl+'</div><div class="es__save-mod'+(isOv?' es__save-mod--ov':'')+'" data-essavemod="'+key+'">'+fmtModEn(mod)+'</div><input class="es__save-override" data-essaveov="'+key+'" type="text" inputmode="numeric" value="'+esc(ov)+'" placeholder="auto" maxlength="4" title="Sovrascrivi modificatore (lascia vuoto per auto)"><button class="es__save-die" data-essaveroll="'+key+'" type="button" title="Tira tiro salvezza '+lbl+' (d20+mod)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button></div>'});
+[['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var key=a[1];var lbl=a[0];var ov=(e.savesOverride&&e.savesOverride[key])||'';var isOv=ov!==''&&ov!=='-';var mod=_esSaveMod(key);h+='<div class="es__save"><div class="es__save-name">'+lbl+'</div><div class="es__save-mod'+(isOv?' es__save-mod--ov':'')+'" data-essavemod="'+key+'" title="Clicca per sovrascrivere il modificatore">'+fmtModEn(mod)+'</div><button class="es__save-die" data-essaveroll="'+key+'" type="button" title="Tira tiro salvezza '+lbl+' (d20+mod)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button></div>'});
 h+='</div></div>';
 h+=_esSecHTML('✨ Tratti','traits',e.traits);
 h+=_esSecHTML('⚡ Reazioni','reactions',e.reactions);
@@ -3833,18 +3835,13 @@ document.getElementById('esheetBody').addEventListener('drop',function(e){var sl
    l'utente sta incollando dentro un input/textarea della sheet. */
 document.addEventListener('paste',function(e){if(!esObj)return;var sheet=document.getElementById('winEsheet');if(!sheet||!sheet.classList.contains('on'))return;if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var k=0;k<items.length;k++){if(items[k].type&&items[k].type.startsWith('image/')){e.preventDefault();var idx=enemies.indexOf(esObj);if(idx<0)return;photoCtx.type='en';photoCtx.i=idx;processEnImg(items[k].getAsFile(),function(thumb,full){applyPhoto(thumb,full)});return}}});
 document.getElementById('esheetBody').addEventListener('input',function(e){if(!esObj)return;var t=e.target;var item=t.closest('[data-esitem]');var sec=t.closest('.es__items[data-essec]');if(item&&sec){var key=sec.dataset.essec;var ii=parseInt(item.dataset.esitem);var field=t.dataset.esfield;if(esObj[key]&&esObj[key][ii]&&field){esObj[key][ii][field]=t.value;sE()}return}
-/* Override modificatore tiro salvezza: salva su esObj.savesOverride[key].
-   Accetta numero intero opzionalmente preceduto da '-' (negativo). Strip
-   inline dei caratteri invalidi, preserva caret. '' = ripristina auto.
-   Aggiorna .es__save-mod inline senza full re-render per non perdere
-   il focus mentre l'utente digita. */
-if(t.dataset.essaveov){var sk=t.dataset.essaveov;var _o=t.value;var _hasMinus=_o.charAt(0)==='-';var _digs=_o.replace(/[^0-9]/g,'').slice(0,3);var _c=_hasMinus?('-'+_digs):_digs;if(_c!==_o){var _sh=_o.length-_c.length;var _pp=Math.max(0,(t.selectionStart||0)-_sh);t.value=_c;try{t.setSelectionRange(_pp,_pp)}catch(_){}}if(!esObj.savesOverride)esObj.savesOverride={};esObj.savesOverride[sk]=_c;sE();var _smEl=document.querySelector('#esheetBody [data-essavemod="'+sk+'"]');if(_smEl){_smEl.textContent=fmtModEn(_esSaveMod(sk));_smEl.classList.toggle('es__save-mod--ov',_c!==''&&_c!=='-')}return}
 var ef=t.dataset.ef;if(!ef)return;/* Digit-only field: strip ogni char non 0-9 dal value, preserva
    approssimativamente la posizione caret, salva come integer
    (o '' se vuoto). */if(t.classList.contains('pg__inp--digits')){var _orig=t.value;var _cleaned=_orig.replace(/[^0-9]/g,'').slice(0,3);if(_cleaned!==_orig){var _shift=_orig.length-_cleaned.length;var _pos=Math.max(0,(t.selectionStart||0)-_shift);t.value=_cleaned;try{t.setSelectionRange(_pos,_pos)}catch(_){}}esObj[ef]=_cleaned===''?'':parseInt(_cleaned,10)}else if(t.type==='number'){var n=parseFloat(t.value);if(isNaN(n))n=0;esObj[ef]=n}else{esObj[ef]=t.value}sE();if(['name','ac','hp','hpCur','init','emoji','cr'].indexOf(ef)>=0)renE();if(ef==='name'){document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)')}if(['str','dex','con','intl','wis','cha'].indexOf(ef)>=0){var ab=t.closest('.pg__ab');if(ab){var modEl=ab.querySelector('.pg__ab-mod');if(modEl)modEl.textContent=fmtModEn(abModEn(esObj[ef]))}
 /* Sync inline anche il save mod corrispondente — solo se NON c'è override
-   attivo (altrimenti l'override resta padrone del valore). */
-var _ov=esObj.savesOverride&&esObj.savesOverride[ef];if(_ov==null||_ov===''||_ov==='-'){var _sm=document.querySelector('#esheetBody [data-essavemod="'+ef+'"]');if(_sm)_sm.textContent=fmtModEn(_esSaveMod(ef))}}
+   attivo (altrimenti l'override resta padrone del valore) e solo se non
+   è già in edit inline (altrimenti distruggeremmo l'input dell'utente). */
+var _ov=esObj.savesOverride&&esObj.savesOverride[ef];if(_ov==null||_ov===''||_ov==='-'){var _sm=document.querySelector('#esheetBody [data-essavemod="'+ef+'"]');if(_sm&&!_sm.querySelector('input'))_sm.textContent=fmtModEn(_esSaveMod(ef))}}
 /* Aggiorna barra HP inline su cambio hp/hpCur/hpTemp senza re-render
    (preserva focus mentre l'utente digita). */
 if(['hp','hpCur','hpTemp'].indexOf(ef)>=0){var hpMx=esObj.hp||1;var hpCr=esObj.hpCur!=null?esObj.hpCur:hpMx;var pct=Math.max(0,Math.min(100,(hpCr/Math.max(1,hpMx))*100));var col=pct>50?'linear-gradient(90deg,#4a9a5a,#5dbf6f)':pct>25?'linear-gradient(90deg,#c49a32,#dab44a)':'linear-gradient(90deg,#c44a4a,#dc5d5d)';var fill=document.querySelector('#esheetBody .pg__hpbar-fill');if(fill){fill.style.width=pct+'%';fill.style.background=col}var tmpSpan=document.querySelector('#esheetBody .pg__hpbar-tmp');if(tmpSpan){tmpSpan.style.opacity=(esObj.hpTemp||0)>0?'':'.4'}}
@@ -3864,6 +3861,25 @@ if(initBtn){e.stopPropagation();_esRollInit();return}
 /* Click su 🎲 tiro salvezza → lancia d20 + save mod (override o auto) */
 var saveBtn=e.target.closest('[data-essaveroll]');
 if(saveBtn){e.stopPropagation();_esRollSave(saveBtn.dataset.essaveroll);return}
+/* Click sul mod del tiro salvezza → inline edit. Sostituisce il testo
+   con un input centrato che accetta 2 cifre + segno opzionale (-99..99).
+   Blur o Enter conferma override; Escape annulla; valore vuoto torna
+   in auto (rimuove l'override). */
+var saveModEl=e.target.closest('.es__save-mod[data-essavemod]');
+if(saveModEl&&!saveModEl.querySelector('input')){e.stopPropagation();
+  var sKey=saveModEl.dataset.essavemod;
+  var curOv=(esObj.savesOverride&&esObj.savesOverride[sKey])||'';
+  var inp=document.createElement('input');
+  inp.className='es__save-edit';inp.type='text';inp.inputMode='numeric';inp.maxLength=3;
+  inp.value=curOv;inp.placeholder='auto';
+  saveModEl.textContent='';saveModEl.appendChild(inp);
+  inp.focus();inp.select();
+  /* Strip caratteri non validi durante typing: solo '-' iniziale + max 2 cifre */
+  inp.addEventListener('input',function(){var v=inp.value;var hm=v.charAt(0)==='-';var dg=v.replace(/[^0-9]/g,'').slice(0,2);var cl=hm?'-'+dg:dg;if(cl!==v){var sh=v.length-cl.length;var pp=Math.max(0,(inp.selectionStart||0)-sh);inp.value=cl;try{inp.setSelectionRange(pp,pp)}catch(_){}}});
+  function _commit(){var v=inp.value;var hm=v.charAt(0)==='-';var dg=v.replace(/[^0-9]/g,'').slice(0,2);var cleaned=hm?(dg===''?'':'-'+dg):dg;if(!esObj.savesOverride)esObj.savesOverride={};esObj.savesOverride[sKey]=cleaned;sE();var mod=_esSaveMod(sKey);saveModEl.textContent=fmtModEn(mod);var isOv=cleaned!==''&&cleaned!=='-';saveModEl.classList.toggle('es__save-mod--ov',isOv)}
+  inp.addEventListener('blur',_commit);
+  inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();inp.blur()}else if(ev.key==='Escape'){ev.preventDefault();inp.value=curOv;inp.blur()}});
+  return}
 /* Click su caratteristica (.pg__ab) → lancia d20+mod. Skip se il target
    è l'input stesso (per non interferire con l'edit). */
 var abEl=e.target.closest('.pg__ab');
