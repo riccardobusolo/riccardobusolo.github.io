@@ -3706,6 +3706,23 @@ function _esRollInit(){if(!esObj)return;var init=esObj.init||0;var d=_esRollD20(
    = -5, parseInt('') = NaN → fallback, parseInt('abc') = NaN → fallback. */
 function _esSaveMod(key){if(!esObj)return 0;var ov=esObj.savesOverride?esObj.savesOverride[key]:'';if(ov==null||ov===''||ov==='-')return abModEn(esObj[key]||10);var n=parseInt(ov,10);if(isNaN(n))return abModEn(esObj[key]||10);return n}
 function _esRollSave(key){if(!esObj)return;var labels={str:'FOR',dex:'DES',con:'COS',intl:'INT',wis:'SAG',cha:'CAR'};if(!labels[key])return;var mod=_esSaveMod(key);var d=_esRollD20();var tot=d+mod;var cls=d===20?'pg__roll-row--crit':d===1?'pg__roll-row--fail':'pg__roll-row--hit';var advLbl=esAdv?' <span style="opacity:.7">('+(esAdv==='adv'?'Vant.':'Svant.')+')</span>':'';esLastRoll={cls:cls,html:'<strong>🛡️ Salv. '+labels[key]+'</strong> &nbsp;d20 = <strong>'+d+'</strong>'+(mod>=0?' +':' ')+mod+' &nbsp;= <strong>'+tot+'</strong>'+advLbl};esAdv=null;openEsheet(enemies.indexOf(esObj))}
+/* Skill check nemico: d20 + ab mod (NO proficiency — i nemici non hanno
+   il cerchietto competenza). Se servono mod speciali (es. Percezione +14
+   per un mostro), si usa l'override sulla caratteristica base o si tiene
+   conto come narrazione. */
+function _esRollSkill(ab,lbl){if(!esObj)return;if(['str','dex','con','intl','wis','cha'].indexOf(ab)<0)return;var mod=abModEn(esObj[ab]||10);var d=_esRollD20();var tot=d+mod;var cls=d===20?'pg__roll-row--crit':d===1?'pg__roll-row--fail':'pg__roll-row--hit';var advLbl=esAdv?' <span style="opacity:.7">('+(esAdv==='adv'?'Vant.':'Svant.')+')</span>':'';esLastRoll={cls:cls,html:'<strong>🎲 '+lbl+'</strong> &nbsp;d20 = <strong>'+d+'</strong>'+(mod>=0?' +':' ')+mod+' &nbsp;= <strong>'+tot+'</strong>'+advLbl};esAdv=null;openEsheet(enemies.indexOf(esObj))}
+/* Skill map locale al IIFE del nemico — il skillMap della scheda PG è
+   in un IIFE diverso (non accessibile da qui). Allineato 1:1 con la
+   versione PG (line ~4407 nel file): se aggiungi/togli abilità, aggiorna
+   entrambi. Manteniamo il campo 'save' per coerenza struttura anche se
+   non lo usiamo qui (i tiri salv. sono gestiti dalla sezione strutturata). */
+var _ES_SKILL_MAP=[
+{ab:'str',name:'FOR',skills:[['atletica','Atletica']]},
+{ab:'dex',name:'DES',skills:[['acrobazia','Acrobazia'],['furtivita','Furtività'],['rapidita','Rapidità di Mano']]},
+{ab:'con',name:'COS',skills:[]},
+{ab:'intl',name:'INT',skills:[['arcano','Arcano'],['indagare','Indagare'],['natura','Natura'],['religione','Religione'],['storia','Storia']]},
+{ab:'wis',name:'SAG',skills:[['animali','Addest. Animali'],['intuizione','Intuizione'],['medicina','Medicina'],['percezione','Percezione'],['sopravvivenza','Sopravvivenza']]},
+{ab:'cha',name:'CAR',skills:[['inganno','Inganno'],['intimidire','Intimidire'],['intrattenere','Intrattenere'],['persuasione','Persuasione']]}];
 function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','saves','skills','dmgResist','dmgImmune','dmgVulner','condImmune','senses','languages','cr','notes'].forEach(function(k){if(e[k]==null)e[k]=''});['str','dex','con','intl','wis','cha'].forEach(function(k){if(e[k]==null)e[k]=10});['traits','actions','bonusActions','reactions','legendaryActions'].forEach(function(k){if(!Array.isArray(e[k]))e[k]=[]});
 /* Saves override: per-ability mod override (stringa: '' = auto da
    abModEn(score), '-5'..'+30' = sovrascrive il calcolo. Permette di
@@ -3777,9 +3794,9 @@ h+='<div class="pg__sec"><div class="pg__sec-title">🎲 Caratteristiche</div><d
 [['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var v=e[a[1]];var m=abModEn(v);h+='<div class="pg__ab"><div class="pg__ab-name">'+a[0]+'</div><div class="pg__ab-score"><input class="pg__inp--inline" data-ef="'+a[1]+'" type="number" value="'+v+'" style="font-size:.82rem"></div><div class="pg__ab-mod">'+fmtModEn(m)+'</div></div>'});
 h+='</div></div>';
 h+='<div class="pg__sec"><div class="pg__sec-title">🛡️ Difese</div>';
-/* "Tiri salvezza" freeform RIMOSSO — ora gestito da sezione strutturata
-   in COL 2 (.es__save-row con override per-caratteristica + dadino roll). */
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Abilità</div><input class="pg__inp es__inp-text" data-ef="skills" value="'+esc(e.skills)+'" placeholder="Percezione +14..."></div></div>';
+/* "Tiri salvezza" e "Abilità" freeform RIMOSSI — ora gestiti da sezioni
+   strutturate in COL 2 (Tiri salvezza con override per-caratteristica,
+   Abilità con click-to-roll su ogni riga). */
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Resistenze danni</div><input class="pg__inp es__inp-text" data-ef="dmgResist" value="'+esc(e.dmgResist)+'" placeholder="radioso; contundente non magico..."></div></div>';
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Immunità danni</div><input class="pg__inp es__inp-text" data-ef="dmgImmune" value="'+esc(e.dmgImmune)+'" placeholder="necrotico, veleno..."></div></div>';
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Vulnerabilità</div><input class="pg__inp es__inp-text" data-ef="dmgVulner" value="'+esc(e.dmgVulner)+'" placeholder="..."></div></div>';
@@ -3799,6 +3816,16 @@ h+='<div class="pg__col">';
    con segno opzionale e sovrascrive il valore auto. */
 h+='<div class="pg__sec"><div class="pg__sec-title">🛡️ Tiri salvezza</div><div class="es__saves">';
 [['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var key=a[1];var lbl=a[0];var ov=(e.savesOverride&&e.savesOverride[key])||'';var isOv=ov!==''&&ov!=='-';var mod=_esSaveMod(key);h+='<div class="es__save"><div class="es__save-name">'+lbl+'</div><div class="es__save-mod'+(isOv?' es__save-mod--ov':'')+'" data-essavemod="'+key+'" title="Clicca per sovrascrivere il modificatore">'+fmtModEn(mod)+'</div><button class="es__save-die" data-essaveroll="'+key+'" type="button" title="Tira tiro salvezza '+lbl+' (d20+mod)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button></div>'});
+h+='</div></div>';
+/* Sezione Abilità: stesso layout/CSS della scheda PG (.pg__skills /
+   .pg__skill / .pg__skill-name / .pg__skill-mod) MA senza il cerchietto
+   .pg__prof — i nemici non hanno la competenza esplicita. Mod calcolato
+   dalla caratteristica base, click sulla riga lancia d20+mod sulla
+   barra dei dadi. Sorted alphabetically per facilitare la consultazione. */
+h+='<div class="pg__sec"><div class="pg__sec-title">🎲 Abilità</div><div class="pg__skills">';
+var _esAllSkills=[];_ES_SKILL_MAP.forEach(function(g){g.skills.forEach(function(sk){_esAllSkills.push({key:sk[0],name:sk[1],ab:g.ab,abName:g.name})})});
+_esAllSkills.sort(function(x,y){return x.name.localeCompare(y.name)});
+_esAllSkills.forEach(function(sk){var mod=abModEn(e[sk.ab]||10);h+='<div class="pg__skill" data-essk="'+sk.key+'" data-eskab="'+sk.ab+'" data-esklbl="'+esc(sk.name)+'" title="Tira '+esc(sk.name)+' (d20'+(mod>=0?'+':'')+mod+')"><span class="pg__skill-name">'+esc(sk.name)+' <span style="color:var(--muted)">('+sk.abName+')</span></span><span class="pg__skill-mod">'+fmtModEn(mod)+'</span></div>'});
 h+='</div></div>';
 h+=_esSecHTML('✨ Tratti','traits',e.traits);
 h+=_esSecHTML('⚡ Reazioni','reactions',e.reactions);
@@ -3861,6 +3888,11 @@ if(initBtn){e.stopPropagation();_esRollInit();return}
 /* Click su 🎲 tiro salvezza → lancia d20 + save mod (override o auto) */
 var saveBtn=e.target.closest('[data-essaveroll]');
 if(saveBtn){e.stopPropagation();_esRollSave(saveBtn.dataset.essaveroll);return}
+/* Click su riga abilità (.pg__skill con data-essk) → lancia d20 + ab mod
+   sulla roll bar. Nessun cerchietto competenza qui — vedi commento sulla
+   sezione Abilità nel build. */
+var skRow=e.target.closest('.pg__skill[data-essk]');
+if(skRow&&skRow.closest('#esheetBody')){e.stopPropagation();_esRollSkill(skRow.dataset.eskab,skRow.dataset.esklbl);return}
 /* Click sul mod del tiro salvezza → inline edit. Sostituisce il testo
    con un input centrato che accetta 2 cifre + segno opzionale (-99..99).
    Blur o Enter conferma override; Escape annulla; valore vuoto torna
