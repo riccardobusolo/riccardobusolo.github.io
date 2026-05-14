@@ -795,12 +795,18 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .pg__coins-exchange .pg__coin-amt,
 .pg__coins-exchange .pg__cls-dd--coin,
 .pg__coins-exchange .pg__roll{height:24px;box-sizing:border-box}
-.pg__coin-amt{flex:0 0 70px;width:70px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0 6px;color:var(--text);font-family:var(--mono);font-size:.66rem;outline:none;transition:border-color .12s;-moz-appearance:textfield;line-height:22px}
+/* Width input dimensionata sul placeholder più lungo ("Guadagna" — 8 char
+   in font .52rem mono ≈ 56px + padding interno). Placeholder leggermente
+   più piccolo del valore digitato (chi inserisce il numero lo vede a font
+   pieno .66rem). */
+.pg__coin-amt{flex:0 0 58px;width:58px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:0 5px;color:var(--text);font-family:var(--mono);font-size:.66rem;outline:none;transition:border-color .12s;-moz-appearance:textfield;line-height:22px}
 .pg__coin-amt::-webkit-outer-spin-button,.pg__coin-amt::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .pg__coin-amt:focus{border-color:var(--gold)}
-.pg__coin-amt::placeholder{color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-size:.6rem;font-weight:600;opacity:.75}
+.pg__coin-amt::placeholder{color:var(--muted);text-transform:uppercase;letter-spacing:.03em;font-size:.52rem;font-weight:600;opacity:.75}
 .pg__coin-amt--err{border-color:var(--red);animation:pgRollFlashFail .8s ease-out}
-.pg__coins-exchange .pg__roll{padding:0 7px;display:inline-flex;align-items:center;justify-content:center}
+/* Bottone freccia stretto — solo lo spazio per l'icona 12x12 + un po'
+   di padding orizzontale. */
+.pg__coins-exchange .pg__roll{padding:0 4px;display:inline-flex;align-items:center;justify-content:center;min-width:0}
 /* Le regole di .pg__cls-dd--coin sono state spostate dopo .pg__cls-dd
    (line ~852) e .pg__cls-dd--custom (line ~867) per non essere
    override dal display:inline-block della base. */
