@@ -603,6 +603,20 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__pperc-val:hover{background:var(--bg);border-color:var(--border);color:var(--gold)}
 .es__pperc-val--ov{color:var(--gold)}
 .es__pperc-edit{width:48px;background:var(--bg);border:1px solid var(--gold);border-radius:3px;padding:1px 2px;color:var(--text);font-family:var(--mono);font-size:.72rem;font-weight:700;outline:none;text-align:center;line-height:1}
+/* Sezioni a lista nemico (Linguaggi, Resistenze, Immunità danni,
+   Vulnerabilità, Immunità condizioni). Visualmente simile alla sezione
+   Equipaggiamento della scheda PG, ma SENZA freccina di toggle: niente
+   descrizione, l'input è sempre direttamente modificabile cliccando
+   sulla barra. Solo input + bottone × elimina. */
+.es__lst{display:flex;flex-direction:column;gap:3px}
+.es__lst-item{display:flex;align-items:stretch;gap:3px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:0 0 0 4px;transition:border-color .12s;overflow:hidden}
+.es__lst-item:hover{border-color:var(--bh)}
+.es__lst-item:focus-within{border-color:var(--gold)}
+.es__lst-input{flex:1;min-width:0;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:.7rem;outline:none;padding:4px 4px}
+.es__lst-input::placeholder{color:var(--muted);opacity:.55;font-style:italic}
+.es__lst-del{flex-shrink:0;width:22px;background:transparent;border:none;border-left:1px solid var(--border);color:var(--muted);cursor:var(--cur-pointer);font-size:.9rem;line-height:1;padding:0;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.es__lst-del:hover{color:var(--red);background:var(--rl)}
+.es__lst-empty{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-align:center;padding:4px 0;font-style:italic}
 /* Sensi row: dropdown tipo (espandibile) + input range numerico + bottone
    unità toggle. Layout single-line con dropdown che si espande quanto
    serve, range e unità a larghezza fissa. Altezze allineate alla riga
@@ -3962,7 +3976,15 @@ var _ES_SKILL_MAP=[
 {ab:'intl',name:'INT',skills:[['arcano','Arcano'],['indagare','Indagare'],['natura','Natura'],['religione','Religione'],['storia','Storia']]},
 {ab:'wis',name:'SAG',skills:[['animali','Addest. Animali'],['intuizione','Intuizione'],['medicina','Medicina'],['percezione','Percezione'],['sopravvivenza','Sopravvivenza']]},
 {ab:'cha',name:'CAR',skills:[['inganno','Inganno'],['intimidire','Intimidire'],['intrattenere','Intrattenere'],['persuasione','Persuasione']]}];
-function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','saves','skills','dmgResist','dmgImmune','dmgVulner','condImmune','senses','languages','cr','notes'].forEach(function(k){if(e[k]==null)e[k]=''});['str','dex','con','intl','wis','cha'].forEach(function(k){if(e[k]==null)e[k]=10});['traits','actions','bonusActions','reactions','legendaryActions'].forEach(function(k){if(!Array.isArray(e[k]))e[k]=[]});
+function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','saves','skills','senses','cr','notes'].forEach(function(k){if(e[k]==null)e[k]=''});['str','dex','con','intl','wis','cha'].forEach(function(k){if(e[k]==null)e[k]=10});['traits','actions','bonusActions','reactions','legendaryActions'].forEach(function(k){if(!Array.isArray(e[k]))e[k]=[]});
+/* Migrazione: linguaggi, resistenze, immunità, vulnerabilità, immunità
+   condizioni da stringa freeform a array di stringhe (split su virgole
+   o punti-virgola). Permette UI a lista stile Equipaggiamento (PG sheet)
+   con +/× per gestire i singoli elementi. */
+['languages','dmgResist','dmgImmune','dmgVulner','condImmune'].forEach(function(k){
+  if(typeof e[k]==='string'){var s=e[k].trim();e[k]=s?s.split(/[,;]\s*/).map(function(x){return x.trim()}).filter(Boolean):[]}
+  if(!Array.isArray(e[k]))e[k]=[]
+});
 /* Saves override: per-ability mod override (stringa: '' = auto da
    abModEn(score), '-5'..'+30' = sovrascrive il calcolo. Permette di
    gestire mostri con bonus speciali ai tiri salvezza che non derivano
@@ -3981,6 +4003,23 @@ if(e.sensesUnit==null||(e.sensesUnit!=='m'&&e.sensesUnit!=='ft'))e.sensesUnit='m
    combattimento, e.hpTemp = temp HP. Migrazione record legacy:
    se hpCur missing → hpCur = hp. */if(e.hpCur==null)e.hpCur=e.hp||0;if(e.hpTemp==null)e.hpTemp=0}
 function _esSecHTML(label,key,items){var h='<div class="pg__sec"><div class="pg__sec-title">'+label+'<button class="pg__sec-add" data-essec="'+key+'" type="button">+ Aggiungi</button></div>';if(!items.length){h+='<div class="es__empty">Nessun elemento — usa + Aggiungi</div>'}else{h+='<div class="es__items" data-essec="'+key+'">';items.forEach(function(it,i){h+='<div class="es__item" data-esitem="'+i+'"><div class="es__item-row"><input class="es__item-name" data-esfield="name" value="'+esc(it.name||'')+'" placeholder="Nome"><button class="es__item-del" data-esdel="1" type="button" title="Elimina">×</button></div><textarea class="es__item-desc" data-esfield="desc" placeholder="Descrizione, formule, range, costo (es. Costa 2 Azioni)...">'+esc(it.desc||'')+'</textarea></div>'});h+='</div>'}h+='</div>';return h}
+/* Sezione a lista semplificata (no descrizione, no toggle): titolo +
+   bottone +, lista di item con solo input + bottone × per cancellare.
+   Click sulla barra = focus input direttamente. Usata per Linguaggi,
+   Resistenze, Immunità danni, Vulnerabilità, Immunità condizioni. */
+function _esListSec(label,field,items,placeholder){
+  var h='<div class="pg__sec"><div class="pg__sec-title">'+label+'<button class="pg__sec-add" data-eslstadd="'+field+'" type="button">+ Aggiungi</button></div>';
+  if(!items||!items.length){h+='<div class="es__lst-empty">Nessun elemento — usa + Aggiungi</div>'}
+  else{
+    h+='<div class="es__lst" data-eslst="'+field+'">';
+    items.forEach(function(v,i){
+      h+='<div class="es__lst-item" data-eslstitem="'+i+'"><input class="es__lst-input" data-eslstfield="'+field+'" data-eslstidx="'+i+'" value="'+esc(v||'')+'" placeholder="'+esc(placeholder||'')+'"><button class="es__lst-del" data-eslstdel="'+field+'-'+i+'" type="button" title="Elimina">×</button></div>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
 function buildEsheet(e){var h='';
 /* HEADER: slot foto + riga Identità stile pg__row--id (Nome, Tipo,
    Allineamento, Taglia in quest'ordine). Tipo/Allineamento/Taglia
@@ -4040,16 +4079,14 @@ h+='</div>';
 h+='<div class="pg__sec"><div class="pg__sec-title">🎲 Caratteristiche</div><div class="pg__abs">';
 [['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var v=e[a[1]];var m=abModEn(v);h+='<div class="pg__ab"><div class="pg__ab-name">'+a[0]+'</div><div class="pg__ab-score"><input class="pg__inp--inline" data-ef="'+a[1]+'" type="number" value="'+v+'" style="font-size:.82rem"></div><div class="pg__ab-mod">'+fmtModEn(m)+'</div></div>'});
 h+='</div></div>';
-h+='<div class="pg__sec"><div class="pg__sec-title">🛡️ Difese</div>';
-/* "Tiri salvezza" e "Abilità" freeform RIMOSSI — ora gestiti da sezioni
-   strutturate in COL 2 (Tiri salvezza con override per-caratteristica,
-   Abilità con click-to-roll su ogni riga). */
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Resistenze danni</div><input class="pg__inp es__inp-text" data-ef="dmgResist" value="'+esc(e.dmgResist)+'" placeholder="radioso; contundente non magico..."></div></div>';
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Immunità danni</div><input class="pg__inp es__inp-text" data-ef="dmgImmune" value="'+esc(e.dmgImmune)+'" placeholder="necrotico, veleno..."></div></div>';
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Vulnerabilità</div><input class="pg__inp es__inp-text" data-ef="dmgVulner" value="'+esc(e.dmgVulner)+'" placeholder="..."></div></div>';
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Immunità condizioni</div><input class="pg__inp es__inp-text" data-ef="condImmune" value="'+esc(e.condImmune)+'" placeholder="affascinato, spaventato..."></div></div>';
-h+='</div>';
-h+='<div class="pg__sec"><div class="pg__sec-title">👁️ Sensi e linguaggi</div>';
+/* Difese e Sensi e linguaggi: 5 sezioni a lista (Resistenze, Immunità
+   danni, Vulnerabilità, Immunità condizioni, Linguaggi) stile
+   Equipaggiamento della scheda PG. Click sulla riga = focus input. */
+h+=_esListSec('🛡️ Resistenze danni','dmgResist',e.dmgResist,'es. radioso, contundente non magico...');
+h+=_esListSec('🚫 Immunità danni','dmgImmune',e.dmgImmune,'es. necrotico, veleno...');
+h+=_esListSec('💥 Vulnerabilità','dmgVulner',e.dmgVulner,'es. fuoco, freddo...');
+h+=_esListSec('🧠 Immunità condizioni','condImmune',e.condImmune,'es. affascinato, spaventato...');
+h+='<div class="pg__sec"><div class="pg__sec-title">👁️ Sensi</div>';
 /* Sensi strutturato: dropdown tipo (stile allineamento .pg__cls-dd--custom)
    + numero range + bottone unità m/ft con conversione automatica D&D 5e
    (1.5 m = 5 ft). Opzioni manuali D&D 5e + Personalizzato. */
@@ -4059,8 +4096,9 @@ var _stIsCustom=_stCur&&SENSI_OPTS.indexOf(_stCur)<0;
 var _stOptsHtml='<button class="pg__cls-dd-opt'+(_stIsCustom?' pg__cls-dd-opt--selected':'')+'" data-esddopt="" type="button">Personalizzato</button>';
 SENSI_OPTS.forEach(function(o){var sel=(_stCur===o)?' pg__cls-dd-opt--selected':'';_stOptsHtml+='<button class="pg__cls-dd-opt'+sel+'" data-esddopt="'+esc(o)+'" type="button">'+esc(o)+'</button>'});
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Sensi<button class="pg__lbl-help" data-help="senses" type="button" title="Cosa sono Scurovisione, Vista Cieca e gli altri sensi speciali" aria-label="Aiuto sensi">?</button></div><div class="es__senses-row"><div class="pg__cls-dd pg__cls-dd--custom es__senses-type" data-esddwrap="sensesType"><input class="pg__inp pg__inp--sm pg__cls-dd-input" data-ef="sensesType" value="'+esc(_stCur)+'" placeholder="—"><button class="pg__cls-dd-chev" data-esddbtn type="button" aria-label="Apri dropdown Sensi">▾</button><div class="pg__cls-dd-panel">'+_stOptsHtml+'</div></div><input class="pg__inp pg__inp--sm pg__inp--digits es__senses-value" data-ef="sensesValue" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="'+esc(String(e.sensesValue||''))+'" placeholder="—"><button class="es__senses-unit" data-essensesunit="1" type="button" title="Clicca per convertire tra metri e piedi (regola D&D 5e: 1.5 m = 5 ft)">'+esc(e.sensesUnit||'m')+'</button></div></div></div>';
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Linguaggi</div><input class="pg__inp es__inp-text" data-ef="languages" value="'+esc(e.languages)+'" placeholder="tutti, telepatia 36 m..."></div></div>';
 h+='</div>';
+/* Linguaggi: sezione a lista separata stile Equipaggiamento. */
+h+=_esListSec('🗣️ Linguaggi','languages',e.languages,'es. Comune, Elfico, telepatia 36 m...');
 h+='</div>';
 /* COLONNA 2: tiri salvezza + tratti + reazioni */
 h+='<div class="pg__col">';
@@ -4124,7 +4162,11 @@ document.getElementById('esheetBody').addEventListener('drop',function(e){var sl
 /* Paste foto sul slot quando la sheet del nemico è aperta. Skip se
    l'utente sta incollando dentro un input/textarea della sheet. */
 document.addEventListener('paste',function(e){if(!esObj)return;var sheet=document.getElementById('winEsheet');if(!sheet||!sheet.classList.contains('on'))return;if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var k=0;k<items.length;k++){if(items[k].type&&items[k].type.startsWith('image/')){e.preventDefault();var idx=enemies.indexOf(esObj);if(idx<0)return;photoCtx.type='en';photoCtx.i=idx;processEnImg(items[k].getAsFile(),function(thumb,full){applyPhoto(thumb,full)});return}}});
-document.getElementById('esheetBody').addEventListener('input',function(e){if(!esObj)return;var t=e.target;var item=t.closest('[data-esitem]');var sec=t.closest('.es__items[data-essec]');if(item&&sec){var key=sec.dataset.essec;var ii=parseInt(item.dataset.esitem);var field=t.dataset.esfield;if(esObj[key]&&esObj[key][ii]&&field){esObj[key][ii][field]=t.value;sE()}return}
+document.getElementById('esheetBody').addEventListener('input',function(e){if(!esObj)return;var t=e.target;
+/* Lista a stringhe (Linguaggi, Resistenze, Immunità, Vulnerabilità,
+   Immunità condizioni): aggiorna esObj[field][idx] = value. */
+if(t.classList&&t.classList.contains('es__lst-input')){var _lf=t.dataset.eslstfield;var _li=parseInt(t.dataset.eslstidx);if(!Array.isArray(esObj[_lf]))esObj[_lf]=[];esObj[_lf][_li]=t.value;sE();return}
+var item=t.closest('[data-esitem]');var sec=t.closest('.es__items[data-essec]');if(item&&sec){var key=sec.dataset.essec;var ii=parseInt(item.dataset.esitem);var field=t.dataset.esfield;if(esObj[key]&&esObj[key][ii]&&field){esObj[key][ii][field]=t.value;sE()}return}
 var ef=t.dataset.ef;if(!ef)return;/* Digit-only field: strip ogni char non 0-9 dal value, preserva
    approssimativamente la posizione caret, salva come integer
    (o '' se vuoto). */if(t.classList.contains('pg__inp--digits')){var _orig=t.value;var _cleaned=_orig.replace(/[^0-9]/g,'').slice(0,3);if(_cleaned!==_orig){var _shift=_orig.length-_cleaned.length;var _pos=Math.max(0,(t.selectionStart||0)-_shift);t.value=_cleaned;try{t.setSelectionRange(_pos,_pos)}catch(_){}}esObj[ef]=_cleaned===''?'':parseInt(_cleaned,10)}else if(t.type==='number'){var n=parseFloat(t.value);if(isNaN(n))n=0;esObj[ef]=n}else{esObj[ef]=t.value}sE();if(['name','ac','hp','hpCur','init','emoji','cr'].indexOf(ef)>=0)renE();if(ef==='name'){document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)')}if(['str','dex','con','intl','wis','cha'].indexOf(ef)>=0){var ab=t.closest('.pg__ab');if(ab){var modEl=ab.querySelector('.pg__ab-mod');if(modEl)modEl.textContent=fmtModEn(abModEn(esObj[ef]))}
@@ -4220,7 +4262,14 @@ var rm=e.target.closest('#esPhotoSlotRm');if(rm){e.stopPropagation();var idx=ene
 /* Click sullo slot foto: apre direttamente il file picker. photoCtx
    viene impostato così il change handler dispatcha a processEnImg
    (200×200 webp) tramite applyPhoto. Niente più popup intermedio. */
-if(e.target.id==='esPhotoSlot'||e.target.closest('#esPhotoSlot')){var idx=enemies.indexOf(esObj);if(idx<0)return;photoCtx.type='en';photoCtx.i=idx;hpPhotoInput.value='';hpPhotoInput.click();return}var add=e.target.closest('.es__add[data-essec]');if(add){var key=add.dataset.essec;if(!Array.isArray(esObj[key]))esObj[key]=[];esObj[key].push({name:'',desc:''});sE();openEsheet(enemies.indexOf(esObj));setTimeout(function(){var items=document.querySelectorAll('.es__items[data-essec="'+key+'"] [data-esitem]');var last=items[items.length-1];if(last){var inp=last.querySelector('.es__item-name');if(inp)inp.focus()}},10);return}var del=e.target.closest('[data-esdel]');if(del){var item=del.closest('[data-esitem]');var sec=del.closest('.es__items[data-essec]');if(item&&sec){var key=sec.dataset.essec;var ii=parseInt(item.dataset.esitem);if(esObj[key]&&esObj[key][ii]!=null){esObj[key].splice(ii,1);sE();openEsheet(enemies.indexOf(esObj))}}return}if(e.target.id==='esheetDel'||e.target.closest('#esheetDel')){var idx=enemies.indexOf(esObj);var nm=esObj.name||'(senza nome)';var _doDel=function(){if(idx>=0)enemies.splice(idx,1);sE();renE();closeEsheet()};if(typeof pgConfirm==='function')pgConfirm('Eliminare definitivamente "'+nm+'"?\nL\'azione è irreversibile.',_doDel,{title:'Elimina nemico',okLabel:'Elimina'});else if(confirm('Eliminare "'+nm+'"?'))_doDel();return}});
+if(e.target.id==='esPhotoSlot'||e.target.closest('#esPhotoSlot')){var idx=enemies.indexOf(esObj);if(idx<0)return;photoCtx.type='en';photoCtx.i=idx;hpPhotoInput.value='';hpPhotoInput.click();return}
+/* Sezioni a lista (Linguaggi, Resistenze, Immunità, Vulnerabilità,
+   Immunità condizioni) — add / del. */
+var _lstAdd=e.target.closest('[data-eslstadd]');
+if(_lstAdd){var _lk=_lstAdd.dataset.eslstadd;if(!Array.isArray(esObj[_lk]))esObj[_lk]=[];esObj[_lk].push('');sE();openEsheet(enemies.indexOf(esObj));setTimeout(function(){var inps=document.querySelectorAll('.es__lst[data-eslst="'+_lk+'"] .es__lst-input');var last=inps[inps.length-1];if(last)last.focus()},10);return}
+var _lstDel=e.target.closest('[data-eslstdel]');
+if(_lstDel){var _parts=_lstDel.dataset.eslstdel.split('-');var _lf=_parts[0];var _li=parseInt(_parts[1]);if(esObj[_lf]&&esObj[_lf][_li]!=null){esObj[_lf].splice(_li,1);sE();openEsheet(enemies.indexOf(esObj))}return}
+var add=e.target.closest('.es__add[data-essec]');if(add){var key=add.dataset.essec;if(!Array.isArray(esObj[key]))esObj[key]=[];esObj[key].push({name:'',desc:''});sE();openEsheet(enemies.indexOf(esObj));setTimeout(function(){var items=document.querySelectorAll('.es__items[data-essec="'+key+'"] [data-esitem]');var last=items[items.length-1];if(last){var inp=last.querySelector('.es__item-name');if(inp)inp.focus()}},10);return}var del=e.target.closest('[data-esdel]');if(del){var item=del.closest('[data-esitem]');var sec=del.closest('.es__items[data-essec]');if(item&&sec){var key=sec.dataset.essec;var ii=parseInt(item.dataset.esitem);if(esObj[key]&&esObj[key][ii]!=null){esObj[key].splice(ii,1);sE();openEsheet(enemies.indexOf(esObj))}}return}if(e.target.id==='esheetDel'||e.target.closest('#esheetDel')){var idx=enemies.indexOf(esObj);var nm=esObj.name||'(senza nome)';var _doDel=function(){if(idx>=0)enemies.splice(idx,1);sE();renE();closeEsheet()};if(typeof pgConfirm==='function')pgConfirm('Eliminare definitivamente "'+nm+'"?\nL\'azione è irreversibile.',_doDel,{title:'Elimina nemico',okLabel:'Elimina'});else if(confirm('Eliminare "'+nm+'"?'))_doDel();return}});
 /* Cross-drag: chars → HP */
 var chDragIdx=null;
 document.getElementById('chList').addEventListener('dragstart',function(e){var row=e.target.closest('[data-idx]');if(row)chDragIdx=parseInt(row.dataset.idx)});
