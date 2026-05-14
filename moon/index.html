@@ -605,14 +605,19 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__pperc-edit{width:48px;background:var(--bg);border:1px solid var(--gold);border-radius:3px;padding:1px 2px;color:var(--text);font-family:var(--mono);font-size:.72rem;font-weight:700;outline:none;text-align:center;line-height:1}
 /* Sezioni a lista nemico (Linguaggi, Resistenze, Immunità danni,
    Vulnerabilità, Immunità condizioni) — riusano le regole .pg__expitem*
-   di Equipaggiamento. Senza toggle/edit/textarea, l'altezza naturale
-   sarebbe inferiore — applichiamo min-height per matchare la sezione
-   Equipaggiamento PG (~34px). Padding-left 8px per dare un po' di
-   respiro al testo (l'equipaggiamento PG usa il toggle button come
-   "leading space"; qui sostituiamo col padding del row). */
-.es__lst-item.pg__expitem .pg__expitem-row{min-height:32px;align-items:center;padding-left:8px}
+   di Equipaggiamento per match esatto di colori/font/altezza.
+
+   Equipaggiamento PG closed: ~18-19px (input + toggle button entrambi
+   senza border esplicita). Mantenere quell'altezza richiede di NON
+   aggiungere min-height extra, e di togliere il border al trash button
+   (che altrimenti aggiunge 4px verticali al row via align-items:stretch).
+
+   Padding-left 8px sul row sostituisce visivamente lo spazio occupato
+   dal toggle nel layout equipaggiamento. */
+.es__lst-item.pg__expitem .pg__expitem-row{align-items:center;padding-left:8px}
 .es__lst-item.pg__expitem .pg__expitem-row>input{padding-left:0}
-.es__lst-item.pg__expitem .pg__atk-del{margin-right:6px}
+.es__lst-item.pg__expitem .pg__atk-del{border:none;width:22px;height:auto;color:var(--muted);background:transparent}
+.es__lst-item.pg__expitem .pg__atk-del:hover{color:var(--red);background:transparent;border:none}
 /* Sensi row: dropdown tipo (espandibile) + input range numerico + bottone
    unità toggle. Layout single-line con dropdown che si espande quanto
    serve, range e unità a larghezza fissa. Altezze allineate alla riga
