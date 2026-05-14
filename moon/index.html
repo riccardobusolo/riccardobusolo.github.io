@@ -4048,7 +4048,7 @@ h+='<div class="pg__sec"><div class="pg__sec-title">👁️ Sensi e linguaggi</d
 /* Sensi strutturato: dropdown tipo (stile allineamento .pg__cls-dd--custom)
    + numero range + bottone unità m/ft con conversione automatica D&D 5e
    (1.5 m = 5 ft). Opzioni manuali D&D 5e + Personalizzato. */
-var SENSI_OPTS=['Scurovisione','Vista Cieca','Vista del Vero','Percezione Tremorica'];
+var SENSI_OPTS=['Scurovisione','Vista Cieca','Vista del Vero','Percezione Tellurica'];
 var _stCur=e.sensesType||'';
 var _stIsCustom=_stCur&&SENSI_OPTS.indexOf(_stCur)<0;
 var _stOptsHtml='<button class="pg__cls-dd-opt'+(_stIsCustom?' pg__cls-dd-opt--selected':'')+'" data-esddopt="" type="button">Personalizzato</button>';
@@ -7495,7 +7495,7 @@ var HELP={
     +'<li><strong>Scurovisione</strong>: vede nel buio come fosse penombra, in scala di grigi.</li>'
     +'<li><strong>Vista Cieca</strong>: percepisce l\'ambiente senza usare la vista (ignora buio, invisibilità, illusioni visive).</li>'
     +'<li><strong>Vista del Vero</strong>: vede attraverso illusioni, travestimenti, invisibilità e buio magico; vede anche nel Piano Etereo.</li>'
-    +'<li><strong>Percezione Tremorica</strong>: rileva vibrazioni nel terreno. Richiede contatto col suolo.</li>'
+    +'<li><strong>Percezione Tellurica</strong>: rileva vibrazioni nel terreno. Richiede contatto col suolo.</li>'
     +'<li><strong>Personalizzato</strong>: per sensi non standard, scrivi tu il nome.</li>'
     +'</ul>'
     +'<h4>Toggle m ↔ ft</h4>'
