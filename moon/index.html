@@ -604,19 +604,15 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__pperc-val--ov{color:var(--gold)}
 .es__pperc-edit{width:48px;background:var(--bg);border:1px solid var(--gold);border-radius:3px;padding:1px 2px;color:var(--text);font-family:var(--mono);font-size:.72rem;font-weight:700;outline:none;text-align:center;line-height:1}
 /* Sezioni a lista nemico (Linguaggi, Resistenze, Immunità danni,
-   Vulnerabilità, Immunità condizioni). Visualmente simile alla sezione
-   Equipaggiamento della scheda PG, ma SENZA freccina di toggle: niente
-   descrizione, l'input è sempre direttamente modificabile cliccando
-   sulla barra. Solo input + bottone × elimina. */
-.es__lst{display:flex;flex-direction:column;gap:3px}
-.es__lst-item{display:flex;align-items:stretch;gap:3px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:0 0 0 4px;transition:border-color .12s;overflow:hidden}
-.es__lst-item:hover{border-color:var(--bh)}
-.es__lst-item:focus-within{border-color:var(--gold)}
-.es__lst-input{flex:1;min-width:0;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:.7rem;outline:none;padding:4px 4px}
-.es__lst-input::placeholder{color:var(--muted);opacity:.55;font-style:italic}
-.es__lst-del{flex-shrink:0;width:22px;background:transparent;border:none;border-left:1px solid var(--border);color:var(--muted);cursor:var(--cur-pointer);font-size:.9rem;line-height:1;padding:0;display:flex;align-items:center;justify-content:center;transition:all .12s}
-.es__lst-del:hover{color:var(--red);background:var(--rl)}
-.es__lst-empty{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-align:center;padding:4px 0;font-style:italic}
+   Vulnerabilità, Immunità condizioni) — riusano le regole .pg__expitem*
+   di Equipaggiamento. Senza toggle/edit/textarea, l'altezza naturale
+   sarebbe inferiore — applichiamo min-height per matchare la sezione
+   Equipaggiamento PG (~34px). Padding-left 8px per dare un po' di
+   respiro al testo (l'equipaggiamento PG usa il toggle button come
+   "leading space"; qui sostituiamo col padding del row). */
+.es__lst-item.pg__expitem .pg__expitem-row{min-height:32px;align-items:center;padding-left:8px}
+.es__lst-item.pg__expitem .pg__expitem-row>input{padding-left:0}
+.es__lst-item.pg__expitem .pg__atk-del{margin-right:6px}
 /* Sensi row: dropdown tipo (espandibile) + input range numerico + bottone
    unità toggle. Layout single-line con dropdown che si espande quanto
    serve, range e unità a larghezza fissa. Altezze allineate alla riga
@@ -4003,20 +3999,22 @@ if(e.sensesUnit==null||(e.sensesUnit!=='m'&&e.sensesUnit!=='ft'))e.sensesUnit='m
    combattimento, e.hpTemp = temp HP. Migrazione record legacy:
    se hpCur missing → hpCur = hp. */if(e.hpCur==null)e.hpCur=e.hp||0;if(e.hpTemp==null)e.hpTemp=0}
 function _esSecHTML(label,key,items){var h='<div class="pg__sec"><div class="pg__sec-title">'+label+'<button class="pg__sec-add" data-essec="'+key+'" type="button">+ Aggiungi</button></div>';if(!items.length){h+='<div class="es__empty">Nessun elemento — usa + Aggiungi</div>'}else{h+='<div class="es__items" data-essec="'+key+'">';items.forEach(function(it,i){h+='<div class="es__item" data-esitem="'+i+'"><div class="es__item-row"><input class="es__item-name" data-esfield="name" value="'+esc(it.name||'')+'" placeholder="Nome"><button class="es__item-del" data-esdel="1" type="button" title="Elimina">×</button></div><textarea class="es__item-desc" data-esfield="desc" placeholder="Descrizione, formule, range, costo (es. Costa 2 Azioni)...">'+esc(it.desc||'')+'</textarea></div>'});h+='</div>'}h+='</div>';return h}
-/* Sezione a lista semplificata (no descrizione, no toggle): titolo +
-   bottone +, lista di item con solo input + bottone × per cancellare.
-   Click sulla barra = focus input direttamente. Usata per Linguaggi,
-   Resistenze, Immunità danni, Vulnerabilità, Immunità condizioni. */
+/* Sezione a lista stile Equipaggiamento (scheda PG) ma SENZA descrizione:
+   - Titolo + bottone "+" identico a pg__sec-add (no testo "Aggiungi")
+   - Ogni item usa .pg__expitem.pg__expitem--on (sempre "aperto" così il
+     trash è visibile) con .pg__expitem-row contenente solo input + trash
+   - Trash usa .pg__atk-del con SVG cestino identico a Equipaggiamento
+   - Niente toggle ▸ né textarea body: la barra è direttamente editabile
+   Font/altezza/colori ereditati dalle regole .pg__expitem* esistenti. */
 function _esListSec(label,field,items,placeholder){
-  var h='<div class="pg__sec"><div class="pg__sec-title">'+label+'<button class="pg__sec-add" data-eslstadd="'+field+'" type="button">+ Aggiungi</button></div>';
-  if(!items||!items.length){h+='<div class="es__lst-empty">Nessun elemento — usa + Aggiungi</div>'}
-  else{
-    h+='<div class="es__lst" data-eslst="'+field+'">';
-    items.forEach(function(v,i){
-      h+='<div class="es__lst-item" data-eslstitem="'+i+'"><input class="es__lst-input" data-eslstfield="'+field+'" data-eslstidx="'+i+'" value="'+esc(v||'')+'" placeholder="'+esc(placeholder||'')+'"><button class="es__lst-del" data-eslstdel="'+field+'-'+i+'" type="button" title="Elimina">×</button></div>';
-    });
-    h+='</div>';
-  }
+  var _trashSvg='<svg viewBox="0 0 24 24" width="10" height="10"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
+  var h='<div class="pg__sec"><div class="pg__sec-title"><span>'+label+'</span><button class="pg__sec-add" data-eslstadd="'+field+'" type="button">+</button></div>';
+  (items||[]).forEach(function(v,i){
+    h+='<div class="pg__expitem pg__expitem--on es__lst-item"><div class="pg__expitem-row">'+
+      '<input class="es__lst-input" data-eslstfield="'+field+'" data-eslstidx="'+i+'" value="'+esc(v||'')+'" placeholder="'+esc(placeholder||'')+'">'+
+      '<button class="pg__atk-del" data-eslstdel="'+field+'-'+i+'" type="button" title="Elimina">'+_trashSvg+'</button>'+
+    '</div></div>';
+  });
   h+='</div>';
   return h;
 }
