@@ -576,6 +576,24 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 /* Ability cards: pg__ab base + mod absolute al fondo della card */
 /* Caratteristiche nemico ora usano puro .pg__ab/.pg__ab-name/.pg__ab-score/
    .pg__ab-mod identico a scheda PG — niente override CSS necessari. */
+/* Tiri salvezza nemico: riga compatta con label FOR/DES/... + modifier
+   effettivo (auto da caratteristica o override) + input override piccolo
+   + dadino cliccabile che tira d20+mod sulla barra dei dadi. Override
+   vuoto = usa auto da caratteristica; numero (anche negativo) sovrascrive.
+   Quando override attivo .es__save-mod--ov colora il mod in oro per
+   feedback visivo immediato. */
+.es__saves{display:flex;flex-direction:column;gap:3px}
+.es__save-row{display:flex;gap:6px;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:3px 6px;transition:border-color .12s}
+.es__save-row:hover{border-color:var(--bh)}
+.es__save-name{flex:0 0 30px;font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--gold);letter-spacing:.04em}
+.es__save-mod{flex:0 0 32px;font-family:var(--mono);font-size:.78rem;font-weight:700;text-align:center;color:var(--text)}
+.es__save-mod--ov{color:var(--gold)}
+.es__save-override{flex:1;min-width:0;width:100%;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:2px 5px;color:var(--text);font-family:var(--mono);font-size:.68rem;outline:none;text-align:center;transition:border-color .12s}
+.es__save-override:focus{border-color:var(--gold)}
+.es__save-override::placeholder{color:var(--dim);opacity:.55}
+.es__save-die{flex-shrink:0;width:22px;height:22px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);border-radius:4px;display:flex;align-items:center;justify-content:center;padding:0;transition:all .12s}
+.es__save-die:hover{color:var(--gold);border-color:var(--gold);background:rgba(196,154,50,.08)}
+.es__save-die svg{display:block;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;width:13px;height:13px}
 /* Section dinamica: items (tratti/azioni/ecc.) come card compatte */
 .es__empty{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-align:center;padding:4px 0;font-style:italic}
 .es__items{display:flex;flex-direction:column;gap:4px}
@@ -3682,7 +3700,19 @@ function fmtModEn(m){return m>=0?'+'+m:''+m}
 function _esRollD20(){var a=1+Math.floor(Math.random()*20);if(esAdv==='adv')return Math.max(a,1+Math.floor(Math.random()*20));if(esAdv==='dis')return Math.min(a,1+Math.floor(Math.random()*20));return a}
 function _esRollAbility(key){var labels={str:'FOR',dex:'DES',con:'COS',intl:'INT',wis:'SAG',cha:'CAR'};if(!labels[key])return;var score=esObj[key]||10;var mod=abModEn(score);var d=_esRollD20();var tot=d+mod;var cls=d===20?'pg__roll-row--crit':d===1?'pg__roll-row--fail':'pg__roll-row--hit';var advLbl=esAdv?' <span style="opacity:.7">('+(esAdv==='adv'?'Vant.':'Svant.')+')</span>':'';esLastRoll={cls:cls,html:'<strong>'+labels[key]+'</strong> &nbsp;d20 = <strong>'+d+'</strong>'+(mod>=0?' +':' ')+mod+' &nbsp;= <strong>'+tot+'</strong>'+advLbl};esAdv=null;if(esObj)openEsheet(enemies.indexOf(esObj))}
 function _esRollInit(){if(!esObj)return;var init=esObj.init||0;var d=_esRollD20();var tot=d+init;var cls=d===20?'pg__roll-row--crit':d===1?'pg__roll-row--fail':'pg__roll-row--hit';var advLbl=esAdv?' <span style="opacity:.7">('+(esAdv==='adv'?'Vant.':'Svant.')+')</span>':'';esLastRoll={cls:cls,html:'<strong>⚡ Iniziativa</strong> &nbsp;d20 = <strong>'+d+'</strong>'+(init>=0?' +':' ')+init+' &nbsp;= <strong>'+tot+'</strong>'+advLbl};esAdv=null;openEsheet(enemies.indexOf(esObj))}
-function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','saves','skills','dmgResist','dmgImmune','dmgVulner','condImmune','senses','languages','cr','notes'].forEach(function(k){if(e[k]==null)e[k]=''});['str','dex','con','intl','wis','cha'].forEach(function(k){if(e[k]==null)e[k]=10});['traits','actions','bonusActions','reactions','legendaryActions'].forEach(function(k){if(!Array.isArray(e[k]))e[k]=[]});/* HP tracking: e.hp = MAX (statblock), e.hpCur = current durante
+/* Save mod effettivo: usa override (parseInt) se presente e valido,
+   altrimenti fallback su modificatore caratteristica. parseInt('-5')
+   = -5, parseInt('') = NaN → fallback, parseInt('abc') = NaN → fallback. */
+function _esSaveMod(key){if(!esObj)return 0;var ov=esObj.savesOverride?esObj.savesOverride[key]:'';if(ov==null||ov===''||ov==='-')return abModEn(esObj[key]||10);var n=parseInt(ov,10);if(isNaN(n))return abModEn(esObj[key]||10);return n}
+function _esRollSave(key){if(!esObj)return;var labels={str:'FOR',dex:'DES',con:'COS',intl:'INT',wis:'SAG',cha:'CAR'};if(!labels[key])return;var mod=_esSaveMod(key);var d=_esRollD20();var tot=d+mod;var cls=d===20?'pg__roll-row--crit':d===1?'pg__roll-row--fail':'pg__roll-row--hit';var advLbl=esAdv?' <span style="opacity:.7">('+(esAdv==='adv'?'Vant.':'Svant.')+')</span>':'';esLastRoll={cls:cls,html:'<strong>🛡️ Salv. '+labels[key]+'</strong> &nbsp;d20 = <strong>'+d+'</strong>'+(mod>=0?' +':' ')+mod+' &nbsp;= <strong>'+tot+'</strong>'+advLbl};esAdv=null;openEsheet(enemies.indexOf(esObj))}
+function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','saves','skills','dmgResist','dmgImmune','dmgVulner','condImmune','senses','languages','cr','notes'].forEach(function(k){if(e[k]==null)e[k]=''});['str','dex','con','intl','wis','cha'].forEach(function(k){if(e[k]==null)e[k]=10});['traits','actions','bonusActions','reactions','legendaryActions'].forEach(function(k){if(!Array.isArray(e[k]))e[k]=[]});
+/* Saves override: per-ability mod override (stringa: '' = auto da
+   abModEn(score), '-5'..'+30' = sovrascrive il calcolo. Permette di
+   gestire mostri con bonus speciali ai tiri salvezza che non derivano
+   direttamente dalle caratteristiche. */
+if(!e.savesOverride||typeof e.savesOverride!=='object')e.savesOverride={};
+['str','dex','con','intl','wis','cha'].forEach(function(k){if(e.savesOverride[k]==null)e.savesOverride[k]=''});
+/* HP tracking: e.hp = MAX (statblock), e.hpCur = current durante
    combattimento, e.hpTemp = temp HP. Migrazione record legacy:
    se hpCur missing → hpCur = hp. */if(e.hpCur==null)e.hpCur=e.hp||0;if(e.hpTemp==null)e.hpTemp=0}
 function _esSecHTML(label,key,items){var h='<div class="pg__sec"><div class="pg__sec-title">'+label+'<button class="pg__sec-add" data-essec="'+key+'" type="button">+ Aggiungi</button></div>';if(!items.length){h+='<div class="es__empty">Nessun elemento — usa + Aggiungi</div>'}else{h+='<div class="es__items" data-essec="'+key+'">';items.forEach(function(it,i){h+='<div class="es__item" data-esitem="'+i+'"><div class="es__item-row"><input class="es__item-name" data-esfield="name" value="'+esc(it.name||'')+'" placeholder="Nome"><button class="es__item-del" data-esdel="1" type="button" title="Elimina">×</button></div><textarea class="es__item-desc" data-esfield="desc" placeholder="Descrizione, formule, range, costo (es. Costa 2 Azioni)...">'+esc(it.desc||'')+'</textarea></div>'});h+='</div>'}h+='</div>';return h}
@@ -3746,7 +3776,8 @@ h+='<div class="pg__sec"><div class="pg__sec-title">🎲 Caratteristiche</div><d
 [['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var v=e[a[1]];var m=abModEn(v);h+='<div class="pg__ab"><div class="pg__ab-name">'+a[0]+'</div><div class="pg__ab-score"><input class="pg__inp--inline" data-ef="'+a[1]+'" type="number" value="'+v+'" style="font-size:.82rem"></div><div class="pg__ab-mod">'+fmtModEn(m)+'</div></div>'});
 h+='</div></div>';
 h+='<div class="pg__sec"><div class="pg__sec-title">🛡️ Difese</div>';
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Tiri salvezza</div><input class="pg__inp es__inp-text" data-ef="saves" value="'+esc(e.saves)+'" placeholder="Int +14, Sag +14..."></div></div>';
+/* "Tiri salvezza" freeform RIMOSSO — ora gestito da sezione strutturata
+   in COL 2 (.es__save-row con override per-caratteristica + dadino roll). */
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Abilità</div><input class="pg__inp es__inp-text" data-ef="skills" value="'+esc(e.skills)+'" placeholder="Percezione +14..."></div></div>';
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Resistenze danni</div><input class="pg__inp es__inp-text" data-ef="dmgResist" value="'+esc(e.dmgResist)+'" placeholder="radioso; contundente non magico..."></div></div>';
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Immunità danni</div><input class="pg__inp es__inp-text" data-ef="dmgImmune" value="'+esc(e.dmgImmune)+'" placeholder="necrotico, veleno..."></div></div>';
@@ -3758,8 +3789,15 @@ h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Sensi</div>
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Linguaggi</div><input class="pg__inp es__inp-text" data-ef="languages" value="'+esc(e.languages)+'" placeholder="tutti, telepatia 36 m..."></div></div>';
 h+='</div>';
 h+='</div>';
-/* COLONNA 2: tratti + reazioni */
+/* COLONNA 2: tiri salvezza + tratti + reazioni */
 h+='<div class="pg__col">';
+/* Sezione Tiri salvezza: 6 righe (FOR/DES/COS/INT/SAG/CAR), ognuna con
+   mod effettivo (auto o override), input override (vuoto=auto) e dadino
+   che tira d20+mod sulla roll bar. Mostri speciali (es. mostro con bonus
+   salv. innaturalmente alto) richiedono l'override. */
+h+='<div class="pg__sec"><div class="pg__sec-title">🛡️ Tiri salvezza</div><div class="es__saves">';
+[['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var key=a[1];var lbl=a[0];var ov=(e.savesOverride&&e.savesOverride[key])||'';var isOv=ov!==''&&ov!=='-';var mod=_esSaveMod(key);h+='<div class="es__save-row"><div class="es__save-name">'+lbl+'</div><div class="es__save-mod'+(isOv?' es__save-mod--ov':'')+'" data-essavemod="'+key+'">'+fmtModEn(mod)+'</div><input class="es__save-override" data-essaveov="'+key+'" type="text" inputmode="numeric" value="'+esc(ov)+'" placeholder="auto" maxlength="4" title="Sovrascrivi modificatore (lascia vuoto per auto)"><button class="es__save-die" data-essaveroll="'+key+'" type="button" title="Tira tiro salvezza '+lbl+' (d20+mod)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button></div>'});
+h+='</div></div>';
 h+=_esSecHTML('✨ Tratti','traits',e.traits);
 h+=_esSecHTML('⚡ Reazioni','reactions',e.reactions);
 h+='</div>';
@@ -3794,9 +3832,19 @@ document.getElementById('esheetBody').addEventListener('drop',function(e){var sl
 /* Paste foto sul slot quando la sheet del nemico è aperta. Skip se
    l'utente sta incollando dentro un input/textarea della sheet. */
 document.addEventListener('paste',function(e){if(!esObj)return;var sheet=document.getElementById('winEsheet');if(!sheet||!sheet.classList.contains('on'))return;if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;var items=e.clipboardData&&e.clipboardData.items;if(!items)return;for(var k=0;k<items.length;k++){if(items[k].type&&items[k].type.startsWith('image/')){e.preventDefault();var idx=enemies.indexOf(esObj);if(idx<0)return;photoCtx.type='en';photoCtx.i=idx;processEnImg(items[k].getAsFile(),function(thumb,full){applyPhoto(thumb,full)});return}}});
-document.getElementById('esheetBody').addEventListener('input',function(e){if(!esObj)return;var t=e.target;var item=t.closest('[data-esitem]');var sec=t.closest('.es__items[data-essec]');if(item&&sec){var key=sec.dataset.essec;var ii=parseInt(item.dataset.esitem);var field=t.dataset.esfield;if(esObj[key]&&esObj[key][ii]&&field){esObj[key][ii][field]=t.value;sE()}return}var ef=t.dataset.ef;if(!ef)return;/* Digit-only field: strip ogni char non 0-9 dal value, preserva
+document.getElementById('esheetBody').addEventListener('input',function(e){if(!esObj)return;var t=e.target;var item=t.closest('[data-esitem]');var sec=t.closest('.es__items[data-essec]');if(item&&sec){var key=sec.dataset.essec;var ii=parseInt(item.dataset.esitem);var field=t.dataset.esfield;if(esObj[key]&&esObj[key][ii]&&field){esObj[key][ii][field]=t.value;sE()}return}
+/* Override modificatore tiro salvezza: salva su esObj.savesOverride[key].
+   Accetta numero intero opzionalmente preceduto da '-' (negativo). Strip
+   inline dei caratteri invalidi, preserva caret. '' = ripristina auto.
+   Aggiorna .es__save-mod inline senza full re-render per non perdere
+   il focus mentre l'utente digita. */
+if(t.dataset.essaveov){var sk=t.dataset.essaveov;var _o=t.value;var _hasMinus=_o.charAt(0)==='-';var _digs=_o.replace(/[^0-9]/g,'').slice(0,3);var _c=_hasMinus?('-'+_digs):_digs;if(_c!==_o){var _sh=_o.length-_c.length;var _pp=Math.max(0,(t.selectionStart||0)-_sh);t.value=_c;try{t.setSelectionRange(_pp,_pp)}catch(_){}}if(!esObj.savesOverride)esObj.savesOverride={};esObj.savesOverride[sk]=_c;sE();var _smEl=document.querySelector('#esheetBody [data-essavemod="'+sk+'"]');if(_smEl){_smEl.textContent=fmtModEn(_esSaveMod(sk));_smEl.classList.toggle('es__save-mod--ov',_c!==''&&_c!=='-')}return}
+var ef=t.dataset.ef;if(!ef)return;/* Digit-only field: strip ogni char non 0-9 dal value, preserva
    approssimativamente la posizione caret, salva come integer
-   (o '' se vuoto). */if(t.classList.contains('pg__inp--digits')){var _orig=t.value;var _cleaned=_orig.replace(/[^0-9]/g,'').slice(0,3);if(_cleaned!==_orig){var _shift=_orig.length-_cleaned.length;var _pos=Math.max(0,(t.selectionStart||0)-_shift);t.value=_cleaned;try{t.setSelectionRange(_pos,_pos)}catch(_){}}esObj[ef]=_cleaned===''?'':parseInt(_cleaned,10)}else if(t.type==='number'){var n=parseFloat(t.value);if(isNaN(n))n=0;esObj[ef]=n}else{esObj[ef]=t.value}sE();if(['name','ac','hp','hpCur','init','emoji','cr'].indexOf(ef)>=0)renE();if(ef==='name'){document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)')}if(['str','dex','con','intl','wis','cha'].indexOf(ef)>=0){var ab=t.closest('.pg__ab');if(ab){var modEl=ab.querySelector('.pg__ab-mod');if(modEl)modEl.textContent=fmtModEn(abModEn(esObj[ef]))}}
+   (o '' se vuoto). */if(t.classList.contains('pg__inp--digits')){var _orig=t.value;var _cleaned=_orig.replace(/[^0-9]/g,'').slice(0,3);if(_cleaned!==_orig){var _shift=_orig.length-_cleaned.length;var _pos=Math.max(0,(t.selectionStart||0)-_shift);t.value=_cleaned;try{t.setSelectionRange(_pos,_pos)}catch(_){}}esObj[ef]=_cleaned===''?'':parseInt(_cleaned,10)}else if(t.type==='number'){var n=parseFloat(t.value);if(isNaN(n))n=0;esObj[ef]=n}else{esObj[ef]=t.value}sE();if(['name','ac','hp','hpCur','init','emoji','cr'].indexOf(ef)>=0)renE();if(ef==='name'){document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)')}if(['str','dex','con','intl','wis','cha'].indexOf(ef)>=0){var ab=t.closest('.pg__ab');if(ab){var modEl=ab.querySelector('.pg__ab-mod');if(modEl)modEl.textContent=fmtModEn(abModEn(esObj[ef]))}
+/* Sync inline anche il save mod corrispondente — solo se NON c'è override
+   attivo (altrimenti l'override resta padrone del valore). */
+var _ov=esObj.savesOverride&&esObj.savesOverride[ef];if(_ov==null||_ov===''||_ov==='-'){var _sm=document.querySelector('#esheetBody [data-essavemod="'+ef+'"]');if(_sm)_sm.textContent=fmtModEn(_esSaveMod(ef))}}
 /* Aggiorna barra HP inline su cambio hp/hpCur/hpTemp senza re-render
    (preserva focus mentre l'utente digita). */
 if(['hp','hpCur','hpTemp'].indexOf(ef)>=0){var hpMx=esObj.hp||1;var hpCr=esObj.hpCur!=null?esObj.hpCur:hpMx;var pct=Math.max(0,Math.min(100,(hpCr/Math.max(1,hpMx))*100));var col=pct>50?'linear-gradient(90deg,#4a9a5a,#5dbf6f)':pct>25?'linear-gradient(90deg,#c49a32,#dab44a)':'linear-gradient(90deg,#c44a4a,#dc5d5d)';var fill=document.querySelector('#esheetBody .pg__hpbar-fill');if(fill){fill.style.width=pct+'%';fill.style.background=col}var tmpSpan=document.querySelector('#esheetBody .pg__hpbar-tmp');if(tmpSpan){tmpSpan.style.opacity=(esObj.hpTemp||0)>0?'':'.4'}}
@@ -3813,6 +3861,9 @@ if(advBtn){e.stopPropagation();var _mode=advBtn.dataset.esadv;esAdv=(esAdv===_mo
 /* Click su ⚡ iniziativa → lancia 1d20 + init bonus */
 var initBtn=e.target.closest('[data-esrollinit]');
 if(initBtn){e.stopPropagation();_esRollInit();return}
+/* Click su 🎲 tiro salvezza → lancia d20 + save mod (override o auto) */
+var saveBtn=e.target.closest('[data-essaveroll]');
+if(saveBtn){e.stopPropagation();_esRollSave(saveBtn.dataset.essaveroll);return}
 /* Click su caratteristica (.pg__ab) → lancia d20+mod. Skip se il target
    è l'input stesso (per non interferire con l'edit). */
 var abEl=e.target.closest('.pg__ab');
