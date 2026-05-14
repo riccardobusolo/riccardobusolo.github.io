@@ -794,21 +794,9 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .pg__coin-amt:focus{border-color:var(--gold)}
 .pg__coin-amt::placeholder{color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-size:.6rem;font-weight:600;opacity:.75}
 .pg__coin-amt--err{border-color:var(--red);animation:pgRollFlashFail .8s ease-out}
-/* Dropdown valuta: stesso pattern di .pg__cls-dd--custom (border condiviso
-   sul wrap, icona a sinistra, chevron a destra), ma solo icona nel preview
-   chiuso e icona+nome nel pannello aperto. */
-.pg__cls-dd--coin{display:inline-flex;align-items:stretch;gap:0;border:1px solid var(--border);border-radius:5px;background:var(--bg3);transition:border-color .12s;flex-shrink:0;position:relative}
-.pg__cls-dd--coin:hover{border-color:var(--rb)}
-.pg__cls-dd--coin:focus-within{border-color:var(--rb)}
-.pg__coin-cur-disp{cursor:var(--cur-pointer);background:transparent;border:none;padding:1px 2px 1px 5px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:0;min-height:22px;border-radius:5px 0 0 5px}
-.pg__coin-cur-disp svg{display:block}
-.pg__cls-dd--coin .pg__cls-dd-chev{padding:0 5px}
-.pg__cls-dd--coin .pg__cls-dd-panel{min-width:max-content}
-/* Opzione nel panel: icona + label esteso (es. "MA — Argento") */
-.pg__coin-cur-opt{display:flex;align-items:center;gap:6px;padding:3px 10px}
-.pg__coin-cur-opt svg{flex-shrink:0}
-.pg__coin-cur-opt-label{font-family:var(--mono);font-size:.78rem}
-.pg__coin-cur-opt-label small{color:var(--muted);font-size:.78em;margin-left:3px}
+/* Le regole di .pg__cls-dd--coin sono state spostate dopo .pg__cls-dd
+   (line ~852) e .pg__cls-dd--custom (line ~867) per non essere
+   override dal display:inline-block della base. */
 /* Pulsanti Vantaggio/Svantaggio (verde/rosso) sulla destra della roll-row.
    Quando attivi, vengono consumati al primo tiro d20 (atk, ability, save). */
 .pg__roll-row__content{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px}
@@ -871,6 +859,23 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .pg__cls-dd--custom .pg__cls-dd-input:focus{color:var(--gold);box-shadow:none!important;outline:none}
 .pg__cls-dd-chev{cursor:var(--cur-pointer);background:transparent;border:none;color:var(--muted);padding:0 6px;font-size:.7rem;line-height:1;border-radius:0 5px 5px 0;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-family:inherit;min-width:18px;transition:color .12s}
 .pg__cls-dd-chev:hover{color:var(--gold);background:rgba(196,154,50,.08)}
+/* Dropdown valuta moneta (variante .pg__cls-dd--coin): icona a SINISTRA,
+   chevron a DESTRA. Stesso pattern di .pg__cls-dd--custom ma senza input
+   testo. Definita DOPO .pg__cls-dd base per garantire che display:inline-flex
+   vinca su display:inline-block dell'antenato (stessa specificità → ultima
+   regola vince). */
+.pg__cls-dd--coin{display:inline-flex;align-items:stretch;gap:0;border:1px solid var(--border);border-radius:5px;background:var(--bg3);overflow:hidden;transition:border-color .12s;flex-shrink:0}
+.pg__cls-dd--coin:hover{border-color:var(--rb)}
+.pg__cls-dd--coin:focus-within{border-color:var(--rb)}
+.pg__coin-cur-disp{cursor:var(--cur-pointer);background:transparent;border:none;padding:1px 2px 1px 5px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:0;min-height:22px;border-radius:5px 0 0 5px}
+.pg__coin-cur-disp svg{display:block}
+.pg__cls-dd--coin .pg__cls-dd-chev{padding:0 5px;border-radius:0 5px 5px 0}
+.pg__cls-dd--coin .pg__cls-dd-panel{min-width:max-content}
+/* Opzione nel panel: icona + label esteso (es. "MA Argento") */
+.pg__coin-cur-opt{display:flex;align-items:center;gap:6px;padding:3px 10px;width:auto}
+.pg__coin-cur-opt svg{flex-shrink:0}
+.pg__coin-cur-opt-label{font-family:var(--mono);font-size:.78rem}
+.pg__coin-cur-opt-label small{color:var(--muted);font-size:.78em;margin-left:3px}
 .pg__inp--inline{-webkit-appearance:none;appearance:none;background:transparent;border:none;padding:0;margin:0;min-height:0;font-family:var(--mono);font-weight:700;color:inherit;text-align:center;outline:none;cursor:var(--cur-pointer);width:3ch;font-size:inherit;line-height:inherit;box-sizing:content-box}.pg__inp--inline:focus{color:var(--gold);cursor:var(--cur-text)}.pg__inp--inline::-webkit-outer-spin-button,.pg__inp--inline::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.pg__inp--inline[type=number]{-moz-appearance:textfield}
 .pg__row--id{gap:3px}.pg__row--id .pg__field{flex:0 0 auto;position:relative;margin-top:12px;min-width:0;transition:none}.pg__row--id .pg__field--empty{flex:1 0 60px}.pg__row--id .pg__lbl{position:absolute;bottom:100%;left:0;white-space:nowrap;margin-bottom:1px;font-size:.544rem}.pg__row--id .pg__inp{padding:5px 4px;width:100%;min-height:0;transition:border-color .12s,color .12s}
 .pg__val--sm{font-size:.84rem;font-weight:400;color:var(--dim)}
