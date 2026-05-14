@@ -627,8 +627,13 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
    imporrebbero font .84rem center color dim. */
 .es__lst-item .es__lst-dd{border:none;background:transparent;border-radius:0;flex:1;min-width:0;overflow:visible}
 .es__lst-item .es__lst-dd:hover,.es__lst-item .es__lst-dd:focus-within{border:none}
-.es__lst-item.pg__expitem .pg__expitem-row>.es__lst-dd>input.pg__cls-dd-input{padding:0 0 0 8px;background:transparent;font-size:.7rem!important;color:var(--text)!important;text-align:left!important;font-weight:400!important;border-radius:0!important}
-.es__lst-item .es__lst-dd .pg__cls-dd-chev{padding:0 6px 0 4px}
+/* min-height:0 forza l'override del default .pg__inp{min-height:24px}
+   che faceva risultare il dropdown input più alto (24px) rispetto al
+   Linguaggi input plain (17px). Padding-left 0 fa che il testo parta
+   al bordo della .es__lst-dd, equivalente al Linguaggi che ha
+   l'input direttamente nella .pg__expitem-row con padding-left ereditato. */
+.es__lst-item.pg__expitem .pg__expitem-row>.es__lst-dd>input.pg__cls-dd-input{padding:0!important;background:transparent;font-size:.7rem!important;color:var(--text)!important;text-align:left!important;font-weight:400!important;border-radius:0!important;min-height:0!important}
+.es__lst-item .es__lst-dd .pg__cls-dd-chev{padding:0 6px 0 4px;min-height:0;font-size:.6rem}
 /* Divisore tra sotto-blocchi della sezione Difese (Resistenze / Immunità
    danni / Vulnerabilità / Immunità condizioni). Stessa idea visiva del
    divisore tra Tiri Salvezza e Abilità nella scheda PG. */
