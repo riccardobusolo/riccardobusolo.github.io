@@ -618,6 +618,13 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__lst-item.pg__expitem .pg__expitem-row>input{padding-left:0}
 .es__lst-item.pg__expitem .pg__atk-del{border:none;width:22px;height:auto;color:var(--muted);background:transparent}
 .es__lst-item.pg__expitem .pg__atk-del:hover{color:var(--red);background:transparent;border:none}
+/* Dropdown inline dentro un list item (Difese): rimuove il border
+   proprio di .pg__cls-dd--custom (il border è già del .pg__expitem
+   esterno) e fa stretch per occupare tutto lo spazio disponibile. */
+.es__lst-item .es__lst-dd{border:none;background:transparent;border-radius:0;flex:1;min-width:0;overflow:visible}
+.es__lst-item .es__lst-dd:hover,.es__lst-item .es__lst-dd:focus-within{border:none}
+.es__lst-item .es__lst-dd .pg__cls-dd-input{padding:0 0 0 0;background:transparent}
+.es__lst-item .es__lst-dd .pg__cls-dd-chev{padding:0 6px 0 4px}
 /* Divisore tra sotto-blocchi della sezione Difese (Resistenze / Immunità
    danni / Vulnerabilità / Immunità condizioni). Stessa idea visiva del
    divisore tra Tiri Salvezza e Abilità nella scheda PG. */
@@ -4022,14 +4029,31 @@ function _esSecHTML(label,key,items){var h='<div class="pg__sec"><div class="pg_
    Font/altezza/colori ereditati dalle regole .pg__expitem* esistenti. */
 function _esListBlock(label,field,items,placeholder,opts){
   var _trashSvg='<svg viewBox="0 0 24 24" width="10" height="10"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
-  /* opts.sub = true → usa sotto-titolo (.es__sub-title) più piccolo,
-     usato per i 4 sotto-blocchi dentro "Difese". Default: pg__sec-title
-     grande (per sezioni standalone come Linguaggi). */
-  var titleCls=(opts&&opts.sub)?'es__sub-title':'pg__sec-title';
+  /* opts.sub = true → usa sotto-titolo (.es__sub-title) più piccolo.
+     opts.options = [...] → ogni item diventa un dropdown stile
+     Tipo/Allineamento/Taglia (.pg__cls-dd--custom) con "Personalizzato"
+     come prima opzione (svuota l'input per typing libero). */
+  opts=opts||{};
+  var titleCls=opts.sub?'es__sub-title':'pg__sec-title';
   var h='<div class="'+titleCls+'"><span>'+label+'</span><button class="pg__sec-add" data-eslstadd="'+field+'" type="button">+</button></div>';
   (items||[]).forEach(function(v,i){
-    h+='<div class="pg__expitem pg__expitem--on es__lst-item"><div class="pg__expitem-row">'+
-      '<input class="es__lst-input" data-eslstfield="'+field+'" data-eslstidx="'+i+'" value="'+esc(v||'')+'" placeholder="'+esc(placeholder||'')+'">'+
+    var inputHtml;
+    if(opts.options){
+      /* Costruisci dropdown stile pg__cls-dd--custom con Personalizzato
+         in cima + tutte le opzioni del manuale. Selected = matching opt
+         oppure (per valori custom) "Personalizzato". */
+      var isCustom=v&&opts.options.indexOf(v)<0;
+      var optsHtml='<button class="pg__cls-dd-opt'+(isCustom||!v?' pg__cls-dd-opt--selected':'')+'" data-eslstopt="" type="button">Personalizzato</button>';
+      opts.options.forEach(function(o){var sel=(v===o)?' pg__cls-dd-opt--selected':'';optsHtml+='<button class="pg__cls-dd-opt'+sel+'" data-eslstopt="'+esc(o)+'" type="button">'+esc(o)+'</button>'});
+      inputHtml='<div class="pg__cls-dd pg__cls-dd--custom es__lst-dd" data-eslstddwrap="'+field+'-'+i+'">'+
+        '<input class="pg__inp pg__inp--sm pg__cls-dd-input es__lst-input" data-eslstfield="'+field+'" data-eslstidx="'+i+'" value="'+esc(v||'')+'" placeholder="'+esc(placeholder||'')+'">'+
+        '<button class="pg__cls-dd-chev" data-eslstddbtn type="button" aria-label="Apri dropdown">▾</button>'+
+        '<div class="pg__cls-dd-panel">'+optsHtml+'</div>'+
+      '</div>';
+    } else {
+      inputHtml='<input class="es__lst-input" data-eslstfield="'+field+'" data-eslstidx="'+i+'" value="'+esc(v||'')+'" placeholder="'+esc(placeholder||'')+'">';
+    }
+    h+='<div class="pg__expitem pg__expitem--on es__lst-item"><div class="pg__expitem-row">'+inputHtml+
       '<button class="pg__atk-del" data-eslstdel="'+field+'-'+i+'" type="button" title="Elimina">'+_trashSvg+'</button>'+
     '</div></div>';
   });
@@ -4098,17 +4122,20 @@ h+='<div class="pg__sec"><div class="pg__sec-title">🎲 Caratteristiche</div><d
 h+='</div></div>';
 /* Difese: titolo grande "🛡️ Difese" + 4 sotto-blocchi più piccoli
    (Resistenze danni, Immunità danni, Vulnerabilità, Immunità condizioni)
-   in un unico .pg__sec separati da divisori sottili. I sotto-titoli
-   usano .es__sub-title (più piccolo + muted) per gerarchia visiva. */
+   in un unico .pg__sec separati da divisori sottili. Ogni item è ora
+   un dropdown stile Tipo/Allineamento/Taglia con "Personalizzato" in
+   cima per valori custom. Opzioni dei manuali D&D 5e (italiano). */
+var DMG_TYPES=['Acido','Contundente','Contundente non magico','Forza','Freddo','Fulmine','Fuoco','Necrotico','Perforante','Perforante non magico','Psichico','Radiante','Taglio','Taglio non magico','Tonante','Veleno'];
+var CONDITIONS=['Accecato','Affascinato','Assordato','Avvelenato','Esausto','Imbozzolato','Incapacitato','Invisibile','Paralizzato','Pietrificato','Privo di sensi','Prono','Spaventato','Stordito','Trattenuto'];
 h+='<div class="pg__sec">';
 h+='<div class="pg__sec-title">🛡️ Difese</div>';
-h+=_esListBlock('Resistenze danni','dmgResist',e.dmgResist,'es. radioso, contundente non magico...',{sub:true});
+h+=_esListBlock('Resistenze danni','dmgResist',e.dmgResist,'Personalizzato...',{sub:true,options:DMG_TYPES});
 h+='<div class="es__defs-div"></div>';
-h+=_esListBlock('Immunità danni','dmgImmune',e.dmgImmune,'es. necrotico, veleno...',{sub:true});
+h+=_esListBlock('Immunità danni','dmgImmune',e.dmgImmune,'Personalizzato...',{sub:true,options:DMG_TYPES});
 h+='<div class="es__defs-div"></div>';
-h+=_esListBlock('Vulnerabilità','dmgVulner',e.dmgVulner,'es. fuoco, freddo...',{sub:true});
+h+=_esListBlock('Vulnerabilità','dmgVulner',e.dmgVulner,'Personalizzato...',{sub:true,options:DMG_TYPES});
 h+='<div class="es__defs-div"></div>';
-h+=_esListBlock('Immunità condizioni','condImmune',e.condImmune,'es. affascinato, spaventato...',{sub:true});
+h+=_esListBlock('Immunità condizioni','condImmune',e.condImmune,'Personalizzato...',{sub:true,options:CONDITIONS});
 h+='</div>';
 h+='<div class="pg__sec"><div class="pg__sec-title">👁️ Sensi</div>';
 /* Sensi strutturato: dropdown tipo (stile allineamento .pg__cls-dd--custom)
@@ -4178,7 +4205,7 @@ document.getElementById('esheetBody').addEventListener('mousedown',function(ev){
 document.getElementById('esheetBody').addEventListener('keydown',function(e){if(e.key!=='Enter')return;var id=e.target.id;var sel=id==='esDmgIn'?'[data-eapplydmg]':id==='esHealIn'?'[data-eapplyheal]':id==='esTmpIn'?'[data-eapplytmp]':null;if(sel){e.preventDefault();var btn=document.querySelector(sel);if(btn)btn.click()}});
 /* Click outside per chiudere i dropdown identità enemy (Tipo/Allineamento/
    Taglia). Skip se il click è dentro un wrap o un panel di questi dropdown. */
-document.addEventListener('click',function(ev){if(ev.target.closest('[data-esddwrap]')||ev.target.closest('[data-esddopt]'))return;document.querySelectorAll('[data-esddwrap].pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')})});
+document.addEventListener('click',function(ev){if(ev.target.closest('[data-esddwrap]')||ev.target.closest('[data-esddopt]')||ev.target.closest('[data-eslstddwrap]')||ev.target.closest('[data-eslstopt]'))return;document.querySelectorAll('[data-esddwrap].pg__cls-dd--open,[data-eslstddwrap].pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')})});
 /* Drag&drop foto sul slot del header (delegation su #esheetBody) */
 document.getElementById('esheetBody').addEventListener('dragover',function(e){var slot=e.target.closest('#esPhotoSlot');if(!slot)return;e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='copy';slot.classList.add('drag-over')});
 document.getElementById('esheetBody').addEventListener('dragleave',function(e){var slot=e.target.closest('#esPhotoSlot');if(!slot)return;if(e.relatedTarget&&slot.contains(e.relatedTarget))return;slot.classList.remove('drag-over')});
@@ -4268,13 +4295,17 @@ if(abEl&&e.target.tagName!=='INPUT'&&abEl.closest('#esheetBody')){var _inp=abEl.
 /* Toggle dropdown identità (Tipo/Allineamento/Taglia). Chiude tutti gli
    altri dropdown già aperti, posiziona il panel sotto il wrap intero
    (input + chev) tramite getBoundingClientRect. */
-var ddBtn=e.target.closest('[data-esddbtn]');
-if(ddBtn){e.stopPropagation();var wrap=ddBtn.closest('[data-esddwrap]');if(!wrap)return;var wasOpen=wrap.classList.contains('pg__cls-dd--open');document.querySelectorAll('.pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')});if(!wasOpen){wrap.classList.add('pg__cls-dd--open');var pnl=wrap.querySelector('.pg__cls-dd-panel');if(pnl){var r=wrap.getBoundingClientRect();pnl.style.top=r.bottom+'px';pnl.style.left=r.left+'px';pnl.style.minWidth=r.width+'px'}}return}
+var ddBtn=e.target.closest('[data-esddbtn], [data-eslstddbtn]');
+if(ddBtn){e.stopPropagation();var wrap=ddBtn.closest('[data-esddwrap], [data-eslstddwrap]');if(!wrap)return;var wasOpen=wrap.classList.contains('pg__cls-dd--open');document.querySelectorAll('.pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')});if(!wasOpen){wrap.classList.add('pg__cls-dd--open');var pnl=wrap.querySelector('.pg__cls-dd-panel');if(pnl){var r=wrap.getBoundingClientRect();pnl.style.top=r.bottom+'px';pnl.style.left=r.left+'px';pnl.style.minWidth=r.width+'px'}}return}
 /* Selezione opzione dropdown: scrive esObj[key]=val, aggiorna input,
    triggera input event per attivare auto-resize + save, chiude panel.
    "Personalizzato" (data-esddopt="") svuota il campo e focusa l'input. */
 var ddOpt=e.target.closest('[data-esddopt]');
 if(ddOpt){e.stopPropagation();var wrap2=ddOpt.closest('[data-esddwrap]');if(!wrap2)return;var key=wrap2.dataset.esddwrap;var val=ddOpt.dataset.esddopt||'';esObj[key]=val;sE();renE();var inp=wrap2.querySelector('input[data-ef="'+key+'"]');if(inp){inp.value=val;inp.dispatchEvent(new Event('input',{bubbles:true}));if(!val)inp.focus()}wrap2.classList.remove('pg__cls-dd--open');return}
+/* Selezione opzione dropdown LIST item (difese): scrive
+   esObj[field][idx]=val, aggiorna input, chiude panel. */
+var lstDdOpt=e.target.closest('[data-eslstopt]');
+if(lstDdOpt){e.stopPropagation();var wrapL=lstDdOpt.closest('[data-eslstddwrap]');if(!wrapL)return;var fi=wrapL.dataset.eslstddwrap.split('-');var lfield=fi[0],lidx=parseInt(fi[1]);var lval=lstDdOpt.dataset.eslstopt||'';if(!Array.isArray(esObj[lfield]))esObj[lfield]=[];esObj[lfield][lidx]=lval;sE();var lInp=wrapL.querySelector('input[data-eslstfield]');if(lInp){lInp.value=lval;if(!lval)lInp.focus()}wrapL.classList.remove('pg__cls-dd--open');return}
 /* Applica danno: assorbe prima i PF temporanei, poi sottrae da hpCur */
 var admg=e.target.closest('[data-eapplydmg]');if(admg){var inp=document.getElementById('esDmgIn');var d=Math.abs(parseInt(inp.value)||1);if(esObj.hpTemp>0){var absorbed=Math.min(esObj.hpTemp,d);esObj.hpTemp-=absorbed;d-=absorbed}if(esObj.hpCur==null)esObj.hpCur=esObj.hp;esObj.hpCur-=d;if(esObj.hpCur<0)esObj.hpCur=0;sE();renE();openEsheet(enemies.indexOf(esObj));return}
 /* Applica cura: somma a hpCur, clampato a hpMax */
