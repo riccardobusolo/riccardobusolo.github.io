@@ -595,6 +595,23 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__save-die{width:22px;height:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);border-radius:4px;display:flex;align-items:center;justify-content:center;padding:0;transition:all .12s}
 .es__save-die:hover{color:var(--gold);border-color:var(--gold);background:rgba(196,154,50,.08)}
 .es__save-die svg{display:block;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;width:12px;height:12px}
+/* Percezione passiva: riga compatta sotto la lista abilità, separata da
+   bordo top. Valore cliccabile → inline edit (stesso pattern delle TS). */
+.es__pperc{margin-top:3px;padding-top:3px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:.58rem;color:var(--dim);font-weight:600}
+.es__pperc-lbl{flex:1}
+.es__pperc-val{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--text);cursor:var(--cur-pointer);padding:1px 5px;border-radius:3px;border:1px solid transparent;transition:all .12s;min-width:24px;text-align:center}
+.es__pperc-val:hover{background:var(--bg);border-color:var(--border);color:var(--gold)}
+.es__pperc-val--ov{color:var(--gold)}
+.es__pperc-edit{width:48px;background:var(--bg);border:1px solid var(--gold);border-radius:3px;padding:1px 2px;color:var(--text);font-family:var(--mono);font-size:.72rem;font-weight:700;outline:none;text-align:center;line-height:1}
+/* Sensi row: dropdown tipo (espandibile) + input range numerico + bottone
+   unità toggle. Layout single-line con dropdown che si espande quanto
+   serve, range e unità a larghezza fissa. */
+.es__senses-row{display:flex;align-items:stretch;gap:4px;width:100%}
+.es__senses-type{flex:1;min-width:0}
+.es__senses-type .pg__cls-dd-input{font-size:.72rem;font-weight:500}
+.es__senses-value{flex:0 0 48px;width:48px;text-align:center;font-size:.72rem}
+.es__senses-unit{flex:0 0 auto;min-width:28px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--gold);font-family:var(--mono);font-size:.66rem;font-weight:600;cursor:var(--cur-pointer);padding:0 6px;transition:all .12s}
+.es__senses-unit:hover{border-color:var(--gold);background:rgba(196,154,50,.12)}
 /* Section dinamica: items (tratti/azioni/ecc.) come card compatte */
 .es__empty{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-align:center;padding:4px 0;font-style:italic}
 .es__items{display:flex;flex-direction:column;gap:4px}
@@ -3943,6 +3960,14 @@ function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','s
    direttamente dalle caratteristiche. */
 if(!e.savesOverride||typeof e.savesOverride!=='object')e.savesOverride={};
 ['str','dex','con','intl','wis','cha'].forEach(function(k){if(e.savesOverride[k]==null)e.savesOverride[k]=''});
+/* Percezione passiva override: numero (es. 14) sovrascrive il valore auto
+   calcolato come 10 + mod SAG. Stringa vuota = usa auto. */
+if(e.passivePerception==null)e.passivePerception='';
+/* Sensi strutturati: tipo (es. Scurovisione, Vista Cieca, ...), valore
+   numerico (range), unità ('m'|'ft'). Stringa vuota in type = personalizzato. */
+if(e.sensesType==null)e.sensesType='';
+if(e.sensesValue==null)e.sensesValue='';
+if(e.sensesUnit==null||(e.sensesUnit!=='m'&&e.sensesUnit!=='ft'))e.sensesUnit='m';
 /* HP tracking: e.hp = MAX (statblock), e.hpCur = current durante
    combattimento, e.hpTemp = temp HP. Migrazione record legacy:
    se hpCur missing → hpCur = hp. */if(e.hpCur==null)e.hpCur=e.hp||0;if(e.hpTemp==null)e.hpTemp=0}
@@ -4016,7 +4041,15 @@ h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Vulnerabili
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Immunità condizioni</div><input class="pg__inp es__inp-text" data-ef="condImmune" value="'+esc(e.condImmune)+'" placeholder="affascinato, spaventato..."></div></div>';
 h+='</div>';
 h+='<div class="pg__sec"><div class="pg__sec-title">👁️ Sensi e linguaggi</div>';
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Sensi</div><input class="pg__inp es__inp-text" data-ef="senses" value="'+esc(e.senses)+'" placeholder="Percezione passiva 24..."></div></div>';
+/* Sensi strutturato: dropdown tipo (stile allineamento .pg__cls-dd--custom)
+   + numero range + bottone unità m/ft con conversione automatica D&D 5e
+   (1.5 m = 5 ft). Opzioni manuali D&D 5e + Personalizzato. */
+var SENSI_OPTS=['Scurovisione','Vista Cieca','Vista del Vero','Percezione Tremorica'];
+var _stCur=e.sensesType||'';
+var _stIsCustom=_stCur&&SENSI_OPTS.indexOf(_stCur)<0;
+var _stOptsHtml='<button class="pg__cls-dd-opt'+(_stIsCustom?' pg__cls-dd-opt--selected':'')+'" data-esddopt="" type="button">Personalizzato</button>';
+SENSI_OPTS.forEach(function(o){var sel=(_stCur===o)?' pg__cls-dd-opt--selected':'';_stOptsHtml+='<button class="pg__cls-dd-opt'+sel+'" data-esddopt="'+esc(o)+'" type="button">'+esc(o)+'</button>'});
+h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Sensi</div><div class="es__senses-row"><div class="pg__cls-dd pg__cls-dd--custom es__senses-type" data-esddwrap="sensesType"><input class="pg__inp pg__inp--sm pg__cls-dd-input" data-ef="sensesType" value="'+esc(_stCur)+'" placeholder="—"><button class="pg__cls-dd-chev" data-esddbtn type="button" aria-label="Apri dropdown Sensi">▾</button><div class="pg__cls-dd-panel">'+_stOptsHtml+'</div></div><input class="pg__inp pg__inp--sm pg__inp--digits es__senses-value" data-ef="sensesValue" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="'+esc(String(e.sensesValue||''))+'" placeholder="—"><button class="es__senses-unit" data-essensesunit="1" type="button" title="Clicca per convertire tra metri e piedi (regola D&D 5e: 1.5 m = 5 ft)">'+esc(e.sensesUnit||'m')+'</button></div></div></div>';
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Linguaggi</div><input class="pg__inp es__inp-text" data-ef="languages" value="'+esc(e.languages)+'" placeholder="tutti, telepatia 36 m..."></div></div>';
 h+='</div>';
 h+='</div>';
@@ -4039,7 +4072,15 @@ h+='<div class="pg__sec"><div class="pg__sec-title">🎲 Abilità</div><div clas
 var _esAllSkills=[];_ES_SKILL_MAP.forEach(function(g){g.skills.forEach(function(sk){_esAllSkills.push({key:sk[0],name:sk[1],ab:g.ab,abName:g.name})})});
 _esAllSkills.sort(function(x,y){return x.name.localeCompare(y.name)});
 _esAllSkills.forEach(function(sk){var mod=abModEn(e[sk.ab]||10);h+='<div class="pg__skill" data-essk="'+sk.key+'" data-eskab="'+sk.ab+'" data-esklbl="'+esc(sk.name)+'" title="Tira '+esc(sk.name)+' (d20'+(mod>=0?'+':'')+mod+')"><span class="pg__skill-name">'+esc(sk.name)+' <span style="color:var(--muted)">('+sk.abName+')</span></span><span class="pg__skill-mod">'+fmtModEn(mod)+'</span></div>'});
-h+='</div></div>';
+h+='</div>';
+/* Percezione Passiva: separata da bordo top, valore cliccabile per
+   override. Auto = 10 + mod SAG; override = numero salvato su
+   e.passivePerception. */
+var _ppOv=(e.passivePerception!=null&&e.passivePerception!=='')?parseInt(e.passivePerception):null;
+var _ppVal=_ppOv!=null?_ppOv:10+abModEn(e.wis||10);
+var _ppIsOv=_ppOv!=null;
+h+='<div class="es__pperc" title="Percezione passiva — click per sovrascrivere"><span class="es__pperc-lbl">👁️ Percezione Passiva</span><span class="es__pperc-val'+(_ppIsOv?' es__pperc-val--ov':'')+'" data-esppercval="1">'+_ppVal+'</span></div>';
+h+='</div>';
 h+=_esSecHTML('✨ Tratti','traits',e.traits);
 h+=_esSecHTML('⚡ Reazioni','reactions',e.reactions);
 h+='</div>';
@@ -4116,7 +4157,7 @@ if(saveModEl&&!saveModEl.querySelector('input')){e.stopPropagation();
   var curOv=(esObj.savesOverride&&esObj.savesOverride[sKey])||'';
   var inp=document.createElement('input');
   inp.className='es__save-edit';inp.type='text';inp.inputMode='numeric';inp.maxLength=3;
-  inp.value=curOv;inp.placeholder='auto';
+  inp.value=curOv;
   saveModEl.textContent='';saveModEl.appendChild(inp);
   inp.focus();inp.select();
   /* Strip caratteri non validi durante typing: solo '-' iniziale + max 2 cifre */
@@ -4125,6 +4166,26 @@ if(saveModEl&&!saveModEl.querySelector('input')){e.stopPropagation();
   inp.addEventListener('blur',_commit);
   inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();inp.blur()}else if(ev.key==='Escape'){ev.preventDefault();inp.value=curOv;inp.blur()}});
   return}
+/* Click sulla Percezione Passiva → inline edit. Stesso pattern delle TS:
+   click apre input centrato che accetta solo cifre (max 3), blur/Enter
+   conferma, Escape annulla, vuoto resetta in auto. */
+var ppValEl=e.target.closest('[data-esppercval]');
+if(ppValEl&&!ppValEl.querySelector('input')){e.stopPropagation();
+  var ppCurOv=esObj.passivePerception||'';
+  var ppInp=document.createElement('input');
+  ppInp.className='es__pperc-edit';ppInp.type='text';ppInp.inputMode='numeric';ppInp.maxLength=3;
+  ppInp.value=ppCurOv;
+  ppValEl.textContent='';ppValEl.appendChild(ppInp);
+  ppInp.focus();ppInp.select();
+  ppInp.addEventListener('input',function(){var v=ppInp.value;var c=v.replace(/[^0-9]/g,'').slice(0,3);if(c!==v){var sh=v.length-c.length;var p=Math.max(0,(ppInp.selectionStart||0)-sh);ppInp.value=c;try{ppInp.setSelectionRange(p,p)}catch(_){}}});
+  function _ppCommit(){var v=ppInp.value.replace(/[^0-9]/g,'').slice(0,3);esObj.passivePerception=v;sE();var auto=10+abModEn(esObj.wis||10);var disp=v?parseInt(v):auto;ppValEl.textContent=disp;ppValEl.classList.toggle('es__pperc-val--ov',!!v)}
+  ppInp.addEventListener('blur',_ppCommit);
+  ppInp.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();ppInp.blur()}else if(ev.key==='Escape'){ev.preventDefault();ppInp.value=ppCurOv;ppInp.blur()}});
+  return}
+/* Toggle unità Sensi m↔ft. Regola D&D 5e: 1.5 m = 5 ft (ratio 0.3 m/ft).
+   Converte il valore numerico mantenendo l'arrotondamento intero. */
+var unitBtn=e.target.closest('[data-essensesunit]');
+if(unitBtn){e.stopPropagation();var curU=esObj.sensesUnit||'m';var curV=parseInt(esObj.sensesValue)||0;var newU,newV;if(curU==='m'){newU='ft';newV=Math.round(curV/1.5*5)}else{newU='m';newV=Math.round(curV/5*1.5)}esObj.sensesUnit=newU;esObj.sensesValue=newV>0?newV:'';sE();openEsheet(enemies.indexOf(esObj));return}
 /* Click su caratteristica (.pg__ab) → lancia d20+mod. Skip se il target
    è l'input stesso (per non interferire con l'edit). */
 var abEl=e.target.closest('.pg__ab');
