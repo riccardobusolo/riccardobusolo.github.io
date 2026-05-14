@@ -620,10 +620,14 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__lst-item.pg__expitem .pg__atk-del:hover{color:var(--red);background:transparent;border:none}
 /* Dropdown inline dentro un list item (Difese): rimuove il border
    proprio di .pg__cls-dd--custom (il border è già del .pg__expitem
-   esterno) e fa stretch per occupare tutto lo spazio disponibile. */
+   esterno) e fa stretch per occupare tutto lo spazio disponibile.
+   Forziamo l'input a matchare gli altri item della lista (font .7rem,
+   text-align left, color text bianco, padding-left 8px) per coerenza
+   visiva — di default le classi pg__inp/pg__inp--sm/pg__cls-dd-input
+   imporrebbero font .84rem center color dim. */
 .es__lst-item .es__lst-dd{border:none;background:transparent;border-radius:0;flex:1;min-width:0;overflow:visible}
 .es__lst-item .es__lst-dd:hover,.es__lst-item .es__lst-dd:focus-within{border:none}
-.es__lst-item .es__lst-dd .pg__cls-dd-input{padding:0 0 0 0;background:transparent}
+.es__lst-item.pg__expitem .pg__expitem-row>.es__lst-dd>input.pg__cls-dd-input{padding:0 0 0 8px;background:transparent;font-size:.7rem!important;color:var(--text)!important;text-align:left!important;font-weight:400!important;border-radius:0!important}
 .es__lst-item .es__lst-dd .pg__cls-dd-chev{padding:0 6px 0 4px}
 /* Divisore tra sotto-blocchi della sezione Difese (Resistenze / Immunità
    danni / Vulnerabilità / Immunità condizioni). Stessa idea visiva del
