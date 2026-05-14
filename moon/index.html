@@ -648,15 +648,18 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
    serve, range e unità a larghezza fissa. Altezze allineate alla riga
    "Linguaggi" sotto (font .7rem, min-height:0, padding 3px 6px); font
    leggermente ridotto rispetto al default. */
-/* Altezza target = 25px (uguale al campo Linguaggi sotto, classe
-   .es__inp-text). Tutti i child del row a 25px box-sizing border-box. */
-.es__senses-row{display:flex;align-items:stretch;gap:4px;width:100%}
-.es__senses-type{flex:1;min-width:0;height:25px;box-sizing:border-box}
-.es__senses-row .pg__cls-dd-input,
-.es__senses-row .es__senses-value{font-size:.66rem!important;font-weight:500!important;padding:3px 6px!important;min-height:0!important;height:100%;box-sizing:border-box}
-.es__senses-value{flex:0 0 42px;width:42px;text-align:center!important;height:25px}
-.es__senses-unit{flex:0 0 auto;min-width:24px;height:25px;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--gold);font-family:var(--mono);font-size:.6rem;font-weight:600;cursor:var(--cur-pointer);padding:0 6px;line-height:1;transition:all .12s}
-.es__senses-unit:hover{border-color:var(--gold);background:rgba(196,154,50,.12)}
+/* Sensi: barra unica stile Linguaggi (outer .pg__expitem ha il bordo,
+   sottoelementi senza bordi propri ma con divisori sottili a sinistra
+   di valore e unità per delineare le 3 sezioni). Altezza 18px come
+   gli altri item. */
+.es__senses-item.pg__expitem .pg__expitem-row{padding-left:0}
+.es__senses-item .es__senses-type{flex:1;min-width:0;height:auto}
+.es__senses-item .es__senses-type .pg__cls-dd-input{font-size:.7rem!important;font-weight:400!important;padding:0 0 0 8px!important;min-height:0!important;color:var(--text)!important;text-align:left!important;background:transparent;border-radius:0!important}
+.es__senses-item .es__senses-type .pg__cls-dd-chev{padding:0 6px 0 4px;font-size:.6rem;min-height:0}
+.es__senses-value{flex:0 0 38px;width:38px;text-align:center!important;font-size:.7rem!important;font-weight:400!important;padding:0 4px!important;min-height:0!important;background:transparent!important;border:none!important;border-left:1px solid var(--border)!important;border-radius:0!important;color:var(--text)!important;outline:none}
+.es__senses-value:focus{color:var(--gold)!important}
+.es__senses-unit{flex:0 0 auto;min-width:24px;background:transparent;border:none;border-left:1px solid var(--border);border-radius:0;color:var(--gold);font-family:var(--mono);font-size:.62rem;font-weight:600;cursor:var(--cur-pointer);padding:0 6px;line-height:1;transition:all .12s}
+.es__senses-unit:hover{background:rgba(196,154,50,.12);color:var(--gold)}
 /* Section dinamica: items (tratti/azioni/ecc.) come card compatte */
 .es__empty{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-align:center;padding:4px 0;font-style:italic}
 .es__items{display:flex;flex-direction:column;gap:4px}
@@ -4164,7 +4167,16 @@ var _stCur=e.sensesType||'';
 var _stIsCustom=_stCur&&SENSI_OPTS.indexOf(_stCur)<0;
 var _stOptsHtml='<button class="pg__cls-dd-opt'+(_stIsCustom?' pg__cls-dd-opt--selected':'')+'" data-esddopt="" type="button">Personalizzato</button>';
 SENSI_OPTS.forEach(function(o){var sel=(_stCur===o)?' pg__cls-dd-opt--selected':'';_stOptsHtml+='<button class="pg__cls-dd-opt'+sel+'" data-esddopt="'+esc(o)+'" type="button">'+esc(o)+'</button>'});
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Sensi<button class="pg__lbl-help" data-help="senses" type="button" title="Cosa sono Scurovisione, Vista Cieca e gli altri sensi speciali" aria-label="Aiuto sensi">?</button></div><div class="es__senses-row"><div class="pg__cls-dd pg__cls-dd--custom es__senses-type" data-esddwrap="sensesType"><input class="pg__inp pg__inp--sm pg__cls-dd-input" data-ef="sensesType" value="'+esc(_stCur)+'" placeholder="—"><button class="pg__cls-dd-chev" data-esddbtn type="button" aria-label="Apri dropdown Sensi">▾</button><div class="pg__cls-dd-panel">'+_stOptsHtml+'</div></div><input class="pg__inp pg__inp--sm pg__inp--digits es__senses-value" data-ef="sensesValue" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="'+esc(String(e.sensesValue||''))+'" placeholder="—"><button class="es__senses-unit" data-essensesunit="1" type="button" title="Clicca per convertire tra metri e piedi (regola D&D 5e: 1.5 m = 5 ft)">'+esc(e.sensesUnit||'m')+'</button></div></div></div>';
+h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Sensi<button class="pg__lbl-help" data-help="senses" type="button" title="Cosa sono Scurovisione, Vista Cieca e gli altri sensi speciali" aria-label="Aiuto sensi">?</button></div>'+
+  /* Barra Sensi stile Linguaggi: outer .pg__expitem.--on.es__lst-item
+     fornisce il bordo unico, dropdown + numero + unità all'interno
+     senza i loro bordi propri. */
+  '<div class="pg__expitem pg__expitem--on es__lst-item es__senses-item"><div class="pg__expitem-row">'+
+    '<div class="pg__cls-dd pg__cls-dd--custom es__lst-dd es__senses-type" data-esddwrap="sensesType"><input class="pg__inp pg__inp--sm pg__cls-dd-input" data-ef="sensesType" value="'+esc(_stCur)+'" placeholder="—"><button class="pg__cls-dd-chev" data-esddbtn type="button" aria-label="Apri dropdown Sensi">▾</button><div class="pg__cls-dd-panel">'+_stOptsHtml+'</div></div>'+
+    '<input class="pg__inp pg__inp--sm pg__inp--digits es__senses-value" data-ef="sensesValue" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="'+esc(String(e.sensesValue||''))+'" placeholder="—">'+
+    '<button class="es__senses-unit" data-essensesunit="1" type="button" title="Clicca per convertire tra metri e piedi (regola D&D 5e: 1.5 m = 5 ft)">'+esc(e.sensesUnit||'m')+'</button>'+
+  '</div></div>'+
+'</div></div>';
 h+='</div>';
 /* Linguaggi: sezione a lista separata stile Equipaggiamento. */
 h+=_esListSec('🗣️ Linguaggi','languages',e.languages,'es. Comune, Elfico, telepatia 36 m...');
