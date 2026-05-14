@@ -605,12 +605,17 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__pperc-edit{width:48px;background:var(--bg);border:1px solid var(--gold);border-radius:3px;padding:1px 2px;color:var(--text);font-family:var(--mono);font-size:.72rem;font-weight:700;outline:none;text-align:center;line-height:1}
 /* Sensi row: dropdown tipo (espandibile) + input range numerico + bottone
    unità toggle. Layout single-line con dropdown che si espande quanto
-   serve, range e unità a larghezza fissa. */
+   serve, range e unità a larghezza fissa. Altezze allineate alla riga
+   "Linguaggi" sotto (font .7rem, min-height:0, padding 3px 6px); font
+   leggermente ridotto rispetto al default. */
+/* Altezza target = 25px (uguale al campo Linguaggi sotto, classe
+   .es__inp-text). Tutti i child del row a 25px box-sizing border-box. */
 .es__senses-row{display:flex;align-items:stretch;gap:4px;width:100%}
-.es__senses-type{flex:1;min-width:0}
-.es__senses-type .pg__cls-dd-input{font-size:.72rem;font-weight:500}
-.es__senses-value{flex:0 0 48px;width:48px;text-align:center;font-size:.72rem}
-.es__senses-unit{flex:0 0 auto;min-width:28px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--gold);font-family:var(--mono);font-size:.66rem;font-weight:600;cursor:var(--cur-pointer);padding:0 6px;transition:all .12s}
+.es__senses-type{flex:1;min-width:0;height:25px;box-sizing:border-box}
+.es__senses-row .pg__cls-dd-input,
+.es__senses-row .es__senses-value{font-size:.66rem!important;font-weight:500!important;padding:3px 6px!important;min-height:0!important;height:100%;box-sizing:border-box}
+.es__senses-value{flex:0 0 42px;width:42px;text-align:center!important;height:25px}
+.es__senses-unit{flex:0 0 auto;min-width:24px;height:25px;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--gold);font-family:var(--mono);font-size:.6rem;font-weight:600;cursor:var(--cur-pointer);padding:0 6px;line-height:1;transition:all .12s}
 .es__senses-unit:hover{border-color:var(--gold);background:rgba(196,154,50,.12)}
 /* Section dinamica: items (tratti/azioni/ecc.) come card compatte */
 .es__empty{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-align:center;padding:4px 0;font-style:italic}
@@ -7500,7 +7505,6 @@ var HELP={
     +'</ul>'
     +'<h4>Toggle m ↔ ft</h4>'
     +'<p>Conversione D&amp;D 5e: <strong>1.5 m = 5 ft</strong> (un quadrato della griglia). Non è la conversione metrica esatta, ma mantiene tondi i numeri del manuale.</p>'
-    +'<p><em>La Percezione Passiva è nella sezione Abilità (10 + mod SAG, cliccabile per override).</em></p>'
   },
   coins:{title:'Monete',body:''
     +'<h4>Tassi di cambio (D&amp;D 5e)</h4>'
