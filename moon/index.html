@@ -622,6 +622,11 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
    danni / Vulnerabilità / Immunità condizioni). Stessa idea visiva del
    divisore tra Tiri Salvezza e Abilità nella scheda PG. */
 .es__defs-div{height:1px;background:var(--border);margin:6px 0}
+/* Sotto-titoli (Resistenze, Immunità danni, ecc.): font più piccolo
+   e meno prominente del titolo grande della sezione (.pg__sec-title).
+   Mantiene maiuscolo + lettering per coerenza estetica. */
+.es__sub-title{font-family:var(--mono);font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.es__sub-title .pg__sec-add{font-size:.58rem;padding:2px 6px;margin-left:auto}
 /* Sensi row: dropdown tipo (espandibile) + input range numerico + bottone
    unità toggle. Layout single-line con dropdown che si espande quanto
    serve, range e unità a larghezza fissa. Altezze allineate alla riga
@@ -4015,9 +4020,13 @@ function _esSecHTML(label,key,items){var h='<div class="pg__sec"><div class="pg_
    - Trash usa .pg__atk-del con SVG cestino identico a Equipaggiamento
    - Niente toggle ▸ né textarea body: la barra è direttamente editabile
    Font/altezza/colori ereditati dalle regole .pg__expitem* esistenti. */
-function _esListBlock(label,field,items,placeholder){
+function _esListBlock(label,field,items,placeholder,opts){
   var _trashSvg='<svg viewBox="0 0 24 24" width="10" height="10"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
-  var h='<div class="pg__sec-title"><span>'+label+'</span><button class="pg__sec-add" data-eslstadd="'+field+'" type="button">+</button></div>';
+  /* opts.sub = true → usa sotto-titolo (.es__sub-title) più piccolo,
+     usato per i 4 sotto-blocchi dentro "Difese". Default: pg__sec-title
+     grande (per sezioni standalone come Linguaggi). */
+  var titleCls=(opts&&opts.sub)?'es__sub-title':'pg__sec-title';
+  var h='<div class="'+titleCls+'"><span>'+label+'</span><button class="pg__sec-add" data-eslstadd="'+field+'" type="button">+</button></div>';
   (items||[]).forEach(function(v,i){
     h+='<div class="pg__expitem pg__expitem--on es__lst-item"><div class="pg__expitem-row">'+
       '<input class="es__lst-input" data-eslstfield="'+field+'" data-eslstidx="'+i+'" value="'+esc(v||'')+'" placeholder="'+esc(placeholder||'')+'">'+
@@ -4087,17 +4096,19 @@ h+='</div>';
 h+='<div class="pg__sec"><div class="pg__sec-title">🎲 Caratteristiche</div><div class="pg__abs">';
 [['FOR','str'],['DES','dex'],['COS','con'],['INT','intl'],['SAG','wis'],['CAR','cha']].forEach(function(a){var v=e[a[1]];var m=abModEn(v);h+='<div class="pg__ab"><div class="pg__ab-name">'+a[0]+'</div><div class="pg__ab-score"><input class="pg__inp--inline" data-ef="'+a[1]+'" type="number" value="'+v+'" style="font-size:.82rem"></div><div class="pg__ab-mod">'+fmtModEn(m)+'</div></div>'});
 h+='</div></div>';
-/* Difese: 4 sotto-blocchi (Resistenze danni, Immunità danni, Vulnerabilità,
-   Immunità condizioni) unificati in un unico .pg__sec, separati da divisori
-   sottili — stesso pattern di Tiri Salvezza + Abilità nella scheda PG. */
+/* Difese: titolo grande "🛡️ Difese" + 4 sotto-blocchi più piccoli
+   (Resistenze danni, Immunità danni, Vulnerabilità, Immunità condizioni)
+   in un unico .pg__sec separati da divisori sottili. I sotto-titoli
+   usano .es__sub-title (più piccolo + muted) per gerarchia visiva. */
 h+='<div class="pg__sec">';
-h+=_esListBlock('🛡️ Resistenze danni','dmgResist',e.dmgResist,'es. radioso, contundente non magico...');
+h+='<div class="pg__sec-title">🛡️ Difese</div>';
+h+=_esListBlock('Resistenze danni','dmgResist',e.dmgResist,'es. radioso, contundente non magico...',{sub:true});
 h+='<div class="es__defs-div"></div>';
-h+=_esListBlock('🚫 Immunità danni','dmgImmune',e.dmgImmune,'es. necrotico, veleno...');
+h+=_esListBlock('Immunità danni','dmgImmune',e.dmgImmune,'es. necrotico, veleno...',{sub:true});
 h+='<div class="es__defs-div"></div>';
-h+=_esListBlock('💥 Vulnerabilità','dmgVulner',e.dmgVulner,'es. fuoco, freddo...');
+h+=_esListBlock('Vulnerabilità','dmgVulner',e.dmgVulner,'es. fuoco, freddo...',{sub:true});
 h+='<div class="es__defs-div"></div>';
-h+=_esListBlock('🧠 Immunità condizioni','condImmune',e.condImmune,'es. affascinato, spaventato...');
+h+=_esListBlock('Immunità condizioni','condImmune',e.condImmune,'es. affascinato, spaventato...',{sub:true});
 h+='</div>';
 h+='<div class="pg__sec"><div class="pg__sec-title">👁️ Sensi</div>';
 /* Sensi strutturato: dropdown tipo (stile allineamento .pg__cls-dd--custom)
