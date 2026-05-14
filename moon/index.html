@@ -943,6 +943,10 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .pg__exh-title{font-family:var(--mono);font-size:.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-weight:600;flex-shrink:0}
 .pg__exh-help,.pg__sec-help{width:18px;height:18px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);font-family:var(--mono);font-size:.6rem;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:all .12s;margin-left:6px}
 .pg__exh-help:hover,.pg__sec-help:hover{background:rgba(196,154,50,.1);color:var(--gold);border-color:rgba(196,154,50,.5)}
+/* Variante compatta per label piccole (.pg__lbl): 13×13 invece di 18×18,
+   in linea con la dimensione del testo del label. */
+.pg__lbl-help{width:13px;height:13px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:var(--cur-pointer);font-family:var(--mono);font-size:.5rem;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;margin-left:4px;vertical-align:middle;transition:all .12s}
+.pg__lbl-help:hover{background:rgba(196,154,50,.1);color:var(--gold);border-color:rgba(196,154,50,.5)}
 .pg__exh-val{font-family:var(--mono);font-size:.6rem;color:var(--muted);font-style:italic;flex-shrink:0}
 .pg__exh-dots{margin-left:auto;display:flex;gap:3px;flex-shrink:0}
 .pg__slot-mode{display:flex;gap:2px;margin-bottom:5px}
@@ -4049,7 +4053,7 @@ var _stCur=e.sensesType||'';
 var _stIsCustom=_stCur&&SENSI_OPTS.indexOf(_stCur)<0;
 var _stOptsHtml='<button class="pg__cls-dd-opt'+(_stIsCustom?' pg__cls-dd-opt--selected':'')+'" data-esddopt="" type="button">Personalizzato</button>';
 SENSI_OPTS.forEach(function(o){var sel=(_stCur===o)?' pg__cls-dd-opt--selected':'';_stOptsHtml+='<button class="pg__cls-dd-opt'+sel+'" data-esddopt="'+esc(o)+'" type="button">'+esc(o)+'</button>'});
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Sensi</div><div class="es__senses-row"><div class="pg__cls-dd pg__cls-dd--custom es__senses-type" data-esddwrap="sensesType"><input class="pg__inp pg__inp--sm pg__cls-dd-input" data-ef="sensesType" value="'+esc(_stCur)+'" placeholder="—"><button class="pg__cls-dd-chev" data-esddbtn type="button" aria-label="Apri dropdown Sensi">▾</button><div class="pg__cls-dd-panel">'+_stOptsHtml+'</div></div><input class="pg__inp pg__inp--sm pg__inp--digits es__senses-value" data-ef="sensesValue" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="'+esc(String(e.sensesValue||''))+'" placeholder="—"><button class="es__senses-unit" data-essensesunit="1" type="button" title="Clicca per convertire tra metri e piedi (regola D&D 5e: 1.5 m = 5 ft)">'+esc(e.sensesUnit||'m')+'</button></div></div></div>';
+h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Sensi<button class="pg__lbl-help" data-help="senses" type="button" title="Cosa sono Scurovisione, Vista Cieca e gli altri sensi speciali" aria-label="Aiuto sensi">?</button></div><div class="es__senses-row"><div class="pg__cls-dd pg__cls-dd--custom es__senses-type" data-esddwrap="sensesType"><input class="pg__inp pg__inp--sm pg__cls-dd-input" data-ef="sensesType" value="'+esc(_stCur)+'" placeholder="—"><button class="pg__cls-dd-chev" data-esddbtn type="button" aria-label="Apri dropdown Sensi">▾</button><div class="pg__cls-dd-panel">'+_stOptsHtml+'</div></div><input class="pg__inp pg__inp--sm pg__inp--digits es__senses-value" data-ef="sensesValue" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="'+esc(String(e.sensesValue||''))+'" placeholder="—"><button class="es__senses-unit" data-essensesunit="1" type="button" title="Clicca per convertire tra metri e piedi (regola D&D 5e: 1.5 m = 5 ft)">'+esc(e.sensesUnit||'m')+'</button></div></div></div>';
 h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Linguaggi</div><input class="pg__inp es__inp-text" data-ef="languages" value="'+esc(e.languages)+'" placeholder="tutti, telepatia 36 m..."></div></div>';
 h+='</div>';
 h+='</div>';
@@ -7483,6 +7487,24 @@ var HELP={
     +'<li>Un <strong>riposo lungo</strong> elimina <strong>1 solo</strong> livello (se hai mangiato e bevuto a sufficienza). Non li azzera tutti.</li>'
     +'<li>L\'incantesimo <em>Ristorare Maggiore</em> rimuove 1 livello a tua scelta — utile quando ne hai accumulati molti.</li>'
     +'<li>Cause comuni: privazione di cibo/acqua, sforzi prolungati senza riposo, magie come <em>Raggio del Sole</em>, freddo estremo, mareggiate, alcune trappole/maledizioni.</li>'
+    +'</ul>'
+  },
+  senses:{title:'Sensi',body:''
+    +'<p>I 4 sensi speciali di D&amp;D 5e — ognuno con il suo trucco da prestigiatore di fronte alla logica fisica.</p>'
+    +'<h4>Tipi di senso</h4>'
+    +'<ul>'
+    +'<li><strong>Scurovisione</strong> (Darkvision): vedi nel buio normale come se fosse penombra, e nel buio magico come buio normale. Però in scala di grigi — niente foto Instagram al chiaro di luna del Sottosuolo.</li>'
+    +'<li><strong>Vista Cieca</strong> (Blindsight): percepisci l\'ambiente entro il raggio anche se non vedi un tubo (buio totale, invisibilità, illusione, benda sugli occhi, occhi cavati da un Mind Flayer mercoledì scorso — tutto incluso).</li>'
+    +'<li><strong>Vista del Vero</strong> (Truesight): scavalca illusioni, travestimenti, invisibilità, buio magico, e ti regala una vista sbirciatella sul Piano Etereo. Quando il GM mette un nemico con Truesight, è il segnale che la sessione "infiltriamoci stealth" è ufficialmente cancellata.</li>'
+    +'<li><strong>Percezione Tremorica</strong> (Tremorsense): senti le vibrazioni nel terreno entro il raggio. Solo se sei in contatto col suolo — sali su una sedia e diventi invisibile al verme gigante. Sì, davvero. Sì, lo permettono. No, non chiedere "perché".</li>'
+    +'</ul>'
+    +'<h4>Il pulsante m ↔ ft</h4>'
+    +'<p>Il manuale italiano usa <strong>metri</strong>, quello inglese <strong>piedi</strong>. Il toggle converte al volo seguendo la regola ufficiale della griglia: <strong>1.5 m = 5 ft</strong> (un quadrato). Non la conversione metrica esatta (1 ft ≈ 0.305 m) — quella spaccherebbe tutti i numeri tondi del manuale e nessun GM ha tempo di calcolare "scurovisione 18.288 m".</p>'
+    +'<h4>💡 Tips</h4>'
+    +'<ul>'
+    +'<li>"Personalizzato" è per le cose che il manuale non copre (sensi divini, abilità speciali di campagna, "il mio Bardo sente il Disagio Sociale a 30 m"). Tieni a mente: il sistema non ne capisce nulla, lo gestisci a parole col GM.</li>'
+    +'<li>La <strong>Percezione Passiva</strong> non sta qui: l\'abbiamo messa in Abilità dove si calcola sola (10 + mod SAG). Cliccala lì per sovrascriverla se il tuo mostro ha bonus a sensi narrativi non meccanici.</li>'
+    +'<li>I mostri con più sensi (es. drago: Scurovisione 36 m + Vista Cieca 18 m) si gestiscono per ora con la dicitura più importante; gli altri vanno nelle Note. Future evoluzioni potrebbero supportare liste multiple.</li>'
     +'</ul>'
   },
   coins:{title:'Monete',body:''
