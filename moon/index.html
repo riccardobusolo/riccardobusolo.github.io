@@ -650,16 +650,20 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
    leggermente ridotto rispetto al default. */
 /* Sensi: barra unica stile Linguaggi (outer .pg__expitem ha il bordo,
    sottoelementi senza bordi propri ma con divisori sottili a sinistra
-   di valore e unità per delineare le 3 sezioni). Altezza 18px come
-   gli altri item. */
-.es__senses-item.pg__expitem .pg__expitem-row{padding-left:0}
+   di valore e unità per delineare le 4 sezioni). Altezza 18px come
+   gli altri item. Padding-left:8px sul row per non attaccare il testo
+   al bordo (come Linguaggi). Valore numerico più stretto (28px). */
+.es__senses-item.pg__expitem .pg__expitem-row{padding-left:0;align-items:center}
 .es__senses-item .es__senses-type{flex:1;min-width:0;height:auto}
-.es__senses-item .es__senses-type .pg__cls-dd-input{font-size:.7rem!important;font-weight:400!important;padding:0 0 0 8px!important;min-height:0!important;color:var(--text)!important;text-align:left!important;background:transparent;border-radius:0!important}
+.es__senses-item.es__lst-item.pg__expitem .pg__expitem-row>.es__lst-dd.es__senses-type>input.pg__cls-dd-input{font-size:.7rem!important;font-weight:400!important;padding:0 0 0 8px!important;min-height:0!important;color:var(--text)!important;text-align:left!important;background:transparent;border-radius:0!important}
 .es__senses-item .es__senses-type .pg__cls-dd-chev{padding:0 6px 0 4px;font-size:.6rem;min-height:0}
-.es__senses-value{flex:0 0 38px;width:38px;text-align:center!important;font-size:.7rem!important;font-weight:400!important;padding:0 4px!important;min-height:0!important;background:transparent!important;border:none!important;border-left:1px solid var(--border)!important;border-radius:0!important;color:var(--text)!important;outline:none}
+.es__senses-item .es__senses-value{flex:0 0 32px!important;width:32px!important;text-align:center!important;font-size:.7rem!important;font-weight:400!important;padding:0 2px!important;min-height:0!important;background:transparent!important;border:none!important;border-left:1px solid var(--border)!important;border-radius:0!important;color:var(--text)!important;outline:none}
 .es__senses-value:focus{color:var(--gold)!important}
-.es__senses-unit{flex:0 0 auto;min-width:24px;background:transparent;border:none;border-left:1px solid var(--border);border-radius:0;color:var(--gold);font-family:var(--mono);font-size:.62rem;font-weight:600;cursor:var(--cur-pointer);padding:0 6px;line-height:1;transition:all .12s}
+.es__senses-unit{flex:0 0 auto;min-width:22px;background:transparent;border:none;border-left:1px solid var(--border);border-radius:0;color:var(--gold);font-family:var(--mono);font-size:.62rem;font-weight:600;cursor:var(--cur-pointer);padding:0 5px;line-height:1;transition:all .12s}
 .es__senses-unit:hover{background:rgba(196,154,50,.12);color:var(--gold)}
+/* Trash button per riga sensi: stile coerente con Difese */
+.es__senses-item .es__senses-del{border:none;border-left:1px solid var(--border);width:22px;height:auto;color:var(--muted);background:transparent;border-radius:0}
+.es__senses-item .es__senses-del:hover{color:var(--red);background:var(--rl)}
 /* Section dinamica: items (tratti/azioni/ecc.) come card compatte */
 .es__empty{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-align:center;padding:4px 0;font-style:italic}
 .es__items{display:flex;flex-direction:column;gap:4px}
@@ -4023,11 +4027,21 @@ if(!e.savesOverride||typeof e.savesOverride!=='object')e.savesOverride={};
 /* Percezione passiva override: numero (es. 14) sovrascrive il valore auto
    calcolato come 10 + mod SAG. Stringa vuota = usa auto. */
 if(e.passivePerception==null)e.passivePerception='';
-/* Sensi strutturati: tipo (es. Scurovisione, Vista Cieca, ...), valore
-   numerico (range), unità ('m'|'ft'). Stringa vuota in type = personalizzato. */
-if(e.sensesType==null)e.sensesType='';
-if(e.sensesValue==null)e.sensesValue='';
-if(e.sensesUnit==null||(e.sensesUnit!=='m'&&e.sensesUnit!=='ft'))e.sensesUnit='m';
+/* Sensi strutturati: ora array di {type, value, unit} per supportare
+   più sensi per mostro (es. drago: Scurovisione 36 m + Vista Cieca 18 m).
+   Migrazione: legacy sensesType/Value/Unit → primo elemento dell'array.
+   Stringa vuota in type = personalizzato. */
+if(typeof e.senses==='string')e.senses=[];
+if(!Array.isArray(e.senses))e.senses=[];
+if(e.senses.length===0&&(e.sensesType||e.sensesValue||e.sensesUnit)){
+  e.senses.push({type:e.sensesType||'',value:e.sensesValue||'',unit:e.sensesUnit||'m'});
+}
+e.senses.forEach(function(s){
+  if(!s||typeof s!=='object')return;
+  if(s.type==null)s.type='';
+  if(s.value==null)s.value='';
+  if(s.unit==null||(s.unit!=='m'&&s.unit!=='ft'))s.unit='m';
+});
 /* HP tracking: e.hp = MAX (statblock), e.hpCur = current durante
    combattimento, e.hpTemp = temp HP. Migrazione record legacy:
    se hpCur missing → hpCur = hp. */if(e.hpCur==null)e.hpCur=e.hp||0;if(e.hpTemp==null)e.hpTemp=0}
@@ -4158,25 +4172,26 @@ h+=_esListBlock('Vulnerabilità','dmgVulner',e.dmgVulner,'Personalizzato...',{su
 h+='<div class="es__defs-div"></div>';
 h+=_esListBlock('Immunità condizioni','condImmune',e.condImmune,'Personalizzato...',{sub:true,options:CONDITIONS});
 h+='</div>';
-h+='<div class="pg__sec"><div class="pg__sec-title">👁️ Sensi</div>';
-/* Sensi strutturato: dropdown tipo (stile allineamento .pg__cls-dd--custom)
-   + numero range + bottone unità m/ft con conversione automatica D&D 5e
-   (1.5 m = 5 ft). Opzioni manuali D&D 5e + Personalizzato. */
+/* Sensi: lista (e.senses è array di {type, value, unit}). Ogni riga
+   ha dropdown tipo + numero range + unità + cestino. Pulsante + nel
+   titolo per aggiungere altre righe (es. drago con Scurovisione +
+   Vista Cieca). Opzioni manuali D&D 5e + Personalizzato. */
 var SENSI_OPTS=['Scurovisione','Vista Cieca','Vista del Vero','Percezione Tellurica'];
-var _stCur=e.sensesType||'';
-var _stIsCustom=_stCur&&SENSI_OPTS.indexOf(_stCur)<0;
-var _stOptsHtml='<button class="pg__cls-dd-opt'+(_stIsCustom?' pg__cls-dd-opt--selected':'')+'" data-esddopt="" type="button">Personalizzato</button>';
-SENSI_OPTS.forEach(function(o){var sel=(_stCur===o)?' pg__cls-dd-opt--selected':'';_stOptsHtml+='<button class="pg__cls-dd-opt'+sel+'" data-esddopt="'+esc(o)+'" type="button">'+esc(o)+'</button>'});
-h+='<div class="pg__row"><div class="pg__field"><div class="pg__lbl">Sensi<button class="pg__lbl-help" data-help="senses" type="button" title="Cosa sono Scurovisione, Vista Cieca e gli altri sensi speciali" aria-label="Aiuto sensi">?</button></div>'+
-  /* Barra Sensi stile Linguaggi: outer .pg__expitem.--on.es__lst-item
-     fornisce il bordo unico, dropdown + numero + unità all'interno
-     senza i loro bordi propri. */
-  '<div class="pg__expitem pg__expitem--on es__lst-item es__senses-item"><div class="pg__expitem-row">'+
-    '<div class="pg__cls-dd pg__cls-dd--custom es__lst-dd es__senses-type" data-esddwrap="sensesType"><input class="pg__inp pg__inp--sm pg__cls-dd-input" data-ef="sensesType" value="'+esc(_stCur)+'" placeholder="—"><button class="pg__cls-dd-chev" data-esddbtn type="button" aria-label="Apri dropdown Sensi">▾</button><div class="pg__cls-dd-panel">'+_stOptsHtml+'</div></div>'+
-    '<input class="pg__inp pg__inp--sm pg__inp--digits es__senses-value" data-ef="sensesValue" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="'+esc(String(e.sensesValue||''))+'" placeholder="—">'+
-    '<button class="es__senses-unit" data-essensesunit="1" type="button" title="Clicca per convertire tra metri e piedi (regola D&D 5e: 1.5 m = 5 ft)">'+esc(e.sensesUnit||'m')+'</button>'+
-  '</div></div>'+
-'</div></div>';
+var _trashSvg='<svg viewBox="0 0 24 24" width="10" height="10"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
+h+='<div class="pg__sec">';
+h+='<div class="pg__sec-title"><span>👁️ Sensi</span><button class="pg__lbl-help" data-help="senses" type="button" title="Cosa sono Scurovisione, Vista Cieca e gli altri sensi speciali" aria-label="Aiuto sensi">?</button><button class="pg__sec-add" data-essensesadd="1" type="button" title="Aggiungi un altro senso">+</button></div>';
+(e.senses||[]).forEach(function(s,si){
+  var stCur=s.type||'';
+  var stIsCustom=stCur&&SENSI_OPTS.indexOf(stCur)<0;
+  var stOptsHtml='<button class="pg__cls-dd-opt'+(stIsCustom||!stCur?' pg__cls-dd-opt--selected':'')+'" data-essensesopt="" type="button">Personalizzato</button>';
+  SENSI_OPTS.forEach(function(o){var sel=(stCur===o)?' pg__cls-dd-opt--selected':'';stOptsHtml+='<button class="pg__cls-dd-opt'+sel+'" data-essensesopt="'+esc(o)+'" type="button">'+esc(o)+'</button>'});
+  h+='<div class="pg__expitem pg__expitem--on es__lst-item es__senses-item"><div class="pg__expitem-row">'+
+    '<div class="pg__cls-dd pg__cls-dd--custom es__lst-dd es__senses-type" data-essensesddwrap="'+si+'"><input class="pg__inp pg__inp--sm pg__cls-dd-input" data-essensesfield="type" data-essensesidx="'+si+'" value="'+esc(stCur)+'" placeholder="—"><button class="pg__cls-dd-chev" data-essensesddbtn type="button" aria-label="Apri dropdown Sensi">▾</button><div class="pg__cls-dd-panel">'+stOptsHtml+'</div></div>'+
+    '<input class="pg__inp pg__inp--sm pg__inp--digits es__senses-value" data-essensesfield="value" data-essensesidx="'+si+'" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="'+esc(String(s.value||''))+'" placeholder="—">'+
+    '<button class="es__senses-unit" data-essensesunitidx="'+si+'" type="button" title="Clicca per convertire tra metri e piedi (regola D&D 5e: 1.5 m = 5 ft)">'+esc(s.unit||'m')+'</button>'+
+    '<button class="pg__atk-del es__senses-del" data-essensesdel="'+si+'" type="button" title="Elimina senso">'+_trashSvg+'</button>'+
+  '</div></div>';
+});
 h+='</div>';
 /* Linguaggi: sezione a lista separata stile Equipaggiamento. */
 h+=_esListSec('🗣️ Linguaggi','languages',e.languages,'es. Comune, Elfico, telepatia 36 m...');
@@ -4235,7 +4250,7 @@ document.getElementById('esheetBody').addEventListener('mousedown',function(ev){
 document.getElementById('esheetBody').addEventListener('keydown',function(e){if(e.key!=='Enter')return;var id=e.target.id;var sel=id==='esDmgIn'?'[data-eapplydmg]':id==='esHealIn'?'[data-eapplyheal]':id==='esTmpIn'?'[data-eapplytmp]':null;if(sel){e.preventDefault();var btn=document.querySelector(sel);if(btn)btn.click()}});
 /* Click outside per chiudere i dropdown identità enemy (Tipo/Allineamento/
    Taglia). Skip se il click è dentro un wrap o un panel di questi dropdown. */
-document.addEventListener('click',function(ev){if(ev.target.closest('[data-esddwrap]')||ev.target.closest('[data-esddopt]')||ev.target.closest('[data-eslstddwrap]')||ev.target.closest('[data-eslstopt]'))return;document.querySelectorAll('[data-esddwrap].pg__cls-dd--open,[data-eslstddwrap].pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')})});
+document.addEventListener('click',function(ev){if(ev.target.closest('[data-esddwrap]')||ev.target.closest('[data-esddopt]')||ev.target.closest('[data-eslstddwrap]')||ev.target.closest('[data-eslstopt]')||ev.target.closest('[data-essensesddwrap]')||ev.target.closest('[data-essensesopt]'))return;document.querySelectorAll('[data-esddwrap].pg__cls-dd--open,[data-eslstddwrap].pg__cls-dd--open,[data-essensesddwrap].pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')})});
 /* Drag&drop foto sul slot del header (delegation su #esheetBody) */
 document.getElementById('esheetBody').addEventListener('dragover',function(e){var slot=e.target.closest('#esPhotoSlot');if(!slot)return;e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='copy';slot.classList.add('drag-over')});
 document.getElementById('esheetBody').addEventListener('dragleave',function(e){var slot=e.target.closest('#esPhotoSlot');if(!slot)return;if(e.relatedTarget&&slot.contains(e.relatedTarget))return;slot.classList.remove('drag-over')});
@@ -4247,6 +4262,9 @@ document.getElementById('esheetBody').addEventListener('input',function(e){if(!e
 /* Lista a stringhe (Linguaggi, Resistenze, Immunità, Vulnerabilità,
    Immunità condizioni): aggiorna esObj[field][idx] = value. */
 if(t.classList&&t.classList.contains('es__lst-input')){var _lf=t.dataset.eslstfield;var _li=parseInt(t.dataset.eslstidx);if(!Array.isArray(esObj[_lf]))esObj[_lf]=[];esObj[_lf][_li]=t.value;sE();return}
+/* Sensi list: aggiorna esObj.senses[idx][field] = value. Per il
+   value numerico, strip non-cifre. */
+if(t.dataset&&t.dataset.essensesfield){var _sf=t.dataset.essensesfield;var _si=parseInt(t.dataset.essensesidx);if(!Array.isArray(esObj.senses))esObj.senses=[];if(!esObj.senses[_si])esObj.senses[_si]={type:'',value:'',unit:'m'};if(_sf==='value'){var _orig=t.value;var _cleaned=_orig.replace(/[^0-9]/g,'').slice(0,4);if(_cleaned!==_orig){var _shift=_orig.length-_cleaned.length;var _pos=Math.max(0,(t.selectionStart||0)-_shift);t.value=_cleaned;try{t.setSelectionRange(_pos,_pos)}catch(_){}}esObj.senses[_si].value=_cleaned===''?'':parseInt(_cleaned,10)}else{esObj.senses[_si][_sf]=t.value}sE();return}
 var item=t.closest('[data-esitem]');var sec=t.closest('.es__items[data-essec]');if(item&&sec){var key=sec.dataset.essec;var ii=parseInt(item.dataset.esitem);var field=t.dataset.esfield;if(esObj[key]&&esObj[key][ii]&&field){esObj[key][ii][field]=t.value;sE()}return}
 var ef=t.dataset.ef;if(!ef)return;/* Digit-only field: strip ogni char non 0-9 dal value, preserva
    approssimativamente la posizione caret, salva come integer
@@ -4316,8 +4334,20 @@ if(ppValEl&&!ppValEl.querySelector('input')){e.stopPropagation();
   return}
 /* Toggle unità Sensi m↔ft. Regola D&D 5e: 1.5 m = 5 ft (ratio 0.3 m/ft).
    Converte il valore numerico mantenendo l'arrotondamento intero. */
-var unitBtn=e.target.closest('[data-essensesunit]');
-if(unitBtn){e.stopPropagation();var curU=esObj.sensesUnit||'m';var curV=parseInt(esObj.sensesValue)||0;var newU,newV;if(curU==='m'){newU='ft';newV=Math.round(curV/1.5*5)}else{newU='m';newV=Math.round(curV/5*1.5)}esObj.sensesUnit=newU;esObj.sensesValue=newV>0?newV:'';sE();openEsheet(enemies.indexOf(esObj));return}
+var unitBtn=e.target.closest('[data-essensesunitidx]');
+if(unitBtn){e.stopPropagation();var uidx=parseInt(unitBtn.dataset.essensesunitidx);var sObj=esObj.senses&&esObj.senses[uidx];if(!sObj)return;var curU=sObj.unit||'m';var curV=parseInt(sObj.value)||0;var newU,newV;if(curU==='m'){newU='ft';newV=Math.round(curV/1.5*5)}else{newU='m';newV=Math.round(curV/5*1.5)}sObj.unit=newU;sObj.value=newV>0?newV:'';sE();openEsheet(enemies.indexOf(esObj));return}
+/* Add nuovo senso alla lista. */
+var sensesAdd=e.target.closest('[data-essensesadd]');
+if(sensesAdd){e.stopPropagation();if(!Array.isArray(esObj.senses))esObj.senses=[];esObj.senses.push({type:'',value:'',unit:'m'});sE();openEsheet(enemies.indexOf(esObj));setTimeout(function(){var inps=document.querySelectorAll('#esheetBody .es__senses-item .pg__cls-dd-input');var last=inps[inps.length-1];if(last)last.focus()},10);return}
+/* Delete senso. */
+var sensesDel=e.target.closest('[data-essensesdel]');
+if(sensesDel){e.stopPropagation();var didx=parseInt(sensesDel.dataset.essensesdel);if(esObj.senses&&esObj.senses[didx]!=null){esObj.senses.splice(didx,1);sE();openEsheet(enemies.indexOf(esObj))}return}
+/* Open dropdown Sensi (riga). */
+var sensesDdBtn=e.target.closest('[data-essensesddbtn]');
+if(sensesDdBtn){e.stopPropagation();var swrap=sensesDdBtn.closest('[data-essensesddwrap]');if(!swrap)return;var swasOpen=swrap.classList.contains('pg__cls-dd--open');document.querySelectorAll('.pg__cls-dd--open').forEach(function(el){el.classList.remove('pg__cls-dd--open')});if(!swasOpen){swrap.classList.add('pg__cls-dd--open');var spnl=swrap.querySelector('.pg__cls-dd-panel');if(spnl){var r=swrap.getBoundingClientRect();spnl.style.top=r.bottom+'px';spnl.style.left=r.left+'px';spnl.style.minWidth=r.width+'px'}}return}
+/* Select opzione dropdown Sensi. */
+var sensesOpt=e.target.closest('[data-essensesopt]');
+if(sensesOpt){e.stopPropagation();var sowrap=sensesOpt.closest('[data-essensesddwrap]');if(!sowrap)return;var soidx=parseInt(sowrap.dataset.essensesddwrap);var soval=sensesOpt.dataset.essensesopt||'';if(!Array.isArray(esObj.senses))esObj.senses=[];if(esObj.senses[soidx]){esObj.senses[soidx].type=soval;sE();var soinp=sowrap.querySelector('input[data-essensesfield="type"]');if(soinp){soinp.value=soval;if(!soval)soinp.focus()}}sowrap.classList.remove('pg__cls-dd--open');return}
 /* Click su caratteristica (.pg__ab) → lancia d20+mod. Skip se il target
    è l'input stesso (per non interferire con l'edit). */
 var abEl=e.target.closest('.pg__ab');
