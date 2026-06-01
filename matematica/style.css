@@ -14,6 +14,7 @@
 }
 /* ── DARK (default) ── */
 html[data-theme="dark"]{
+  color-scheme: dark; /* impedisce al browser (auto dark mode / estensioni) di re-invertire la pagina */
   --bg:#0a0a10; --bg-2:#0f0f16; --card:#15151c; --card-2:#1c1c25;
   --border:rgba(180,185,200,.10); --border-2:rgba(180,185,200,.22);
   --text:#e8e9ef; --dim:#a4a6b3; --muted:#71737f;
@@ -22,6 +23,7 @@ html[data-theme="dark"]{
 }
 /* ── LIGHT ── */
 html[data-theme="light"]{
+  color-scheme: light;
   --cyan:#018c83; --cyan-2:#01a99c;
   --bg:#f4f6f9; --bg-2:#eef1f5; --card:#ffffff; --card-2:#f7f9fc;
   --border:rgba(20,30,50,.10); --border-2:rgba(20,30,50,.20);
