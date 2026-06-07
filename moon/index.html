@@ -2734,6 +2734,7 @@ body.mp-sb-dragging .mp__sb-item:not(.on):not(.mp__sb-item--drag):not(.mp__sb-it
 <section class="setpanel__sec">
 <h4 class="setpanel__h4">🖥 Schermo</h4>
 <button class="setpanel__btn" id="setFullscreen"><svg viewBox="0 0 24 24" width="14" height="14"><polyline points="4 14 4 20 10 20"/><polyline points="20 10 20 4 14 4"/><line x1="4" y1="20" x2="10" y2="14"/><line x1="20" y1="4" x2="14" y2="10"/></svg> <span id="setFullscreenLbl">Schermo intero</span></button>
+<button class="setpanel__btn" id="setGatherWins"><svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="3" y="3" width="9" height="9" rx="1" fill="currentColor" stroke="none"/></svg> Raccogli le finestre in alto a sinistra</button>
 <div class="setpanel__hint">Premi <kbd style="font-family:var(--mono);font-size:.66rem;background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:0 4px;color:var(--gold)">Esc</kbd> per uscire dalla modalità a schermo intero.</div>
 </section>
 <section class="setpanel__sec">
@@ -2972,6 +2973,12 @@ document.addEventListener('click',function(e){if(!e.target.closest('.wh__menu')&
 /* Su resize del browser: ri-clampa ogni finestra aperta così l'header resta
    sempre raggiungibile anche se l'area di lavoro si rimpicciolisce. */
 window.addEventListener('resize',function(){var mn=document.getElementById('main');if(!mn)return;var mr=mn.getBoundingClientRect();var ch=false;Object.keys(wm).forEach(function(k){if(op.indexOf(k)<0)return;var w=document.getElementById(wm[k]);if(!w)return;var cur={x:parseInt(w.style.left)||0,y:parseInt(w.style.top)||0,w:parseInt(w.style.width)||w.offsetWidth,h:parseInt(w.style.height)||w.offsetHeight};var cl=_winClampPos(cur,mr);if(cl.x!==cur.x||cl.y!==cur.y){w.style.left=cl.x+'px';w.style.top=cl.y+'px';winPos[k]={x:cl.x,y:cl.y,w:cur.w,h:cur.h};ch=true}});if(ch)sWP()});
+/* Raccogli finestre: riporta TUTTE le finestre (aperte e chiuse) nell'angolo
+   in alto a sinistra dell'area di lavoro — x=0,y=0 = subito a destra della
+   barra laterale, mai sotto di essa. Conserva le dimensioni; le finestre
+   chiuse aggiornano solo la posizione salvata (verrà applicata all'apertura). */
+function gatherWins(){Object.keys(wm).forEach(function(k){var cur=winPos[k]||defaultPos(k,0);cur.x=0;cur.y=0;winPos[k]=cur;var w=document.getElementById(wm[k]);if(w&&w.classList.contains('on')){w.style.left='0px';w.style.top='0px'}});sWP()}
+var _gw=document.getElementById('setGatherWins');if(_gw)_gw.onclick=gatherWins;
 _injectLayBtns();
 /* === Settings panel === */
 /* Font scale: apply globally via root font-size */
