@@ -1473,6 +1473,11 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .sp-md__row input,.sp-md__row select,.sp-md__row textarea{font-family:var(--mono);font-size:.84rem;color:var(--text);padding:7px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;outline:none;width:100%;box-sizing:border-box;transition:border-color .12s}
 .sp-md__row input:focus,.sp-md__row select:focus,.sp-md__row textarea:focus{border-color:var(--rb);color:var(--gold)}
 .sp-md__row textarea{min-height:110px;resize:vertical;line-height:1.5;font-family:var(--font);font-size:.86rem}
+/* Riga descrizione: assorbe lo spazio verticale rimanente del corpo così la
+   textarea cresce/rimpicciolisce insieme alla finestra, invece di lasciare un
+   vuoto sotto. La textarea riempie tutta l'altezza della riga. */
+.sp-md__row--grow{flex:1 1 auto;min-height:120px}
+.sp-md__row--grow textarea{flex:1 1 auto;min-height:0;resize:none}
 .sp-md__row select{cursor:var(--cur-pointer);appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'><path d='M4 6l4 4 4-4'/></svg>");background-repeat:no-repeat;background-position:right 8px center;background-size:14px;padding-right:28px}
 .sp-md__prep{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:var(--cur-pointer);transition:all .12s;user-select:none}.sp-md__prep:hover{border-color:var(--bh)}.sp-md__prep.on{background:rgba(196,154,50,.1);border-color:rgba(196,154,50,.4);color:var(--gold)}
 /* Layout compatto: una sola riga con checkbox a sinistra del testo. */
@@ -2456,7 +2461,7 @@ body.mp-sb-dragging .mp__sb-item:not(.on):not(.mp__sb-item--drag):not(.mp__sb-it
 <div class="sp-md__atk-sec"><div class="sp-md__atk-sec-title">⚔ Configurazione Attacco</div>
 <div class="sp-md__row--3 sp-md__row"><div><label>Tipo</label><select id="spfAtkType"><option value="">Nessuno</option><option value="atk">Tiro per colpire</option><option value="save">Tiro salvezza</option></select></div><div id="spfSaveAbilWrap"><label>Caratt. Salvezza</label><select id="spfSaveAbil"><option value="">—</option><option value="str">Forza</option><option value="dex">Destrezza</option><option value="con">Costituzione</option><option value="intl">Intelligenza</option><option value="wis">Saggezza</option><option value="cha">Carisma</option></select></div><div><label>Tipo Danno</label><input type="text" id="spfDmgType" placeholder="es. fuoco, taglio"></div></div>
 <div class="sp-md__row"><label>Formula Danno</label><input type="text" id="spfDmg" placeholder="es. 1d10, 8d6, 2d6+3"></div></div>
-<div class="sp-md__row"><label>Descrizione</label><textarea id="spfDesc" placeholder="Effetto dell'incantesimo..."></textarea></div>
+<div class="sp-md__row sp-md__row--grow"><label>Descrizione</label><textarea id="spfDesc" placeholder="Effetto dell'incantesimo..."></textarea></div>
 </div>
 <div class="sp-md__foot"><button class="sp-md__btn sp-md__btn--del" id="spMdDel">🗑 Elimina</button><button class="sp-md__btn sp-md__btn--save" id="spMdOk">Salva</button></div>
 </div>
