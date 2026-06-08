@@ -34,8 +34,8 @@
              cr: '', xp: '', hpDice: '', str: 10, dex: 10, con: 10, intl: 10, wis: 10, cha: 10 };
   }
 
-  /* ---- Stato vista ---- */
-  var view = { mode: 'list', curId: null, q: '' };
+  /* ---- Stato vista (sempre split: lista a sx, anteprima a dx) ---- */
+  var view = { curId: null, q: '' };
 
   /* ---- API pubblica ---- */
   window.cmBestiary = {
@@ -54,29 +54,36 @@
     render: function () { render(); }
   };
 
-  /* ---- Render ---- */
+  /* ---- Render: due colonne (lista a sinistra, anteprima a destra) ---- */
   function render() {
     var el = host(); if (!el) return;
-    if (view.mode === 'preview' && getById(view.curId)) renderPreview(el);
-    else { view.mode = 'list'; renderList(el); }
+    var left = el.querySelector('.best__left'), right = el.querySelector('.best__right');
+    if (!left || !right) {
+      el.innerHTML = '<div class="best__left"></div><div class="best__right"></div>';
+      left = el.querySelector('.best__left'); right = el.querySelector('.best__right');
+    }
+    renderLeftInto(left); renderRightInto(right);
   }
+  /* Aggiorna solo la colonna sinistra (per non perdere il focus dalla ricerca). */
+  function renderLeft() { var el = host(); if (!el) return; var left = el.querySelector('.best__left'); if (left) renderLeftInto(left); }
 
-  function renderList(el) {
+  function renderLeftInto(left) {
     var q = (view.q || '').toLowerCase();
     var items = data.filter(function (m) {
       return !q || (m.name || '').toLowerCase().indexOf(q) >= 0 || String(m.type || '').toLowerCase().indexOf(q) >= 0;
     });
     var h = '<div class="best__bar"><input class="best__search" id="bestSearch" placeholder="Cerca mostro..." value="' + esc(view.q) + '" spellcheck="false"><button class="best__add" data-bestnew="1" type="button">＋ Nuovo mostro</button></div>';
     if (!data.length) {
-      h += '<div class="best__empty">Bestiario vuoto.<br>Crea un mostro con <strong>＋ Nuovo mostro</strong>,<br>oppure salva un Nemico nel bestiario<br>(menu ⋮ → <em>Salva nel bestiario</em>).</div>';
+      h += '<div class="best__empty">Bestiario vuoto.<br>Crea un mostro con <strong>＋ Nuovo mostro</strong>, oppure salva un Nemico nel bestiario (menu ⋮ → <em>Salva nel bestiario</em>).</div>';
     } else if (!items.length) {
-      h += '<div class="best__empty">Nessun mostro corrisponde a "' + esc(view.q) + '".</div>';
+      h += '<div class="best__empty">Nessun risultato per "' + esc(view.q) + '".</div>';
     } else {
       h += '<div class="best__list">';
       items.forEach(function (m) {
         var cr = (m.cr != null && m.cr !== '') ? ('CR ' + esc(String(m.cr))) : '';
         var sep = (cr && m.type) ? ' · ' : '';
-        h += '<div class="best__card" data-bestopen="' + esc(m.id) + '">' +
+        var on = (m.id === view.curId) ? ' best__card--on' : '';
+        h += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '">' +
           '<span class="best__emoji">' + esc(m.emoji || '🐾') + '</span>' +
           '<div class="best__info"><div class="best__name">' + esc(m.name || '(senza nome)') + '</div>' +
           '<div class="best__meta">' + cr + sep + esc(m.type || '') + '</div></div>' +
@@ -85,12 +92,15 @@
       });
       h += '</div>';
     }
-    el.innerHTML = h;
+    left.innerHTML = h;
   }
 
-  function renderPreview(el) {
+  function renderRightInto(right) {
     var m = getById(view.curId);
-    if (!m) { view.mode = 'list'; renderList(el); return; }
+    if (!m) {
+      right.innerHTML = '<div class="best__placeholder"><div class="best__placeholder-ico">📖</div><div>Seleziona un mostro dalla lista<br>per vederne l\'anteprima.</div></div>';
+      return;
+    }
     var abils = [['FOR', 'str'], ['DES', 'dex'], ['COS', 'con'], ['INT', 'intl'], ['SAG', 'wis'], ['CAR', 'cha']];
     var abH = abils.map(function (a) {
       var v = m[a[1]] != null ? m[a[1]] : 10;
@@ -107,8 +117,7 @@
       return '<div class="best__pv-sec"><div class="best__pv-sectitle">' + title + '</div>' + rows + '</div>';
     }
 
-    var h = '<div class="best__pv-head"><button class="best__back" data-bestback="1" type="button">← Indietro</button></div>';
-    h += '<div class="best__pv">';
+    var h = '<div class="best__pv">';
     h += '<div class="best__pv-id"><span class="best__pv-emoji">' + esc(m.emoji || '🐾') + '</span><div>' +
       '<div class="best__pv-name">' + esc(m.name || '(senza nome)') + '</div>' +
       '<div class="best__pv-sub">' + esc(m.size || '') + (m.size && m.type ? ' ' : '') + esc(m.type || '') + (m.alignment ? ', ' + esc(m.alignment) : '') + '</div></div></div>';
@@ -130,7 +139,7 @@
       '<button class="best__btn best__btn--del" data-bestdel="' + esc(m.id) + '" type="button">🗑 Elimina</button>' +
       '</div>';
     h += '</div>';
-    el.innerHTML = h;
+    right.innerHTML = h;
   }
 
   /* ---- Eventi (delegati, limitati a #bestiaryBody) ---- */
@@ -138,13 +147,11 @@
     var el = host(); if (!el || !el.contains(e.target)) return;
 
     var openC = e.target.closest('[data-bestopen]');
-    if (openC) { view.curId = openC.dataset.bestopen; view.mode = 'preview'; render(); return; }
-
-    if (e.target.closest('[data-bestback]')) { view.mode = 'list'; render(); return; }
+    if (openC) { view.curId = openC.dataset.bestopen; render(); return; }
 
     if (e.target.closest('[data-bestnew]')) {
       var nid = window.cmBestiary.upsert(blankMonster());
-      view.mode = 'preview'; view.curId = nid; render();
+      view.curId = nid; render();
       var obj = getById(nid);
       if (obj && window.cmOpenMonsterEditor) window.cmOpenMonsterEditor(obj, window.cmBestiary.save);
       return;
@@ -169,7 +176,7 @@
       var id = dlB.dataset.bestdel;
       var md = getById(id);
       var nm = md ? (md.name || '(senza nome)') : '';
-      var doDel = function () { window.cmBestiary.remove(id); view.mode = 'list'; render(); };
+      var doDel = function () { if (view.curId === id) view.curId = null; window.cmBestiary.remove(id); };
       if (typeof window.pgConfirm === 'function') window.pgConfirm('Eliminare "' + nm + '" dal bestiario?\nL\'azione è irreversibile.', doDel, { title: 'Elimina dal bestiario', okLabel: 'Elimina' });
       else if (confirm('Eliminare "' + nm + '" dal bestiario?')) doDel();
       return;
@@ -180,18 +187,26 @@
   document.addEventListener('input', function (e) {
     if (!e.target || e.target.id !== 'bestSearch') return;
     view.q = e.target.value;
-    var el = host(); if (!el) return;
-    renderList(el);
+    renderLeft();
     var s = document.getElementById('bestSearch');
     if (s) { s.focus(); var v = s.value; try { s.setSelectionRange(v.length, v.length); } catch (_) {} }
   });
 
   /* ---- Stili (iniettati: tutto il codice del bestiario resta esterno) ---- */
   var css =
-    '.best__bar{display:flex;gap:6px;align-items:center;margin-bottom:8px;position:sticky;top:0;background:var(--bg2);padding-bottom:6px;z-index:2}' +
+    /* Due colonne: il corpo finestra diventa una flex-row con due pannelli che
+       scrollano in modo indipendente (come #winChars). */
+    '#winBestiary{min-width:520px}' +
+    '#bestiaryBody{padding:0;display:flex;flex-direction:row;align-items:stretch;overflow:hidden}' +
+    '.best__left{flex:0 0 232px;display:flex;flex-direction:column;min-width:0;overflow:hidden auto;scrollbar-width:thin;padding:8px;border-right:1px solid var(--border)}' +
+    '.best__right{flex:1;min-width:0;overflow:hidden auto;scrollbar-width:thin;padding:10px 12px}' +
+    '.best__placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.74rem;line-height:1.6;padding:20px}' +
+    '.best__placeholder-ico{font-size:2rem;opacity:.45}' +
+    '.best__card--on{border-color:var(--gold);background:rgba(196,154,50,.12)}' +
+    '.best__bar{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;position:sticky;top:0;background:var(--bg2);padding-bottom:6px;z-index:2}' +
     '.best__search{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:.74rem;outline:none;transition:border-color .12s}' +
     '.best__search:focus{border-color:var(--gold)}' +
-    '.best__add{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 11px;color:var(--gold);font-family:var(--mono);font-size:.72rem;cursor:var(--cur-pointer);white-space:nowrap;transition:all .12s}' +
+    '.best__add{width:100%;text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 11px;color:var(--gold);font-family:var(--mono);font-size:.72rem;cursor:var(--cur-pointer);white-space:nowrap;transition:all .12s}' +
     '.best__add:hover{border-color:var(--gold);background:rgba(196,154,50,.08)}' +
     '.best__empty{text-align:center;color:var(--muted);font-family:var(--mono);font-size:.72rem;line-height:1.7;padding:26px 12px}' +
     '.best__list{display:flex;flex-direction:column;gap:5px}' +
