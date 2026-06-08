@@ -76,7 +76,7 @@
       notes: 'Guardiani Alati del Cielo\n\nHabitat: Montagne, Piani (Piano Elementale dell\'Aria)\n\nGli schermagliatori aarakocra sono esperti nel combattere i nemici in volo tra le nuvole. Spesso attaccano le minacce terrestri con rapide picchiate provenienti dall\'alto.\n\n' + AARAKOCRA_LORE
     },
     {
-      id: 'preset_aboleth', name: 'Aboleth', emoji: '🐙', rarity: 'legendary',
+      id: 'preset_aboleth', name: 'Aboleth', emoji: '🐙', rarity: 'epic',
       type: 'Aberrazione', size: 'Grande', alignment: 'Legale Malvagio',
       ac: 17, hp: 150, hpCur: 150, hpTemp: 0, hpDice: '20d10+40', init: 7,
       speed: '3 m, Nuotare 12 m', cr: '10', xp: '',
@@ -376,7 +376,7 @@
       var crBadge = (m.cr != null && m.cr !== '') ? '<span class="best__corner best__corner--tr">' + esc(String(m.cr)) + '</span>' : '';
       ch += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '" draggable="true" style="' + rarityVars(m) + '">' +
         '<div class="best__photo">' + typeBadge + crBadge + monsterPhotoHtml(m) + '</div>' +
-        '<div class="best__name">' + esc(m.name || '(senza nome)') + '</div>' +
+        '<div class="best__name"><span>' + esc(m.name || '(senza nome)') + '</span></div>' +
         '<div class="best__holo"></div><div class="best__shine"></div>' +
         '</div>';
     });
@@ -719,17 +719,19 @@
     '.best__list{display:grid;grid-template-columns:repeat(auto-fill,132px);gap:8px;align-content:start;justify-content:start}' +
     '.best__corner{position:absolute;top:4px;font-family:var(--mono);font-size:.56rem;font-weight:600;background:rgba(0,0,0,.62);padding:2px 5px;border-radius:5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:2}' +
     '.best__corner--tl{left:4px;color:#fff;max-width:calc(100% - 44px)}' +
-    '.best__corner--tr{right:4px;color:var(--gold)}' +
-    '.best__card{position:relative;display:flex;flex-direction:column;text-align:center;gap:5px;height:176px;padding:7px;background:var(--bg);border:1px solid var(--rare-c1,var(--border));border-radius:10px;cursor:var(--cur-pointer);box-sizing:border-box;transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--scale,1));transition:transform .13s ease-out,box-shadow .3s ease,border-color .25s ease;box-shadow:0 3px 10px rgba(0,0,0,.45);will-change:transform}' +
+    '.best__corner--tr{right:4px;color:#fff}' +
+    '.best__card{position:relative;display:flex;flex-direction:column;text-align:center;gap:5px;height:176px;padding:7px;background:#000;border:1px solid var(--rare-c1,rgba(255,255,255,.14));border-radius:10px;cursor:var(--cur-pointer);box-sizing:border-box;transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--scale,1));transition:transform .13s ease-out,box-shadow .3s ease,border-color .25s ease;box-shadow:0 3px 10px rgba(0,0,0,.45);will-change:transform}' +
     '.best__card:hover{z-index:3;border-color:var(--rare-c2);box-shadow:0 16px 34px -10px var(--glow,rgba(0,0,0,.5)),0 0 0 1px var(--rare-c2) inset}' +
     '.best__shine{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5;opacity:0;transition:opacity .3s ease;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.5),rgba(255,255,255,0) 42%);mix-blend-mode:soft-light}' +
     '.best__card:hover .best__shine{opacity:1}' +
     '.best__holo{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;background:linear-gradient(115deg,transparent 28%,var(--rare-c2) 43%,var(--rare-c1) 50%,var(--rare-c2) 57%,transparent 72%);background-size:200% 200%;background-repeat:no-repeat;background-position:var(--hx,50%) var(--hy,50%);opacity:0;mix-blend-mode:color-dodge;transition:opacity .3s ease}' +
     '.best__card:hover .best__holo{opacity:calc(var(--holo,0) * .5 + .03)}' +
-    '.best__photo{position:relative;flex:1;width:100%;min-height:0;border-radius:7px;overflow:hidden;background:var(--bg2);display:flex;align-items:center;justify-content:center}' +
+    '.best__photo{position:relative;flex:1;width:100%;min-height:0;border-radius:7px;overflow:hidden;background:#0a0a0a;display:flex;align-items:center;justify-content:center}' +
     '.best__photo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}' +
     '.best__photo-ph{width:40px;height:40px;opacity:.4;stroke:var(--muted);fill:none;stroke-width:1.6}' +
-    '.best__name{position:relative;z-index:6;font-family:var(--mono);font-size:.7rem;color:var(--text);font-weight:600;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;flex-shrink:0}' +
+    '.best__photo .best__photo-ph{stroke:#888}' +
+    '.best__name{position:relative;z-index:6;flex-shrink:0;height:2.3em;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;color:#fff;font-weight:600;line-height:1.15}' +
+    '.best__name span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;width:100%}' +
     '.best__meta{font-family:var(--mono);font-size:.56rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}' +
     '.best__pv-head{margin-bottom:8px}' +
     '.best__back{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--dim);font-family:var(--mono);font-size:.7rem;cursor:var(--cur-pointer);transition:all .12s}' +
