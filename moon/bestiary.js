@@ -44,7 +44,7 @@
       traits: [],
       actions: [
         { name: 'Multiattacco', desc: 'L\'aarakocra effettua due attacchi con il Bastone del Vento e può utilizzare Incantare per lanciare Raffica di Vento.' },
-        { name: 'Bastone del Vento', desc: 'Attacco con arma da mischia o a distanza: +5 a colpire.\nPortata 1,5 m oppure gittata 36/72 m.\nColpito: 7 (1d8 + 3) danni contundenti più 11 (2d10) danni da fulmine.', atkHit: '+5', atkDmg: '1d8+3+2d10' },
+        { name: 'Bastone del Vento', desc: 'Attacco con arma da mischia o a distanza: +5 a colpire.\nPortata 1,5 m oppure gittata 36/72 m.\nColpito: 7 (1d8 + 3) danni contundenti più 11 (2d10) danni da fulmine.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'contundenti' }, { f: '2d10', t: 'fulmine' }] },
         { name: 'Incantare', desc: 'L\'aarakocra lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 13 per i tiri salvezza).\n\nA volontà: Controllo Elementale (Elementalism), Raffica di Vento (Gust of Wind), Mano Magica (Mage Hand), Messaggio (Message).\n\n1 volta al giorno: Fulmine (Lightning Bolt).' }
       ],
       bonusActions: [],
@@ -68,8 +68,8 @@
       dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
       traits: [],
       actions: [
-        { name: 'Artigli', desc: 'Attacco in mischia: +4 a colpire, portata 1,5 m.\nColpito: 4 (1d4 + 2) danni taglienti.\nSe l\'aarakocra ha volato per almeno 9 metri in linea retta verso il bersaglio immediatamente prima dell\'attacco, infligge invece 9 (3d4 + 2) danni taglienti.', atkHit: '+4', atkDmg: '1d4+2' },
-        { name: 'Giavellotto del Vento', desc: 'Attacco in mischia o a distanza: +4 a colpire.\nPortata 1,5 m oppure gittata 9/36 m.\nColpito: 5 (1d6 + 2) danni perforanti più 2 (1d4) danni da tuono.\nColpisca o manchi il bersaglio, dopo un attacco a distanza il giavellotto ritorna magicamente nella mano dell\'aarakocra immediatamente dopo il lancio.', atkHit: '+4', atkDmg: '1d6+2+1d4' }
+        { name: 'Artigli', desc: 'Attacco in mischia: +4 a colpire, portata 1,5 m.\nColpito: 4 (1d4 + 2) danni taglienti.\nSe l\'aarakocra ha volato per almeno 9 metri in linea retta verso il bersaglio immediatamente prima dell\'attacco, infligge invece 9 (3d4 + 2) danni taglienti.', atkHit: '+4', atkDmgs: [{ f: '1d4+2', t: 'taglienti' }] },
+        { name: 'Giavellotto del Vento', desc: 'Attacco in mischia o a distanza: +4 a colpire.\nPortata 1,5 m oppure gittata 9/36 m.\nColpito: 5 (1d6 + 2) danni perforanti più 2 (1d4) danni da tuono.\nColpisca o manchi il bersaglio, dopo un attacco a distanza il giavellotto ritorna magicamente nella mano dell\'aarakocra immediatamente dopo il lancio.', atkHit: '+4', atkDmgs: [{ f: '1d6+2', t: 'perforanti' }, { f: '1d4', t: 'tuono' }] }
       ],
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Tesoro', desc: 'Oggetti personali, equipaggiamento individuale.' }],
