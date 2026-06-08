@@ -4475,7 +4475,7 @@ function openEsheet(idx){if(esEditMode==='bestiary'){if(!esObj)return}else{if(id
    non si resetta ad ogni re-render della scheda. */
 if(window._esNotesRO){try{window._esNotesRO.disconnect()}catch(_){}}
 var _esNotesTa=document.querySelector('#esheetBody textarea[data-ef="notes"]');
-if(_esNotesTa&&window.ResizeObserver){var _esPrevH=Math.round(_esNotesTa.getBoundingClientRect().height);window._esNotesRO=new ResizeObserver(function(){if(!esObj)return;var hh=Math.round(_esNotesTa.getBoundingClientRect().height);if(hh>0&&hh!==_esPrevH){_esPrevH=hh;esObj.notesH=hh;sE()}});window._esNotesRO.observe(_esNotesTa)}}
+if(_esNotesTa){if(!esObj.notesH){_esNotesTa.style.height='auto';_esNotesTa.style.height=_esNotesTa.scrollHeight+'px';}if(window.ResizeObserver){var _esPrevH=Math.round(_esNotesTa.getBoundingClientRect().height);window._esNotesRO=new ResizeObserver(function(){if(!esObj)return;var hh=Math.round(_esNotesTa.getBoundingClientRect().height);if(hh>0&&hh!==_esPrevH){_esPrevH=hh;esObj.notesH=hh;sE()}});window._esNotesRO.observe(_esNotesTa)}}}
 function closeEsheet(){esObj=null;esEditMode='enemy';esBestiarySave=null;var i=op.indexOf('esheet');if(i>=0){op.splice(i,1);sO();rW()}}
 /* === PONTI BESTIARIO (usati da bestiary.js) ============================== */
 /* Apre la scheda nemico puntata su un mostro della libreria; ogni salvataggio
