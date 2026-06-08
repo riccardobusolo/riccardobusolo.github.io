@@ -624,6 +624,8 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__pperc-val{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--text);cursor:var(--cur-pointer);padding:1px 5px;border-radius:3px;border:1px solid transparent;transition:all .12s;min-width:24px;text-align:center}
 .es__pperc-val:hover{background:var(--bg);border-color:var(--border);color:var(--gold)}
 .es__pperc-val--ov{color:var(--gold)}
+/* Campo XP override (valore inserito a mano, diverso dall'auto-calcolo CR). */
+.es__xp--ov{color:var(--gold);font-weight:600}
 .es__pperc-edit{width:48px;background:var(--bg);border:1px solid var(--gold);border-radius:3px;padding:1px 2px;color:var(--text);font-family:var(--mono);font-size:.72rem;font-weight:700;outline:none;text-align:center;line-height:1}
 /* Sezioni a lista nemico (Linguaggi, Resistenze, Immunità danni,
    Vulnerabilità, Immunità condizioni) — riusano le regole .pg__expitem*
@@ -4219,6 +4221,12 @@ function _esListBlock(label,field,items,placeholder,opts){
 }
 /* Wrapper standalone: pg__sec attorno a un _esListBlock singolo. */
 function _esListSec(label,field,items,placeholder){return '<div class="pg__sec">'+_esListBlock(label,field,items,placeholder)+'</div>'}
+/* === Tabella XP per Sfida (CR) — D&D 5e ===
+   CR 0 → 10 XP (valore standard per i mostri CR 0 da combattimento; la tabella
+   ufficiale riporta "0 o 10"). Sempre sovrascrivibile a mano nel campo XP. */
+var ES_CR_XP={'0':10,'1/8':25,'1/4':50,'1/2':100,'1':200,'2':450,'3':700,'4':1100,'5':1800,'6':2300,'7':2900,'8':3900,'9':5000,'10':5900,'11':7200,'12':8400,'13':10000,'14':11500,'15':13000,'16':15000,'17':18000,'18':20000,'19':22000,'20':25000,'21':33000,'22':41000,'23':50000,'24':62000,'25':75000,'26':90000,'27':105000,'28':120000,'29':135000,'30':155000};
+var ES_CR_OPTS=['0','1/8','1/4','1/2','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30'];
+function esXpForCr(cr){if(cr==null||cr==='')return null;var k=String(cr).trim();return Object.prototype.hasOwnProperty.call(ES_CR_XP,k)?ES_CR_XP[k]:null}
 function buildEsheet(e){var h='';
 /* HEADER: slot foto + riga Identità stile pg__row--id (Nome, Tipo,
    Allineamento, Taglia in quest'ordine). Tipo/Allineamento/Taglia
@@ -4234,10 +4242,14 @@ function _esNumField(label,key,val){var sv=(val!==''&&val!=null)?String(val):'';
 function _esDdField(label,key,val,opts){var isCustom=val&&opts.indexOf(val)<0;var w=val.length;var lblW=Math.ceil(label.length*0.8);var sty=' style="width:calc('+Math.max(w,lblW)+'ch + 10px)"';var optsHtml='<button class="pg__cls-dd-opt'+(isCustom?' pg__cls-dd-opt--selected':'')+'" data-esddopt="" type="button">Personalizzato</button>';opts.forEach(function(o){var sel=(val===o)?' pg__cls-dd-opt--selected':'';optsHtml+='<button class="pg__cls-dd-opt'+sel+'" data-esddopt="'+esc(o)+'" type="button">'+esc(o)+'</button>'});return '<div class="pg__field"><div class="pg__lbl">'+label+'</div><div class="pg__cls-dd pg__cls-dd--custom" data-esddwrap="'+key+'"><input class="pg__inp pg__inp--sm pg__cls-dd-input" data-ef="'+key+'" value="'+esc(val)+'" placeholder="—"'+sty+'><button class="pg__cls-dd-chev" data-esddbtn type="button" aria-label="Apri dropdown '+label+'">▾</button><div class="pg__cls-dd-panel">'+optsHtml+'</div></div></div>'}
 /* Opzioni D&D 5e (italiano). "Personalizzato" è gestita come opzione
    speciale data-esddopt="" che svuota il campo per permettere typing. */
+/* Campo XP: calcolato automaticamente dalla CR (esXpForCr) ma sovrascrivibile.
+   value = override e.xp se presente, altrimenti il valore auto dalla CR.
+   Classe es__xp--ov (oro) quando è un override manuale. */
+function _esXpField(e){var auto=esXpForCr(e.cr);var ov=(e.xp!=null&&e.xp!=='');var shown=ov?String(e.xp):(auto!=null?String(auto):'');return '<div class="pg__field"><div class="pg__lbl">XP</div><input class="pg__inp pg__inp--sm es__xp'+(ov?' es__xp--ov':'')+'" data-ef="xp" type="text" inputmode="numeric" maxlength="7" value="'+esc(shown)+'" placeholder="—" style="width:8ch;text-align:center" title="XP forniti: calcolati automaticamente dalla CR, modificabili a mano"></div>'}
 var TYPE_OPTS=['Aberrazione','Bestia','Celestiale','Costrutto','Drago','Elementale','Fata','Gigante','Immondo','Melma','Mostruosità','Non Morto','Pianta','Umanoide'];
 var ALIGN_OPTS=['Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale','Neutrale','Caotico Neutrale','Legale Malvagio','Neutrale Malvagio','Caotico Malvagio','Senza Allineamento','Qualsiasi allineamento'];
 var SIZE_OPTS=['Minuscola','Piccola','Media','Grande','Enorme','Mastodontica'];
-var idCells=_esTextField('Nome','name',e.name||'')+_esNumField('CR','cr',e.cr)+_esDdField('Tipo','type',e.type||'',TYPE_OPTS)+_esDdField('Allineamento','alignment',e.alignment||'',ALIGN_OPTS)+_esDdField('Taglia','size',e.size||'',SIZE_OPTS);
+var idCells=_esTextField('Nome','name',e.name||'')+_esDdField('CR','cr',(e.cr!=null?String(e.cr):''),ES_CR_OPTS)+_esXpField(e)+_esDdField('Tipo','type',e.type||'',TYPE_OPTS)+_esDdField('Allineamento','alignment',e.alignment||'',ALIGN_OPTS)+_esDdField('Taglia','size',e.size||'',SIZE_OPTS);
 h+='<div class="es__hdr"><div class="es__photo-slot'+(e.photo?' es__photo-slot--has':'')+'" id="esPhotoSlot" title="'+(e.photo?'Clicca per cambiare foto, o trascina nuova foto':'Aggiungi foto (clicca o trascina)')+'">'+photoSlotInner+'</div><div class="es__hdr-right"><div class="pg__row pg__row--id">'+idCells+'</div></div></div>';
 /* Roll row: barra full-width sopra le 3 colonne (stile PG sheet).
    Mostra l'ultimo tiro d20 + bottoni Vantaggio/Svantaggio. Click su
@@ -4410,6 +4422,12 @@ if(t.classList&&t.classList.contains('es__lst-input')){var _lf=t.dataset.eslstfi
    value numerico, strip non-cifre. */
 if(t.dataset&&t.dataset.essensesfield){var _sf=t.dataset.essensesfield;var _si=parseInt(t.dataset.essensesidx);if(!Array.isArray(esObj.senses))esObj.senses=[];if(!esObj.senses[_si])esObj.senses[_si]={type:'',value:'',unit:'m'};if(_sf==='value'){var _orig=t.value;var _cleaned=_orig.replace(/[^0-9]/g,'').slice(0,4);if(_cleaned!==_orig){var _shift=_orig.length-_cleaned.length;var _pos=Math.max(0,(t.selectionStart||0)-_shift);t.value=_cleaned;try{t.setSelectionRange(_pos,_pos)}catch(_){}}esObj.senses[_si].value=_cleaned===''?'':parseInt(_cleaned,10)}else{esObj.senses[_si][_sf]=t.value}sE();return}
 if(t.dataset&&t.dataset.esexp!==undefined){var _xp=t.dataset.esexp.split('-');var _xk=_xp[0],_xi=parseInt(_xp[1]);var _xf=t.dataset.esexpf;if(!Array.isArray(esObj[_xk]))esObj[_xk]=[];while(esObj[_xk].length<=_xi)esObj[_xk].push({name:'',desc:''});var _xe=esObj[_xk][_xi];if(typeof _xe==='string')_xe=esObj[_xk][_xi]={name:_xe,desc:''};if(!_xe||typeof _xe!=='object')_xe=esObj[_xk][_xi]={name:'',desc:''};_xe[_xf]=t.value;sE();return}
+/* CR (dropdown o digitato): salva come stringa (supporta '1/8' ecc.), aggiorna
+   la lista e ricalcola gli XP automatici azzerando un eventuale override. */
+if(t.dataset&&t.dataset.ef==='cr'){esObj.cr=t.value;esObj.xp='';sE();renE();var _xAuto=esXpForCr(esObj.cr);var _xpInp=document.querySelector('#esheetBody input[data-ef="xp"]');if(_xpInp){_xpInp.value=(_xAuto!=null?String(_xAuto):'');_xpInp.classList.remove('es__xp--ov')}return}
+/* XP: digit-only (max 7 cifre), salvato come override e.xp ('' = nessun
+   override → torna al valore automatico della CR). Indicatore --ov live. */
+if(t.dataset&&t.dataset.ef==='xp'){var _xo=t.value;var _xc=_xo.replace(/[^0-9]/g,'').slice(0,7);if(_xc!==_xo){var _xsh=_xo.length-_xc.length;var _xps=Math.max(0,(t.selectionStart||0)-_xsh);t.value=_xc;try{t.setSelectionRange(_xps,_xps)}catch(_){}}esObj.xp=(_xc===''?'':parseInt(_xc,10));t.classList.toggle('es__xp--ov',_xc!=='');sE();return}
 var ef=t.dataset.ef;if(!ef)return;/* Digit-only field: strip ogni char non 0-9 dal value, preserva
    approssimativamente la posizione caret, salva come integer
    (o '' se vuoto). */if(t.classList.contains('pg__inp--digits')){var _orig=t.value;var _cleaned=_orig.replace(/[^0-9]/g,'').slice(0,3);if(_cleaned!==_orig){var _shift=_orig.length-_cleaned.length;var _pos=Math.max(0,(t.selectionStart||0)-_shift);t.value=_cleaned;try{t.setSelectionRange(_pos,_pos)}catch(_){}}esObj[ef]=_cleaned===''?'':parseInt(_cleaned,10)}else if(t.type==='number'){var n=parseFloat(t.value);if(isNaN(n))n=0;esObj[ef]=n}else{esObj[ef]=t.value}sE();if(['name','ac','hp','hpCur','init','emoji','cr'].indexOf(ef)>=0)renE();if(ef==='name'){document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)')}if(['str','dex','con','intl','wis','cha'].indexOf(ef)>=0){var ab=t.closest('.pg__ab');if(ab){var modEl=ab.querySelector('.pg__ab-mod');if(modEl)modEl.textContent=fmtModEn(abModEn(esObj[ef]))}
