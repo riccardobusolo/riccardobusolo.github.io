@@ -117,6 +117,34 @@
     return ph + '<img class="best__photo-img" src="' + esc(src) + '" alt=""' + handlers + '>';
   }
 
+  /* ---- Rarità in base alla CR (colore bordo/bagliore/foil della figurina) ---- */
+  function crNum(cr) {
+    if (cr == null || cr === '') return -1;
+    var s = String(cr).trim();
+    if (s.indexOf('/') >= 0) { var p = s.split('/'); return (parseFloat(p[0]) || 0) / (parseFloat(p[1]) || 1); }
+    return parseFloat(s) || 0;
+  }
+  var RARITIES = {
+    none:      { c1: '#5b6470', c2: '#8b95a3', glow: 'rgba(150,160,175,.30)', holo: 0 },
+    common:    { c1: '#7d8794', c2: '#aeb8c4', glow: 'rgba(165,178,194,.42)', holo: .12 },
+    uncommon:  { c1: '#3fae5a', c2: '#86e89a', glow: 'rgba(70,200,110,.48)',  holo: .24 },
+    rare:      { c1: '#3b82f6', c2: '#8fd3ff', glow: 'rgba(70,150,255,.52)',  holo: .40 },
+    epic:      { c1: '#a855f7', c2: '#e2b6ff', glow: 'rgba(180,90,250,.56)',  holo: .58 },
+    legendary: { c1: '#f59e0b', c2: '#ffe39a', glow: 'rgba(245,175,40,.64)',  holo: .74 },
+    mythic:    { c1: '#ef4444', c2: '#ffd089', glow: 'rgba(255,95,70,.68)',   holo: .95 }
+  };
+  function rarityForCr(cr) {
+    var n = crNum(cr);
+    if (n < 0) return RARITIES.none;
+    if (n < 2) return RARITIES.common;
+    if (n < 5) return RARITIES.uncommon;
+    if (n < 11) return RARITIES.rare;
+    if (n < 17) return RARITIES.epic;
+    if (n < 24) return RARITIES.legendary;
+    return RARITIES.mythic;
+  }
+  function rarityVars(cr) { var r = rarityForCr(cr); return '--rare-c1:' + r.c1 + ';--rare-c2:' + r.c2 + ';--glow:' + r.glow + ';--holo:' + r.holo + ';'; }
+
   function blankMonster() {
     return { name: 'Nuovo mostro', emoji: '🐾', ac: 10, hp: 10, hpCur: 10, hpTemp: 0, init: 0,
              cr: '', xp: '', hpDice: '', str: 10, dex: 10, con: 10, intl: 10, wis: 10, cha: 10 };
@@ -186,9 +214,10 @@
         var on = (m.id === view.curId) ? ' best__card--on' : '';
         var typeBadge = m.type ? '<span class="best__corner best__corner--tl">' + esc(m.type) + '</span>' : '';
         var crBadge = (m.cr != null && m.cr !== '') ? '<span class="best__corner best__corner--tr">' + esc(String(m.cr)) + '</span>' : '';
-        h += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '">' +
+        h += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '" style="' + rarityVars(m.cr) + '">' +
           '<div class="best__photo">' + typeBadge + crBadge + monsterPhotoHtml(m) + '</div>' +
           '<div class="best__name">' + esc(m.name || '(senza nome)') + '</div>' +
+          '<div class="best__holo"></div><div class="best__shine"></div>' +
           '</div>';
       });
       h += '</div>';
@@ -316,6 +345,41 @@
     if (s) { s.focus(); var v = s.value; try { s.setSelectionRange(v.length, v.length); } catch (_) {} }
   });
 
+  /* ---- Effetto figurina: tilt 3D + glare + foil olografico che seguono il
+     cursore (variabili CSS aggiornate via JS, throttle a 1/frame). ---- */
+  var tiltCard = null, tiltRaf = 0, tiltPos = null;
+  function applyTilt() {
+    tiltRaf = 0;
+    if (!tiltCard || !tiltPos || !tiltCard.isConnected) return;
+    var r = tiltCard.getBoundingClientRect(); if (!r.width) return;
+    var px = Math.max(0, Math.min(1, (tiltPos.x - r.left) / r.width));
+    var py = Math.max(0, Math.min(1, (tiltPos.y - r.top) / r.height));
+    var s = tiltCard.style;
+    s.setProperty('--rx', ((0.5 - py) * 15).toFixed(2) + 'deg');
+    s.setProperty('--ry', ((px - 0.5) * 15).toFixed(2) + 'deg');
+    s.setProperty('--scale', '1.05');
+    s.setProperty('--gx', (px * 100).toFixed(1) + '%');
+    s.setProperty('--gy', (py * 100).toFixed(1) + '%');
+    s.setProperty('--hx', (px * 130 - 15).toFixed(1) + '%');
+    s.setProperty('--hy', (py * 130 - 15).toFixed(1) + '%');
+  }
+  function resetTilt(card) {
+    if (!card) return;
+    var s = card.style;
+    s.setProperty('--rx', '0deg'); s.setProperty('--ry', '0deg'); s.setProperty('--scale', '1');
+  }
+  document.addEventListener('mousemove', function (e) {
+    var el = host(); if (!el) return;
+    var card = (e.target && e.target.closest) ? e.target.closest('.best__card') : null;
+    if (card && el.contains(card)) {
+      if (card !== tiltCard) { resetTilt(tiltCard); tiltCard = card; }
+      tiltPos = { x: e.clientX, y: e.clientY };
+      if (!tiltRaf) tiltRaf = requestAnimationFrame(applyTilt);
+    } else if (tiltCard) {
+      resetTilt(tiltCard); tiltCard = null;
+    }
+  });
+
   /* ---- Stili (iniettati: tutto il codice del bestiario resta esterno) ---- */
   var css =
     /* Due colonne: il corpo finestra diventa una flex-row con due pannelli che
@@ -326,7 +390,7 @@
     '.best__right{flex:1 1 0;min-width:0;overflow:hidden auto;scrollbar-width:thin;padding:10px 12px}' +
     '.best__placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.74rem;line-height:1.6;padding:20px}' +
     '.best__placeholder-ico{font-size:2rem;opacity:.45}' +
-    '.best__card--on{border-color:var(--gold);background:rgba(196,154,50,.12)}' +
+    '.best__card--on{border-color:var(--rare-c2);box-shadow:0 0 0 2px var(--rare-c2) inset,0 10px 26px -8px var(--glow,rgba(0,0,0,.5))}' +
     '.best__bar{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;position:sticky;top:0;background:var(--bg2);padding-bottom:6px;z-index:2}' +
     '.best__search{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:.74rem;outline:none;transition:border-color .12s}' +
     '.best__search:focus{border-color:var(--gold)}' +
@@ -337,12 +401,16 @@
     '.best__corner{position:absolute;top:4px;font-family:var(--mono);font-size:.56rem;font-weight:600;background:rgba(0,0,0,.62);padding:2px 5px;border-radius:5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:2}' +
     '.best__corner--tl{left:4px;color:#fff;max-width:calc(100% - 44px)}' +
     '.best__corner--tr{right:4px;color:var(--gold)}' +
-    '.best__card{display:flex;flex-direction:column;text-align:center;gap:5px;height:176px;padding:7px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:var(--cur-pointer);transition:border-color .12s,background .12s;box-sizing:border-box}' +
-    '.best__card:hover{border-color:var(--gold);background:rgba(196,154,50,.05)}' +
+    '.best__card{position:relative;display:flex;flex-direction:column;text-align:center;gap:5px;height:176px;padding:7px;background:var(--bg);border:1px solid var(--rare-c1,var(--border));border-radius:10px;cursor:var(--cur-pointer);box-sizing:border-box;transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--scale,1));transition:transform .13s ease-out,box-shadow .3s ease,border-color .25s ease;box-shadow:0 3px 10px rgba(0,0,0,.45);will-change:transform}' +
+    '.best__card:hover{z-index:3;border-color:var(--rare-c2);box-shadow:0 16px 34px -10px var(--glow,rgba(0,0,0,.5)),0 0 0 1px var(--rare-c2) inset}' +
+    '.best__shine{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5;opacity:0;transition:opacity .3s ease;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.5),rgba(255,255,255,0) 42%);mix-blend-mode:soft-light}' +
+    '.best__card:hover .best__shine{opacity:1}' +
+    '.best__holo{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;background:linear-gradient(115deg,transparent 16%,var(--rare-c2) 33%,transparent 41%,var(--rare-c1) 50%,transparent 59%,var(--rare-c2) 70%,transparent 84%);background-size:260% 260%;background-position:var(--hx,50%) var(--hy,50%);opacity:calc(var(--holo,0) * .35);mix-blend-mode:color-dodge;transition:opacity .3s ease}' +
+    '.best__card:hover .best__holo{opacity:calc(var(--holo,0) * .85 + .08)}' +
     '.best__photo{position:relative;flex:1;width:100%;min-height:0;border-radius:7px;overflow:hidden;background:var(--bg2);display:flex;align-items:center;justify-content:center}' +
     '.best__photo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}' +
     '.best__photo-ph{width:40px;height:40px;opacity:.4;stroke:var(--muted);fill:none;stroke-width:1.6}' +
-    '.best__name{font-family:var(--mono);font-size:.7rem;color:var(--text);font-weight:600;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;flex-shrink:0}' +
+    '.best__name{position:relative;z-index:6;font-family:var(--mono);font-size:.7rem;color:var(--text);font-weight:600;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;flex-shrink:0}' +
     '.best__meta{font-family:var(--mono);font-size:.56rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}' +
     '.best__pv-head{margin-bottom:8px}' +
     '.best__back{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--dim);font-family:var(--mono);font-size:.7rem;cursor:var(--cur-pointer);transition:all .12s}' +
