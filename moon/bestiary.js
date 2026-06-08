@@ -125,16 +125,14 @@
     return parseFloat(s) || 0;
   }
   var RARITIES = {
-    none:      { c1: '#5b6470', c2: '#8b95a3', glow: 'rgba(150,160,175,.30)', holo: 0 },
-    common:    { c1: '#7d8794', c2: '#aeb8c4', glow: 'rgba(165,178,194,.42)', holo: .12 },
-    uncommon:  { c1: '#3fae5a', c2: '#86e89a', glow: 'rgba(70,200,110,.48)',  holo: .24 },
-    rare:      { c1: '#3b82f6', c2: '#8fd3ff', glow: 'rgba(70,150,255,.52)',  holo: .40 },
-    epic:      { c1: '#a855f7', c2: '#e2b6ff', glow: 'rgba(180,90,250,.56)',  holo: .58 },
-    legendary: { c1: '#f59e0b', c2: '#ffe39a', glow: 'rgba(245,175,40,.64)',  holo: .74 },
-    mythic:    { c1: '#ef4444', c2: '#ffd089', glow: 'rgba(255,95,70,.68)',   holo: .95 }
+    common:    { c1: '#7d8794', c2: '#aeb8c4', glow: 'rgba(165,178,194,.42)', holo: .10 },
+    uncommon:  { c1: '#3fae5a', c2: '#86e89a', glow: 'rgba(70,200,110,.48)',  holo: .20 },
+    rare:      { c1: '#3b82f6', c2: '#8fd3ff', glow: 'rgba(70,150,255,.52)',  holo: .30 },
+    epic:      { c1: '#a855f7', c2: '#e2b6ff', glow: 'rgba(180,90,250,.56)',  holo: .40 },
+    legendary: { c1: '#f59e0b', c2: '#ffe39a', glow: 'rgba(245,175,40,.64)',  holo: .50 }
   };
-  var RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'];
-  var RARITY_NAMES = { common: 'Comune', uncommon: 'Non comune', rare: 'Raro', epic: 'Epico', legendary: 'Leggendario', mythic: 'Mitico' };
+  var RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+  var RARITY_NAMES = { common: 'Comune', uncommon: 'Non comune', rare: 'Raro', epic: 'Epico', legendary: 'Leggendario' };
   /* Fallback solo per mostri legacy senza rarità esplicita: derivata dalla CR. */
   function rarityKeyForCr(cr) {
     var n = crNum(cr);
@@ -142,10 +140,9 @@
     if (n < 5) return 'uncommon';
     if (n < 11) return 'rare';
     if (n < 17) return 'epic';
-    if (n < 24) return 'legendary';
-    return 'mythic';
+    return 'legendary';
   }
-  function rarityKeyOf(m) { return (m && m.rarity && RARITIES[m.rarity]) ? m.rarity : rarityKeyForCr(m && m.cr); }
+  function rarityKeyOf(m) { var k = m && m.rarity; if (k === 'mythic') k = 'legendary'; return (k && RARITIES[k]) ? k : rarityKeyForCr(m && m.cr); }
   function rarityOf(m) { return RARITIES[rarityKeyOf(m)] || RARITIES.common; }
   function rarityVars(m) { var r = rarityOf(m); return '--rare-c1:' + r.c1 + ';--rare-c2:' + r.c2 + ';--glow:' + r.glow + ';--holo:' + r.holo + ';'; }
 
@@ -437,7 +434,7 @@
     '.best__shine{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5;opacity:0;transition:opacity .3s ease;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.5),rgba(255,255,255,0) 42%);mix-blend-mode:soft-light}' +
     '.best__card:hover .best__shine{opacity:1}' +
     '.best__holo{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;background:linear-gradient(115deg,transparent 28%,var(--rare-c2) 43%,var(--rare-c1) 50%,var(--rare-c2) 57%,transparent 72%);background-size:200% 200%;background-repeat:no-repeat;background-position:var(--hx,50%) var(--hy,50%);opacity:0;mix-blend-mode:color-dodge;transition:opacity .3s ease}' +
-    '.best__card:hover .best__holo{opacity:calc(var(--holo,0) * .8 + .12)}' +
+    '.best__card:hover .best__holo{opacity:calc(var(--holo,0) * .5 + .03)}' +
     '.best__photo{position:relative;flex:1;width:100%;min-height:0;border-radius:7px;overflow:hidden;background:var(--bg2);display:flex;align-items:center;justify-content:center}' +
     '.best__photo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}' +
     '.best__photo-ph{width:40px;height:40px;opacity:.4;stroke:var(--muted);fill:none;stroke-width:1.6}' +
