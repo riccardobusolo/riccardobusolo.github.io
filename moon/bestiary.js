@@ -74,6 +74,40 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Tesoro', desc: 'Oggetti personali, equipaggiamento individuale.' }],
       notes: 'Guardiani Alati del Cielo\n\nHabitat: Montagne, Piani (Piano Elementale dell\'Aria)\n\nGli schermagliatori aarakocra sono esperti nel combattere i nemici in volo tra le nuvole. Spesso attaccano le minacce terrestri con rapide picchiate provenienti dall\'alto.\n\n' + AARAKOCRA_LORE
+    },
+    {
+      id: 'preset_aboleth', name: 'Aboleth', emoji: '🐙', rarity: 'legendary',
+      type: 'Aberrazione', size: 'Grande', alignment: 'Legale Malvagio',
+      ac: 17, hp: 150, hpCur: 150, hpTemp: 0, hpDice: '20d10+40', init: 7,
+      speed: '3 m, Nuotare 12 m', cr: '10', xp: '',
+      str: 21, dex: 9, con: 15, intl: 18, wis: 15, cha: 18,
+      savesOverride: { str: '', dex: '3', con: '6', intl: '8', wis: '6', cha: '' },
+      skillOverrides: { storia: '12', percezione: '10' },
+      passivePerception: 20, senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }],
+      languages: ['Linguaggio degli Abissi Profondi (Deep Speech)', 'Telepatia 36 m'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'L\'aboleth può respirare sia aria sia acqua.' },
+        { name: 'Rigenerazione Eldritch', desc: 'Se viene distrutto, l\'aboleth ottiene un nuovo corpo entro 5d10 giorni, tornando in vita con tutti i suoi punti ferita nel Reame Remoto o in un altro luogo scelto dal DM.' },
+        { name: 'Resistenza Leggendaria (3/Giorno, o 4/Giorno nella Tana)', desc: 'Se l\'aboleth fallisce un tiro salvezza, può scegliere di superarlo invece.' },
+        { name: 'Nube di Muco', desc: 'Quando è sott\'acqua, l\'aboleth è circondato da una nube di muco.\nTiro Salvezza su Costituzione: CD 14. Alla fine del turno dell\'aboleth, ogni creatura entro 1,5 metri deve effettuare il tiro salvezza.\nFallimento: il bersaglio viene maledetto. Finché la maledizione permane la pelle diventa viscida, il bersaglio può respirare aria e acqua e non può recuperare punti ferita se non è sott\'acqua. Inoltre, fuori dall\'acqua subisce 6 (1d12) danni da acido ogni 10 minuti, a meno che la pelle non venga mantenuta umida.' },
+        { name: 'Telepatia Investigativa', desc: 'Quando una creatura visibile all\'aboleth comunica telepaticamente con esso, l\'aboleth apprende il desiderio più profondo della creatura.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'aboleth effettua due attacchi con Tentacolo e utilizza Consumare Ricordi oppure Dominare Mente, se disponibile.' },
+        { name: 'Tentacolo', desc: 'Attacco in mischia: +9 a colpire, portata 4,5 m.\nColpito: 12 (2d6 + 5) danni contundenti.\nSe il bersaglio è di taglia Grande o inferiore, ottiene la condizione Afferrato (CD 14 per liberarsi) da uno dei quattro tentacoli dell\'aboleth.', atkHit: '+9', atkDmgs: [{ f: '2d6+5', t: 'contundenti' }] },
+        { name: 'Consumare Ricordi', desc: 'Tiro Salvezza su Intelligenza: CD 16. Un bersaglio entro 9 metri Ammaliato o Afferrato dall\'aboleth.\nFallimento: 10 (3d6) danni psichici. Successo: metà danni.\nSe il bersaglio è un Umanoide e l\'azione lo riduce a 0 punti ferita, l\'aboleth acquisisce tutti i suoi ricordi.', atkDmgs: [{ f: '3d6', t: 'psichici' }] },
+        { name: 'Dominare Mente (2/Giorno)', desc: 'Tiro Salvezza su Saggezza: CD 16. Una creatura entro 9 metri visibile all\'aboleth.\nFallimento: il bersaglio ottiene la condizione Ammaliato finché l\'aboleth non muore o finché i due non si trovano su piani di esistenza differenti.\nMentre è ammaliato considera l\'aboleth un alleato, è sotto il suo controllo entro 18 metri e i due possono comunicare telepaticamente a qualsiasi distanza.\nIl bersaglio ripete il tiro salvezza ogni volta che subisce danni e ogni 24 ore trascorse ad almeno 1,6 km dall\'aboleth; con un successo l\'effetto termina.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'L\'aboleth può usare una sola azione leggendaria alla volta, immediatamente dopo il turno di un\'altra creatura. Recupera tutti gli usi spesi all\'inizio del proprio turno.' },
+        { name: 'Frustata', desc: 'L\'aboleth effettua un attacco con Tentacolo.', atkHit: '+9', atkDmgs: [{ f: '2d6+5', t: 'contundenti' }] },
+        { name: 'Drenaggio Psichico', desc: 'Se almeno una creatura è Ammaliata o Afferrata dall\'aboleth, esso utilizza Consumare Ricordi e recupera 5 (1d10) punti ferita.', atkDmgs: [{ f: '3d6', t: 'psichici' }] }
+      ],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie del suo impero sommerso da tempo e tesori custoditi in camere piene d\'aria al riparo dall\'acqua.' }],
+      notes: 'Antica Mente Aliena Senza Età\n\nHabitat: Sottosuolo, Ambienti Acquatici\nTesoro: Reliquie\n\nNegli abissi acquatici gli aboleth sognano imperi morti e orchestrano complotti che si sviluppano attraverso le ere. Questi elusivi immortali anfibi sopraffanno le loro vittime sia fisicamente sia mentalmente, trasformando le creature tramite una viscida infezione aberrante e plasmando altri esseri affinché li servano sotto le onde.\n\nGli aboleth possiedono intelletti terrificanti e menti totalmente aliene. Conservano ricordi perfetti di mondi primordiali e di domini incomprensibili risalenti alle prime epoche del multiverso. I loro segreti sono innumerevoli e insondabili.\n\nEssi si annidano in luoghi intrisi di misteri ancestrali: rovine di imperi sommersi, antichi crocevia magici nascosti o fragili punti di contatto tra diversi piani di esistenza. In questi rifugi sognano epoche passate, raccolgono servitori dominati psichicamente, consumano le menti delle vittime e preparano il loro ritorno al potere. Gli obiettivi e i metodi degli aboleth sono spesso incomprensibili alle altre creature.\n\n— Intrighi dell\'Aboleth (d6) —\n1. Portare a termine piani incomprensibili che lo spingono ad agire in modi apparentemente casuali.\n2. Apprendere di più sul mondo rapendo individui e consumandone le menti.\n3. Manipolare innocenti affinché lo venerino come una divinità usando la sua telepatia dall\'ombra.\n4. Aprire un varco verso un lontano passato o futuro, liberando un\'invasione da un\'altra epoca.\n5. Risvegliare una tartaruga dragone, un kraken o un altro mostro marino per sommergere una città costiera.\n6. Ingannare cercatori di tesori affinché recuperino reliquie del suo impero caduto da tempo.\n\n— Tana dell\'Aboleth —\nGli aboleth dimorano in rovine sommerse e caverne allagate, mantenendo camere piene d\'aria per i servitori terrestri e per i tesori che l\'acqua danneggerebbe.\n\nAcque Corrotte: le fonti d\'acqua entro 1,6 km dalla tana vengono contaminate. Una creatura diversa dall\'aboleth e dai suoi alleati che ne beva deve superare un Tiro Salvezza su Costituzione CD 15 o subire la condizione Avvelenato per 1 ora.\n\nProiezione Psionica: nella sua tana l\'aboleth può lanciare Immagine Proiettata (Project Image) senza componenti materiali, usando l\'Intelligenza come caratteristica da incantatore (CD 16); la gittata diventa 1 miglio e l\'aboleth può usare la propria telepatia come se si trovasse nello spazio dell\'illusione. Se l\'aboleth muore o abbandona la tana, gli effetti terminano.'
     }
   ];
 
