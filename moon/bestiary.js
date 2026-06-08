@@ -77,23 +77,20 @@
     }
   ];
 
-  var data = load();
-  /* Seeding una-tantum dei preset: aggiunge i mostri di partenza una sola volta
-     (un flag impedisce che ricompaiano se l'utente li elimina). */
-  if (localStorage.getItem('cm_bestiary_seeded') !== '1') {
-    PRESETS.forEach(function (p) {
-      if (!data.some(function (x) { return x.id === p.id; })) data.push(JSON.parse(JSON.stringify(p)));
-    });
-    persist();
-    localStorage.setItem('cm_bestiary_seeded', '1');
-  }
+  /* Il "Bestiario" ufficiale vive nei PRESETS (codice, sola lettura). cm_bestiary
+     contiene ORA solo i mostri "Personalizzati" creati dall'utente. Migrazione:
+     rimuove eventuali preset seminati in passato. */
+  function isOfficialId(id) { for (var i = 0; i < PRESETS.length; i++) if (PRESETS[i].id === id) return true; return false; }
+  var data = load().filter(function (m) { return m && String(m.id || '').indexOf('preset_') !== 0; });
+  persist();
 
   function genId() { return 'm_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function abMod(s) { return Math.floor(((s | 0) - 10) / 2); }
   function fmtMod(m) { return m >= 0 ? '+' + m : '' + m; }
   function host() { return document.getElementById('bestiaryBody'); }
-  function getById(id) { for (var i = 0; i < data.length; i++) if (data[i].id === id) return data[i]; return null; }
+  function getById(id) { for (var i = 0; i < PRESETS.length; i++) if (PRESETS[i].id === id) return PRESETS[i]; for (var j = 0; j < data.length; j++) if (data[j].id === id) return data[j]; return null; }
+  function currentList() { return view.tab === 'custom' ? data : PRESETS; }
 
   /* Foto del mostro: usa l'upload (m.photo, base64) se presente; altrimenti un
      file nel repo il cui nome corrisponde al nome della creatura:
@@ -151,8 +148,8 @@
              cr: '', xp: '', hpDice: '', str: 10, dex: 10, con: 10, intl: 10, wis: 10, cha: 10 };
   }
 
-  /* ---- Stato vista (sempre split: lista a sx, anteprima a dx) ---- */
-  var view = { curId: null, q: '' };
+  /* ---- Stato vista (split: lista a sx, anteprima a dx; tab official|custom) ---- */
+  var view = { tab: 'official', curId: null, q: '' };
 
   /* ---- Caricamento foto mostro (stessa compressione della scheda nemico) ---- */
   var pendingPhotoId = null;
@@ -200,13 +197,22 @@
   function renderLeft() { var el = host(); if (!el) return; var left = el.querySelector('.best__left'); if (left) renderLeftInto(left); }
 
   function renderLeftInto(left) {
+    var list = currentList();
+    var isCustom = view.tab === 'custom';
     var q = (view.q || '').toLowerCase();
-    var items = data.filter(function (m) {
+    var items = list.filter(function (m) {
       return !q || (m.name || '').toLowerCase().indexOf(q) >= 0 || String(m.type || '').toLowerCase().indexOf(q) >= 0;
     });
-    var h = '<div class="best__bar"><input class="best__search" id="bestSearch" placeholder="Cerca mostro..." value="' + esc(view.q) + '" spellcheck="false"><button class="best__add" data-bestnew="1" type="button">＋ Nuovo mostro</button></div>';
-    if (!data.length) {
-      h += '<div class="best__empty">Bestiario vuoto.<br>Crea un mostro con <strong>＋ Nuovo mostro</strong>, oppure salva un Nemico nel bestiario (menu ⋮ → <em>Salva nel bestiario</em>).</div>';
+    var h = '<div class="best__tabs">' +
+      '<button class="best__tab' + (view.tab === 'official' ? ' best__tab--on' : '') + '" data-besttab="official" type="button">Bestiario</button>' +
+      '<button class="best__tab' + (isCustom ? ' best__tab--on' : '') + '" data-besttab="custom" type="button">Personalizzati</button>' +
+      '</div>';
+    h += '<div class="best__bar"><input class="best__search" id="bestSearch" placeholder="Cerca mostro..." value="' + esc(view.q) + '" spellcheck="false">' +
+      (isCustom ? '<button class="best__add" data-bestnew="1" type="button">＋ Nuovo</button>' : '') + '</div>';
+    if (!list.length) {
+      h += '<div class="best__empty">' + (isCustom
+        ? 'Nessun mostro personalizzato.<br>Crea con <strong>＋ Nuovo</strong>, oppure salva un Nemico nel bestiario (menu ⋮ → <em>Salva nel bestiario</em>).'
+        : 'Bestiario vuoto.') + '</div>';
     } else if (!items.length) {
       h += '<div class="best__empty">Nessun risultato per "' + esc(view.q) + '".</div>';
     } else {
@@ -267,7 +273,8 @@
       metaLine('Vulnerabilità', (m.dmgVulner || []).join(', ')) + metaLine('Immunità a condizioni', (m.condImmune || []).join(', '));
     if (metaH) metaH = '<div class="best__pv-meta">' + metaH + '</div>';
 
-    var pvPhoto = '<span class="best__pv-photo" data-bestphoto="' + esc(m.id) + '" title="Carica o cambia foto">' + monsterPhotoHtml(m) + '</span>';
+    var _ro = isOfficialId(m.id);
+    var pvPhoto = '<span class="best__pv-photo"' + (_ro ? '' : ' data-bestphoto="' + esc(m.id) + '" title="Carica o cambia foto"') + '>' + monsterPhotoHtml(m) + '</span>';
     var h = '<div class="best__pv">';
     h += '<div class="best__pv-id">' + pvPhoto + '<div>' +
       '<div class="best__pv-name">' + esc(m.name || '(senza nome)') + '</div>' +
@@ -281,19 +288,26 @@
       '<span>⚡ <strong>' + fmtMod(m.init || 0) + '</strong> Iniz.</span>' +
       '</div>';
     var _curRar = rarityKeyOf(m);
-    var rarH = '<div class="best__rarity"><div class="best__rarity-lbl">Rarità</div><div class="best__rarity-chips">' +
-      RARITY_ORDER.map(function (k) {
-        var rr = RARITIES[k];
-        return '<button class="best__rarity-chip' + (k === _curRar ? ' best__rarity-chip--sel' : '') + '" data-bestrarity="' + k + '" style="--c1:' + rr.c1 + ';--c2:' + rr.c2 + '" title="' + RARITY_NAMES[k] + '"><span class="best__rarity-dot"></span>' + RARITY_NAMES[k] + '</button>';
-      }).join('') + '</div></div>';
+    var _rr = RARITIES[_curRar] || RARITIES.common;
+    var rarH;
+    if (_ro) {
+      rarH = '<div class="best__rarity"><div class="best__rarity-lbl">Rarità</div><div class="best__rarity-ro"><span class="best__rarity-dot" style="--c1:' + _rr.c1 + ';--c2:' + _rr.c2 + '"></span>' + RARITY_NAMES[_curRar] + '</div></div>';
+    } else {
+      rarH = '<div class="best__rarity"><div class="best__rarity-lbl">Rarità</div><div class="best__rarity-chips">' +
+        RARITY_ORDER.map(function (k) {
+          var rr = RARITIES[k];
+          return '<button class="best__rarity-chip' + (k === _curRar ? ' best__rarity-chip--sel' : '') + '" data-bestrarity="' + k + '" style="--c1:' + rr.c1 + ';--c2:' + rr.c2 + '" title="' + RARITY_NAMES[k] + '"><span class="best__rarity-dot"></span>' + RARITY_NAMES[k] + '</button>';
+        }).join('') + '</div></div>';
+    }
     h += rarH + '<div class="best__pv-abs">' + abH + '</div>' + metaH;
     h += secList('✨ Tratti', 'traits') + secList('⚔️ Azioni', 'actions') + secList('🎯 Azioni bonus', 'bonusActions') +
       secList('⚡ Reazioni', 'reactions') + secList('👑 Azioni leggendarie', 'legendaryActions') + secList('💰 Drop', 'drop');
     if (m.notes) h += '<div class="best__pv-sec"><div class="best__pv-sectitle">📝 Note</div><div class="best__pv-notes">' + esc(m.notes) + '</div></div>';
     h += '<div class="best__pv-actions">' +
       '<button class="best__btn best__btn--add" data-bestadd="' + esc(m.id) + '" type="button">➕ Aggiungi ai Nemici</button>' +
-      '<button class="best__btn" data-bestedit="' + esc(m.id) + '" type="button">✏️ Modifica</button>' +
-      '<button class="best__btn best__btn--del" data-bestdel="' + esc(m.id) + '" type="button">🗑 Elimina</button>' +
+      (_ro ? '' :
+        '<button class="best__btn" data-bestedit="' + esc(m.id) + '" type="button">✏️ Modifica</button>' +
+        '<button class="best__btn best__btn--del" data-bestdel="' + esc(m.id) + '" type="button">🗑 Elimina</button>') +
       '</div>';
     h += '</div>';
     right.innerHTML = h;
@@ -303,16 +317,20 @@
   document.addEventListener('click', function (e) {
     var el = host(); if (!el || !el.contains(e.target)) return;
 
+    var tabBtn = e.target.closest('[data-besttab]');
+    if (tabBtn) { var _t = tabBtn.dataset.besttab; if (_t !== view.tab) { view.tab = _t; view.curId = null; render(); } return; }
+
     var photoBtn = e.target.closest('[data-bestphoto]');
     if (photoBtn) { e.preventDefault(); e.stopPropagation(); pendingPhotoId = photoBtn.dataset.bestphoto; ensureFileInput(); fileInput.click(); return; }
 
     var rarBtn = e.target.closest('[data-bestrarity]');
-    if (rarBtn) { var rm = getById(view.curId); if (rm) { rm.rarity = rarBtn.dataset.bestrarity; persist(); render(); } return; }
+    if (rarBtn) { var rm = getById(view.curId); if (rm && !isOfficialId(rm.id)) { rm.rarity = rarBtn.dataset.bestrarity; persist(); render(); } return; }
 
     var openC = e.target.closest('[data-bestopen]');
     if (openC) { view.curId = openC.dataset.bestopen; render(); return; }
 
     if (e.target.closest('[data-bestnew]')) {
+      view.tab = 'custom';
       var nid = window.cmBestiary.upsert(blankMonster());
       view.curId = nid; render();
       var obj = getById(nid);
@@ -330,13 +348,14 @@
     var edB = e.target.closest('[data-bestedit]');
     if (edB) {
       var me = getById(edB.dataset.bestedit);
-      if (me && window.cmOpenMonsterEditor) window.cmOpenMonsterEditor(me, window.cmBestiary.save);
+      if (me && !isOfficialId(me.id) && window.cmOpenMonsterEditor) window.cmOpenMonsterEditor(me, window.cmBestiary.save);
       return;
     }
 
     var dlB = e.target.closest('[data-bestdel]');
     if (dlB) {
       var id = dlB.dataset.bestdel;
+      if (isOfficialId(id)) return;
       var md = getById(id);
       var nm = md ? (md.name || '(senza nome)') : '';
       var doDel = function () { if (view.curId === id) view.curId = null; window.cmBestiary.remove(id); };
@@ -419,6 +438,11 @@
     '.best__placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.74rem;line-height:1.6;padding:20px}' +
     '.best__placeholder-ico{font-size:2rem;opacity:.45}' +
     '.best__card--on{border-color:var(--rare-c2);box-shadow:0 0 0 2px var(--rare-c2) inset,0 10px 26px -8px var(--glow,rgba(0,0,0,.5))}' +
+    '.best__tabs{display:flex;gap:3px;margin-bottom:7px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px}' +
+    '.best__tab{flex:1;padding:5px 6px;border:none;background:transparent;color:var(--muted);font-family:var(--mono);font-size:.66rem;border-radius:6px;cursor:var(--cur-pointer);transition:all .12s}' +
+    '.best__tab:hover{color:var(--text)}' +
+    '.best__tab--on{background:var(--bg3);color:var(--gold);font-weight:600}' +
+    '.best__rarity-ro{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.7rem;color:var(--text);font-weight:600}' +
     '.best__bar{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;position:sticky;top:0;background:var(--bg2);padding-bottom:6px;z-index:2}' +
     '.best__search{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:.74rem;outline:none;transition:border-color .12s}' +
     '.best__search:focus{border-color:var(--gold)}' +
