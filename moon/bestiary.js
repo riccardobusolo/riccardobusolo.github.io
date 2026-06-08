@@ -665,6 +665,23 @@
     }
   });
 
+  /* Chiudi il pannello filtri/ordina cliccando fuori dal suo contenuto. Chiusura
+     "chirurgica" (rimuove solo il pannello) così la barra di ricerca non viene
+     ridisegnata e non perde il focus. */
+  function closeBestFilterPanel() {
+    if (!view.openFilter) return;
+    view.openFilter = null;
+    var el = host(); if (!el) return;
+    var p = el.querySelector('.best__fpanel'); if (p) p.remove();
+    el.querySelectorAll('.best__ftoggle--open').forEach(function (b) { b.classList.remove('best__ftoggle--open'); });
+  }
+  document.addEventListener('click', function (e) {
+    if (!view.openFilter) return;
+    var t = e.target;
+    if (t && t.closest && (t.closest('.best__fpanel') || t.closest('[data-bestfopen]'))) return;
+    closeBestFilterPanel();
+  });
+
   /* Ricerca + slider CR: aggiornano solo le card (focus/stato preservati). */
   document.addEventListener('input', function (e) {
     var el = host(); if (!el || !e.target || !el.contains(e.target)) return;
