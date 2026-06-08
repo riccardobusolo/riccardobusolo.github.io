@@ -701,8 +701,13 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__item-desc:focus{border-color:var(--gold)}
 /* Override defenses/senses input: text fields freeform, allineati a sinistra */
 .es__inp-text{padding:3px 6px !important;min-height:0 !important;font-size:.72rem !important;font-weight:500 !important;text-align:left !important}
-.es__ta{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 8px;color:var(--text);font-family:var(--mono);font-size:.7rem;outline:none;width:100%;box-sizing:border-box;min-height:54px;resize:vertical;line-height:1.4;transition:border-color .12s}
+.es__ta{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 8px;color:var(--text);font-family:var(--mono);font-size:.7rem;outline:none;width:100%;box-sizing:border-box;min-height:54px;max-height:none;resize:vertical;overflow-y:auto;scrollbar-width:thin;line-height:1.4;transition:border-color .12s}
 .es__ta:focus{border-color:var(--gold)}
+.es__ta::-webkit-scrollbar{width:6px}
+.es__ta::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+/* La sezione Note non deve ritagliare la maniglia di resize della textarea
+   (specificità .pg__sec.es__notes-sec per battere .pg__sec{overflow:hidden}). */
+.pg__sec.es__notes-sec{overflow:visible}
 /* Pulsante elimina nemico */
 .es__del-btn{margin-top:8px;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--rb);color:var(--red);padding:5px 11px;border-radius:5px;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.66rem;transition:all .12s}
 .es__del-btn:hover{background:var(--rl)}
@@ -4322,7 +4327,7 @@ h+='</div>';
 /* Linguaggi: sezione a lista separata stile Equipaggiamento. */
 h+=_esListSec('🗣️ Linguaggi','languages',e.languages,'es. Comune, Elfico, telepatia 36 m...');
 /* NOTE: in fondo alla prima colonna */
-h+='<div class="pg__sec"><div class="pg__sec-title">📝 Note</div><textarea class="es__ta" data-ef="notes" placeholder="Lore, tattiche, comportamenti, contesto...">'+esc(e.notes)+'</textarea></div>';
+h+='<div class="pg__sec es__notes-sec"><div class="pg__sec-title">📝 Note</div><textarea class="es__ta" data-ef="notes"'+(e.notesH?' style="height:'+parseInt(e.notesH)+'px"':'')+' placeholder="Lore, tattiche, comportamenti, contesto...">'+esc(e.notes)+'</textarea></div>';
 h+='</div>';
 /* COLONNA 2: tiri salvezza + tratti + reazioni */
 h+='<div class="pg__col">';
@@ -4368,10 +4373,15 @@ h+=_esSecHTML('🎯 Azioni bonus','bonusActions',e.bonusActions);
 h+=_esSecHTML('👑 Azioni leggendarie','legendaryActions',e.legendaryActions);
 h+='</div>';
 h+='</div>';
-/* ELIMINA */
-h+='<button class="es__del-btn" id="esheetDel" type="button"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Elimina nemico</button>';
+/* Nessun pulsante elimina qui: l'eliminazione del nemico avviene dal menu ⋮
+   nella lista Nemici del tool Personaggi. */
 return h}
-function openEsheet(idx){if(idx==null||!enemies[idx])return;/* Reset stato roll se cambio nemico (mantiene lastRoll su stesso nemico) */if(esObj!==enemies[idx]){esLastRoll=null;esAdv=null}esObj=enemies[idx];defaultEnemy(esObj);document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)');document.getElementById('esheetBody').innerHTML=buildEsheet(esObj)}
+function openEsheet(idx){if(idx==null||!enemies[idx])return;/* Reset stato roll se cambio nemico (mantiene lastRoll su stesso nemico) */if(esObj!==enemies[idx]){esLastRoll=null;esAdv=null}esObj=enemies[idx];defaultEnemy(esObj);document.getElementById('esheetTitle').textContent='Scheda — '+(esObj.name||'(senza nome)');document.getElementById('esheetBody').innerHTML=buildEsheet(esObj);
+/* Persiste l'altezza della casella Note quando l'utente la ridimensiona, così
+   non si resetta ad ogni re-render della scheda. */
+if(window._esNotesRO){try{window._esNotesRO.disconnect()}catch(_){}}
+var _esNotesTa=document.querySelector('#esheetBody textarea[data-ef="notes"]');
+if(_esNotesTa&&window.ResizeObserver){var _esPrevH=Math.round(_esNotesTa.getBoundingClientRect().height);window._esNotesRO=new ResizeObserver(function(){if(!esObj)return;var hh=Math.round(_esNotesTa.getBoundingClientRect().height);if(hh>0&&hh!==_esPrevH){_esPrevH=hh;esObj.notesH=hh;sE()}});window._esNotesRO.observe(_esNotesTa)}}
 function closeEsheet(){esObj=null;var i=op.indexOf('esheet');if(i>=0){op.splice(i,1);sO();rW()}}
 document.getElementById('esheetClose').addEventListener('click',closeEsheet);
 /* HP bar drag: click o drag sulla barra imposta hpCur in base a posizione X.
