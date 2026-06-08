@@ -701,18 +701,14 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__item-desc:focus{border-color:var(--gold)}
 /* Override defenses/senses input: text fields freeform, allineati a sinistra */
 .es__inp-text{padding:3px 6px !important;min-height:0 !important;font-size:.72rem !important;font-weight:500 !important;text-align:left !important}
-.es__ta{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 8px;color:var(--text);font-family:var(--mono);font-size:.7rem;outline:none;width:100%;box-sizing:border-box;min-height:54px;max-height:none;resize:vertical;overflow-y:auto;scrollbar-width:thin;line-height:1.4;transition:border-color .12s}
+/* Casella Note: ridimensionabile + scrollabile. L'indicatore a linee diagonali
+   (stesso stile della maniglia .sp-md__resize) è disegnato come background-image
+   NELL'angolo in basso a destra della textarea stessa: così resta sempre dentro
+   al bordo, allineato all'angolo, e segue il box quando lo ridimensioni. */
+.es__ta{background-color:var(--bg2);background-image:linear-gradient(135deg,transparent 0,transparent 30%,rgba(150,150,160,.55) 30%,rgba(150,150,160,.55) 40%,transparent 40%,transparent 55%,rgba(150,150,160,.55) 55%,rgba(150,150,160,.55) 65%,transparent 65%,transparent 80%,rgba(150,150,160,.55) 80%,rgba(150,150,160,.55) 90%,transparent 90%);background-repeat:no-repeat;background-position:right 5px bottom 5px;background-size:9px 9px;border:1px solid var(--border);border-radius:5px;padding:6px 8px;color:var(--text);font-family:var(--mono);font-size:.7rem;outline:none;width:100%;box-sizing:border-box;min-height:54px;max-height:none;resize:vertical;overflow-y:auto;scrollbar-width:thin;line-height:1.4;transition:border-color .12s}
 .es__ta:focus{border-color:var(--gold)}
 .es__ta::-webkit-scrollbar{width:6px}
 .es__ta::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-/* La sezione Note non deve ritagliare la maniglia di resize della textarea
-   (specificità .pg__sec.es__notes-sec per battere .pg__sec{overflow:hidden}). */
-.pg__sec.es__notes-sec{overflow:visible;position:relative}
-/* Indicatore "ridimensionabile" nell'angolo in basso a destra: stesse linee
-   diagonali della maniglia di resize del modale incantesimi (.sp-md__resize).
-   pointer-events:none così il drag nativo del textarea continua a funzionare. */
-.es__notes-sec::after{content:'';position:absolute;right:9px;bottom:7px;width:11px;height:11px;pointer-events:none;background:linear-gradient(135deg,transparent 0,transparent 30%,rgba(140,140,150,.4) 30%,rgba(140,140,150,.4) 40%,transparent 40%,transparent 55%,rgba(140,140,150,.4) 55%,rgba(140,140,150,.4) 65%,transparent 65%,transparent 80%,rgba(140,140,150,.4) 80%,rgba(140,140,150,.4) 90%,transparent 90%);transition:background .12s}
-.es__notes-sec:hover::after{background:linear-gradient(135deg,transparent 0,transparent 30%,var(--gold) 30%,var(--gold) 40%,transparent 40%,transparent 55%,var(--gold) 55%,var(--gold) 65%,transparent 65%,transparent 80%,var(--gold) 80%,var(--gold) 90%,transparent 90%)}
 /* Pulsante elimina nemico */
 .es__del-btn{margin-top:8px;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--rb);color:var(--red);padding:5px 11px;border-radius:5px;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.66rem;transition:all .12s}
 .es__del-btn:hover{background:var(--rl)}
