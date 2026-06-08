@@ -458,6 +458,7 @@
   function bestHasAtk(it) { if (!it || typeof it !== 'object') return false; if (it.atkHit && String(it.atkHit).trim()) return true; var d = bestItemDmgs(it); for (var i = 0; i < d.length; i++) if (d[i] && d[i].f && String(d[i].f).trim()) return true; return false; }
   function bestHasAtkCfg(it) { return !!(it && typeof it === 'object' && (it.atkHit != null || Array.isArray(it.atkDmgs) || (it.atkDmg != null && String(it.atkDmg).trim()))); }
   function bestAtkConfigHTML(o, key, i, ro) {
+    if (key === 'drop') return ''; // i drop (tesoro) non hanno attacchi
     var atkable = (key === 'actions' || key === 'bonusActions' || key === 'legendaryActions' || key === 'reactions');
     if (ro) {
       if (!bestHasAtk(o)) return '';
