@@ -707,7 +707,12 @@ body.csb-dragging,body.csb-dragging *{cursor:var(--cur-pointer)!important;user-s
 .es__ta::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 /* La sezione Note non deve ritagliare la maniglia di resize della textarea
    (specificità .pg__sec.es__notes-sec per battere .pg__sec{overflow:hidden}). */
-.pg__sec.es__notes-sec{overflow:visible}
+.pg__sec.es__notes-sec{overflow:visible;position:relative}
+/* Indicatore "ridimensionabile" nell'angolo in basso a destra: stesse linee
+   diagonali della maniglia di resize del modale incantesimi (.sp-md__resize).
+   pointer-events:none così il drag nativo del textarea continua a funzionare. */
+.es__notes-sec::after{content:'';position:absolute;right:9px;bottom:7px;width:11px;height:11px;pointer-events:none;background:linear-gradient(135deg,transparent 0,transparent 30%,rgba(140,140,150,.4) 30%,rgba(140,140,150,.4) 40%,transparent 40%,transparent 55%,rgba(140,140,150,.4) 55%,rgba(140,140,150,.4) 65%,transparent 65%,transparent 80%,rgba(140,140,150,.4) 80%,rgba(140,140,150,.4) 90%,transparent 90%);transition:background .12s}
+.es__notes-sec:hover::after{background:linear-gradient(135deg,transparent 0,transparent 30%,var(--gold) 30%,var(--gold) 40%,transparent 40%,transparent 55%,var(--gold) 55%,var(--gold) 65%,transparent 65%,transparent 80%,var(--gold) 80%,var(--gold) 90%,transparent 90%)}
 /* Pulsante elimina nemico */
 .es__del-btn{margin-top:8px;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--rb);color:var(--red);padding:5px 11px;border-radius:5px;cursor:var(--cur-pointer);font-family:var(--mono);font-size:.66rem;transition:all .12s}
 .es__del-btn:hover{background:var(--rl)}
