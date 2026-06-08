@@ -95,6 +95,28 @@
   function host() { return document.getElementById('bestiaryBody'); }
   function getById(id) { for (var i = 0; i < data.length; i++) if (data[i].id === id) return data[i]; return null; }
 
+  /* Foto del mostro: usa l'upload (m.photo, base64) se presente; altrimenti un
+     file nel repo il cui nome corrisponde al nome della creatura:
+     img/bestiary/<slug>.webp (slug = minuscolo, accenti rimossi, simboli→'-').
+     Se il file manca → placeholder (registrato in imgCache per non riprovare). */
+  var IMG_DIR = 'img/bestiary/';
+  function slugForName(name) {
+    return String(name || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+  function derivedPhoto(name) { var s = slugForName(name); return s ? (IMG_DIR + s + '.webp') : ''; }
+  window.cmBestiarySlug = slugForName;
+  var imgCache = {};
+  window.__bestImg = function (src, ok, el) { imgCache[src] = ok ? 'ok' : 'fail'; if (!ok && el && el.remove) el.remove(); };
+  function monsterPhotoHtml(m) {
+    var ph = '<svg class="best__photo-ph" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+    var src = m.photo || derivedPhoto(m.name);
+    if (!src) return ph;
+    var isData = src.slice(0, 5) === 'data:';
+    if (!isData && imgCache[src] === 'fail') return ph;
+    var handlers = isData ? '' : (' onload="window.__bestImg(\'' + src + '\',1)" onerror="window.__bestImg(\'' + src + '\',0,this)"');
+    return ph + '<img class="best__photo-img" src="' + esc(src) + '" alt=""' + handlers + '>';
+  }
+
   function blankMonster() {
     return { name: 'Nuovo mostro', emoji: '🐾', ac: 10, hp: 10, hpCur: 10, hpTemp: 0, init: 0,
              cr: '', xp: '', hpDice: '', str: 10, dex: 10, con: 10, intl: 10, wis: 10, cha: 10 };
@@ -162,13 +184,10 @@
       h += '<div class="best__list">';
       items.forEach(function (m) {
         var on = (m.id === view.curId) ? ' best__card--on' : '';
-        var photoInner = m.photo
-          ? '<img src="' + esc(m.photo) + '" alt="">'
-          : '<svg class="best__photo-ph" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
         var typeBadge = m.type ? '<span class="best__corner best__corner--tl">' + esc(m.type) + '</span>' : '';
         var crBadge = (m.cr != null && m.cr !== '') ? '<span class="best__corner best__corner--tr">' + esc(String(m.cr)) + '</span>' : '';
         h += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '">' +
-          '<div class="best__photo' + (m.photo ? '' : ' best__photo--empty') + '">' + typeBadge + crBadge + photoInner + '</div>' +
+          '<div class="best__photo">' + typeBadge + crBadge + monsterPhotoHtml(m) + '</div>' +
           '<div class="best__name">' + esc(m.name || '(senza nome)') + '</div>' +
           '</div>';
       });
@@ -218,8 +237,7 @@
       metaLine('Vulnerabilità', (m.dmgVulner || []).join(', ')) + metaLine('Immunità a condizioni', (m.condImmune || []).join(', '));
     if (metaH) metaH = '<div class="best__pv-meta">' + metaH + '</div>';
 
-    var pvPhoto = '<span class="best__pv-photo' + (m.photo ? '' : ' best__pv-photo--empty') + '" data-bestphoto="' + esc(m.id) + '" title="Carica o cambia foto">' +
-      (m.photo ? '<img src="' + esc(m.photo) + '" alt="">' : '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>') + '</span>';
+    var pvPhoto = '<span class="best__pv-photo" data-bestphoto="' + esc(m.id) + '" title="Carica o cambia foto">' + monsterPhotoHtml(m) + '</span>';
     var h = '<div class="best__pv">';
     h += '<div class="best__pv-id">' + pvPhoto + '<div>' +
       '<div class="best__pv-name">' + esc(m.name || '(senza nome)') + '</div>' +
@@ -322,7 +340,7 @@
     '.best__card{display:flex;flex-direction:column;text-align:center;gap:5px;height:176px;padding:7px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:var(--cur-pointer);transition:border-color .12s,background .12s;box-sizing:border-box}' +
     '.best__card:hover{border-color:var(--gold);background:rgba(196,154,50,.05)}' +
     '.best__photo{position:relative;flex:1;width:100%;min-height:0;border-radius:7px;overflow:hidden;background:var(--bg2);display:flex;align-items:center;justify-content:center}' +
-    '.best__photo img{width:100%;height:100%;object-fit:cover;display:block}' +
+    '.best__photo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}' +
     '.best__photo-ph{width:40px;height:40px;opacity:.4;stroke:var(--muted);fill:none;stroke-width:1.6}' +
     '.best__name{font-family:var(--mono);font-size:.7rem;color:var(--text);font-weight:600;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;flex-shrink:0}' +
     '.best__meta{font-family:var(--mono);font-size:.56rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}' +
@@ -331,10 +349,9 @@
     '.best__back:hover{color:var(--gold);border-color:var(--gold)}' +
     '.best__pv{display:flex;flex-direction:column;gap:8px}' +
     '.best__pv-id{display:flex;align-items:center;gap:10px}' +
-    '.best__pv-photo{width:52px;height:52px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--border);transition:border-color .12s}' +
+    '.best__pv-photo{position:relative;width:52px;height:52px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--border);transition:border-color .12s}' +
     '.best__pv-photo:hover{border-color:var(--gold)}' +
-    '.best__pv-photo img{width:100%;height:100%;object-fit:cover;display:block}' +
-    '.best__pv-photo--empty svg{width:26px;height:26px;opacity:.4;stroke:var(--muted);fill:none;stroke-width:1.6}' +
+    '.best__pv-photo .best__photo-ph{width:26px;height:26px}' +
     '.best__pv-name{font-family:var(--mono);font-size:1rem;color:var(--gold);font-weight:700}' +
     '.best__pv-sub{font-family:var(--mono);font-size:.66rem;color:var(--muted);text-transform:capitalize}' +
     '.best__pv-stats{display:flex;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:.74rem;color:var(--text);padding:7px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}' +
