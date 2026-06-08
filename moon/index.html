@@ -1233,9 +1233,11 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .pg__expitem-body:focus{background:var(--bg2)}
 .pg__expitem--on .pg__expitem-body{display:block}
 /* Voce azione nemico: pulsante tira (accanto al nome) + editor formula. */
-.es__exproll{flex-shrink:0;align-self:center;display:flex;align-items:center;justify-content:center;width:28px;height:22px;margin:0 4px;background:rgba(196,154,50,.14);border:1px solid rgba(196,154,50,.5);border-radius:5px;color:var(--gold);cursor:var(--cur-pointer);padding:0;transition:all .12s}
-.es__exproll:hover{background:rgba(196,154,50,.26);color:#ffd97a}
+.es__exproll{flex-shrink:0;align-self:center;display:flex;align-items:center;justify-content:center;width:22px;height:20px;margin:0 2px;background:transparent;border:none;color:var(--muted);cursor:var(--cur-pointer);padding:0;transition:color .12s}
+.es__exproll:hover{color:var(--gold)}
 .es__exproll:active{transform:scale(.9)}
+.es__exproll svg{display:block;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;width:14px;height:14px}
+.es__exproll svg circle{fill:currentColor;stroke:none}
 .pg__expitem:not(.pg__expitem--on) .es__exproll--off{display:none}
 .es__exp-atk{display:none;flex-direction:column;gap:6px;padding:7px 8px;border-top:1px solid var(--border);background:var(--bg2)}
 .pg__expitem--on .es__exp-atk{display:flex}
