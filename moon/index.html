@@ -4132,7 +4132,7 @@ var _ES_SKILL_MAP=[
 {ab:'intl',name:'INT',skills:[['arcano','Arcano'],['indagare','Indagare'],['natura','Natura'],['religione','Religione'],['storia','Storia']]},
 {ab:'wis',name:'SAG',skills:[['animali','Addest. Animali'],['intuizione','Intuizione'],['medicina','Medicina'],['percezione','Percezione'],['sopravvivenza','Sopravvivenza']]},
 {ab:'cha',name:'CAR',skills:[['inganno','Inganno'],['intimidire','Intimidire'],['intrattenere','Intrattenere'],['persuasione','Persuasione']]}];
-function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','saves','skills','senses','cr','notes'].forEach(function(k){if(e[k]==null)e[k]=''});['str','dex','con','intl','wis','cha'].forEach(function(k){if(e[k]==null)e[k]=10});['traits','actions','bonusActions','reactions','legendaryActions'].forEach(function(k){if(!Array.isArray(e[k]))e[k]=[]});
+function defaultEnemy(e){['size','type','alignment','acType','hpDice','speed','saves','skills','senses','cr','notes'].forEach(function(k){if(e[k]==null)e[k]=''});['str','dex','con','intl','wis','cha'].forEach(function(k){if(e[k]==null)e[k]=10});['traits','actions','bonusActions','reactions','legendaryActions','drop'].forEach(function(k){if(!Array.isArray(e[k]))e[k]=[]});
 /* Migrazione: linguaggi, resistenze, immunità, vulnerabilità, immunità
    condizioni da stringa freeform a array di stringhe (split su virgole
    o punti-virgola). Permette UI a lista stile Equipaggiamento (PG sheet)
@@ -4372,6 +4372,7 @@ h+='<div class="pg__col">';
 h+=_esSecHTML('⚔️ Azioni','actions',e.actions);
 h+=_esSecHTML('🎯 Azioni bonus','bonusActions',e.bonusActions);
 h+=_esSecHTML('👑 Azioni leggendarie','legendaryActions',e.legendaryActions);
+h+=_esSecHTML('💰 Drop','drop',e.drop);
 h+='</div>';
 h+='</div>';
 /* Nessun pulsante elimina qui: l'eliminazione del nemico avviene dal menu ⋮
