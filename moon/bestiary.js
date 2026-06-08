@@ -29,6 +29,7 @@
      CR. La lore va in `notes`, il tesoro in `drop`.
      ------------------------------------------------------------------------- */
   var AARAKOCRA_LORE = 'Gli aarakocra sono esseri simili ad uccelli che solcano i cieli di innumerevoli mondi e le infinite distese del Piano Elementale dell\'Aria. Spesso ricordano gli uccelli comuni delle regioni in cui vivono: alcuni assomigliano a falchi o condor, mentre altri ricordano colibrì o archeotteri.\n\nIn molte terre, gli aarakocra narrano le gesta dei loro antichi eroi che combatterono la malvagia Regina del Caos Alato insieme ai misteriosi Duchi del Vento di Aaqa.';
+  var ANIMATI_LORE = 'La magia può manipolare oggetti ordinari, costringendoli a svolgere semplici compiti. Questi oggetti animati possono apparire come innocui utensili o decorazioni capaci però di difendere il loro creatore.\n\nEssi seguono semplici istruzioni impartite dalla forza o dall\'incantatore che li ha creati. Se lasciati senza supervisione, possono continuare a proteggere una zona per anni oppure ripetere lo stesso compito fino a consumarsi.\n\n— Catalizzatori degli Oggetti Animati (d10) —\n1. Un Celestiale o un Immondo che usa l\'oggetto per proteggere o tormentare un mortale.\n2. Una combinazione di magia e tecnologia, come alchimia o scienza aliena.\n3. L\'essenza di qualcuno trasformata da un ingannatore soprannaturale.\n4. Fate impegnate nei loro giochi o intrighi.\n5. Il caso, dopo che l\'oggetto ha acquisito una parvenza di vita dopo un secolo di utilizzo.\n6. Un incantatore che necessita di una guardia o di un servitore.\n7. Il canto di uno strumento magico.\n8. Uno spirito che possiede l\'oggetto.\n9. Magia selvaggia, un incantesimo fallito o un artefatto caotico.\n10. La volontà di una potente entità psionica.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -174,6 +175,89 @@
       ],
       drop: [{ name: 'Reliquie', desc: 'Reliquie sacre legate al suo dominio e alla bestia che rappresenta.' }],
       notes: 'Reggente Immortale delle Terre Selvagge\n\nHabitat: Piani (Beastlands)\nTesoro: Reliquie\n\nI Signori degli Animali sono gli spiriti immortali di creature leggendarie. Agiscono come protettori divini degli animali della loro specie e appaiono come ibridi tra umanoidi e le bestie che difendono.\n\nSpesso assumono la forma di versioni gigantesche e idealizzate degli animali a cui sono associati, con occhi luminosi; quando interagiscono con altre creature possono apparire come esseri quasi umani dotati di sottili tratti animali. Indipendentemente dall\'aspetto, manifestano gli istinti della creatura che rappresentano, temperati da immensa saggezza ed esperienza.\n\nLa maggior parte dimora nelle Beastlands, talvolta viaggiando nel Feywild o in altri reami idilliaci. Raramente visitano il Piano Materiale, intervenendo solo quando un mondo affronta una catastrofe ambientale o quando grandi popolazioni animali sono in pericolo.\n\nTra i più noti vi sono quelli associati a gatti, falchi, lucertole e lupi, ma esistono rappresentanti di ogni bestia; alcuni incarnano persino creature rare o estinte come megafauna preistorica o dinosauri. Grazie al loro potere divino possono evocare animali spettrali, canalizzare energie spirituali e manifestare capacità legate a uno dei tre grandi archetipi: Raccoglitore, Cacciatore, Saggio.\n\n— Aspetti Raccoglitori (d10) —\nOrso, Ape, Bisonte, Capibara, Carpa, Coniglio, Gallo, Bradipo, Cervo, Avvoltoio.\n\n— Aspetti Cacciatori (d10) —\nAlligatore, Tasso, Pipistrello, Gatto, Falco, Mangusta, Mantide Religiosa, Squalo, Serpente, Lupo.\n\n— Aspetti Sapienti (d10) —\nCoyote, Corvo, Elefante, Lucertola, Topo, Gufo, Salmone, Ragno, Tartaruga, Balena.'
+    },
+    {
+      id: 'preset_armatura_animata', name: 'Armatura Animata', emoji: '🛡️', rarity: 'common',
+      type: 'Costrutto', size: 'Media', alignment: 'Senza Allineamento',
+      ac: 18, hp: 33, hpCur: 33, hpTemp: 0, hpDice: '6d8+6', init: 2,
+      speed: '7,5 m', cr: '1', xp: '',
+      str: 14, dex: 11, con: 13, intl: 1, wis: 3, cha: 1,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {},
+      passivePerception: 6, senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }],
+      languages: ['Nessuna'],
+      dmgResist: [], dmgImmune: ['Psichico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Accecato', 'Ammaliato', 'Avvelenato', 'Assordato', 'Esausto', 'Paralizzato', 'Pietrificato', 'Spaventato'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'armatura effettua due attacchi Schianto.' },
+        { name: 'Schianto', desc: 'Attacco in mischia: +4 a colpire, portata 1,5 m.\nColpito: 5 (1d6 + 2) danni contundenti.', atkHit: '+4', atkDmgs: [{ f: '1d6+2', t: 'contundenti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Oggetti Comuni che Prendono Vita\n\nHabitat: Urbano\nTesoro: Nessuno\n\nLe armature animate possono muoversi con passi lenti e deliberati oppure con andature rigide e innaturali. Spesso sono create a partire da armature complete e possono essere facilmente scambiate per soldati o cavalieri. Altri tipi di armature o persino statue metalliche possono utilizzare queste stesse statistiche.\n\n' + ANIMATI_LORE
+    },
+    {
+      id: 'preset_scopa_animata', name: 'Scopa Animata', emoji: '🧹', rarity: 'common',
+      type: 'Costrutto', size: 'Piccola', alignment: 'Senza Allineamento',
+      ac: 15, hp: 14, hpCur: 14, hpTemp: 0, hpDice: '4d6', init: 5,
+      speed: '1,5 m, Volare 15 m (stazionario)', cr: '1/4', xp: '',
+      str: 10, dex: 17, con: 10, intl: 1, wis: 5, cha: 1,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {},
+      passivePerception: 7, senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }],
+      languages: ['Nessuna'],
+      dmgResist: [], dmgImmune: ['Psichico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Accecato', 'Ammaliato', 'Avvelenato', 'Assordato', 'Esausto', 'Paralizzato', 'Pietrificato', 'Spaventato'],
+      traits: [
+        { name: 'Passo Radente', desc: 'La scopa non provoca attacchi di opportunità quando esce dalla portata di un nemico mentre vola.' }
+      ],
+      actions: [
+        { name: 'Schianto', desc: 'Attacco in mischia: +5 a colpire, portata 1,5 m.\nColpito: 5 (1d4 + 3) danni contundenti.', atkHit: '+5', atkDmgs: [{ f: '1d4+3', t: 'contundenti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Oggetti Comuni che Prendono Vita\n\nHabitat: Urbano\nTesoro: Nessuno\n\nLe scope animate mantengono pulito l\'ambiente circostante e lo difendono quando necessario. Quando combattono si lanciano in aria e colpiscono i nemici da direzioni imprevedibili. Anche altri oggetti volanti, come utensili o bastoni animati, possono utilizzare questo blocco statistiche.\n\n' + ANIMATI_LORE
+    },
+    {
+      id: 'preset_spada_volante_animata', name: 'Spada Volante Animata', emoji: '🗡️', rarity: 'common',
+      type: 'Costrutto', size: 'Piccola', alignment: 'Senza Allineamento',
+      ac: 17, hp: 14, hpCur: 14, hpTemp: 0, hpDice: '4d6', init: 4,
+      speed: '1,5 m, Volare 15 m (stazionario)', cr: '1/4', xp: '',
+      str: 12, dex: 15, con: 11, intl: 1, wis: 5, cha: 1,
+      savesOverride: { str: '', dex: '4', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {},
+      passivePerception: 7, senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }],
+      languages: ['Nessuna'],
+      dmgResist: [], dmgImmune: ['Psichico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Accecato', 'Ammaliato', 'Avvelenato', 'Assordato', 'Esausto', 'Paralizzato', 'Pietrificato', 'Spaventato'],
+      traits: [],
+      actions: [
+        { name: 'Fendente', desc: 'Attacco in mischia: +4 a colpire, portata 1,5 m.\nColpito: 6 (1d8 + 2) danni taglienti.', atkHit: '+4', atkDmgs: [{ f: '1d8+2', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Oggetti Comuni che Prendono Vita\n\nHabitat: Urbano\nTesoro: Nessuno\n\nLe spade volanti animate si muovono come se fossero impugnate da guerrieri invisibili. Che si tratti di una lama appena forgiata o di frammenti ricomposti magicamente, il loro comportamento rimane identico. Anche altre armi animate possono utilizzare queste statistiche.\n\n' + ANIMATI_LORE
+    },
+    {
+      id: 'preset_tappeto_soffocante_animato', name: 'Tappeto Soffocante Animato', emoji: '🟫', rarity: 'common',
+      type: 'Costrutto', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 12, hp: 27, hpCur: 27, hpTemp: 0, hpDice: '5d10', init: 4,
+      speed: '3 m', cr: '2', xp: '',
+      str: 17, dex: 14, con: 10, intl: 1, wis: 3, cha: 1,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {},
+      passivePerception: 6, senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }],
+      languages: ['Nessuna'],
+      dmgResist: [], dmgImmune: ['Psichico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Accecato', 'Ammaliato', 'Avvelenato', 'Assordato', 'Esausto', 'Paralizzato', 'Pietrificato', 'Spaventato'],
+      traits: [],
+      actions: [
+        { name: 'Soffocare', desc: 'Attacco in mischia: +5 a colpire, portata 1,5 m.\nColpito: 10 (2d6 + 3) danni contundenti.\nSe il bersaglio è una creatura di taglia Media o inferiore, il tappeto può invece afferrarlo (CD 13 per sfuggire) al posto di infliggere danni. Finché la lotta continua il bersaglio è Accecato e Trattenuto, sta soffocando e subisce 10 (2d6 + 3) danni contundenti all\'inizio di ogni turno del tappeto. Il tappeto può soffocare una sola creatura alla volta.\nMentre afferra una creatura il tappeto non può usare nuovamente questa azione, dimezza tutti i danni che subisce (arrotondando per difetto) e la creatura afferrata subisce lo stesso ammontare di danni che il tappeto riceve.', atkHit: '+5', atkDmgs: [{ f: '2d6+3', t: 'contundenti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Oggetti Comuni che Prendono Vita\n\nHabitat: Urbano\nTesoro: Nessuno\n\nI tappeti soffocanti animati possono attaccare chiunque li calpesti oppure fingersi oggetti magici innocui, come tappeti volanti, per sorprendere le proprie vittime. Arazzi, pellicce e altri tessuti mortali possono utilizzare queste stesse statistiche.\n\n' + ANIMATI_LORE
     }
   ];
 
