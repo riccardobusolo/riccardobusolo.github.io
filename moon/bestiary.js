@@ -89,7 +89,7 @@
       traits: [
         { name: 'Anfibio', desc: 'L\'aboleth può respirare sia aria sia acqua.' },
         { name: 'Rigenerazione Eldritch', desc: 'Se viene distrutto, l\'aboleth ottiene un nuovo corpo entro 5d10 giorni, tornando in vita con tutti i suoi punti ferita nel Reame Remoto o in un altro luogo scelto dal DM.' },
-        { name: 'Resistenza Leggendaria (3/Giorno, o 4/Giorno nella Tana)', desc: 'Se l\'aboleth fallisce un tiro salvezza, può scegliere di superarlo invece.' },
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe l\'aboleth fallisce un tiro salvezza, può scegliere di superarlo invece.' },
         { name: 'Nube di Muco', desc: 'Quando è sott\'acqua, l\'aboleth è circondato da una nube di muco.\nTiro Salvezza su Costituzione: CD 14. Alla fine del turno dell\'aboleth, ogni creatura entro 1,5 metri deve effettuare il tiro salvezza.\nFallimento: il bersaglio viene maledetto. Finché la maledizione permane la pelle diventa viscida, il bersaglio può respirare aria e acqua e non può recuperare punti ferita se non è sott\'acqua. Inoltre, fuori dall\'acqua subisce 6 (1d12) danni da acido ogni 10 minuti, a meno che la pelle non venga mantenuta umida.' },
         { name: 'Telepatia Investigativa', desc: 'Quando una creatura visibile all\'aboleth comunica telepaticamente con esso, l\'aboleth apprende il desiderio più profondo della creatura.' }
       ],
@@ -753,7 +753,7 @@
     '.best__shine{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5;opacity:0;transition:opacity .3s ease;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.5),rgba(255,255,255,0) 42%);mix-blend-mode:soft-light}' +
     '.best__card:hover .best__shine{opacity:1}' +
     '.best__holo{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;background:linear-gradient(115deg,transparent 28%,var(--rare-c2) 43%,var(--rare-c1) 50%,var(--rare-c2) 57%,transparent 72%);background-size:200% 200%;background-repeat:no-repeat;background-position:var(--hx,50%) var(--hy,50%);opacity:0;mix-blend-mode:color-dodge;transition:opacity .3s ease}' +
-    '.best__card:hover .best__holo{opacity:calc(var(--holo,0) * .5 + .03)}' +
+    '.best__card:hover .best__holo{opacity:calc((var(--holo,0) * .5 + .03) * 1.1)}' +
     '.best__photo{position:relative;flex:1;width:100%;min-height:0;border-radius:7px;overflow:hidden;background:#0a0a0a;display:flex;align-items:center;justify-content:center}' +
     '.best__photo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}' +
     '.best__photo-ph{width:40px;height:40px;opacity:.4;stroke:var(--muted);fill:none;stroke-width:1.6}' +
