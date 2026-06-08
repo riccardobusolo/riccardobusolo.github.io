@@ -31,7 +31,7 @@
   var AARAKOCRA_LORE = 'Gli aarakocra sono esseri simili ad uccelli che solcano i cieli di innumerevoli mondi e le infinite distese del Piano Elementale dell\'Aria. Spesso ricordano gli uccelli comuni delle regioni in cui vivono: alcuni assomigliano a falchi o condor, mentre altri ricordano colibrì o archeotteri.\n\nIn molte terre, gli aarakocra narrano le gesta dei loro antichi eroi che combatterono la malvagia Regina del Caos Alato insieme ai misteriosi Duchi del Vento di Aaqa.';
   var PRESETS = [
     {
-      id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅',
+      id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
       type: 'Elementale', size: 'Media', alignment: 'Neutrale',
       ac: 16, hp: 66, hpCur: 66, hpTemp: 0, hpDice: '12d8+12', init: 3,
       speed: '6 m, Volare 15 m', cr: '4', xp: '',
@@ -56,7 +56,7 @@
       notes: 'Guardiani Alati del Cielo\n\nHabitat: Montagne, Piani (Piano Elementale dell\'Aria)\n\nGli aeromanti aarakocra controllano venti magici provenienti dalle tempeste infinite del Piano Elementale dell\'Aria.\n\n' + AARAKOCRA_LORE
     },
     {
-      id: 'preset_aarakocra_schermagliatore', name: 'Aarakocra Schermagliatore', emoji: '🪶',
+      id: 'preset_aarakocra_schermagliatore', name: 'Aarakocra Schermagliatore', emoji: '🪶', rarity: 'common',
       type: 'Elementale', size: 'Media', alignment: 'Neutrale',
       ac: 12, hp: 11, hpCur: 11, hpTemp: 0, hpDice: '2d8+2', init: 2,
       speed: '6 m, Volare 15 m', cr: '1/4', xp: '',
@@ -133,20 +133,24 @@
     legendary: { c1: '#f59e0b', c2: '#ffe39a', glow: 'rgba(245,175,40,.64)',  holo: .74 },
     mythic:    { c1: '#ef4444', c2: '#ffd089', glow: 'rgba(255,95,70,.68)',   holo: .95 }
   };
-  function rarityForCr(cr) {
+  var RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'];
+  var RARITY_NAMES = { common: 'Comune', uncommon: 'Non comune', rare: 'Raro', epic: 'Epico', legendary: 'Leggendario', mythic: 'Mitico' };
+  /* Fallback solo per mostri legacy senza rarità esplicita: derivata dalla CR. */
+  function rarityKeyForCr(cr) {
     var n = crNum(cr);
-    if (n < 0) return RARITIES.none;
-    if (n < 2) return RARITIES.common;
-    if (n < 5) return RARITIES.uncommon;
-    if (n < 11) return RARITIES.rare;
-    if (n < 17) return RARITIES.epic;
-    if (n < 24) return RARITIES.legendary;
-    return RARITIES.mythic;
+    if (n < 2) return 'common';
+    if (n < 5) return 'uncommon';
+    if (n < 11) return 'rare';
+    if (n < 17) return 'epic';
+    if (n < 24) return 'legendary';
+    return 'mythic';
   }
-  function rarityVars(cr) { var r = rarityForCr(cr); return '--rare-c1:' + r.c1 + ';--rare-c2:' + r.c2 + ';--glow:' + r.glow + ';--holo:' + r.holo + ';'; }
+  function rarityKeyOf(m) { return (m && m.rarity && RARITIES[m.rarity]) ? m.rarity : rarityKeyForCr(m && m.cr); }
+  function rarityOf(m) { return RARITIES[rarityKeyOf(m)] || RARITIES.common; }
+  function rarityVars(m) { var r = rarityOf(m); return '--rare-c1:' + r.c1 + ';--rare-c2:' + r.c2 + ';--glow:' + r.glow + ';--holo:' + r.holo + ';'; }
 
   function blankMonster() {
-    return { name: 'Nuovo mostro', emoji: '🐾', ac: 10, hp: 10, hpCur: 10, hpTemp: 0, init: 0,
+    return { name: 'Nuovo mostro', emoji: '🐾', rarity: 'common', ac: 10, hp: 10, hpCur: 10, hpTemp: 0, init: 0,
              cr: '', xp: '', hpDice: '', str: 10, dex: 10, con: 10, intl: 10, wis: 10, cha: 10 };
   }
 
@@ -214,7 +218,7 @@
         var on = (m.id === view.curId) ? ' best__card--on' : '';
         var typeBadge = m.type ? '<span class="best__corner best__corner--tl">' + esc(m.type) + '</span>' : '';
         var crBadge = (m.cr != null && m.cr !== '') ? '<span class="best__corner best__corner--tr">' + esc(String(m.cr)) + '</span>' : '';
-        h += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '" draggable="true" style="' + rarityVars(m.cr) + '">' +
+        h += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '" draggable="true" style="' + rarityVars(m) + '">' +
           '<div class="best__photo">' + typeBadge + crBadge + monsterPhotoHtml(m) + '</div>' +
           '<div class="best__name">' + esc(m.name || '(senza nome)') + '</div>' +
           '<div class="best__holo"></div><div class="best__shine"></div>' +
@@ -279,7 +283,13 @@
       (m.speed ? '<span>🦶 ' + esc(m.speed) + '</span>' : '') +
       '<span>⚡ <strong>' + fmtMod(m.init || 0) + '</strong> Iniz.</span>' +
       '</div>';
-    h += '<div class="best__pv-abs">' + abH + '</div>' + metaH;
+    var _curRar = rarityKeyOf(m);
+    var rarH = '<div class="best__rarity"><div class="best__rarity-lbl">Rarità</div><div class="best__rarity-chips">' +
+      RARITY_ORDER.map(function (k) {
+        var rr = RARITIES[k];
+        return '<button class="best__rarity-chip' + (k === _curRar ? ' best__rarity-chip--sel' : '') + '" data-bestrarity="' + k + '" style="--c1:' + rr.c1 + ';--c2:' + rr.c2 + '" title="' + RARITY_NAMES[k] + '"><span class="best__rarity-dot"></span>' + RARITY_NAMES[k] + '</button>';
+      }).join('') + '</div></div>';
+    h += rarH + '<div class="best__pv-abs">' + abH + '</div>' + metaH;
     h += secList('✨ Tratti', 'traits') + secList('⚔️ Azioni', 'actions') + secList('🎯 Azioni bonus', 'bonusActions') +
       secList('⚡ Reazioni', 'reactions') + secList('👑 Azioni leggendarie', 'legendaryActions') + secList('💰 Drop', 'drop');
     if (m.notes) h += '<div class="best__pv-sec"><div class="best__pv-sectitle">📝 Note</div><div class="best__pv-notes">' + esc(m.notes) + '</div></div>';
@@ -298,6 +308,9 @@
 
     var photoBtn = e.target.closest('[data-bestphoto]');
     if (photoBtn) { e.preventDefault(); e.stopPropagation(); pendingPhotoId = photoBtn.dataset.bestphoto; ensureFileInput(); fileInput.click(); return; }
+
+    var rarBtn = e.target.closest('[data-bestrarity]');
+    if (rarBtn) { var rm = getById(view.curId); if (rm) { rm.rarity = rarBtn.dataset.bestrarity; persist(); render(); } return; }
 
     var openC = e.target.closest('[data-bestopen]');
     if (openC) { view.curId = openC.dataset.bestopen; render(); return; }
@@ -444,6 +457,13 @@
     '.best__pv-meta{display:flex;flex-direction:column;gap:3px;padding:6px 0;border-bottom:1px solid var(--border)}' +
     '.best__pv-line{font-family:var(--mono);font-size:.7rem;color:var(--text);line-height:1.45;word-break:break-word}' +
     '.best__pv-llabel{color:var(--gold);font-weight:600}' +
+    '.best__rarity{display:flex;flex-direction:column;gap:5px;padding:7px 0;border-bottom:1px solid var(--border)}' +
+    '.best__rarity-lbl{font-family:var(--mono);font-size:.62rem;color:var(--gold);text-transform:uppercase;letter-spacing:.05em;font-weight:600}' +
+    '.best__rarity-chips{display:flex;flex-wrap:wrap;gap:5px}' +
+    '.best__rarity-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-family:var(--mono);font-size:.62rem;cursor:var(--cur-pointer);transition:all .12s}' +
+    '.best__rarity-chip:hover{border-color:var(--c1);color:var(--text)}' +
+    '.best__rarity-chip--sel{border-color:var(--c1);color:#fff;box-shadow:0 0 0 1px var(--c1) inset,0 0 10px -3px var(--c1)}' +
+    '.best__rarity-dot{width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,var(--c1),var(--c2));flex-shrink:0}' +
     '.best__ab{flex:1;text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 2px}' +
     '.best__ab-l{font-family:var(--mono);font-size:.56rem;color:var(--muted)}' +
     '.best__ab-v{font-family:var(--mono);font-size:.82rem;color:var(--text);font-weight:700}' +
