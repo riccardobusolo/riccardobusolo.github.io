@@ -108,6 +108,34 @@
       ],
       drop: [{ name: 'Reliquie', desc: 'Reliquie del suo impero sommerso da tempo e tesori custoditi in camere piene d\'aria al riparo dall\'acqua.' }],
       notes: 'Antica Mente Aliena Senza Età\n\nHabitat: Sottosuolo, Ambienti Acquatici\nTesoro: Reliquie\n\nNegli abissi acquatici gli aboleth sognano imperi morti e orchestrano complotti che si sviluppano attraverso le ere. Questi elusivi immortali anfibi sopraffanno le loro vittime sia fisicamente sia mentalmente, trasformando le creature tramite una viscida infezione aberrante e plasmando altri esseri affinché li servano sotto le onde.\n\nGli aboleth possiedono intelletti terrificanti e menti totalmente aliene. Conservano ricordi perfetti di mondi primordiali e di domini incomprensibili risalenti alle prime epoche del multiverso. I loro segreti sono innumerevoli e insondabili.\n\nEssi si annidano in luoghi intrisi di misteri ancestrali: rovine di imperi sommersi, antichi crocevia magici nascosti o fragili punti di contatto tra diversi piani di esistenza. In questi rifugi sognano epoche passate, raccolgono servitori dominati psichicamente, consumano le menti delle vittime e preparano il loro ritorno al potere. Gli obiettivi e i metodi degli aboleth sono spesso incomprensibili alle altre creature.\n\n— Intrighi dell\'Aboleth (d6) —\n1. Portare a termine piani incomprensibili che lo spingono ad agire in modi apparentemente casuali.\n2. Apprendere di più sul mondo rapendo individui e consumandone le menti.\n3. Manipolare innocenti affinché lo venerino come una divinità usando la sua telepatia dall\'ombra.\n4. Aprire un varco verso un lontano passato o futuro, liberando un\'invasione da un\'altra epoca.\n5. Risvegliare una tartaruga dragone, un kraken o un altro mostro marino per sommergere una città costiera.\n6. Ingannare cercatori di tesori affinché recuperino reliquie del suo impero caduto da tempo.\n\n— Tana dell\'Aboleth —\nGli aboleth dimorano in rovine sommerse e caverne allagate, mantenendo camere piene d\'aria per i servitori terrestri e per i tesori che l\'acqua danneggerebbe.\n\nAcque Corrotte: le fonti d\'acqua entro 1,6 km dalla tana vengono contaminate. Una creatura diversa dall\'aboleth e dai suoi alleati che ne beva deve superare un Tiro Salvezza su Costituzione CD 15 o subire la condizione Avvelenato per 1 ora.\n\nProiezione Psionica: nella sua tana l\'aboleth può lanciare Immagine Proiettata (Project Image) senza componenti materiali, usando l\'Intelligenza come caratteristica da incantatore (CD 16); la gittata diventa 1 miglio e l\'aboleth può usare la propria telepatia come se si trovasse nello spazio dell\'illusione. Se l\'aboleth muore o abbandona la tana, gli effetti terminano.'
+    },
+    {
+      id: 'preset_elementale_aria', name: 'Elementale dell\'Aria', emoji: '🌪️', rarity: 'rare',
+      type: 'Elementale', size: 'Grande', alignment: 'Neutrale',
+      ac: 15, hp: 90, hpCur: 90, hpTemp: 0, hpDice: '12d10+24', init: 5,
+      speed: '3 m, Volare 27 m (stazionario)', cr: '5', xp: '',
+      str: 14, dex: 20, con: 14, intl: 6, wis: 10, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {},
+      passivePerception: 10, senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }],
+      languages: ['Primordiale (Auran)'],
+      dmgResist: ['Contundente', 'Perforante', 'Tagliente', 'Fulmine'],
+      dmgImmune: ['Veleno', 'Tuono'],
+      dmgVulner: [],
+      condImmune: ['Afferrato', 'Avvelenato', 'Esausto', 'Paralizzato', 'Pietrificato', 'Prono', 'Trattenuto', 'Privo di Sensi'],
+      traits: [
+        { name: 'Forma Aerea', desc: 'L\'elementale può entrare nello spazio di un\'altra creatura e fermarsi al suo interno.\nPuò inoltre attraversare aperture strette fino a 2,5 centimetri di larghezza senza spendere movimento aggiuntivo.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'elementale effettua due attacchi Schianto Tonante.' },
+        { name: 'Schianto Tonante', desc: 'Attacco in mischia: +8 a colpire, portata 3 m.\nColpito: 14 (2d8 + 5) danni da tuono.', atkHit: '+8', atkDmgs: [{ f: '2d8+5', t: 'tuono' }] },
+        { name: 'Turbine (Ricarica 4-6)', desc: 'Tiro Salvezza su Forza: CD 13. Una creatura di taglia Media o inferiore che si trovi nello spazio dell\'elementale.\nFallimento: 24 (4d10 + 2) danni da tuono; il bersaglio viene spinto fino a 6 metri in linea retta lontano dall\'elementale e ottiene la condizione Prono.\nSuccesso: metà danni e nessun altro effetto.', atkDmgs: [{ f: '4d10+2', t: 'tuono' }] }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [],
+      drop: [],
+      notes: 'Spirito Primordiale del Vento e della Tempesta\n\nHabitat: Deserti, Montagne, Piani (Piano Elementale dell\'Aria)\nTesoro: Nessuno\n\nSpiriti energetici provenienti dal Piano Elementale dell\'Aria, gli elementali dell\'aria raccolgono nubi e venti in corpi mutevoli, dotati di arti indistinti e forme vagamente definite.\n\nAl di fuori del loro piano natale, questi elementali possono servire gli incantatori che li evocano oppure radunarsi attorno a nodi di energia planare incontrollata, come vette montane battute dai venti o tempeste eterne.\n\nIn combattimento, gli elementali dell\'aria travolgono i nemici con potenti raffiche oppure si trasformano in vortici devastanti capaci di scagliare lontano gli avversari.\n\n— Composizioni dell\'Elementale dell\'Aria (d6) —\n1. Nubi cumuliformi o cirri.\n2. Una miscela di gas dai colori vivaci.\n3. Un miasma acre dall\'aspetto malsano.\n4. Ammassi di nuvole mutevoli che ricordano animali o forme semplici.\n5. Tratti sinistri nascosti all\'interno di una massa nebbiosa.\n6. Nubi tempestose in continuo vortice.'
     }
   ];
 
