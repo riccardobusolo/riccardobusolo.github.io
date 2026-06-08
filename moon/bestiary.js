@@ -253,7 +253,7 @@
   }
 
   /* ---- Stato vista (split: lista a sx, anteprima a dx; tab official|custom) ---- */
-  var view = { tab: 'official', curId: null, q: '', fRarities: [], fTypes: [], fCrMin: 0, fCrMax: 33, openFilter: null, sortKey: '', sortDir: 'asc' };
+  var view = { tab: 'official', curId: null, q: '', fRarities: [], fTypes: [], fCrMin: 0, fCrMax: 33, openFilter: null, sortKey: '', sortDir: 'asc', randomOrder: {} };
 
   /* ---- Caricamento foto mostro (stessa compressione della scheda nemico) ---- */
   var pendingPhotoId = null;
@@ -364,20 +364,27 @@
       '<input type="range" class="best__cr-thumb" min="0" max="' + lastIdx + '" step="1" value="' + view.fCrMax + '" data-bestcr="max"></div>';
   }
 
-  var SORT_OPTS = [['alpha', 'Alfabetico'], ['type', 'Tipo'], ['cr', 'Sfida (CR)'], ['rarity', 'Rarità']];
+  var SORT_OPTS = [['alpha', 'Alfabetico'], ['type', 'Tipo'], ['cr', 'Sfida (CR)'], ['rarity', 'Rarità'], ['random', '🎲 Casuale']];
   function sortPanelHtml() {
     var chips = SORT_OPTS.map(function (o) {
       return '<button class="best__fchip' + (view.sortKey === o[0] ? ' best__fchip--on' : '') + '" data-bestsort="' + o[0] + '" type="button">' + o[1] + '</button>';
     }).join('');
     var desc = view.sortDir === 'desc';
     return '<div class="best__chiprow">' + chips + '</div>' +
-      '<button class="best__dirbtn' + (view.sortKey ? '' : ' best__dirbtn--off') + '" data-bestsortdir="1" type="button">' +
+      '<button class="best__dirbtn' + (view.sortKey && view.sortKey !== 'random' ? '' : ' best__dirbtn--off') + '" data-bestsortdir="1" type="button">' +
       (desc ? 'Decrescente <span class="best__diric">↓</span>' : 'Crescente <span class="best__diric">↑</span>') + '</button>';
   }
 
   function rarityRank(m) { var i = RARITY_ORDER.indexOf(rarityKeyOf(m)); return i < 0 ? 0 : i; }
   function sortItems(items) {
     if (!view.sortKey) return items;
+    if (view.sortKey === 'random') {
+      /* Ordine casuale STABILE: un rank casuale per carta, rigenerato solo
+         cliccando "Casuale" (non a ogni ricerca/filtro). */
+      var ro = view.randomOrder || (view.randomOrder = {});
+      items.forEach(function (m) { if (ro[m.id] == null) ro[m.id] = Math.random(); });
+      return items.slice().sort(function (a, b) { return (ro[a.id] || 0) - (ro[b.id] || 0); });
+    }
     var dir = view.sortDir === 'desc' ? -1 : 1, key = view.sortKey;
     var byName = function (a, b) { return String(a.name || '').localeCompare(String(b.name || ''), 'it', { sensitivity: 'base' }); };
     var arr = items.slice();
@@ -574,7 +581,15 @@
     if (resetBtn) { view.fRarities = []; view.fTypes = []; view.fCrMin = 0; view.fCrMax = BEST_CR_SCALE.length - 1; view.sortKey = ''; view.sortDir = 'asc'; renderLeft(); return; }
 
     var sortBtn = e.target.closest('[data-bestsort]');
-    if (sortBtn) { var _sk = sortBtn.dataset.bestsort; view.sortKey = (view.sortKey === _sk) ? '' : _sk; renderLeft(); return; }
+    if (sortBtn) {
+      var _sk = sortBtn.dataset.bestsort;
+      if (_sk === 'random') {
+        /* Click su "Casuale" = (ri)mescola sempre: nuovo ordine casuale. */
+        view.sortKey = 'random'; view.randomOrder = {};
+        currentList().forEach(function (m) { view.randomOrder[m.id] = Math.random(); });
+      } else { view.sortKey = (view.sortKey === _sk) ? '' : _sk; }
+      renderLeft(); return;
+    }
 
     var sortDirBtn = e.target.closest('[data-bestsortdir]');
     if (sortDirBtn) { if (!view.sortKey) return; view.sortDir = (view.sortDir === 'desc') ? 'asc' : 'desc'; renderLeft(); return; }
