@@ -153,7 +153,7 @@
   }
 
   /* ---- Stato vista (split: lista a sx, anteprima a dx; tab official|custom) ---- */
-  var view = { tab: 'official', curId: null, q: '', fRarities: [], fTypes: [], fCrMin: 0, fCrMax: 33, openFilter: null };
+  var view = { tab: 'official', curId: null, q: '', fRarities: [], fTypes: [], fCrMin: 0, fCrMax: 33, openFilter: null, sortKey: '', sortDir: 'asc' };
 
   /* ---- Caricamento foto mostro (stessa compressione della scheda nemico) ---- */
   var pendingPhotoId = null;
@@ -211,17 +211,21 @@
     h += '<div class="best__bar"><input class="best__search" id="bestSearch" placeholder="Cerca mostro..." value="' + esc(view.q) + '" spellcheck="false">' +
       (isCustom ? '<button class="best__add" data-bestnew="1" type="button" title="Nuovo mostro">＋</button>' : '') + '</div>';
     var crActive = (view.fCrMin > 0 || view.fCrMax < lastIdx) ? 1 : 0;
+    var anyActive = view.fRarities.length || view.fTypes.length || crActive || view.sortKey;
     h += '<div class="best__filters">';
     h += '<div class="best__fbar">' +
       filterToggle('rarity', 'Rarità', view.fRarities.length, false) +
       filterToggle('type', 'Tipo', view.fTypes.length, false) +
       filterToggle('cr', 'Sfida', crActive, true) +
+      filterToggle('sort', 'Ordina', view.sortKey ? 1 : 0, true) +
+      '<button class="best__freset' + (anyActive ? '' : ' best__freset--off') + '" data-bestreset="1" type="button" title="Reimposta filtri e ordinamento">↺</button>' +
       '</div>';
     if (view.openFilter) {
       h += '<div class="best__fpanel">' +
         (view.openFilter === 'rarity' ? rarityPanelHtml()
           : view.openFilter === 'type' ? typePanelHtml()
-            : crPanelHtml()) +
+            : view.openFilter === 'cr' ? crPanelHtml()
+              : sortPanelHtml()) +
         '</div>';
     }
     h += '</div>';
@@ -259,18 +263,50 @@
       '<input type="range" class="best__cr-thumb" min="0" max="' + lastIdx + '" step="1" value="' + view.fCrMax + '" data-bestcr="max"></div>';
   }
 
-  /* Aggiorna badge/stato-attivo dei 3 bottoni-filtro senza ricostruire il pannello. */
+  var SORT_OPTS = [['alpha', 'Alfabetico'], ['type', 'Tipo'], ['cr', 'Sfida (CR)'], ['rarity', 'Rarità']];
+  function sortPanelHtml() {
+    var chips = SORT_OPTS.map(function (o) {
+      return '<button class="best__fchip' + (view.sortKey === o[0] ? ' best__fchip--on' : '') + '" data-bestsort="' + o[0] + '" type="button">' + o[1] + '</button>';
+    }).join('');
+    var desc = view.sortDir === 'desc';
+    return '<div class="best__chiprow">' + chips + '</div>' +
+      '<button class="best__dirbtn' + (view.sortKey ? '' : ' best__dirbtn--off') + '" data-bestsortdir="1" type="button">' +
+      (desc ? 'Decrescente <span class="best__diric">↓</span>' : 'Crescente <span class="best__diric">↑</span>') + '</button>';
+  }
+
+  function rarityRank(m) { var i = RARITY_ORDER.indexOf(rarityKeyOf(m)); return i < 0 ? 0 : i; }
+  function sortItems(items) {
+    if (!view.sortKey) return items;
+    var dir = view.sortDir === 'desc' ? -1 : 1, key = view.sortKey;
+    var byName = function (a, b) { return String(a.name || '').localeCompare(String(b.name || ''), 'it', { sensitivity: 'base' }); };
+    var arr = items.slice();
+    arr.sort(function (a, b) {
+      var r = 0;
+      if (key === 'alpha') r = byName(a, b);
+      else if (key === 'type') r = String(a.type || '').localeCompare(String(b.type || ''), 'it', { sensitivity: 'base' });
+      else if (key === 'cr') r = crNum(a.cr) - crNum(b.cr);
+      else if (key === 'rarity') r = rarityRank(a) - rarityRank(b);
+      if (r === 0) r = byName(a, b);
+      return r * dir;
+    });
+    return arr;
+  }
+
+  /* Aggiorna badge/stato-attivo dei bottoni-filtro senza ricostruire il pannello. */
   function updateFilterChrome() {
     var el = host(); if (!el) return;
     var lastIdx = BEST_CR_SCALE.length - 1;
-    var info = { rarity: view.fRarities.length, type: view.fTypes.length, cr: (view.fCrMin > 0 || view.fCrMax < lastIdx) ? 1 : 0 };
-    ['rarity', 'type', 'cr'].forEach(function (k) {
+    var crA = (view.fCrMin > 0 || view.fCrMax < lastIdx) ? 1 : 0;
+    var info = { rarity: view.fRarities.length, type: view.fTypes.length, cr: crA, sort: view.sortKey ? 1 : 0 };
+    ['rarity', 'type', 'cr', 'sort'].forEach(function (k) {
       var btn = el.querySelector('[data-bestfopen="' + k + '"]'); if (!btn) return;
-      var n = info[k];
+      var n = info[k], dot = (k === 'cr' || k === 'sort');
       btn.classList.toggle('best__ftoggle--active', n > 0);
       var cnt = btn.querySelector('.best__fcount');
-      if (cnt) { cnt.textContent = n ? (k === 'cr' ? '•' : String(n)) : ''; cnt.style.display = n ? '' : 'none'; }
+      if (cnt) { cnt.textContent = n ? (dot ? '•' : String(n)) : ''; cnt.style.display = n ? '' : 'none'; }
     });
+    var reset = el.querySelector('[data-bestreset]');
+    if (reset) reset.classList.toggle('best__freset--off', !(view.fRarities.length || view.fTypes.length || crA || view.sortKey));
   }
 
   /* Aggiorna SOLO le card filtrate (i controlli filtro/ricerca restano intatti,
@@ -297,6 +333,7 @@
       return;
     }
     if (!items.length) { wrap.innerHTML = '<div class="best__empty">Nessun risultato con i filtri attuali.</div>'; return; }
+    items = sortItems(items);
     var ch = '<div class="best__list">';
     items.forEach(function (m) {
       var on = (m.id === view.curId) ? ' best__card--on' : '';
@@ -398,10 +435,19 @@
     var el = host(); if (!el || !el.contains(e.target)) return;
 
     var tabBtn = e.target.closest('[data-besttab]');
-    if (tabBtn) { var _t = tabBtn.dataset.besttab; if (_t !== view.tab) { view.tab = _t; view.curId = null; view.q = ''; view.fRarities = []; view.fTypes = []; view.fCrMin = 0; view.fCrMax = BEST_CR_SCALE.length - 1; view.openFilter = null; render(); } return; }
+    if (tabBtn) { var _t = tabBtn.dataset.besttab; if (_t !== view.tab) { view.tab = _t; view.curId = null; view.q = ''; view.fRarities = []; view.fTypes = []; view.fCrMin = 0; view.fCrMax = BEST_CR_SCALE.length - 1; view.openFilter = null; view.sortKey = ''; view.sortDir = 'asc'; render(); } return; }
 
     var fopenBtn = e.target.closest('[data-bestfopen]');
     if (fopenBtn) { var _fk = fopenBtn.dataset.bestfopen; view.openFilter = (view.openFilter === _fk) ? null : _fk; renderLeft(); return; }
+
+    var resetBtn = e.target.closest('[data-bestreset]');
+    if (resetBtn) { view.fRarities = []; view.fTypes = []; view.fCrMin = 0; view.fCrMax = BEST_CR_SCALE.length - 1; view.sortKey = ''; view.sortDir = 'asc'; renderLeft(); return; }
+
+    var sortBtn = e.target.closest('[data-bestsort]');
+    if (sortBtn) { var _sk = sortBtn.dataset.bestsort; view.sortKey = (view.sortKey === _sk) ? '' : _sk; renderLeft(); return; }
+
+    var sortDirBtn = e.target.closest('[data-bestsortdir]');
+    if (sortDirBtn) { if (!view.sortKey) return; view.sortDir = (view.sortDir === 'desc') ? 'asc' : 'desc'; renderLeft(); return; }
 
     var frarBtn = e.target.closest('[data-bestfrar]');
     if (frarBtn) { var _rk = frarBtn.dataset.bestfrar; var _ri = view.fRarities.indexOf(_rk); if (_ri >= 0) view.fRarities.splice(_ri, 1); else view.fRarities.push(_rk); frarBtn.classList.toggle('best__fchip--on'); fillCards(); updateFilterChrome(); return; }
@@ -554,7 +600,14 @@
     '.best__fcount{flex:0 0 auto;min-width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;border-radius:8px;background:var(--gold);color:#1a1a1a;font-size:.54rem;font-weight:700}' +
     '.best__fcaret{flex:0 0 auto;font-size:.55rem;opacity:.7;transition:transform .15s}' +
     '.best__ftoggle--open .best__fcaret{transform:rotate(180deg)}' +
+    '.best__freset{flex:0 0 auto;width:30px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:1rem;line-height:1;cursor:var(--cur-pointer);transition:all .12s}' +
+    '.best__freset:hover{color:var(--red);border-color:var(--rb)}' +
+    '.best__freset--off{opacity:.35;pointer-events:none}' +
     '.best__fpanel{margin-top:7px;padding:9px;border:1px solid var(--border);border-radius:7px;background:var(--bg)}' +
+    '.best__dirbtn{margin-top:8px;width:100%;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-family:var(--mono);font-size:.62rem;cursor:var(--cur-pointer);transition:all .12s}' +
+    '.best__dirbtn:hover{border-color:var(--gold);color:var(--gold)}' +
+    '.best__dirbtn--off{opacity:.4;pointer-events:none}' +
+    '.best__diric{color:var(--gold);font-weight:700}' +
     '.best__cr-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}' +
     '.best__cr-val{color:var(--gold);font-weight:600;letter-spacing:0;text-transform:none}' +
     '.best__chiprow{display:flex;flex-wrap:wrap;gap:4px}' +
