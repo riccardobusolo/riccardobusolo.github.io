@@ -143,13 +143,17 @@
   function rarityOf(m) { return RARITIES[rarityKeyOf(m)] || RARITIES.common; }
   function rarityVars(m) { var r = rarityOf(m); return '--rare-c1:' + r.c1 + ';--rare-c2:' + r.c2 + ';--glow:' + r.glow + ';--holo:' + r.holo + ';'; }
 
+  /* Tutti i tipi (come nella scheda nemico) e la scala CR per i filtri. */
+  var BEST_TYPES = ['Aberrazione', 'Bestia', 'Celestiale', 'Costrutto', 'Drago', 'Elementale', 'Fata', 'Gigante', 'Immondo', 'Melma', 'Mostruosità', 'Non Morto', 'Pianta', 'Umanoide'];
+  var BEST_CR_SCALE = ['0', '1/8', '1/4', '1/2', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'];
+
   function blankMonster() {
     return { name: 'Nuovo mostro', emoji: '🐾', rarity: 'common', ac: 10, hp: 10, hpCur: 10, hpTemp: 0, init: 0,
              cr: '', xp: '', hpDice: '', str: 10, dex: 10, con: 10, intl: 10, wis: 10, cha: 10 };
   }
 
   /* ---- Stato vista (split: lista a sx, anteprima a dx; tab official|custom) ---- */
-  var view = { tab: 'official', curId: null, q: '', fRarity: '', fType: '' };
+  var view = { tab: 'official', curId: null, q: '', fRarities: [], fTypes: [], fCrMin: 0, fCrMax: 33 };
 
   /* ---- Caricamento foto mostro (stessa compressione della scheda nemico) ---- */
   var pendingPhotoId = null;
@@ -197,50 +201,72 @@
   function renderLeft() { var el = host(); if (!el) return; var left = el.querySelector('.best__left'); if (left) renderLeftInto(left); }
 
   function renderLeftInto(left) {
-    var list = currentList();
     var isCustom = view.tab === 'custom';
-    var q = (view.q || '').toLowerCase();
-    var items = list.filter(function (m) {
-      if (q && (m.name || '').toLowerCase().indexOf(q) < 0 && String(m.type || '').toLowerCase().indexOf(q) < 0) return false;
-      if (view.fRarity && rarityKeyOf(m) !== view.fRarity) return false;
-      if (view.fType && (m.type || '') !== view.fType) return false;
-      return true;
-    });
-    var types = []; list.forEach(function (m) { if (m.type && types.indexOf(m.type) < 0) types.push(m.type); }); types.sort();
+    var lastIdx = BEST_CR_SCALE.length - 1;
+    var lp = (view.fCrMin / lastIdx) * 100, rp = (view.fCrMax / lastIdx) * 100;
     var h = '<div class="best__tabs">' +
       '<button class="best__tab' + (view.tab === 'official' ? ' best__tab--on' : '') + '" data-besttab="official" type="button">Bestiario</button>' +
       '<button class="best__tab' + (isCustom ? ' best__tab--on' : '') + '" data-besttab="custom" type="button">Personalizzati</button>' +
       '</div>';
     h += '<div class="best__bar"><input class="best__search" id="bestSearch" placeholder="Cerca mostro..." value="' + esc(view.q) + '" spellcheck="false">' +
       (isCustom ? '<button class="best__add" data-bestnew="1" type="button" title="Nuovo mostro">＋</button>' : '') + '</div>';
-    h += '<div class="best__filters">' +
-      '<select class="best__filter" data-bestfilter="rarity"><option value="">Tutte le rarità</option>' +
-        RARITY_ORDER.map(function (k) { return '<option value="' + k + '"' + (view.fRarity === k ? ' selected' : '') + '>' + RARITY_NAMES[k] + '</option>'; }).join('') +
-      '</select>' +
-      '<select class="best__filter" data-bestfilter="type"><option value="">Tutti i tipi</option>' +
-        types.map(function (t) { return '<option value="' + esc(t) + '"' + (view.fType === t ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') +
-      '</select></div>';
+    h += '<div class="best__filters">';
+    h += '<div class="best__fgroup"><div class="best__fgroup-lbl">Rarità</div><div class="best__chiprow">' +
+      RARITY_ORDER.map(function (k) {
+        var rr = RARITIES[k];
+        return '<button class="best__fchip' + (view.fRarities.indexOf(k) >= 0 ? ' best__fchip--on' : '') + '" data-bestfrar="' + k + '" style="--c1:' + rr.c1 + ';--c2:' + rr.c2 + '" type="button"><span class="best__rarity-dot"></span>' + RARITY_NAMES[k] + '</button>';
+      }).join('') + '</div></div>';
+    h += '<div class="best__fgroup"><div class="best__fgroup-lbl">Tipo</div><div class="best__chiprow">' +
+      BEST_TYPES.map(function (t) {
+        return '<button class="best__fchip' + (view.fTypes.indexOf(t) >= 0 ? ' best__fchip--on' : '') + '" data-bestftype="' + esc(t) + '" type="button">' + esc(t) + '</button>';
+      }).join('') + '</div></div>';
+    h += '<div class="best__fgroup"><div class="best__fgroup-lbl"><span>Sfida (CR)</span><span class="best__cr-val" id="bestCrVal">' + BEST_CR_SCALE[view.fCrMin] + ' – ' + BEST_CR_SCALE[view.fCrMax] + '</span></div>' +
+      '<div class="best__cr-slider"><div class="best__cr-rail"></div><div class="best__cr-fill" id="bestCrFill" style="left:' + lp + '%;width:' + (rp - lp) + '%"></div>' +
+      '<input type="range" class="best__cr-thumb" min="0" max="' + lastIdx + '" step="1" value="' + view.fCrMin + '" data-bestcr="min">' +
+      '<input type="range" class="best__cr-thumb" min="0" max="' + lastIdx + '" step="1" value="' + view.fCrMax + '" data-bestcr="max"></div></div>';
+    h += '</div>';
+    h += '<div class="best__cards"></div>';
+    left.innerHTML = h;
+    fillCards();
+  }
+
+  /* Aggiorna SOLO le card filtrate (i controlli filtro/ricerca restano intatti,
+     così non si perde il focus né lo stato dello slider/chip). */
+  function fillCards() {
+    var el = host(); var wrap = el && el.querySelector('.best__cards'); if (!wrap) return;
+    var list = currentList();
+    var isCustom = view.tab === 'custom';
+    var q = (view.q || '').toLowerCase();
+    var lastIdx = BEST_CR_SCALE.length - 1;
+    var crActive = view.fCrMin > 0 || view.fCrMax < lastIdx;
+    var minVal = crNum(BEST_CR_SCALE[view.fCrMin]), maxVal = crNum(BEST_CR_SCALE[view.fCrMax]);
+    var items = list.filter(function (m) {
+      if (q && (m.name || '').toLowerCase().indexOf(q) < 0 && String(m.type || '').toLowerCase().indexOf(q) < 0) return false;
+      if (view.fRarities.length && view.fRarities.indexOf(rarityKeyOf(m)) < 0) return false;
+      if (view.fTypes.length && view.fTypes.indexOf(m.type || '') < 0) return false;
+      if (crActive) { var cn = crNum(m.cr); if (cn >= 0 && (cn < minVal || cn > maxVal)) return false; }
+      return true;
+    });
     if (!list.length) {
-      h += '<div class="best__empty">' + (isCustom
+      wrap.innerHTML = '<div class="best__empty">' + (isCustom
         ? 'Nessun mostro personalizzato.<br>Crea con <strong>＋</strong>, oppure salva un Nemico nel bestiario (menu ⋮ → <em>Salva nel bestiario</em>).'
         : 'Bestiario vuoto.') + '</div>';
-    } else if (!items.length) {
-      h += '<div class="best__empty">Nessun risultato con i filtri attuali.</div>';
-    } else {
-      h += '<div class="best__list">';
-      items.forEach(function (m) {
-        var on = (m.id === view.curId) ? ' best__card--on' : '';
-        var typeBadge = m.type ? '<span class="best__corner best__corner--tl">' + esc(m.type) + '</span>' : '';
-        var crBadge = (m.cr != null && m.cr !== '') ? '<span class="best__corner best__corner--tr">' + esc(String(m.cr)) + '</span>' : '';
-        h += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '" draggable="true" style="' + rarityVars(m) + '">' +
-          '<div class="best__photo">' + typeBadge + crBadge + monsterPhotoHtml(m) + '</div>' +
-          '<div class="best__name">' + esc(m.name || '(senza nome)') + '</div>' +
-          '<div class="best__holo"></div><div class="best__shine"></div>' +
-          '</div>';
-      });
-      h += '</div>';
+      return;
     }
-    left.innerHTML = h;
+    if (!items.length) { wrap.innerHTML = '<div class="best__empty">Nessun risultato con i filtri attuali.</div>'; return; }
+    var ch = '<div class="best__list">';
+    items.forEach(function (m) {
+      var on = (m.id === view.curId) ? ' best__card--on' : '';
+      var typeBadge = m.type ? '<span class="best__corner best__corner--tl">' + esc(m.type) + '</span>' : '';
+      var crBadge = (m.cr != null && m.cr !== '') ? '<span class="best__corner best__corner--tr">' + esc(String(m.cr)) + '</span>' : '';
+      ch += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '" draggable="true" style="' + rarityVars(m) + '">' +
+        '<div class="best__photo">' + typeBadge + crBadge + monsterPhotoHtml(m) + '</div>' +
+        '<div class="best__name">' + esc(m.name || '(senza nome)') + '</div>' +
+        '<div class="best__holo"></div><div class="best__shine"></div>' +
+        '</div>';
+    });
+    ch += '</div>';
+    wrap.innerHTML = ch;
   }
 
   function renderRightInto(right) {
@@ -329,7 +355,13 @@
     var el = host(); if (!el || !el.contains(e.target)) return;
 
     var tabBtn = e.target.closest('[data-besttab]');
-    if (tabBtn) { var _t = tabBtn.dataset.besttab; if (_t !== view.tab) { view.tab = _t; view.curId = null; view.q = ''; view.fRarity = ''; view.fType = ''; render(); } return; }
+    if (tabBtn) { var _t = tabBtn.dataset.besttab; if (_t !== view.tab) { view.tab = _t; view.curId = null; view.q = ''; view.fRarities = []; view.fTypes = []; view.fCrMin = 0; view.fCrMax = BEST_CR_SCALE.length - 1; render(); } return; }
+
+    var frarBtn = e.target.closest('[data-bestfrar]');
+    if (frarBtn) { var _rk = frarBtn.dataset.bestfrar; var _ri = view.fRarities.indexOf(_rk); if (_ri >= 0) view.fRarities.splice(_ri, 1); else view.fRarities.push(_rk); frarBtn.classList.toggle('best__fchip--on'); fillCards(); return; }
+
+    var ftypeBtn = e.target.closest('[data-bestftype]');
+    if (ftypeBtn) { var _tk = ftypeBtn.dataset.bestftype; var _ti = view.fTypes.indexOf(_tk); if (_ti >= 0) view.fTypes.splice(_ti, 1); else view.fTypes.push(_tk); ftypeBtn.classList.toggle('best__fchip--on'); fillCards(); return; }
 
     var photoBtn = e.target.closest('[data-bestphoto]');
     if (photoBtn) { e.preventDefault(); e.stopPropagation(); pendingPhotoId = photoBtn.dataset.bestphoto; ensureFileInput(); fileInput.click(); return; }
@@ -376,22 +408,23 @@
     }
   });
 
-  /* Ricerca: filtra la lista mantenendo il focus nel campo. */
+  /* Ricerca + slider CR: aggiornano solo le card (focus/stato preservati). */
   document.addEventListener('input', function (e) {
-    if (!e.target || e.target.id !== 'bestSearch') return;
-    view.q = e.target.value;
-    renderLeft();
-    var s = document.getElementById('bestSearch');
-    if (s) { s.focus(); var v = s.value; try { s.setSelectionRange(v.length, v.length); } catch (_) {} }
-  });
-
-  /* Filtri rarità / tipo. */
-  document.addEventListener('change', function (e) {
-    var f = (e.target && e.target.closest) ? e.target.closest('[data-bestfilter]') : null;
-    if (!f) return;
-    if (f.dataset.bestfilter === 'rarity') view.fRarity = f.value;
-    else if (f.dataset.bestfilter === 'type') view.fType = f.value;
-    renderLeft();
+    var el = host(); if (!el || !e.target || !el.contains(e.target)) return;
+    if (e.target.id === 'bestSearch') { view.q = e.target.value; fillCards(); return; }
+    var cr = e.target.closest ? e.target.closest('[data-bestcr]') : null;
+    if (cr) {
+      var lastIdx = BEST_CR_SCALE.length - 1;
+      var val = parseInt(cr.value, 10); if (isNaN(val)) val = 0;
+      if (cr.dataset.bestcr === 'min') { if (val > view.fCrMax) val = view.fCrMax; cr.value = val; view.fCrMin = val; }
+      else { if (val < view.fCrMin) val = view.fCrMin; cr.value = val; view.fCrMax = val; }
+      var fill = document.getElementById('bestCrFill'), lbl = document.getElementById('bestCrVal');
+      var lp = (view.fCrMin / lastIdx) * 100, rp = (view.fCrMax / lastIdx) * 100;
+      if (fill) { fill.style.left = lp + '%'; fill.style.width = (rp - lp) + '%'; }
+      if (lbl) lbl.textContent = BEST_CR_SCALE[view.fCrMin] + ' – ' + BEST_CR_SCALE[view.fCrMax];
+      fillCards();
+      return;
+    }
   });
 
   /* ---- Effetto figurina: tilt 3D + glare + foil olografico che seguono il
@@ -464,13 +497,27 @@
     '.best__tab--on{background:var(--bg3);color:var(--gold);font-weight:600}' +
     '.best__rarity-ro{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.7rem;color:var(--text);font-weight:600}' +
     '.best__bar{display:flex;flex-direction:row;align-items:center;gap:6px;margin-bottom:7px}' +
-    '.best__filters{display:flex;gap:6px;margin-bottom:8px}' +
-    '.best__filter{flex:1;min-width:0;background-color:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 22px 5px 8px;color:var(--text);font-family:var(--mono);font-size:.64rem;outline:none;cursor:var(--cur-pointer);appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\' fill=\'%23999999\'><path d=\'M4 6l4 4 4-4\'/></svg>");background-repeat:no-repeat;background-position:right 7px center;background-size:11px}' +
-    '.best__filter:focus{border-color:var(--gold)}' +
+    '.best__filters{display:flex;flex-direction:column;gap:7px;margin-bottom:9px}' +
+    '.best__fgroup{display:flex;flex-direction:column;gap:4px}' +
+    '.best__fgroup-lbl{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}' +
+    '.best__cr-val{color:var(--gold);font-weight:600;letter-spacing:0;text-transform:none}' +
+    '.best__chiprow{display:flex;flex-wrap:wrap;gap:4px}' +
+    '.best__fchip{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-family:var(--mono);font-size:.59rem;line-height:1;cursor:var(--cur-pointer);transition:all .12s}' +
+    '.best__fchip:hover{color:var(--text);border-color:var(--bh)}' +
+    '.best__fchip--on{color:#fff;background:var(--bg3);border-color:var(--c1,var(--gold))}' +
+    '.best__rarity-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--c1,#888),var(--c2,#bbb));box-shadow:0 0 4px var(--c1,transparent);flex:0 0 auto}' +
+    '.best__cr-slider{position:relative;height:20px}' +
+    '.best__cr-rail{position:absolute;top:50%;left:0;right:0;height:4px;transform:translateY(-50%);background:var(--border);border-radius:2px}' +
+    '.best__cr-fill{position:absolute;top:50%;height:4px;transform:translateY(-50%);background:var(--gold);border-radius:2px}' +
+    '.best__cr-thumb{position:absolute;top:0;left:0;width:100%;height:20px;margin:0;padding:0;background:transparent;pointer-events:none;-webkit-appearance:none;appearance:none}' +
+    '.best__cr-thumb::-webkit-slider-runnable-track{height:20px;background:transparent;border:none}' +
+    '.best__cr-thumb::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:14px;height:14px;margin-top:3px;border-radius:50%;background:var(--gold);border:2px solid var(--bg2);box-shadow:0 1px 3px rgba(0,0,0,.55);cursor:var(--cur-pointer)}' +
+    '.best__cr-thumb::-moz-range-track{height:20px;background:transparent;border:none}' +
+    '.best__cr-thumb::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid var(--bg2);box-shadow:0 1px 3px rgba(0,0,0,.55);cursor:var(--cur-pointer)}' +
     '.best__search{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:.74rem;outline:none;transition:border-color .12s}' +
     '.best__search:focus{border-color:var(--gold)}' +
-    '.best__add{flex:0 0 auto;width:34px;height:32px;display:flex;align-items:center;justify-content:center;padding:0;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--gold);font-family:var(--mono);font-size:1.1rem;line-height:1;cursor:var(--cur-pointer);transition:all .12s}' +
-    '.best__add:hover{border-color:var(--gold);background:rgba(196,154,50,.08)}' +
+    '.best__add{flex:0 0 auto;align-self:stretch;display:flex;align-items:center;justify-content:center;padding:0 16px;background:rgba(40,140,60,.1);border:1px solid rgba(40,140,60,.25);border-radius:6px;color:#4a9a5a;font-family:var(--mono);font-size:1.05rem;font-weight:600;line-height:1;cursor:var(--cur-pointer);transition:all .15s}' +
+    '.best__add:hover{background:rgba(40,140,60,.2);color:#6fc47f}' +
     '.best__empty{text-align:center;color:var(--muted);font-family:var(--mono);font-size:.72rem;line-height:1.7;padding:26px 12px}' +
     '.best__list{display:grid;grid-template-columns:repeat(auto-fill,132px);gap:8px;align-content:start;justify-content:start}' +
     '.best__corner{position:absolute;top:4px;font-family:var(--mono);font-size:.56rem;font-weight:600;background:rgba(0,0,0,.62);padding:2px 5px;border-radius:5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:2}' +
