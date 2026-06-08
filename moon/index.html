@@ -1312,6 +1312,16 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 .pg__hpbar-info{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:1.15rem}
 .pg__hpbar-nums{display:flex;align-items:baseline;gap:0}
 .pg__hpbar-tmp{font-size:.94rem;color:var(--gold)}
+/* Controllo "genera PF": dado (lancia formula) + parentesi con campo formula,
+   accanto ai PF. Compatto, font mono ridotto rispetto ai numeri PF. */
+.es__hpdice{display:inline-flex;align-items:center;gap:2px;margin-left:8px;font-family:var(--mono);font-size:.8rem;color:var(--muted);white-space:nowrap}
+.es__hpdice-btn{background:transparent;border:none;color:var(--muted);cursor:var(--cur-pointer);padding:0;display:inline-flex;align-items:center;transition:color .12s}
+.es__hpdice-btn:hover{color:var(--gold)}
+.es__hpdice-btn svg{width:15px;height:15px;display:block}
+.es__hpdice-paren{display:inline-flex;align-items:center}
+.es__hpdice-inp{background:transparent;border:none;border-bottom:1px dashed var(--border);color:var(--text);font-family:var(--mono);font-size:.68rem;width:6.5ch;text-align:center;outline:none;padding:1px 2px}
+.es__hpdice-inp:focus{border-bottom-color:var(--gold)}
+.es__hpdice-inp::placeholder{color:var(--dim)}
 .pg__hpbar{position:relative;height:16px;background:var(--bg3);border-radius:5px;overflow:hidden;border:1px solid var(--border);cursor:var(--cur-pointer)}
 .pg__hpbar-fill{position:absolute;left:0;top:0;height:100%;transition:width .15s var(--ease);pointer-events:none;overflow:hidden}.pg__hpbar-fill::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.1) 44%,rgba(255,255,255,.22) 50%,rgba(255,255,255,.1) 56%,transparent 75%);animation:hpShine 3.5s ease-in-out infinite}
 .pg__hpbar-temp{position:absolute;top:0;height:100%;background:#5ba8c8;border-radius:0 5px 5px 0;transition:width .15s var(--ease),left .15s var(--ease);pointer-events:none}
@@ -4272,7 +4282,7 @@ var barCol=hpPct>50?'linear-gradient(90deg,#4a9a5a,#5dbf6f)':hpPct>25?'linear-gr
 h+='<div class="pg__sec"><div class="pg__sec-title">⚔️ Combattimento</div>';
 h+='<div class="pg__combat-top">';
 h+='<div class="pg__shield"><input class="pg__inp--inline" data-ef="ac" type="number" value="'+e.ac+'" style="font-size:1.3rem;font-weight:700;color:var(--gold);width:3ch"><div class="pg__shield-lbl">CA</div></div>';
-h+='<div class="pg__hpblock"><div class="pg__hpbar-info"><span class="pg__hpbar-nums"><span style="color:var(--muted);font-weight:400">💚 </span><input class="pg__inp--inline" data-ef="hpCur" type="number" value="'+hpCur+'" style="font-weight:700;color:var(--text);width:'+Math.max(1,String(hpCur).length)+'ch"><span style="color:var(--muted)"> / </span><input class="pg__inp--inline" data-ef="hp" type="number" value="'+hpMax+'" style="color:var(--dim);width:'+Math.max(1,String(hpMax).length)+'ch"></span><span class="pg__hpbar-tmp"'+(hpTemp>0?'':' style="opacity:.4"')+'>🛡️ <input class="pg__inp--inline" data-ef="hpTemp" type="number" value="'+hpTemp+'" style="color:var(--gold);width:'+Math.max(1,String(hpTemp).length)+'ch"></span></div>';
+h+='<div class="pg__hpblock"><div class="pg__hpbar-info"><span class="pg__hpbar-nums"><span style="color:var(--muted);font-weight:400">💚 </span><input class="pg__inp--inline" data-ef="hpCur" type="number" value="'+hpCur+'" style="font-weight:700;color:var(--text);width:'+Math.max(1,String(hpCur).length)+'ch"><span style="color:var(--muted)"> / </span><input class="pg__inp--inline" data-ef="hp" type="number" value="'+hpMax+'" style="color:var(--dim);width:'+Math.max(1,String(hpMax).length)+'ch">'+'<span class="es__hpdice" title="Genera PF casuali dalla formula: imposta PF max e attuali"><button class="es__hpdice-btn" data-eshprolldice="1" type="button" title="Tira la formula per generare i PF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg></button><span class="es__hpdice-paren">(<input class="es__hpdice-inp" data-ef="hpDice" type="text" value="'+esc(e.hpDice||'')+'" placeholder="8d8+16" spellcheck="false">)</span></span>'+'</span><span class="pg__hpbar-tmp"'+(hpTemp>0?'':' style="opacity:.4"')+'>🛡️ <input class="pg__inp--inline" data-ef="hpTemp" type="number" value="'+hpTemp+'" style="color:var(--gold);width:'+Math.max(1,String(hpTemp).length)+'ch"></span></div>';
 h+='<div class="pg__hpbar" data-hpbar="1" title="Clicca o trascina per impostare i PF attuali"><div class="pg__hpbar-fill" style="width:'+hpPct+'%;background:'+barCol+';border-radius:5px"></div></div>';
 h+='</div></div>';
 /* Action row Danno/Cura/Temp */
@@ -4444,6 +4454,10 @@ if(['hp','hpCur','hpTemp'].indexOf(ef)>=0){var hpMx=esObj.hp||1;var hpCr=esObj.h
    field vuoti che si espandono a riempire lo spazio. */
 if(t.classList&&t.classList.contains('pg__inp')&&t.dataset.ef&&t.closest('.pg__row--id')&&t.type!=='number'){var _fld=t.closest('.pg__field');if(_fld){var _lbl=_fld.querySelector('.pg__lbl');var _lblTxt=_lbl?_lbl.textContent:'';var _lblW=Math.ceil(_lblTxt.length*0.8);var _vw=t.value.length;var _isDd=!!t.closest('[data-esddwrap]');if(!_isDd&&!t.value){_fld.classList.add('pg__field--empty');t.style.width=''}else{_fld.classList.remove('pg__field--empty');t.style.width='calc('+Math.max(_vw,_lblW)+'ch + 10px)'}}}});
 document.getElementById('esheetBody').addEventListener('click',function(e){if(!esObj)return;
+/* Genera PF casuali dalla formula PF (es. "8d8+16"): mostra il tiro sulla barra
+   dadi della scheda e imposta i PF massimi + attuali. */
+var hpRollBtn=e.target.closest('[data-eshprolldice]');
+if(hpRollBtn){var _f=(esObj.hpDice||'').trim();if(!_f){var _hi=document.querySelector('#esheetBody input[data-ef="hpDice"]');if(_hi)_hi.focus();return}var _tk=(typeof window.cm_parseDmgFormula==='function')?window.cm_parseDmgFormula(_f):null;if(!_tk){esLastRoll={cls:'pg__roll-row--fail',html:'<span class="cm-roll-prefix">❤️ <strong>PF</strong>: ⚠ formula non valida (<code>'+esc(_f)+'</code>)</span>'};openEsheet(enemies.indexOf(esObj));return}var _ev=window.cm_evalDmgTokens(_tk,1,function(s){return 1+Math.floor(Math.random()*s)},0);var _tot=Math.max(1,_ev.total);esObj.hp=_tot;esObj.hpCur=_tot;esLastRoll={cls:'pg__roll-row--hit',html:'<span class="cm-roll-prefix">❤️ <strong>PF</strong> = </span><strong style="color:var(--gold)">'+_tot+'</strong><span class="cm-roll-prefix"> ('+_ev.display+')</span>'};sE();renE();openEsheet(enemies.indexOf(esObj));return}
 /* Toggle Vantaggio/Svantaggio per il prossimo tiro. Update inline
    delle classi sui bottoni (no full re-render). */
 var advBtn=e.target.closest('[data-esadv]');
