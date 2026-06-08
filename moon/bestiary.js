@@ -396,6 +396,13 @@
     h += '<div class="best__pv-id">' + pvPhoto + '<div>' +
       '<div class="best__pv-name">' + esc(m.name || '(senza nome)') + '</div>' +
       '<div class="best__pv-sub">' + esc(m.size || '') + (m.size && m.type ? ' ' : '') + esc(m.type || '') + (m.alignment ? ', ' + esc(m.alignment) : '') + '</div></div></div>';
+    h += '<div class="best__pv-actions">' +
+      '<button class="best__btn best__btn--add" data-bestadd="' + esc(m.id) + '" type="button">➕ Aggiungi ai Nemici</button>' +
+      (_ro
+        ? '<button class="best__btn" data-bestdup="' + esc(m.id) + '" type="button">⧉ Duplica in personalizzati</button>'
+        : '<button class="best__btn" data-bestedit="' + esc(m.id) + '" type="button">✏️ Modifica</button>' +
+          '<button class="best__btn best__btn--del" data-bestdel="' + esc(m.id) + '" type="button">🗑 Elimina</button>') +
+      '</div>';
     h += '<div class="best__pv-stats">' +
       '<span>🛡️ <strong>' + esc(m.ac != null ? m.ac : '—') + '</strong> CA</span>' +
       '<span>❤️ <strong>' + esc(m.hp != null ? m.hp : '—') + '</strong> PF' + (m.hpDice ? ' (' + esc(m.hpDice) + ')' : '') + '</span>' +
@@ -420,12 +427,6 @@
     h += secList('✨ Tratti', 'traits') + secList('⚔️ Azioni', 'actions') + secList('🎯 Azioni bonus', 'bonusActions') +
       secList('⚡ Reazioni', 'reactions') + secList('👑 Azioni leggendarie', 'legendaryActions') + secList('💰 Drop', 'drop');
     if (m.notes) h += '<div class="best__pv-sec"><div class="best__pv-sectitle">📝 Note</div><div class="best__pv-notes">' + esc(m.notes) + '</div></div>';
-    h += '<div class="best__pv-actions">' +
-      '<button class="best__btn best__btn--add" data-bestadd="' + esc(m.id) + '" type="button">➕ Aggiungi ai Nemici</button>' +
-      (_ro ? '' :
-        '<button class="best__btn" data-bestedit="' + esc(m.id) + '" type="button">✏️ Modifica</button>' +
-        '<button class="best__btn best__btn--del" data-bestdel="' + esc(m.id) + '" type="button">🗑 Elimina</button>') +
-      '</div>';
     h += '</div>';
     right.innerHTML = h;
   }
@@ -477,6 +478,16 @@
     if (addB) {
       var ma = getById(addB.dataset.bestadd);
       if (ma && window.cmAddEnemyFromMonster) window.cmAddEnemyFromMonster(ma);
+      return;
+    }
+
+    var dupB = e.target.closest('[data-bestdup]');
+    if (dupB) {
+      var src = getById(dupB.dataset.bestdup);
+      if (src) {
+        var nid = window.cmBestiary.upsert(src); // clona con nuovo id nei personalizzati
+        view.tab = 'custom'; view.curId = nid; view.q = ''; view.openFilter = null; render();
+      }
       return;
     }
 
@@ -676,8 +687,8 @@
     '.best__pv-item{padding:3px 0}' +
     '.best__pv-iname{font-family:var(--mono);font-size:.72rem;color:var(--text);font-weight:600}' +
     '.best__pv-idesc,.best__pv-notes{font-family:var(--mono);font-size:.68rem;color:var(--dim);line-height:1.45;white-space:pre-wrap;word-break:break-word}' +
-    '.best__pv-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;border-top:1px solid var(--border);padding-top:10px}' +
-    '.best__btn{flex:1;min-width:110px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:.72rem;cursor:var(--cur-pointer);transition:all .12s}' +
+    '.best__pv-actions{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 11px;border-bottom:1px solid var(--border);padding-bottom:11px}' +
+    '.best__btn{flex:1;min-width:100px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--text);font-family:var(--mono);font-size:.7rem;line-height:1.25;cursor:var(--cur-pointer);transition:all .12s}' +
     '.best__btn:hover{border-color:var(--gold);color:var(--gold)}' +
     '.best__btn--add{border-color:rgba(196,154,50,.4);color:var(--gold)}' +
     '.best__btn--add:hover{background:rgba(196,154,50,.1)}' +
