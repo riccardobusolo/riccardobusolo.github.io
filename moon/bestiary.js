@@ -240,7 +240,7 @@
     var open = view.openFilter === key, active = count > 0;
     return '<button class="best__ftoggle' + (open ? ' best__ftoggle--open' : '') + (active ? ' best__ftoggle--active' : '') + '" data-bestfopen="' + key + '" type="button">' +
       '<span class="best__ftoggle-lbl">' + label + '</span>' +
-      '<span class="best__fcount" data-fbadge="' + key + '"' + (active ? '' : ' style="display:none"') + '>' + (active ? (dot ? '•' : count) : '') + '</span>' +
+      '<span class="best__fcount' + (dot ? ' best__fcount--dot' : '') + '" data-fbadge="' + key + '"' + (active ? '' : ' style="display:none"') + '>' + (active && !dot ? count : '') + '</span>' +
       '<span class="best__fcaret">▾</span></button>';
   }
   function rarityPanelHtml() {
@@ -303,7 +303,7 @@
       var n = info[k], dot = (k === 'cr' || k === 'sort');
       btn.classList.toggle('best__ftoggle--active', n > 0);
       var cnt = btn.querySelector('.best__fcount');
-      if (cnt) { cnt.textContent = n ? (dot ? '•' : String(n)) : ''; cnt.style.display = n ? '' : 'none'; }
+      if (cnt) { cnt.textContent = (n && !dot) ? String(n) : ''; cnt.style.display = n ? '' : 'none'; }
     });
     var reset = el.querySelector('[data-bestreset]');
     if (reset) reset.classList.toggle('best__freset--off', !(view.fRarities.length || view.fTypes.length || crA || view.sortKey));
@@ -597,7 +597,8 @@
     '.best__ftoggle--active{color:var(--gold);border-color:rgba(196,154,50,.4)}' +
     '.best__ftoggle--open{color:var(--text);background:var(--bg3);border-color:var(--gold)}' +
     '.best__ftoggle-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-    '.best__fcount{flex:0 0 auto;min-width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;border-radius:8px;background:var(--gold);color:#1a1a1a;font-size:.54rem;font-weight:700}' +
+    '.best__fcount{flex:0 0 auto;box-sizing:border-box;min-width:12px;height:12px;display:inline-flex;align-items:center;justify-content:center;padding:0 2px;border-radius:6px;background:var(--gold);color:#1a1a1a;font-size:.46rem;font-weight:700;line-height:1;text-align:center}' +
+    '.best__fcount--dot{min-width:0;width:7px;height:7px;padding:0;border-radius:50%}' +
     '.best__fcaret{flex:0 0 auto;font-size:.55rem;opacity:.7;transition:transform .15s}' +
     '.best__ftoggle--open .best__fcaret{transform:rotate(180deg)}' +
     '.best__freset{flex:0 0 auto;width:30px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:1rem;line-height:1;cursor:var(--cur-pointer);transition:all .12s}' +
