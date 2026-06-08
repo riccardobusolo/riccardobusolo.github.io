@@ -199,6 +199,7 @@
   }
   /* Aggiorna solo la colonna sinistra (per non perdere il focus dalla ricerca). */
   function renderLeft() { var el = host(); if (!el) return; var left = el.querySelector('.best__left'); if (left) renderLeftInto(left); }
+  function renderRight() { var el = host(); if (!el) return; var right = el.querySelector('.best__right'); if (right) renderRightInto(right); }
 
   function renderLeftInto(left) {
     var isCustom = view.tab === 'custom';
@@ -349,6 +350,32 @@
     wrap.innerHTML = ch;
   }
 
+  /* ---- Configuratore attacco (anteprima): righe danno {f,t} + bonus colpire.
+     Sola lettura per i mostri ufficiali, editabile per i personalizzati. ---- */
+  var BEST_TRASH = '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
+  function bestItemDmgs(it) { if (it && Array.isArray(it.atkDmgs)) return it.atkDmgs; if (it && it.atkDmg != null && String(it.atkDmg).trim()) return [{ f: String(it.atkDmg), t: '' }]; return []; }
+  function bestEnsureDmgs(it) { if (!Array.isArray(it.atkDmgs)) { it.atkDmgs = (it.atkDmg != null && String(it.atkDmg).trim()) ? [{ f: String(it.atkDmg), t: '' }] : []; if ('atkDmg' in it) delete it.atkDmg; } return it.atkDmgs; }
+  function bestHasAtk(it) { if (!it || typeof it !== 'object') return false; if (it.atkHit && String(it.atkHit).trim()) return true; var d = bestItemDmgs(it); for (var i = 0; i < d.length; i++) if (d[i] && d[i].f && String(d[i].f).trim()) return true; return false; }
+  function bestHasAtkCfg(it) { return !!(it && typeof it === 'object' && (it.atkHit != null || Array.isArray(it.atkDmgs) || (it.atkDmg != null && String(it.atkDmg).trim()))); }
+  function bestAtkConfigHTML(o, key, i, ro) {
+    var atkable = (key === 'actions' || key === 'bonusActions' || key === 'legendaryActions' || key === 'reactions');
+    if (ro) {
+      if (!bestHasAtk(o)) return '';
+      var hh = (o.atkHit && String(o.atkHit).trim()) ? '<span class="best__atk-chip">🎯 ' + esc(String(o.atkHit).trim()) + ' al colpire</span>' : '';
+      var dd = bestItemDmgs(o).filter(function (d) { return d && d.f && String(d.f).trim(); }).map(function (d) { return '<span class="best__atk-chip">⚔️ ' + esc(String(d.f).trim()) + (d.t && String(d.t).trim() ? ' <em>' + esc(String(d.t).trim()) + '</em>' : '') + '</span>'; }).join('');
+      if (!hh && !dd) return '';
+      return '<div class="best__atk best__atk--ro">' + hh + dd + '</div>';
+    }
+    if (bestHasAtkCfg(o)) {
+      var rows = bestItemDmgs(o).map(function (d, j) {
+        return '<div class="best__atk-drow"><span class="best__atk-ico">⚔️</span><input class="best__atk-in best__atk-in--f" data-bestdmg="' + key + '-' + i + '-' + j + '" data-bestdmgf="f" value="' + esc(d.f || '') + '" placeholder="1d8+3" title="Formula danni"><input class="best__atk-in best__atk-in--t" data-bestdmg="' + key + '-' + i + '-' + j + '" data-bestdmgf="t" value="' + esc(d.t || '') + '" placeholder="tipo (es. fulmine)" title="Tipo di danno"><button class="best__atk-del" data-bestdmgdel="' + key + '-' + i + '-' + j + '" type="button" title="Rimuovi danno">' + BEST_TRASH + '</button></div>';
+      }).join('');
+      return '<div class="best__atk best__atk--edit"><div class="best__atk-hrow"><span class="best__atk-ico">🎯</span><input class="best__atk-in best__atk-in--hit" data-bestatkhit="' + key + '-' + i + '" value="' + esc(o.atkHit != null ? String(o.atkHit) : '') + '" placeholder="+5" title="Bonus al tiro per colpire"><button class="best__atk-dadd" data-bestdmgadd="' + key + '-' + i + '" type="button" title="Aggiungi un tipo di danno">+ danno</button></div>' + rows + '</div>';
+    }
+    if (atkable) return '<button class="best__atk-init" data-bestatkinit="' + key + '-' + i + '" type="button">⚔️ Aggiungi attacco</button>';
+    return '';
+  }
+
   function renderRightInto(right) {
     var m = getById(view.curId);
     if (!m) {
@@ -363,10 +390,11 @@
 
     function secList(title, key) {
       var arr = m[key] || []; if (!arr.length) return '';
-      var rows = arr.map(function (it) {
+      var rows = arr.map(function (it, i) {
         var o = (typeof it === 'string') ? { name: it, desc: '' } : (it || {});
         return '<div class="best__pv-item"><div class="best__pv-iname">' + esc(o.name || '') + '</div>' +
-          (o.desc ? '<div class="best__pv-idesc">' + esc(o.desc) + '</div>' : '') + '</div>';
+          (o.desc ? '<div class="best__pv-idesc">' + esc(o.desc) + '</div>' : '') +
+          bestAtkConfigHTML(o, key, i, _ro) + '</div>';
       }).join('');
       return '<div class="best__pv-sec"><div class="best__pv-sectitle">' + title + '</div>' + rows + '</div>';
     }
@@ -462,6 +490,16 @@
     var rarBtn = e.target.closest('[data-bestrarity]');
     if (rarBtn) { var rm = getById(view.curId); if (rm && !isOfficialId(rm.id)) { rm.rarity = rarBtn.dataset.bestrarity; persist(); render(); } return; }
 
+    /* Configuratore attacco (solo personalizzati): init / aggiungi danno / rimuovi danno. */
+    var atkInit = e.target.closest('[data-bestatkinit]');
+    if (atkInit) { var mi = getById(view.curId); if (!mi || isOfficialId(mi.id)) return; var ip = atkInit.dataset.bestatkinit.split('-'); var ik = ip[0], ii = parseInt(ip[1]); if (typeof mi[ik][ii] === 'string') mi[ik][ii] = { name: mi[ik][ii], desc: '' }; var iit = mi[ik][ii]; if (iit && typeof iit === 'object') { if (iit.atkHit == null) iit.atkHit = ''; bestEnsureDmgs(iit); if (!iit.atkDmgs.length) iit.atkDmgs.push({ f: '', t: '' }); persist(); renderRight(); var fi = host().querySelector('input[data-bestdmg="' + ik + '-' + ii + '-0"][data-bestdmgf="f"]'); if (fi) fi.focus(); } return; }
+
+    var dmgAddB = e.target.closest('[data-bestdmgadd]');
+    if (dmgAddB) { var ma = getById(view.curId); if (!ma || isOfficialId(ma.id)) return; var ap = dmgAddB.dataset.bestdmgadd.split('-'); var ak = ap[0], ai = parseInt(ap[1]); var ait = ma[ak] && ma[ak][ai]; if (ait && typeof ait === 'object') { bestEnsureDmgs(ait).push({ f: '', t: '' }); persist(); renderRight(); var nf = host().querySelector('input[data-bestdmg="' + ak + '-' + ai + '-' + (ait.atkDmgs.length - 1) + '"][data-bestdmgf="f"]'); if (nf) nf.focus(); } return; }
+
+    var dmgDelB = e.target.closest('[data-bestdmgdel]');
+    if (dmgDelB) { var mz = getById(view.curId); if (!mz || isOfficialId(mz.id)) return; var zp = dmgDelB.dataset.bestdmgdel.split('-'); var zk = zp[0], zi = parseInt(zp[1]), zj = parseInt(zp[2]); var zit = mz[zk] && mz[zk][zi]; if (zit && typeof zit === 'object') { var zarr = bestEnsureDmgs(zit); if (zarr[zj] != null) zarr.splice(zj, 1); persist(); renderRight(); } return; }
+
     var openC = e.target.closest('[data-bestopen]');
     if (openC) { view.curId = openC.dataset.bestopen; render(); return; }
 
@@ -515,6 +553,10 @@
   document.addEventListener('input', function (e) {
     var el = host(); if (!el || !e.target || !el.contains(e.target)) return;
     if (e.target.id === 'bestSearch') { view.q = e.target.value; fillCards(); return; }
+    /* Configuratore attacco (solo personalizzati): salva senza re-render per non perdere il focus. */
+    var t = e.target;
+    if (t.dataset && t.dataset.bestatkhit !== undefined) { var mh = getById(view.curId); if (!mh || isOfficialId(mh.id)) return; var hp = t.dataset.bestatkhit.split('-'); var hit = mh[hp[0]] && mh[hp[0]][parseInt(hp[1])]; if (hit && typeof hit === 'object') { hit.atkHit = t.value; persist(); } return; }
+    if (t.dataset && t.dataset.bestdmg !== undefined) { var md = getById(view.curId); if (!md || isOfficialId(md.id)) return; var dp = t.dataset.bestdmg.split('-'); var dit = md[dp[0]] && md[dp[0]][parseInt(dp[1])]; if (dit && typeof dit === 'object') { var arr = bestEnsureDmgs(dit); var dj = parseInt(dp[2]); while (arr.length <= dj) arr.push({ f: '', t: '' }); arr[dj][t.dataset.bestdmgf] = t.value; persist(); } return; }
     var cr = e.target.closest ? e.target.closest('[data-bestcr]') : null;
     if (cr) {
       var lastIdx = BEST_CR_SCALE.length - 1;
@@ -687,6 +729,24 @@
     '.best__pv-item{padding:3px 0}' +
     '.best__pv-iname{font-family:var(--mono);font-size:.72rem;color:var(--text);font-weight:600}' +
     '.best__pv-idesc,.best__pv-notes{font-family:var(--mono);font-size:.68rem;color:var(--dim);line-height:1.45;white-space:pre-wrap;word-break:break-word}' +
+    '.best__atk{margin-top:5px;display:flex;flex-direction:column;gap:5px;padding:6px 7px;border:1px solid var(--border);border-radius:6px;background:var(--bg)}' +
+    '.best__atk--ro{flex-direction:row;flex-wrap:wrap;gap:6px;align-items:center}' +
+    '.best__atk-chip{font-family:var(--mono);font-size:.64rem;color:var(--text);background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:2px 7px}' +
+    '.best__atk-chip em{color:var(--gold);font-style:normal}' +
+    '.best__atk-ico{font-size:.78rem;line-height:1;flex:0 0 auto}' +
+    '.best__atk-hrow,.best__atk-drow{display:flex;align-items:center;gap:5px}' +
+    '.best__atk-in{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:3px 6px;color:var(--text);font-family:var(--mono);font-size:.66rem;outline:none;min-width:0;transition:border-color .12s}' +
+    '.best__atk-in:focus{border-color:var(--gold)}' +
+    '.best__atk-in--hit{width:46px;flex:0 0 auto}' +
+    '.best__atk-in--f{width:74px;flex:0 0 auto}' +
+    '.best__atk-in--t{flex:1 1 auto}' +
+    '.best__atk-dadd{margin-left:auto;flex:0 0 auto;white-space:nowrap;background:transparent;border:1px dashed rgba(196,154,50,.4);border-radius:5px;padding:2px 8px;color:var(--gold);font-family:var(--mono);font-size:.58rem;cursor:var(--cur-pointer);transition:all .12s}' +
+    '.best__atk-dadd:hover{background:rgba(196,154,50,.1);border-color:var(--gold)}' +
+    '.best__atk-del{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:22px;height:22px;background:transparent;border:none;color:var(--muted);cursor:var(--cur-pointer);padding:0;border-radius:4px;transition:all .12s}' +
+    '.best__atk-del:hover{color:var(--red);background:var(--rl)}' +
+    '.best__atk-del svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}' +
+    '.best__atk-init{margin-top:5px;background:transparent;border:1px dashed var(--border);border-radius:5px;padding:3px 9px;color:var(--muted);font-family:var(--mono);font-size:.6rem;cursor:var(--cur-pointer);transition:all .12s}' +
+    '.best__atk-init:hover{border-color:var(--gold);color:var(--gold)}' +
     '.best__pv-actions{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 11px;border-bottom:1px solid var(--border);padding-bottom:11px}' +
     '.best__btn{flex:1;min-width:100px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--text);font-family:var(--mono);font-size:.7rem;line-height:1.25;cursor:var(--cur-pointer);transition:all .12s}' +
     '.best__btn:hover{border-color:var(--gold);color:var(--gold)}' +
