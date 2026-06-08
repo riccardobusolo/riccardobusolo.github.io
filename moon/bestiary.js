@@ -868,7 +868,8 @@
     '#winBestiary{min-width:520px}' +
     '.win__half.best-drop-over{outline:2px dashed var(--gold);outline-offset:-4px;background:rgba(196,154,50,.07);border-radius:8px}' +
     '#bestiaryBody{padding:0;display:flex;flex-direction:row;align-items:stretch;overflow:hidden}' +
-    '.best__left{flex:1 1 0;display:flex;flex-direction:column;min-width:0;overflow:hidden auto;scrollbar-width:thin;padding:8px;border-right:1px solid var(--border)}' +
+    '.best__left{flex:1 1 0;display:flex;flex-direction:column;min-width:0;overflow:hidden auto;scrollbar-width:none;-ms-overflow-style:none;padding:8px;border-right:1px solid var(--border)}' +
+    '.best__left::-webkit-scrollbar{width:0;height:0;display:none}' +
     '.best__right{flex:1 1 0;min-width:0;overflow:hidden auto;scrollbar-width:thin;padding:10px 12px}' +
     '.best__placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.74rem;line-height:1.6;padding:20px}' +
     '.best__placeholder-ico{font-size:2rem;opacity:.45}' +
