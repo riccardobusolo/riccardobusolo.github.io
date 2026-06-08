@@ -20,7 +20,73 @@
 
   function load() { try { return JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { return []; } }
   function persist() { localStorage.setItem(KEY, JSON.stringify(data)); }
+
+  /* ----------------------------------------------------------------------------
+     PRESET — mostri di partenza. Tutti i campi sono mappati 1:1 sullo schema
+     della scheda nemico (enemy-shaped) così il trasferimento "Aggiungi ai
+     Nemici" non perde nulla. I tiri salvezza/abilità sono override solo dove il
+     valore differisce dal modificatore di caratteristica; gli XP derivano dalla
+     CR. La lore va in `notes`, il tesoro in `drop`.
+     ------------------------------------------------------------------------- */
+  var AARAKOCRA_LORE = 'Gli aarakocra sono esseri simili ad uccelli che solcano i cieli di innumerevoli mondi e le infinite distese del Piano Elementale dell\'Aria. Spesso ricordano gli uccelli comuni delle regioni in cui vivono: alcuni assomigliano a falchi o condor, mentre altri ricordano colibrì o archeotteri.\n\nIn molte terre, gli aarakocra narrano le gesta dei loro antichi eroi che combatterono la malvagia Regina del Caos Alato insieme ai misteriosi Duchi del Vento di Aaqa.';
+  var PRESETS = [
+    {
+      id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅',
+      type: 'Elementale', size: 'Media', alignment: 'Neutrale',
+      ac: 16, hp: 66, hpCur: 66, hpTemp: 0, hpDice: '12d8+12', init: 3,
+      speed: '6 m, Volare 15 m', cr: '4', xp: '',
+      str: 10, dex: 16, con: 12, intl: 13, wis: 17, cha: 12,
+      savesOverride: { str: '', dex: '5', con: '', intl: '', wis: '5', cha: '' },
+      skillOverrides: { arcano: '3', natura: '5', percezione: '7' },
+      passivePerception: 17, senses: [],
+      languages: ['Aarakocra', 'Primordiale (Auran)'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'aarakocra effettua due attacchi con il Bastone del Vento e può utilizzare Incantare per lanciare Raffica di Vento.' },
+        { name: 'Bastone del Vento', desc: 'Attacco con arma da mischia o a distanza: +5 a colpire.\nPortata 1,5 m oppure gittata 36/72 m.\nColpito: 7 (1d8 + 3) danni contundenti più 11 (2d10) danni da fulmine.' },
+        { name: 'Incantare', desc: 'L\'aarakocra lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 13 per i tiri salvezza).\n\nA volontà: Controllo Elementale (Elementalism), Raffica di Vento (Gust of Wind), Mano Magica (Mage Hand), Messaggio (Message).\n\n1 volta al giorno: Fulmine (Lightning Bolt).' }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Caduta Piumata (1/Giorno)', desc: 'In risposta al normale innesco dell\'incantesimo, l\'aarakocra lancia Caduta Morbida (Feather Fall) usando la stessa caratteristica da incantatore di Incantare.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Tesoro', desc: 'Oggetti personali, equipaggiamento individuale.' }],
+      notes: 'Guardiani Alati del Cielo\n\nHabitat: Montagne, Piani (Piano Elementale dell\'Aria)\n\nGli aeromanti aarakocra controllano venti magici provenienti dalle tempeste infinite del Piano Elementale dell\'Aria.\n\n' + AARAKOCRA_LORE
+    },
+    {
+      id: 'preset_aarakocra_schermagliatore', name: 'Aarakocra Schermagliatore', emoji: '🪶',
+      type: 'Elementale', size: 'Media', alignment: 'Neutrale',
+      ac: 12, hp: 11, hpCur: 11, hpTemp: 0, hpDice: '2d8+2', init: 2,
+      speed: '6 m, Volare 15 m', cr: '1/4', xp: '',
+      str: 10, dex: 14, con: 12, intl: 11, wis: 12, cha: 11,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '5' },
+      passivePerception: 15, senses: [],
+      languages: ['Aarakocra', 'Primordiale (Auran)'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Artigli', desc: 'Attacco in mischia: +4 a colpire, portata 1,5 m.\nColpito: 4 (1d4 + 2) danni taglienti.\nSe l\'aarakocra ha volato per almeno 9 metri in linea retta verso il bersaglio immediatamente prima dell\'attacco, infligge invece 9 (3d4 + 2) danni taglienti.' },
+        { name: 'Giavellotto del Vento', desc: 'Attacco in mischia o a distanza: +4 a colpire.\nPortata 1,5 m oppure gittata 9/36 m.\nColpito: 5 (1d6 + 2) danni perforanti più 2 (1d4) danni da tuono.\nColpisca o manchi il bersaglio, dopo un attacco a distanza il giavellotto ritorna magicamente nella mano dell\'aarakocra immediatamente dopo il lancio.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Tesoro', desc: 'Oggetti personali, equipaggiamento individuale.' }],
+      notes: 'Guardiani Alati del Cielo\n\nHabitat: Montagne, Piani (Piano Elementale dell\'Aria)\n\nGli schermagliatori aarakocra sono esperti nel combattere i nemici in volo tra le nuvole. Spesso attaccano le minacce terrestri con rapide picchiate provenienti dall\'alto.\n\n' + AARAKOCRA_LORE
+    }
+  ];
+
   var data = load();
+  /* Seeding una-tantum dei preset: aggiunge i mostri di partenza una sola volta
+     (un flag impedisce che ricompaiano se l'utente li elimina). */
+  if (localStorage.getItem('cm_bestiary_seeded') !== '1') {
+    PRESETS.forEach(function (p) {
+      if (!data.some(function (x) { return x.id === p.id; })) data.push(JSON.parse(JSON.stringify(p)));
+    });
+    persist();
+    localStorage.setItem('cm_bestiary_seeded', '1');
+  }
 
   function genId() { return 'm_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -117,6 +183,25 @@
       return '<div class="best__pv-sec"><div class="best__pv-sectitle">' + title + '</div>' + rows + '</div>';
     }
 
+    var xpVal = (m.xp != null && m.xp !== '') ? m.xp : (window.cmXpForCr ? window.cmXpForCr(m.cr) : null);
+    /* Righe meta: tiri salvezza/abilità (solo dove c'è override), sensi +
+       percezione passiva, lingue, difese. */
+    var SAVE_L = { str: 'FOR', dex: 'DES', con: 'COS', intl: 'INT', wis: 'SAG', cha: 'CAR' };
+    var SKILL_N = { atletica: 'Atletica', acrobazia: 'Acrobazia', furtivita: 'Furtività', rapidita: 'Rapidità di Mano', arcano: 'Arcano', indagare: 'Indagare', natura: 'Natura', religione: 'Religione', storia: 'Storia', animali: 'Addest. Animali', intuizione: 'Intuizione', medicina: 'Medicina', percezione: 'Percezione', sopravvivenza: 'Sopravvivenza', inganno: 'Inganno', intimidire: 'Intimidire', intrattenere: 'Intrattenere', persuasione: 'Persuasione' };
+    function metaLine(label, val) { return val ? '<div class="best__pv-line"><span class="best__pv-llabel">' + label + '</span> ' + esc(val) + '</div>' : ''; }
+    var so = m.savesOverride || {};
+    var savesTxt = Object.keys(SAVE_L).filter(function (k) { return so[k] != null && so[k] !== ''; }).map(function (k) { return SAVE_L[k] + ' ' + fmtMod(parseInt(so[k], 10) || 0); }).join(', ');
+    var sko = m.skillOverrides || {};
+    var skillsTxt = Object.keys(sko).filter(function (k) { return sko[k] != null && sko[k] !== ''; }).map(function (k) { return (SKILL_N[k] || k) + ' ' + fmtMod(parseInt(sko[k], 10) || 0); }).join(', ');
+    var sensesTxt = (m.senses || []).map(function (s) { return ((s.type || '') + (s.value ? ' ' + s.value + ' ' + (s.unit || 'm') : '')).trim(); }).filter(Boolean).join(', ');
+    var ppVal = (m.passivePerception != null && m.passivePerception !== '') ? m.passivePerception : (10 + abMod(m.wis != null ? m.wis : 10));
+    var sensesFull = (sensesTxt ? sensesTxt + ', ' : '') + 'Percezione passiva ' + ppVal;
+    var metaH = metaLine('Tiri salvezza', savesTxt) + metaLine('Abilità', skillsTxt) + metaLine('Sensi', sensesFull) +
+      metaLine('Lingue', (m.languages || []).join(', ')) +
+      metaLine('Resistenze', (m.dmgResist || []).join(', ')) + metaLine('Immunità ai danni', (m.dmgImmune || []).join(', ')) +
+      metaLine('Vulnerabilità', (m.dmgVulner || []).join(', ')) + metaLine('Immunità a condizioni', (m.condImmune || []).join(', '));
+    if (metaH) metaH = '<div class="best__pv-meta">' + metaH + '</div>';
+
     var h = '<div class="best__pv">';
     h += '<div class="best__pv-id"><span class="best__pv-emoji">' + esc(m.emoji || '🐾') + '</span><div>' +
       '<div class="best__pv-name">' + esc(m.name || '(senza nome)') + '</div>' +
@@ -125,11 +210,11 @@
       '<span>🛡️ <strong>' + esc(m.ac != null ? m.ac : '—') + '</strong> CA</span>' +
       '<span>❤️ <strong>' + esc(m.hp != null ? m.hp : '—') + '</strong> PF' + (m.hpDice ? ' (' + esc(m.hpDice) + ')' : '') + '</span>' +
       ((m.cr != null && m.cr !== '') ? '<span>CR <strong>' + esc(String(m.cr)) + '</strong></span>' : '') +
-      ((m.xp != null && m.xp !== '') ? '<span><strong>' + esc(m.xp) + '</strong> XP</span>' : '') +
+      ((xpVal != null && xpVal !== '') ? '<span><strong>' + esc(xpVal) + '</strong> XP</span>' : '') +
       (m.speed ? '<span>🦶 ' + esc(m.speed) + '</span>' : '') +
       '<span>⚡ <strong>' + fmtMod(m.init || 0) + '</strong> Iniz.</span>' +
       '</div>';
-    h += '<div class="best__pv-abs">' + abH + '</div>';
+    h += '<div class="best__pv-abs">' + abH + '</div>' + metaH;
     h += secList('✨ Tratti', 'traits') + secList('⚔️ Azioni', 'actions') + secList('🎯 Azioni bonus', 'bonusActions') +
       secList('⚡ Reazioni', 'reactions') + secList('👑 Azioni leggendarie', 'legendaryActions') + secList('💰 Drop', 'drop');
     if (m.notes) h += '<div class="best__pv-sec"><div class="best__pv-sectitle">📝 Note</div><div class="best__pv-notes">' + esc(m.notes) + '</div></div>';
@@ -228,6 +313,9 @@
     '.best__pv-stats{display:flex;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:.74rem;color:var(--text);padding:7px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}' +
     '.best__pv-stats strong{color:var(--gold)}' +
     '.best__pv-abs{display:flex;gap:5px}' +
+    '.best__pv-meta{display:flex;flex-direction:column;gap:3px;padding:6px 0;border-bottom:1px solid var(--border)}' +
+    '.best__pv-line{font-family:var(--mono);font-size:.7rem;color:var(--text);line-height:1.45;word-break:break-word}' +
+    '.best__pv-llabel{color:var(--gold);font-weight:600}' +
     '.best__ab{flex:1;text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 2px}' +
     '.best__ab-l{font-family:var(--mono);font-size:.56rem;color:var(--muted)}' +
     '.best__ab-v{font-family:var(--mono);font-size:.82rem;color:var(--text);font-weight:700}' +
