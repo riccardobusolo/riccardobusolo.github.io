@@ -539,6 +539,25 @@
     });
     ch += '</div>';
     wrap.innerHTML = ch;
+    fitCardNames(wrap);
+  }
+
+  /* Rimpicciolisce il font del nome di una card finché non entra nello spazio
+     (2 righe), invece di troncarlo con i puntini. */
+  function fitCardNames(wrap) {
+    if (!wrap) return;
+    var boxes = wrap.querySelectorAll('.best__name');
+    for (var i = 0; i < boxes.length; i++) {
+      var box = boxes[i], span = box.querySelector('span');
+      if (!span) continue;
+      span.style.fontSize = '';
+      if (box.clientHeight < 2) continue; // non ancora in layout (bestiario nascosto)
+      var fs = parseFloat(getComputedStyle(span).fontSize) || 11;
+      var minPx = 7, g = 0;
+      while (span.scrollHeight > box.clientHeight + 1 && fs > minPx && g < 40) {
+        fs -= 0.5; span.style.fontSize = fs + 'px'; g++;
+      }
+    }
   }
 
   /* ---- Configuratore attacco (anteprima): righe danno {f,t} + bonus colpire.
@@ -913,8 +932,8 @@
     '.best__photo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}' +
     '.best__photo-ph{width:40px;height:40px;opacity:.4;stroke:var(--muted);fill:none;stroke-width:1.6}' +
     '.best__photo .best__photo-ph{stroke:#888}' +
-    '.best__name{position:relative;z-index:6;flex-shrink:0;height:2.3em;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;color:#fff;font-weight:600;line-height:1.15}' +
-    '.best__name span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;width:100%}' +
+    '.best__name{position:relative;z-index:6;flex-shrink:0;height:2.3em;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:var(--mono);font-size:.7rem;color:#fff;font-weight:600;line-height:1.15}' +
+    '.best__name span{display:block;width:100%;word-break:break-word;line-height:1.15}' +
     '.best__meta{font-family:var(--mono);font-size:.56rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}' +
     '.best__pv-head{margin-bottom:8px}' +
     '.best__back{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--dim);font-family:var(--mono);font-size:.7rem;cursor:var(--cur-pointer);transition:all .12s}' +
