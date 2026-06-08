@@ -4706,6 +4706,8 @@ hpD.forEach(function(c){if(c.ac==null)c.ac=10;if(c.tmp==null){if(c.hp>c.max){c.t
    usato sia come thumb che come full (200 è abbastanza per il sheet
    header 64×64 retina e per la riga 28×28). */
 function processEnImg(file,cb){if(!file||!file.type.startsWith('image/'))return;var reader=new FileReader();reader.onload=function(){var img=new Image();img.onload=function(){var SIZE=200;var sz=Math.min(img.width,img.height);var sx=(img.width-sz)/2,sy=(img.height-sz)/2;var cv=document.createElement('canvas');cv.width=SIZE;cv.height=SIZE;var ctx=cv.getContext('2d');ctx.imageSmoothingQuality='high';ctx.drawImage(img,sx,sy,sz,sz,0,0,SIZE,SIZE);var url=cv.toDataURL('image/webp',0.82);if(url.indexOf('image/webp')<0)url=cv.toDataURL('image/jpeg',0.82);cb(url,url)};img.onerror=function(){};img.src=reader.result};reader.readAsDataURL(file)}
+/* Bestiario: stessa compressione foto della scheda nemico (200x200 webp). */
+window.cmProcessMonsterImg=processEnImg;
 function processHpImg(file,cb){if(!file||!file.type.startsWith('image/'))return;var reader=new FileReader();reader.onload=function(){var img=new Image();img.onload=function(){
 /* Mantiene aspect ratio originale: l'utente può poi trascinare per posizionare
    la porzione visibile nella miniatura quadrata della barra (object-fit:cover). */
