@@ -149,7 +149,7 @@
   }
 
   /* ---- Stato vista (split: lista a sx, anteprima a dx; tab official|custom) ---- */
-  var view = { tab: 'official', curId: null, q: '' };
+  var view = { tab: 'official', curId: null, q: '', fRarity: '', fType: '' };
 
   /* ---- Caricamento foto mostro (stessa compressione della scheda nemico) ---- */
   var pendingPhotoId = null;
@@ -201,20 +201,31 @@
     var isCustom = view.tab === 'custom';
     var q = (view.q || '').toLowerCase();
     var items = list.filter(function (m) {
-      return !q || (m.name || '').toLowerCase().indexOf(q) >= 0 || String(m.type || '').toLowerCase().indexOf(q) >= 0;
+      if (q && (m.name || '').toLowerCase().indexOf(q) < 0 && String(m.type || '').toLowerCase().indexOf(q) < 0) return false;
+      if (view.fRarity && rarityKeyOf(m) !== view.fRarity) return false;
+      if (view.fType && (m.type || '') !== view.fType) return false;
+      return true;
     });
+    var types = []; list.forEach(function (m) { if (m.type && types.indexOf(m.type) < 0) types.push(m.type); }); types.sort();
     var h = '<div class="best__tabs">' +
       '<button class="best__tab' + (view.tab === 'official' ? ' best__tab--on' : '') + '" data-besttab="official" type="button">Bestiario</button>' +
       '<button class="best__tab' + (isCustom ? ' best__tab--on' : '') + '" data-besttab="custom" type="button">Personalizzati</button>' +
       '</div>';
     h += '<div class="best__bar"><input class="best__search" id="bestSearch" placeholder="Cerca mostro..." value="' + esc(view.q) + '" spellcheck="false">' +
-      (isCustom ? '<button class="best__add" data-bestnew="1" type="button">＋ Nuovo</button>' : '') + '</div>';
+      (isCustom ? '<button class="best__add" data-bestnew="1" type="button" title="Nuovo mostro">＋</button>' : '') + '</div>';
+    h += '<div class="best__filters">' +
+      '<select class="best__filter" data-bestfilter="rarity"><option value="">Tutte le rarità</option>' +
+        RARITY_ORDER.map(function (k) { return '<option value="' + k + '"' + (view.fRarity === k ? ' selected' : '') + '>' + RARITY_NAMES[k] + '</option>'; }).join('') +
+      '</select>' +
+      '<select class="best__filter" data-bestfilter="type"><option value="">Tutti i tipi</option>' +
+        types.map(function (t) { return '<option value="' + esc(t) + '"' + (view.fType === t ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') +
+      '</select></div>';
     if (!list.length) {
       h += '<div class="best__empty">' + (isCustom
-        ? 'Nessun mostro personalizzato.<br>Crea con <strong>＋ Nuovo</strong>, oppure salva un Nemico nel bestiario (menu ⋮ → <em>Salva nel bestiario</em>).'
+        ? 'Nessun mostro personalizzato.<br>Crea con <strong>＋</strong>, oppure salva un Nemico nel bestiario (menu ⋮ → <em>Salva nel bestiario</em>).'
         : 'Bestiario vuoto.') + '</div>';
     } else if (!items.length) {
-      h += '<div class="best__empty">Nessun risultato per "' + esc(view.q) + '".</div>';
+      h += '<div class="best__empty">Nessun risultato con i filtri attuali.</div>';
     } else {
       h += '<div class="best__list">';
       items.forEach(function (m) {
@@ -318,7 +329,7 @@
     var el = host(); if (!el || !el.contains(e.target)) return;
 
     var tabBtn = e.target.closest('[data-besttab]');
-    if (tabBtn) { var _t = tabBtn.dataset.besttab; if (_t !== view.tab) { view.tab = _t; view.curId = null; render(); } return; }
+    if (tabBtn) { var _t = tabBtn.dataset.besttab; if (_t !== view.tab) { view.tab = _t; view.curId = null; view.q = ''; view.fRarity = ''; view.fType = ''; render(); } return; }
 
     var photoBtn = e.target.closest('[data-bestphoto]');
     if (photoBtn) { e.preventDefault(); e.stopPropagation(); pendingPhotoId = photoBtn.dataset.bestphoto; ensureFileInput(); fileInput.click(); return; }
@@ -372,6 +383,15 @@
     renderLeft();
     var s = document.getElementById('bestSearch');
     if (s) { s.focus(); var v = s.value; try { s.setSelectionRange(v.length, v.length); } catch (_) {} }
+  });
+
+  /* Filtri rarità / tipo. */
+  document.addEventListener('change', function (e) {
+    var f = (e.target && e.target.closest) ? e.target.closest('[data-bestfilter]') : null;
+    if (!f) return;
+    if (f.dataset.bestfilter === 'rarity') view.fRarity = f.value;
+    else if (f.dataset.bestfilter === 'type') view.fType = f.value;
+    renderLeft();
   });
 
   /* ---- Effetto figurina: tilt 3D + glare + foil olografico che seguono il
@@ -443,10 +463,13 @@
     '.best__tab:hover{color:var(--text)}' +
     '.best__tab--on{background:var(--bg3);color:var(--gold);font-weight:600}' +
     '.best__rarity-ro{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.7rem;color:var(--text);font-weight:600}' +
-    '.best__bar{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;position:sticky;top:0;background:var(--bg2);padding-bottom:6px;z-index:2}' +
+    '.best__bar{display:flex;flex-direction:row;align-items:center;gap:6px;margin-bottom:7px}' +
+    '.best__filters{display:flex;gap:6px;margin-bottom:8px}' +
+    '.best__filter{flex:1;min-width:0;background-color:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 22px 5px 8px;color:var(--text);font-family:var(--mono);font-size:.64rem;outline:none;cursor:var(--cur-pointer);appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\' fill=\'%23999999\'><path d=\'M4 6l4 4 4-4\'/></svg>");background-repeat:no-repeat;background-position:right 7px center;background-size:11px}' +
+    '.best__filter:focus{border-color:var(--gold)}' +
     '.best__search{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--mono);font-size:.74rem;outline:none;transition:border-color .12s}' +
     '.best__search:focus{border-color:var(--gold)}' +
-    '.best__add{width:100%;text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 11px;color:var(--gold);font-family:var(--mono);font-size:.72rem;cursor:var(--cur-pointer);white-space:nowrap;transition:all .12s}' +
+    '.best__add{flex:0 0 auto;width:34px;height:32px;display:flex;align-items:center;justify-content:center;padding:0;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--gold);font-family:var(--mono);font-size:1.1rem;line-height:1;cursor:var(--cur-pointer);transition:all .12s}' +
     '.best__add:hover{border-color:var(--gold);background:rgba(196,154,50,.08)}' +
     '.best__empty{text-align:center;color:var(--muted);font-family:var(--mono);font-size:.72rem;line-height:1.7;padding:26px 12px}' +
     '.best__list{display:grid;grid-template-columns:repeat(auto-fill,132px);gap:8px;align-content:start;justify-content:start}' +
