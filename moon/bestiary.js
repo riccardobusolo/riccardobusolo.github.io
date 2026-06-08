@@ -136,6 +136,44 @@
       legendaryActions: [],
       drop: [],
       notes: 'Spirito Primordiale del Vento e della Tempesta\n\nHabitat: Deserti, Montagne, Piani (Piano Elementale dell\'Aria)\nTesoro: Nessuno\n\nSpiriti energetici provenienti dal Piano Elementale dell\'Aria, gli elementali dell\'aria raccolgono nubi e venti in corpi mutevoli, dotati di arti indistinti e forme vagamente definite.\n\nAl di fuori del loro piano natale, questi elementali possono servire gli incantatori che li evocano oppure radunarsi attorno a nodi di energia planare incontrollata, come vette montane battute dai venti o tempeste eterne.\n\nIn combattimento, gli elementali dell\'aria travolgono i nemici con potenti raffiche oppure si trasformano in vortici devastanti capaci di scagliare lontano gli avversari.\n\n— Composizioni dell\'Elementale dell\'Aria (d6) —\n1. Nubi cumuliformi o cirri.\n2. Una miscela di gas dai colori vivaci.\n3. Un miasma acre dall\'aspetto malsano.\n4. Ammassi di nuvole mutevoli che ricordano animali o forme semplici.\n5. Tratti sinistri nascosti all\'interno di una massa nebbiosa.\n6. Nubi tempestose in continuo vortice.'
+    },
+    {
+      id: 'preset_signore_animali', name: 'Signore degli Animali', emoji: '🐾', rarity: 'epic',
+      type: 'Celestiale', size: 'Media', alignment: 'Neutrale',
+      ac: 19, hp: 323, hpCur: 323, hpTemp: 0, hpDice: '34d8+170', init: 19,
+      speed: '18 m, Volare 18 m (stazionario), Nuotare 18 m', cr: '20', xp: '',
+      str: 24, dex: 25, con: 20, intl: 19, wis: 23, cha: 22,
+      savesOverride: { str: '', dex: '', con: '11', intl: '', wis: '12', cha: '' },
+      skillOverrides: { acrobazia: '13', atletica: '13', furtivita: '13', percezione: '18' },
+      passivePerception: 28, senses: [{ type: 'Vista del Vero', value: 36, unit: 'm' }],
+      languages: ['Tutte'],
+      dmgResist: ['Freddo', 'Fuoco', 'Necrotico', 'Psichico', 'Radiante'],
+      dmgImmune: [], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Spaventato', 'Stordito'],
+      traits: [
+        { name: 'Signoria Animale', desc: 'Il Signore degli Animali rappresenta un Raccoglitore, un Cacciatore oppure un Saggio (a scelta del DM). Questa scelta determina alcuni tratti presenti nel blocco statistiche.' },
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno)\nSe fallisce un tiro salvezza, il Signore degli Animali può scegliere di superarlo invece.' },
+        { name: 'Presenza Regale', desc: 'Tiro Salvezza su Saggezza: CD 20. Ogni nemico che inizi il proprio turno entro un\'emanazione di 9 metri deve effettuare il tiro salvezza; con un fallimento subisce uno dei seguenti effetti.\nAffascinato (solo Raccoglitore): condizione Ammaliato e Incapacitato fino alla fine del proprio turno successivo.\nTerrorizzato (solo Cacciatore): condizione Spaventato fino alla fine del proprio turno successivo.\nConfuso (solo Saggio): 10 (3d6) danni psichici e magicamente confuso fino alla fine del proprio turno successivo (mentre è confuso sottrae 1d4 a tutti i tiri salvezza).' },
+        { name: 'Resistenza Magica', desc: 'Il Signore degli Animali ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il Signore degli Animali effettua due attacchi, scegliendo liberamente tra Lacerazione e Raggio Radiante, quindi utilizza Spirito Animale.' },
+        { name: 'Lacerazione', desc: 'Attacco in mischia: +13 a colpire, portata 1,5 m.\nColpito: 14 (2d6 + 7) danni taglienti più 7 (2d6) danni da forza.', atkHit: '+13', atkDmgs: [{ f: '2d6+7', t: 'taglienti' }, { f: '2d6', t: 'forza' }] },
+        { name: 'Raggio Radiante', desc: 'Attacco a distanza: +12 a colpire, gittata 36 m.\nColpito: 20 (4d6 + 6) danni radianti.', atkHit: '+12', atkDmgs: [{ f: '4d6+6', t: 'radianti' }] },
+        { name: 'Spirito Animale', desc: 'Il Signore degli Animali evoca uno spirito animale che colpisce una creatura e poi svanisce.\nTiro Salvezza su Destrezza: CD 20. Una creatura visibile entro 36 metri.\nFallimento: 28 (4d10 + 6) danni radianti. Successo: metà danni.\nIn ogni caso si verifica inoltre uno dei seguenti effetti.\nFortificare (solo Raccoglitore): il Signore degli Animali ottiene 20 punti ferita temporanei.\nMarchiato come Preda (solo Cacciatore): ottiene vantaggio ai tiri per colpire contro il bersaglio fino all\'inizio del proprio turno successivo.\nSciame Molesto (solo Saggio): il bersaglio subisce svantaggio ai tiri per colpire e alle prove di caratteristica fino alla fine del proprio turno successivo.', atkDmgs: [{ f: '4d10+6', t: 'radianti' }] },
+        { name: 'Incantare', desc: 'Il Signore degli Animali lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 20).\n\nA volontà: Amicizia con gli Animali (Animal Friendship), Messaggero Animale (Animal Messenger), Parlare con gli Animali (Speak with Animals).\n\n2 volte al giorno ciascuno: Risveglio (Awaken), Restauro Superiore (Greater Restoration).\n\n1 volta al giorno ciascuno (solo Saggio): Forme Animali (Animal Shapes), Esplosione Solare (Sunburst).' }
+      ],
+      bonusActions: [
+        { name: 'Mutaforma', desc: 'Il Signore degli Animali si trasforma in una versione Grande o inferiore dell\'animale che rappresenta, in un umanoide Medio o Piccolo, oppure ritorna alla sua vera forma. Le statistiche di gioco rimangono invariate eccetto la taglia. L\'equipaggiamento indossato o trasportato non viene trasformato.' }
+      ],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round)', desc: 'Il Signore degli Animali può utilizzare una sola azione leggendaria alla volta, immediatamente dopo il turno di un\'altra creatura. Recupera tutti gli usi spesi all\'inizio del proprio turno.' },
+        { name: 'Assalto Ferino', desc: 'Il Signore degli Animali si muove fino alla propria velocità senza provocare attacchi di opportunità e poi effettua un attacco Lacerazione.', atkHit: '+13', atkDmgs: [{ f: '2d6+7', t: 'taglienti' }, { f: '2d6', t: 'forza' }] },
+        { name: 'Assalto Radiante', desc: 'Il Signore degli Animali effettua un attacco Raggio Radiante.', atkHit: '+12', atkDmgs: [{ f: '4d6+6', t: 'radianti' }] }
+      ],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie sacre legate al suo dominio e alla bestia che rappresenta.' }],
+      notes: 'Reggente Immortale delle Terre Selvagge\n\nHabitat: Piani (Beastlands)\nTesoro: Reliquie\n\nI Signori degli Animali sono gli spiriti immortali di creature leggendarie. Agiscono come protettori divini degli animali della loro specie e appaiono come ibridi tra umanoidi e le bestie che difendono.\n\nSpesso assumono la forma di versioni gigantesche e idealizzate degli animali a cui sono associati, con occhi luminosi; quando interagiscono con altre creature possono apparire come esseri quasi umani dotati di sottili tratti animali. Indipendentemente dall\'aspetto, manifestano gli istinti della creatura che rappresentano, temperati da immensa saggezza ed esperienza.\n\nLa maggior parte dimora nelle Beastlands, talvolta viaggiando nel Feywild o in altri reami idilliaci. Raramente visitano il Piano Materiale, intervenendo solo quando un mondo affronta una catastrofe ambientale o quando grandi popolazioni animali sono in pericolo.\n\nTra i più noti vi sono quelli associati a gatti, falchi, lucertole e lupi, ma esistono rappresentanti di ogni bestia; alcuni incarnano persino creature rare o estinte come megafauna preistorica o dinosauri. Grazie al loro potere divino possono evocare animali spettrali, canalizzare energie spirituali e manifestare capacità legate a uno dei tre grandi archetipi: Raccoglitore, Cacciatore, Saggio.\n\n— Aspetti Raccoglitori (d10) —\nOrso, Ape, Bisonte, Capibara, Carpa, Coniglio, Gallo, Bradipo, Cervo, Avvoltoio.\n\n— Aspetti Cacciatori (d10) —\nAlligatore, Tasso, Pipistrello, Gatto, Falco, Mangusta, Mantide Religiosa, Squalo, Serpente, Lupo.\n\n— Aspetti Sapienti (d10) —\nCoyote, Corvo, Elefante, Lucertola, Topo, Gufo, Salmone, Ragno, Tartaruga, Balena.'
     }
   ];
 
