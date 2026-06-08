@@ -214,7 +214,7 @@
         var on = (m.id === view.curId) ? ' best__card--on' : '';
         var typeBadge = m.type ? '<span class="best__corner best__corner--tl">' + esc(m.type) + '</span>' : '';
         var crBadge = (m.cr != null && m.cr !== '') ? '<span class="best__corner best__corner--tr">' + esc(String(m.cr)) + '</span>' : '';
-        h += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '" style="' + rarityVars(m.cr) + '">' +
+        h += '<div class="best__card' + on + '" data-bestopen="' + esc(m.id) + '" draggable="true" style="' + rarityVars(m.cr) + '">' +
           '<div class="best__photo">' + typeBadge + crBadge + monsterPhotoHtml(m) + '</div>' +
           '<div class="best__name">' + esc(m.name || '(senza nome)') + '</div>' +
           '<div class="best__holo"></div><div class="best__shine"></div>' +
@@ -380,11 +380,27 @@
     }
   });
 
+  /* ---- Trascinamento di una carta verso i Nemici: imposta l'id del mostro
+     nel dataTransfer; la finestra Personaggi/Nemici lo riceve e lo aggiunge. ---- */
+  document.addEventListener('dragstart', function (e) {
+    var el = host(); if (!el) return;
+    var card = (e.target && e.target.closest) ? e.target.closest('.best__card') : null;
+    if (!card || !el.contains(card)) return;
+    var id = card.dataset.bestopen; if (!id || !e.dataTransfer) return;
+    try {
+      e.dataTransfer.setData('application/x-cm-monster', id);
+      e.dataTransfer.setData('text/plain', id);
+      e.dataTransfer.effectAllowed = 'copy';
+    } catch (_) {}
+    resetTilt(card); if (tiltCard === card) tiltCard = null;
+  });
+
   /* ---- Stili (iniettati: tutto il codice del bestiario resta esterno) ---- */
   var css =
     /* Due colonne: il corpo finestra diventa una flex-row con due pannelli che
        scrollano in modo indipendente (come #winChars). */
     '#winBestiary{min-width:520px}' +
+    '.win__half.best-drop-over{outline:2px dashed var(--gold);outline-offset:-4px;background:rgba(196,154,50,.07);border-radius:8px}' +
     '#bestiaryBody{padding:0;display:flex;flex-direction:row;align-items:stretch;overflow:hidden}' +
     '.best__left{flex:1 1 0;display:flex;flex-direction:column;min-width:0;overflow:hidden auto;scrollbar-width:thin;padding:8px;border-right:1px solid var(--border)}' +
     '.best__right{flex:1 1 0;min-width:0;overflow:hidden auto;scrollbar-width:thin;padding:10px 12px}' +
