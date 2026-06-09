@@ -315,7 +315,7 @@
       notes: 'Yugoloth della Manipolazione Arcana\n\nHabitat: Piani (Piani Inferiori)\nTesoro: Conoscenze Arcane\n\nSebbene tutti gli yugoloth siano manifestazioni immonde di malvagità e avidità, gli arcanaloth indirizzano il loro considerevole intelletto verso l\'accumulo e lo sfruttamento dei segreti.\n\nUtilizzano tali conoscenze per intrappolare innumerevoli vittime e malviventi minori, seducendo i loro bersagli con false promesse e potenti magie.\n\nGli arcanaloth possiedono una straordinaria maestria nell\'arte degli incantesimi e spesso si celano dietro illusioni e travestimenti magici. Preferiscono lasciare che servitori magici o altri yugoloth combattano per loro, ma sono comunque perfettamente in grado di difendersi con il proprio potere arcano, arrivando persino a bandire i nemici all\'interno delle pagine dei loro tomi magici.'
     },
     {
-      id: 'preset_arcistrega', name: 'Arcistrega', emoji: '🧙', rarity: 'legendary',
+      id: 'preset_arcistrega', name: 'Arcistrega', emoji: '🧙', rarity: 'epic',
       type: 'Fata', size: 'Grande', alignment: 'Neutrale Malvagio',
       ac: 20, hp: 333, hpCur: 333, hpTemp: 0, hpDice: '29d10+174', init: 16,
       speed: '12 m', cr: '21', xp: '',
@@ -351,6 +351,32 @@
       ],
       drop: [{ name: 'Conoscenze Arcane', desc: 'Segreti proibiti, magie bizzarre e conoscenze del multiverso — ma ogni segreto ha un prezzo.' }],
       notes: 'Megera dei Segreti Proibiti e della Malizia Magica\n\nHabitat: Qualsiasi\nTesoro: Conoscenze Arcane\n\nImmortali e imprevedibili, le arcistreghe accumulano segreti e stringono strani patti magici, alterando il destino per soddisfare i propri capricci. Queste eterne cospiratrici inseguono i misteri del multiverso e praticano magie bizzarre per perseguire obiettivi insondabili.\n\nLe arcistreghe sono egoiste, avide e imprevedibili, caratterizzate da ossessioni e fascinazioni eccentriche. Nonostante ciò, stringono spesso accordi per favorire i propri piani. Sono fonti inesauribili di conoscenze segrete, soprattutto riguardo alla magia proibita e ai misteri del multiverso.\n\nPossono condividere ciò che sanno, ma ogni segreto ha sempre un prezzo: in cambio possono richiedere missioni insolite, oggetti magici preziosi o valute soprannaturali come ricordi, anni di vita o persino la capacità di piangere.\n\nLa maggior parte evita il combattimento, ma quando è costretta a lottare scatena magie devastanti: artigli spettrali, fulmini crepitanti e incantesimi capaci di piegare la mente. Anche quando sembrano sconfitte, le loro preparazioni permettono di fuggire e tramare vendetta.\n\n— Anatemi dell\'Arcistrega —\nOgni arcistrega ha una debolezza unica legata a un evento del passato o a qualcosa che rappresenta l\'opposto della sua magia. Non può essere ferita fisicamente dal proprio anatema, ma può essere distrutta definitivamente solo quando la sua debolezza si trova nelle vicinanze.\n\nTabella degli Anatemi (d10):\n1. Le ossa del suo primo amore.\n2. Una lacrima di diavolo.\n3. Un uovo contenente un castello in miniatura.\n4. Un fiore che sboccia soltanto quando il tempo si ferma.\n5. Un dono ricevuto dalla sua gemella.\n6. La peggiore battuta del multiverso.\n7. Uno dei denti perduti dell\'arcistrega.\n8. Neve raccolta dalla cima del Monte Celestia.\n9. Una stella strappata dal cielo.\n10. Un filo proveniente dalle vesti della Signora del Dolore.\n\n— Tana dell\'Arcistrega —\nOgni arcistrega crea una dimora magica: un semipiano nascosto, un maniero sospeso su una nube tempestosa o, come Baba Yaga, una capanna su gigantesche zampe di gallina. Gli interni mutano spesso o mostrano caratteristiche assurde e disorientanti.\n\nEffetti regionali (entro 1,6 km dalla tana):\nLapsus di Lingua: le creature diverse dall\'arcistrega e dai suoi alleati sottraggono 1d10 a tutte le prove di caratteristica fatte usando l\'azione Influenzare.\nMagia Ficcanaso: quando una creatura non alleata completa un riposo lungo entro 1 miglio dalla tana, il primo incantesimo che lancia con uno slot provoca anche l\'effetto di Confusione centrato su sé stessa (usa la caratteristica da incantatore della creatura, nessuna concentrazione).\nSe l\'arcistrega è distrutta o abbandona la tana, questi effetti terminano.'
+    },
+    {
+      id: 'preset_assassino', name: 'Assassino', emoji: '🥷', rarity: 'uncommon',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 16, hp: 97, hpCur: 97, hpTemp: 0, hpDice: '15d8+30', init: 10,
+      speed: '9 m', cr: '8', xp: '',
+      str: 11, dex: 18, con: 14, intl: 16, wis: 11, cha: 10,
+      savesOverride: { str: '', dex: '7', con: '', intl: '6', wis: '', cha: '' },
+      skillOverrides: { acrobazia: '7', furtivita: '10', percezione: '6' },
+      passivePerception: 16, senses: [],
+      languages: ['Comune', 'Gergo dei Ladri'],
+      dmgResist: ['Veleno'], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Eludere', desc: 'Quando l\'assassino è soggetto a un effetto che gli consente di effettuare un tiro salvezza su Destrezza per subire metà danni, non subisce alcun danno se supera il tiro salvezza e solo metà danni se lo fallisce.\nNon può usare questo tratto mentre è Incapacitato.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'assassino effettua tre attacchi, utilizzando Spada Corta e Balestra Leggera in qualsiasi combinazione.' },
+        { name: 'Spada Corta', desc: 'Attacco in mischia: +7 a colpire, portata 1,5 m.\nColpito: 7 (1d6 + 4) danni perforanti più 17 (5d6) danni da veleno.\nIl bersaglio ottiene la condizione Avvelenato fino all\'inizio del turno successivo dell\'assassino.', atkHit: '+7', atkDmgs: [{ f: '1d6+4', t: 'perforanti' }, { f: '5d6', t: 'veleno' }] },
+        { name: 'Balestra Leggera', desc: 'Attacco a distanza: +7 a colpire, gittata 24/96 m.\nColpito: 8 (1d8 + 4) danni perforanti più 21 (6d6) danni da veleno.', atkHit: '+7', atkDmgs: [{ f: '1d8+4', t: 'perforanti' }, { f: '6d6', t: 'veleno' }] }
+      ],
+      bonusActions: [
+        { name: 'Azione Scaltra', desc: 'L\'assassino esegue una delle seguenti azioni: Scatto, Disimpegno oppure Nascondersi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Balestra Leggera, Spada Corta, Armatura di Cuoio Borchiato e oggetti personali.' }],
+      notes: 'Sicario a Contratto\n\nHabitat: Qualsiasi\nTesoro: Equipaggiamento, Oggetti Personali\n\nGli assassini sono killer professionisti specializzati nell\'avvicinarsi furtivamente alle proprie vittime e colpire senza essere visti.\n\nLa maggior parte di essi uccide per una ragione precisa, mettendosi al servizio di ricchi committenti o combattendo per cause prive di scrupoli. Utilizzano veleni e altri strumenti letali e spesso trasportano equipaggiamento utile per infiltrarsi in luoghi protetti o evitare la cattura.\n\nMolti assassini seguono un rigido codice professionale oppure possiedono una caratteristica distintiva che li rende celebri.\n\n— Metodi Operativi dell\'Assassino (d6) —\n1. Disporre le proprie vittime in macabri tableaux artistici.\n2. Nascondersi all\'interno di grandi oggetti, come armature complete o mobili cavi.\n3. Lasciare un segno distintivo, come una carta da visita, un fiore, una conchiglia o un dente.\n4. Fingersi una celebrità, una figura religiosa o un servitore.\n5. Conservare trofei sottratti alle proprie vittime.\n6. Utilizzare un veleno dal colore o dall\'odore caratteristico.'
     }
   ];
 
