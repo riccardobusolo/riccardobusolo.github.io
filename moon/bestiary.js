@@ -32,6 +32,7 @@
   var ANIMATI_LORE = 'La magia può manipolare oggetti ordinari, costringendoli a svolgere semplici compiti. Questi oggetti animati possono apparire come innocui utensili o decorazioni capaci però di difendere il loro creatore.\n\nEssi seguono semplici istruzioni impartite dalla forza o dall\'incantatore che li ha creati. Se lasciati senza supervisione, possono continuare a proteggere una zona per anni oppure ripetere lo stesso compito fino a consumarsi.\n\n— Catalizzatori degli Oggetti Animati (d10) —\n1. Un Celestiale o un Immondo che usa l\'oggetto per proteggere o tormentare un mortale.\n2. Una combinazione di magia e tecnologia, come alchimia o scienza aliena.\n3. L\'essenza di qualcuno trasformata da un ingannatore soprannaturale.\n4. Fate impegnate nei loro giochi o intrighi.\n5. Il caso, dopo che l\'oggetto ha acquisito una parvenza di vita dopo un secolo di utilizzo.\n6. Un incantatore che necessita di una guardia o di un servitore.\n7. Il canto di uno strumento magico.\n8. Uno spirito che possiede l\'oggetto.\n9. Magia selvaggia, un incantesimo fallito o un artefatto caotico.\n10. La volontà di una potente entità psionica.';
   var PIANTE_LORE = 'La magia può infondere nelle piante mobilità, intelligenza e perfino una voce. Incantesimi come Risveglio (Awaken) o l\'influenza di altri piani di esistenza possono dare vita alla vegetazione comune, mentre alcune piante straordinarie possiedono naturalmente tali caratteristiche.';
   var BECCO_LORE = 'I becchi d\'ascia sono creature simili a grandi uccelli incapaci di volare, riconoscibili per il caratteristico becco a forma di lama d\'ascia.\n\nPredatori rapidi e aggressivi, inseguono le proprie prede e usano i becchi per squarciare il fogliame che protegge le vittime. Vivono in ambienti molto diversi: esemplari dal piumaggio variopinto percorrono le pianure tropicali, mentre quelli ricoperti di piume chiare e folte cacciano nelle gelide tundre.\n\nI becchi d\'ascia sono difficili da addestrare, ma gli esemplari nati e cresciuti in cattività possono diventare cavalcature affidabili.';
+  var AZER_LORE = 'Gli azer sono esseri di bronzo vivente che lavorano gli elementi primordiali della creazione per forgiare armi e meraviglie magiche nelle più grandi fornaci del multiverso.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -457,6 +458,56 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Predatore Aviano Incapace di Volare\n\nHabitat: Artico, Praterie, Colline\nTesoro: Nessuno\n\nI becchi d\'ascia giganti abitano generalmente regioni isolate e selvagge, come isole remote o terre primordiali inesplorate. Spesso competono con dinosauri e altre bestie gigantesche per il controllo del territorio.\n\n' + BECCO_LORE
+    },
+    {
+      id: 'preset_piromante_azer', name: 'Piromante Azer', emoji: '🔥', rarity: 'rare',
+      type: 'Elementale', size: 'Media', alignment: 'Legale Neutrale',
+      ac: 18, hp: 97, hpCur: 97, hpTemp: 0, hpDice: '13d8+39', init: 2,
+      speed: '9 m', cr: '6', xp: '',
+      str: 15, dex: 14, con: 16, intl: 12, wis: 18, cha: 13,
+      savesOverride: { str: '', dex: '', con: '6', intl: '', wis: '7', cha: '' },
+      skillOverrides: { arcano: '4', percezione: '7' },
+      passivePerception: 17, senses: [],
+      languages: ['Primordiale (Ignan)'],
+      dmgResist: [], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [], condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Aura di Fuoco', desc: 'Alla fine di ciascun turno dell\'azer, ogni creatura a sua scelta entro un\'emanazione di 1,5 metri subisce 11 (2d10) danni da fuoco, a meno che l\'azer non sia Incapacitato.' },
+        { name: 'Illuminazione', desc: 'L\'azer emette luce intensa entro 3 metri e luce fioca per ulteriori 3 metri.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il piromante azer effettua due attacchi Esplosione di Fiamma.' },
+        { name: 'Esplosione di Fiamma', desc: 'Attacco in mischia o a distanza: +7 a colpire, portata 1,5 m oppure gittata 36 m.\nColpito: 15 (2d10 + 4) danni da fuoco.', atkHit: '+7', atkDmgs: [{ f: '2d10+4', t: 'fuoco' }] },
+        { name: 'Incantare', desc: 'L\'azer lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 15).\n\nA volontà: Elementalismo (Elementalism), Mano Magica (Mage Hand).\n\n1 volta al giorno: Palla di Fuoco (Fireball).' }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Rimprovero Infernale (2/Giorno)', desc: 'L\'azer lancia Rimprovero Infernale (Hellish Rebuke) in risposta al normale innesco dell\'incantesimo, usando la stessa caratteristica da incantatore di Incantare.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Armi e oggetti personali forgiati nelle fornaci azer.' }],
+      notes: 'Fabbri Ardenti di Metallo Vivente\n\nHabitat: Montagne, Piani (Piano Elementale del Fuoco)\nTesoro: Armamenti, Oggetti Personali\n\nI piromanti azer evocano fiamme dal Piano Elementale del Fuoco per difendersi e alimentare forge magiche.\n\n' + AZER_LORE
+    },
+    {
+      id: 'preset_sentinella_azer', name: 'Sentinella Azer', emoji: '🔨', rarity: 'uncommon',
+      type: 'Elementale', size: 'Media', alignment: 'Legale Neutrale',
+      ac: 17, hp: 39, hpCur: 39, hpTemp: 0, hpDice: '6d8+12', init: 1,
+      speed: '9 m', cr: '2', xp: '',
+      str: 17, dex: 12, con: 15, intl: 12, wis: 13, cha: 10,
+      savesOverride: { str: '', dex: '', con: '4', intl: '', wis: '', cha: '' },
+      skillOverrides: {},
+      passivePerception: 11, senses: [],
+      languages: ['Primordiale (Ignan)'],
+      dmgResist: [], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [], condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Aura di Fuoco', desc: 'Alla fine di ciascun turno dell\'azer, ogni creatura a sua scelta entro un\'emanazione di 1,5 metri subisce 5 (1d10) danni da fuoco, a meno che l\'azer non sia Incapacitato.' },
+        { name: 'Illuminazione', desc: 'L\'azer emette luce intensa entro 3 metri e luce fioca per ulteriori 3 metri.' }
+      ],
+      actions: [
+        { name: 'Martello Ardente', desc: 'Attacco in mischia: +5 a colpire, portata 1,5 m.\nColpito: 8 (1d10 + 3) danni contundenti più 3 (1d6) danni da fuoco.', atkHit: '+5', atkDmgs: [{ f: '1d10+3', t: 'contundenti' }, { f: '1d6', t: 'fuoco' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Armi e oggetti personali forgiati nelle fornaci azer.' }],
+      notes: 'Fabbri Ardenti di Metallo Vivente\n\nHabitat: Montagne, Piani (Piano Elementale del Fuoco)\nTesoro: Armamenti, Oggetti Personali\n\nLe sentinelle azer proteggono i fabbri delle loro comunità e incanalano il proprio fuoco attraverso le armi che impugnano.\n\n' + AZER_LORE
     }
   ];
 
