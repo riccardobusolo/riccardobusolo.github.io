@@ -682,6 +682,33 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Tesoro', desc: 'Parte della collezione del diavolo: manufatti rari, simboli di potere e trofei sottratti ai ladri falliti.' }],
       notes: 'Diavolo dell\'Avidità e dell\'Ossessione\n\nHabitat: Piani (Nove Inferi)\nTesoro: Qualsiasi\n\nCollezionisti infernali, i diavoli uncinati proteggono fanaticamente i propri tesori e perlustrano i piani dell\'esistenza alla ricerca di nuove aggiunte alle loro collezioni.\n\nConosciuti tra le schiere dei Nove Inferi come hamatula, questi diavoli adornano le loro pelli spinose con i possedimenti più preziosi e con trofei sottratti a coloro che hanno fallito nel tentativo di derubarli. Quando vengono minacciati, colpiscono con i loro arti ricoperti di spine e scagliano fiamme infernali contro i nemici.\n\nI diavoli uncinati servono spesso come guardie e contabili per generali di diavoli del ghiaccio, signori delle fosse, arcidiavoli e altri potenti malvagi. In cambio ottengono protezione per le proprie collezioni. Molti mantengono inoltre reti di imp e servitori incaricati di cercare nei vari piani tesori d\'interesse o mortali particolarmente avidi.\n\nRaramente raccolgono oggetti comuni come monete o gemme. Preferiscono invece possedere la più grande collezione esistente di una specifica categoria di oggetti, solitamente manufatti rari o simboli di potere. I diavoli uncinati non rubano ciò che desiderano: stipulano patti per ottenere sia tesori che anime mortali.'
+    },
+    {
+      id: 'preset_barlgura', name: 'Barlgura', emoji: '🦍', rarity: 'uncommon',
+      type: 'Immondo', size: 'Grande', alignment: 'Caotico Malvagio',
+      ac: 15, hp: 85, hpCur: 85, hpTemp: 0, hpDice: '10d10+30', init: 2,
+      speed: '12 m, Scalare 12 m', cr: '5', xp: '',
+      str: 18, dex: 15, con: 16, intl: 7, wis: 14, cha: 9,
+      savesOverride: { str: '', dex: '5', con: '6', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '5', furtivita: '5' }, passivePerception: 15,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Abissale', 'Telepatia 36 m'],
+      dmgResist: ['Freddo', 'Fuoco', 'Fulmine'], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Rigenerazione Demoniaca', desc: 'Se la barlgura muore al di fuori dell\'Abisso, il suo corpo si dissolve in icore e ottiene immediatamente un nuovo corpo, tornando in vita con tutti i suoi punti ferita in qualche luogo dell\'Abisso.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'La barlgura effettua un attacco Morso Tormentatore e due attacchi Percossa.' },
+        { name: 'Morso Tormentatore', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 11 (2d6 + 4) danni perforanti più 13 (2d12) danni psichici.', atkHit: '+7', atkDmgs: [{ f: '2d6+4', t: 'perforanti' }, { f: '2d12', t: 'psichici' }] },
+        { name: 'Percossa', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 9 (1d10 + 4) danni contundenti. Se il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Prono.', atkHit: '+7', atkDmgs: [{ f: '1d10+4', t: 'contundenti' }] },
+        { name: 'Incantare', desc: 'La barlgura lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 13).\n\n2 volte al giorno ciascuno: Camuffare Sé Stesso, Invisibilità (solo su sé stessa).\n\n1 volta al giorno ciascuno: Intralciare, Assassino Fantasmatico (versione di 6° livello).' }
+      ],
+      bonusActions: [
+        { name: 'Balzo', desc: 'La barlgura salta fino a 12 metri spendendo 3 metri del proprio movimento.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Tesoro', desc: 'Trofei di antiche cacce e simboli demoniaci sottratti alle prede.' }],
+      notes: 'Demone dell\'Istinto e della Violenza Primordiale\n\nHabitat: Piani (Abisso)\nTesoro: Qualsiasi\n\nLe barlgura sono demoni che incarnano la brutalità e l\'istinto omicida. Cacciano senza pietà qualsiasi creatura entri nei loro territori, che si tratti delle terre selvagge dell\'Abisso o di luoghi in cui sono state evocate da malvagi incantatori.\n\nLe barlgura disseminano i propri domini di simboli demoniaci e terrificanti prove delle loro uccisioni.\n\nCooperano con altri demoni, specialmente con altre barlgura, purché vi siano prede in abbondanza. Se una regione viene privata di vittime da massacrare, questi demoni finiscono per rivolgere la propria ferocia gli uni contro gli altri, dando origine a scontri devastanti.\n\nL\'aspetto delle barlgura varia notevolmente, ma tutte possiedono corpi possenti e mani capaci di arrampicarsi rapidamente e infliggere colpi schiaccianti. Quando la sola forza bruta non basta, ricorrono alla magia demoniaca per evocare illusioni terrificanti e liane avvinghianti.\n\nLa maggior parte delle barlgura ricorda scimmie mostruose da incubo, mentre altre mostrano caratteristiche esagerate di predatori tipici delle terre che abitano. Molte incorporano trofei di antiche cacce direttamente nelle proprie carni demoniache.'
     }
   ];
 
