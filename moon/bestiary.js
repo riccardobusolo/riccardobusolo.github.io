@@ -982,11 +982,44 @@
   function renderLeft() { var el = host(); if (!el) return; var left = el.querySelector('.best__left'); if (left) renderLeftInto(left); }
   function renderRight() { var el = host(); if (!el) return; var right = el.querySelector('.best__right'); if (right) renderRightInto(right); }
 
+  /* Persistenza della posizione di scroll della lista (sopravvive al reload della pagina). */
+  var BEST_SCROLL_KEY = 'cm_best_scroll';
+  var bestScrollInit = false, bestScrollSaveT = null;
+  function ensureBestScrollPersist(left) {
+    if (bestScrollInit || !left) return;
+    bestScrollInit = true;
+    // Lo scroll non fa bubbling: ascolto in fase di cattura e salvo (con debounce) la posizione di .best__cards.
+    left.addEventListener('scroll', function (e) {
+      var c = e.target;
+      if (!c || !c.classList || !c.classList.contains('best__cards')) return;
+      if (bestScrollSaveT) clearTimeout(bestScrollSaveT);
+      bestScrollSaveT = setTimeout(function () {
+        try { localStorage.setItem(BEST_SCROLL_KEY, String(Math.round(c.scrollTop))); } catch (_) {}
+      }, 150);
+    }, true);
+    // Ripristino una sola volta, quando la lista diventa visibile (es. dopo un reload o riaprendo la finestra).
+    if (typeof IntersectionObserver === 'function') {
+      var obs = new IntersectionObserver(function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          if (entries[i].isIntersecting) {
+            obs.disconnect();
+            var v = 0; try { v = parseInt(localStorage.getItem(BEST_SCROLL_KEY) || '0', 10) || 0; } catch (_) {}
+            if (v > 0) requestAnimationFrame(function () { var cc = left.querySelector('.best__cards'); if (cc) cc.scrollTop = v; });
+            return;
+          }
+        }
+      });
+      obs.observe(left);
+    }
+  }
+
   function renderLeftInto(left) {
+    ensureBestScrollPersist(left);
     var isCustom = view.tab === 'custom';
     var lastIdx = BEST_CR_SCALE.length - 1;
     var lp = (view.fCrMin / lastIdx) * 100, rp = (view.fCrMax / lastIdx) * 100;
-    var h = '<div class="best__tabs">' +
+    var h = '<div class="best__head">' +
+      '<div class="best__tabs">' +
       '<button class="best__tab' + (view.tab === 'official' ? ' best__tab--on' : '') + '" data-besttab="official" type="button">Bestiario</button>' +
       '<button class="best__tab' + (isCustom ? ' best__tab--on' : '') + '" data-besttab="custom" type="button">Personalizzati</button>' +
       '</div>';
@@ -1010,6 +1043,7 @@
               : sortPanelHtml()) +
         '</div>';
     }
+    h += '</div>';
     h += '</div>';
     h += '<div class="best__cards"></div>';
     left.innerHTML = h;
@@ -1465,8 +1499,10 @@
     '#winBestiary{min-width:520px}' +
     '.win__half.best-drop-over{outline:2px dashed var(--gold);outline-offset:-4px;background:rgba(196,154,50,.07);border-radius:8px}' +
     '#bestiaryBody{padding:0;display:flex;flex-direction:row;align-items:stretch;overflow:hidden}' +
-    '.best__left{flex:1 1 0;display:flex;flex-direction:column;min-width:0;overflow:hidden auto;scrollbar-width:none;-ms-overflow-style:none;padding:8px;border-right:1px solid var(--border)}' +
-    '.best__left::-webkit-scrollbar{width:0;height:0;display:none}' +
+    '.best__left{flex:1 1 0;display:flex;flex-direction:column;min-width:0;overflow:hidden;padding:8px;border-right:1px solid var(--border)}' +
+    '.best__head{flex:0 0 auto}' +
+    '.best__cards{flex:1 1 0;min-height:0;overflow:hidden auto;scrollbar-width:none;-ms-overflow-style:none}' +
+    '.best__cards::-webkit-scrollbar{width:0;height:0;display:none}' +
     '.best__right{flex:1 1 0;min-width:0;overflow:hidden auto;scrollbar-width:none;-ms-overflow-style:none;padding:10px 12px}' +
     '.best__right::-webkit-scrollbar{width:0;height:0;display:none}' +
     '.best__placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.74rem;line-height:1.6;padding:20px}' +
