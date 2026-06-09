@@ -630,6 +630,32 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Equipaggiamento', desc: 'Pistole (2), scimitarra, armatura di cuoio borchiato, più bottino vario.' }],
       notes: 'Criminali e Canaglie\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\nI signori del crimine manipolano organizzazioni oscure e mettono sempre la propria sopravvivenza davanti a qualsiasi sottoposto o piano.\n\n' + BANDITI_TAIL
+    },
+    {
+      id: 'preset_banshee', name: 'Banshee', emoji: '👻', rarity: 'rare',
+      type: 'Non Morto', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 12, hp: 54, hpCur: 54, hpTemp: 0, hpDice: '12d8', init: 2,
+      speed: '1,5 m, Volare 12 m (fluttuare)', cr: '4', xp: '',
+      str: 1, dex: 14, con: 10, intl: 12, wis: 11, cha: 17,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '2', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune', 'Elfico'],
+      dmgResist: ['Acido', 'Contundente', 'Fuoco', 'Fulmine', 'Perforante', 'Tagliente', 'Tuono'],
+      dmgImmune: ['Freddo', 'Necrotico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Afferrato', 'Avvelenato', 'Esausto', 'Spaventato', 'Paralizzato', 'Pietrificato', 'Prono', 'Trattenuto'],
+      traits: [
+        { name: 'Percepire la Vita', desc: 'La banshee percepisce magicamente la direzione delle creature entro 1 miglio (1,6 km) che non siano Costrutti o Non Morti.' },
+        { name: 'Movimento Incorporeo', desc: 'La banshee può attraversare creature e oggetti come se fossero terreno difficile.\nSubisce 5 (1d10) danni da forza se termina il proprio turno all\'interno di un oggetto.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'La banshee effettua due attacchi Tocco Corrotto e utilizza Terrificare.' },
+        { name: 'Tocco Corrotto', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 7 (1d8 + 3) danni necrotici.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'necrotici' }] },
+        { name: 'Terrificare', desc: 'Tiro Salvezza su Saggezza: CD 13. Una creatura entro 18 metri che la banshee possa vedere e che possa vedere la banshee.\nFallimento: il bersaglio ottiene la condizione Spaventato fino all\'inizio del turno successivo della banshee.\nSuccesso: il bersaglio diventa immune all\'Aspetto Terrificante di questa banshee per 24 ore.' },
+        { name: 'Lamento Mortale (1/Giorno)', desc: 'La banshee emette un lamento funebre se non si trova alla luce del sole. Tiro Salvezza su Costituzione: CD 13. Ogni creatura entro 9 metri che possa udire il lamento e che non sia un Costrutto o un Non Morto.\nFallimento: se il bersaglio possiede 25 punti ferita o meno, i suoi punti ferita scendono immediatamente a 0; altrimenti subisce 10 (3d6) danni psichici.\nSuccesso: nessun effetto aggiuntivo oltre ai normali effetti del tiro salvezza.', atkDmgs: [{ f: '3d6', t: 'psichici' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Oggetti e cimeli legati al tormento irrisolto della banshee.' }],
+      notes: 'Messaggera Urlante della Morte\n\nHabitat: Qualsiasi\nTesoro: Reliquie\n\nPresagi di sventura e pestilenza per i viventi, le banshee sono spiriti ossessionati da amarezza o dolore irrisolti.\n\nQuesti celebri fantasmi uccidono chiunque li guardi o ascolti i loro lamenti funebri. Sebbene qualunque anima tormentata possa trasformarsi in una banshee, alcune comunità le temono particolarmente e credono che coloro che accumulano o distruggono la bellezza — naturale o artificiale — rischino di ritornare come banshee dopo la morte.\n\nMolte forme di sofferenza possono dare origine a una banshee. Tira un dado o scegli un risultato dalla tabella seguente per determinare quale tragedia l\'abbia generata.\n\nDolori della Banshee (tira 1d6 o scegli) — Il tormento spinge la banshee a...\n1) Apparire prima della morte di un membro della famiglia.\n2) Infestare il luogo in cui è stata giustiziata.\n3) Piangere un amore perduto e infestare la sua tomba.\n4) Annunciare una catastrofe o una tragedia imminente.\n5) Cercare la restituzione di un tesoro rubato.\n6) Uccidere coloro che sono più belli di quanto fosse in vita.'
     }
   ];
 
