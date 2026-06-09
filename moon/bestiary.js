@@ -931,6 +931,37 @@
       ],
       drop: [{ name: 'Reliquie', desc: 'Reliquie di imperi caduti e simboli di speranza infranta accumulati dal drago.' }],
       notes: 'Draghi della Decadenza e della Disperazione\n\nHabitat: Palude\nTesoro: Reliquie\n\n' + DRAGHI_NERI_LORE + '\n\n(Affrontato nella propria tana, il drago vale 13.000 PE.)'
+    },
+    {
+      id: 'preset_drago_nero_antico', name: 'Drago Nero Antico', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Mastodontica', alignment: 'Caotico Malvagio',
+      ac: 22, hp: 367, hpCur: 367, hpTemp: 0, hpDice: '21d20+147', init: 16,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '21', xp: '',
+      str: 27, dex: 14, con: 25, intl: 16, wis: 15, cha: 22,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '16', furtivita: '9' }, passivePerception: 26,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Acido'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria che acqua.' },
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con Incantesimi, lanciando Freccia Acida di Melf (versione di 4° livello).' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +15 a colpire, portata 4,5 metri.\nColpito: 17 (2d8 + 8) danni taglienti più 9 (2d8) danni da acido.', atkHit: '+15', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '2d8', t: 'acido' }] },
+        { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 22. Ogni creatura in una linea lunga 27 metri e larga 3 metri.\nFallimento: 67 (15d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '15d8', t: 'acido' }] },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 21, +13 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Paura, Freccia Acida di Melf (versione di 4° livello).\n\n1/Giorno ciascuno: Creare Non Morti, Parlare con i Morti, Sfera Vitriolica (versione di 5° livello).' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera le azioni spese all\'inizio del proprio turno.' },
+        { name: 'Nube di Insetti', desc: 'Tiro Salvezza su Destrezza: CD 21. Una creatura entro 36 metri che il drago può vedere.\nFallimento: 33 (6d10) danni da veleno e il bersaglio ha svantaggio ai tiri salvezza per mantenere la concentrazione fino alla fine del suo prossimo turno.\nIl drago non può usare nuovamente questa azione fino all\'inizio del suo prossimo turno.', atkDmgs: [{ f: '6d10', t: 'veleno' }] },
+        { name: 'Presenza Terrificante', desc: 'Il drago usa Incantesimi per lanciare Paura. Non può utilizzare nuovamente questa azione fino all\'inizio del suo prossimo turno.' },
+        { name: 'Balzo Predatorio', desc: 'Il drago si muove fino a metà della sua velocità e poi effettua un attacco Lacerazione.', atkHit: '+15', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '2d8', t: 'acido' }] }
+      ],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie di imperi caduti e simboli di speranza infranta accumulati nei secoli dal drago.' }],
+      notes: 'Draghi della Decadenza e della Disperazione\n\nHabitat: Palude\nTesoro: Reliquie\n\n' + DRAGHI_NERI_LORE + '\n\n— Effetti della Tana —\nUn drago nero antico altera il territorio entro 1,5 km dalla sua tana.\n\nFoschia Acrida: una nebbia soffocante e maleodorante copre l\'area, che diventa Leggermente Oscurata; il viaggio richiede il doppio del tempo per chiunque non sia il drago o i suoi alleati.\n\nAcque Corrotte: le fonti d\'acqua entro 1,5 km dalla tana sono contaminate soprannaturalmente. Una creatura che beve quell\'acqua deve superare un Tiro Salvezza su Costituzione CD 15 oppure ottenere la condizione Avvelenato per 1 ora.\n\nSe il drago muore o abbandona la tana, questi effetti cessano immediatamente.\n\n(Affrontato nella propria tana, il drago vale 41.000 PE.)'
     }
   ];
 
