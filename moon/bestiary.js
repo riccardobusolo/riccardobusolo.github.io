@@ -37,6 +37,7 @@
   var BANDITI_MOTIV = 'Motivazioni dei Banditi (tira 1d6 o scegli):\n1) Combatte soltanto contro gli oppressori.\n2) È un ex soldato abbandonato dalla propria nazione e ora si prende ciò che ritiene gli fosse stato promesso.\n3) Fa parte di una banda che considera nemici tutti coloro che non ne fanno parte.\n4) Serve controvoglia un leader malvagio.\n5) Lavora segretamente per un governo o un governante regionale allo scopo di diffondere il caos.\n6) Prende ciò che gli serve per sopravvivere.';
   var BANDITI_TAIL = BANDITI_LORE + '\n\n' + BANDITI_MOTIV;
   var BERSERKER_LORE = 'Consumati dall\'adrenalina della battaglia, i berserker sono invasori spericolati, combattenti da arena e guerrieri feroci che vivono per il conflitto. La loro furia li rende avversari temibili, capaci di ignorare il dolore e combattere fino all\'ultimo respiro.';
+  var DRAGHI_NERI_LORE = 'I draghi neri traggono piacere dalla sofferenza e dalla rovina. A differenza di altri draghi cromatici, che tramano per ottenere potere e ricchezze, essi desiderano distruggere tutto ciò che vedono e dominare le macerie che restano.\n\nSono creature terrificanti, caratterizzate da corna ricurve e da visi scheletrici che ricordano teschi demoniaci. Prediligono paludi stagnanti, rovine in rovina e luoghi corrotti dalla magia o dal degrado ambientale. Il loro soffio acido deturpa il territorio, consumando antiche statue e lasciando nella natura ferite permanenti.\n\nI draghi neri accumulano simboli di speranza infranta e reliquie di imperi caduti. Più un tesoro è desiderato o prezioso, maggiore è il piacere che provano nel possederlo, soprattutto se sono stati loro a causarne la perdita.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -855,6 +856,50 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'Ascia bipenne, 6 giavellotti e bottino individuale.' }],
       notes: 'Guerrieri della Furia e Predoni Spietati\n\nHabitat: Qualsiasi\nTesoro: Armamenti, Individuale\n\nI comandanti berserker portano sul corpo i segni di innumerevoli battaglie e guidano i loro seguaci con uno zelo brutale e contagioso. Molti di essi attingono a una magia primordiale che amplifica la loro forza e alimenta la furia delle orde che guidano.\n\n' + BERSERKER_LORE
+    },
+    {
+      id: 'preset_cucciolo_drago_nero', name: 'Cucciolo di Drago Nero', emoji: '🐲', rarity: 'epic',
+      type: 'Drago', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 17, hp: 33, hpCur: 33, hpTemp: 0, hpDice: '6d8+6', init: 4,
+      speed: '9 m, Volare 18 m, Nuotare 9 m', cr: '2', xp: '',
+      str: 15, dex: 14, con: 13, intl: 10, wis: 11, cha: 13,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '4', furtivita: '4' }, passivePerception: 14,
+      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico'],
+      dmgResist: [], dmgImmune: ['Acido'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria che acqua.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua due attacchi Lacerazione.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 5 (1d6 + 2) danni taglienti più 3 (1d4) danni da acido.', atkHit: '+4', atkDmgs: [{ f: '1d6+2', t: 'taglienti' }, { f: '1d4', t: 'acido' }] },
+        { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 11. Ogni creatura in una linea lunga 4,5 metri e larga 1,5 metri.\nFallimento: 22 (5d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '5d8', t: 'acido' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie di imperi caduti e simboli di speranza infranta accumulati dal drago.' }],
+      notes: 'Draghi della Decadenza e della Disperazione\n\nHabitat: Palude\nTesoro: Reliquie\n\nI cuccioli di drago nero si nascondono in acquitrini e corsi d\'acqua contaminati, dove cacciano prede deboli e creature facili da sopraffare. I più giovani possono persino combattersi tra loro per stabilire una gerarchia all\'interno della covata.\n\n' + DRAGHI_NERI_LORE
+    },
+    {
+      id: 'preset_giovane_drago_nero', name: 'Giovane Drago Nero', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Grande', alignment: 'Caotico Malvagio',
+      ac: 18, hp: 127, hpCur: 127, hpTemp: 0, hpDice: '15d10+45', init: 5,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '7', xp: '',
+      str: 19, dex: 14, con: 17, intl: 12, wis: 11, cha: 15,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '6', furtivita: '5' }, passivePerception: 16,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Acido'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria che acqua.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 9 (2d4 + 4) danni taglienti più 3 (1d6) danni da acido.', atkHit: '+7', atkDmgs: [{ f: '2d4+4', t: 'taglienti' }, { f: '1d6', t: 'acido' }] },
+        { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 14. Ogni creatura in una linea lunga 9 metri e larga 1,5 metri.\nFallimento: 49 (14d6) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '14d6', t: 'acido' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie di imperi caduti e simboli di speranza infranta accumulati dal drago.' }],
+      notes: 'Draghi della Decadenza e della Disperazione\n\nHabitat: Palude\nTesoro: Reliquie\n\nLa maggior parte dei giovani draghi neri reclama una tana nascosta, spesso situata in luoghi lugubri raggiungibili attraverso rovine pericolose o paludi insidiose. Amano terrorizzare piccoli insediamenti e assoggettare servitori timorosi come coboldi e trogloditi. Alcuni stringono alleanze con potenti non morti o aberrazioni del sottosuolo.\n\n' + DRAGHI_NERI_LORE
     }
   ];
 
