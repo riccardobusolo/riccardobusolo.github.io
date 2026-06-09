@@ -656,6 +656,32 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Oggetti e cimeli legati al tormento irrisolto della banshee.' }],
       notes: 'Messaggera Urlante della Morte\n\nHabitat: Qualsiasi\nTesoro: Reliquie\n\nPresagi di sventura e pestilenza per i viventi, le banshee sono spiriti ossessionati da amarezza o dolore irrisolti.\n\nQuesti celebri fantasmi uccidono chiunque li guardi o ascolti i loro lamenti funebri. Sebbene qualunque anima tormentata possa trasformarsi in una banshee, alcune comunità le temono particolarmente e credono che coloro che accumulano o distruggono la bellezza — naturale o artificiale — rischino di ritornare come banshee dopo la morte.\n\nMolte forme di sofferenza possono dare origine a una banshee. Tira un dado o scegli un risultato dalla tabella seguente per determinare quale tragedia l\'abbia generata.\n\nDolori della Banshee (tira 1d6 o scegli) — Il tormento spinge la banshee a...\n1) Apparire prima della morte di un membro della famiglia.\n2) Infestare il luogo in cui è stata giustiziata.\n3) Piangere un amore perduto e infestare la sua tomba.\n4) Annunciare una catastrofe o una tragedia imminente.\n5) Cercare la restituzione di un tesoro rubato.\n6) Uccidere coloro che sono più belli di quanto fosse in vita.'
+    },
+    {
+      id: 'preset_diavolo_uncinato', name: 'Diavolo Uncinato', emoji: '😈', rarity: 'uncommon',
+      type: 'Immondo', size: 'Media', alignment: 'Legale Malvagio',
+      ac: 15, hp: 110, hpCur: 110, hpTemp: 0, hpDice: '13d8+52', init: 3,
+      speed: '9 m, Scalare 9 m', cr: '5', xp: '',
+      str: 16, dex: 17, con: 18, intl: 12, wis: 14, cha: 14,
+      savesOverride: { str: '6', dex: '', con: '7', intl: '', wis: '5', cha: '5' },
+      skillOverrides: { inganno: '5', intuizione: '5', percezione: '8' }, passivePerception: 18,
+      senses: [{ type: 'Scurovisione (non ostacolata dall\'oscurità magica)', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
+      dmgResist: ['Freddo'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
+      condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Pelle Spinata', desc: 'All\'inizio di ciascuno dei suoi turni, il diavolo infligge 5 (1d10) danni perforanti a qualsiasi creatura che stia afferrando o che sia afferrata da lui.' },
+        { name: 'Rigenerazione Diabolica', desc: 'Se il diavolo muore al di fuori dei Nove Inferi, il suo corpo svanisce in una nube di fumo sulfureo.\nOttiene immediatamente un nuovo corpo e ritorna in vita con tutti i suoi punti ferita in un luogo dei Nove Inferi.' },
+        { name: 'Resistenza Magica', desc: 'Il diavolo possiede vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il diavolo effettua un attacco Artigli e un attacco Coda, oppure due attacchi Scagliare Fiamma.' },
+        { name: 'Artigli', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 10 (2d6 + 3) danni perforanti. Se il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Afferrato (CD 13 per liberarsi) da entrambi gli artigli del diavolo.', atkHit: '+6', atkDmgs: [{ f: '2d6+3', t: 'perforanti' }] },
+        { name: 'Coda', desc: 'Attacco con arma da mischia: +6 a colpire, portata 3 metri.\nColpito: 14 (2d10 + 3) danni taglienti.', atkHit: '+6', atkDmgs: [{ f: '2d10+3', t: 'taglienti' }] },
+        { name: 'Scagliare Fiamma', desc: 'Attacco con arma a distanza: +5 a colpire, gittata 45 metri.\nColpito: 17 (5d6) danni da fuoco. Se il bersaglio è un oggetto infiammabile che non viene indossato o trasportato, prende fuoco.', atkHit: '+5', atkDmgs: [{ f: '5d6', t: 'fuoco' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Tesoro', desc: 'Parte della collezione del diavolo: manufatti rari, simboli di potere e trofei sottratti ai ladri falliti.' }],
+      notes: 'Diavolo dell\'Avidità e dell\'Ossessione\n\nHabitat: Piani (Nove Inferi)\nTesoro: Qualsiasi\n\nCollezionisti infernali, i diavoli uncinati proteggono fanaticamente i propri tesori e perlustrano i piani dell\'esistenza alla ricerca di nuove aggiunte alle loro collezioni.\n\nConosciuti tra le schiere dei Nove Inferi come hamatula, questi diavoli adornano le loro pelli spinose con i possedimenti più preziosi e con trofei sottratti a coloro che hanno fallito nel tentativo di derubarli. Quando vengono minacciati, colpiscono con i loro arti ricoperti di spine e scagliano fiamme infernali contro i nemici.\n\nI diavoli uncinati servono spesso come guardie e contabili per generali di diavoli del ghiaccio, signori delle fosse, arcidiavoli e altri potenti malvagi. In cambio ottengono protezione per le proprie collezioni. Molti mantengono inoltre reti di imp e servitori incaricati di cercare nei vari piani tesori d\'interesse o mortali particolarmente avidi.\n\nRaramente raccolgono oggetti comuni come monete o gemme. Preferiscono invece possedere la più grande collezione esistente di una specifica categoria di oggetti, solitamente manufatti rari o simboli di potere. I diavoli uncinati non rubano ciò che desiderano: stipulano patti per ottenere sia tesori che anime mortali.'
     }
   ];
 
