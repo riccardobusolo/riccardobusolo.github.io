@@ -313,6 +313,44 @@
       legendaryActions: [],
       drop: [{ name: 'Conoscenze Arcane', desc: 'Segreti accumulati, tomi e conoscenze arcane (incluso il Tomo delle Anime).' }],
       notes: 'Yugoloth della Manipolazione Arcana\n\nHabitat: Piani (Piani Inferiori)\nTesoro: Conoscenze Arcane\n\nSebbene tutti gli yugoloth siano manifestazioni immonde di malvagità e avidità, gli arcanaloth indirizzano il loro considerevole intelletto verso l\'accumulo e lo sfruttamento dei segreti.\n\nUtilizzano tali conoscenze per intrappolare innumerevoli vittime e malviventi minori, seducendo i loro bersagli con false promesse e potenti magie.\n\nGli arcanaloth possiedono una straordinaria maestria nell\'arte degli incantesimi e spesso si celano dietro illusioni e travestimenti magici. Preferiscono lasciare che servitori magici o altri yugoloth combattano per loro, ma sono comunque perfettamente in grado di difendersi con il proprio potere arcano, arrivando persino a bandire i nemici all\'interno delle pagine dei loro tomi magici.'
+    },
+    {
+      id: 'preset_arcistrega', name: 'Arcistrega', emoji: '🧙', rarity: 'legendary',
+      type: 'Fata', size: 'Grande', alignment: 'Neutrale Malvagio',
+      ac: 20, hp: 333, hpCur: 333, hpTemp: 0, hpDice: '29d10+174', init: 16,
+      speed: '12 m', cr: '21', xp: '',
+      str: 24, dex: 15, con: 23, intl: 19, wis: 19, cha: 25,
+      savesOverride: { str: '', dex: '9', con: '', intl: '', wis: '11', cha: '' },
+      skillOverrides: { inganno: '14', percezione: '11', persuasione: '21' },
+      passivePerception: 21, senses: [{ type: 'Vista del Vero', value: 18, unit: 'm' }],
+      languages: ['Tutte'],
+      dmgResist: ['Freddo', 'Fuoco', 'Psichico'], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato'],
+      traits: [
+        { name: 'Magia del Circolo', desc: 'Finché si trova entro 9 metri da almeno altre due megere alleate, l\'arcistrega può lanciare uno dei seguenti incantesimi senza componenti materiali, usando l\'Intelligenza come caratteristica da incantatore (CD 19): Augurio (Augury), Trova Famiglio (Find Familiar), Identificare (Identify), Individuare Oggetto (Locate Object), Scrutare (Scrying), Servitore Invisibile (Unseen Servant).\nDopo aver usato questo tratto, deve completare un riposo lungo prima di poterlo usare di nuovo.' },
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe fallisce un tiro salvezza, l\'arcistrega può scegliere di superarlo invece.' },
+        { name: 'Resistenza Magica', desc: 'L\'arcistrega ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Fuga Rancorosa', desc: 'Quando l\'arcistrega scende a 0 punti ferita, muore soltanto se si trova entro 9 metri dal proprio anatema. In caso contrario scende invece a 1 punto ferita, si teletrasporta in un semipiano innocuo e non può ritornare sul piano che ha lasciato per 2d6 giorni.\nQuando scompare, ogni creatura entro 18 metri dal punto in cui si trovava viene maledetta. Finché dura la maledizione la creatura ha svantaggio alle prove di caratteristica e ai tiri salvezza, e l\'arcistrega ne conosce la posizione in qualunque punto del multiverso.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'arcistrega effettua due attacchi Artiglio Spettrale e utilizza Onda Crepitante.' },
+        { name: 'Artiglio Spettrale', desc: 'Attacco in mischia o a distanza: +14 a colpire, portata 3 m oppure gittata 18 m.\nColpito: 17 (3d6 + 7) danni da forza.\nSe il bersaglio è di taglia Grande o inferiore, ottiene la condizione Prono.', atkHit: '+14', atkDmgs: [{ f: '3d6+7', t: 'forza' }] },
+        { name: 'Onda Crepitante', desc: 'Tiro Salvezza su Destrezza: CD 22. Ogni creatura in un cono di 18 metri.\nFallimento: 32 (5d12) danni da fulmine. Successo: metà danni.\nIn ogni caso il bersaglio viene maledetto fino alla fine del turno successivo dell\'arcistrega; finché dura la maledizione non può effettuare reazioni.', atkDmgs: [{ f: '5d12', t: 'fulmine' }] },
+        { name: 'Incantare', desc: 'L\'arcistrega lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 22).\n\nA volontà: Individuazione dei Pensieri (Detect Thoughts), Porta Dimensionale (Dimension Door), Dissolvi Magie (Dispel Magic), Trama Ipnotica (Hypnotic Pattern).\n\n2 volte al giorno ciascuno: Suggestione di Massa (Mass Suggestion), Modificare Memoria (Modify Memory), Spostamento Planare (Plane Shift).' }
+      ],
+      bonusActions: [
+        { name: 'Colpo della Strega', desc: 'Ogni creatura maledetta dall\'arcistrega e situata entro 18 metri da essa subisce 14 (4d6) danni da fulmine.', atkDmgs: [{ f: '4d6', t: 'fulmine' }] }
+      ],
+      reactions: [
+        { name: 'Scioglilingua', desc: 'L\'arcistrega lancia Controincantesimo (Counterspell) in risposta al normale innesco dell\'incantesimo, usando la stessa caratteristica da incantatore di Incantare.\nSe il bersaglio fallisce il tiro salvezza richiesto da Controincantesimo, viene maledetto fino alla fine del proprio turno successivo: non può lanciare incantesimi con componenti verbali e, quando parla, dice l\'opposto di ciò che intende esprimere.' }
+      ],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'L\'arcistrega può usare una sola azione leggendaria alla volta, immediatamente dopo il turno di un\'altra creatura. Recupera tutti gli usi spesi all\'inizio del proprio turno.' },
+        { name: 'Sferzata della Megera', desc: 'L\'arcistrega effettua un attacco Artiglio Spettrale.', atkHit: '+14', atkDmgs: [{ f: '3d6+7', t: 'forza' }] },
+        { name: 'Magia Malevola', desc: 'L\'arcistrega utilizza Incantare per lanciare Porta Dimensionale (Dimension Door) oppure Trama Ipnotica (Hypnotic Pattern). Non può usare di nuovo questa azione fino all\'inizio del proprio turno successivo.' }
+      ],
+      drop: [{ name: 'Conoscenze Arcane', desc: 'Segreti proibiti, magie bizzarre e conoscenze del multiverso — ma ogni segreto ha un prezzo.' }],
+      notes: 'Megera dei Segreti Proibiti e della Malizia Magica\n\nHabitat: Qualsiasi\nTesoro: Conoscenze Arcane\n\nImmortali e imprevedibili, le arcistreghe accumulano segreti e stringono strani patti magici, alterando il destino per soddisfare i propri capricci. Queste eterne cospiratrici inseguono i misteri del multiverso e praticano magie bizzarre per perseguire obiettivi insondabili.\n\nLe arcistreghe sono egoiste, avide e imprevedibili, caratterizzate da ossessioni e fascinazioni eccentriche. Nonostante ciò, stringono spesso accordi per favorire i propri piani. Sono fonti inesauribili di conoscenze segrete, soprattutto riguardo alla magia proibita e ai misteri del multiverso.\n\nPossono condividere ciò che sanno, ma ogni segreto ha sempre un prezzo: in cambio possono richiedere missioni insolite, oggetti magici preziosi o valute soprannaturali come ricordi, anni di vita o persino la capacità di piangere.\n\nLa maggior parte evita il combattimento, ma quando è costretta a lottare scatena magie devastanti: artigli spettrali, fulmini crepitanti e incantesimi capaci di piegare la mente. Anche quando sembrano sconfitte, le loro preparazioni permettono di fuggire e tramare vendetta.\n\n— Anatemi dell\'Arcistrega —\nOgni arcistrega ha una debolezza unica legata a un evento del passato o a qualcosa che rappresenta l\'opposto della sua magia. Non può essere ferita fisicamente dal proprio anatema, ma può essere distrutta definitivamente solo quando la sua debolezza si trova nelle vicinanze.\n\nTabella degli Anatemi (d10):\n1. Le ossa del suo primo amore.\n2. Una lacrima di diavolo.\n3. Un uovo contenente un castello in miniatura.\n4. Un fiore che sboccia soltanto quando il tempo si ferma.\n5. Un dono ricevuto dalla sua gemella.\n6. La peggiore battuta del multiverso.\n7. Uno dei denti perduti dell\'arcistrega.\n8. Neve raccolta dalla cima del Monte Celestia.\n9. Una stella strappata dal cielo.\n10. Un filo proveniente dalle vesti della Signora del Dolore.\n\n— Tana dell\'Arcistrega —\nOgni arcistrega crea una dimora magica: un semipiano nascosto, un maniero sospeso su una nube tempestosa o, come Baba Yaga, una capanna su gigantesche zampe di gallina. Gli interni mutano spesso o mostrano caratteristiche assurde e disorientanti.\n\nEffetti regionali (entro 1,6 km dalla tana):\nLapsus di Lingua: le creature diverse dall\'arcistrega e dai suoi alleati sottraggono 1d10 a tutte le prove di caratteristica fatte usando l\'azione Influenzare.\nMagia Ficcanaso: quando una creatura non alleata completa un riposo lungo entro 1 miglio dalla tana, il primo incantesimo che lancia con uno slot provoca anche l\'effetto di Confusione centrato su sé stessa (usa la caratteristica da incantatore della creatura, nessuna concentrazione).\nSe l\'arcistrega è distrutta o abbandona la tana, questi effetti terminano.'
     }
   ];
 
