@@ -709,6 +709,27 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Tesoro', desc: 'Trofei di antiche cacce e simboli demoniaci sottratti alle prede.' }],
       notes: 'Demone dell\'Istinto e della Violenza Primordiale\n\nHabitat: Piani (Abisso)\nTesoro: Qualsiasi\n\nLe barlgura sono demoni che incarnano la brutalità e l\'istinto omicida. Cacciano senza pietà qualsiasi creatura entri nei loro territori, che si tratti delle terre selvagge dell\'Abisso o di luoghi in cui sono state evocate da malvagi incantatori.\n\nLe barlgura disseminano i propri domini di simboli demoniaci e terrificanti prove delle loro uccisioni.\n\nCooperano con altri demoni, specialmente con altre barlgura, purché vi siano prede in abbondanza. Se una regione viene privata di vittime da massacrare, questi demoni finiscono per rivolgere la propria ferocia gli uni contro gli altri, dando origine a scontri devastanti.\n\nL\'aspetto delle barlgura varia notevolmente, ma tutte possiedono corpi possenti e mani capaci di arrampicarsi rapidamente e infliggere colpi schiaccianti. Quando la sola forza bruta non basta, ricorrono alla magia demoniaca per evocare illusioni terrificanti e liane avvinghianti.\n\nLa maggior parte delle barlgura ricorda scimmie mostruose da incubo, mentre altre mostrano caratteristiche esagerate di predatori tipici delle terre che abitano. Molte incorporano trofei di antiche cacce direttamente nelle proprie carni demoniache.'
+    },
+    {
+      id: 'preset_basilisco', name: 'Basilisco', emoji: '🦎', rarity: 'rare',
+      type: 'Mostruosità', size: 'Media', alignment: 'Senza Allineamento',
+      ac: 15, hp: 52, hpCur: 52, hpTemp: 0, hpDice: '8d8+16', init: -1,
+      speed: '6 m', cr: '3', xp: '',
+      str: 16, dex: 8, con: 15, intl: 2, wis: 8, cha: 7,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 9,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 10 (2d6 + 3) danni perforanti più 7 (2d6) danni da veleno.', atkHit: '+5', atkDmgs: [{ f: '2d6+3', t: 'perforanti' }, { f: '2d6', t: 'veleno' }] }
+      ],
+      bonusActions: [
+        { name: 'Sguardo Pietrificante (Ricarica 4-6)', desc: 'Tiro Salvezza su Costituzione: CD 12. Ogni creatura entro un cono di 9 metri. Se il basilisco vede il proprio riflesso all\'interno del cono, deve effettuare anch\'esso il tiro salvezza.\nPrimo Fallimento: il bersaglio ottiene la condizione Trattenuto e ripete il tiro salvezza alla fine del proprio turno successivo se è ancora trattenuto (con un successo, l\'effetto termina).\nSecondo Fallimento: la condizione Trattenuto viene sostituita dalla condizione Pietrificato.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Tesoro', desc: 'Ricchezze custodite dal basilisco e resti pietrificati delle sue prede.' }],
+      notes: 'Guardiano Rettiliano dallo Sguardo Pietrificante\n\nHabitat: Montagne, Sottosuolo\nTesoro: Qualsiasi\n\nI basilischi sono predatori massicci dotati di otto zampe artigliate, spine cristalline e potenti mascelle.\n\nPiuttosto che inseguire le prede, utilizzano il loro sguardo soprannaturale per trasformare le creature in pietra e consumarle con calma in seguito. Sebbene preferiscano tane sotterranee, molti basilischi vengono catturati e tenuti da individui senza scrupoli come guardiani di tesori e ricchezze.\n\nI resti delle creature pietrificate costellano le aree in cui un basilisco caccia. Possono trattarsi di comuni avventurieri oppure di esseri molto più insoliti che hanno avuto la sfortuna di incrociare il suo sguardo. Tira un dado o scegli un risultato dalla tabella seguente per determinare quali statue si trovano nel territorio di caccia di un basilisco.\n\nVi è il 50% di probabilità che ciascuna di queste statue sia priva di arti o ridotta in pezzi.\n\nVittime Pietrificate del Basilisco (tira 1d8 o scegli) — Il basilisco ha pietrificato...\n1) Un avventuriero con una chiave decorata appesa al collo.\n2) Animali come pipistrelli, orsi, cervi o capre.\n3) Uno scalatore aggrappato a una stalattite.\n4) Sé stesso mentre osservava un grande specchio o una superficie riflettente.\n5) Un mimic camuffato da scrigno colmo di tesori.\n6) Un mostro come un umber hulk o un troglodita.\n7) Qualcuno sorpreso in una posa comica o mentre faceva una smorfia ridicola.\n8) Una vittima ormai utilizzata come nido da insetti o altri parassiti.'
     }
   ];
 
