@@ -508,6 +508,36 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'Armi e oggetti personali forgiati nelle fornaci azer.' }],
       notes: 'Fabbri Ardenti di Metallo Vivente\n\nHabitat: Montagne, Piani (Piano Elementale del Fuoco)\nTesoro: Armamenti, Oggetti Personali\n\nLe sentinelle azer proteggono i fabbri delle loro comunità e incanalano il proprio fuoco attraverso le armi che impugnano.\n\n' + AZER_LORE
+    },
+    {
+      id: 'preset_balor', name: 'Balor', emoji: '👹', rarity: 'legendary',
+      type: 'Immondo', size: 'Enorme', alignment: 'Caotico Malvagio',
+      ac: 19, hp: 300, hpCur: 300, hpTemp: 0, hpDice: '24d12+144', init: 14,
+      speed: '12 m, Volare 24 m', cr: '19', xp: '',
+      str: 26, dex: 15, con: 22, intl: 20, wis: 16, cha: 22,
+      savesOverride: { str: '', dex: '', con: '12', intl: '', wis: '9', cha: '' },
+      skillOverrides: { percezione: '9' },
+      passivePerception: 19, senses: [{ type: 'Vista del Vero', value: 36, unit: 'm' }],
+      languages: ['Abissale', 'Telepatia 36 m'],
+      dmgResist: ['Freddo', 'Fulmine'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Avvelenato', 'Spaventato'],
+      traits: [
+        { name: 'Agonia della Morte', desc: 'Quando il balor muore, esplode.\nTiro Salvezza su Destrezza: CD 20. Ogni creatura entro un\'emanazione di 9 metri dal balor.\nFallimento: 31 (9d6) danni da fuoco più 31 (9d6) danni da forza. Successo: metà danni.\nInoltre, se il balor muore al di fuori dell\'Abisso, ottiene immediatamente un nuovo corpo e ritorna in vita con tutti i propri punti ferita in qualche luogo dell\'Abisso.' },
+        { name: 'Aura di Fuoco', desc: 'Alla fine di ciascun turno del balor, ogni creatura entro un\'emanazione di 1,5 metri subisce 13 (3d8) danni da fuoco.' },
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno)\nSe il balor fallisce un tiro salvezza, può scegliere di superarlo invece.' },
+        { name: 'Resistenza Magica', desc: 'Il balor ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il balor effettua un attacco Frusta di Fiamme e un attacco Lama del Fulmine.' },
+        { name: 'Frusta di Fiamme', desc: 'Attacco in mischia: +14 a colpire, portata 9 metri.\nColpito: 18 (3d6 + 8) danni da forza più 17 (5d6) danni da fuoco.\nSe il bersaglio è di taglia Enorme o inferiore, viene trascinato fino a 7,5 metri in linea retta verso il balor e ottiene la condizione Prono.', atkHit: '+14', atkDmgs: [{ f: '3d6+8', t: 'forza' }, { f: '5d6', t: 'fuoco' }] },
+        { name: 'Lama del Fulmine', desc: 'Attacco in mischia: +14 a colpire, portata 3 metri.\nColpito: 21 (3d8 + 8) danni da forza più 22 (4d10) danni da fulmine.\nIl bersaglio non può effettuare Reazioni fino all\'inizio del turno successivo del balor.', atkHit: '+14', atkDmgs: [{ f: '3d8+8', t: 'forza' }, { f: '4d10', t: 'fulmine' }] }
+      ],
+      bonusActions: [
+        { name: 'Teletrasporto', desc: 'Il balor teletrasporta sé stesso oppure un demone consenziente entro 3 metri da lui fino a 18 metri, in uno spazio libero che può vedere.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'La spada del fulmine e la frusta di fiamme del balor, oltre ad altri armamenti abissali.' }],
+      notes: 'Demone dell\'Ira Travolgente\n\nHabitat: Piani (Abisso)\nTesoro: Armamenti\n\nI balor incarnano la furia distruttiva e l\'odio dei demoni.\n\nQuesti colossali terrori alati ribollono di rabbia incessante, manifestando la propria collera attraverso ondate di fuoco e due armi terrificanti: una spada di fulmini crepitanti e una frusta di fiamme sferzanti.\n\nL\'ira di un balor persiste fino all\'istante della sua morte, momento in cui esplode in un\'ultima vendetta contro coloro che lo hanno abbattuto.\n\nSignori dei demoni e divinità malvagie sfruttano la furia dei balor facendone comandanti di eserciti infernali o guardiani di segreti proibiti.'
     }
   ];
 
