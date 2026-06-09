@@ -280,6 +280,39 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Predatore Insettoide Scavatore\n\nHabitat: Foreste, Praterie\nTesoro: Nessuno\n\nGli ankheg sono enormi insetti che scavano gallerie poco sotto la superficie, creando vasti labirinti sotterranei. Dai loro tunnel emergono all\'improvviso per dissolvere e divorare creature più piccole utilizzando mandibole grondanti acido e getti di enzimi digestivi.\n\nGli ankheg rappresentano una piaga per gli agricoltori, poiché il bestiame al pascolo costituisce una facile preda. Molti vivono in solitudine, ma nelle regioni ricche di cibo possono riunirsi in nidi composti da diverse decine di esemplari, minacciando intere comunità.\n\nEliminare un nido di ankheg può essere estremamente difficile, a meno che non vengano bonificati tutti i tunnel e distrutte le loro uova.\n\nLe loro gallerie hanno generalmente forma cilindrica e sono spesso disseminate dei resti delle prede e di tesori trascinati nel sottosuolo.\n\n— Scoperte nei Tunnel degli Ankheg (d8) —\n1. Un\'altra galleria (naturale o scavata nella pietra) che conduce al Sottosuolo.\n2. Una rovina sepolta o una tomba riportata alla luce dal tunnel.\n3. Un gruppo di 1d4 uova fresche di ankheg, che possono essere rotte e utilizzate come ampolle di acido.\n4. Il cadavere di un ankheg e le prove dell\'esistenza di un predatore sotterraneo ancora più pericoloso.\n5. Un frammento di carapace di ankheg utilizzabile come scudo.\n6. Una borsa contenente 2d6 monete d\'oro accanto a una pozza d\'acido.\n7. Un animale randagio proveniente da una fattoria o da un bosco.\n8. Uno spaventapasseri brutalmente dilaniato.'
+    },
+    {
+      id: 'preset_arcanaloth', name: 'Arcanaloth', emoji: '🐺', rarity: 'rare',
+      type: 'Immondo', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 17, hp: 175, hpCur: 175, hpTemp: 0, hpDice: '27d8+54', init: 5,
+      speed: '9 m, Volare 9 m (stazionario)', cr: '12', xp: '',
+      str: 17, dex: 12, con: 14, intl: 20, wis: 16, cha: 17,
+      savesOverride: { str: '', dex: '5', con: '6', intl: '9', wis: '7', cha: '' },
+      skillOverrides: { arcano: '9', inganno: '7', intuizione: '7', percezione: '7' },
+      passivePerception: 17, senses: [{ type: 'Vista del Vero', value: 36, unit: 'm' }],
+      languages: ['Tutte', 'Telepatia 36 m'],
+      dmgResist: ['Freddo', 'Fuoco', 'Fulmine'], dmgImmune: ['Acido', 'Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Avvelenato'],
+      traits: [
+        { name: 'Rigenerazione Immonda', desc: 'Se l\'arcanaloth muore al di fuori di Gehenna, il suo corpo si dissolve in icore e ottiene immediatamente un nuovo corpo, tornando in vita con tutti i propri punti ferita a Gehenna.' },
+        { name: 'Resistenza Magica', desc: 'L\'arcanaloth ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Tomo delle Anime', desc: 'L\'arcanaloth possiede un tomo magico. Finché tiene o trasporta il tomo, può utilizzare l\'azione Artiglio Esiliante.\nIl tomo ha CA 17, 35 punti ferita e immunità ai danni necrotici, psichici e da veleno. Recupera tutti i punti ferita alla fine di ogni turno e si trasforma in polvere se ridotto a 0 punti ferita o se l\'arcanaloth muore. Se viene distrutto, l\'arcanaloth può crearne uno nuovo al termine di un riposo breve o lungo.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'arcanaloth effettua tre attacchi Esplosione Immonda. Può sostituire uno di questi attacchi con Artiglio Esiliante.' },
+        { name: 'Esplosione Immonda', desc: 'Attacco in mischia o a distanza: +9 a colpire, portata 1,5 m oppure gittata 36 m.\nColpito: 31 (4d12 + 5) danni necrotici.', atkHit: '+9', atkDmgs: [{ f: '4d12+5', t: 'necrotici' }] },
+        { name: 'Artiglio Esiliante', desc: '(Richiede il Tomo delle Anime) Attacco in mischia: +9 a colpire, portata 1,5 m.\nColpito: 10 (2d4 + 5) danni taglienti più 19 (3d12) danni psichici.\nSe il bersaglio è una creatura, deve superare un tiro salvezza su Carisma CD 17 o venire imprigionato in un semipiano all\'interno del Tomo delle Anime (condizione Incapacitato; ripete il TS alla fine di ogni proprio turno). Con un successo fugge e riappare nello spazio che occupava (o nel più vicino libero). Se fallisce tre TS nel semipiano, resta vincolato permanentemente al tomo e può essere liberato solo riducendo il tomo a 0 punti ferita.', atkHit: '+9', atkDmgs: [{ f: '2d4+5', t: 'taglienti' }, { f: '3d12', t: 'psichici' }] },
+        { name: 'Incantare', desc: 'L\'arcanaloth lancia uno dei seguenti incantesimi senza componenti materiali, usando l\'Intelligenza come caratteristica da incantatore (CD 17).\n\nA volontà: Alterare Sé (Alter Self), Individuazione del Magico (Detect Magic), Identificare (Identify), Mano Magica (Mage Hand), Prestidigitazione (Prestidigitation).\n\n1 volta al giorno ciascuno: Contattare Altri Piani (Contact Other Plane), Individuazione dei Pensieri (Detect Thoughts), Porta Dimensionale (Dimension Door), Mente Vuota (Mind Blank).' }
+      ],
+      bonusActions: [
+        { name: 'Teletrasporto', desc: 'L\'arcanaloth si teletrasporta fino a 9 metri in uno spazio libero che può vedere.' }
+      ],
+      reactions: [
+        { name: 'Controincantesimo', desc: 'L\'arcanaloth lancia Controincantesimo (Counterspell) in risposta al normale innesco dell\'incantesimo, usando la stessa caratteristica da incantatore di Incantare.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Conoscenze Arcane', desc: 'Segreti accumulati, tomi e conoscenze arcane (incluso il Tomo delle Anime).' }],
+      notes: 'Yugoloth della Manipolazione Arcana\n\nHabitat: Piani (Piani Inferiori)\nTesoro: Conoscenze Arcane\n\nSebbene tutti gli yugoloth siano manifestazioni immonde di malvagità e avidità, gli arcanaloth indirizzano il loro considerevole intelletto verso l\'accumulo e lo sfruttamento dei segreti.\n\nUtilizzano tali conoscenze per intrappolare innumerevoli vittime e malviventi minori, seducendo i loro bersagli con false promesse e potenti magie.\n\nGli arcanaloth possiedono una straordinaria maestria nell\'arte degli incantesimi e spesso si celano dietro illusioni e travestimenti magici. Preferiscono lasciare che servitori magici o altri yugoloth combattano per loro, ma sono comunque perfettamente in grado di difendersi con il proprio potere arcano, arrivando persino a bandire i nemici all\'interno delle pagine dei loro tomi magici.'
     }
   ];
 
