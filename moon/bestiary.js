@@ -30,6 +30,7 @@
      ------------------------------------------------------------------------- */
   var AARAKOCRA_LORE = 'Gli aarakocra sono esseri simili ad uccelli che solcano i cieli di innumerevoli mondi e le infinite distese del Piano Elementale dell\'Aria. Spesso ricordano gli uccelli comuni delle regioni in cui vivono: alcuni assomigliano a falchi o condor, mentre altri ricordano colibrì o archeotteri.\n\nIn molte terre, gli aarakocra narrano le gesta dei loro antichi eroi che combatterono la malvagia Regina del Caos Alato insieme ai misteriosi Duchi del Vento di Aaqa.';
   var ANIMATI_LORE = 'La magia può manipolare oggetti ordinari, costringendoli a svolgere semplici compiti. Questi oggetti animati possono apparire come innocui utensili o decorazioni capaci però di difendere il loro creatore.\n\nEssi seguono semplici istruzioni impartite dalla forza o dall\'incantatore che li ha creati. Se lasciati senza supervisione, possono continuare a proteggere una zona per anni oppure ripetere lo stesso compito fino a consumarsi.\n\n— Catalizzatori degli Oggetti Animati (d10) —\n1. Un Celestiale o un Immondo che usa l\'oggetto per proteggere o tormentare un mortale.\n2. Una combinazione di magia e tecnologia, come alchimia o scienza aliena.\n3. L\'essenza di qualcuno trasformata da un ingannatore soprannaturale.\n4. Fate impegnate nei loro giochi o intrighi.\n5. Il caso, dopo che l\'oggetto ha acquisito una parvenza di vita dopo un secolo di utilizzo.\n6. Un incantatore che necessita di una guardia o di un servitore.\n7. Il canto di uno strumento magico.\n8. Uno spirito che possiede l\'oggetto.\n9. Magia selvaggia, un incantesimo fallito o un artefatto caotico.\n10. La volontà di una potente entità psionica.';
+  var PIANTE_LORE = 'La magia può infondere nelle piante mobilità, intelligenza e perfino una voce. Incantesimi come Risveglio (Awaken) o l\'influenza di altri piani di esistenza possono dare vita alla vegetazione comune, mentre alcune piante straordinarie possiedono naturalmente tali caratteristiche.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -377,6 +378,44 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Equipaggiamento', desc: 'Balestra Leggera, Spada Corta, Armatura di Cuoio Borchiato e oggetti personali.' }],
       notes: 'Sicario a Contratto\n\nHabitat: Qualsiasi\nTesoro: Equipaggiamento, Oggetti Personali\n\nGli assassini sono killer professionisti specializzati nell\'avvicinarsi furtivamente alle proprie vittime e colpire senza essere visti.\n\nLa maggior parte di essi uccide per una ragione precisa, mettendosi al servizio di ricchi committenti o combattendo per cause prive di scrupoli. Utilizzano veleni e altri strumenti letali e spesso trasportano equipaggiamento utile per infiltrarsi in luoghi protetti o evitare la cattura.\n\nMolti assassini seguono un rigido codice professionale oppure possiedono una caratteristica distintiva che li rende celebri.\n\n— Metodi Operativi dell\'Assassino (d6) —\n1. Disporre le proprie vittime in macabri tableaux artistici.\n2. Nascondersi all\'interno di grandi oggetti, come armature complete o mobili cavi.\n3. Lasciare un segno distintivo, come una carta da visita, un fiore, una conchiglia o un dente.\n4. Fingersi una celebrità, una figura religiosa o un servitore.\n5. Conservare trofei sottratti alle proprie vittime.\n6. Utilizzare un veleno dal colore o dall\'odore caratteristico.'
+    },
+    {
+      id: 'preset_arbusto_risvegliato', name: 'Arbusto Risvegliato', emoji: '🌿', rarity: 'rare',
+      type: 'Pianta', size: 'Piccola', alignment: 'Neutrale',
+      ac: 9, hp: 10, hpCur: 10, hpTemp: 0, hpDice: '3d6', init: -1,
+      speed: '6 m', cr: '0', xp: '',
+      str: 3, dex: 8, con: 11, intl: 10, wis: 10, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {},
+      passivePerception: 10, senses: [],
+      languages: ['Comune', 'Un\'altra lingua a scelta'],
+      dmgResist: ['Perforante'], dmgImmune: [], dmgVulner: ['Fuoco'], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Graffio', desc: 'Attacco in mischia: +1 a colpire, portata 1,5 m.\nColpito: 1 danno tagliente.', atkHit: '+1', atkDmgs: [{ f: '1', t: 'tagliente' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Vegetazione Dotata di Vita Magica\n\nHabitat: Foreste\nTesoro: Nessuno\n\nGli arbusti risvegliati possono assumere l\'aspetto di qualsiasi piccola pianta, dai cespugli delle foreste ai gruppi di fiori. Spesso si trovano nei pressi di alberi risvegliati o in regioni permeate da magia primordiale. Alcuni presentano forme bizzarre o fogliame che ricorda vagamente lineamenti del volto, mentre altri assomigliano a statue vegetali animate raffiguranti animali.\n\n' + PIANTE_LORE
+    },
+    {
+      id: 'preset_albero_risvegliato', name: 'Albero Risvegliato', emoji: '🌳', rarity: 'rare',
+      type: 'Pianta', size: 'Enorme', alignment: 'Neutrale',
+      ac: 13, hp: 59, hpCur: 59, hpTemp: 0, hpDice: '7d12+14', init: -2,
+      speed: '6 m', cr: '2', xp: '',
+      str: 19, dex: 6, con: 15, intl: 10, wis: 10, cha: 7,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {},
+      passivePerception: 10, senses: [],
+      languages: ['Comune', 'Un\'altra lingua a scelta'],
+      dmgResist: ['Contundente', 'Perforante'], dmgImmune: [], dmgVulner: ['Fuoco'], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Schianto', desc: 'Attacco in mischia: +6 a colpire, portata 3 m.\nColpito: 14 (3d6 + 4) danni contundenti.', atkHit: '+6', atkDmgs: [{ f: '3d6+4', t: 'contundenti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Vegetazione Dotata di Vita Magica\n\nHabitat: Foreste\nTesoro: Nessuno\n\nAlcuni alberi risvegliati rimangono immobili per lunghi periodi in uno stato quasi meditativo, rendendosi facilmente confondibili con alberi normali. Altri pattugliano invece territori intrisi di potere naturale.\n\nTalvolta vengono animati dall\'influenza del Feywild, assumendo colori vivaci e fioriture perenni. Altri sono plasmati dall\'energia dello Shadowfell, che li ricopre di nodi contorti e deformità inquietanti, conferendo loro un aspetto quasi privo di vita.\n\n' + PIANTE_LORE
     }
   ];
 
