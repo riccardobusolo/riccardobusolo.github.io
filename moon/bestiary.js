@@ -730,6 +730,29 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Tesoro', desc: 'Ricchezze custodite dal basilisco e resti pietrificati delle sue prede.' }],
       notes: 'Guardiano Rettiliano dallo Sguardo Pietrificante\n\nHabitat: Montagne, Sottosuolo\nTesoro: Qualsiasi\n\nI basilischi sono predatori massicci dotati di otto zampe artigliate, spine cristalline e potenti mascelle.\n\nPiuttosto che inseguire le prede, utilizzano il loro sguardo soprannaturale per trasformare le creature in pietra e consumarle con calma in seguito. Sebbene preferiscano tane sotterranee, molti basilischi vengono catturati e tenuti da individui senza scrupoli come guardiani di tesori e ricchezze.\n\nI resti delle creature pietrificate costellano le aree in cui un basilisco caccia. Possono trattarsi di comuni avventurieri oppure di esseri molto più insoliti che hanno avuto la sfortuna di incrociare il suo sguardo. Tira un dado o scegli un risultato dalla tabella seguente per determinare quali statue si trovano nel territorio di caccia di un basilisco.\n\nVi è il 50% di probabilità che ciascuna di queste statue sia priva di arti o ridotta in pezzi.\n\nVittime Pietrificate del Basilisco (tira 1d8 o scegli) — Il basilisco ha pietrificato...\n1) Un avventuriero con una chiave decorata appesa al collo.\n2) Animali come pipistrelli, orsi, cervi o capre.\n3) Uno scalatore aggrappato a una stalattite.\n4) Sé stesso mentre osservava un grande specchio o una superficie riflettente.\n5) Un mimic camuffato da scrigno colmo di tesori.\n6) Un mostro come un umber hulk o un troglodita.\n7) Qualcuno sorpreso in una posa comica o mentre faceva una smorfia ridicola.\n8) Una vittima ormai utilizzata come nido da insetti o altri parassiti.'
+    },
+    {
+      id: 'preset_diavolo_barbuto', name: 'Diavolo Barbuto', emoji: '👿', rarity: 'uncommon',
+      type: 'Immondo', size: 'Media', alignment: 'Legale Malvagio',
+      ac: 13, hp: 58, hpCur: 58, hpTemp: 0, hpDice: '9d8+18', init: 2,
+      speed: '9 m', cr: '3', xp: '',
+      str: 16, dex: 15, con: 15, intl: 9, wis: 11, cha: 14,
+      savesOverride: { str: '5', dex: '', con: '4', intl: '', wis: '', cha: '4' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione (non ostacolata dall\'oscurità magica)', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
+      dmgResist: ['Freddo'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
+      condImmune: ['Avvelenato', 'Spaventato'],
+      traits: [
+        { name: 'Resistenza Magica', desc: 'Il diavolo possiede vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il diavolo effettua un attacco Barba e un attacco Glaive Infernale.' },
+        { name: 'Barba', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 7 (1d8 + 3) danni perforanti. Il bersaglio ottiene la condizione Avvelenato fino all\'inizio del turno successivo del diavolo. Finché il veleno permane, il bersaglio non può recuperare punti ferita.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'perforanti' }] },
+        { name: 'Glaive Infernale', desc: 'Attacco con arma da mischia: +5 a colpire, portata 3 metri.\nColpito: 8 (1d10 + 3) danni taglienti. Se il bersaglio è una creatura e non possiede già una Ferita Infernale, deve effettuare un Tiro Salvezza su Costituzione (CD 12).\nFallimento: il bersaglio subisce una Ferita Infernale. Finché la ferita permane, all\'inizio di ciascun suo turno perde 5 (1d10) punti ferita.\nLa ferita si chiude dopo 1 minuto, se un incantesimo ripristina punti ferita al bersaglio, oppure se una creatura entro 1,5 metri usa un\'azione per fasciare la ferita superando una prova di Saggezza (Medicina) con CD 12.', atkHit: '+5', atkDmgs: [{ f: '1d10+3', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'La glaive infernale del diavolo e altri armamenti diabolici.' }],
+      notes: 'Diavolo della Forza e dell\'Intimidazione\n\nHabitat: Piani (Nove Inferi)\nTesoro: Armamenti\n\nI diavoli barbuti, noti anche come barbazu, riempiono le legioni dei Nove Inferi.\n\nQuesti crudeli soldati eseguono gli ordini dei generali infernali mentre difendono i regni diabolici, invadono il Piano Materiale e combattono contro i demoni in conflitti che attraversano molteplici piani di esistenza.\n\nQuando agiscono di propria iniziativa, i diavoli barbuti incoraggiano i mortali a esercitare il proprio potere in modo spietato e abusarne, alimentando il loro ego e ispirando piccole tirannie.\n\nI malvagi alleati dei Nove Inferi invocano spesso i diavoli barbuti come guardiani, esecutori della propria volontà o soldati in eserciti oscuri.\n\nLe loro caratteristiche barbe sono costituite da grottesche escrescenze simili a tentacoli. Queste barbe contorte e ricoperte di aculei trasportano un veleno capace di ostacolare la guarigione magica.\n\nI diavoli barbuti sono inoltre celebri per le loro glaive infernali, attraverso le quali incanalano energie diaboliche. Le ferite inflitte da tali armi diventano piaghe infernali che peggiorano nel tempo finché non vengono curate o fasciate adeguatamente.'
     }
   ];
 
