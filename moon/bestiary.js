@@ -258,6 +258,28 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Oggetti Comuni che Prendono Vita\n\nHabitat: Urbano\nTesoro: Nessuno\n\nI tappeti soffocanti animati possono attaccare chiunque li calpesti oppure fingersi oggetti magici innocui, come tappeti volanti, per sorprendere le proprie vittime. Arazzi, pellicce e altri tessuti mortali possono utilizzare queste stesse statistiche.\n\n' + ANIMATI_LORE
+    },
+    {
+      id: 'preset_ankheg', name: 'Ankheg', emoji: '🪲', rarity: 'rare',
+      type: 'Mostruosità', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 14, hp: 45, hpCur: 45, hpTemp: 0, hpDice: '6d10+12', init: 0,
+      speed: '9 m, Scavare 3 m', cr: '2', xp: '',
+      str: 17, dex: 11, con: 14, intl: 1, wis: 13, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {},
+      passivePerception: 11, senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }, { type: 'Percezione Tellurica', value: 18, unit: 'm' }],
+      languages: ['Nessuna'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Scavatore', desc: 'L\'ankheg può scavare attraverso la roccia solida alla metà della propria velocità di scavo e lascia dietro di sé un tunnel largo circa 3 metri.' }
+      ],
+      actions: [
+        { name: 'Morso', desc: 'Attacco in mischia: +5 a colpire (con vantaggio se il bersaglio è già Afferrato dall\'ankheg), portata 1,5 m.\nColpito: 10 (2d6 + 3) danni taglienti più 3 (1d6) danni da acido.\nSe il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Afferrato (CD 13 per sfuggire).', atkHit: '+5', atkDmgs: [{ f: '2d6+3', t: 'taglienti' }, { f: '1d6', t: 'acido' }] },
+        { name: 'Spruzzo Acido (Ricarica 6)', desc: 'Tiro Salvezza su Destrezza: CD 12. Tutte le creature in una linea lunga 9 metri e larga 1,5 metri.\nFallimento: 14 (4d6) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '4d6', t: 'acido' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Predatore Insettoide Scavatore\n\nHabitat: Foreste, Praterie\nTesoro: Nessuno\n\nGli ankheg sono enormi insetti che scavano gallerie poco sotto la superficie, creando vasti labirinti sotterranei. Dai loro tunnel emergono all\'improvviso per dissolvere e divorare creature più piccole utilizzando mandibole grondanti acido e getti di enzimi digestivi.\n\nGli ankheg rappresentano una piaga per gli agricoltori, poiché il bestiame al pascolo costituisce una facile preda. Molti vivono in solitudine, ma nelle regioni ricche di cibo possono riunirsi in nidi composti da diverse decine di esemplari, minacciando intere comunità.\n\nEliminare un nido di ankheg può essere estremamente difficile, a meno che non vengano bonificati tutti i tunnel e distrutte le loro uova.\n\nLe loro gallerie hanno generalmente forma cilindrica e sono spesso disseminate dei resti delle prede e di tesori trascinati nel sottosuolo.\n\n— Scoperte nei Tunnel degli Ankheg (d8) —\n1. Un\'altra galleria (naturale o scavata nella pietra) che conduce al Sottosuolo.\n2. Una rovina sepolta o una tomba riportata alla luce dal tunnel.\n3. Un gruppo di 1d4 uova fresche di ankheg, che possono essere rotte e utilizzate come ampolle di acido.\n4. Il cadavere di un ankheg e le prove dell\'esistenza di un predatore sotterraneo ancora più pericoloso.\n5. Un frammento di carapace di ankheg utilizzabile come scudo.\n6. Una borsa contenente 2d6 monete d\'oro accanto a una pozza d\'acido.\n7. Un animale randagio proveniente da una fattoria o da un bosco.\n8. Uno spaventapasseri brutalmente dilaniato.'
     }
   ];
 
