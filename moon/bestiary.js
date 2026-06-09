@@ -900,6 +900,37 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Reliquie di imperi caduti e simboli di speranza infranta accumulati dal drago.' }],
       notes: 'Draghi della Decadenza e della Disperazione\n\nHabitat: Palude\nTesoro: Reliquie\n\nLa maggior parte dei giovani draghi neri reclama una tana nascosta, spesso situata in luoghi lugubri raggiungibili attraverso rovine pericolose o paludi insidiose. Amano terrorizzare piccoli insediamenti e assoggettare servitori timorosi come coboldi e trogloditi. Alcuni stringono alleanze con potenti non morti o aberrazioni del sottosuolo.\n\n' + DRAGHI_NERI_LORE
+    },
+    {
+      id: 'preset_drago_nero_adulto', name: 'Drago Nero Adulto', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Enorme', alignment: 'Caotico Malvagio',
+      ac: 19, hp: 195, hpCur: 195, hpTemp: 0, hpDice: '17d12+85', init: 12,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '14', xp: '',
+      str: 23, dex: 14, con: 21, intl: 14, wis: 13, cha: 19,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '11', furtivita: '7' }, passivePerception: 21,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Acido'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria che acqua.' },
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con Incantesimi, lanciando Freccia Acida di Melf (versione di 3° livello).' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +11 a colpire, portata 3 metri.\nColpito: 13 (2d6 + 6) danni taglienti più 4 (1d8) danni da acido.', atkHit: '+11', atkDmgs: [{ f: '2d6+6', t: 'taglienti' }, { f: '1d8', t: 'acido' }] },
+        { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 18. Ogni creatura in una linea lunga 18 metri e larga 1,5 metri.\nFallimento: 54 (12d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '12d8', t: 'acido' }] },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 17, +9 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Paura, Freccia Acida di Melf (versione di 3° livello).\n\n1/Giorno ciascuno: Parlare con i Morti, Sfera Vitriolica.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera tutte le azioni spese all\'inizio del proprio turno.' },
+        { name: 'Nube di Insetti', desc: 'Tiro Salvezza su Destrezza: CD 17. Una creatura entro 36 metri che il drago può vedere.\nFallimento: 22 (4d10) danni da veleno e il bersaglio ha svantaggio ai tiri salvezza per mantenere la concentrazione fino alla fine del suo prossimo turno.\nIl drago non può usare nuovamente questa azione fino all\'inizio del suo prossimo turno.', atkDmgs: [{ f: '4d10', t: 'veleno' }] },
+        { name: 'Presenza Terrificante', desc: 'Il drago usa Incantesimi per lanciare Paura. Non può utilizzare nuovamente questa azione fino all\'inizio del suo prossimo turno.' },
+        { name: 'Balzo Predatorio', desc: 'Il drago si muove fino a metà della sua velocità e poi effettua un attacco Lacerazione.', atkHit: '+11', atkDmgs: [{ f: '2d6+6', t: 'taglienti' }, { f: '1d8', t: 'acido' }] }
+      ],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie di imperi caduti e simboli di speranza infranta accumulati dal drago.' }],
+      notes: 'Draghi della Decadenza e della Disperazione\n\nHabitat: Palude\nTesoro: Reliquie\n\n' + DRAGHI_NERI_LORE + '\n\n(Affrontato nella propria tana, il drago vale 13.000 PE.)'
     }
   ];
 
