@@ -753,6 +753,31 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'La glaive infernale del diavolo e altri armamenti diabolici.' }],
       notes: 'Diavolo della Forza e dell\'Intimidazione\n\nHabitat: Piani (Nove Inferi)\nTesoro: Armamenti\n\nI diavoli barbuti, noti anche come barbazu, riempiono le legioni dei Nove Inferi.\n\nQuesti crudeli soldati eseguono gli ordini dei generali infernali mentre difendono i regni diabolici, invadono il Piano Materiale e combattono contro i demoni in conflitti che attraversano molteplici piani di esistenza.\n\nQuando agiscono di propria iniziativa, i diavoli barbuti incoraggiano i mortali a esercitare il proprio potere in modo spietato e abusarne, alimentando il loro ego e ispirando piccole tirannie.\n\nI malvagi alleati dei Nove Inferi invocano spesso i diavoli barbuti come guardiani, esecutori della propria volontà o soldati in eserciti oscuri.\n\nLe loro caratteristiche barbe sono costituite da grottesche escrescenze simili a tentacoli. Queste barbe contorte e ricoperte di aculei trasportano un veleno capace di ostacolare la guarigione magica.\n\nI diavoli barbuti sono inoltre celebri per le loro glaive infernali, attraverso le quali incanalano energie diaboliche. Le ferite inflitte da tali armi diventano piaghe infernali che peggiorano nel tempo finché non vengono curate o fasciate adeguatamente.'
+    },
+    {
+      id: 'preset_behir', name: 'Behir', emoji: '🐉', rarity: 'rare',
+      type: 'Mostruosità', size: 'Enorme', alignment: 'Neutrale Malvagio',
+      ac: 17, hp: 168, hpCur: 168, hpTemp: 0, hpDice: '16d12+64', init: 3,
+      speed: '15 m, Scalare 15 m', cr: '11', xp: '',
+      str: 23, dex: 16, con: 18, intl: 7, wis: 14, cha: 12,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '6', furtivita: '7' }, passivePerception: 16,
+      senses: [{ type: 'Scurovisione', value: 27, unit: 'm' }], languages: ['Draconico'],
+      dmgResist: [], dmgImmune: ['Fulmine'], dmgVulner: [],
+      condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il behir effettua un attacco Morso e usa Costrizione.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +10 a colpire, portata 3 metri.\nColpito: 19 (2d12 + 6) danni perforanti più 11 (2d10) danni da fulmine.', atkHit: '+10', atkDmgs: [{ f: '2d12+6', t: 'perforanti' }, { f: '2d10', t: 'fulmine' }] },
+        { name: 'Costrizione', desc: 'Tiro Salvezza su Forza: CD 18. Una creatura Grande o più piccola entro 1,5 metri che il behir può vedere.\nFallimento: 28 (5d8 + 6) danni contundenti, e il bersaglio ottiene le condizioni Afferrato (CD fuga 16) e Trattenuto. Le condizioni terminano quando la presa termina.', atkDmgs: [{ f: '5d8+6', t: 'contundenti' }] },
+        { name: 'Soffio Fulminante (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 16. Ogni creatura in una linea lunga 27 metri e larga 1,5 metri.\nFallimento: 66 (12d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '12d10', t: 'fulmine' }] }
+      ],
+      bonusActions: [
+        { name: 'Ingoiare', desc: 'Tiro Salvezza su Destrezza: CD 18. Una creatura Grande o più piccola afferrata dal behir.\nFallimento: il bersaglio viene ingoiato. Una creatura ingoiata non è più afferrata, è Accecata e Trattenuta, ha Copertura Totale contro effetti esterni e subisce 21 (6d6) danni da acido all\'inizio di ogni turno del behir.\nSe il behir subisce 30 o più danni in un singolo turno da una creatura ingoiata, alla fine di quel turno effettua un Tiro Salvezza su Costituzione (CD 14); se fallisce, rigurgita la creatura, che cade Prona entro 3 metri da lui.\nSe il behir muore, la creatura ingoiata non è più Trattenuta e può uscire dal cadavere spendendo 4,5 metri di movimento, terminando Prona.', atkDmgs: [{ f: '6d6', t: 'acido' }] }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Tesoro', desc: 'Bottino accumulato nel covo del behir, tra resti di prede e covate di drago divorate.' }],
+      notes: 'Mostro Fulminante Vorace\n\nHabitat: Sottosuolo (Underdark)\nTesoro: Qualsiasi\n\nI behir sono giganteschi predatori rettiliani dotati di dodici zampe che cacciano senza sosta la loro prossima preda. Le loro corte ma potenti zampe permettono loro di muoversi rapidamente attraverso grotte e cunicoli, mentre il loro alito elettrico incenerisce qualsiasi creatura abbastanza veloce da sfuggire alle loro fauci.\n\nSecondo antiche leggende, i primi behir furono creati dai giganti delle tempeste alterando l\'essenza dei draghi blu durante un\'antica guerra tra draghi e giganti. Da allora, queste creature hanno sviluppato una particolare predilezione per le uova di drago.\n\nI behir preferiscono sistemi di caverne estesi e rovine sotterranee, dove possono sfruttare la loro agilità e la capacità di scalare pareti verticali. Sebbene evitino i draghi adulti, talvolta assaltano i loro covi alla ricerca di uova da divorare.'
     }
   ];
 
