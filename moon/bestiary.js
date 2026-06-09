@@ -33,6 +33,7 @@
   var PIANTE_LORE = 'La magia può infondere nelle piante mobilità, intelligenza e perfino una voce. Incantesimi come Risveglio (Awaken) o l\'influenza di altri piani di esistenza possono dare vita alla vegetazione comune, mentre alcune piante straordinarie possiedono naturalmente tali caratteristiche.';
   var BECCO_LORE = 'I becchi d\'ascia sono creature simili a grandi uccelli incapaci di volare, riconoscibili per il caratteristico becco a forma di lama d\'ascia.\n\nPredatori rapidi e aggressivi, inseguono le proprie prede e usano i becchi per squarciare il fogliame che protegge le vittime. Vivono in ambienti molto diversi: esemplari dal piumaggio variopinto percorrono le pianure tropicali, mentre quelli ricoperti di piume chiare e folte cacciano nelle gelide tundre.\n\nI becchi d\'ascia sono difficili da addestrare, ma gli esemplari nati e cresciuti in cattività possono diventare cavalcature affidabili.';
   var AZER_LORE = 'Gli azer sono esseri di bronzo vivente che lavorano gli elementi primordiali della creazione per forgiare armi e meraviglie magiche nelle più grandi fornaci del multiverso.';
+  var BANDITI_LORE = 'I banditi utilizzano la minaccia della violenza per ottenere ciò che desiderano.\n\nTra questi criminali si trovano membri di bande, desperados e mercenari senza legge. Tuttavia, non tutti i banditi sono mossi dall\'avidità: alcuni vengono spinti verso una vita criminale da leggi ingiuste, dalla disperazione o dalle minacce di capi spietati.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -538,6 +539,49 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'La spada del fulmine e la frusta di fiamme del balor, oltre ad altri armamenti abissali.' }],
       notes: 'Demone dell\'Ira Travolgente\n\nHabitat: Piani (Abisso)\nTesoro: Armamenti\n\nI balor incarnano la furia distruttiva e l\'odio dei demoni.\n\nQuesti colossali terrori alati ribollono di rabbia incessante, manifestando la propria collera attraverso ondate di fuoco e due armi terrificanti: una spada di fulmini crepitanti e una frusta di fiamme sferzanti.\n\nL\'ira di un balor persiste fino all\'istante della sua morte, momento in cui esplode in un\'ultima vendetta contro coloro che lo hanno abbattuto.\n\nSignori dei demoni e divinità malvagie sfruttano la furia dei balor facendone comandanti di eserciti infernali o guardiani di segreti proibiti.'
+    },
+    {
+      id: 'preset_bandito', name: 'Bandito', emoji: '🗡️', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 12, hp: 11, hpCur: 11, hpTemp: 0, hpDice: '2d8+2', init: 1,
+      speed: '9 m', cr: '1/8', xp: '',
+      str: 11, dex: 12, con: 12, intl: 10, wis: 10, cha: 10,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [], languages: ['Comune', 'Gergo dei Ladri'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Scimitarra', desc: 'Attacco con arma da mischia: +3 a colpire, portata 1,5 metri.\nColpito: 4 (1d6 + 1) danni taglienti.', atkHit: '+3', atkDmgs: [{ f: '1d6+1', t: 'taglienti' }] },
+        { name: 'Balestra Leggera', desc: 'Attacco con arma a distanza: +3 a colpire, gittata 24/96 metri.\nColpito: 5 (1d8 + 1) danni perforanti.', atkHit: '+3', atkDmgs: [{ f: '1d8+1', t: 'perforanti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Armatura di cuoio, balestra leggera, scimitarra, più bottino vario.' }],
+      notes: 'Criminali e Canaglie\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\n' + BANDITI_LORE
+    },
+    {
+      id: 'preset_capitano_dei_banditi', name: 'Capitano dei Banditi', emoji: '🔫', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 15, hp: 52, hpCur: 52, hpTemp: 0, hpDice: '8d8+16', init: 3,
+      speed: '9 m', cr: '2', xp: '',
+      str: 15, dex: 16, con: 14, intl: 14, wis: 11, cha: 14,
+      savesOverride: { str: '4', dex: '5', con: '', intl: '', wis: '2', cha: '' },
+      skillOverrides: { atletica: '4', inganno: '4' }, passivePerception: 10,
+      senses: [], languages: ['Comune', 'Gergo dei Ladri'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il capitano dei banditi effettua due attacchi, utilizzando Scimitarra e Pistola in qualsiasi combinazione.' },
+        { name: 'Scimitarra', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 6 (1d6 + 3) danni taglienti.', atkHit: '+5', atkDmgs: [{ f: '1d6+3', t: 'taglienti' }] },
+        { name: 'Pistola', desc: 'Attacco con arma a distanza: +5 a colpire, gittata 9/27 metri.\nColpito: 8 (1d10 + 3) danni perforanti.', atkHit: '+5', atkDmgs: [{ f: '1d10+3', t: 'perforanti' }] }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Parata', desc: 'Innesco: il capitano dei banditi viene colpito da un attacco in mischia mentre impugna un\'arma.\nRisposta: il capitano aggiunge +2 alla propria Classe Armatura contro quell\'attacco, potenzialmente facendolo mancare.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Pistola, scimitarra, armatura di cuoio borchiato, più bottino vario.' }],
+      notes: 'Criminali e Canaglie\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\n' + BANDITI_LORE
     }
   ];
 
