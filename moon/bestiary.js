@@ -34,6 +34,8 @@
   var BECCO_LORE = 'I becchi d\'ascia sono creature simili a grandi uccelli incapaci di volare, riconoscibili per il caratteristico becco a forma di lama d\'ascia.\n\nPredatori rapidi e aggressivi, inseguono le proprie prede e usano i becchi per squarciare il fogliame che protegge le vittime. Vivono in ambienti molto diversi: esemplari dal piumaggio variopinto percorrono le pianure tropicali, mentre quelli ricoperti di piume chiare e folte cacciano nelle gelide tundre.\n\nI becchi d\'ascia sono difficili da addestrare, ma gli esemplari nati e cresciuti in cattività possono diventare cavalcature affidabili.';
   var AZER_LORE = 'Gli azer sono esseri di bronzo vivente che lavorano gli elementi primordiali della creazione per forgiare armi e meraviglie magiche nelle più grandi fornaci del multiverso.';
   var BANDITI_LORE = 'I banditi utilizzano la minaccia della violenza per ottenere ciò che desiderano.\n\nTra questi criminali si trovano membri di bande, desperados e mercenari senza legge. Tuttavia, non tutti i banditi sono mossi dall\'avidità: alcuni vengono spinti verso una vita criminale da leggi ingiuste, dalla disperazione o dalle minacce di capi spietati.';
+  var BANDITI_MOTIV = 'Motivazioni dei Banditi (tira 1d6 o scegli):\n1) Combatte soltanto contro gli oppressori.\n2) È un ex soldato abbandonato dalla propria nazione e ora si prende ciò che ritiene gli fosse stato promesso.\n3) Fa parte di una banda che considera nemici tutti coloro che non ne fanno parte.\n4) Serve controvoglia un leader malvagio.\n5) Lavora segretamente per un governo o un governante regionale allo scopo di diffondere il caos.\n6) Prende ciò che gli serve per sopravvivere.';
+  var BANDITI_TAIL = BANDITI_LORE + '\n\n' + BANDITI_MOTIV;
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -557,7 +559,7 @@
       ],
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Equipaggiamento', desc: 'Armatura di cuoio, balestra leggera, scimitarra, più bottino vario.' }],
-      notes: 'Criminali e Canaglie\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\n' + BANDITI_LORE
+      notes: 'Criminali e Canaglie\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\nI banditi sono criminali inesperti che normalmente eseguono gli ordini di membri di rango superiore della propria banda.\n\n' + BANDITI_TAIL
     },
     {
       id: 'preset_capitano_dei_banditi', name: 'Capitano dei Banditi', emoji: '🔫', rarity: 'common',
@@ -581,7 +583,53 @@
       ],
       legendaryActions: [],
       drop: [{ name: 'Equipaggiamento', desc: 'Pistola, scimitarra, armatura di cuoio borchiato, più bottino vario.' }],
-      notes: 'Criminali e Canaglie\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\n' + BANDITI_LORE
+      notes: 'Criminali e Canaglie\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\nI capitani dei banditi guidano bande di furfanti e organizzano rapine dirette e senza complicazioni. Alcuni servono anche come guardie del corpo o uomini di fiducia per criminali più influenti.\n\n' + BANDITI_TAIL
+    },
+    {
+      id: 'preset_ingannatore_dei_banditi', name: 'Ingannatore dei Banditi', emoji: '🎭', rarity: 'uncommon',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 16, hp: 130, hpCur: 130, hpTemp: 0, hpDice: '20d8+40', init: 6,
+      speed: '9 m', cr: '7', xp: '',
+      str: 8, dex: 16, con: 14, intl: 17, wis: 12, cha: 16,
+      savesOverride: { str: '', dex: '6', con: '', intl: '6', wis: '', cha: '' },
+      skillOverrides: { acrobazia: '6', percezione: '4', furtivita: '9' }, passivePerception: 14,
+      senses: [], languages: ['Comune', 'Gergo dei Ladri'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'ingannatore effettua tre attacchi con Pugnale.' },
+        { name: 'Pugnale', desc: 'Attacco con arma da mischia o a distanza: +6 a colpire, portata 1,5 metri oppure gittata 6/18 metri.\nColpito: 8 (2d4 + 3) danni perforanti più 10 (3d6) danni da veleno.', atkHit: '+6', atkDmgs: [{ f: '2d4+3', t: 'perforanti' }, { f: '3d6', t: 'veleno' }] },
+        { name: 'Lampo Accecante (Ricarica 4-6)', desc: 'Tiro Salvezza su Costituzione: CD 14. Ogni creatura entro una sfera di 3 metri di raggio centrata su un punto visibile entro 36 metri.\nFallimento: 13 (3d6 + 3) danni radiosi; il bersaglio ottiene la condizione Accecato fino all\'inizio del turno successivo dell\'ingannatore.\nSuccesso: metà danni.', atkDmgs: [{ f: '3d6+3', t: 'radiosi' }] },
+        { name: 'Incantare', desc: 'L\'ingannatore lancia uno dei seguenti incantesimi usando l\'Intelligenza come caratteristica da incantatore (CD 14).\n\nA volontà: Camuffare Sé Stesso, Mano Magica, Illusione Minore.\n\n1 volta al giorno ciascuno: Blocca Persone (versione di 4° livello), Armatura Magica (già inclusa nelle statistiche), Immagine Maggiore.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Pugnali (6), bacchetta, più bottino vario.' }],
+      notes: 'Criminali e Canaglie\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\nGli ingannatori dei banditi utilizzano la magia per nascondere le proprie attività o creare spettacolari distrazioni.\n\n' + BANDITI_TAIL
+    },
+    {
+      id: 'preset_signore_del_crimine_dei_banditi', name: 'Signore del Crimine dei Banditi', emoji: '🎩', rarity: 'uncommon',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 17, hp: 169, hpCur: 169, hpTemp: 0, hpDice: '26d8+52', init: 9,
+      speed: '9 m', cr: '11', xp: '',
+      str: 10, dex: 20, con: 14, intl: 18, wis: 14, cha: 15,
+      savesOverride: { str: '', dex: '9', con: '6', intl: '', wis: '', cha: '' },
+      skillOverrides: { acrobazia: '9', percezione: '10', furtivita: '13' }, passivePerception: 20,
+      senses: [], languages: ['Comune', 'Gergo dei Ladri'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Eludere', desc: 'Quando il signore del crimine è soggetto a un effetto che consente un tiro salvezza su Destrezza per subire soltanto metà danni, non subisce alcun danno se supera il tiro salvezza e soltanto metà danni se lo fallisce.\nNon può utilizzare questo tratto mentre è Incapacitato.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il signore del crimine effettua tre attacchi, utilizzando Scimitarra e Pistola in qualsiasi combinazione.' },
+        { name: 'Scimitarra', desc: 'Attacco con arma da mischia: +9 a colpire, portata 1,5 metri.\nColpito: 12 (2d6 + 5) danni taglienti più 14 (4d6) danni da veleno.', atkHit: '+9', atkDmgs: [{ f: '2d6+5', t: 'taglienti' }, { f: '4d6', t: 'veleno' }] },
+        { name: 'Pistola', desc: 'Attacco con arma a distanza: +9 a colpire, gittata 9/27 metri.\nColpito: 10 (1d10 + 5) danni perforanti più 14 (4d6) danni da veleno.', atkHit: '+9', atkDmgs: [{ f: '1d10+5', t: 'perforanti' }, { f: '4d6', t: 'veleno' }] }
+      ],
+      bonusActions: [
+        { name: 'Mira Letale', desc: 'Il signore del crimine ottiene Vantaggio al prossimo tiro per colpire effettuato durante il turno corrente.\nSe quell\'attacco colpisce, il bersaglio subisce inoltre 28 (8d6) danni da veleno aggiuntivi.', atkDmgs: [{ f: '8d6', t: 'veleno' }] }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Pistole (2), scimitarra, armatura di cuoio borchiato, più bottino vario.' }],
+      notes: 'Criminali e Canaglie\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\nI signori del crimine manipolano organizzazioni oscure e mettono sempre la propria sopravvivenza davanti a qualsiasi sottoposto o piano.\n\n' + BANDITI_TAIL
     }
   ];
 
