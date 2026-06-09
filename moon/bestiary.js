@@ -31,6 +31,7 @@
   var AARAKOCRA_LORE = 'Gli aarakocra sono esseri simili ad uccelli che solcano i cieli di innumerevoli mondi e le infinite distese del Piano Elementale dell\'Aria. Spesso ricordano gli uccelli comuni delle regioni in cui vivono: alcuni assomigliano a falchi o condor, mentre altri ricordano colibrì o archeotteri.\n\nIn molte terre, gli aarakocra narrano le gesta dei loro antichi eroi che combatterono la malvagia Regina del Caos Alato insieme ai misteriosi Duchi del Vento di Aaqa.';
   var ANIMATI_LORE = 'La magia può manipolare oggetti ordinari, costringendoli a svolgere semplici compiti. Questi oggetti animati possono apparire come innocui utensili o decorazioni capaci però di difendere il loro creatore.\n\nEssi seguono semplici istruzioni impartite dalla forza o dall\'incantatore che li ha creati. Se lasciati senza supervisione, possono continuare a proteggere una zona per anni oppure ripetere lo stesso compito fino a consumarsi.\n\n— Catalizzatori degli Oggetti Animati (d10) —\n1. Un Celestiale o un Immondo che usa l\'oggetto per proteggere o tormentare un mortale.\n2. Una combinazione di magia e tecnologia, come alchimia o scienza aliena.\n3. L\'essenza di qualcuno trasformata da un ingannatore soprannaturale.\n4. Fate impegnate nei loro giochi o intrighi.\n5. Il caso, dopo che l\'oggetto ha acquisito una parvenza di vita dopo un secolo di utilizzo.\n6. Un incantatore che necessita di una guardia o di un servitore.\n7. Il canto di uno strumento magico.\n8. Uno spirito che possiede l\'oggetto.\n9. Magia selvaggia, un incantesimo fallito o un artefatto caotico.\n10. La volontà di una potente entità psionica.';
   var PIANTE_LORE = 'La magia può infondere nelle piante mobilità, intelligenza e perfino una voce. Incantesimi come Risveglio (Awaken) o l\'influenza di altri piani di esistenza possono dare vita alla vegetazione comune, mentre alcune piante straordinarie possiedono naturalmente tali caratteristiche.';
+  var BECCO_LORE = 'I becchi d\'ascia sono creature simili a grandi uccelli incapaci di volare, riconoscibili per il caratteristico becco a forma di lama d\'ascia.\n\nPredatori rapidi e aggressivi, inseguono le proprie prede e usano i becchi per squarciare il fogliame che protegge le vittime. Vivono in ambienti molto diversi: esemplari dal piumaggio variopinto percorrono le pianure tropicali, mentre quelli ricoperti di piume chiare e folte cacciano nelle gelide tundre.\n\nI becchi d\'ascia sono difficili da addestrare, ma gli esemplari nati e cresciuti in cattività possono diventare cavalcature affidabili.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -380,7 +381,7 @@
       notes: 'Sicario a Contratto\n\nHabitat: Qualsiasi\nTesoro: Equipaggiamento, Oggetti Personali\n\nGli assassini sono killer professionisti specializzati nell\'avvicinarsi furtivamente alle proprie vittime e colpire senza essere visti.\n\nLa maggior parte di essi uccide per una ragione precisa, mettendosi al servizio di ricchi committenti o combattendo per cause prive di scrupoli. Utilizzano veleni e altri strumenti letali e spesso trasportano equipaggiamento utile per infiltrarsi in luoghi protetti o evitare la cattura.\n\nMolti assassini seguono un rigido codice professionale oppure possiedono una caratteristica distintiva che li rende celebri.\n\n— Metodi Operativi dell\'Assassino (d6) —\n1. Disporre le proprie vittime in macabri tableaux artistici.\n2. Nascondersi all\'interno di grandi oggetti, come armature complete o mobili cavi.\n3. Lasciare un segno distintivo, come una carta da visita, un fiore, una conchiglia o un dente.\n4. Fingersi una celebrità, una figura religiosa o un servitore.\n5. Conservare trofei sottratti alle proprie vittime.\n6. Utilizzare un veleno dal colore o dall\'odore caratteristico.'
     },
     {
-      id: 'preset_arbusto_risvegliato', name: 'Arbusto Risvegliato', emoji: '🌿', rarity: 'rare',
+      id: 'preset_arbusto_risvegliato', name: 'Arbusto Risvegliato', emoji: '🌿', rarity: 'uncommon',
       type: 'Pianta', size: 'Piccola', alignment: 'Neutrale',
       ac: 9, hp: 10, hpCur: 10, hpTemp: 0, hpDice: '3d6', init: -1,
       speed: '6 m', cr: '0', xp: '',
@@ -399,7 +400,7 @@
       notes: 'Vegetazione Dotata di Vita Magica\n\nHabitat: Foreste\nTesoro: Nessuno\n\nGli arbusti risvegliati possono assumere l\'aspetto di qualsiasi piccola pianta, dai cespugli delle foreste ai gruppi di fiori. Spesso si trovano nei pressi di alberi risvegliati o in regioni permeate da magia primordiale. Alcuni presentano forme bizzarre o fogliame che ricorda vagamente lineamenti del volto, mentre altri assomigliano a statue vegetali animate raffiguranti animali.\n\n' + PIANTE_LORE
     },
     {
-      id: 'preset_albero_risvegliato', name: 'Albero Risvegliato', emoji: '🌳', rarity: 'rare',
+      id: 'preset_albero_risvegliato', name: 'Albero Risvegliato', emoji: '🌳', rarity: 'uncommon',
       type: 'Pianta', size: 'Enorme', alignment: 'Neutrale',
       ac: 13, hp: 59, hpCur: 59, hpTemp: 0, hpDice: '7d12+14', init: -2,
       speed: '6 m', cr: '2', xp: '',
@@ -416,6 +417,46 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Vegetazione Dotata di Vita Magica\n\nHabitat: Foreste\nTesoro: Nessuno\n\nAlcuni alberi risvegliati rimangono immobili per lunghi periodi in uno stato quasi meditativo, rendendosi facilmente confondibili con alberi normali. Altri pattugliano invece territori intrisi di potere naturale.\n\nTalvolta vengono animati dall\'influenza del Feywild, assumendo colori vivaci e fioriture perenni. Altri sono plasmati dall\'energia dello Shadowfell, che li ricopre di nodi contorti e deformità inquietanti, conferendo loro un aspetto quasi privo di vita.\n\n' + PIANTE_LORE
+    },
+    {
+      id: 'preset_becco_ascia', name: 'Becco d\'Ascia', emoji: '🦤', rarity: 'common',
+      type: 'Mostruosità', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 11, hp: 19, hpCur: 19, hpTemp: 0, hpDice: '3d10+3', init: 1,
+      speed: '15 m', cr: '1/4', xp: '',
+      str: 14, dex: 12, con: 12, intl: 2, wis: 10, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {},
+      passivePerception: 10, senses: [],
+      languages: ['Nessuna'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Becco', desc: 'Attacco in mischia: +4 a colpire, portata 1,5 m.\nColpito: 6 (1d8 + 2) danni taglienti.', atkHit: '+4', atkDmgs: [{ f: '1d8+2', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Predatore Aviano Incapace di Volare\n\nHabitat: Artico, Praterie, Colline\nTesoro: Nessuno\n\nSolitari o riuniti in piccoli gruppi, i becchi d\'ascia cacciano per nutrire il proprio stormo. Quando agiscono insieme usano tattiche rudimentali: alcuni distraggono le minacce mentre altri attaccano i bersagli più vulnerabili o conducono i giovani esemplari al sicuro.\n\n' + BECCO_LORE
+    },
+    {
+      id: 'preset_becco_ascia_gigante', name: 'Becco d\'Ascia Gigante', emoji: '🦤', rarity: 'uncommon',
+      type: 'Mostruosità', size: 'Enorme', alignment: 'Senza Allineamento',
+      ac: 15, hp: 84, hpCur: 84, hpTemp: 0, hpDice: '8d12+32', init: 5,
+      speed: '15 m', cr: '5', xp: '',
+      str: 21, dex: 14, con: 19, intl: 3, wis: 12, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '4' },
+      passivePerception: 14, senses: [],
+      languages: ['Nessuna'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il becco d\'ascia gigante effettua un attacco Becco Affilato e un attacco Artigli.' },
+        { name: 'Becco Affilato', desc: 'Attacco in mischia: +8 a colpire, portata 3 m.\nColpito: 18 (2d12 + 5) danni taglienti.\nInoltre, una creatura entro 1,5 metri dal bersaglio colpito (a scelta del becco d\'ascia) subisce 6 (1d12) danni taglienti.', atkHit: '+8', atkDmgs: [{ f: '2d12+5', t: 'taglienti' }, { f: '1d12', t: 'taglienti (a un vicino)' }] },
+        { name: 'Artigli', desc: 'Attacco in mischia: +8 a colpire, portata 1,5 m.\nColpito: 14 (2d8 + 5) danni perforanti.\nSe il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Prono.', atkHit: '+8', atkDmgs: [{ f: '2d8+5', t: 'perforanti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Predatore Aviano Incapace di Volare\n\nHabitat: Artico, Praterie, Colline\nTesoro: Nessuno\n\nI becchi d\'ascia giganti abitano generalmente regioni isolate e selvagge, come isole remote o terre primordiali inesplorate. Spesso competono con dinosauri e altre bestie gigantesche per il controllo del territorio.\n\n' + BECCO_LORE
     }
   ];
 
