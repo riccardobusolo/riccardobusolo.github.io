@@ -36,6 +36,7 @@
   var BANDITI_LORE = 'I banditi utilizzano la minaccia della violenza per ottenere ciò che desiderano.\n\nTra questi criminali si trovano membri di bande, desperados e mercenari senza legge. Tuttavia, non tutti i banditi sono mossi dall\'avidità: alcuni vengono spinti verso una vita criminale da leggi ingiuste, dalla disperazione o dalle minacce di capi spietati.';
   var BANDITI_MOTIV = 'Motivazioni dei Banditi (tira 1d6 o scegli):\n1) Combatte soltanto contro gli oppressori.\n2) È un ex soldato abbandonato dalla propria nazione e ora si prende ciò che ritiene gli fosse stato promesso.\n3) Fa parte di una banda che considera nemici tutti coloro che non ne fanno parte.\n4) Serve controvoglia un leader malvagio.\n5) Lavora segretamente per un governo o un governante regionale allo scopo di diffondere il caos.\n6) Prende ciò che gli serve per sopravvivere.';
   var BANDITI_TAIL = BANDITI_LORE + '\n\n' + BANDITI_MOTIV;
+  var BERSERKER_LORE = 'Consumati dall\'adrenalina della battaglia, i berserker sono invasori spericolati, combattenti da arena e guerrieri feroci che vivono per il conflitto. La loro furia li rende avversari temibili, capaci di ignorare il dolore e combattere fino all\'ultimo respiro.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -809,6 +810,51 @@
       ],
       drop: [{ name: 'Arcana', desc: 'Artefatti magici accumulati e le statue pietrificate degli eroi sconfitti, esibite come trofei.' }],
       notes: 'Tiranno Oculare Infame\n\nHabitat: Sottosuolo (Underdark)\nTesoro: Arcana\n\nI beholder, conosciuti anche come tiranni oculari, sono tra le creature più temute e detestate del Sottosuolo. Pochi esseri del multiverso ispirano tanto terrore quanto questi orrori paranoici e megalomani.\n\nIl loro corpo globulare è dominato da un\'enorme bocca piena di denti e da un gigantesco occhio centrale. Dieci peduncoli oculari si protendono dal loro corpo, ciascuno terminante con un occhio minore capace di emettere un diverso raggio magico. L\'occhio centrale può annullare la magia, mentre gli altri occhi infliggono effetti devastanti: pietrificazione, paralisi, morte istantanea e molto altro.\n\nLe menti dei beholder sono completamente aliene. Sono spesso paranoici, narcisisti e convinti della propria superiorità assoluta. Alcuni si isolano, altri costruiscono reti di servitori e manipolano intere comunità del Sottosuolo o persino della superficie.\n\nI beholder odiano ogni altro membro della loro specie. Ognuno si considera l\'apice assoluto della perfezione fisica e mentale, vedendo gli altri beholder come rivali degenerati da dominare o distruggere. Le guerre tra beholder possono devastare interi regni sotterranei per decenni.\n\nI tiranni oculari sono attratti da antiche rovine e luoghi intrisi di magia. Spesso accumulano artefatti magici e le statue pietrificate degli eroi che hanno sconfitto, esibendole come trofei.\n\n— Tana del Beholder —\nI beholder si annidano in enormi complessi di caverne che scavano usando i loro raggi oculari, oppure in fortezze costruite dai loro servitori. La regione entro 1 miglio (1,6 km) dalla tana è deformata dalla loro presenza, generando i seguenti effetti regionali.\n\nScopofobia: le creature avvertono costantemente la sensazione di essere osservate. Qualsiasi creatura (eccetto il beholder e i suoi alleati) che completa un Riposo Breve entro 1 miglio dalla tana deve superare un Tiro Salvezza su Saggezza CD 13 oppure non ottiene alcun beneficio dal riposo.\n\nTerreno Distorto: piccole anomalie della realtà si manifestano vicino alla tana. Qualsiasi creatura (eccetto il beholder) entro 1 miglio dalla tana che ottiene 1 naturale in una prova con d20 ottiene la condizione Prono.\n\nSe il beholder muore o abbandona la tana, questi effetti regionali terminano immediatamente.'
+    },
+    {
+      id: 'preset_berserker', name: 'Berserker', emoji: '🪓', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 13, hp: 67, hpCur: 67, hpTemp: 0, hpDice: '9d8+27', init: 1,
+      speed: '9 m', cr: '2', xp: '',
+      str: 16, dex: 12, con: 17, intl: 9, wis: 11, cha: 9,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Frenesia Sanguinaria', desc: 'Mentre è Ferito (Bloodied), il berserker ha vantaggio ai tiri per colpire e ai tiri salvezza.' }
+      ],
+      actions: [
+        { name: 'Ascia Bipenne', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 9 (1d12 + 3) danni taglienti.', atkHit: '+5', atkDmgs: [{ f: '1d12+3', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Ascia bipenne, armatura di pelli e bottino individuale.' }],
+      notes: 'Guerrieri della Furia e Predoni Spietati\n\nHabitat: Qualsiasi\nTesoro: Armamenti, Individuale\n\nI berserker comuni combattono per gloria personale, per fedeltà a una banda o come membri di orde urlanti che devastano ogni cosa sul loro cammino.\n\n' + BERSERKER_LORE
+    },
+    {
+      id: 'preset_comandante_berserker', name: 'Comandante Berserker', emoji: '⚔️', rarity: 'uncommon',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 16, hp: 136, hpCur: 136, hpTemp: 0, hpDice: '16d8+64', init: 5,
+      speed: '12 m', cr: '8', xp: '',
+      str: 19, dex: 14, con: 19, intl: 10, wis: 14, cha: 9,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { atletica: '7', percezione: '5' }, passivePerception: 15,
+      senses: [], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: ['Ammaliato', 'Spaventato'],
+      traits: [
+        { name: 'Frenesia Sanguinaria', desc: 'Mentre è Ferito (Bloodied), il berserker ha vantaggio ai tiri per colpire e ai tiri salvezza.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il comandante berserker effettua tre attacchi, combinando liberamente Ascia Bipenne e Giavellotto.' },
+        { name: 'Ascia Bipenne', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 10 (1d12 + 4) danni taglienti più 10 (3d6) danni da tuono. I danni da tuono possono colpire il bersaglio oppure un\'altra creatura entro 1,5 metri da esso.', atkHit: '+7', atkDmgs: [{ f: '1d12+4', t: 'taglienti' }, { f: '3d6', t: 'tuono' }] },
+        { name: 'Giavellotto', desc: 'Attacco con arma da mischia o a distanza: +7 a colpire, portata 1,5 metri oppure gittata 9/36 metri.\nColpito: 18 (4d6 + 4) danni perforanti. La velocità del bersaglio si riduce di 1,5 metri fino all\'inizio del prossimo turno del berserker.', atkHit: '+7', atkDmgs: [{ f: '4d6+4', t: 'perforanti' }] }
+      ],
+      bonusActions: [
+        { name: 'Carica Frenetica', desc: 'Ogni alleato entro 9 metri dal berserker può usare la propria Reazione per muoversi fino a metà della sua velocità senza provocare attacchi di opportunità. Anche il comandante può muoversi fino a metà della propria velocità senza provocare attacchi di opportunità.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Ascia bipenne, 6 giavellotti e bottino individuale.' }],
+      notes: 'Guerrieri della Furia e Predoni Spietati\n\nHabitat: Qualsiasi\nTesoro: Armamenti, Individuale\n\nI comandanti berserker portano sul corpo i segni di innumerevoli battaglie e guidano i loro seguaci con uno zelo brutale e contagioso. Molti di essi attingono a una magia primordiale che amplifica la loro forza e alimenta la furia delle orde che guidano.\n\n' + BERSERKER_LORE
     }
   ];
 
