@@ -260,7 +260,7 @@
       notes: 'Oggetti Comuni che Prendono Vita\n\nHabitat: Urbano\nTesoro: Nessuno\n\nI tappeti soffocanti animati possono attaccare chiunque li calpesti oppure fingersi oggetti magici innocui, come tappeti volanti, per sorprendere le proprie vittime. Arazzi, pellicce e altri tessuti mortali possono utilizzare queste stesse statistiche.\n\n' + ANIMATI_LORE
     },
     {
-      id: 'preset_ankheg', name: 'Ankheg', emoji: '🪲', rarity: 'rare',
+      id: 'preset_ankheg', name: 'Ankheg', emoji: '🪲', rarity: 'uncommon',
       type: 'Mostruosità', size: 'Grande', alignment: 'Senza Allineamento',
       ac: 14, hp: 45, hpCur: 45, hpTemp: 0, hpDice: '6d10+12', init: 0,
       speed: '9 m, Scavare 3 m', cr: '2', xp: '',
