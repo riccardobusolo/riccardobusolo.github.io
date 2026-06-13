@@ -43,6 +43,8 @@
   var DRAGHI_BLU_TANA = '— Tane dei Draghi Blu —\nI draghi blu vivono in terre aride. Le loro tane possono essere trappole mortali progettate per intrappolare gli invasori oppure ostentate fortezze da cui pianificano la propria dominazione. La regione entro 1 miglio dalla tana di un drago blu adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nVoragini: ogni volta che una creatura nell\'area (diversa dal drago e dai suoi alleati) completa un Riposo Lungo, tira 1d20; con un 1 una voragine si apre sotto di essa, che deve superare un Tiro Salvezza su Destrezza CD 15 oppure precipitare per 2d4 × 10 piedi.\n\nTempeste Malevole: tempeste di sabbia e temporali infuriano entro 1 miglio dalla tana e l\'area è Leggermente Oscurata.\n\nSe il drago muore o sposta la propria tana altrove, questi effetti terminano immediatamente.';
   var DRAGHI_OTTONE_LORE = 'Socievoli ed estroversi, i draghi d\'ottone adorano condividere conoscenze e storie. Sebbene questi draghi metallici prediligano le terre aride, percorrono volentieri grandi distanze per visitare creature amichevoli, trasmettere ciò che hanno imparato e raccogliere notizie.\n\nPur essendo di buon cuore, i draghi d\'ottone non evitano il combattimento quando necessario, ostacolando i nemici con sonno magico e bruciandoli con fiamme roventi.\n\nPrediligono i climi caldi, in particolare steppe e deserti rocciosi o sabbiosi, e di solito dimorano vicino a importanti crocevia o oasi frequentate da viaggiatori. Amano assumere forme umanoidi, travestendosi da mercanti itineranti, studiosi, narratori o chiunque altro sia interessato alle storie altrui.\n\nI draghi d\'ottone collezionano oggetti eclettici. Sebbene possano sembrare semplici cianfrusaglie, ciascuno di essi fa parte di una storia: un ricordo nostalgico o la prova di una leggenda ormai divenuta mito. Il cappello di un vecchio amico e la corona dell\'ultimo sovrano di una dinastia dimenticata potrebbero occupare lo stesso scaffale nel tesoro di un drago d\'ottone.';
   var DRAGHI_OTTONE_TANA = '— Tane dei Draghi d\'Ottone —\nI draghi d\'ottone vivono normalmente in caverne segrete e canyon vicini a rotte molto frequentate. La regione entro 1 miglio dalla tana di un drago d\'ottone adulto o antico viene alterata dalla sua presenza, creando i seguenti effetti regionali.\n\nMiraggi: nella sua tana il drago può lanciare Immagine Maggiore (senza componenti materiali, con la stessa caratteristica da incantatore della sua capacità Incantesimi); la gittata diventa 1 miglio e il drago non ha bisogno di vedere il punto in cui compare l\'illusione.\n\nAcqua Ristoratrice: l\'acqua entro 1 miglio dalla tana è magicamente rinvigorente; una creatura che la beve ottiene 2d4 Punti Ferita Temporanei e il drago viene immediatamente a conoscenza della sua presenza.\n\nSe il drago muore o sposta la propria tana altrove, questi effetti terminano immediatamente.';
+  var DRAGHI_BRONZO_LORE = 'Dove dimorano i draghi di bronzo, le meraviglie prosperano. Immaginativi ma riflessivi, questi draghi metallici lavorano per raggiungere la grandezza e aiutano gli altri a realizzare tutto il proprio potenziale.\n\nEssi si sforzano di preservare le innovazioni, dalle opere delle civiltà passate alle nuove scoperte, e condividono ampiamente tali conoscenze. Quando hanno a che fare con creature dalla vita più breve, i draghi di bronzo preferiscono conquistarle attraverso il dialogo e la formazione, ma non esitano a combattere quando i malvagi impediscono agli altri di raggiungere il proprio potenziale.\n\nI draghi di bronzo amano il potere e le infinite possibilità offerte dal mare e spesso stabiliscono le proprie tane in luoghi di bellezza naturale o presso comunità che desiderano proteggere. Nelle loro dimore accumulano oggetti che ritengono potranno essere utili un giorno. Recuperano inoltre tesori perduti in mare, riportando alla luce ricchezze e navi affondate.';
+  var DRAGHI_BRONZO_TANA = '— Tane dei Draghi di Bronzo —\nI draghi di bronzo costruiscono normalmente le proprie dimore vicino al mare o sotto di esso. La regione entro 1 miglio dalla tana di un drago di bronzo adulto o antico è alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nCorrenti Galleggianti: le creature entro 1 miglio dalla tana che non possiedono una velocità di nuotare ignorano il costo aggiuntivo di movimento mentre nuotano.\n\nSole e Tempeste: nella sua tana il drago può lanciare Controllare il Clima (senza componenti materiali, con la stessa caratteristica da incantatore della sua azione Incantesimi) e può controllare il tempo atmosferico entro 1 miglio dalla tana, dentro o fuori di essa.\n\nSe il drago muore o trasferisce la propria tana altrove, questi effetti terminano immediatamente.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -1401,6 +1403,116 @@
       ],
       drop: [{ name: 'Arcani', desc: 'Oggetti eclettici e curiosi accumulati nei secoli, ognuno legato a una storia o a una leggenda.' }],
       notes: 'Draghi della Conoscenza e della Conversazione\n\nHabitat: Deserto\nTesoro: Arcani\n\nGli antichi draghi d\'ottone creano reti che si estendono attraverso interi mondi. Combattono le forze della repressione e della disinformazione, aiutando le persone a imparare dagli errori del passato. Personalmente o tramite reti di messaggeri, mantengono i loro alleati informati sulle sfide che potrebbero affrontare insieme.\n\n' + DRAGHI_OTTONE_LORE + '\n\n' + DRAGHI_OTTONE_TANA + '\n\n(Affrontato nella propria tana, il drago vale 33.000 PE.)'
+    },
+    {
+      id: 'preset_cucciolo_drago_bronzo', name: 'Cucciolo di Drago di Bronzo', emoji: '🐲', rarity: 'epic',
+      type: 'Drago', size: 'Media', alignment: 'Legale Buono',
+      ac: 15, hp: 39, hpCur: 39, hpTemp: 0, hpDice: '6d8+12', init: 2,
+      speed: '9 m, Volare 18 m, Nuotare 9 m', cr: '2', xp: '',
+      str: 17, dex: 10, con: 15, intl: 12, wis: 11, cha: 15,
+      savesOverride: { str: '', dex: '2', con: '', intl: '', wis: '2', cha: '' },
+      skillOverrides: { percezione: '4', furtivita: '2' }, passivePerception: 14,
+      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico'],
+      dmgResist: [], dmgImmune: ['Fulmine'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria che acqua.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua due attacchi Lacerazione.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 8 (1d10 + 3) danni taglienti.', atkHit: '+5', atkDmgs: [{ f: '1d10+3', t: 'taglienti' }] },
+        { name: 'Soffio di Fulmine (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 12. Ogni creatura in una linea lunga 12 metri e larga 1,5 metri.\nFallimento: 16 (3d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '3d10', t: 'fulmine' }] },
+        { name: 'Soffio di Repulsione', desc: 'Tiro Salvezza su Forza: CD 12. Ogni creatura in un cono di 9 metri.\nFallimento: il bersaglio viene spinto fino a 9 metri direttamente lontano dal drago e ottiene la condizione Prono.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Strumenti', desc: 'Oggetti potenzialmente utili e tesori recuperati dal mare, comprese ricchezze e navi affondate.' }],
+      notes: 'Draghi del Potenziale e della Conservazione\n\nHabitat: Costa\nTesoro: Strumenti\n\nI cuccioli di drago di bronzo credono di poter risolvere qualsiasi problema e cercano costantemente di dimostrarlo. Spesso si fissano su questioni locali, come siccità o banditismo dilagante. Sebbene il loro entusiasmo possa risultare affascinante, talvolta si spingono oltre le proprie capacità e possono aver bisogno di aiuto per correggere i loro errori.\n\n' + DRAGHI_BRONZO_LORE
+    },
+    {
+      id: 'preset_giovane_drago_bronzo', name: 'Giovane Drago di Bronzo', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Grande', alignment: 'Legale Buono',
+      ac: 17, hp: 142, hpCur: 142, hpTemp: 0, hpDice: '15d10+60', init: 3,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '8', xp: '',
+      str: 21, dex: 10, con: 19, intl: 14, wis: 13, cha: 17,
+      savesOverride: { str: '', dex: '3', con: '', intl: '', wis: '4', cha: '' },
+      skillOverrides: { intuizione: '4', percezione: '7', furtivita: '3' }, passivePerception: 17,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fulmine'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria che acqua.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire un attacco con un uso di Soffio di Repulsione.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +8 a colpire, portata 3 metri.\nColpito: 16 (2d10 + 5) danni taglienti.', atkHit: '+8', atkDmgs: [{ f: '2d10+5', t: 'taglienti' }] },
+        { name: 'Soffio di Fulmine (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 15. Ogni creatura in una linea lunga 18 metri e larga 1,5 metri.\nFallimento: 49 (9d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '9d10', t: 'fulmine' }] },
+        { name: 'Soffio di Repulsione', desc: 'Tiro Salvezza su Forza: CD 15. Ogni creatura in un cono di 9 metri.\nFallimento: il bersaglio viene spinto fino a 12 metri direttamente lontano dal drago e ottiene la condizione Prono.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Strumenti', desc: 'Oggetti potenzialmente utili e tesori recuperati dal mare, comprese ricchezze e navi affondate.' }],
+      notes: 'Draghi del Potenziale e della Conservazione\n\nHabitat: Costa\nTesoro: Strumenti\n\nMolti giovani draghi di bronzo diventano esperti in un particolare tipo di problema, come scacciare i pirati o proteggere le comunità dalle tempeste. Raccolgono amici con competenze diverse, costruendo una comunità di esperti su cui poter fare affidamento.\n\n' + DRAGHI_BRONZO_LORE
+    },
+    {
+      id: 'preset_drago_bronzo_adulto', name: 'Drago di Bronzo Adulto', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Enorme', alignment: 'Legale Buono',
+      ac: 18, hp: 212, hpCur: 212, hpTemp: 0, hpDice: '17d12+102', init: 10,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '15', xp: '',
+      str: 25, dex: 10, con: 23, intl: 16, wis: 15, cha: 20,
+      savesOverride: { str: '', dex: '5', con: '', intl: '', wis: '7', cha: '' },
+      skillOverrides: { intuizione: '7', percezione: '12', furtivita: '5' }, passivePerception: 22,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fulmine'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria che acqua.' },
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire un attacco con un uso di Soffio di Repulsione oppure con il lancio di Dardo Guida (versione di 2° livello).' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +12 a colpire, portata 3 metri.\nColpito: 16 (2d8 + 7) danni taglienti più 5 (1d10) danni da fulmine.', atkHit: '+12', atkDmgs: [{ f: '2d8+7', t: 'taglienti' }, { f: '1d10', t: 'fulmine' }] },
+        { name: 'Soffio di Fulmine (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 19. Ogni creatura in una linea lunga 27 metri e larga 1,5 metri.\nFallimento: 55 (10d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '10d10', t: 'fulmine' }] },
+        { name: 'Soffio di Repulsione', desc: 'Tiro Salvezza su Forza: CD 19. Ogni creatura in un cono di 9 metri.\nFallimento: il bersaglio viene spinto fino a 18 metri direttamente lontano dal drago e ottiene la condizione Prono.' },
+        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 17, +10 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Dardo Guida (versione di 2° livello), Cambiare Forma (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali, Taumaturgia.\n\n1/Giorno ciascuno: Individuazione dei Pensieri, Respirare Sott\'Acqua.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
+        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Guida (versione di 2° livello).' },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della propria velocità ed effettua un attacco Lacerazione.', atkHit: '+12', atkDmgs: [{ f: '2d8+7', t: 'taglienti' }, { f: '1d10', t: 'fulmine' }] },
+        { name: 'Tuonoclap', desc: 'Tiro Salvezza su Costituzione: CD 17. Ogni creatura entro una sfera di raggio 6 metri centrata in un punto che il drago può vedere entro 27 metri.\nFallimento: 10 (3d6) danni da tuono e il bersaglio ottiene la condizione Assordato fino alla fine del suo turno successivo.', atkDmgs: [{ f: '3d6', t: 'tuono' }] }
+      ],
+      drop: [{ name: 'Strumenti', desc: 'Oggetti potenzialmente utili e tesori recuperati dal mare, comprese ricchezze e navi affondate.' }],
+      notes: 'Draghi del Potenziale e della Conservazione\n\nHabitat: Costa\nTesoro: Strumenti\n\nI draghi di bronzo adulti vivono spesso vicino ai luoghi che difendono o dove aiutano gli altri a perseguire i propri obiettivi. Possono diventare protettori di intere città, consigliando i governanti e contribuendo alla prosperità di generazioni.\n\n' + DRAGHI_BRONZO_LORE + '\n\n' + DRAGHI_BRONZO_TANA + '\n\n(Affrontato nella propria tana, il drago vale 15.000 PE.)'
+    },
+    {
+      id: 'preset_drago_bronzo_antico', name: 'Drago di Bronzo Antico', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Mastodontica', alignment: 'Legale Buono',
+      ac: 22, hp: 444, hpCur: 444, hpTemp: 0, hpDice: '24d20+192', init: 14,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '22', xp: '',
+      str: 29, dex: 10, con: 27, intl: 18, wis: 17, cha: 25,
+      savesOverride: { str: '', dex: '7', con: '', intl: '', wis: '10', cha: '' },
+      skillOverrides: { intuizione: '10', percezione: '17', furtivita: '7' }, passivePerception: 27,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fulmine'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria che acqua.' },
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire un attacco con un uso di Soffio di Repulsione oppure con il lancio di Dardo Guida (versione di 2° livello).' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +16 a colpire, portata 4,5 metri.\nColpito: 18 (2d8 + 9) danni taglienti più 9 (2d8) danni da fulmine.', atkHit: '+16', atkDmgs: [{ f: '2d8+9', t: 'taglienti' }, { f: '2d8', t: 'fulmine' }] },
+        { name: 'Soffio di Fulmine (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 23. Ogni creatura in una linea lunga 36 metri e larga 3 metri.\nFallimento: 82 (15d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '15d10', t: 'fulmine' }] },
+        { name: 'Soffio di Repulsione', desc: 'Tiro Salvezza su Forza: CD 23. Ogni creatura in un cono di 9 metri.\nFallimento: il bersaglio viene spinto fino a 18 metri direttamente lontano dal drago e ottiene la condizione Prono.' },
+        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 22, +14 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Dardo Guida (versione di 2° livello), Cambiare Forma (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali, Taumaturgia.\n\n1/Giorno ciascuno: Individuazione dei Pensieri, Controllare l\'Acqua, Scrutare, Respirare Sott\'Acqua.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
+        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Guida (versione di 2° livello).' },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della propria velocità ed effettua un attacco Lacerazione.', atkHit: '+16', atkDmgs: [{ f: '2d8+9', t: 'taglienti' }, { f: '2d8', t: 'fulmine' }] },
+        { name: 'Tuonoclap', desc: 'Tiro Salvezza su Costituzione: CD 22. Ogni creatura entro una sfera di raggio 6 metri centrata in un punto che il drago può vedere entro 36 metri.\nFallimento: 13 (3d8) danni da tuono e il bersaglio ottiene la condizione Assordato fino alla fine del suo turno successivo.', atkDmgs: [{ f: '3d8', t: 'tuono' }] }
+      ],
+      drop: [{ name: 'Strumenti', desc: 'Oggetti potenzialmente utili e tesori recuperati dal mare, comprese ricchezze e navi affondate, accumulati nei secoli.' }],
+      notes: 'Draghi del Potenziale e della Conservazione\n\nHabitat: Costa\nTesoro: Strumenti\n\nGli antichi draghi di bronzo sviluppano spettacolari patine sulle loro scaglie scintillanti. Si impegnano a proteggere intere regioni, continenti o perfino pianeti dalle minacce. Cercano soluzioni a calamità che coinvolgono più mondi o a pericoli multiversali e si oppongono al male dei potenti draghi cromatici.\n\n' + DRAGHI_BRONZO_LORE + '\n\n' + DRAGHI_BRONZO_TANA + '\n\n(Affrontato nella propria tana, il drago vale 50.000 PE.)'
     }
   ];
 
