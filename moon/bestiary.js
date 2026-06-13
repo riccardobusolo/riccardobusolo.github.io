@@ -39,6 +39,8 @@
   var BERSERKER_LORE = 'Consumati dall\'adrenalina della battaglia, i berserker sono invasori spericolati, combattenti da arena e guerrieri feroci che vivono per il conflitto. La loro furia li rende avversari temibili, capaci di ignorare il dolore e combattere fino all\'ultimo respiro.';
   var DRAGHI_NERI_LORE = 'I draghi neri traggono piacere dalla sofferenza e dalla rovina. A differenza di altri draghi cromatici, che tramano per ottenere potere e ricchezze, essi desiderano distruggere tutto ciò che vedono e dominare le macerie che restano.\n\nSono creature terrificanti, caratterizzate da corna ricurve e da visi scheletrici che ricordano teschi demoniaci. Prediligono paludi stagnanti, rovine in rovina e luoghi corrotti dalla magia o dal degrado ambientale. Il loro soffio acido deturpa il territorio, consumando antiche statue e lasciando nella natura ferite permanenti.\n\nI draghi neri accumulano simboli di speranza infranta e reliquie di imperi caduti. Più un tesoro è desiderato o prezioso, maggiore è il piacere che provano nel possederlo, soprattutto se sono stati loro a causarne la perdita.';
   var BLIGHTS_LORE = 'I blights sono piante maligne nate da un male profondamente radicato. Le loro forme nodose e deformi presentano tratti inquietanti che ricordano arti umani e fauci fameliche. Si nascondono tra la vegetazione comune e tendono imboscate a tutte le creature che non appartengono al regno vegetale.\n\nSebbene alcuni blights agiscano autonomamente, la maggior parte serve le forze oscure che li hanno generati oppure creature malvagie capaci di dominare la natura. La magia che li crea spesso contamina anche la flora circostante, facendo proliferare rovi, liane e alberi contorti che invadono sentieri e campi, soffocano pozzi e ruscelli e costringono gli animali ad abbandonare il proprio habitat naturale.\n\nPer questo motivo, la comparsa dei blights è spesso il primo segnale di una corruzione più grande che si sta diffondendo.';
+  var DRAGHI_BLU_LORE = 'Arroganti e imperiosi, i draghi blu sono draghi cromatici che bramano il controllo e raccolgono seguaci proprio come altri draghi accumulano tesori. Cercano di trasformare i propri territori in imperi, domini che intere nazioni temano.\n\nI draghi blu possiedono tratti affilati, corna perforanti e scaglie che variano dal colore dello zaffiro alle tonalità dei cieli tempestosi. Vivono nei deserti e nelle terre aride, in particolare nelle regioni caratterizzate da spettacolari pinnacoli rocciosi dai quali possono osservare per chilometri.\n\nScelgono di costruire le loro tane vicino a luoghi dal forte valore simbolico, come fortezze giganti abbandonate, colossi di imperi caduti o monumenti eretti dai loro seguaci.\n\nLe insegne del potere sovrano e i capolavori artistici riempiono i tesori dei draghi blu. Questi draghi non mostrano interesse per tesori comuni o imperfetti: preferiscono gemme uniche nel loro genere, corone appartenute a sovrani decaduti e oggetti magici capaci di diffondere la loro influenza.';
+  var DRAGHI_BLU_TANA = '— Tane dei Draghi Blu —\nI draghi blu vivono in terre aride. Le loro tane possono essere trappole mortali progettate per intrappolare gli invasori oppure ostentate fortezze da cui pianificano la propria dominazione. La regione entro 1 miglio dalla tana di un drago blu adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nVoragini: ogni volta che una creatura nell\'area (diversa dal drago e dai suoi alleati) completa un Riposo Lungo, tira 1d20; con un 1 una voragine si apre sotto di essa, che deve superare un Tiro Salvezza su Destrezza CD 15 oppure precipitare per 2d4 × 10 piedi.\n\nTempeste Malevole: tempeste di sabbia e temporali infuriano entro 1 miglio dalla tana e l\'area è Leggermente Oscurata.\n\nSe il drago muore o sposta la propria tana altrove, questi effetti terminano immediatamente.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -1148,6 +1150,106 @@
       ],
       drop: [{ name: 'Contenuti della Massa', desc: 'Solo gli oggetti magici e i cadaveri di dèi e titani sopravvivono al suo interno. Tira 1d10 sulla tabella "Contenuti della Massa dell\'Annientamento" (nelle note) per scoprire quale straordinario oggetto o creatura custodisce.' }],
       notes: 'Entropia Cosmica Divoratrice di Tutto Scatenata\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\nLa Massa dell\'Annientamento è un coagulo di entropia cosmica congiunto ai resti di divinità morte. Questa entità malvagia vaga per lo Spazio Selvaggio e per le distese del multiverso ostili alla vita: regioni immense nelle quali la probabilità di incontrarla è molto bassa.\n\nLa Massa rappresenta la minaccia più grande quando disastri o incantatori nichilisti la evocano in regni abitati. Una volta liberata, rotola attraverso le terre in enormi vortici cosmici, mentre frammenti della sua sostanza si separano per inghiottire altri bersagli.\n\nLa Massa consuma tutto ciò che incontra, spazzando foreste, villaggi e fortezze dentro il proprio corpo. Al suo interno si trova una distesa priva di aria e gravità, dove le forze entropiche distruggono qualunque cosa venga inghiottita. Nulla può sopravvivervi a lungo.\n\nSoltanto gli oggetti magici e i cadaveri di dèi e titani possono resistere all\'interno della Massa. Per questo motivo, cacciatori di tesori e teologi a volte si assumono il compito mortale di recuperare qualcosa dal suo interno: un\'impresa che di solito termina con l\'annientamento, ma che occasionalmente porta alla scoperta della vita.\n\n— Contenuti della Massa dell\'Annientamento (tira 1d10) —\n1. Un Amuleto dei Piani.\n2. Un artefatto scelto dal DM.\n3. I corpi di due divinità che combattevano quando la Massa le ha consumate.\n4. Un Cancello Cubico.\n5. Un Mazzo delle Molte Cose.\n6. Una chiave magica che apre una porta a Sigil che nessun\'altra chiave o incantesimo può aprire.\n7. Il corpo conservato di un Empireo.\n8. I resti di metà di un Kraken.\n9. Il teschio di un dio della morte.\n10. Una Tarrasque appena morta.\n\n— Vi, Artefice di Eberron —\n"Tesoro, ho visto orrori che ti farebbero sporcare i pantaloni e cercare il santuario più vicino. E poi c\'è la Massa dell\'Annientamento. Se la vedi, scappa. E se non riesci a scappare, spera soltanto di dissolverti in fretta."'
+    },
+    {
+      id: 'preset_cucciolo_drago_blu', name: 'Cucciolo di Drago Blu', emoji: '🐲', rarity: 'epic',
+      type: 'Drago', size: 'Media', alignment: 'Legale Malvagio',
+      ac: 17, hp: 65, hpCur: 65, hpTemp: 0, hpDice: '10d8+20', init: 0,
+      speed: '9 m, Scavare 4,5 m, Volare 18 m', cr: '3', xp: '',
+      str: 17, dex: 10, con: 15, intl: 12, wis: 11, cha: 15,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '4', furtivita: '2' }, passivePerception: 14,
+      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico'],
+      dmgResist: [], dmgImmune: ['Fulmine'], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua due attacchi Lacerazione.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 8 (1d10 + 3) danni taglienti più 3 (1d6) danni da fulmine.', atkHit: '+5', atkDmgs: [{ f: '1d10+3', t: 'taglienti' }, { f: '1d6', t: 'fulmine' }] },
+        { name: 'Soffio Fulminante (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 12. Ogni creatura in una linea lunga 9 metri e larga 1,5 metri.\nFallimento: 21 (6d6) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '6d6', t: 'fulmine' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Insegne del potere sovrano, gemme rare e oggetti magici accumulati dal drago blu.' }],
+      notes: 'Draghi della Tirannia e delle Tempeste\n\nHabitat: Costa, Deserto\nTesoro: Reliquie\n\nI cuccioli di drago blu spesso servono altre creature potenti, apprendendo da esse le tecniche del controllo e costruendosi una reputazione temibile tra le creature più deboli.\n\nMolti cuccioli inizialmente servono con lealtà, ma quando il loro potere cresce fino a eguagliare le loro ambizioni finiscono per tradire o abbandonare i propri alleati.\n\nQuesti cuccioli tentano piccoli gruppi di creature affinché entrino al loro servizio, ricompensandoli con modesti tesori e promesse di potere futuro.\n\n' + DRAGHI_BLU_LORE
+    },
+    {
+      id: 'preset_giovane_drago_blu', name: 'Giovane Drago Blu', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Grande', alignment: 'Legale Malvagio',
+      ac: 18, hp: 152, hpCur: 152, hpTemp: 0, hpDice: '16d10+64', init: 0,
+      speed: '12 m, Scavare 6 m, Volare 24 m', cr: '9', xp: '',
+      str: 21, dex: 10, con: 19, intl: 14, wis: 13, cha: 17,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '9', furtivita: '4' }, passivePerception: 19,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fulmine'], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +9 a colpire, portata 3 metri.\nColpito: 12 (2d6 + 5) danni taglienti più 5 (1d10) danni da fulmine.', atkHit: '+9', atkDmgs: [{ f: '2d6+5', t: 'taglienti' }, { f: '1d10', t: 'fulmine' }] },
+        { name: 'Soffio Fulminante (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 16. Ogni creatura in una linea lunga 18 metri e larga 1,5 metri.\nFallimento: 55 (10d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '10d10', t: 'fulmine' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Insegne del potere sovrano, gemme rare e oggetti magici accumulati dal drago blu.' }],
+      notes: 'Draghi della Tirannia e delle Tempeste\n\nHabitat: Costa, Deserto\nTesoro: Reliquie\n\nI giovani draghi blu cercano di imporsi come forze da temere. Molti reclamano comunità isolate da governare oppure antiche rovine dove potrebbero trovare percorsi magici verso il potere.\n\nQuesti draghi possono temporaneamente collaborare con altri draghi o potenti malvagi per ottenere seguaci e influenza.\n\n' + DRAGHI_BLU_LORE
+    },
+    {
+      id: 'preset_drago_blu_adulto', name: 'Drago Blu Adulto', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Enorme', alignment: 'Legale Malvagio',
+      ac: 19, hp: 212, hpCur: 212, hpTemp: 0, hpDice: '17d12+102', init: 0,
+      speed: '12 m, Scavare 9 m, Volare 24 m', cr: '16', xp: '',
+      str: 25, dex: 10, con: 23, intl: 16, wis: 15, cha: 20,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '12', furtivita: '5' }, passivePerception: 22,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fulmine'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con un uso di Incantesimi per lanciare Frantumare.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +12 a colpire, portata 3 metri.\nColpito: 16 (2d8 + 7) danni taglienti più 5 (1d10) danni da fulmine.', atkHit: '+12', atkDmgs: [{ f: '2d8+7', t: 'taglienti' }, { f: '1d10', t: 'fulmine' }] },
+        { name: 'Soffio Fulminante (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 19. Ogni creatura in una linea lunga 27 metri e larga 1,5 metri.\nFallimento: 60 (11d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '11d10', t: 'fulmine' }] },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 18, +10 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Invisibilità, Mano Magica, Frantumare.\n\n1/Giorno ciascuno: Scrutare, Messaggio Onirico.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
+        { name: 'Volo Celato', desc: 'Il drago usa Incantesimi per lanciare Invisibilità su sé stesso e può volare fino a metà della propria velocità di volo. Non può usare di nuovo questa azione fino all\'inizio del suo prossimo turno.' },
+        { name: 'Boom Sonico', desc: 'Il drago usa Incantesimi per lanciare Frantumare. Non può usare di nuovo questa azione fino all\'inizio del suo prossimo turno.' },
+        { name: 'Colpo di Coda', desc: 'Il drago effettua un attacco Lacerazione.', atkHit: '+12', atkDmgs: [{ f: '2d8+7', t: 'taglienti' }, { f: '1d10', t: 'fulmine' }] }
+      ],
+      drop: [{ name: 'Reliquie', desc: 'Insegne del potere sovrano, corone di sovrani decaduti, gemme uniche e oggetti magici accumulati dal drago blu.' }],
+      notes: 'Draghi della Tirannia e delle Tempeste\n\nHabitat: Costa, Deserto\nTesoro: Reliquie\n\nI draghi blu adulti comandano piccoli imperi che possono comprendere territori popolati da sudditi sottomessi, oscure reti criminali o enclave di cultisti.\n\nPerennemente sospettosi e diffidenti verso i rivali, questi draghi elaborano complessi intrighi per rovinare i propri nemici, mettere alla prova la lealtà dei loro servitori e garantire il proprio dominio per secoli.\n\n' + DRAGHI_BLU_LORE + '\n\n' + DRAGHI_BLU_TANA + '\n\n(Affrontato nella propria tana, il drago vale 18.000 PE.)'
+    },
+    {
+      id: 'preset_antico_drago_blu', name: 'Antico Drago Blu', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Mastodontica', alignment: 'Legale Malvagio',
+      ac: 22, hp: 481, hpCur: 481, hpTemp: 0, hpDice: '26d20+208', init: 0,
+      speed: '12 m, Scavare 12 m, Volare 24 m', cr: '23', xp: '',
+      str: 29, dex: 10, con: 27, intl: 18, wis: 17, cha: 25,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '17', furtivita: '7' }, passivePerception: 27,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fulmine'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con un uso di Incantesimi per lanciare Frantumare (versione di 3° livello).' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +16 a colpire, portata 4,5 metri.\nColpito: 18 (2d8 + 9) danni taglienti più 11 (2d10) danni da fulmine.', atkHit: '+16', atkDmgs: [{ f: '2d8+9', t: 'taglienti' }, { f: '2d10', t: 'fulmine' }] },
+        { name: 'Soffio Fulminante (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 23. Ogni creatura in una linea lunga 36 metri e larga 3 metri.\nFallimento: 88 (16d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '16d10', t: 'fulmine' }] },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 22).\n\nA volontà: Individuazione del Magico, Invisibilità, Mano Magica, Frantumare (versione di 3° livello).\n\n1/Giorno ciascuno: Scrutare, Messaggio Onirico.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
+        { name: 'Volo Celato', desc: 'Il drago usa Incantesimi per lanciare Invisibilità su sé stesso e può volare fino a metà della propria velocità di volo. Non può usare di nuovo questa azione fino all\'inizio del proprio prossimo turno.' },
+        { name: 'Boom Sonico', desc: 'Il drago usa Incantesimi per lanciare Frantumare (versione di 3° livello). Non può usare di nuovo questa azione fino all\'inizio del proprio prossimo turno.' },
+        { name: 'Colpo di Coda', desc: 'Il drago effettua un attacco Lacerazione.', atkHit: '+16', atkDmgs: [{ f: '2d8+9', t: 'taglienti' }, { f: '2d10', t: 'fulmine' }] }
+      ],
+      drop: [{ name: 'Reliquie', desc: 'Insegne del potere sovrano, corone di sovrani decaduti, gemme uniche e oggetti magici accumulati nei secoli dal drago blu.' }],
+      notes: 'Draghi della Tirannia e delle Tempeste\n\nHabitat: Costa, Deserto\nTesoro: Reliquie\n\nGli antichi draghi blu pensano oltre il semplice dominio di gruppi di servitori dalla vita breve. Cercano invece di elevare il proprio status sopra quello degli altri draghi e degli abitanti più potenti del mondo.\n\nSe la dominazione mondiale appare troppo laboriosa o banale, questi draghi possono tentare di impadronirsi di reami extraplanari, imperi multiversali o delle stesse forze della realtà, come la vita, le tempeste o il tempo.\n\n' + DRAGHI_BLU_LORE + '\n\n' + DRAGHI_BLU_TANA + '\n\n(Affrontato nella propria tana, il drago vale 62.000 PE.)'
     }
   ];
 
