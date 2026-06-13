@@ -1656,6 +1656,28 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Attrezzi', desc: 'Attrezzi della palude e armi rudimentali, più effetti personali.' }],
       notes: 'Abitanti Anfibi di Paludi e Fanghiglia\n\nHabitat: Palude\nTesoro: Attrezzi, Individuale\n\nI guerrieri bullywug sono esperti nel muoversi attraverso le paludi e tendere imboscate agli intrusi. Spesso combattono al fianco di branchi di rane giganti addestrate.\n\n' + BULLYWUG_LORE
+    },
+    {
+      id: 'preset_cambion', name: 'Cambion', emoji: '🦹', rarity: 'uncommon',
+      type: 'Immondo', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 19, hp: 105, hpCur: 105, hpTemp: 0, hpDice: '14d8+42', init: 4,
+      speed: '9 m, Volare 18 m', cr: '5', xp: '',
+      str: 18, dex: 18, con: 16, intl: 14, wis: 12, cha: 16,
+      savesOverride: { str: '7', dex: '', con: '6', intl: '5', wis: '', cha: '6' },
+      skillOverrides: { inganno: '6', percezione: '4', furtivita: '7' }, passivePerception: 14,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Abissale', 'Comune', 'Infernale'],
+      dmgResist: ['Freddo', 'Fuoco', 'Fulmine', 'Veleno'], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Avvelenato'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il cambion effettua due attacchi, usando Artiglio o Raggio di Fuoco in qualsiasi combinazione.' },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 8 (1d8 + 4) danni taglienti più 7 (2d6) danni da fuoco.', atkHit: '+7', atkDmgs: [{ f: '1d8+4', t: 'taglienti' }, { f: '2d6', t: 'fuoco' }] },
+        { name: 'Raggio di Fuoco', desc: 'Attacco con incantesimo a distanza: +7 a colpire, gittata 36 metri.\nColpito: 13 (3d6 + 3) danni da fuoco.', atkHit: '+7', atkDmgs: [{ f: '3d6+3', t: 'fuoco' }] },
+        { name: 'Incantesimi', desc: 'Il cambion lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 14).\n\n2/Giorno ciascuno: Alterare Sé Stesso, Comando (versione di 3° livello), Individuazione del Magico.\n\n1/Giorno ciascuno: Dominare Persone (versione di 8° livello), Trasporto Planare (solo su sé stesso).' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie e oggetti legati alla fonte del potere immondo del cambion.' }],
+      notes: 'Mortale infuso di potere immondo\n\nHabitat: Qualsiasi\nTesoro: Reliquie\n\nI cambion sono ex mortali corrotti dal potere degli immondi o posseduti da forze insidiose. Mentre i tiefling sono individui dal libero arbitrio con una traccia di ascendenza immonda, i cambion sono intrinsecamente legati alla malvagia magia dei Piani Inferiori oppure da essa ricreati.\n\nMolti cambion servono le forze malevole che costituiscono la fonte dei loro poteri. Altri cercano di rivendicare la potenza di qualunque entità li abbia creati o di impadronirsi di poteri extraplanari per conto proprio. Tra i più famigerati vi è Iuz, un malvagio che ascese allo stato di semidio e il cui regno minaccia la Libera Città di Greyhawk su Oerth.\n\n— Origini del Cambion (tira 1d6) —\n1. Essere stato posseduto da un immondo.\n2. Essere stato resuscitato da un malvagio incantatore.\n3. Una lunga esposizione a un Piano Inferiore.\n4. Aver stretto un patto con un immondo.\n5. Aver subito la maledizione di una divinità.\n6. Aver preso parte a rituali immondi.\n\n— Iuz il Malvagio, semidio cambion —\n«Sembra che debba fare tutto da solo, visto che ho soltanto degli sciocchi come servitori. Chiaramente la delusione dev\'essere il prezzo della divinità.»'
     }
   ];
 
