@@ -1117,7 +1117,7 @@
       notes: 'Cane Lampeggiante delle Selve Fatate\n\nHabitat: Foresta, Piano Fatato (Feywild)\nTesoro: Nessuno\n\nI Cani Intermittenti scintillano di una magia innata che consente loro di teletrasportarsi, "lampeggiando" da un luogo all\'altro in un istante.\n\nQuesti cani utilizzano questo potere per inseguire le prede, confondere i nemici ed esprimere la propria gioia. Sono spesso associati agli abitanti del Feywild, come centauri e pixie, e partecipano frequentemente a cacce sfrenate che attraversano i confini tra i mondi.\n\n— Descrizione per il DM —\nI Cani Intermittenti sono tra le creature benevole più iconiche del Feywild. Nonostante il loro aspetto da semplici cani, sono intelligenti, leali e dotati di capacità soprannaturali. Spesso fungono da compagni, guide o cacciatori al servizio di fate, eladrin e altre creature delle Selve Fatate.\n\nUn branco di Cani Intermittenti può rappresentare:\n• alleati in una foresta incantata;\n• guide attraverso portali fatati;\n• protettori di un antico sentiero magico;\n• nemici temporanei se scambiano gli avventurieri per predatori o invasori.'
     },
     {
-      id: 'preset_massa_annientamento', name: 'Massa dell\'Annientamento', emoji: '🕳️', rarity: 'epic',
+      id: 'preset_massa_annientamento', name: 'Massa dell\'Annientamento', emoji: '🕳️', rarity: 'legendary',
       type: 'Melma', size: 'Mastodontica', alignment: 'Neutrale Malvagio',
       ac: 18, hp: 448, hpCur: 448, hpTemp: 0, hpDice: '23d20+207', init: 2,
       speed: '9 m', cr: '23', xp: '',
