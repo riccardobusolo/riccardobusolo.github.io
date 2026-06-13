@@ -1274,6 +1274,28 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Strumenti', desc: 'Strumenti e implementi diabolici usati per far rispettare i patti infernali.' }],
       notes: 'Diavolo del Terrore e dell\'Obbedienza\n\nHabitat: Planare (Nove Inferi)\nTesoro: Strumenti\n\nI diavoli d\'ossa sono Esseri Immondi alti e scheletrici dall\'aspetto da incubo, con pelle pallida tesa su corpi che combinano caratteristiche umane e insettoidi. Conosciuti anche come osyluth, comandano diavoli più deboli e altri esseri allineati alle legioni infernali.\n\nI diavoli d\'ossa garantiscono che gli ordini dei sovrani infernali vengano eseguiti con efficienza e che i non-diavoli rispettino gli impegni presi con i Nove Inferi. Uccidono coloro che rinnegano i patti infernali, inviando le anime mortali traditrici ad affrontare punizioni indicibili.\n\nQuando non sono al servizio dei loro padroni diabolici, i diavoli d\'ossa tentano i mortali egocentrici con promesse di adulazione e obbedienza da parte di altre creature: sostengono piccoli tiranni, aiutandoli a diventare sempre più crudeli e amorali.\n\nViaggiano attraverso il multiverso per adempiere agli ordini infernali e, se non hanno altra scelta, possono arruolare mortali affinché li assistano nei loro obiettivi malvagi.\n\n— Obiettivi del Diavolo d\'Ossa (tira 1d4) —\n1. Catturare un\'anima fuggita dai Nove Inferi.\n2. Consegnare un messaggio o punire qualcuno in nome di un arcidiavolo.\n3. Trovare qualcuno che ha infranto un patto con un diavolo.\n4. Uccidere qualcuno o rubare qualcosa come parte di un accordo con un malvagio utilizzatore di magia.\n\n— Sylvira Savikas, saggia di Candlekeep —\n"I diavoli d\'ossa sono solo una delle mille ragioni per non stringere mai un patto con un diavolo, ma sono una ragione importante. Rompi un accordo e probabilmente sarai trascinato nei Nove Inferi da uno di questi incubi."'
+    },
+    {
+      id: 'preset_naga_ossa', name: 'Naga d\'Ossa', emoji: '🐍', rarity: 'uncommon',
+      type: 'Non Morto', size: 'Grande', alignment: 'Neutrale Malvagio',
+      ac: 15, hp: 65, hpCur: 65, hpTemp: 0, hpDice: '10d10+10', init: 3,
+      speed: '12 m', cr: '4', xp: '',
+      str: 15, dex: 16, con: 12, intl: 16, wis: 15, cha: 15,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 12,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune più un\'altra lingua'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Paralizzato', 'Avvelenato'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'La naga effettua due attacchi Morso. Può sostituire qualsiasi attacco con un utilizzo di Sguardo Serpentino.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +5 a colpire, portata 3 metri.\nColpito: 10 (2d6 + 3) danni perforanti più 7 (2d6) danni necrotici.', atkHit: '+5', atkDmgs: [{ f: '2d6+3', t: 'perforanti' }, { f: '2d6', t: 'necrotici' }] },
+        { name: 'Sguardo Serpentino', desc: 'Tiro Salvezza su Saggezza: CD 13. Una creatura che la naga può vedere entro 18 metri.\nFallimento: 13 (3d6 + 3) danni psichici e il bersaglio ottiene la condizione Ammaliato fino all\'inizio del turno successivo della naga.', atkDmgs: [{ f: '3d6+3', t: 'psichici' }] },
+        { name: 'Incantesimi', desc: 'La naga lancia uno dei seguenti incantesimi, senza componenti materiali e usando Intelligenza come caratteristica da incantatore (CD 13).\n\nA volontà: Mano Magica, Taumaturgia.\n\n1/Giorno ciascuno: Comando, Individuazione dei Pensieri, Fulmine.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Conoscenze e reliquie accumulate dalla naga durante la sua vita, ora frammentate dalla non morte.' }],
+      notes: 'Manipolatore Serpentino Immortale\n\nHabitat: Sottosuolo\nTesoro: Reliquie\n\nLe naga sono immortali ma non invincibili, e una magia sufficientemente potente può porre fine alle loro vite. Le naga d\'ossa sono terrori scheletrici creati dai resti di naga uccise tramite la magia oppure di naga morte che non erano ancora ringiovanite.\n\nViene loro concessa una non-vita tramite rituali praticati da cultisti, yuan-ti e macabre naga spirituali. Queste naga non morte possiedono capacità magiche simili a quelle che avevano in vita, oltre a uno sguardo inquietante capace di ammaliare altre creature.\n\nLe naga d\'ossa normalmente obbediscono a coloro che le hanno riportate in vita, servendo i loro creatori come instancabili guardiane e condividendo le conoscenze che avevano raccolto in vita. La non morte altera la memoria perfetta di cui godevano quando erano vive, lasciandole con lacune nei ricordi o dettagli confusi in grovigli simili a enigmi.\n\nIn rari casi, le naga d\'ossa continuano a perseguire gli obiettivi che avevano in vita invece di servire altre creature. La maggior parte delle naga d\'ossa dotate di libero arbitrio sono esseri malvagi creati dai resti di naga spirituali, ma in circostanze insolite quelle create da naga guardiane continuano a essere creature buone, sebbene confuse.'
     }
   ];
 
