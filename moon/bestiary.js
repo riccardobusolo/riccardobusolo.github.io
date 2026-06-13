@@ -48,6 +48,7 @@
   var BUGBEAR_LORE = 'I bugbear incarnano la paura delle terre selvagge e la minaccia dei luoghi naturali. Sono notoriamente furtivi e i nemici che si avventurano nei loro territori spesso scompaiono senza lasciare traccia.';
   var BULETTE_LORE = 'Conosciute anche come "squali di terra", le bulette sono predatori ossessivi che scavano sottoterra, balzano sopra gli ostacoli e irrompono attraverso di essi all\'inseguimento delle loro prede. Scavano rapidamente appena sotto la superficie del terreno. Quando percepiscono un movimento, erompono dal sottosuolo tentando di catturare le prede nelle loro enormi fauci.';
   var BULLYWUG_LORE = 'I bullywug, incarnazioni fatate delle terre paludose, proteggono le selvagge distese fangose e si considerano favoriti dal cosmo per tale ruolo. Queste creature delle dimensioni di un umano, simili a rospi o rane, intrattengono stretti rapporti con le altre creature della palude.';
+  var CENTAURI_LORE = 'I centauri sono difensori delle foreste, delle pianure e dei luoghi intrisi di potere primordiale. Con la parte superiore del corpo simile a quella degli umani e la parte inferiore simile a quella dei cavalli, i centauri si lanciano in battaglia contro chiunque minacci i loro alleati.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -1700,6 +1701,53 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Necrofago delle Catacombe\n\nHabitat: Sottosuolo, Urbano\nTesoro: Nessuno\n\nVoraci divoratori di cadaveri, gli striscianti carogna gravitano verso luoghi di massacro e decomposizione. In ambienti così carichi, si nutrono dei morti senza alcuna considerazione per l\'origine o la freschezza dei loro pasti.\n\nPossiedono corpi segmentati simili a giganteschi vermi tagliatori. Da sotto le loro mascelle multipartite sporgono otto sottili tentacoli sferzanti. Le creature colpite da questi tentacoli rischiano di essere paralizzate e divorate.\n\nPerlustrano fogne, campi di battaglia, necropoli e terre selvagge corrotte alla ricerca di cadaveri, aggrappandosi ai soffitti per tendere imboscate alle prede più piccole e per evitare i predatori concorrenti. Sono attratti dalla luce e dall\'odore del sangue, che riconoscono come segnali della presenza di cibo.\n\nQuesti spazzini evitano di ingerire materiale inorganico: cripte con armature funerarie ripulite dai loro cadaveri e catacombe inquietantemente immacolate sono segni di infestazione da striscianti carogna.'
+    },
+    {
+      id: 'preset_guardiano_centauro', name: 'Guardiano Centauro', emoji: '🐎', rarity: 'rare',
+      type: 'Fata', size: 'Grande', alignment: 'Neutrale Buono',
+      ac: 16, hp: 105, hpCur: 105, hpTemp: 0, hpDice: '14d10+28', init: 2,
+      speed: '15 m', cr: '7', xp: '',
+      str: 18, dex: 14, con: 14, intl: 9, wis: 18, cha: 11,
+      savesOverride: { str: '', dex: '', con: '5', intl: '', wis: '7', cha: '' },
+      skillOverrides: { atletica: '7', natura: '5', percezione: '7' }, passivePerception: 17,
+      senses: [], languages: ['Druidico', 'Elfico', 'Silvano'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il centauro effettua due attacchi, usando Bastone della Foresta o Raggio Solare in qualsiasi combinazione.' },
+        { name: 'Bastone della Foresta', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 13 (2d8 + 4) danni contundenti più 14 (4d6) danni da veleno.', atkHit: '+7', atkDmgs: [{ f: '2d8+4', t: 'contundenti' }, { f: '4d6', t: 'veleno' }] },
+        { name: 'Raggio Solare', desc: 'Attacco con incantesimo a distanza: +7 a colpire, gittata 27 metri.\nColpito: 14 (3d6 + 4) danni radiosi e il bersaglio ottiene la condizione Accecato fino all\'inizio del turno successivo del centauro.', atkHit: '+7', atkDmgs: [{ f: '3d6+4', t: 'radiosi' }] },
+        { name: 'Incantesimi', desc: 'Il centauro lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 15).\n\nA volontà: Arte Druidica, Parlare con gli Animali.' }
+      ],
+      bonusActions: [
+        { name: 'Sentiero Intralciante (Ricarica 5-6)', desc: 'Il centauro si muove fino alla propria velocità senza provocare attacchi di opportunità. Ogni creatura entro 1,5 metri dal centauro durante il movimento è bersaglio del seguente effetto.\nTiro Salvezza su Forza: CD 15.\nFallimento: 11 (2d6 + 4) danni contundenti e il bersaglio ottiene la condizione Trattenuto fino alla fine del suo turno successivo.', atkDmgs: [{ f: '2d6+4', t: 'contundenti' }] }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armi', desc: 'Il bastone della foresta e le armi del centauro, più effetti personali.' }],
+      notes: 'Difensori delle Terre Fatate\n\nHabitat: Foresta, Prateria, Piano Fatato (Feywild)\nTesoro: Armi, Individuale\n\nI guardiani centauri guidano spesso gruppi di soldati centauri e fungono da intermediari tra le creature fatate e gli intrusi che penetrano nei loro territori.\n\n' + CENTAURI_LORE
+    },
+    {
+      id: 'preset_soldato_centauro', name: 'Soldato Centauro', emoji: '🐎', rarity: 'uncommon',
+      type: 'Fata', size: 'Grande', alignment: 'Neutrale Buono',
+      ac: 16, hp: 45, hpCur: 45, hpTemp: 0, hpDice: '6d10+12', init: 2,
+      speed: '15 m', cr: '2', xp: '',
+      str: 18, dex: 14, con: 14, intl: 9, wis: 13, cha: 11,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { atletica: '6', percezione: '3' }, passivePerception: 13,
+      senses: [], languages: ['Elfico', 'Silvano'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il centauro effettua due attacchi, usando Picca o Arco Lungo in qualsiasi combinazione.' },
+        { name: 'Picca', desc: 'Attacco con arma da mischia: +6 a colpire, portata 3 metri.\nColpito: 9 (1d10 + 4) danni perforanti.', atkHit: '+6', atkDmgs: [{ f: '1d10+4', t: 'perforanti' }] },
+        { name: 'Arco Lungo', desc: 'Attacco con arma a distanza: +4 a colpire, gittata 45/180 metri.\nColpito: 6 (1d8 + 2) danni perforanti.', atkHit: '+4', atkDmgs: [{ f: '1d8+2', t: 'perforanti' }] }
+      ],
+      bonusActions: [
+        { name: 'Carica Travolgente (Ricarica 5-6)', desc: 'Il centauro si muove fino alla propria velocità senza provocare attacchi di opportunità e può attraversare gli spazi occupati da creature di taglia Media o inferiore. Ogni creatura il cui spazio viene attraversato è bersaglio del seguente effetto.\nTiro Salvezza su Forza: CD 14.\nFallimento: 7 (1d6 + 4) danni contundenti e il bersaglio ottiene la condizione Prono.', atkDmgs: [{ f: '1d6+4', t: 'contundenti' }] }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Corazza pettorale, arco lungo, picca, più effetti personali.' }],
+      notes: 'Difensori delle Terre Fatate\n\nHabitat: Foresta, Prateria, Piano Fatato (Feywild)\nTesoro: Armi, Individuale\n\nI soldati centauri sono guardiani simili a cavalieri. Molti di loro diffidano delle creature che non appartengono al popolo fatato.\n\n' + CENTAURI_LORE
     }
   ];
 
