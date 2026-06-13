@@ -46,6 +46,7 @@
   var DRAGHI_BRONZO_LORE = 'Dove dimorano i draghi di bronzo, le meraviglie prosperano. Immaginativi ma riflessivi, questi draghi metallici lavorano per raggiungere la grandezza e aiutano gli altri a realizzare tutto il proprio potenziale.\n\nEssi si sforzano di preservare le innovazioni, dalle opere delle civiltà passate alle nuove scoperte, e condividono ampiamente tali conoscenze. Quando hanno a che fare con creature dalla vita più breve, i draghi di bronzo preferiscono conquistarle attraverso il dialogo e la formazione, ma non esitano a combattere quando i malvagi impediscono agli altri di raggiungere il proprio potenziale.\n\nI draghi di bronzo amano il potere e le infinite possibilità offerte dal mare e spesso stabiliscono le proprie tane in luoghi di bellezza naturale o presso comunità che desiderano proteggere. Nelle loro dimore accumulano oggetti che ritengono potranno essere utili un giorno. Recuperano inoltre tesori perduti in mare, riportando alla luce ricchezze e navi affondate.';
   var DRAGHI_BRONZO_TANA = '— Tane dei Draghi di Bronzo —\nI draghi di bronzo costruiscono normalmente le proprie dimore vicino al mare o sotto di esso. La regione entro 1 miglio dalla tana di un drago di bronzo adulto o antico è alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nCorrenti Galleggianti: le creature entro 1 miglio dalla tana che non possiedono una velocità di nuotare ignorano il costo aggiuntivo di movimento mentre nuotano.\n\nSole e Tempeste: nella sua tana il drago può lanciare Controllare il Clima (senza componenti materiali, con la stessa caratteristica da incantatore della sua azione Incantesimi) e può controllare il tempo atmosferico entro 1 miglio dalla tana, dentro o fuori di essa.\n\nSe il drago muore o trasferisce la propria tana altrove, questi effetti terminano immediatamente.';
   var BUGBEAR_LORE = 'I bugbear incarnano la paura delle terre selvagge e la minaccia dei luoghi naturali. Sono notoriamente furtivi e i nemici che si avventurano nei loro territori spesso scompaiono senza lasciare traccia.';
+  var BULETTE_LORE = 'Conosciute anche come "squali di terra", le bulette sono predatori ossessivi che scavano sottoterra, balzano sopra gli ostacoli e irrompono attraverso di essi all\'inseguimento delle loro prede. Scavano rapidamente appena sotto la superficie del terreno. Quando percepiscono un movimento, erompono dal sottosuolo tentando di catturare le prede nelle loro enormi fauci.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -1560,6 +1561,50 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Equipaggiamento', desc: 'Armatura di cuoio, 3 martelli leggeri, più effetti personali.' }],
       notes: 'Bruti Goblinoidi in Agguato\n\nHabitat: Foresta, Prateria, Piano Fatato (Feywild), Sottosuolo\nTesoro: Armamenti, Personale\n\nI Guerrieri Bugbear servono coloro che offrono loro tesori, cibo o la possibilità di cacciare prede impegnative.\n\n' + BUGBEAR_LORE
+    },
+    {
+      id: 'preset_bulette', name: 'Bulette', emoji: '🦈', rarity: 'uncommon',
+      type: 'Mostruosità', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 17, hp: 94, hpCur: 94, hpTemp: 0, hpDice: '9d10+45', init: 0,
+      speed: '12 m, Scavare 12 m', cr: '5', xp: '',
+      str: 19, dex: 11, con: 21, intl: 2, wis: 10, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '6' }, passivePerception: 16,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }, { type: 'Percezione Tellurica', value: 36, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'La bulette effettua due attacchi Morso.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 17 (2d12 + 4) danni perforanti.', atkHit: '+7', atkDmgs: [{ f: '2d12+4', t: 'perforanti' }] },
+        { name: 'Balzo Mortale', desc: 'La bulette spende 1,5 metri di movimento per saltare in uno spazio entro 4,5 metri che contenga una o più creature Grandi o più piccole. Ogni creatura nello spazio di destinazione effettua un Tiro Salvezza su Destrezza (CD 15).\nFallimento: 19 (3d12) danni contundenti e il bersaglio ottiene la condizione Prono.\nSuccesso: metà danni e il bersaglio viene spinto di 1,5 metri in linea retta lontano dalla bulette.', atkDmgs: [{ f: '3d12', t: 'contundenti' }] }
+      ],
+      bonusActions: [
+        { name: 'Balzo', desc: 'La bulette salta fino a 9 metri spendendo 3 metri di movimento.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Voraci Squali di Terra Sotterranei\n\nHabitat: Prateria, Colline, Montagne\nTesoro: Nessuno\n\nLe bulette percorrono vasti territori. Spesso minacciano le mandrie di animali e possono annientare intere comunità agricole.\n\n' + BULETTE_LORE
+    },
+    {
+      id: 'preset_cucciolo_bulette', name: 'Cucciolo di Bulette', emoji: '🦈', rarity: 'common',
+      type: 'Mostruosità', size: 'Media', alignment: 'Senza Allineamento',
+      ac: 16, hp: 45, hpCur: 45, hpTemp: 0, hpDice: '6d8+18', init: -1,
+      speed: '9 m, Scavare 6 m', cr: '2', xp: '',
+      str: 16, dex: 8, con: 17, intl: 2, wis: 10, cha: 4,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '4' }, passivePerception: 14,
+      senses: [{ type: 'Scurovisione', value: 9, unit: 'm' }, { type: 'Percezione Tellurica', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 14 (2d10 + 3) danni perforanti.', atkHit: '+5', atkDmgs: [{ f: '2d10+3', t: 'perforanti' }] }
+      ],
+      bonusActions: [
+        { name: 'Balzo', desc: 'Il cucciolo salta fino a 9 metri spendendo 3 metri di movimento.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Voraci Squali di Terra Sotterranei\n\nHabitat: Prateria, Colline, Montagne\nTesoro: Nessuno\n\nLe bulette giovani sono note come cuccioli. Viaggiano in piccoli gruppi, sfruttando il numero per abbattere avversari più grandi. Il loro arrivo è spesso presagio della comparsa di una bulette adulta.\n\n' + BULETTE_LORE
     }
   ];
 
