@@ -1094,6 +1094,27 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Piante Germogliate dal Male\n\nHabitat: Foresta\nTesoro: Nessuno\n\nGli antichi vegetali corrotti conosciuti come blight Gulthias si nutrono del sangue e devastano la terra che li circonda. La loro presenza genera nuovi blights e trasforma intere foreste in domini infestati.\n\nPrendono il nome da Gulthias, un vampiro il cui cuore fu trafitto da un paletto. Secondo la leggenda, dal paletto ancora intriso della sua maledizione nacque il primo albero Gulthias. Da esso discenderebbero tutti gli altri.\n\nPer queste creature ogni essere vivente è soltanto un servo da dominare oppure fertilizzante per diffondere la propria corruzione.\n\n' + BLIGHTS_LORE + '\n\n— Belak l\'Esiliato, Druido del Bosco del Crepuscolo —\n"È vivo, anche se sembra morto. In un\'epoca lontana qualcuno conficcò un paletto nel cuore di un vampiro proprio in questo luogo. Quel paletto non è mai marcito e mise radici. Così nacque l\'Albero Gulthias, pulsando di un antico potere primordiale."'
+    },
+    {
+      id: 'preset_blink_dog', name: 'Blink Dog', emoji: '🐕', rarity: 'rare',
+      type: 'Fata', size: 'Media', alignment: 'Legale Buono',
+      ac: 13, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '4d8+4', init: 3,
+      speed: '12 m', cr: '1/4', xp: '',
+      str: 12, dex: 17, con: 12, intl: 10, wis: 13, cha: 11,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '5', furtivita: '5' }, passivePerception: 15,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Blink Dog', 'Comprende Elfico e Silvano ma non può parlarli'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 5 (1d4 + 3) danni perforanti.', atkHit: '+5', atkDmgs: [{ f: '1d4+3', t: 'perforanti' }] }
+      ],
+      bonusActions: [
+        { name: 'Teletrasporto (Ricarica 4-6)', desc: 'Il Blink Dog si teletrasporta fino a 12 metri in uno spazio libero che può vedere.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Cane Lampeggiante delle Selve Fatate\n\nHabitat: Foresta, Piano Fatato (Feywild)\nTesoro: Nessuno\n\nI Blink Dog scintillano di una magia innata che consente loro di teletrasportarsi, "lampeggiando" da un luogo all\'altro in un istante.\n\nQuesti cani utilizzano questo potere per inseguire le prede, confondere i nemici ed esprimere la propria gioia. Sono spesso associati agli abitanti del Feywild, come centauri e pixie, e partecipano frequentemente a cacce sfrenate che attraversano i confini tra i mondi.\n\n— Descrizione per il DM —\nI Blink Dog sono tra le creature benevole più iconiche del Feywild. Nonostante il loro aspetto da semplici cani, sono intelligenti, leali e dotati di capacità soprannaturali. Spesso fungono da compagni, guide o cacciatori al servizio di fate, eladrin e altre creature delle Selve Fatate.\n\nUn branco di Blink Dog può rappresentare:\n• alleati in una foresta incantata;\n• guide attraverso portali fatati;\n• protettori di un antico sentiero magico;\n• nemici temporanei se scambiano gli avventurieri per predatori o invasori.'
     }
   ];
 
