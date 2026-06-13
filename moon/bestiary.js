@@ -1678,6 +1678,28 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Reliquie e oggetti legati alla fonte del potere immondo del cambion.' }],
       notes: 'Mortale infuso di potere immondo\n\nHabitat: Qualsiasi\nTesoro: Reliquie\n\nI cambion sono ex mortali corrotti dal potere degli immondi o posseduti da forze insidiose. Mentre i tiefling sono individui dal libero arbitrio con una traccia di ascendenza immonda, i cambion sono intrinsecamente legati alla malvagia magia dei Piani Inferiori oppure da essa ricreati.\n\nMolti cambion servono le forze malevole che costituiscono la fonte dei loro poteri. Altri cercano di rivendicare la potenza di qualunque entità li abbia creati o di impadronirsi di poteri extraplanari per conto proprio. Tra i più famigerati vi è Iuz, un malvagio che ascese allo stato di semidio e il cui regno minaccia la Libera Città di Greyhawk su Oerth.\n\n— Origini del Cambion (tira 1d6) —\n1. Essere stato posseduto da un immondo.\n2. Essere stato resuscitato da un malvagio incantatore.\n3. Una lunga esposizione a un Piano Inferiore.\n4. Aver stretto un patto con un immondo.\n5. Aver subito la maledizione di una divinità.\n6. Aver preso parte a rituali immondi.\n\n— Iuz il Malvagio, semidio cambion —\n«Sembra che debba fare tutto da solo, visto che ho soltanto degli sciocchi come servitori. Chiaramente la delusione dev\'essere il prezzo della divinità.»'
+    },
+    {
+      id: 'preset_strisciante_carogna', name: 'Strisciante Carogna', emoji: '🪱', rarity: 'common',
+      type: 'Mostruosità', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 13, hp: 51, hpCur: 51, hpTemp: 0, hpDice: '6d10+18', init: 1,
+      speed: '9 m, Scalare 9 m', cr: '2', xp: '',
+      str: 14, dex: 13, con: 16, intl: 1, wis: 12, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '5' }, passivePerception: 15,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Camminare sui Ragni', desc: 'Lo strisciante carogna può scalare superfici difficili, inclusi i soffitti, senza dover effettuare una prova di caratteristica.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Lo strisciante carogna usa Tentacoli Paralizzanti ed effettua un attacco con Morso.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 7 (2d4 + 2) danni perforanti più 3 (1d6) danni da veleno.', atkHit: '+4', atkDmgs: [{ f: '2d4+2', t: 'perforanti' }, { f: '1d6', t: 'veleno' }] },
+        { name: 'Tentacoli Paralizzanti', desc: 'Tiro Salvezza su Destrezza: CD 12. Una creatura che lo strisciante carogna può vedere entro 3 metri.\nFallimento: il bersaglio ottiene la condizione Avvelenato e ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l\'effetto su sé stesso con un successo (dopo 1 minuto riesce automaticamente). Finché è Avvelenato in questo modo, ottiene anche la condizione Paralizzato.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Necrofago delle Catacombe\n\nHabitat: Sottosuolo, Urbano\nTesoro: Nessuno\n\nVoraci divoratori di cadaveri, gli striscianti carogna gravitano verso luoghi di massacro e decomposizione. In ambienti così carichi, si nutrono dei morti senza alcuna considerazione per l\'origine o la freschezza dei loro pasti.\n\nPossiedono corpi segmentati simili a giganteschi vermi tagliatori. Da sotto le loro mascelle multipartite sporgono otto sottili tentacoli sferzanti. Le creature colpite da questi tentacoli rischiano di essere paralizzate e divorate.\n\nPerlustrano fogne, campi di battaglia, necropoli e terre selvagge corrotte alla ricerca di cadaveri, aggrappandosi ai soffitti per tendere imboscate alle prede più piccole e per evitare i predatori concorrenti. Sono attratti dalla luce e dall\'odore del sangue, che riconoscono come segnali della presenza di cibo.\n\nQuesti spazzini evitano di ingerire materiale inorganico: cripte con armature funerarie ripulite dai loro cadaveri e catacombe inquietantemente immacolate sono segni di infestazione da striscianti carogna.'
     }
   ];
 
