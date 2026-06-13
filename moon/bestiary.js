@@ -41,6 +41,8 @@
   var BLIGHTS_LORE = 'I blights sono piante maligne nate da un male profondamente radicato. Le loro forme nodose e deformi presentano tratti inquietanti che ricordano arti umani e fauci fameliche. Si nascondono tra la vegetazione comune e tendono imboscate a tutte le creature che non appartengono al regno vegetale.\n\nSebbene alcuni blights agiscano autonomamente, la maggior parte serve le forze oscure che li hanno generati oppure creature malvagie capaci di dominare la natura. La magia che li crea spesso contamina anche la flora circostante, facendo proliferare rovi, liane e alberi contorti che invadono sentieri e campi, soffocano pozzi e ruscelli e costringono gli animali ad abbandonare il proprio habitat naturale.\n\nPer questo motivo, la comparsa dei blights è spesso il primo segnale di una corruzione più grande che si sta diffondendo.';
   var DRAGHI_BLU_LORE = 'Arroganti e imperiosi, i draghi blu sono draghi cromatici che bramano il controllo e raccolgono seguaci proprio come altri draghi accumulano tesori. Cercano di trasformare i propri territori in imperi, domini che intere nazioni temano.\n\nI draghi blu possiedono tratti affilati, corna perforanti e scaglie che variano dal colore dello zaffiro alle tonalità dei cieli tempestosi. Vivono nei deserti e nelle terre aride, in particolare nelle regioni caratterizzate da spettacolari pinnacoli rocciosi dai quali possono osservare per chilometri.\n\nScelgono di costruire le loro tane vicino a luoghi dal forte valore simbolico, come fortezze giganti abbandonate, colossi di imperi caduti o monumenti eretti dai loro seguaci.\n\nLe insegne del potere sovrano e i capolavori artistici riempiono i tesori dei draghi blu. Questi draghi non mostrano interesse per tesori comuni o imperfetti: preferiscono gemme uniche nel loro genere, corone appartenute a sovrani decaduti e oggetti magici capaci di diffondere la loro influenza.';
   var DRAGHI_BLU_TANA = '— Tane dei Draghi Blu —\nI draghi blu vivono in terre aride. Le loro tane possono essere trappole mortali progettate per intrappolare gli invasori oppure ostentate fortezze da cui pianificano la propria dominazione. La regione entro 1 miglio dalla tana di un drago blu adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nVoragini: ogni volta che una creatura nell\'area (diversa dal drago e dai suoi alleati) completa un Riposo Lungo, tira 1d20; con un 1 una voragine si apre sotto di essa, che deve superare un Tiro Salvezza su Destrezza CD 15 oppure precipitare per 2d4 × 10 piedi.\n\nTempeste Malevole: tempeste di sabbia e temporali infuriano entro 1 miglio dalla tana e l\'area è Leggermente Oscurata.\n\nSe il drago muore o sposta la propria tana altrove, questi effetti terminano immediatamente.';
+  var DRAGHI_OTTONE_LORE = 'Socievoli ed estroversi, i draghi d\'ottone adorano condividere conoscenze e storie. Sebbene questi draghi metallici prediligano le terre aride, percorrono volentieri grandi distanze per visitare creature amichevoli, trasmettere ciò che hanno imparato e raccogliere notizie.\n\nPur essendo di buon cuore, i draghi d\'ottone non evitano il combattimento quando necessario, ostacolando i nemici con sonno magico e bruciandoli con fiamme roventi.\n\nPrediligono i climi caldi, in particolare steppe e deserti rocciosi o sabbiosi, e di solito dimorano vicino a importanti crocevia o oasi frequentate da viaggiatori. Amano assumere forme umanoidi, travestendosi da mercanti itineranti, studiosi, narratori o chiunque altro sia interessato alle storie altrui.\n\nI draghi d\'ottone collezionano oggetti eclettici. Sebbene possano sembrare semplici cianfrusaglie, ciascuno di essi fa parte di una storia: un ricordo nostalgico o la prova di una leggenda ormai divenuta mito. Il cappello di un vecchio amico e la corona dell\'ultimo sovrano di una dinastia dimenticata potrebbero occupare lo stesso scaffale nel tesoro di un drago d\'ottone.';
+  var DRAGHI_OTTONE_TANA = '— Tane dei Draghi d\'Ottone —\nI draghi d\'ottone vivono normalmente in caverne segrete e canyon vicini a rotte molto frequentate. La regione entro 1 miglio dalla tana di un drago d\'ottone adulto o antico viene alterata dalla sua presenza, creando i seguenti effetti regionali.\n\nMiraggi: nella sua tana il drago può lanciare Immagine Maggiore (senza componenti materiali, con la stessa caratteristica da incantatore della sua capacità Incantesimi); la gittata diventa 1 miglio e il drago non ha bisogno di vedere il punto in cui compare l\'illusione.\n\nAcqua Ristoratrice: l\'acqua entro 1 miglio dalla tana è magicamente rinvigorente; una creatura che la beve ottiene 2d4 Punti Ferita Temporanei e il drago viene immediatamente a conoscenza della sua presenza.\n\nSe il drago muore o sposta la propria tana altrove, questi effetti terminano immediatamente.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -1296,6 +1298,109 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Conoscenze e reliquie accumulate dalla naga durante la sua vita, ora frammentate dalla non morte.' }],
       notes: 'Manipolatore Serpentino Immortale\n\nHabitat: Sottosuolo\nTesoro: Reliquie\n\nLe naga sono immortali ma non invincibili, e una magia sufficientemente potente può porre fine alle loro vite. Le naga d\'ossa sono terrori scheletrici creati dai resti di naga uccise tramite la magia oppure di naga morte che non erano ancora ringiovanite.\n\nViene loro concessa una non-vita tramite rituali praticati da cultisti, yuan-ti e macabre naga spirituali. Queste naga non morte possiedono capacità magiche simili a quelle che avevano in vita, oltre a uno sguardo inquietante capace di ammaliare altre creature.\n\nLe naga d\'ossa normalmente obbediscono a coloro che le hanno riportate in vita, servendo i loro creatori come instancabili guardiane e condividendo le conoscenze che avevano raccolto in vita. La non morte altera la memoria perfetta di cui godevano quando erano vive, lasciandole con lacune nei ricordi o dettagli confusi in grovigli simili a enigmi.\n\nIn rari casi, le naga d\'ossa continuano a perseguire gli obiettivi che avevano in vita invece di servire altre creature. La maggior parte delle naga d\'ossa dotate di libero arbitrio sono esseri malvagi creati dai resti di naga spirituali, ma in circostanze insolite quelle create da naga guardiane continuano a essere creature buone, sebbene confuse.'
+    },
+    {
+      id: 'preset_cucciolo_drago_ottone', name: 'Cucciolo di Drago d\'Ottone', emoji: '🐲', rarity: 'epic',
+      type: 'Drago', size: 'Media', alignment: 'Caotico Buono',
+      ac: 15, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '4d8+4', init: 2,
+      speed: '9 m, Scavare 4,5 m, Volare 18 m', cr: '1', xp: '',
+      str: 15, dex: 10, con: 13, intl: 10, wis: 11, cha: 13,
+      savesOverride: { str: '', dex: '2', con: '', intl: '', wis: '2', cha: '' },
+      skillOverrides: { percezione: '4', furtivita: '2' }, passivePerception: 14,
+      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 7 (1d10 + 2) danni taglienti.', atkHit: '+4', atkDmgs: [{ f: '1d10+2', t: 'taglienti' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 11. Ogni creatura in una linea lunga 6 metri e larga 1,5 metri.\nFallimento: 14 (4d6) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '4d6', t: 'fuoco' }] },
+        { name: 'Soffio del Sonno', desc: 'Tiro Salvezza su Costituzione: CD 11. Ogni creatura in un cono di 4,5 metri.\nFallimento: il bersaglio ottiene la condizione Incapacitato fino alla fine del suo turno successivo, momento in cui ripete il tiro salvezza.\nSecondo Fallimento: il bersaglio ottiene la condizione Privo di Sensi per 1 minuto. L\'effetto termina se subisce danni oppure se una creatura entro 1,5 metri usa un\'azione per svegliarlo.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Oggetti eclettici e curiosi, ognuno legato a una storia o a una leggenda.' }],
+      notes: 'Draghi della Conoscenza e della Conversazione\n\nHabitat: Deserto\nTesoro: Arcani\n\nI cuccioli di drago d\'ottone sono instancabilmente curiosi. Cercano con entusiasmo il contatto con creature avvicinabili ed esplorano rapidamente qualsiasi luogo che presenti qualcosa di interessante. Una volta ascoltate storie di avventure, molti sono impazienti di iniziare le proprie.\n\n' + DRAGHI_OTTONE_LORE
+    },
+    {
+      id: 'preset_giovane_drago_ottone', name: 'Giovane Drago d\'Ottone', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Grande', alignment: 'Caotico Buono',
+      ac: 17, hp: 110, hpCur: 110, hpTemp: 0, hpDice: '13d10+39', init: 3,
+      speed: '12 m, Scavare 6 m, Volare 24 m', cr: '6', xp: '',
+      str: 19, dex: 10, con: 17, intl: 12, wis: 11, cha: 15,
+      savesOverride: { str: '', dex: '3', con: '', intl: '', wis: '3', cha: '' },
+      skillOverrides: { percezione: '6', persuasione: '5', furtivita: '3' }, passivePerception: 16,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire due attacchi con un uso di Soffio del Sonno.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 15 (2d10 + 4) danni taglienti.', atkHit: '+7', atkDmgs: [{ f: '2d10+4', t: 'taglienti' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 14. Ogni creatura in una linea lunga 12 metri e larga 1,5 metri.\nFallimento: 38 (11d6) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '11d6', t: 'fuoco' }] },
+        { name: 'Soffio del Sonno', desc: 'Tiro Salvezza su Costituzione: CD 14. Ogni creatura in un cono di 9 metri.\nFallimento: il bersaglio ottiene la condizione Incapacitato fino alla fine del suo turno successivo e poi ripete il tiro salvezza.\nSecondo Fallimento: il bersaglio ottiene la condizione Privo di Sensi per 1 minuto. L\'effetto termina se subisce danni o se una creatura entro 1,5 metri usa un\'azione per svegliarlo.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Oggetti eclettici e curiosi, ognuno legato a una storia o a una leggenda.' }],
+      notes: 'Draghi della Conoscenza e della Conversazione\n\nHabitat: Deserto\nTesoro: Arcani\n\nI giovani draghi d\'ottone viaggiano molto, spesso trascorrendo alcuni anni in una regione prima di tornare alla propria tana. Alcuni lavorano a stretto contatto con altri draghi metallici, trasportando informazioni tra alleati.\n\n' + DRAGHI_OTTONE_LORE
+    },
+    {
+      id: 'preset_drago_ottone_adulto', name: 'Drago d\'Ottone Adulto', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Enorme', alignment: 'Caotico Buono',
+      ac: 18, hp: 172, hpCur: 172, hpTemp: 0, hpDice: '15d12+75', init: 10,
+      speed: '12 m, Scavare 9 m, Volare 24 m', cr: '13', xp: '',
+      str: 23, dex: 10, con: 21, intl: 14, wis: 13, cha: 17,
+      savesOverride: { str: '', dex: '5', con: '', intl: '', wis: '6', cha: '' },
+      skillOverrides: { storia: '7', percezione: '11', persuasione: '8', furtivita: '5' }, passivePerception: 21,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire un attacco con un uso di Soffio del Sonno oppure con il lancio di Raggio Rovente tramite Incantesimi.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +11 a colpire, portata 3 metri.\nColpito: 17 (2d10 + 6) danni taglienti più 4 (1d8) danni da fuoco.', atkHit: '+11', atkDmgs: [{ f: '2d10+6', t: 'taglienti' }, { f: '1d8', t: 'fuoco' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 18, ogni creatura nella linea del soffio.\nFallimento: 45 (10d8) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '10d8', t: 'fuoco' }] },
+        { name: 'Soffio del Sonno', desc: 'Tiro Salvezza su Costituzione: CD 18. Ogni creatura in un cono di 18 metri.\nFallimento: il bersaglio ottiene la condizione Incapacitato fino alla fine del suo turno successivo e poi ripete il tiro salvezza.\nSecondo Fallimento: il bersaglio ottiene la condizione Privo di Sensi per 10 minuti. L\'effetto termina se subisce danni o viene svegliato.' },
+        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 16).\n\nA volontà: Individuazione del Magico, Illusione Minore, Raggio Rovente, Cambiare Forma (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali.\n\n1/Giorno ciascuno: Individuazione dei Pensieri, Controllare il Clima.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
+        { name: 'Luce Accecante', desc: 'Il drago usa Incantesimi per lanciare Raggio Rovente.' },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della propria velocità ed effettua un attacco Lacerazione.', atkHit: '+11', atkDmgs: [{ f: '2d10+6', t: 'taglienti' }, { f: '1d8', t: 'fuoco' }] },
+        { name: 'Sabbie Ustionanti', desc: 'Tiro Salvezza su Destrezza: CD 16. Una creatura entro 36 metri.\nFallimento: 27 (6d8) danni da fuoco e la velocità del bersaglio è dimezzata fino alla fine del suo turno successivo.\nIl drago non può usare nuovamente questa azione fino all\'inizio del suo turno successivo.', atkDmgs: [{ f: '6d8', t: 'fuoco' }] }
+      ],
+      drop: [{ name: 'Arcani', desc: 'Oggetti eclettici e curiosi, ognuno legato a una storia o a una leggenda.' }],
+      notes: 'Draghi della Conoscenza e della Conversazione\n\nHabitat: Deserto\nTesoro: Arcani\n\nI draghi d\'ottone adulti conoscono molti segreti e dispongono di vaste reti di contatti. Condividono le prospettive apprese in tutto il mondo e combattono con passione le menzogne di truffatori e malvagi che portano le persone fuori strada.\n\n' + DRAGHI_OTTONE_LORE + '\n\n' + DRAGHI_OTTONE_TANA + '\n\n(Affrontato nella propria tana, il drago vale 11.500 PE.)'
+    },
+    {
+      id: 'preset_drago_ottone_antico', name: 'Drago d\'Ottone Antico', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Mastodontica', alignment: 'Caotico Buono',
+      ac: 20, hp: 332, hpCur: 332, hpTemp: 0, hpDice: '19d20+133', init: 12,
+      speed: '12 m, Scavare 12 m, Volare 24 m', cr: '20', xp: '',
+      str: 27, dex: 10, con: 25, intl: 16, wis: 15, cha: 22,
+      savesOverride: { str: '', dex: '6', con: '', intl: '', wis: '8', cha: '' },
+      skillOverrides: { storia: '9', percezione: '14', persuasione: '12', furtivita: '6' }, passivePerception: 24,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire un attacco con Soffio del Sonno oppure con Raggio Rovente (versione di 3° livello).' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +14 a colpire, portata 4,5 metri.\nColpito: 19 (2d10 + 8) danni taglienti più 7 (2d6) danni da fuoco.', atkHit: '+14', atkDmgs: [{ f: '2d10+8', t: 'taglienti' }, { f: '2d6', t: 'fuoco' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 21. Ogni creatura in una linea lunga 27 metri.\nFallimento: 58 (13d8) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '13d8', t: 'fuoco' }] },
+        { name: 'Soffio del Sonno', desc: 'Tiro Salvezza su Costituzione: CD 21. Ogni creatura in un cono di 27 metri.\nFallimento: il bersaglio ottiene la condizione Incapacitato fino alla fine del suo turno successivo e poi ripete il tiro salvezza.\nSecondo Fallimento: il bersaglio ottiene la condizione Privo di Sensi per 10 minuti. L\'effetto termina se subisce danni o viene svegliato.' },
+        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 20).\n\nA volontà: Individuazione del Magico, Illusione Minore, Raggio Rovente (versione di 3° livello), Cambiare Forma (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali.\n\n1/Giorno ciascuno: Controllare il Clima, Individuazione dei Pensieri.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
+        { name: 'Luce Accecante', desc: 'Il drago lancia Raggio Rovente (versione di 3° livello).' },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della propria velocità ed effettua un attacco Lacerazione.', atkHit: '+14', atkDmgs: [{ f: '2d10+8', t: 'taglienti' }, { f: '2d6', t: 'fuoco' }] },
+        { name: 'Sabbie Ustionanti', desc: 'Tiro Salvezza su Destrezza: CD 20. Una creatura entro 36 metri.\nFallimento: 36 (8d8) danni da fuoco e la velocità del bersaglio è dimezzata fino alla fine del suo turno successivo.\nIl drago non può usare nuovamente questa azione fino all\'inizio del suo turno successivo.', atkDmgs: [{ f: '8d8', t: 'fuoco' }] }
+      ],
+      drop: [{ name: 'Arcani', desc: 'Oggetti eclettici e curiosi accumulati nei secoli, ognuno legato a una storia o a una leggenda.' }],
+      notes: 'Draghi della Conoscenza e della Conversazione\n\nHabitat: Deserto\nTesoro: Arcani\n\nGli antichi draghi d\'ottone creano reti che si estendono attraverso interi mondi. Combattono le forze della repressione e della disinformazione, aiutando le persone a imparare dagli errori del passato. Personalmente o tramite reti di messaggeri, mantengono i loro alleati informati sulle sfide che potrebbero affrontare insieme.\n\n' + DRAGHI_OTTONE_LORE + '\n\n' + DRAGHI_OTTONE_TANA + '\n\n(Affrontato nella propria tana, il drago vale 33.000 PE.)'
     }
   ];
 
