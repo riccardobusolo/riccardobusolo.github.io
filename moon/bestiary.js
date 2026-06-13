@@ -45,6 +45,7 @@
   var DRAGHI_OTTONE_TANA = '— Tane dei Draghi d\'Ottone —\nI draghi d\'ottone vivono normalmente in caverne segrete e canyon vicini a rotte molto frequentate. La regione entro 1 miglio dalla tana di un drago d\'ottone adulto o antico viene alterata dalla sua presenza, creando i seguenti effetti regionali.\n\nMiraggi: nella sua tana il drago può lanciare Immagine Maggiore (senza componenti materiali, con la stessa caratteristica da incantatore della sua capacità Incantesimi); la gittata diventa 1 miglio e il drago non ha bisogno di vedere il punto in cui compare l\'illusione.\n\nAcqua Ristoratrice: l\'acqua entro 1 miglio dalla tana è magicamente rinvigorente; una creatura che la beve ottiene 2d4 Punti Ferita Temporanei e il drago viene immediatamente a conoscenza della sua presenza.\n\nSe il drago muore o sposta la propria tana altrove, questi effetti terminano immediatamente.';
   var DRAGHI_BRONZO_LORE = 'Dove dimorano i draghi di bronzo, le meraviglie prosperano. Immaginativi ma riflessivi, questi draghi metallici lavorano per raggiungere la grandezza e aiutano gli altri a realizzare tutto il proprio potenziale.\n\nEssi si sforzano di preservare le innovazioni, dalle opere delle civiltà passate alle nuove scoperte, e condividono ampiamente tali conoscenze. Quando hanno a che fare con creature dalla vita più breve, i draghi di bronzo preferiscono conquistarle attraverso il dialogo e la formazione, ma non esitano a combattere quando i malvagi impediscono agli altri di raggiungere il proprio potenziale.\n\nI draghi di bronzo amano il potere e le infinite possibilità offerte dal mare e spesso stabiliscono le proprie tane in luoghi di bellezza naturale o presso comunità che desiderano proteggere. Nelle loro dimore accumulano oggetti che ritengono potranno essere utili un giorno. Recuperano inoltre tesori perduti in mare, riportando alla luce ricchezze e navi affondate.';
   var DRAGHI_BRONZO_TANA = '— Tane dei Draghi di Bronzo —\nI draghi di bronzo costruiscono normalmente le proprie dimore vicino al mare o sotto di esso. La regione entro 1 miglio dalla tana di un drago di bronzo adulto o antico è alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nCorrenti Galleggianti: le creature entro 1 miglio dalla tana che non possiedono una velocità di nuotare ignorano il costo aggiuntivo di movimento mentre nuotano.\n\nSole e Tempeste: nella sua tana il drago può lanciare Controllare il Clima (senza componenti materiali, con la stessa caratteristica da incantatore della sua azione Incantesimi) e può controllare il tempo atmosferico entro 1 miglio dalla tana, dentro o fuori di essa.\n\nSe il drago muore o trasferisce la propria tana altrove, questi effetti terminano immediatamente.';
+  var BUGBEAR_LORE = 'I bugbear incarnano la paura delle terre selvagge e la minaccia dei luoghi naturali. Sono notoriamente furtivi e i nemici che si avventurano nei loro territori spesso scompaiono senza lasciare traccia.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -1513,6 +1514,52 @@
       ],
       drop: [{ name: 'Strumenti', desc: 'Oggetti potenzialmente utili e tesori recuperati dal mare, comprese ricchezze e navi affondate, accumulati nei secoli.' }],
       notes: 'Draghi del Potenziale e della Conservazione\n\nHabitat: Costa\nTesoro: Strumenti\n\nGli antichi draghi di bronzo sviluppano spettacolari patine sulle loro scaglie scintillanti. Si impegnano a proteggere intere regioni, continenti o perfino pianeti dalle minacce. Cercano soluzioni a calamità che coinvolgono più mondi o a pericoli multiversali e si oppongono al male dei potenti draghi cromatici.\n\n' + DRAGHI_BRONZO_LORE + '\n\n' + DRAGHI_BRONZO_TANA + '\n\n(Affrontato nella propria tana, il drago vale 50.000 PE.)'
+    },
+    {
+      id: 'preset_bugbear_stalker', name: 'Bugbear Stalker', emoji: '👺', rarity: 'common',
+      type: 'Fata', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 15, hp: 65, hpCur: 65, hpTemp: 0, hpDice: '10d8+20', init: 2,
+      speed: '9 m', cr: '3', xp: '',
+      str: 17, dex: 14, con: 14, intl: 11, wis: 12, cha: 11,
+      savesOverride: { str: '', dex: '', con: '4', intl: '', wis: '3', cha: '' },
+      skillOverrides: { furtivita: '6', sopravvivenza: '3' }, passivePerception: 11,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune', 'Goblin'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Rapire', desc: 'Il bugbear non deve spendere movimento aggiuntivo per muovere una creatura che sta afferrando.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il bugbear effettua due attacchi con Giavellotto o Mazza Chiodata.' },
+        { name: 'Giavellotto', desc: 'Attacco con arma da mischia o a distanza: +5 a colpire, portata 3 metri oppure gittata 9/36 metri.\nColpito: 13 (3d6 + 3) danni perforanti.', atkHit: '+5', atkDmgs: [{ f: '3d6+3', t: 'perforanti' }] },
+        { name: 'Mazza Chiodata', desc: 'Attacco con arma da mischia: +5 a colpire (con Vantaggio se il bersaglio è Afferrato dal bugbear), portata 3 metri.\nColpito: 12 (2d8 + 3) danni perforanti.', atkHit: '+5', atkDmgs: [{ f: '2d8+3', t: 'perforanti' }] }
+      ],
+      bonusActions: [
+        { name: 'Presa Rapida', desc: 'Tiro Salvezza su Destrezza: CD 13. Una creatura Media o più piccola che il bugbear può vedere entro 3 metri.\nFallimento: il bersaglio ottiene la condizione Afferrato (CD di fuga 13).' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Cotta di maglia, 6 giavellotti, mazza chiodata, più effetti personali.' }],
+      notes: 'Bruti Goblinoidi in Agguato\n\nHabitat: Foresta, Prateria, Piano Fatato (Feywild), Sottosuolo\nTesoro: Armamenti, Personale\n\nI bugbear stalker prendono frequentemente in ostaggio le loro vittime, compiacendosi delle occasioni di imprigionare e terrorizzare altre creature.\n\n' + BUGBEAR_LORE
+    },
+    {
+      id: 'preset_bugbear_warrior', name: 'Bugbear Warrior', emoji: '👺', rarity: 'common',
+      type: 'Fata', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 14, hp: 33, hpCur: 33, hpTemp: 0, hpDice: '6d8+6', init: 2,
+      speed: '9 m', cr: '1', xp: '',
+      str: 15, dex: 14, con: 13, intl: 8, wis: 11, cha: 9,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '6', sopravvivenza: '2' }, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune', 'Goblin'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Rapire', desc: 'Il bugbear non deve spendere movimento aggiuntivo per muovere una creatura che sta afferrando.' }
+      ],
+      actions: [
+        { name: 'Afferrare', desc: 'Attacco con arma da mischia: +4 a colpire, portata 3 metri.\nColpito: 9 (2d6 + 2) danni contundenti. Se il bersaglio è una creatura Media o più piccola, ottiene la condizione Afferrato (CD di fuga 12).', atkHit: '+4', atkDmgs: [{ f: '2d6+2', t: 'contundenti' }] },
+        { name: 'Martello Leggero', desc: 'Attacco con arma da mischia o a distanza: +4 a colpire (con Vantaggio se il bersaglio è Afferrato dal bugbear), portata 3 metri oppure gittata 6/18 metri.\nColpito: 9 (3d4 + 2) danni contundenti.', atkHit: '+4', atkDmgs: [{ f: '3d4+2', t: 'contundenti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Armatura di cuoio, 3 martelli leggeri, più effetti personali.' }],
+      notes: 'Bruti Goblinoidi in Agguato\n\nHabitat: Foresta, Prateria, Piano Fatato (Feywild), Sottosuolo\nTesoro: Armamenti, Personale\n\nI bugbear warrior servono coloro che offrono loro tesori, cibo o la possibilità di cacciare prede impegnative.\n\n' + BUGBEAR_LORE
     }
   ];
 
