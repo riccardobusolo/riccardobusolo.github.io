@@ -1250,6 +1250,30 @@
       ],
       drop: [{ name: 'Reliquie', desc: 'Insegne del potere sovrano, corone di sovrani decaduti, gemme uniche e oggetti magici accumulati nei secoli dal drago blu.' }],
       notes: 'Draghi della Tirannia e delle Tempeste\n\nHabitat: Costa, Deserto\nTesoro: Reliquie\n\nGli antichi draghi blu pensano oltre il semplice dominio di gruppi di servitori dalla vita breve. Cercano invece di elevare il proprio status sopra quello degli altri draghi e degli abitanti più potenti del mondo.\n\nSe la dominazione mondiale appare troppo laboriosa o banale, questi draghi possono tentare di impadronirsi di reami extraplanari, imperi multiversali o delle stesse forze della realtà, come la vita, le tempeste o il tempo.\n\n' + DRAGHI_BLU_LORE + '\n\n' + DRAGHI_BLU_TANA + '\n\n(Affrontato nella propria tana, il drago vale 62.000 PE.)'
+    },
+    {
+      id: 'preset_diavolo_ossa', name: 'Diavolo d\'Ossa', emoji: '💀', rarity: 'rare',
+      type: 'Immondo', size: 'Grande', alignment: 'Legale Malvagio',
+      ac: 16, hp: 161, hpCur: 161, hpTemp: 0, hpDice: '17d10+68', init: 7,
+      speed: '12 m, Volare 12 m', cr: '9', xp: '',
+      str: 18, dex: 16, con: 18, intl: 13, wis: 14, cha: 16,
+      savesOverride: { str: '8', dex: '', con: '', intl: '5', wis: '6', cha: '7' },
+      skillOverrides: { inganno: '7', intuizione: '6' }, passivePerception: 12,
+      senses: [{ type: 'Scurovisione (non ostacolata dall\'oscurità magica)', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
+      dmgResist: ['Freddo'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
+      condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Restaurazione Diabolica', desc: 'Se il diavolo muore al di fuori dei Nove Inferi, il suo corpo scompare in una nube di fumo sulfureo e ottiene immediatamente un nuovo corpo, tornando in vita con tutti i suoi punti ferita da qualche parte nei Nove Inferi.' },
+        { name: 'Resistenza Magica', desc: 'Il diavolo ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il diavolo effettua due attacchi Artiglio e un attacco Pungiglione Infernale.' },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +8 a colpire, portata 3 metri.\nColpito: 13 (2d8 + 4) danni taglienti.', atkHit: '+8', atkDmgs: [{ f: '2d8+4', t: 'taglienti' }] },
+        { name: 'Pungiglione Infernale', desc: 'Attacco con arma da mischia: +8 a colpire, portata 3 metri.\nColpito: 15 (2d10 + 4) danni perforanti più 18 (4d8) danni da veleno e il bersaglio ottiene la condizione Avvelenato fino all\'inizio del turno successivo del diavolo. Mentre è Avvelenato in questo modo, non può recuperare punti ferita.', atkHit: '+8', atkDmgs: [{ f: '2d10+4', t: 'perforanti' }, { f: '4d8', t: 'veleno' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Strumenti', desc: 'Strumenti e implementi diabolici usati per far rispettare i patti infernali.' }],
+      notes: 'Diavolo del Terrore e dell\'Obbedienza\n\nHabitat: Planare (Nove Inferi)\nTesoro: Strumenti\n\nI diavoli d\'ossa sono Esseri Immondi alti e scheletrici dall\'aspetto da incubo, con pelle pallida tesa su corpi che combinano caratteristiche umane e insettoidi. Conosciuti anche come osyluth, comandano diavoli più deboli e altri esseri allineati alle legioni infernali.\n\nI diavoli d\'ossa garantiscono che gli ordini dei sovrani infernali vengano eseguiti con efficienza e che i non-diavoli rispettino gli impegni presi con i Nove Inferi. Uccidono coloro che rinnegano i patti infernali, inviando le anime mortali traditrici ad affrontare punizioni indicibili.\n\nQuando non sono al servizio dei loro padroni diabolici, i diavoli d\'ossa tentano i mortali egocentrici con promesse di adulazione e obbedienza da parte di altre creature: sostengono piccoli tiranni, aiutandoli a diventare sempre più crudeli e amorali.\n\nViaggiano attraverso il multiverso per adempiere agli ordini infernali e, se non hanno altra scelta, possono arruolare mortali affinché li assistano nei loro obiettivi malvagi.\n\n— Obiettivi del Diavolo d\'Ossa (tira 1d4) —\n1. Catturare un\'anima fuggita dai Nove Inferi.\n2. Consegnare un messaggio o punire qualcuno in nome di un arcidiavolo.\n3. Trovare qualcuno che ha infranto un patto con un diavolo.\n4. Uccidere qualcuno o rubare qualcosa come parte di un accordo con un malvagio utilizzatore di magia.\n\n— Sylvira Savikas, saggia di Candlekeep —\n"I diavoli d\'ossa sono solo una delle mille ragioni per non stringere mai un patto con un diavolo, ma sono una ragione importante. Rompi un accordo e probabilmente sarai trascinato nei Nove Inferi da uno di questi incubi."'
     }
   ];
 
