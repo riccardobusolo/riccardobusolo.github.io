@@ -1541,7 +1541,7 @@
       notes: 'Bruti Goblinoidi in Agguato\n\nHabitat: Foresta, Prateria, Piano Fatato (Feywild), Sottosuolo\nTesoro: Armamenti, Personale\n\nI bugbear stalker prendono frequentemente in ostaggio le loro vittime, compiacendosi delle occasioni di imprigionare e terrorizzare altre creature.\n\n' + BUGBEAR_LORE
     },
     {
-      id: 'preset_bugbear_warrior', name: 'Bugbear Warrior', emoji: '👺', rarity: 'common',
+      id: 'preset_guerriero_bugbear', name: 'Guerriero Bugbear', emoji: '👺', rarity: 'common',
       type: 'Fata', size: 'Media', alignment: 'Caotico Malvagio',
       ac: 14, hp: 33, hpCur: 33, hpTemp: 0, hpDice: '6d8+6', init: 2,
       speed: '9 m', cr: '1', xp: '',
@@ -1559,7 +1559,7 @@
       ],
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Equipaggiamento', desc: 'Armatura di cuoio, 3 martelli leggeri, più effetti personali.' }],
-      notes: 'Bruti Goblinoidi in Agguato\n\nHabitat: Foresta, Prateria, Piano Fatato (Feywild), Sottosuolo\nTesoro: Armamenti, Personale\n\nI bugbear warrior servono coloro che offrono loro tesori, cibo o la possibilità di cacciare prede impegnative.\n\n' + BUGBEAR_LORE
+      notes: 'Bruti Goblinoidi in Agguato\n\nHabitat: Foresta, Prateria, Piano Fatato (Feywild), Sottosuolo\nTesoro: Armamenti, Personale\n\nI Guerrieri Bugbear servono coloro che offrono loro tesori, cibo o la possibilità di cacciare prede impegnative.\n\n' + BUGBEAR_LORE
     }
   ];
 
