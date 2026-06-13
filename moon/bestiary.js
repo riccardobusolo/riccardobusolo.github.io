@@ -1984,9 +1984,8 @@
     '.best__holo{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;background:linear-gradient(115deg,transparent 28%,var(--rare-c2) 43%,var(--rare-c1) 50%,var(--rare-c2) 57%,transparent 72%);background-size:200% 200%;background-repeat:no-repeat;background-position:var(--hx,50%) var(--hy,50%);opacity:0;mix-blend-mode:color-dodge;transition:opacity .3s ease}' +
     '.best__card:hover .best__holo{opacity:calc((var(--holo,0) * .5 + .03) * 1.21)}' +
     /* === Effetto premium "sbrilluccichio olografico" solo per le carte leggendarie === */
-    '.best__card--lgd{box-shadow:0 3px 12px rgba(0,0,0,.5),0 0 15px -5px var(--glow)}' +
     '.best__card--lgd:hover{box-shadow:0 16px 36px -10px var(--glow),0 0 0 1px var(--rare-c2) inset,0 0 24px -3px var(--glow)}' +
-    '.best__lux{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6;overflow:hidden;opacity:.82;transition:opacity .3s ease}' +
+    '.best__lux{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6;overflow:hidden;opacity:0;transition:opacity .35s ease}' +
     '.best__card--lgd:hover .best__lux{opacity:1}' +
     '.best__lux::before{content:"";position:absolute;inset:-30%;background:linear-gradient(115deg,transparent 20%,rgba(255,90,170,.55) 33%,rgba(255,220,90,.55) 40%,rgba(120,255,205,.55) 47%,rgba(120,200,255,.55) 54%,rgba(205,120,255,.55) 61%,transparent 74%);background-size:250% 250%;mix-blend-mode:color-dodge;opacity:.5;animation:bestLuxSheen 5.5s ease-in-out infinite;will-change:background-position}' +
     '.best__lux::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle 1.4px at 50% 50%,rgba(255,255,255,.98),transparent),radial-gradient(circle 1px at 50% 50%,rgba(255,235,170,.95),transparent);background-size:29px 29px,43px 43px;background-position:4px 6px,19px 25px;mix-blend-mode:screen;opacity:.34;animation:bestLuxTwinkle 3.4s ease-in-out infinite,bestLuxDrift 11s linear infinite;will-change:opacity,background-position}' +
