@@ -962,6 +962,33 @@
       ],
       drop: [{ name: 'Reliquie', desc: 'Reliquie di imperi caduti e simboli di speranza infranta accumulati nei secoli dal drago.' }],
       notes: 'Draghi della Decadenza e della Disperazione\n\nHabitat: Palude\nTesoro: Reliquie\n\n' + DRAGHI_NERI_LORE + '\n\n— Effetti della Tana —\nUn drago nero antico altera il territorio entro 1,5 km dalla sua tana.\n\nFoschia Acrida: una nebbia soffocante e maleodorante copre l\'area, che diventa Leggermente Oscurata; il viaggio richiede il doppio del tempo per chiunque non sia il drago o i suoi alleati.\n\nAcque Corrotte: le fonti d\'acqua entro 1,5 km dalla tana sono contaminate soprannaturalmente. Una creatura che beve quell\'acqua deve superare un Tiro Salvezza su Costituzione CD 15 oppure ottenere la condizione Avvelenato per 1 ora.\n\nSe il drago muore o abbandona la tana, questi effetti cessano immediatamente.\n\n(Affrontato nella propria tana, il drago vale 41.000 PE.)'
+    },
+    {
+      id: 'preset_melma_nera', name: 'Melma Nera', emoji: '⚫', rarity: 'common',
+      type: 'Melma', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 7, hp: 68, hpCur: 68, hpTemp: 0, hpDice: '8d10+24', init: -3,
+      speed: '6 m, Scalare 6 m', cr: '4', xp: '',
+      str: 16, dex: 5, con: 16, intl: 1, wis: 6, cha: 1,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 8,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: ['Acido', 'Freddo', 'Fulmine', 'Tagliente'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Assordato', 'Esausto', 'Spaventato', 'Afferrato', 'Prono', 'Trattenuto'],
+      traits: [
+        { name: 'Corpo Amorfo', desc: 'La melma può passare attraverso aperture larghe appena 2,5 cm senza spendere movimento aggiuntivo.' },
+        { name: 'Forma Corrosiva', desc: 'Una creatura che colpisce la melma con un attacco in mischia subisce 4 (1d8) danni da acido.\nLe munizioni non magiche che la colpiscono vengono immediatamente distrutte. Le armi non magiche subiscono una penalità cumulativa di -1 ai tiri per colpire e ai danni ogni volta che colpiscono la melma; un\'arma viene distrutta quando la penalità raggiunge -5. L\'incantesimo Riparare (Mending) elimina la penalità.' },
+        { name: 'Arrampicata del Ragno', desc: 'La melma può scalare superfici difficili, compresi i soffitti a testa in giù, senza effettuare prove.' }
+      ],
+      actions: [
+        { name: 'Pseudopode Dissolvente', desc: 'Attacco con arma da mischia: +5 a colpire, portata 3 metri.\nColpito: 17 (4d6 + 3) danni da acido. Se il bersaglio indossa un\'armatura non magica, questa subisce una penalità permanente di -1 alla CA fornita (l\'armatura viene distrutta quando la sua CA si riduce a 10). L\'incantesimo Riparare (Mending) può eliminare la penalità.', atkHit: '+5', atkDmgs: [{ f: '4d6+3', t: 'acido' }] }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Divisione', desc: 'Innesco: mentre la melma è Grande o Media, ha almeno 10 punti ferita e diventa Ferita Gravemente oppure subisce danni da Fulmine o Taglienti.\nEffetto: la melma si divide in due Melme Nere più piccole. Ogni nuova melma è di una categoria di taglia inferiore, agisce alla stessa iniziativa e riceve metà dei punti ferita (arrotondati per difetto).' }
+      ],
+      legendaryActions: [],
+      drop: [],
+      notes: 'Black Pudding\n\nMelma corrosiva e amorfa che divora carne, ossa e metallo, lasciando dietro di sé solo armi corrose e armature dissolte. Striscia attraverso le fessure più strette, scala persino i soffitti e si divide in due quando viene colpita da fulmini o lame.\n\nIdee d\'incontro:\n• Una Melma Nera che vive nelle fogne sotto una città.\n• Un laboratorio alchemico abbandonato pieno di melme nate da esperimenti falliti.\n• Una caverna dove le armi dei precedenti avventurieri sono state completamente corrose.\n• Una Melma Nera enorme che si divide continuamente creando decine di frammenti più piccoli.'
     }
   ];
 
