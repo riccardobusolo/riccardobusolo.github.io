@@ -38,6 +38,7 @@
   var BANDITI_TAIL = BANDITI_LORE + '\n\n' + BANDITI_MOTIV;
   var BERSERKER_LORE = 'Consumati dall\'adrenalina della battaglia, i berserker sono invasori spericolati, combattenti da arena e guerrieri feroci che vivono per il conflitto. La loro furia li rende avversari temibili, capaci di ignorare il dolore e combattere fino all\'ultimo respiro.';
   var DRAGHI_NERI_LORE = 'I draghi neri traggono piacere dalla sofferenza e dalla rovina. A differenza di altri draghi cromatici, che tramano per ottenere potere e ricchezze, essi desiderano distruggere tutto ciò che vedono e dominare le macerie che restano.\n\nSono creature terrificanti, caratterizzate da corna ricurve e da visi scheletrici che ricordano teschi demoniaci. Prediligono paludi stagnanti, rovine in rovina e luoghi corrotti dalla magia o dal degrado ambientale. Il loro soffio acido deturpa il territorio, consumando antiche statue e lasciando nella natura ferite permanenti.\n\nI draghi neri accumulano simboli di speranza infranta e reliquie di imperi caduti. Più un tesoro è desiderato o prezioso, maggiore è il piacere che provano nel possederlo, soprattutto se sono stati loro a causarne la perdita.';
+  var BLIGHTS_LORE = 'I blights sono piante maligne nate da un male profondamente radicato. Le loro forme nodose e deformi presentano tratti inquietanti che ricordano arti umani e fauci fameliche. Si nascondono tra la vegetazione comune e tendono imboscate a tutte le creature che non appartengono al regno vegetale.\n\nSebbene alcuni blights agiscano autonomamente, la maggior parte serve le forze oscure che li hanno generati oppure creature malvagie capaci di dominare la natura. La magia che li crea spesso contamina anche la flora circostante, facendo proliferare rovi, liane e alberi contorti che invadono sentieri e campi, soffocano pozzi e ruscelli e costringono gli animali ad abbandonare il proprio habitat naturale.\n\nPer questo motivo, la comparsa dei blights è spesso il primo segnale di una corruzione più grande che si sta diffondendo.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -989,6 +990,110 @@
       legendaryActions: [],
       drop: [],
       notes: 'Black Pudding\n\nMelma corrosiva e amorfa che divora carne, ossa e metallo, lasciando dietro di sé solo armi corrose e armature dissolte. Striscia attraverso le fessure più strette, scala persino i soffitti e si divide in due quando viene colpita da fulmini o lame.\n\nIdee d\'incontro:\n• Una Melma Nera che vive nelle fogne sotto una città.\n• Un laboratorio alchemico abbandonato pieno di melme nate da esperimenti falliti.\n• Una caverna dove le armi dei precedenti avventurieri sono state completamente corrose.\n• Una Melma Nera enorme che si divide continuamente creando decine di frammenti più piccoli.'
+    },
+    {
+      id: 'preset_blight_ramo', name: 'Blight Ramo', emoji: '🪵', rarity: 'common',
+      type: 'Pianta', size: 'Piccola', alignment: 'Neutrale Malvagio',
+      ac: 14, hp: 7, hpCur: 7, hpTemp: 0, hpDice: '2d6', init: 2,
+      speed: '6 m', cr: '1/8', xp: '',
+      str: 6, dex: 14, con: 11, intl: 4, wis: 8, cha: 3,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '4' }, passivePerception: 9,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: ['Comprende il Comune ma non può parlare'],
+      dmgResist: [], dmgImmune: [], dmgVulner: ['Fuoco'], condImmune: ['Assordato'],
+      traits: [
+        { name: 'Tattiche di Branco', desc: 'Il blight ha vantaggio ai tiri per colpire contro una creatura se almeno un alleato del blight si trova entro 1,5 metri dal bersaglio e non è incapacitato.' }
+      ],
+      actions: [
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 4 (1d4 + 2) danni taglienti.', atkHit: '+4', atkDmgs: [{ f: '1d4+2', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Piante Germogliate dal Male\n\nHabitat: Foresta\nTesoro: Nessuno\n\nI blight ramo assomigliano a fasci di ramoscelli secchi o cespugli morti. Si confondono facilmente con legna accatastata, detriti vegetali o mucchi di rami presenti nelle campagne.\n\nSpesso si raccolgono in gruppi presso attraversamenti fluviali, pozzi dimenticati e antichi accampamenti, dove attendono che qualcuno abbassi la guardia prima di colpire.\n\n' + BLIGHTS_LORE
+    },
+    {
+      id: 'preset_blight_ago', name: 'Blight Ago', emoji: '🌵', rarity: 'common',
+      type: 'Pianta', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 12, hp: 16, hpCur: 16, hpTemp: 0, hpDice: '3d8+3', init: 1,
+      speed: '9 m', cr: '1/4', xp: '',
+      str: 12, dex: 12, con: 13, intl: 4, wis: 8, cha: 3,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 9,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: ['Comprende il Comune ma non può parlare'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: ['Assordato'],
+      traits: [],
+      actions: [
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +3 a colpire, portata 1,5 metri.\nColpito: 6 (2d4 + 1) danni taglienti.', atkHit: '+3', atkDmgs: [{ f: '2d4+1', t: 'taglienti' }] },
+        { name: 'Aghi', desc: 'Attacco con arma a distanza: +3 a colpire, gittata 9/18 metri.\nColpito: 6 (2d4 + 1) danni perforanti.', atkHit: '+3', atkDmgs: [{ f: '2d4+1', t: 'perforanti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Piante Germogliate dal Male\n\nHabitat: Foresta\nTesoro: Nessuno\n\nI blight ago possiedono una forma vagamente bipede, con arti lunghi e sottili simili a rami rinsecchiti. Che rimangano immobili come alberi morti o avanzino con la loro andatura innaturale, raramente possono essere scambiati per normali piante o viandanti.\n\nQuando individuano una preda, attaccano con artigli ricoperti di spine oppure scagliano raffiche di aghi seghettati che crescono e vengono espulsi dal loro corpo in pochi istanti.\n\n' + BLIGHTS_LORE
+    },
+    {
+      id: 'preset_blight_rampicante', name: 'Blight Rampicante', emoji: '🌿', rarity: 'uncommon',
+      type: 'Pianta', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 12, hp: 19, hpCur: 19, hpTemp: 0, hpDice: '3d8+6', init: -1,
+      speed: '6 m', cr: '1/2', xp: '',
+      str: 15, dex: 8, con: 14, intl: 5, wis: 10, cha: 3,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '1' }, passivePerception: 10,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: ['Assordato'],
+      traits: [],
+      actions: [
+        { name: 'Liana Costrittrice', desc: 'Attacco con arma da mischia: +4 a colpire, portata 3 metri.\nColpito: 6 (1d8 + 2) danni contundenti. Se il bersaglio è di taglia Grande o inferiore, ottiene la condizione Afferrato (CD 12 per sfuggire). Finché la presa continua, il bersaglio subisce 4 (1d8) danni contundenti all\'inizio di ogni suo turno e il blight non può usare nuovamente questa azione.', atkHit: '+4', atkDmgs: [{ f: '1d8+2', t: 'contundenti' }] },
+        { name: 'Piante Intrappolanti (Ricarica 5-6)', desc: 'Il blight lancia Intralciare, usando Costituzione come caratteristica da incantatore (CD 12).' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Piante Germogliate dal Male\n\nHabitat: Foresta\nTesoro: Nessuno\n\nI blight rampicanti ricordano figure umanoidi avvolte da liane e viticci tipici delle regioni in cui crescono. Alcuni appaiono come uomini ricoperti d\'edera, altri come masse di rampicanti intrecciati.\n\nA differenza della maggior parte dei blights, possono parlare, anche se raramente lo fanno. Quando comunicano, di solito trasmettono gli ordini dei loro padroni o ripetono le ultime parole pronunciate dalle loro vittime con una voce roca e innaturale.\n\n' + BLIGHTS_LORE
+    },
+    {
+      id: 'preset_blight_albero', name: 'Blight Albero', emoji: '🌳', rarity: 'uncommon',
+      type: 'Pianta', size: 'Enorme', alignment: 'Neutrale Malvagio',
+      ac: 15, hp: 115, hpCur: 115, hpTemp: 0, hpDice: '10d12+50', init: 0,
+      speed: '9 m', cr: '7', xp: '',
+      str: 23, dex: 10, con: 20, intl: 6, wis: 10, cha: 3,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: ['Comprende Comune e Druidico ma non può parlare'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: ['Assordato'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il blight effettua due attacchi Ramo e usa Radice Avvinghiante.' },
+        { name: 'Ramo', desc: 'Attacco con arma da mischia: +9 a colpire, portata 4,5 metri.\nColpito: 16 (3d6 + 6) danni contundenti.', atkHit: '+9', atkDmgs: [{ f: '3d6+6', t: 'contundenti' }] },
+        { name: 'Radice Avvinghiante', desc: 'Tiro Salvezza su Forza: CD 17. Una creatura Grande o inferiore entro 4,5 metri viene trascinata fino a 3 metri verso il blight e Afferrata (CD 16 per liberarsi).\nFinché è afferrata, all\'inizio di ogni suo turno subisce 13 (2d6 + 6) danni contundenti.', atkDmgs: [{ f: '2d6+6', t: 'contundenti' }] }
+      ],
+      bonusActions: [
+        { name: 'Rosicchiata', desc: 'Una creatura afferrata dal blight effettua un Tiro Salvezza su Destrezza (CD 17).\nFallimento: 19 (3d8 + 6) danni perforanti. Successo: metà danni.', atkDmgs: [{ f: '3d8+6', t: 'perforanti' }] }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Piante Germogliate dal Male\n\nHabitat: Foresta\nTesoro: Nessuno\n\nI blight albero sembrano enormi alberi morti e antichissimi, caratterizzati da rami contorti e tronchi spaccati. Animati da un\'insaziabile sete di sangue, si nutrono delle creature viventi.\n\nI resti delle loro vittime rimangono spesso impigliati tra rami e radici. Sebbene collaborino con altri blights, attaccano senza esitazione esseri simili ad alberi, come treant e alberi risvegliati.\n\n' + BLIGHTS_LORE
+    },
+    {
+      id: 'preset_blight_gulthias', name: 'Blight Gulthias', emoji: '🌲', rarity: 'rare',
+      type: 'Pianta', size: 'Mastodontica', alignment: 'Neutrale Malvagio',
+      ac: 20, hp: 264, hpCur: 264, hpTemp: 0, hpDice: '16d20+96', init: 0,
+      speed: '15 m', cr: '16', xp: '',
+      str: 25, dex: 10, con: 22, intl: 10, wis: 18, cha: 12,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '9' }, passivePerception: 19,
+      senses: [{ type: 'Vista Cieca', value: 36, unit: 'm' }], languages: ['Comune', 'Druidico'],
+      dmgResist: ['Fuoco', 'Necrotico'], dmgImmune: [], dmgVulner: [], condImmune: ['Assordato'],
+      traits: [
+        { name: 'Semi della Corruzione', desc: 'Al termine di un Riposo Lungo, il blight espelle 1d6 semi in spazi liberi entro 9 metri. Dopo 24 ore ogni seme diventa una creatura sotto il controllo del blight (tira 1d8 per ogni seme):\n1-4: Blight Ramo\n5-6: Blight Ago\n7-8: Blight Rampicante' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il blight effettua due attacchi Schianto o Raffica di Spine in qualsiasi combinazione, e inoltre usa Radice Drenante.' },
+        { name: 'Schianto', desc: 'Attacco con arma da mischia: +12 a colpire, portata 3 metri.\nColpito: 25 (4d8 + 7) danni contundenti.', atkHit: '+12', atkDmgs: [{ f: '4d8+7', t: 'contundenti' }] },
+        { name: 'Raffica di Spine', desc: 'Attacco con arma a distanza: +12 a colpire, gittata 18/54 metri.\nColpito: 20 (3d8 + 7) danni perforanti.', atkHit: '+12', atkDmgs: [{ f: '3d8+7', t: 'perforanti' }] },
+        { name: 'Radice Drenante', desc: 'Tiro Salvezza su Costituzione: CD 20. Una creatura Enorme o inferiore entro 9 metri.\nFallimento: 14 (2d6 + 7) danni necrotici; la creatura viene Afferrata (CD 17), ottiene la condizione Trattenuto e all\'inizio di ogni suo turno subisce 14 (4d6) danni necrotici. Inoltre il suo massimo dei punti ferita si riduce di una quantità pari ai danni necrotici subiti e il blight recupera altrettanti punti ferita.', atkDmgs: [{ f: '2d6+7', t: 'necrotici' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Piante Germogliate dal Male\n\nHabitat: Foresta\nTesoro: Nessuno\n\nGli antichi vegetali corrotti conosciuti come blight Gulthias si nutrono del sangue e devastano la terra che li circonda. La loro presenza genera nuovi blights e trasforma intere foreste in domini infestati.\n\nPrendono il nome da Gulthias, un vampiro il cui cuore fu trafitto da un paletto. Secondo la leggenda, dal paletto ancora intriso della sua maledizione nacque il primo albero Gulthias. Da esso discenderebbero tutti gli altri.\n\nPer queste creature ogni essere vivente è soltanto un servo da dominare oppure fertilizzante per diffondere la propria corruzione.\n\n' + BLIGHTS_LORE + '\n\n— Belak l\'Esiliato, Druido del Bosco del Crepuscolo —\n"È vivo, anche se sembra morto. In un\'epoca lontana qualcuno conficcò un paletto nel cuore di un vampiro proprio in questo luogo. Quel paletto non è mai marcito e mise radici. Così nacque l\'Albero Gulthias, pulsando di un antico potere primordiale."'
     }
   ];
 
