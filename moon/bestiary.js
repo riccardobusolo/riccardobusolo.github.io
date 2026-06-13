@@ -47,6 +47,7 @@
   var DRAGHI_BRONZO_TANA = '— Tane dei Draghi di Bronzo —\nI draghi di bronzo costruiscono normalmente le proprie dimore vicino al mare o sotto di esso. La regione entro 1 miglio dalla tana di un drago di bronzo adulto o antico è alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nCorrenti Galleggianti: le creature entro 1 miglio dalla tana che non possiedono una velocità di nuotare ignorano il costo aggiuntivo di movimento mentre nuotano.\n\nSole e Tempeste: nella sua tana il drago può lanciare Controllare il Clima (senza componenti materiali, con la stessa caratteristica da incantatore della sua azione Incantesimi) e può controllare il tempo atmosferico entro 1 miglio dalla tana, dentro o fuori di essa.\n\nSe il drago muore o trasferisce la propria tana altrove, questi effetti terminano immediatamente.';
   var BUGBEAR_LORE = 'I bugbear incarnano la paura delle terre selvagge e la minaccia dei luoghi naturali. Sono notoriamente furtivi e i nemici che si avventurano nei loro territori spesso scompaiono senza lasciare traccia.';
   var BULETTE_LORE = 'Conosciute anche come "squali di terra", le bulette sono predatori ossessivi che scavano sottoterra, balzano sopra gli ostacoli e irrompono attraverso di essi all\'inseguimento delle loro prede. Scavano rapidamente appena sotto la superficie del terreno. Quando percepiscono un movimento, erompono dal sottosuolo tentando di catturare le prede nelle loro enormi fauci.';
+  var BULLYWUG_LORE = 'I bullywug, incarnazioni fatate delle terre paludose, proteggono le selvagge distese fangose e si considerano favoriti dal cosmo per tale ruolo. Queste creature delle dimensioni di un umano, simili a rospi o rane, intrattengono stretti rapporti con le altre creature della palude.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -1605,6 +1606,56 @@
       reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Voraci Squali di Terra Sotterranei\n\nHabitat: Prateria, Colline, Montagne\nTesoro: Nessuno\n\nLe bulette giovani sono note come cuccioli. Viaggiano in piccoli gruppi, sfruttando il numero per abbattere avversari più grandi. Il loro arrivo è spesso presagio della comparsa di una bulette adulta.\n\n' + BULETTE_LORE
+    },
+    {
+      id: 'preset_saggio_paludi_bullywug', name: 'Saggio delle Paludi Bullywug', emoji: '🐸', rarity: 'uncommon',
+      type: 'Fata', size: 'Media', alignment: 'Neutrale',
+      ac: 16, hp: 52, hpCur: 52, hpTemp: 0, hpDice: '8d8+16', init: 3,
+      speed: '9 m, Nuotare 9 m', cr: '4', xp: '',
+      str: 8, dex: 16, con: 14, intl: 10, wis: 16, cha: 12,
+      savesOverride: { str: '', dex: '', con: '4', intl: '', wis: '5', cha: '' },
+      skillOverrides: { natura: '4', furtivita: '5' }, passivePerception: 13,
+      senses: [], languages: ['Bullywug', 'Comune', 'Silvano'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il bullywug può respirare sia aria che acqua.' },
+        { name: 'Parlare con Rane e Rospi', desc: 'Quando parla in bullywug, può comunicare concetti semplici a rane e rospi.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il bullywug effettua due attacchi con il Bastone della Palude. Può sostituire uno qualsiasi di questi attacchi con l\'uso di Incantare per lanciare Raggio di Infermità.' },
+        { name: 'Bastone della Palude', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 7 (1d8 + 3) danni contundenti più 10 (3d6) danni da veleno.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'contundenti' }, { f: '3d6', t: 'veleno' }] },
+        { name: 'Incantare', desc: 'Il bullywug lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 13, +5 a colpire con gli attacchi con incantesimo).\n\nA volontà: Luci Danzanti, Artigianato Druidico, Raggio di Infermità.\n\n1/Giorno ciascuno: Parlare con le Piante, Sfera Vitriolica.' }
+      ],
+      bonusActions: [
+        { name: 'Balzo', desc: 'Il bullywug salta fino a 9 metri spendendo 3 metri di movimento.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Attrezzi', desc: 'Borsa dei componenti e attrezzi della palude, più effetti personali.' }],
+      notes: 'Abitanti Anfibi di Paludi e Fanghiglia\n\nHabitat: Palude\nTesoro: Attrezzi, Individuale\n\nI saggi delle paludi bullywug incanalano la magia della palude per indebolire i nemici e parlare con le piante.\n\n' + BULLYWUG_LORE
+    },
+    {
+      id: 'preset_guerriero_bullywug', name: 'Guerriero Bullywug', emoji: '🐸', rarity: 'common',
+      type: 'Fata', size: 'Media', alignment: 'Neutrale',
+      ac: 15, hp: 11, hpCur: 11, hpTemp: 0, hpDice: '2d8+2', init: 2,
+      speed: '9 m, Nuotare 9 m', cr: '1/4', xp: '',
+      str: 12, dex: 14, con: 13, intl: 7, wis: 10, cha: 7,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '4' }, passivePerception: 10,
+      senses: [], languages: ['Bullywug', 'Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il bullywug può respirare sia aria che acqua.' },
+        { name: 'Parlare con Rane e Rospi', desc: 'Quando parla in bullywug, può comunicare concetti semplici a rane e rospi.' }
+      ],
+      actions: [
+        { name: 'Stocco Insettile', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 6 (1d8 + 2) danni perforanti più 2 (1d4) danni da veleno.', atkHit: '+4', atkDmgs: [{ f: '1d8+2', t: 'perforanti' }, { f: '1d4', t: 'veleno' }] }
+      ],
+      bonusActions: [
+        { name: 'Balzo', desc: 'Il bullywug salta fino a 9 metri spendendo 3 metri di movimento.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Attrezzi', desc: 'Attrezzi della palude e armi rudimentali, più effetti personali.' }],
+      notes: 'Abitanti Anfibi di Paludi e Fanghiglia\n\nHabitat: Palude\nTesoro: Attrezzi, Individuale\n\nI guerrieri bullywug sono esperti nel muoversi attraverso le paludi e tendere imboscate agli intrusi. Spesso combattono al fianco di branchi di rane giganti addestrate.\n\n' + BULLYWUG_LORE
     }
   ];
 
