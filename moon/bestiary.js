@@ -1031,7 +1031,7 @@
       notes: 'Piante Germogliate dal Male\n\nHabitat: Foresta\nTesoro: Nessuno\n\nI blight ago possiedono una forma vagamente bipede, con arti lunghi e sottili simili a rami rinsecchiti. Che rimangano immobili come alberi morti o avanzino con la loro andatura innaturale, raramente possono essere scambiati per normali piante o viandanti.\n\nQuando individuano una preda, attaccano con artigli ricoperti di spine oppure scagliano raffiche di aghi seghettati che crescono e vengono espulsi dal loro corpo in pochi istanti.\n\n' + BLIGHTS_LORE
     },
     {
-      id: 'preset_blight_rampicante', name: 'Blight Rampicante', emoji: '🌿', rarity: 'uncommon',
+      id: 'preset_blight_rampicante', name: 'Blight Rampicante', emoji: '🌿', rarity: 'common',
       type: 'Pianta', size: 'Media', alignment: 'Neutrale Malvagio',
       ac: 12, hp: 19, hpCur: 19, hpTemp: 0, hpDice: '3d8+6', init: -1,
       speed: '6 m', cr: '1/2', xp: '',
