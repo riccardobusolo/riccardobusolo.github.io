@@ -1115,6 +1115,39 @@
       reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Cane Lampeggiante delle Selve Fatate\n\nHabitat: Foresta, Piano Fatato (Feywild)\nTesoro: Nessuno\n\nI Cani Intermittenti scintillano di una magia innata che consente loro di teletrasportarsi, "lampeggiando" da un luogo all\'altro in un istante.\n\nQuesti cani utilizzano questo potere per inseguire le prede, confondere i nemici ed esprimere la propria gioia. Sono spesso associati agli abitanti del Feywild, come centauri e pixie, e partecipano frequentemente a cacce sfrenate che attraversano i confini tra i mondi.\n\n— Descrizione per il DM —\nI Cani Intermittenti sono tra le creature benevole più iconiche del Feywild. Nonostante il loro aspetto da semplici cani, sono intelligenti, leali e dotati di capacità soprannaturali. Spesso fungono da compagni, guide o cacciatori al servizio di fate, eladrin e altre creature delle Selve Fatate.\n\nUn branco di Cani Intermittenti può rappresentare:\n• alleati in una foresta incantata;\n• guide attraverso portali fatati;\n• protettori di un antico sentiero magico;\n• nemici temporanei se scambiano gli avventurieri per predatori o invasori.'
+    },
+    {
+      id: 'preset_massa_annientamento', name: 'Massa dell\'Annientamento', emoji: '🕳️', rarity: 'epic',
+      type: 'Melma', size: 'Mastodontica', alignment: 'Neutrale Malvagio',
+      ac: 18, hp: 448, hpCur: 448, hpTemp: 0, hpDice: '23d20+207', init: 2,
+      speed: '9 m', cr: '23', xp: '',
+      str: 27, dex: 14, con: 28, intl: 10, wis: 16, cha: 10,
+      savesOverride: { str: '15', dex: '9', con: '16', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 13,
+      senses: [{ type: 'Vista Cieca', value: 36, unit: 'm' }], languages: [],
+      dmgResist: ['Contundente', 'Perforante', 'Tagliente'], dmgImmune: ['Acido', 'Necrotico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato', 'Afferrato', 'Paralizzato', 'Pietrificato', 'Avvelenato', 'Prono', 'Trattenuto', 'Stordito', 'Privo di Sensi'],
+      traits: [
+        { name: 'Implosione Astrale', desc: 'Se la massa viene ridotta a 0 punti ferita, implode ed espelle nel Mare Astrale tutte le creature e gli oggetti che aveva inghiottito. La massa stessa svanisce, lasciando uno strato di melma su tutto ciò che si trovava entro 180 metri da essa.\nDopo 1d20 anni la massa si ricostituisce su un mondo casuale del Piano Materiale.' },
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno)\nSe la massa fallisce un tiro salvezza, può scegliere di superarlo invece.' },
+        { name: 'Resistenza Magica', desc: 'La massa dispone di vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'La massa effettua due attacchi di Pseudopodo e usa Inghiottire. Può sostituire uno degli attacchi con un utilizzo di Globo Restrittivo.' },
+        { name: 'Pseudopodo', desc: 'Attacco con arma da mischia: +15 a colpire, portata 9 metri.\nColpito: 24 (3d10 + 8) danni da forza.', atkHit: '+15', atkDmgs: [{ f: '3d10+8', t: 'forza' }] },
+        { name: 'Inghiottire', desc: 'La massa si muove fino alla propria velocità e può attraversare gli spazi occupati da creature e oggetti Enormi o più piccoli. Ogni creatura o oggetto nel cui spazio la massa entra per la prima volta durante questo movimento effettua un Tiro Salvezza su Forza (CD 23).\nFallimento: il bersaglio viene inghiottito; gode di copertura totale contro effetti esterni, si muove con la massa e (se oggetto non magico) viene distrutto dopo 1 minuto al suo interno. Mentre è inghiottita, una creatura subisce 21 (6d6) danni da forza all\'inizio di ciascun proprio turno, sta soffocando, ha la condizione Trattenuto e ripete il tiro salvezza alla fine di ogni proprio turno; se ridotta a 0 punti ferita si dissolve in cenere, espulsa nel Mare Astrale.\nSuccesso: il bersaglio fugge e compare nello spazio libero più vicino.', atkDmgs: [{ f: '6d6', t: 'forza' }] },
+        { name: 'Globo Restrittivo', desc: 'La massa lancia un globo di melma vischiosa contro una creatura Grande o più piccola che possa vedere entro 180 metri. Tiro Salvezza su Destrezza: CD 23.\nFallimento: 18 (3d6 + 8) danni da acido; il globo trascina il bersaglio per 18 metri in linea retta verso la massa e lo lascia Trattenuto fino alla fine del turno successivo della massa, quando il globo si dissolve innocuamente.\nSuccesso: metà danni.', atkDmgs: [{ f: '3d6+8', t: 'acido' }] }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round)', desc: 'Immediatamente dopo il turno di un\'altra creatura, la massa può spendere un utilizzo per una delle azioni leggendarie seguenti. Recupera tutti gli utilizzi spesi all\'inizio di ciascun proprio turno.' },
+        { name: 'Decadimento', desc: 'La massa infligge 14 (4d6) danni necrotici a ogni creatura da essa inghiottita. Non può usare nuovamente questa azione fino all\'inizio del suo prossimo turno.', atkDmgs: [{ f: '4d6', t: 'necrotici' }] },
+        { name: 'Globo Afferrante', desc: 'La massa usa Globo Restrittivo. Non può usare nuovamente questa azione fino all\'inizio del suo prossimo turno.' },
+        { name: 'Melma Sferzante', desc: 'La massa effettua un attacco di Pseudopodo.', atkHit: '+15', atkDmgs: [{ f: '3d10+8', t: 'forza' }] }
+      ],
+      drop: [{ name: 'Contenuti della Massa', desc: 'Solo gli oggetti magici e i cadaveri di dèi e titani sopravvivono al suo interno. Tira 1d10 sulla tabella "Contenuti della Massa dell\'Annientamento" (nelle note) per scoprire quale straordinario oggetto o creatura custodisce.' }],
+      notes: 'Entropia Cosmica Divoratrice di Tutto Scatenata\n\nHabitat: Qualsiasi\nTesoro: Qualsiasi\n\nLa Massa dell\'Annientamento è un coagulo di entropia cosmica congiunto ai resti di divinità morte. Questa entità malvagia vaga per lo Spazio Selvaggio e per le distese del multiverso ostili alla vita: regioni immense nelle quali la probabilità di incontrarla è molto bassa.\n\nLa Massa rappresenta la minaccia più grande quando disastri o incantatori nichilisti la evocano in regni abitati. Una volta liberata, rotola attraverso le terre in enormi vortici cosmici, mentre frammenti della sua sostanza si separano per inghiottire altri bersagli.\n\nLa Massa consuma tutto ciò che incontra, spazzando foreste, villaggi e fortezze dentro il proprio corpo. Al suo interno si trova una distesa priva di aria e gravità, dove le forze entropiche distruggono qualunque cosa venga inghiottita. Nulla può sopravvivervi a lungo.\n\nSoltanto gli oggetti magici e i cadaveri di dèi e titani possono resistere all\'interno della Massa. Per questo motivo, cacciatori di tesori e teologi a volte si assumono il compito mortale di recuperare qualcosa dal suo interno: un\'impresa che di solito termina con l\'annientamento, ma che occasionalmente porta alla scoperta della vita.\n\n— Contenuti della Massa dell\'Annientamento (tira 1d10) —\n1. Un Amuleto dei Piani.\n2. Un artefatto scelto dal DM.\n3. I corpi di due divinità che combattevano quando la Massa le ha consumate.\n4. Un Cancello Cubico.\n5. Un Mazzo delle Molte Cose.\n6. Una chiave magica che apre una porta a Sigil che nessun\'altra chiave o incantesimo può aprire.\n7. Il corpo conservato di un Empireo.\n8. I resti di metà di un Kraken.\n9. Il teschio di un dio della morte.\n10. Una Tarrasque appena morta.\n\n— Vi, Artefice di Eberron —\n"Tesoro, ho visto orrori che ti farebbero sporcare i pantaloni e cercare il santuario più vicino. E poi c\'è la Massa dell\'Annientamento. Se la vedi, scappa. E se non riesci a scappare, spera soltanto di dissolverti in fretta."'
     }
   ];
 
