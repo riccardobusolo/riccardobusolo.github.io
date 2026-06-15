@@ -1802,6 +1802,28 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Reliquie e cimeli sottratti alle vittime trascinate nelle orde demoniache.' }],
       notes: 'Demone del Tradimento e dell\'Adulazione\n\nHabitat: Piani (Abisso)\nTesoro: Reliquie\n\nEmergendo dall\'Abisso, i chasme assomigliano a mosche grandi quanto un cavallo. Rendono incapaci i nemici producendo un ronzio che intorpidisce la mente, poi usano le loro proboscidi per prosciugare la forza vitale delle vittime. Nell\'Abisso, la maggior parte dei chasme serve ossequiosamente demoni più potenti e va in cerca di prigionieri da costringere a unirsi alle orde demoniache.'
+    },
+    {
+      id: 'preset_chimera', name: 'Chimera', emoji: '🦁', rarity: 'uncommon',
+      type: 'Mostruosità', size: 'Grande', alignment: 'Caotico Malvagio',
+      ac: 14, hp: 114, hpCur: 114, hpTemp: 0, hpDice: '12d10+48', init: 0,
+      speed: '9 m, Volare 18 m', cr: '6', xp: '',
+      str: 19, dex: 11, con: 19, intl: 3, wis: 14, cha: 10,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '8' }, passivePerception: 18,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comprende il Draconico ma non può parlare'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'La chimera effettua un attacco con Cornata, un attacco con Morso e un attacco con Artiglio. Può sostituire l\'attacco con Artiglio con un utilizzo di Soffio di Fuoco, se disponibile.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 11 (2d6 + 4) danni perforanti, oppure 18 (4d6 + 4) danni perforanti se la chimera aveva Vantaggio al tiro per colpire.', atkHit: '+7', atkDmgs: [{ f: '2d6+4', t: 'perforanti' }] },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 7 (1d6 + 4) danni taglienti.', atkHit: '+7', atkDmgs: [{ f: '1d6+4', t: 'taglienti' }] },
+        { name: 'Cornata', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 10 (1d12 + 4) danni contundenti. Se il bersaglio è una creatura di taglia Media o inferiore, ottiene la condizione Prono.', atkHit: '+7', atkDmgs: [{ f: '1d12+4', t: 'contundenti' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 15. Ogni creatura in un cono di 4,5 metri.\nFallimento: 31 (7d8) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '7d8', t: 'fuoco' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Tesoro', desc: 'Oggetti luccicanti, trofei e ossa delle prede accumulati nella tana cavernosa della chimera.' }],
+      notes: 'Predatrice Multicefala\n\nHabitat: Prateria, Collina, Montagna\nTesoro: Qualsiasi\n\nViolente e imprevedibili, le chimere combinano i tratti più letali di leoni, arieti e draghi rossi. Con i loro artigli spaventosi, le corna devastanti e il soffio infuocato, le chimere sono tempeste di ferocia, guidate dagli istinti contrastanti delle loro tre teste. Le loro teste concordano su ben poche cose, ma condividono il desiderio di nutrirsi e di scacciare i rivali dai territori impervi in cui stabiliscono le proprie tane. Quando individuano una preda, in genere bersagliano i nemici con il loro soffio di fuoco prima di atterrare per attaccare con zanne, corna e artigli.\n\nA causa dei loro istinti draconici, le chimere sono creature avide che accumulano tesori nelle loro tane cavernose. Non sono particolarmente selettive riguardo a ciò che raccolgono, ammassando oggetti luccicanti accanto a trofei e ossa delle loro recenti uccisioni. Anime coraggiose che desiderano distrarre o placare temporaneamente una chimera possono riuscirci offrendole tesori e cibo.'
     }
   ];
 
