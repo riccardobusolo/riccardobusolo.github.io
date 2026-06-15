@@ -53,6 +53,7 @@
   var DRAGHI_RAME_LORE = 'Instancabilmente amichevoli e curiosi, la maggior parte dei draghi di rame vede il mondo come un luogo di meraviglie e possibilità infinite. Questi draghi socievoli sono fonti di pazienza, ospitalità e umorismo e cercano di migliorare la vita — o almeno l\'umore — di coloro con cui interagiscono. Se costretti a combattere per difendere sé stessi o i loro amici, preferiscono usare il soffio rallentante e gli attacchi fisici per sottomettere gli avversari; solo in casi di estremo pericolo o forte emozione ricorrono al loro mortale soffio acido.\n\nI draghi di rame vivono tipicamente in caverne tra colline pittoresche e formazioni rocciose, soprattutto quelle che costituiscono punti di riferimento importanti. Collezionano doni, ma hanno poco interesse per tesori privi di significato, indipendentemente dal loro valore: per loro i regali fatti con attenzione e i sentimenti o i ricordi che rappresentano valgono più di capolavori o reliquie magiche.';
   var DRAGHI_RAME_TANA = '— Tane dei Draghi di Rame —\nI draghi di rame abitano tipicamente caverne a più camere e rovine restaurate. La regione attorno alla tana di un drago di rame adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nAnimaletti Chiacchieroni: le Bestie Minuscole entro 10 km dalla tana ottengono magicamente la capacità di parlare e comprendere il Draconico.\n\nAttacchi di Risate: quando una creatura diversa dal drago e dai suoi alleati, entro 1,5 km dalla tana, ottiene un 1 naturale in un Test d20, deve superare un Tiro Salvezza su Saggezza CD 15 oppure ottenere la condizione Incapacitato fino alla fine del suo turno successivo, sopraffatta dalle risate.\n\nSe il drago muore o trasferisce la propria tana altrove, questi effetti terminano immediatamente.';
   var MANI_STRISCIANTI_LORE = 'Le mani striscianti sono mani mozzate che si muovono e agiscono secondo la propria volontà omicida. Queste appendici senza vita possono animarsi a partire dagli arti recisi di assassini e criminali, e sinistri utilizzatori di magia potrebbero animarle come ripugnanti servitori.\n\nAssumono molte forme diverse, dalle mani umane in decomposizione alle appendici appena recise di animali o mostri.\n\n— Ansolm Haas, "L\'Isolamento del Male" —\n«È possibile che una creatura, qualsiasi essere vivente, sia intrinsecamente malvagia? Una simile affermazione potrebbe di per sé facilitare il compimento di atti malvagi: definendo una persona come malvagia, le concediamo la libertà di comportarsi come tale, assolvendo la malvagità delle sue parole e delle sue azioni.»';
+  var CICLOPI_LORE = 'I ciclopi sono giganteschi discendenti degli dèi dotati di un solo occhio. Grazie alla loro visione mistica, possono osservare come gli eventi futuri probabilmente si svolgeranno.';
   var CULTISTI_LORE = 'I cultisti utilizzano la magia e misure estreme per diffondere credenze radicali. Alcuni perseguono in segreto misteri esoterici, mentre altri formano oscure congreghe che cercano di provocare fini terribili. Seguono spesso tradizioni mistiche oscure o si ossessionano con interpretazioni di antiche profezie, e possono venerare patroni soprannaturali: divinità, creature ultraterrene, menti aliene manipolatrici o forze enigmatiche.\n\n— Obiettivi del Culto (1d6) —\n1. Provocare la fine di un ordine dominante, di un\'epoca o del mondo.\n2. Bruciare le rassicuranti menzogne della realtà, rivelando verità dimenticate o terribili.\n3. Espandere la propria fede tramite controllo mentale o coercizione soprannaturale.\n4. Apportare cambiamenti globali, come sprofondare terre o risvegliare vulcani.\n5. Rifare la vita su vasta scala, alterando i corpi di altre creature o esseri spirituali.\n6. Evocare nel proprio mondo la propria divinità, il suo araldo, la sua arma o il suo reame.\n\n— Riti del Culto del Male Elementale —\n«Temi Tharizdun, potere dell\'Occhio Elementale Anziano e signore di tutte le forze distruttive. Io sono il Campione del Male Elementale e sono pronto a eseguire i tuoi desideri.»';
   var PRESETS = [
     {
@@ -2357,6 +2358,55 @@
       legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Corazza e reliquie infernali legate al patrono immondo.' }],
       notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI cultisti immondi venerano immondi o divinità malvagie. Spesso lavorano per portare rovina agli innocenti o evocare nel mondo il loro sinistro patrono. Possono servire potenze famigerate come arcidiavoli e signori dei demoni, oppure immortali corrotti quali Demogorgon, Pazuzu, Iuz, Zariel o Zuggtmoy.\n\n' + CULTISTI_LORE
+    },
+    {
+      id: 'preset_sentinella_ciclope', name: 'Sentinella Ciclope', emoji: '🧿', rarity: 'uncommon',
+      type: 'Gigante', size: 'Enorme', alignment: 'Caotico Neutrale',
+      ac: 14, hp: 138, hpCur: 138, hpTemp: 0, hpDice: '12d12+60', init: 0,
+      speed: '12 m', cr: '6', xp: '',
+      str: 22, dex: 11, con: 20, intl: 8, wis: 6, cha: 10,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 8,
+      senses: [], languages: ['Gigante'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il ciclope effettua due attacchi, usando Grande Clava o Roccia in qualsiasi combinazione.' },
+        { name: 'Grande Clava', desc: 'Attacco con arma da mischia: +9 a colpire, portata 3 metri.\nColpito: 16 (3d6 + 6) danni contundenti. Se il bersaglio è una creatura di taglia Enorme o inferiore, ottiene la condizione Prono.', atkHit: '+9', atkDmgs: [{ f: '3d6+6', t: 'contundenti' }] },
+        { name: 'Roccia', desc: 'Attacco con arma a distanza: +9 a colpire, gittata 9/36 metri.\nColpito: 22 (3d10 + 6) danni contundenti.', atkHit: '+9', atkDmgs: [{ f: '3d10+6', t: 'contundenti' }] }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Precognizione Limitata (Ricarica 6)', desc: 'Innesco: una creatura che il ciclope può vedere effettua un tiro per colpire contro di lui.\nRisposta: il ciclope impone Svantaggio a quel tiro e ottiene Vantaggio ai tiri per colpire contro quel bersaglio fino alla fine del proprio turno successivo.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'La grande clava e i massi della sentinella, più armamenti a misura di gigante.' }],
+      notes: 'Servitori Monocoli del Destino\n\nHabitat: Costa, Deserto, Prateria, Colline, Montagne, Sottosuolo\nTesoro: Armamenti\n\nLa maggior parte delle sentinelle ciclopi serve i propri progenitori divini e si oppone a chiunque tenti di alterare il destino.\n\n' + CICLOPI_LORE
+    },
+    {
+      id: 'preset_oracolo_ciclope', name: 'Oracolo Ciclope', emoji: '🔮', rarity: 'rare',
+      type: 'Gigante', size: 'Enorme', alignment: 'Caotico Neutrale',
+      ac: 16, hp: 207, hpCur: 207, hpTemp: 0, hpDice: '18d12+90', init: 8,
+      speed: '12 m', cr: '10', xp: '',
+      str: 22, dex: 11, con: 20, intl: 16, wis: 18, cha: 10,
+      savesOverride: { str: '', dex: '', con: '9', intl: '', wis: '8', cha: '' },
+      skillOverrides: { storia: '11', percezione: '12' }, passivePerception: 22,
+      senses: [{ type: 'Vista del Vero', value: 9, unit: 'm' }], languages: ['Gigante'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'oracolo ciclope effettua tre attacchi, usando Colpo Radioso o Lampo di Luce in qualsiasi combinazione.' },
+        { name: 'Colpo Radioso', desc: 'Attacco con arma da mischia: +10 a colpire, portata 3 metri.\nColpito: 22 (3d10 + 6) danni radiosi.', atkHit: '+10', atkDmgs: [{ f: '3d10+6', t: 'radiosi' }] },
+        { name: 'Lampo di Luce', desc: 'Attacco con arma a distanza: +10 a colpire, gittata 36 metri.\nColpito: 17 (2d10 + 6) danni radiosi e il bersaglio ha Svantaggio ai tiri per colpire fino alla fine del turno successivo del ciclope.', atkHit: '+10', atkDmgs: [{ f: '2d10+6', t: 'radiosi' }] },
+        { name: 'Incantesimi', desc: 'Il ciclope lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 16).\n\n2/Giorno ciascuno: Occhio Arcano, Individuazione del Magico, Localizza Oggetto.\n\n1/Giorno: Conoscenza delle Leggende.' }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Presagio (Ricarica 4-6)', desc: 'Innesco: il ciclope o un alleato che può vedere effettua un Test d20.\nRisposta: il ciclope tira 1d20 e sceglie se utilizzare quel risultato al posto del d20 originale.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Armi e armamenti a misura di gigante dell\'oracolo, oltre a segreti e profezie raccolti nel tempo.' }],
+      notes: 'Servitori Monocoli del Destino\n\nHabitat: Costa, Deserto, Prateria, Colline, Montagne, Sottosuolo\nTesoro: Armamenti\n\nGli oracoli ciclopi scrutano attraverso la storia per apprendere verità nascoste. Molti condividono questi segreti con coloro che li aiutano a correggere gli errori del passato.\n\n' + CICLOPI_LORE
     }
   ];
 
