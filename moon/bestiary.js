@@ -2951,7 +2951,18 @@
     if (dmgDelB) { var mz = getById(view.curId); if (!mz || isOfficialId(mz.id)) return; var zp = dmgDelB.dataset.bestdmgdel.split('-'); var zk = zp[0], zi = parseInt(zp[1]), zj = parseInt(zp[2]); var zit = mz[zk] && mz[zk][zi]; if (zit && typeof zit === 'object') { var zarr = bestEnsureDmgs(zit); if (zarr[zj] != null) zarr.splice(zj, 1); persist(); renderRight(); } return; }
 
     var openC = e.target.closest('[data-bestopen]');
-    if (openC) { view.curId = openC.dataset.bestopen; render(); return; }
+    if (openC) {
+      view.curId = openC.dataset.bestopen;
+      /* Aggiorno solo lo stato selezionato delle card e il pannello destro,
+         senza ricostruire la colonna sinistra: un render() pieno rigenera
+         .best__cards e riporta lo scroll in cima a ogni click. */
+      var elO = host(); var wrapO = elO && elO.querySelector('.best__cards');
+      var scO = wrapO ? wrapO.scrollTop : 0;
+      fillCards();
+      if (wrapO) wrapO.scrollTop = scO;
+      renderRight();
+      return;
+    }
 
     if (e.target.closest('[data-bestnew]')) {
       view.tab = 'custom';
