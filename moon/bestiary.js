@@ -2454,6 +2454,26 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Predatore d\'Imboscata che si Aggrappa ai Soffitti\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nCacciatori sotterranei innaturali, i manti oscuri si avvolgono in ombre magiche e sfruttano la loro anatomia bizzarra per camuffarsi da stalattiti. Quando una preda passa sotto di loro, i manti oscuri appostati si lasciano cadere e dispiegano i loro tentacoli membranosi, tentando di accecare, soffocare o schiacciare le vittime.\n\nI manti oscuri condividono alcune caratteristiche con i perforatori (piercer) e i pendagli assassini (roper) e spesso cacciano vicino a tali mostri. Gli studiosi hanno tentato di stabilire un\'origine comune o un ciclo vitale condiviso tra queste creature, ma i loro sforzi sono ostacolati dalla fisiologia soprannaturale e dalla natura letale di tali mostri.'
+    },
+    {
+      id: 'preset_cane_della_morte', name: 'Cane della Morte', emoji: '🐕', rarity: 'common',
+      type: 'Mostruosità', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 12, hp: 39, hpCur: 39, hpTemp: 0, hpDice: '6d8+12', init: 2,
+      speed: '12 m', cr: '1', xp: '',
+      str: 15, dex: 14, con: 14, intl: 3, wis: 13, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '5', furtivita: '4' }, passivePerception: 15,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Accecato', 'Ammaliato', 'Assordato', 'Spaventato', 'Stordito', 'Privo di Sensi'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il cane della morte effettua due attacchi con Morso.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 4 (1d4 + 2) danni perforanti.\nSe il bersaglio è una creatura, è soggetto al seguente effetto. Tiro Salvezza su Costituzione: CD 12.\nPrimo Fallimento: il bersaglio ottiene la condizione Avvelenato. Finché è Avvelenato, il suo massimo dei punti ferita non si ripristina al termine di un Riposo Lungo, e ripete il tiro salvezza ogni 24 ore, terminando l\'effetto con un successo.\nFallimenti Successivi: il massimo dei punti ferita del bersaglio Avvelenato diminuisce di 5 (1d10).', atkHit: '+4', atkDmgs: [{ f: '1d4+2', t: 'perforanti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Diffusore di Malattie a Due Teste\n\nHabitat: Deserto\nTesoro: Nessuno\n\nI cani della morte sono una piaga delle terre aride che abitano. Questi feroci canidi a due teste tendono imboscate alle creature che percepiscono come più deboli di loro, privilegiando i feriti e gli infermi. Attaccano con sconsiderata aggressività, cercando di infettare quante più creature possibile con le loro mascelle malate. Se vengono scacciati, i cani della morte rimangono nei pressi delle loro vittime, lasciando che l\'infezione indebolisca la preda prima di colpire nuovamente.\n\nLe leggende collegano i cani della morte a malvagie divinità della morte, all\'oltretomba e a sovrani maledetti. Queste storie si basano sul morbo diffuso dai cani della morte. I sintomi seguenti sono puramente narrativi e non modificano gli effetti del Morso; scompaiono quando la vittima non è più Avvelenata dal morso.\n\nSintomi del Morbo del Cane della Morte (1d6):\n1 — Segni di mascelle canine compaiono sul corpo della vittima, come se fosse ancora dilaniata dai morsi.\n2 — Il corpo della vittima si inaridisce, come se fosse costantemente esposto al calore del deserto.\n3 — La vittima è distratta da ululati lontani o sussurri indistinti che soltanto lei può udire.\n4 — La carne della vittima imputridisce come quella di un cadavere.\n5 — Un prurito incessante, come se avesse pulci o granelli di sabbia sotto la pelle.\n6 — Simboli malvagi compaiono gradualmente e si diffondono sul corpo della vittima.\n\n«E i suoi dolori perseguiteranno la tua terra come cani affamati, finché i mari non diverranno sabbia e il sole non si consumerà in cenere.»\n— Frammento di tavoletta del Deserto Splendente'
     }
   ];
 
