@@ -1748,6 +1748,34 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Equipaggiamento', desc: 'Corazza pettorale, arco lungo, picca, più effetti personali.' }],
       notes: 'Difensori delle Terre Fatate\n\nHabitat: Foresta, Prateria, Piano Fatato (Feywild)\nTesoro: Armi, Individuale\n\nI soldati centauri sono guardiani simili a cavalieri. Molti di loro diffidano delle creature che non appartengono al popolo fatato.\n\n' + CENTAURI_LORE
+    },
+    {
+      id: 'preset_diavolo_catene', name: 'Diavolo delle Catene', emoji: '⛓️', rarity: 'rare',
+      type: 'Immondo', size: 'Media', alignment: 'Legale Malvagio',
+      ac: 15, hp: 85, hpCur: 85, hpTemp: 0, hpDice: '10d8+40', init: 5,
+      speed: '9 m', cr: '8', xp: '',
+      str: 18, dex: 15, con: 18, intl: 11, wis: 12, cha: 14,
+      savesOverride: { str: '', dex: '', con: '7', intl: '', wis: '4', cha: '' },
+      skillOverrides: {}, passivePerception: 11,
+      senses: [{ type: 'Scurovisione (non ostacolata dall\'oscurità magica)', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
+      dmgResist: ['Contundente', 'Freddo', 'Perforante', 'Tagliente'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
+      condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Restaurazione Diabolica', desc: 'Se il diavolo muore al di fuori dei Nove Inferi, il suo corpo scompare in una nube di fumo sulfureo e ottiene immediatamente un nuovo corpo, tornando in vita con tutti i suoi punti ferita da qualche parte nei Nove Inferi.' },
+        { name: 'Resistenza Magica', desc: 'Il diavolo ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il diavolo effettua due attacchi con Catena e usa Evocare Catena Infernale.' },
+        { name: 'Catena', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 11 (2d6 + 4) danni taglienti. Se il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Afferrato (CD di fuga 14) da una delle due catene e la condizione Trattenuto finché la presa non termina.', atkHit: '+7', atkDmgs: [{ f: '2d6+4', t: 'taglienti' }] },
+        { name: 'Evocare Catena Infernale', desc: 'Il diavolo evoca una catena fiammeggiante per vincolare una creatura. Tiro Salvezza su Destrezza: CD 15, una creatura che il diavolo può vedere entro 18 metri.\nFallimento: 9 (2d4 + 4) danni da fuoco e il bersaglio subisce la condizione Trattenuto fino alla fine del turno successivo del diavolo, quando la catena scompare; se è di taglia Grande o inferiore, il diavolo lo sposta fino a 9 metri in linea retta verso di sé.\nSuccesso: la catena scompare.', atkDmgs: [{ f: '2d4+4', t: 'fuoco' }] }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Sguardo Inquietante', desc: 'Innesco: una creatura che il diavolo può vedere inizia il proprio turno entro 9 metri da lui e può vedere il diavolo.\nRisposta: la creatura effettua un Tiro Salvezza su Saggezza (CD 15).\nFallimento: subisce la condizione Spaventato fino alla fine del suo turno.\nSuccesso: è immune allo Sguardo Inquietante di questo diavolo per 24 ore.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Strumenti', desc: 'Catene animate e strumenti di tortura usati dal diavolo per estorcere segreti.' }],
+      notes: 'Diavolo del Dolore e del Controllo\n\nHabitat: Piani (Nove Inferi)\nTesoro: Strumenti\n\nConosciuti anche come kyton, i diavoli delle catene si considerano macabri artigiani che usano inganno, intimidazione e metallo crudele per costringere i prigionieri a tradire sé stessi. Molti servono diavoli potenti, strappando segreti alle anime imprigionate mediante catene animate e letali. Lasciati a sé stessi, incoraggiano individui spietati a perseguire magie proibite, conducendo i loro discepoli lungo sentieri che portano ai Nove Inferi.\n\nOltre alle minacce psicologiche e ai danni fisici, un diavolo delle catene usa il suo sguardo inquietante per far percepire alle vittime la loro peggiore paura, invece del mostro che hanno davanti.\n\n— Maschere del Diavolo delle Catene (tira 1d4) —\nPer un osservatore, il diavolo appare come...\n1. Il cadavere di una persona amata.\n2. Una divinità disapprovante.\n3. Un istruttore o superiore severo.\n4. L\'osservatore nel momento più basso della sua vita.'
     }
   ];
 
