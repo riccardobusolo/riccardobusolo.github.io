@@ -2240,7 +2240,7 @@
       notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI fanatici guidano piccoli culti o cellule all\'interno di culti più grandi. Conoscono più misteri del culto rispetto ai membri di rango inferiore, e ciò concede loro accesso ai poteri magici dei loro patroni.\n\n' + CULTISTI_LORE
     },
     {
-      id: 'preset_ierofante_culto', name: 'Ierofante del Culto', emoji: '✨', rarity: 'common',
+      id: 'preset_ierofante_culto', name: 'Ierofante del Culto', emoji: '✨', rarity: 'rare',
       type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
       ac: 16, hp: 144, hpCur: 144, hpTemp: 0, hpDice: '17d8+68', init: 8,
       speed: '9 m', cr: '10', xp: '',
@@ -2261,7 +2261,7 @@
       notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nGli ierofanti sono leader che supervisionano la vita dei loro seguaci, dettano gli editti del culto e interpretano la volontà del loro patrono. Possiedono poteri soprannaturali e conoscono i segreti più profondi del culto, controllando spesso strane reliquie, siti mistici e servitori mostruosi.\n\n' + CULTISTI_LORE
     },
     {
-      id: 'preset_cultista_aberrante', name: 'Cultista Aberrante', emoji: '🐙', rarity: 'common',
+      id: 'preset_cultista_aberrante', name: 'Cultista Aberrante', emoji: '🐙', rarity: 'uncommon',
       type: 'Umanoide', size: 'Media', alignment: 'Neutrale Malvagio',
       ac: 14, hp: 137, hpCur: 137, hpTemp: 0, hpDice: '25d8+25', init: 7,
       speed: '9 m', cr: '8', xp: '',
@@ -2286,7 +2286,7 @@
       notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI cultisti aberranti perseguono poteri capaci di piegare la mente provenienti da forze aliene. Si alleano con mostri come aboleth e mind flayer o con entità del Reame Remoto: Cthulhu, Hadar, Nyarlathotep, maliziosi corpi celesti o altre menti incomprensibili.\n\n' + CULTISTI_LORE
     },
     {
-      id: 'preset_cultista_morte', name: 'Cultista della Morte', emoji: '⚰️', rarity: 'common',
+      id: 'preset_cultista_morte', name: 'Cultista della Morte', emoji: '⚰️', rarity: 'uncommon',
       type: 'Umanoide', size: 'Media', alignment: 'Neutrale Malvagio',
       ac: 17, hp: 127, hpCur: 127, hpTemp: 0, hpDice: '15d8+60', init: 4,
       speed: '9 m', cr: '8', xp: '',
@@ -2310,7 +2310,7 @@
       notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI cultisti della morte si crogiolano in forze nichiliste, abbracciandole come vie verso la non morte, la purezza multiversale o l\'inevitabilità entropica. Servono potenti non morti, profezie apocalittiche o immortali che dominano la morte: Acererak, Kyuss, Orcus, Vecna o Wee Jas.\n\n' + CULTISTI_LORE
     },
     {
-      id: 'preset_cultista_elementale', name: 'Cultista Elementale', emoji: '🔥', rarity: 'common',
+      id: 'preset_cultista_elementale', name: 'Cultista Elementale', emoji: '🔥', rarity: 'uncommon',
       type: 'Umanoide', size: 'Media', alignment: 'Caotico Malvagio',
       ac: 16, hp: 135, hpCur: 135, hpTemp: 0, hpDice: '18d8+54', init: 4,
       speed: '9 m', cr: '8', xp: '',
@@ -2335,7 +2335,7 @@
       notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI cultisti elementali sfruttano forze naturali distruttive per purificare il mondo dalla civiltà o dimostrare il dominio di un elemento sugli altri. Sono alleati di mostri elementali o di immortali malvagi come i Principi del Male Elementale o l\'Occhio Elementale Anziano.\n\n' + CULTISTI_LORE
     },
     {
-      id: 'preset_cultista_immondo', name: 'Cultista Immondo', emoji: '😈', rarity: 'common',
+      id: 'preset_cultista_immondo', name: 'Cultista Immondo', emoji: '😈', rarity: 'uncommon',
       type: 'Umanoide', size: 'Media', alignment: 'Neutrale Malvagio',
       ac: 16, hp: 127, hpCur: 127, hpTemp: 0, hpDice: '17d8+51', init: 5,
       speed: '9 m', cr: '8', xp: '',
