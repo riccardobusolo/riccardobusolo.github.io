@@ -1876,6 +1876,33 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Materiali sacri e reliquie magiche impiegati nella creazione del golem (argilla di un sito sacro, mattoni di una rovina magica).' }],
       notes: 'Guardiano della Casa e del Focolare\n\nHabitat: Urbano\nTesoro: Reliquie\n\nI golem d\'argilla sono difensori magici creati da terra e argilla per proteggere luoghi o comunità. I materiali impiegati nella loro creazione provengono dalle vicinanze del luogo che proteggono e spesso hanno un significato speciale per i loro creatori, come argilla di un sito sacro o mattoni recuperati da una rovina magica. Alcuni golem sono scolpiti con maestria per assomigliare a esseri viventi, altri possiedono soltanto forme vagamente umanoidi.\n\nQuesti golem obbediscono agli ordini dei loro creatori e proteggono ciò che i loro padroni apprezzano di più. Alcuni continuano a seguire tali ordini molto tempo dopo la morte dei loro creatori.\n\n— Ordini del Golem d\'Argilla (tira 1d4) —\nIl golem segue ordini per...\n1. Bloccare il cammino di chiunque entri in un luogo con un\'arma sguainata.\n2. Difendere qualsiasi membro della famiglia o della comunità del suo creatore minacciato in sua presenza.\n3. Impedire a qualsiasi immondo di attraversare un ponte.\n4. Allontanare chiunque entri nel laboratorio del suo creatore.'
+    },
+    {
+      id: 'preset_cloaker', name: 'Cloaker', emoji: '🦇', rarity: 'uncommon',
+      type: 'Aberrazione', size: 'Grande', alignment: 'Caotico Neutrale',
+      ac: 14, hp: 91, hpCur: 91, hpTemp: 0, hpDice: '14d10+14', init: 5,
+      speed: '3 m, Volare 12 m', cr: '8', xp: '',
+      str: 17, dex: 15, con: 12, intl: 13, wis: 14, cha: 7,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '5' }, passivePerception: 12,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Linguaggio Profondo', 'Sottocomune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Spaventato'],
+      traits: [
+        { name: 'Sensibilità alla Luce', desc: 'Finché si trova in Luce Intensa, il cloaker ha Svantaggio ai tiri per colpire.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il cloaker effettua un attacco Avvinghiare e due attacchi con la Coda.' },
+        { name: 'Avvinghiare', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 13 (3d6 + 3) danni perforanti. Se il bersaglio è una creatura di taglia Grande o inferiore, il cloaker vi si attacca.\nFinché resta attaccato: il bersaglio è Accecato; il cloaker dimezza i danni che subisce e il bersaglio subisce un ammontare di danni pari a quelli subiti dal cloaker. Il cloaker può staccarsi spendendo 1,5 metri di movimento; il bersaglio o una creatura entro 1,5 metri può usare un\'azione per staccarlo con una prova di Forza (Atletica) CD 14.', atkHit: '+6', atkDmgs: [{ f: '3d6+3', t: 'perforanti' }] },
+        { name: 'Coda', desc: 'Attacco con arma da mischia: +6 a colpire, portata 3 metri.\nColpito: 8 (1d10 + 3) danni taglienti.', atkHit: '+6', atkDmgs: [{ f: '1d10+3', t: 'taglienti' }] }
+      ],
+      bonusActions: [
+        { name: 'Fantasmi (Ricarica dopo Riposo Breve o Lungo)', desc: 'Il cloaker lancia Immagine Speculare senza componenti, usando Saggezza come caratteristica da incantatore. L\'incantesimo termina prematuramente se il cloaker inizia o termina il proprio turno in Luce Intensa.' },
+        { name: 'Lamento', desc: 'Tiro Salvezza su Saggezza: CD 13, ogni creatura entro un\'emanazione di 18 metri originata dal cloaker.\nFallimento: il bersaglio subisce la condizione Spaventato fino alla fine del turno successivo del cloaker.\nSuccesso: il bersaglio è immune al Lamento di questo cloaker per 24 ore.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Strumenti', desc: 'Oggetti e strumenti lasciati dalle prede divorate nel nido sotterraneo del cloaker.' }],
+      notes: 'Predatore delle Tenebre\n\nHabitat: Sottosuolo\nTesoro: Strumenti\n\nI cloaker sono misteriosi predatori del Sottosuolo, chiamati così dagli avventurieri per la loro somiglianza a mantelli appesi quando si aggrappano alle pareti. Come chiamino sé stessi è sconosciuto, ammesso che si riferiscano a sé stessi in qualche modo. Sebbene siano innegabilmente intelligenti, il loro comportamento è spesso imperscrutabile.\n\nTalvolta i cloaker si radunano in enclave del Sottosuolo, ma raramente costruiscono insediamenti o formano strutture sociali. La maggior parte vive come predatore solitario, annidandosi in desolate profondità sotterranee o in dungeon abbandonati — talvolta per mesi interi — mentre aspetta il passaggio di una preda. Usano le loro pelli screziate per confondersi con l\'ambiente circostante. Quando una preda ignara si avvicina, i cloaker si dispiegano e tentano di avvinghiarsi a essa per poi soffocarla nelle loro potenti ali.\n\nProvano piacere nell\'incutere paura ai nemici. Oltre ai metodi d\'imboscata, possono creare duplicati illusori di sé stessi ed emettere lamenti surreali che chi non è un cloaker trova terrificanti in modi inspiegabili e primordiali. Possono tormentare esploratori smarriti nel Sottosuolo per giorni, terrorizzandoli e disperdendoli prima di attaccare. Raramente conversano con altri esseri, se non per sussurrare inquietanti enigmi a coloro che stanno per divorare.'
     }
   ];
 
