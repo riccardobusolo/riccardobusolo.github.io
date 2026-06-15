@@ -1903,6 +1903,30 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Strumenti', desc: 'Oggetti e strumenti lasciati dalle prede divorate nel nido sotterraneo del cloaker.' }],
       notes: 'Predatore delle Tenebre\n\nHabitat: Sottosuolo\nTesoro: Strumenti\n\nI cloaker sono misteriosi predatori del Sottosuolo, chiamati così dagli avventurieri per la loro somiglianza a mantelli appesi quando si aggrappano alle pareti. Come chiamino sé stessi è sconosciuto, ammesso che si riferiscano a sé stessi in qualche modo. Sebbene siano innegabilmente intelligenti, il loro comportamento è spesso imperscrutabile.\n\nTalvolta i cloaker si radunano in enclave del Sottosuolo, ma raramente costruiscono insediamenti o formano strutture sociali. La maggior parte vive come predatore solitario, annidandosi in desolate profondità sotterranee o in dungeon abbandonati — talvolta per mesi interi — mentre aspetta il passaggio di una preda. Usano le loro pelli screziate per confondersi con l\'ambiente circostante. Quando una preda ignara si avvicina, i cloaker si dispiegano e tentano di avvinghiarsi a essa per poi soffocarla nelle loro potenti ali.\n\nProvano piacere nell\'incutere paura ai nemici. Oltre ai metodi d\'imboscata, possono creare duplicati illusori di sé stessi ed emettere lamenti surreali che chi non è un cloaker trova terrificanti in modi inspiegabili e primordiali. Possono tormentare esploratori smarriti nel Sottosuolo per giorni, terrorizzandoli e disperdendoli prima di attaccare. Raramente conversano con altri esseri, se non per sussurrare inquietanti enigmi a coloro che stanno per divorare.'
+    },
+    {
+      id: 'preset_gigante_nuvole', name: 'Gigante delle Nuvole', emoji: '☁️', rarity: 'rare',
+      type: 'Gigante', size: 'Enorme', alignment: 'Neutrale',
+      ac: 14, hp: 200, hpCur: 200, hpTemp: 0, hpDice: '16d12+96', init: 4,
+      speed: '12 m, Volare 6 m (fluttuare)', cr: '9', xp: '',
+      str: 27, dex: 10, con: 22, intl: 12, wis: 16, cha: 16,
+      savesOverride: { str: '', dex: '', con: '10', intl: '', wis: '7', cha: '' },
+      skillOverrides: { intuizione: '7', percezione: '11' }, passivePerception: 21,
+      senses: [], languages: ['Comune', 'Gigante'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il gigante effettua due attacchi, usando Mazza Tonante o Nube del Tuono in qualsiasi combinazione. Può sostituire uno degli attacchi con un uso di Incantesimi per lanciare Nube di Nebbia.' },
+        { name: 'Mazza Tonante', desc: 'Attacco con arma da mischia: +12 a colpire, portata 3 metri.\nColpito: 21 (3d8 + 8) danni contundenti più 7 (2d6) danni da tuono.', atkHit: '+12', atkDmgs: [{ f: '3d8+8', t: 'contundenti' }, { f: '2d6', t: 'tuono' }] },
+        { name: 'Nube del Tuono', desc: 'Attacco con arma a distanza: +12 a colpire, gittata 72 metri.\nColpito: 18 (3d6 + 8) danni da tuono e il bersaglio subisce la condizione Incapacitato fino alla fine del suo turno successivo.', atkHit: '+12', atkDmgs: [{ f: '3d6+8', t: 'tuono' }] },
+        { name: 'Incantesimi', desc: 'Il gigante lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 15).\n\nA volontà: Individuazione del Magico, Nube di Nebbia, Luce.\n\n1/Giorno ciascuno: Controllare il Tempo Atmosferico, Forma Gassosa, Telecinesi.' }
+      ],
+      bonusActions: [
+        { name: 'Passo Velato', desc: 'Il gigante lancia l\'incantesimo Passo Velato, usando la stessa caratteristica da incantatore di Incantesimi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Favolosi tesori magici a misura di gigante, raccolti da ogni angolo del mondo o creati dal gigante stesso.' }],
+      notes: 'Gigante delle Altezze Più Sublimi\n\nHabitat: Montagna\nTesoro: Arcani\n\nI giganti delle nuvole usano il potere dei cieli per osservare e influenzare sottilmente il mondo. Assomigliano a esseri umani con capelli che vanno dall\'argento al blu e pelle dalle sfumature simili alle nuvole, dal bianco abbagliante ai colori del crepuscolo. Canini ricurvi sporgono dalle loro mascelle superiori oltre il labbro inferiore. In battaglia combattono con armi avvolte da nubi tempestose e lanciano fragorose teste di tuono.\n\nLa maggior parte abita cittadelle che coronano immense montagne oppure palazzi magici che fluttuano tra le nuvole. Molti credono di possedere uno status o uno scopo altrettanto elevati: alcuni si considerano esseri quasi divini che possono manipolare e derubare impunemente le creature terrestri; altri sostengono che la loro lunga vita e il loro posto tra le nuvole concedano prospettive uniche, perciò registrano ciò che osservano nel mondo sottostante senza interferire. In entrambi i casi possiedono spesso favolosi tesori magici, ottenuti in ogni angolo del mondo oppure creati da loro stessi (e a misura di gigante).'
     }
   ];
 
