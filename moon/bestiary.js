@@ -1930,7 +1930,7 @@
       notes: 'Gigante delle Altezze Più Sublimi\n\nHabitat: Montagna\nTesoro: Arcani\n\nI giganti delle nuvole usano il potere dei cieli per osservare e influenzare sottilmente il mondo. Assomigliano a esseri umani con capelli che vanno dall\'argento al blu e pelle dalle sfumature simili alle nuvole, dal bianco abbagliante ai colori del crepuscolo. Canini ricurvi sporgono dalle loro mascelle superiori oltre il labbro inferiore. In battaglia combattono con armi avvolte da nubi tempestose e lanciano fragorose teste di tuono.\n\nLa maggior parte abita cittadelle che coronano immense montagne oppure palazzi magici che fluttuano tra le nuvole. Molti credono di possedere uno status o uno scopo altrettanto elevati: alcuni si considerano esseri quasi divini che possono manipolare e derubare impunemente le creature terrestri; altri sostengono che la loro lunga vita e il loro posto tra le nuvole concedano prospettive uniche, perciò registrano ciò che osservano nel mondo sottostante senza interferire. In entrambi i casi possiedono spesso favolosi tesori magici, ottenuti in ogni angolo del mondo oppure creati da loro stessi (e a misura di gigante).'
     },
     {
-      id: 'preset_cockatrice', name: 'Cockatrice', emoji: '🐓', rarity: 'uncommon',
+      id: 'preset_cockatrice', name: 'Cockatrice', emoji: '🐓', rarity: 'common',
       type: 'Mostruosità', size: 'Piccola', alignment: 'Senza Allineamento',
       ac: 11, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '5d6+5', init: 1,
       speed: '6 m, Volare 12 m', cr: '1/2', xp: '',
