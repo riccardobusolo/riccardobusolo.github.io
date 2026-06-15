@@ -1824,6 +1824,30 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Tesoro', desc: 'Oggetti luccicanti, trofei e ossa delle prede accumulati nella tana cavernosa della chimera.' }],
       notes: 'Predatrice Multicefala\n\nHabitat: Prateria, Collina, Montagna\nTesoro: Qualsiasi\n\nViolente e imprevedibili, le chimere combinano i tratti più letali di leoni, arieti e draghi rossi. Con i loro artigli spaventosi, le corna devastanti e il soffio infuocato, le chimere sono tempeste di ferocia, guidate dagli istinti contrastanti delle loro tre teste. Le loro teste concordano su ben poche cose, ma condividono il desiderio di nutrirsi e di scacciare i rivali dai territori impervi in cui stabiliscono le proprie tane. Quando individuano una preda, in genere bersagliano i nemici con il loro soffio di fuoco prima di atterrare per attaccare con zanne, corna e artigli.\n\nA causa dei loro istinti draconici, le chimere sono creature avide che accumulano tesori nelle loro tane cavernose. Non sono particolarmente selettive riguardo a ciò che raccolgono, ammassando oggetti luccicanti accanto a trofei e ossa delle loro recenti uccisioni. Anime coraggiose che desiderano distrarre o placare temporaneamente una chimera possono riuscirci offrendole tesori e cibo.'
+    },
+    {
+      id: 'preset_chuul', name: 'Chuul', emoji: '🦞', rarity: 'uncommon',
+      type: 'Aberrazione', size: 'Grande', alignment: 'Caotico Malvagio',
+      ac: 16, hp: 76, hpCur: 76, hpTemp: 0, hpDice: '9d10+27', init: 0,
+      speed: '9 m, Nuotare 9 m', cr: '4', xp: '',
+      str: 19, dex: 10, con: 16, intl: 5, wis: 11, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '4' }, passivePerception: 14,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comprende il Linguaggio Profondo ma non può parlare'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Anfibio', desc: 'Il chuul può respirare sia aria sia acqua.' },
+        { name: 'Percepire la Magia', desc: 'Il chuul percepisce la magia entro 36 metri da sé. Questo tratto funziona per il resto come l\'incantesimo Individuazione del Magico, ma non è di natura magica.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il chuul effettua due attacchi con Chela e usa Tentacoli Paralizzanti.' },
+        { name: 'Chela', desc: 'Attacco con arma da mischia: +6 a colpire, portata 3 metri.\nColpito: 9 (1d10 + 4) danni contundenti. Se il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Afferrato (CD di fuga 14) da una delle due chele.', atkHit: '+6', atkDmgs: [{ f: '1d10+4', t: 'contundenti' }] },
+        { name: 'Tentacoli Paralizzanti', desc: 'Tiro Salvezza su Costituzione: CD 13, una creatura afferrata dal chuul.\nFallimento: il bersaglio subisce la condizione Avvelenato e ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l\'effetto su sé stesso con un successo (dopo 1 minuto riesce automaticamente). Finché è Avvelenato in questo modo, ottiene anche la condizione Paralizzato.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Antichi tesori magici raccolti senza sosta dal chuul nel corso delle ere.' }],
+      notes: 'Servitore Chitinoso di Poteri Primordiali\n\nHabitat: Costa, Palude, Sottosuolo\nTesoro: Reliquie\n\nI chuul ebbero origine in epoche dimenticate, quando gli aboleth e altre strane entità governavano imperi alieni sotto le onde. Gli aboleth trasformarono numerosi predatori degli abissi in servitori capaci di avventurarsi oltre i mari per reclamare altra magia e nuove creature da sfruttare. I chuul sono i più duraturi tra questi bizzarri servitori.\n\nMolti chuul servono signori aboleth, eseguendone i capricci nei mari senza luce e nelle paludi primordiali. Altri obbediscono a nuovi padroni aberranti, come beholder, grell o illithid. Alcuni seguono invece i propri impulsi, raccogliendo senza sosta antichi tesori magici o interpretando ordini vecchi di ere in modi bizzarri. Qualunque sia il loro scopo, i chuul intrappolano le creature nelle loro enormi chele prima di rendere impotenti i nemici con i tentacoli paralizzanti.\n\nI chuul non invecchiano e possono restare dormienti in luoghi nascosti per millenni, finché minacce, antichi ordini o strane compulsioni non li risvegliano.'
     }
   ];
 
