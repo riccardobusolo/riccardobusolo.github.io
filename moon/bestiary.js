@@ -684,7 +684,7 @@
       str: 16, dex: 17, con: 18, intl: 12, wis: 14, cha: 14,
       savesOverride: { str: '6', dex: '', con: '7', intl: '', wis: '5', cha: '5' },
       skillOverrides: { inganno: '5', intuizione: '5', percezione: '8' }, passivePerception: 18,
-      senses: [{ type: 'Scurovisione (non ostacolata dall\'oscurità magica)', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
+      senses: [{ type: 'Vista del Diavolo', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
       dmgResist: ['Freddo'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
       condImmune: ['Avvelenato'],
       traits: [
@@ -758,7 +758,7 @@
       str: 16, dex: 15, con: 15, intl: 9, wis: 11, cha: 14,
       savesOverride: { str: '5', dex: '', con: '4', intl: '', wis: '', cha: '4' },
       skillOverrides: {}, passivePerception: 10,
-      senses: [{ type: 'Scurovisione (non ostacolata dall\'oscurità magica)', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
+      senses: [{ type: 'Vista del Diavolo', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
       dmgResist: ['Freddo'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
       condImmune: ['Avvelenato', 'Spaventato'],
       traits: [
@@ -1273,7 +1273,7 @@
       str: 18, dex: 16, con: 18, intl: 13, wis: 14, cha: 16,
       savesOverride: { str: '8', dex: '', con: '', intl: '5', wis: '6', cha: '7' },
       skillOverrides: { inganno: '7', intuizione: '6' }, passivePerception: 12,
-      senses: [{ type: 'Scurovisione (non ostacolata dall\'oscurità magica)', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
+      senses: [{ type: 'Vista del Diavolo', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
       dmgResist: ['Freddo'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
       condImmune: ['Avvelenato'],
       traits: [
@@ -1763,7 +1763,7 @@
       str: 18, dex: 15, con: 18, intl: 11, wis: 12, cha: 14,
       savesOverride: { str: '', dex: '', con: '7', intl: '', wis: '4', cha: '' },
       skillOverrides: {}, passivePerception: 11,
-      senses: [{ type: 'Scurovisione (non ostacolata dall\'oscurità magica)', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
+      senses: [{ type: 'Vista del Diavolo', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
       dmgResist: ['Contundente', 'Freddo', 'Perforante', 'Tagliente'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
       condImmune: ['Avvelenato'],
       traits: [
@@ -2343,7 +2343,7 @@
       str: 18, dex: 14, con: 16, intl: 13, wis: 18, cha: 12,
       savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
       skillOverrides: { percezione: '7', religione: '4' }, passivePerception: 17,
-      senses: [{ type: 'Scurovisione (non ostacolata dall\'oscurità magica)', value: 27, unit: 'm' }], languages: ['Abissale', 'Comune', 'Infernale'],
+      senses: [{ type: 'Vista del Diavolo', value: 27, unit: 'm' }], languages: ['Abissale', 'Comune', 'Infernale'],
       dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
       traits: [],
       actions: [
