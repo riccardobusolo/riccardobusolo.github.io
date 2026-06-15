@@ -52,6 +52,7 @@
   var COCKATRICE_LORE = 'Le cockatrici combinano le caratteristiche di galli iracondi e rettili affamati. Pietrificano coloro che mordono: il più lieve dei loro colpi di becco può trasformare la preda in pietra.';
   var DRAGHI_RAME_LORE = 'Instancabilmente amichevoli e curiosi, la maggior parte dei draghi di rame vede il mondo come un luogo di meraviglie e possibilità infinite. Questi draghi socievoli sono fonti di pazienza, ospitalità e umorismo e cercano di migliorare la vita — o almeno l\'umore — di coloro con cui interagiscono. Se costretti a combattere per difendere sé stessi o i loro amici, preferiscono usare il soffio rallentante e gli attacchi fisici per sottomettere gli avversari; solo in casi di estremo pericolo o forte emozione ricorrono al loro mortale soffio acido.\n\nI draghi di rame vivono tipicamente in caverne tra colline pittoresche e formazioni rocciose, soprattutto quelle che costituiscono punti di riferimento importanti. Collezionano doni, ma hanno poco interesse per tesori privi di significato, indipendentemente dal loro valore: per loro i regali fatti con attenzione e i sentimenti o i ricordi che rappresentano valgono più di capolavori o reliquie magiche.';
   var DRAGHI_RAME_TANA = '— Tane dei Draghi di Rame —\nI draghi di rame abitano tipicamente caverne a più camere e rovine restaurate. La regione attorno alla tana di un drago di rame adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nAnimaletti Chiacchieroni: le Bestie Minuscole entro 10 km dalla tana ottengono magicamente la capacità di parlare e comprendere il Draconico.\n\nAttacchi di Risate: quando una creatura diversa dal drago e dai suoi alleati, entro 1,5 km dalla tana, ottiene un 1 naturale in un Test d20, deve superare un Tiro Salvezza su Saggezza CD 15 oppure ottenere la condizione Incapacitato fino alla fine del suo turno successivo, sopraffatta dalle risate.\n\nSe il drago muore o trasferisce la propria tana altrove, questi effetti terminano immediatamente.';
+  var MANI_STRISCIANTI_LORE = 'Le mani striscianti sono mani mozzate che si muovono e agiscono secondo la propria volontà omicida. Queste appendici senza vita possono animarsi a partire dagli arti recisi di assassini e criminali, e sinistri utilizzatori di magia potrebbero animarle come ripugnanti servitori.\n\nAssumono molte forme diverse, dalle mani umane in decomposizione alle appendici appena recise di animali o mostri.\n\n— Ansolm Haas, "L\'Isolamento del Male" —\n«È possibile che una creatura, qualsiasi essere vivente, sia intrinsecamente malvagia? Una simile affermazione potrebbe di per sé facilitare il compimento di atti malvagi: definendo una persona come malvagia, le concediamo la libertà di comportarsi come tale, assolvendo la malvagità delle sue parole e delle sue azioni.»';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -2156,6 +2157,46 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Segreti divini, profezie e reliquie sacre custodite dal couatl, forse perfino il suo meraviglioso uovo dai colori dell\'arcobaleno.' }],
       notes: 'Manifestazione Guardiana del Divino\n\nHabitat: Deserto, Foresta, Prateria, Urbano\nTesoro: Reliquie\n\nIncarnazioni della profezia e custodi dei segreti divini, i couatl fanno sì che il destino si svolga come dovrebbe. Assomigliano a serpenti con ali dai colori dell\'arcobaleno, e ciascuno è la manifestazione di un decreto divino, di una verità o di un fato che una giusta divinità vuole resti immutabile per sempre. La maggior parte dei couatl appare in luoghi di antico potere, dove protegge magie nascoste o garantisce che eventi profetizzati avvengano — o non avvengano. Più raramente vigilano su comunità o percorrono il mondo sotto mentite spoglie, interpretando presagi o manipolando gli eventi affinché il destino segua il corso appropriato.\n\nMotivati da mandati eterni, i couatl talvolta si comportano in modi imperscrutabili o apparentemente ostili. Sono inflessibili e intransigenti, poiché la loro esistenza è legata in modo fondamentale alle direttive divine, ma arrecano danno alle altre creature soltanto quando è assolutamente necessario per raggiungere obiettivi divini.\n\nOgni couatl attraversa un periodo di rinnovamento al termine di un\'era: quando l\'era volge alla fine, depone un meraviglioso uovo dai colori dell\'arcobaleno e poi muore. Per un certo periodo il suo compito rimane senza custode; trascorso questo tempo, dallo stesso uovo si schiude il medesimo couatl, completamente cresciuto e rinnovato per servire per un\'altra era.'
+    },
+    {
+      id: 'preset_mano_strisciante', name: 'Mano Strisciante', emoji: '🖐️', rarity: 'common',
+      type: 'Non Morto', size: 'Minuscola', alignment: 'Neutrale Malvagio',
+      ac: 12, hp: 2, hpCur: 2, hpTemp: 0, hpDice: '1d4', init: 2,
+      speed: '6 m, Scalare 6 m', cr: '0', xp: '',
+      str: 13, dex: 14, con: 11, intl: 5, wis: 10, cha: 4,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }], languages: ['Comprende il Comune ma non può parlare'],
+      dmgResist: [], dmgImmune: ['Necrotico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato', 'Incapacitato', 'Avvelenato'],
+      traits: [],
+      actions: [
+        { name: 'Schianto', desc: 'Attacco con arma da mischia: +3 a colpire, portata 1,5 metri.\nColpito: 2 danni necrotici.', atkHit: '+3', atkDmgs: [{ f: '2', t: 'necrotici' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Appendici Recise Animate da una Volontà Maligna\n\nHabitat: Qualsiasi\nTesoro: Nessuno\n\nLe mani striscianti solitarie possono continuare le serie di omicidi che perpetravano in vita. Alcune attaccano sconsideratamente i viventi, mentre altre perseguitano vittime specifiche. In rari casi una mano semina il caos mentre il resto del suo corpo è ancora vivo, e la creatura originaria potrebbe essere del tutto ignara dei crimini commessi dalla propria mano recisa.\n\n' + MANI_STRISCIANTI_LORE
+    },
+    {
+      id: 'preset_sciame_mani_striscianti', name: 'Sciame di Mani Striscianti', emoji: '🖐️', rarity: 'common',
+      type: 'Non Morto', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 12, hp: 49, hpCur: 49, hpTemp: 0, hpDice: '11d8', init: 2,
+      speed: '9 m, Scalare 9 m', cr: '3', xp: '',
+      str: 14, dex: 14, con: 11, intl: 5, wis: 10, cha: 4,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }], languages: ['Comprende il Comune ma non può parlare'],
+      dmgResist: ['Contundente', 'Perforante', 'Tagliente'], dmgImmune: ['Necrotico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato', 'Afferrato', 'Incapacitato', 'Paralizzato', 'Pietrificato', 'Avvelenato', 'Prono', 'Trattenuto', 'Stordito'],
+      traits: [
+        { name: 'Sciame', desc: 'Lo sciame può occupare lo spazio di un\'altra creatura e viceversa, e può muoversi attraverso qualsiasi apertura abbastanza grande da lasciar passare una creatura Minuscola. Lo sciame non può recuperare punti ferita né ottenere punti ferita temporanei.' }
+      ],
+      actions: [
+        { name: 'Sciame di Mani Afferranti', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 20 (4d8 + 2) danni necrotici, oppure 11 (2d8 + 2) danni necrotici se lo sciame è Ferito (Bloodied). Se il bersaglio è una creatura Media o più piccola, ottiene la condizione Prono.', atkHit: '+4', atkDmgs: [{ f: '4d8+2', t: 'necrotici' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Appendici Recise Animate da una Volontà Maligna\n\nHabitat: Qualsiasi\nTesoro: Nessuno\n\nGli sciami di mani striscianti vengono tipicamente animati da necromanti depravati. Talvolta questi sciami grotteschi sorgono da fosse comuni o in seguito a tragedie, rifiutandosi di lasciar sfuggire i loro assassini dalla propria presa.\n\n' + MANI_STRISCIANTI_LORE
     }
   ];
 
