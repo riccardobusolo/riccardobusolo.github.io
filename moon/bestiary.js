@@ -50,6 +50,8 @@
   var BULLYWUG_LORE = 'I bullywug, incarnazioni fatate delle terre paludose, proteggono le selvagge distese fangose e si considerano favoriti dal cosmo per tale ruolo. Queste creature delle dimensioni di un umano, simili a rospi o rane, intrattengono stretti rapporti con le altre creature della palude.';
   var CENTAURI_LORE = 'I centauri sono difensori delle foreste, delle pianure e dei luoghi intrisi di potere primordiale. Con la parte superiore del corpo simile a quella degli umani e la parte inferiore simile a quella dei cavalli, i centauri si lanciano in battaglia contro chiunque minacci i loro alleati.';
   var COCKATRICE_LORE = 'Le cockatrici combinano le caratteristiche di galli iracondi e rettili affamati. Pietrificano coloro che mordono: il più lieve dei loro colpi di becco può trasformare la preda in pietra.';
+  var DRAGHI_RAME_LORE = 'Instancabilmente amichevoli e curiosi, la maggior parte dei draghi di rame vede il mondo come un luogo di meraviglie e possibilità infinite. Questi draghi socievoli sono fonti di pazienza, ospitalità e umorismo e cercano di migliorare la vita — o almeno l\'umore — di coloro con cui interagiscono. Se costretti a combattere per difendere sé stessi o i loro amici, preferiscono usare il soffio rallentante e gli attacchi fisici per sottomettere gli avversari; solo in casi di estremo pericolo o forte emozione ricorrono al loro mortale soffio acido.\n\nI draghi di rame vivono tipicamente in caverne tra colline pittoresche e formazioni rocciose, soprattutto quelle che costituiscono punti di riferimento importanti. Collezionano doni, ma hanno poco interesse per tesori privi di significato, indipendentemente dal loro valore: per loro i regali fatti con attenzione e i sentimenti o i ricordi che rappresentano valgono più di capolavori o reliquie magiche.';
+  var DRAGHI_RAME_TANA = '— Tane dei Draghi di Rame —\nI draghi di rame abitano tipicamente caverne a più camere e rovine restaurate. La regione attorno alla tana di un drago di rame adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nAnimaletti Chiacchieroni: le Bestie Minuscole entro 10 km dalla tana ottengono magicamente la capacità di parlare e comprendere il Draconico.\n\nAttacchi di Risate: quando una creatura diversa dal drago e dai suoi alleati, entro 1,5 km dalla tana, ottiene un 1 naturale in un Test d20, deve superare un Tiro Salvezza su Saggezza CD 15 oppure ottenere la condizione Incapacitato fino alla fine del suo turno successivo, sopraffatta dalle risate.\n\nSe il drago muore o trasferisce la propria tana altrove, questi effetti terminano immediatamente.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -2025,6 +2027,109 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Beni Personali', desc: 'Un randello e i modesti effetti personali del popolano.' }],
       notes: 'Gente Comune\n\nHabitat: Qualsiasi\nTesoro: Individuale\n\nI popolani costituiscono la maggioranza delle persone che non perseguono talenti magici, addestramenti straordinari o una vita d\'avventura. Alcuni sono individui generosi e disponibili, mentre altri sono più cauti nel condividere ciò che possiedono.\n\n— Mestieri e ruoli (esempi) —\nArtista, Fornaio, Oste, Fabbro, Macellaio, Prigioniero, Carpentiere, Naufrago, Calzolaio, Cuoco, Tintore, Contadino, Pescatore, Costruttore di frecce, Imbroglione, Pettegolo, Eremita, Teppista, Cacciatore, Locandiere, Manovale, Lampionaio, Muratore, Mercante, Minatore, Vagabondo, Paziente, Pellegrino, Resurrezionista, Rivoltoso, Scriba, Servitore, Pastore, Studente, Sarto, Conciatore, Banditore, Tessitore, Ragazzo.\n\n(Resurrezionista: storicamente un trafugatore di cadaveri che vendeva corpi a medici e anatomisti.)'
+    },
+    {
+      id: 'preset_cucciolo_drago_rame', name: 'Cucciolo di Drago di Rame', emoji: '🐲', rarity: 'epic',
+      type: 'Drago', size: 'Media', alignment: 'Caotico Buono',
+      ac: 16, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '4d8+4', init: 3,
+      speed: '9 m, Scalare 9 m, Volare 18 m', cr: '1', xp: '',
+      str: 15, dex: 12, con: 13, intl: 14, wis: 11, cha: 13,
+      savesOverride: { str: '', dex: '3', con: '', intl: '', wis: '2', cha: '' },
+      skillOverrides: { percezione: '4', furtivita: '3' }, passivePerception: 14,
+      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico'],
+      dmgResist: [], dmgImmune: ['Acido'], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 7 (1d10 + 2) danni taglienti.', atkHit: '+4', atkDmgs: [{ f: '1d10+2', t: 'taglienti' }] },
+        { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 11. Ogni creatura in una linea lunga 6 metri e larga 1,5 metri.\nFallimento: 18 (4d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '4d8', t: 'acido' }] },
+        { name: 'Soffio Rallentante', desc: 'Tiro Salvezza su Costituzione: CD 11. Ogni creatura in un cono di 4,5 metri.\nFallimento: fino alla fine del suo turno successivo il bersaglio non può effettuare Reazioni, ha la velocità dimezzata e durante il proprio turno può compiere un\'Azione oppure un\'Azione Bonus, ma non entrambe.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Doni e ricordi cari al drago, più qualche reliquia magica raccolta nei suoi viaggi.' }],
+      notes: 'Draghi della Curiosità e della Comunità\n\nHabitat: Colline\nTesoro: Arcani\n\nI cuccioli di drago di rame si avventurano nel mondo alla ricerca di amici e meraviglie da scoprire. Talvolta finiscono nei guai, ma coloro che li aiutano possono diventare loro amici per la vita.\n\n' + DRAGHI_RAME_LORE
+    },
+    {
+      id: 'preset_giovane_drago_rame', name: 'Giovane Drago di Rame', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Grande', alignment: 'Caotico Buono',
+      ac: 17, hp: 119, hpCur: 119, hpTemp: 0, hpDice: '14d10+42', init: 4,
+      speed: '12 m, Scalare 12 m, Volare 24 m', cr: '7', xp: '',
+      str: 19, dex: 12, con: 17, intl: 16, wis: 13, cha: 15,
+      savesOverride: { str: '', dex: '4', con: '', intl: '', wis: '4', cha: '' },
+      skillOverrides: { inganno: '5', percezione: '7', furtivita: '4' }, passivePerception: 17,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Acido'], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi con Artiglio. Può sostituire uno degli attacchi con un uso di Soffio Rallentante.' },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 15 (2d10 + 4) danni taglienti.', atkHit: '+7', atkDmgs: [{ f: '2d10+4', t: 'taglienti' }] },
+        { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 14. Ogni creatura in una linea lunga 12 metri e larga 1,5 metri.\nFallimento: 40 (9d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '9d8', t: 'acido' }] },
+        { name: 'Soffio Rallentante', desc: 'Tiro Salvezza su Costituzione: CD 14. Ogni creatura in un cono di 9 metri.\nFallimento: fino alla fine del suo turno successivo il bersaglio non può effettuare Reazioni, ha la velocità dimezzata e durante il proprio turno può compiere un\'Azione oppure un\'Azione Bonus, ma non entrambe.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Doni e ricordi cari al drago, più qualche reliquia magica raccolta nei suoi viaggi.' }],
+      notes: 'Draghi della Curiosità e della Comunità\n\nHabitat: Colline\nTesoro: Arcani\n\nI giovani draghi di rame instaurano forti legami con una comunità o un gruppo di amici, passando con entusiasmo da una fissazione artistica all\'altra.\n\n' + DRAGHI_RAME_LORE
+    },
+    {
+      id: 'preset_drago_rame_adulto', name: 'Drago di Rame Adulto', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Enorme', alignment: 'Caotico Buono',
+      ac: 18, hp: 184, hpCur: 184, hpTemp: 0, hpDice: '16d12+80', init: 11,
+      speed: '12 m, Scalare 12 m, Volare 24 m', cr: '14', xp: '',
+      str: 23, dex: 12, con: 21, intl: 18, wis: 15, cha: 18,
+      savesOverride: { str: '', dex: '6', con: '', intl: '', wis: '7', cha: '' },
+      skillOverrides: { inganno: '9', percezione: '12', furtivita: '6' }, passivePerception: 22,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Acido'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi con Artiglio. Può sostituire un attacco con un uso di Soffio Rallentante oppure con il lancio di Picco Mentale (versione di 4° livello) tramite Incantesimi.' },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +11 a colpire, portata 3 metri.\nColpito: 17 (2d10 + 6) danni taglienti più 4 (1d8) danni da acido.', atkHit: '+11', atkDmgs: [{ f: '2d10+6', t: 'taglienti' }, { f: '1d8', t: 'acido' }] },
+        { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 18. Ogni creatura in una linea lunga 18 metri e larga 1,5 metri.\nFallimento: 54 (12d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '12d8', t: 'acido' }] },
+        { name: 'Soffio Rallentante', desc: 'Tiro Salvezza su Costituzione: CD 18. Ogni creatura in un cono di 18 metri.\nFallimento: fino alla fine del suo turno successivo il bersaglio non può effettuare Reazioni, ha la velocità dimezzata e durante il proprio turno può compiere un\'Azione oppure un\'Azione Bonus, ma non entrambe.' },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 17).\n\nA volontà: Individuazione del Magico, Picco Mentale (versione di 4° livello), Illusione Minore, Mutaforma (solo forma di Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta).\n\n1/Giorno ciascuno: Restaurazione Superiore, Immagine Maggiore.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
+        { name: 'Magia Esilarante', desc: 'Tiro Salvezza su Carisma: CD 17, una creatura che il drago può vedere entro 27 metri.\nFallimento: 24 (7d6) danni psichici e, fino alla fine del suo turno successivo, ogni volta che il bersaglio effettua una prova di caratteristica o un tiro per colpire tira anche 1d6 e ne sottrae il risultato.\nIl drago non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.', atkDmgs: [{ f: '7d6', t: 'psichici' }] },
+        { name: 'Scossa Mentale', desc: 'Il drago usa Incantesimi per lanciare Picco Mentale (versione di 4° livello). Non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.' },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della propria velocità ed effettua un attacco con Artiglio.', atkHit: '+11', atkDmgs: [{ f: '2d10+6', t: 'taglienti' }, { f: '1d8', t: 'acido' }] }
+      ],
+      drop: [{ name: 'Arcani', desc: 'Doni e ricordi cari al drago, più reliquie magiche raccolte dalla sua vasta rete di amici.' }],
+      notes: 'Draghi della Curiosità e della Comunità\n\nHabitat: Colline\nTesoro: Arcani\n\nI draghi di rame adulti usano la loro influenza per migliorare il mondo. Con vaste cerchie di amici, traggono gioia dal mettere le persone in contatto tra loro e dall\'aiutarle a trovare luoghi dove possano prosperare. Quando si verifica una calamità, fanno affidamento sulla loro rete di conoscenze per offrire supporto, rimediare ai torti e ricostruire più saldamente di prima.\n\n' + DRAGHI_RAME_LORE + '\n\n' + DRAGHI_RAME_TANA + '\n\n(Affrontato nella propria tana, il drago vale 13.000 PE.)'
+    },
+    {
+      id: 'preset_drago_rame_antico', name: 'Drago di Rame Antico', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Mastodontica', alignment: 'Caotico Buono',
+      ac: 21, hp: 367, hpCur: 367, hpTemp: 0, hpDice: '21d20+147', init: 15,
+      speed: '12 m, Scalare 12 m, Volare 24 m', cr: '21', xp: '',
+      str: 27, dex: 12, con: 25, intl: 20, wis: 17, cha: 22,
+      savesOverride: { str: '', dex: '8', con: '', intl: '', wis: '10', cha: '' },
+      skillOverrides: { inganno: '13', percezione: '17', furtivita: '8' }, passivePerception: 27,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Acido'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi con Artiglio. Può sostituire un attacco con un uso di Soffio Rallentante oppure con il lancio di Picco Mentale (versione di 5° livello) tramite Incantesimi.' },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +15 a colpire, portata 4,5 metri.\nColpito: 19 (2d10 + 8) danni taglienti più 9 (2d8) danni da acido.', atkHit: '+15', atkDmgs: [{ f: '2d10+8', t: 'taglienti' }, { f: '2d8', t: 'acido' }] },
+        { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 22. Ogni creatura in una linea lunga 27 metri e larga 3 metri.\nFallimento: 63 (14d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '14d8', t: 'acido' }] },
+        { name: 'Soffio Rallentante', desc: 'Tiro Salvezza su Costituzione: CD 22. Ogni creatura in un cono di 27 metri.\nFallimento: fino alla fine del suo turno successivo il bersaglio non può effettuare Reazioni, ha la velocità dimezzata e durante il proprio turno può compiere un\'Azione oppure un\'Azione Bonus, ma non entrambe.' },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 21).\n\nA volontà: Individuazione del Magico, Picco Mentale (versione di 5° livello), Illusione Minore, Mutaforma (solo forma di Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta).\n\n1/Giorno ciascuno: Restaurazione Superiore, Immagine Maggiore, Immagine Proiettata.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
+        { name: 'Magia Esilarante', desc: 'Tiro Salvezza su Carisma: CD 21, una creatura che il drago può vedere entro 36 metri.\nFallimento: 31 (9d6) danni psichici e, fino alla fine del suo turno successivo, ogni volta che il bersaglio effettua una prova di caratteristica o un tiro per colpire tira anche 1d8 e ne sottrae il risultato.\nIl drago non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.', atkDmgs: [{ f: '9d6', t: 'psichici' }] },
+        { name: 'Scossa Mentale', desc: 'Il drago usa Incantesimi per lanciare Picco Mentale (versione di 5° livello). Non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.' },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della propria velocità ed effettua un attacco con Artiglio.', atkHit: '+15', atkDmgs: [{ f: '2d10+8', t: 'taglienti' }, { f: '2d8', t: 'acido' }] }
+      ],
+      drop: [{ name: 'Arcani', desc: 'Doni e ricordi cari al drago, più reliquie magiche accumulate nei secoli nelle sue accoglienti tane.' }],
+      notes: 'Draghi della Curiosità e della Comunità\n\nHabitat: Colline\nTesoro: Arcani\n\nI draghi di rame antichi usano calore umano e affidabilità per influenzare il mondo nel corso del tempo. Aprono le loro accoglienti tane agli amici come rifugi di apprendimento e risate per i giovani e per chi è nel bisogno. Vigilano contro le minacce future e vi si oppongono, mentre favoriscono santuari di semplice bontà.\n\n' + DRAGHI_RAME_LORE + '\n\n' + DRAGHI_RAME_TANA + '\n\n(Affrontato nella propria tana, il drago vale 41.000 PE.)'
     }
   ];
 
