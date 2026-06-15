@@ -2434,6 +2434,26 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Strumenti', desc: 'Tesori della terra: gemme grezze, gioielli forgiati da metalli puri e meravigliosi fossili.' }],
       notes: 'Genio della Terra\n\nHabitat: Piano Elementale della Terra, Sottosuolo\nTesoro: Strumenti\n\nI dao, geni dei minerali e delle gemme, incarnano la risolutezza della roccia. Grazie alla loro magia innata si muovono attraverso la terra senza ostacoli, esplorando profondità inaccessibili ai più. Si compiacciono dei tesori della terra — gemme grezze, gioielli di metalli puri o meravigliosi fossili — e in cambio possono rivelare misteri sotterranei: passaggi attraverso il Sottosuolo, rovine sepolte o interi regni nascosti.\n\nMolti dao chiamano casa il Piano Elementale della Terra, dove costruiscono città che scintillano di tesori. Tra questi reami si trova la vasta distesa labirintica nota come il Grande Scavo Abissale (Great Dismal Delve) o Settevolte Labirinto, che protegge la Città delle Gemme, il Crogiolo di Ferro e lo Stretto dei Magneti.\n\n— Gundren Rockseeker, cacciatore di tesori nano —\n«Sul Piano Elementale della Terra, galassie di gemme brillano sopra volte piene di tesori. Se i dao si trovano laggiù, allora c\'è ricchezza degna di essere cercata.»'
+    },
+    {
+      id: 'preset_manto_oscuro', name: 'Manto Oscuro', emoji: '🦇', rarity: 'common',
+      type: 'Aberrazione', size: 'Piccola', alignment: 'Senza Allineamento',
+      ac: 11, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '5d6+5', init: 3,
+      speed: '3 m, Volare 9 m', cr: '1/2', xp: '',
+      str: 16, dex: 12, con: 13, intl: 2, wis: 10, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '3' }, passivePerception: 10,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Schiacciare', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 6 (1d6 + 3) danni contundenti e il manto oscuro si attacca al bersaglio.\nSe il bersaglio è una creatura Media o più piccola e il manto oscuro aveva vantaggio al tiro per colpire, esso ricopre il bersaglio, che ottiene la condizione Accecato e sta soffocando finché il manto oscuro rimane attaccato in questo modo.\nMentre è attaccato a un bersaglio, il manto oscuro può attaccare soltanto quel bersaglio ma ha vantaggio ai tiri per colpire. La sua Velocità diventa 0, non può beneficiare di alcun bonus alla Velocità e si muove insieme al bersaglio.\nUna creatura può usare un\'Azione per tentare di staccare il manto oscuro da sé, riuscendoci con una prova di Forza (Atletica) CD 13 superata. Nel proprio turno, il manto oscuro può staccarsi usando 1,5 metri del proprio movimento.', atkHit: '+5', atkDmgs: [{ f: '1d6+3', t: 'contundenti' }] },
+        { name: 'Aura di Oscurità (1/Giorno)', desc: 'Un\'Oscurità magica riempie un\'emanazione di 4,5 metri originata dal manto oscuro. Questo effetto dura finché il manto oscuro mantiene la Concentrazione, fino a un massimo di 10 minuti. La Scurovisione non può penetrare quest\'area e nessuna luce può illuminarla.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Predatore d\'Imboscata che si Aggrappa ai Soffitti\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nCacciatori sotterranei innaturali, i manti oscuri si avvolgono in ombre magiche e sfruttano la loro anatomia bizzarra per camuffarsi da stalattiti. Quando una preda passa sotto di loro, i manti oscuri appostati si lasciano cadere e dispiegano i loro tentacoli membranosi, tentando di accecare, soffocare o schiacciare le vittime.\n\nI manti oscuri condividono alcune caratteristiche con i perforatori (piercer) e i pendagli assassini (roper) e spesso cacciano vicino a tali mostri. Gli studiosi hanno tentato di stabilire un\'origine comune o un ciclo vitale condiviso tra queste creature, ma i loro sforzi sono ostacolati dalla fisiologia soprannaturale e dalla natura letale di tali mostri.'
     }
   ];
 
