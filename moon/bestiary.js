@@ -2407,6 +2407,33 @@
       legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'Armi e armamenti a misura di gigante dell\'oracolo, oltre a segreti e profezie raccolti nel tempo.' }],
       notes: 'Servitori Monocoli del Destino\n\nHabitat: Costa, Deserto, Prateria, Colline, Montagne, Sottosuolo\nTesoro: Armamenti\n\nGli oracoli ciclopi scrutano attraverso la storia per apprendere verità nascoste. Molti condividono questi segreti con coloro che li aiutano a correggere gli errori del passato.\n\n' + CICLOPI_LORE
+    },
+    {
+      id: 'preset_dao', name: 'Dao', emoji: '🧞', rarity: 'epic',
+      type: 'Elementale', size: 'Grande', alignment: 'Neutrale',
+      ac: 18, hp: 200, hpCur: 200, hpTemp: 0, hpDice: '16d10+112', init: 1,
+      speed: '9 m, Scavare 9 m, Volare 9 m (fluttuare)', cr: '11', xp: '',
+      str: 23, dex: 12, con: 24, intl: 12, wis: 13, cha: 18,
+      savesOverride: { str: '', dex: '5', con: '', intl: '', wis: '5', cha: '' },
+      skillOverrides: {}, passivePerception: 11,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Primordiale (Terran)'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Pietrificato'],
+      traits: [
+        { name: 'Attraversare la Terra', desc: 'Il dao può scavare attraverso terra e pietra non magiche e non lavorate. Mentre lo fa, non disturba il materiale attraverso cui si muove.' },
+        { name: 'Restaurazione Elementale', desc: 'Se il dao muore al di fuori del Piano Elementale della Terra, il suo corpo si dissolve in terra e ottiene un nuovo corpo in 1d4 giorni, tornando in vita con tutti i suoi punti ferita da qualche parte sul Piano della Terra.' },
+        { name: 'Resistenza Magica', desc: 'Il dao ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Desideri', desc: 'Il dao ha una probabilità del 30% di conoscere l\'incantesimo Desiderio. Se lo conosce, può lanciarlo soltanto per conto di una creatura non genio che esprima un desiderio in modo a lui comprensibile, senza subire lo stress dell\'incantesimo. Dopo averlo lanciato tre volte, non può più farlo per 365 giorni.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il dao effettua tre attacchi con Maglio di Terra oppure due attacchi con Esplosione Terrestre.' },
+        { name: 'Maglio di Terra', desc: 'Attacco con arma da mischia: +10 a colpire, portata 1,5 metri.\nColpito: 20 (4d6 + 6) danni contundenti. Se il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Prono.', atkHit: '+10', atkDmgs: [{ f: '4d6+6', t: 'contundenti' }] },
+        { name: 'Esplosione Terrestre', desc: 'Attacco con arma a distanza: +10 a colpire, gittata 36 metri.\nColpito: 15 (2d8 + 6) danni contundenti.\nColpito o Mancato: la terra esplode dallo spazio del bersaglio. Tiro Salvezza su Destrezza: CD 16, ogni creatura in un\'emanazione di 3 metri che parte dal bersaglio (incluso il bersaglio).\nFallimento: 10 (3d6) danni da tuono.', atkHit: '+10', atkDmgs: [{ f: '2d8+6', t: 'contundenti' }, { f: '3d6', t: 'tuono' }] },
+        { name: 'Incantesimi', desc: 'Il dao lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 16).\n\nA volontà: Individuazione del Bene e del Male, Individuazione del Magico, Plasmare Pietra.\n\n1/Giorno ciascuno: Forma Gassosa, Invisibilità, Muovere il Terreno, Passapareti, Traslazione Planare, Linguaggi, Muro di Pietra.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Strumenti', desc: 'Tesori della terra: gemme grezze, gioielli forgiati da metalli puri e meravigliosi fossili.' }],
+      notes: 'Genio della Terra\n\nHabitat: Piano Elementale della Terra, Sottosuolo\nTesoro: Strumenti\n\nI dao, geni dei minerali e delle gemme, incarnano la risolutezza della roccia. Grazie alla loro magia innata si muovono attraverso la terra senza ostacoli, esplorando profondità inaccessibili ai più. Si compiacciono dei tesori della terra — gemme grezze, gioielli di metalli puri o meravigliosi fossili — e in cambio possono rivelare misteri sotterranei: passaggi attraverso il Sottosuolo, rovine sepolte o interi regni nascosti.\n\nMolti dao chiamano casa il Piano Elementale della Terra, dove costruiscono città che scintillano di tesori. Tra questi reami si trova la vasta distesa labirintica nota come il Grande Scavo Abissale (Great Dismal Delve) o Settevolte Labirinto, che protegge la Città delle Gemme, il Crogiolo di Ferro e lo Stretto dei Magneti.\n\n— Gundren Rockseeker, cacciatore di tesori nano —\n«Sul Piano Elementale della Terra, galassie di gemme brillano sopra volte piene di tesori. Se i dao si trovano laggiù, allora c\'è ricchezza degna di essere cercata.»'
     }
   ];
 
