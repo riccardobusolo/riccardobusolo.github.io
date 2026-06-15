@@ -1776,6 +1776,32 @@
       legendaryActions: [],
       drop: [{ name: 'Strumenti', desc: 'Catene animate e strumenti di tortura usati dal diavolo per estorcere segreti.' }],
       notes: 'Diavolo del Dolore e del Controllo\n\nHabitat: Piani (Nove Inferi)\nTesoro: Strumenti\n\nConosciuti anche come kyton, i diavoli delle catene si considerano macabri artigiani che usano inganno, intimidazione e metallo crudele per costringere i prigionieri a tradire sé stessi. Molti servono diavoli potenti, strappando segreti alle anime imprigionate mediante catene animate e letali. Lasciati a sé stessi, incoraggiano individui spietati a perseguire magie proibite, conducendo i loro discepoli lungo sentieri che portano ai Nove Inferi.\n\nOltre alle minacce psicologiche e ai danni fisici, un diavolo delle catene usa il suo sguardo inquietante per far percepire alle vittime la loro peggiore paura, invece del mostro che hanno davanti.\n\n— Maschere del Diavolo delle Catene (tira 1d4) —\nPer un osservatore, il diavolo appare come...\n1. Il cadavere di una persona amata.\n2. Una divinità disapprovante.\n3. Un istruttore o superiore severo.\n4. L\'osservatore nel momento più basso della sua vita.'
+    },
+    {
+      id: 'preset_chasme', name: 'Chasme', emoji: '🪰', rarity: 'uncommon',
+      type: 'Immondo', size: 'Grande', alignment: 'Caotico Malvagio',
+      ac: 15, hp: 78, hpCur: 78, hpTemp: 0, hpDice: '12d10+12', init: 5,
+      speed: '6 m, Volare 18 m', cr: '6', xp: '',
+      str: 15, dex: 15, con: 12, intl: 11, wis: 14, cha: 10,
+      savesOverride: { str: '', dex: '5', con: '', intl: '', wis: '5', cha: '' },
+      skillOverrides: { percezione: '5' }, passivePerception: 15,
+      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Abissale', 'Telepatia 36 m'],
+      dmgResist: ['Freddo', 'Fuoco', 'Fulmine'], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Restaurazione Demoniaca', desc: 'Se il chasme muore al di fuori dell\'Abisso, il suo corpo si dissolve in icore ed esso ottiene immediatamente un nuovo corpo, tornando in vita con tutti i suoi punti ferita da qualche parte nell\'Abisso.' },
+        { name: 'Resistenza Magica', desc: 'Il chasme ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Camminare sui Ragni', desc: 'Il chasme può scalare superfici difficili, inclusi i soffitti, senza dover effettuare una prova di caratteristica.' }
+      ],
+      actions: [
+        { name: 'Proboscide', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 16 (4d6 + 2) danni perforanti più 21 (6d6) danni necrotici. Se il bersaglio è una creatura, il suo massimo dei punti ferita diminuisce di un ammontare pari ai danni necrotici subiti.', atkHit: '+5', atkDmgs: [{ f: '4d6+2', t: 'perforanti' }, { f: '6d6', t: 'necrotici' }] }
+      ],
+      bonusActions: [
+        { name: 'Ronzio', desc: 'Tiro Salvezza su Costituzione: CD 12, ogni creatura entro un\'emanazione di 9 metri originata dal chasme (i demoni superano automaticamente il tiro salvezza).\nFallimento: il bersaglio subisce la condizione Privo di Sensi e ripete il tiro salvezza alla fine di ciascuno dei suoi turni. Supera automaticamente il tiro dopo 10 minuti, se subisce danni, oppure se una creatura entro 1,5 metri usa un\'azione per svuotargli addosso una fiaschetta di Acqua Santa.\nSuccesso: il bersaglio è immune al Ronzio di questo chasme per 24 ore.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie e cimeli sottratti alle vittime trascinate nelle orde demoniache.' }],
+      notes: 'Demone del Tradimento e dell\'Adulazione\n\nHabitat: Piani (Abisso)\nTesoro: Reliquie\n\nEmergendo dall\'Abisso, i chasme assomigliano a mosche grandi quanto un cavallo. Rendono incapaci i nemici producendo un ronzio che intorpidisce la mente, poi usano le loro proboscidi per prosciugare la forza vitale delle vittime. Nell\'Abisso, la maggior parte dei chasme serve ossequiosamente demoni più potenti e va in cerca di prigionieri da costringere a unirsi alle orde demoniache.'
     }
   ];
 
