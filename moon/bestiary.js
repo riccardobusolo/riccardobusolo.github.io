@@ -53,6 +53,7 @@
   var DRAGHI_RAME_LORE = 'Instancabilmente amichevoli e curiosi, la maggior parte dei draghi di rame vede il mondo come un luogo di meraviglie e possibilità infinite. Questi draghi socievoli sono fonti di pazienza, ospitalità e umorismo e cercano di migliorare la vita — o almeno l\'umore — di coloro con cui interagiscono. Se costretti a combattere per difendere sé stessi o i loro amici, preferiscono usare il soffio rallentante e gli attacchi fisici per sottomettere gli avversari; solo in casi di estremo pericolo o forte emozione ricorrono al loro mortale soffio acido.\n\nI draghi di rame vivono tipicamente in caverne tra colline pittoresche e formazioni rocciose, soprattutto quelle che costituiscono punti di riferimento importanti. Collezionano doni, ma hanno poco interesse per tesori privi di significato, indipendentemente dal loro valore: per loro i regali fatti con attenzione e i sentimenti o i ricordi che rappresentano valgono più di capolavori o reliquie magiche.';
   var DRAGHI_RAME_TANA = '— Tane dei Draghi di Rame —\nI draghi di rame abitano tipicamente caverne a più camere e rovine restaurate. La regione attorno alla tana di un drago di rame adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nAnimaletti Chiacchieroni: le Bestie Minuscole entro 10 km dalla tana ottengono magicamente la capacità di parlare e comprendere il Draconico.\n\nAttacchi di Risate: quando una creatura diversa dal drago e dai suoi alleati, entro 1,5 km dalla tana, ottiene un 1 naturale in un Test d20, deve superare un Tiro Salvezza su Saggezza CD 15 oppure ottenere la condizione Incapacitato fino alla fine del suo turno successivo, sopraffatta dalle risate.\n\nSe il drago muore o trasferisce la propria tana altrove, questi effetti terminano immediatamente.';
   var MANI_STRISCIANTI_LORE = 'Le mani striscianti sono mani mozzate che si muovono e agiscono secondo la propria volontà omicida. Queste appendici senza vita possono animarsi a partire dagli arti recisi di assassini e criminali, e sinistri utilizzatori di magia potrebbero animarle come ripugnanti servitori.\n\nAssumono molte forme diverse, dalle mani umane in decomposizione alle appendici appena recise di animali o mostri.\n\n— Ansolm Haas, "L\'Isolamento del Male" —\n«È possibile che una creatura, qualsiasi essere vivente, sia intrinsecamente malvagia? Una simile affermazione potrebbe di per sé facilitare il compimento di atti malvagi: definendo una persona come malvagia, le concediamo la libertà di comportarsi come tale, assolvendo la malvagità delle sue parole e delle sue azioni.»';
+  var CULTISTI_LORE = 'I cultisti utilizzano la magia e misure estreme per diffondere credenze radicali. Alcuni perseguono in segreto misteri esoterici, mentre altri formano oscure congreghe che cercano di provocare fini terribili. Seguono spesso tradizioni mistiche oscure o si ossessionano con interpretazioni di antiche profezie, e possono venerare patroni soprannaturali: divinità, creature ultraterrene, menti aliene manipolatrici o forze enigmatiche.\n\n— Obiettivi del Culto (1d6) —\n1. Provocare la fine di un ordine dominante, di un\'epoca o del mondo.\n2. Bruciare le rassicuranti menzogne della realtà, rivelando verità dimenticate o terribili.\n3. Espandere la propria fede tramite controllo mentale o coercizione soprannaturale.\n4. Apportare cambiamenti globali, come sprofondare terre o risvegliare vulcani.\n5. Rifare la vita su vasta scala, alterando i corpi di altre creature o esseri spirituali.\n6. Evocare nel proprio mondo la propria divinità, il suo araldo, la sua arma o il suo reame.\n\n— Riti del Culto del Male Elementale —\n«Temi Tharizdun, potere dell\'Occhio Elementale Anziano e signore di tutte le forze distruttive. Io sono il Campione del Male Elementale e sono pronto a eseguire i tuoi desideri.»';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -2197,6 +2198,165 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Appendici Recise Animate da una Volontà Maligna\n\nHabitat: Qualsiasi\nTesoro: Nessuno\n\nGli sciami di mani striscianti vengono tipicamente animati da necromanti depravati. Talvolta questi sciami grotteschi sorgono da fosse comuni o in seguito a tragedie, rifiutandosi di lasciar sfuggire i loro assassini dalla propria presa.\n\n' + MANI_STRISCIANTI_LORE
+    },
+    {
+      id: 'preset_cultista', name: 'Cultista', emoji: '🕯️', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 12, hp: 9, hpCur: 9, hpTemp: 0, hpDice: '2d8', init: 1,
+      speed: '9 m', cr: '1/8', xp: '',
+      str: 11, dex: 12, con: 10, intl: 10, wis: 11, cha: 10,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { inganno: '2', religione: '2' }, passivePerception: 10,
+      senses: [], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Falcetto Rituale', desc: 'Attacco con arma da mischia: +3 a colpire, portata 1,5 metri.\nColpito: 3 (1d4 + 1) danni taglienti più 1 danno necrotico.', atkHit: '+3', atkDmgs: [{ f: '1d4+1', t: 'taglienti' }, { f: '1', t: 'necrotici' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Armatura di cuoio, falcetto rituale e simboli del culto.' }],
+      notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI cultisti si consacrano ai capi della loro fede e ai loro padroni ultraterreni. Questo zelo non concede loro poteri magici, ma dona una notevole determinazione di fronte alle minacce. Svolgono gran parte del lavoro ordinario del culto: evangelizzazione, attività criminali o il ruolo di sacrifici.\n\n' + CULTISTI_LORE
+    },
+    {
+      id: 'preset_fanatico_culto', name: 'Fanatico del Culto', emoji: '📿', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 13, hp: 44, hpCur: 44, hpTemp: 0, hpDice: '8d8+8', init: 2,
+      speed: '9 m', cr: '2', xp: '',
+      str: 11, dex: 14, con: 12, intl: 10, wis: 14, cha: 13,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { inganno: '3', persuasione: '3', religione: '2' }, passivePerception: 12,
+      senses: [], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Lama del Patto', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 6 (1d8 + 2) danni taglienti più 7 (2d6) danni necrotici.', atkHit: '+4', atkDmgs: [{ f: '1d8+2', t: 'taglienti' }, { f: '2d6', t: 'necrotici' }] },
+        { name: 'Incantesimi', desc: 'Il cultista lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 12, +4 a colpire con gli incantesimi).\n\nA volontà: Luce, Taumaturgia.\n\n2/Giorno: Comando.\n\n1/Giorno: Blocca Persone.' }
+      ],
+      bonusActions: [
+        { name: 'Arma Spirituale (2/Giorno)', desc: 'Il cultista lancia Arma Spirituale, usando la stessa caratteristica da incantatore degli Incantesimi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Simbolo sacro, armatura di cuoio e reliquie del culto.' }],
+      notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI fanatici guidano piccoli culti o cellule all\'interno di culti più grandi. Conoscono più misteri del culto rispetto ai membri di rango inferiore, e ciò concede loro accesso ai poteri magici dei loro patroni.\n\n' + CULTISTI_LORE
+    },
+    {
+      id: 'preset_ierofante_culto', name: 'Ierofante del Culto', emoji: '✨', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 16, hp: 144, hpCur: 144, hpTemp: 0, hpDice: '17d8+68', init: 8,
+      speed: '9 m', cr: '10', xp: '',
+      str: 20, dex: 18, con: 18, intl: 13, wis: 17, cha: 20,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '7', persuasione: '9', religione: '5' }, passivePerception: 17,
+      senses: [], languages: ['Celestiale', 'Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Lo ierofante effettua tre attacchi usando Lama del Patto o Raggio Radioso in qualsiasi combinazione.' },
+        { name: 'Lama del Patto', desc: 'Attacco con arma da mischia: +9 a colpire, portata 1,5 metri.\nColpito: 12 (2d6 + 5) danni taglienti più 18 (4d8) danni radiosi.', atkHit: '+9', atkDmgs: [{ f: '2d6+5', t: 'taglienti' }, { f: '4d8', t: 'radiosi' }] },
+        { name: 'Raggio Radioso', desc: 'Attacco con arma a distanza: +9 a colpire, gittata 36 metri.\nColpito: 31 (4d12 + 5) danni radiosi.', atkHit: '+9', atkDmgs: [{ f: '4d12+5', t: 'radiosi' }] },
+        { name: 'Incantesimi', desc: 'Il cultista lancia uno dei seguenti incantesimi usando Carisma come caratteristica da incantatore (CD 17).\n\nA volontà: Armatura Magica (già inclusa nella CA), Taumaturgia.\n\n1/Giorno ciascuno: Tempesta di Radiosità di Jallarzi (versione di 7° livello), Suggestione di Massa.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Corazza, simbolo sacro, strane reliquie e i segreti più profondi del culto.' }],
+      notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nGli ierofanti sono leader che supervisionano la vita dei loro seguaci, dettano gli editti del culto e interpretano la volontà del loro patrono. Possiedono poteri soprannaturali e conoscono i segreti più profondi del culto, controllando spesso strane reliquie, siti mistici e servitori mostruosi.\n\n' + CULTISTI_LORE
+    },
+    {
+      id: 'preset_cultista_aberrante', name: 'Cultista Aberrante', emoji: '🐙', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 14, hp: 137, hpCur: 137, hpTemp: 0, hpDice: '25d8+25', init: 7,
+      speed: '9 m', cr: '8', xp: '',
+      str: 11, dex: 18, con: 12, intl: 16, wis: 18, cha: 12,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { arcano: '6', percezione: '7', religione: '6' }, passivePerception: 17,
+      senses: [{ type: 'Scurovisione', value: 27, unit: 'm' }], languages: ['Comune', 'Linguaggio Profondo', 'Telepatia 9 m'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il cultista effettua due attacchi con Frustata Tentacolare. Può sostituire uno qualsiasi degli attacchi con Marciume Mentale.' },
+        { name: 'Frustata Tentacolare', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 7 (1d6 + 4) danni taglienti più 14 (4d6) danni psichici. Se il bersaglio è una creatura Grande o più piccola, ottiene la condizione Afferrato (CD 14 per sfuggire) da uno dei due tentacoli e la condizione Trattenuto finché la presa non termina.', atkHit: '+7', atkDmgs: [{ f: '1d6+4', t: 'taglienti' }, { f: '4d6', t: 'psichici' }] },
+        { name: 'Marciume Mentale', desc: 'Tiro Salvezza su Saggezza: CD 15, una creatura che il cultista può vedere entro 27 metri.\nFallimento: 27 (6d8) danni psichici e il bersaglio ottiene la condizione Avvelenato fino all\'inizio del turno successivo del cultista. Successo: metà danni.', atkDmgs: [{ f: '6d8', t: 'psichici' }] },
+        { name: 'Incantesimi', desc: 'Il cultista lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 15).\n\nA volontà: Individuazione dei Pensieri, Illusione Minore.' }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Controincantesimo (2/Giorno)', desc: 'Il cultista lancia Controincantesimo in risposta al suo innesco.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie aliene e frammenti di sapere proibito del Reame Remoto.' }],
+      notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI cultisti aberranti perseguono poteri capaci di piegare la mente provenienti da forze aliene. Si alleano con mostri come aboleth e mind flayer o con entità del Reame Remoto: Cthulhu, Hadar, Nyarlathotep, maliziosi corpi celesti o altre menti incomprensibili.\n\n' + CULTISTI_LORE
+    },
+    {
+      id: 'preset_cultista_morte', name: 'Cultista della Morte', emoji: '⚰️', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 17, hp: 127, hpCur: 127, hpTemp: 0, hpDice: '15d8+60', init: 4,
+      speed: '9 m', cr: '8', xp: '',
+      str: 18, dex: 14, con: 18, intl: 13, wis: 17, cha: 12,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { intuizione: '6', percezione: '6', religione: '4' }, passivePerception: 16,
+      senses: [], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il cultista effettua tre attacchi usando Falce Funesta o Raggio Mortale in qualsiasi combinazione.' },
+        { name: 'Falce Funesta', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 9 (1d10 + 4) danni taglienti più 11 (2d10) danni necrotici. Il bersaglio non può recuperare punti ferita fino alla fine del suo turno successivo.', atkHit: '+7', atkDmgs: [{ f: '1d10+4', t: 'taglienti' }, { f: '2d10', t: 'necrotici' }] },
+        { name: 'Raggio Mortale', desc: 'Attacco con arma a distanza: +6 a colpire, gittata 36 metri.\nColpito: 22 (4d10) danni necrotici.', atkHit: '+6', atkDmgs: [{ f: '4d10', t: 'necrotici' }] },
+        { name: 'Incantesimi', desc: 'Il cultista lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 14).\n\nA volontà: Parlare con i Morti, Taumaturgia.' }
+      ],
+      bonusActions: [
+        { name: 'Lamento Spirituale (Ricarica 5-6)', desc: 'Tiro Salvezza su Saggezza: CD 14, ogni creatura in un\'emanazione di 6 metri originata dal cultista.\nFallimento: 14 (4d6) danni psichici e condizione Spaventato fino alla fine del turno successivo. Successo: metà danni.', atkDmgs: [{ f: '4d6', t: 'psichici' }] }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Armatura a strisce e reliquie funeste legate alla non morte.' }],
+      notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI cultisti della morte si crogiolano in forze nichiliste, abbracciandole come vie verso la non morte, la purezza multiversale o l\'inevitabilità entropica. Servono potenti non morti, profezie apocalittiche o immortali che dominano la morte: Acererak, Kyuss, Orcus, Vecna o Wee Jas.\n\n' + CULTISTI_LORE
+    },
+    {
+      id: 'preset_cultista_elementale', name: 'Cultista Elementale', emoji: '🔥', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 16, hp: 135, hpCur: 135, hpTemp: 0, hpDice: '18d8+54', init: 4,
+      speed: '9 m', cr: '8', xp: '',
+      str: 18, dex: 18, con: 16, intl: 14, wis: 18, cha: 12,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { arcano: '5', percezione: '7', religione: '5' }, passivePerception: 17,
+      senses: [], languages: ['Comune', 'Primordiale'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il cultista effettua tre attacchi usando Flagello Elementale o Artiglio Elementale in qualsiasi combinazione.' },
+        { name: 'Flagello Elementale', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 25 (6d6 + 4) danni di un tipo a scelta del cultista tra acido, freddo, fuoco, fulmine o tuono.', atkHit: '+7', atkDmgs: [{ f: '6d6+4', t: 'fuoco' }] },
+        { name: 'Artiglio Elementale', desc: 'Attacco con arma a distanza: +7 a colpire, gittata 36 metri.\nColpito: 22 (4d10) danni di un tipo a scelta del cultista tra acido, freddo, fuoco, fulmine o tuono. Se il bersaglio è Medio o più piccolo, il cultista lo sposta fino a 3 metri in linea retta verso di sé o lontano da sé.', atkHit: '+7', atkDmgs: [{ f: '4d10', t: 'fuoco' }] },
+        { name: 'Incantesimi', desc: 'Il cultista lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 15).\n\nA volontà: Elementalismo, Mano Magica.' }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Assorbimento Elementale (1/Giorno)', desc: 'Innesco: il cultista subisce danni da acido, freddo, fuoco, fulmine o tuono.\nRisposta: il cultista ottiene Resistenza a quella specifica istanza di danno e guadagna 10 punti ferita temporanei.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Cotta di maglia e reliquie del Male Elementale.' }],
+      notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI cultisti elementali sfruttano forze naturali distruttive per purificare il mondo dalla civiltà o dimostrare il dominio di un elemento sugli altri. Sono alleati di mostri elementali o di immortali malvagi come i Principi del Male Elementale o l\'Occhio Elementale Anziano.\n\n' + CULTISTI_LORE
+    },
+    {
+      id: 'preset_cultista_immondo', name: 'Cultista Immondo', emoji: '😈', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 16, hp: 127, hpCur: 127, hpTemp: 0, hpDice: '17d8+51', init: 5,
+      speed: '9 m', cr: '8', xp: '',
+      str: 18, dex: 14, con: 16, intl: 13, wis: 18, cha: 12,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '7', religione: '4' }, passivePerception: 17,
+      senses: [{ type: 'Scurovisione (non ostacolata dall\'oscurità magica)', value: 27, unit: 'm' }], languages: ['Abissale', 'Comune', 'Infernale'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il cultista effettua tre attacchi con Ascia del Patto.' },
+        { name: 'Ascia del Patto', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 10 (1d12 + 4) danni taglienti più 13 (3d8) danni da fuoco.', atkHit: '+7', atkDmgs: [{ f: '1d12+4', t: 'taglienti' }, { f: '3d8', t: 'fuoco' }] },
+        { name: 'Incantesimi', desc: 'Il cultista lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 15, +7 a colpire con gli incantesimi).\n\nA volontà: Raggio Rovente (versione di 5° livello), Taumaturgia.\n\n2/Giorno: Palla di Fuoco (versione di 6° livello).' }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Rimprovero Infernale', desc: 'Il cultista lancia Rimprovero Infernale in risposta al suo innesco, usando la stessa caratteristica da incantatore degli Incantesimi.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Corazza e reliquie infernali legate al patrono immondo.' }],
+      notes: 'Profeti di Sventura e Fanatici\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\n\nI cultisti immondi venerano immondi o divinità malvagie. Spesso lavorano per portare rovina agli innocenti o evocare nel mondo il loro sinistro patrono. Possono servire potenze famigerate come arcidiavoli e signori dei demoni, oppure immortali corrotti quali Demogorgon, Pazuzu, Iuz, Zariel o Zuggtmoy.\n\n' + CULTISTI_LORE
     }
   ];
 
