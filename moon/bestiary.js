@@ -44,7 +44,7 @@
   var DRAGHI_OTTONE_LORE = 'Socievoli ed estroversi, i draghi d\'ottone adorano condividere conoscenze e storie. Sebbene questi draghi metallici prediligano le terre aride, percorrono volentieri grandi distanze per visitare creature amichevoli, trasmettere ciò che hanno imparato e raccogliere notizie.\n\nPur essendo di buon cuore, i draghi d\'ottone non evitano il combattimento quando necessario, ostacolando i nemici con sonno magico e bruciandoli con fiamme roventi.\n\nPrediligono i climi caldi, in particolare steppe e deserti rocciosi o sabbiosi, e di solito dimorano vicino a importanti crocevia o oasi frequentate da viaggiatori. Amano assumere forme umanoidi, travestendosi da mercanti itineranti, studiosi, narratori o chiunque altro sia interessato alle storie altrui.\n\nI draghi d\'ottone collezionano oggetti eclettici. Sebbene possano sembrare semplici cianfrusaglie, ciascuno di essi fa parte di una storia: un ricordo nostalgico o la prova di una leggenda ormai divenuta mito. Il cappello di un vecchio amico e la corona dell\'ultimo sovrano di una dinastia dimenticata potrebbero occupare lo stesso scaffale nel tesoro di un drago d\'ottone.';
   var DRAGHI_OTTONE_TANA = '— Tane dei Draghi d\'Ottone —\nI draghi d\'ottone vivono normalmente in caverne segrete e canyon vicini a rotte molto frequentate. La regione entro 1 miglio dalla tana di un drago d\'ottone adulto o antico viene alterata dalla sua presenza, creando i seguenti effetti regionali.\n\nMiraggi: nella sua tana il drago può lanciare Immagine Maggiore (senza componenti materiali, con la stessa caratteristica da incantatore della sua capacità Incantesimi); la gittata diventa 1 miglio e il drago non ha bisogno di vedere il punto in cui compare l\'illusione.\n\nAcqua Ristoratrice: l\'acqua entro 1 miglio dalla tana è magicamente rinvigorente; una creatura che la beve ottiene 2d4 Punti Ferita Temporanei e il drago viene immediatamente a conoscenza della sua presenza.\n\nSe il drago muore o sposta la propria tana altrove, questi effetti terminano immediatamente.';
   var DRAGHI_BRONZO_LORE = 'Dove dimorano i draghi di bronzo, le meraviglie prosperano. Immaginativi ma riflessivi, questi draghi metallici lavorano per raggiungere la grandezza e aiutano gli altri a realizzare tutto il proprio potenziale.\n\nEssi si sforzano di preservare le innovazioni, dalle opere delle civiltà passate alle nuove scoperte, e condividono ampiamente tali conoscenze. Quando hanno a che fare con creature dalla vita più breve, i draghi di bronzo preferiscono conquistarle attraverso il dialogo e la formazione, ma non esitano a combattere quando i malvagi impediscono agli altri di raggiungere il proprio potenziale.\n\nI draghi di bronzo amano il potere e le infinite possibilità offerte dal mare e spesso stabiliscono le proprie tane in luoghi di bellezza naturale o presso comunità che desiderano proteggere. Nelle loro dimore accumulano oggetti che ritengono potranno essere utili un giorno. Recuperano inoltre tesori perduti in mare, riportando alla luce ricchezze e navi affondate.';
-  var DRAGHI_BRONZO_TANA = '— Tane dei Draghi di Bronzo —\nI draghi di bronzo costruiscono normalmente le proprie dimore vicino al mare o sotto di esso. La regione entro 1 miglio dalla tana di un drago di bronzo adulto o antico è alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nCorrenti Galleggianti: le creature entro 1 miglio dalla tana che non possiedono una velocità di nuotare ignorano il costo aggiuntivo di movimento mentre nuotano.\n\nSole e Tempeste: nella sua tana il drago può lanciare Controllare il Clima (senza componenti materiali, con la stessa caratteristica da incantatore della sua azione Incantesimi) e può controllare il tempo atmosferico entro 1 miglio dalla tana, dentro o fuori di essa.\n\nSe il drago muore o trasferisce la propria tana altrove, questi effetti terminano immediatamente.';
+  var DRAGHI_BRONZO_TANA = '— Tane dei Draghi di Bronzo —\nI draghi di bronzo costruiscono normalmente le proprie dimore vicino al mare o sotto di esso. La regione entro 1 miglio dalla tana di un drago di bronzo adulto o antico è alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nCorrenti Galleggianti: le creature entro 1 miglio dalla tana che non possiedono una velocità di nuotare ignorano il costo aggiuntivo di movimento mentre nuotano.\n\nSole e Tempeste: nella sua tana il drago può lanciare Controllare Tempo Atmosferico (senza componenti materiali, con la stessa caratteristica da incantatore della sua azione Incantesimi) e può controllare il tempo atmosferico entro 1 miglio dalla tana, dentro o fuori di essa.\n\nSe il drago muore o trasferisce la propria tana altrove, questi effetti terminano immediatamente.';
   var BUGBEAR_LORE = 'I bugbear incarnano la paura delle terre selvagge e la minaccia dei luoghi naturali. Sono notoriamente furtivi e i nemici che si avventurano nei loro territori spesso scompaiono senza lasciare traccia.';
   var BULETTE_LORE = 'Conosciute anche come "squali di terra", le bulette sono predatori ossessivi che scavano sottoterra, balzano sopra gli ostacoli e irrompono attraverso di essi all\'inseguimento delle loro prede. Scavano rapidamente appena sotto la superficie del terreno. Quando percepiscono un movimento, erompono dal sottosuolo tentando di catturare le prede nelle loro enormi fauci.';
   var BULLYWUG_LORE = 'I bullywug, incarnazioni fatate delle terre paludose, proteggono le selvagge distese fangose e si considerano favoriti dal cosmo per tale ruolo. Queste creature delle dimensioni di un umano, simili a rospi o rane, intrattengono stretti rapporti con le altre creature della palude.';
@@ -69,9 +69,9 @@
       dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
       traits: [],
       actions: [
-        { name: 'Multiattacco', desc: 'L\'aarakocra effettua due attacchi con il Bastone del Vento e può utilizzare Incantare per lanciare Raffica di Vento.' },
+        { name: 'Multiattacco', desc: 'L\'aarakocra effettua due attacchi con il Bastone del Vento e può utilizzare Incantare per lanciare Folata di Vento.' },
         { name: 'Bastone del Vento', desc: 'Attacco con arma da mischia o a distanza: +5 a colpire.\nPortata 1,5 m oppure gittata 36/72 m.\nColpito: 7 (1d8 + 3) danni contundenti più 11 (2d10) danni da fulmine.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'contundenti' }, { f: '2d10', t: 'fulmine' }] },
-        { name: 'Incantare', desc: 'L\'aarakocra lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 13 per i tiri salvezza).\n\nA volontà: Controllo Elementale (Elementalism), Raffica di Vento (Gust of Wind), Mano Magica (Mage Hand), Messaggio (Message).\n\n1 volta al giorno: Fulmine (Lightning Bolt).' }
+        { name: 'Incantare', desc: 'L\'aarakocra lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 13 per i tiri salvezza).\n\nA volontà: Controllo Elementale (Elementalism), Folata di Vento (Gust of Wind), Mano Magica (Mage Hand), Messaggio (Message).\n\n1 volta al giorno: Fulmine (Lightning Bolt).' }
       ],
       bonusActions: [],
       reactions: [
@@ -187,7 +187,7 @@
         { name: 'Lacerazione', desc: 'Attacco in mischia: +13 a colpire, portata 1,5 m.\nColpito: 14 (2d6 + 7) danni taglienti più 7 (2d6) danni da forza.', atkHit: '+13', atkDmgs: [{ f: '2d6+7', t: 'taglienti' }, { f: '2d6', t: 'forza' }] },
         { name: 'Raggio Radiante', desc: 'Attacco a distanza: +12 a colpire, gittata 36 m.\nColpito: 20 (4d6 + 6) danni radianti.', atkHit: '+12', atkDmgs: [{ f: '4d6+6', t: 'radianti' }] },
         { name: 'Spirito Animale', desc: 'Il Signore degli Animali evoca uno spirito animale che colpisce una creatura e poi svanisce.\nTiro Salvezza su Destrezza: CD 20. Una creatura visibile entro 36 metri.\nFallimento: 28 (4d10 + 6) danni radianti. Successo: metà danni.\nIn ogni caso si verifica inoltre uno dei seguenti effetti.\nFortificare (solo Raccoglitore): il Signore degli Animali ottiene 20 punti ferita temporanei.\nMarchiato come Preda (solo Cacciatore): ottiene vantaggio ai tiri per colpire contro il bersaglio fino all\'inizio del proprio turno successivo.\nSciame Molesto (solo Saggio): il bersaglio subisce svantaggio ai tiri per colpire e alle prove di caratteristica fino alla fine del proprio turno successivo.', atkDmgs: [{ f: '4d10+6', t: 'radianti' }] },
-        { name: 'Incantare', desc: 'Il Signore degli Animali lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 20).\n\nA volontà: Amicizia con gli Animali (Animal Friendship), Messaggero Animale (Animal Messenger), Parlare con gli Animali (Speak with Animals).\n\n2 volte al giorno ciascuno: Risveglio (Awaken), Restauro Superiore (Greater Restoration).\n\n1 volta al giorno ciascuno (solo Saggio): Forme Animali (Animal Shapes), Esplosione Solare (Sunburst).' }
+        { name: 'Incantare', desc: 'Il Signore degli Animali lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 20).\n\nA volontà: Amicizia con gli Animali (Animal Friendship), Animale Messaggero (Animal Messenger), Parlare con gli Animali (Speak with Animals).\n\n2 volte al giorno ciascuno: Risveglio (Awaken), Ristorare Superiore (Greater Restoration).\n\n1 volta al giorno ciascuno (solo Saggio): Forme Animali (Animal Shapes), Esplosione Solare (Sunburst).' }
       ],
       bonusActions: [
         { name: 'Mutaforma', desc: 'Il Signore degli Animali si trasforma in una versione Grande o inferiore dell\'animale che rappresenta, in un umanoide Medio o Piccolo, oppure ritorna alla sua vera forma. Le statistiche di gioco rimangono invariate eccetto la taglia. L\'equipaggiamento indossato o trasportato non viene trasformato.' }
@@ -327,7 +327,7 @@
         { name: 'Multiattacco', desc: 'L\'arcanaloth effettua tre attacchi Esplosione Immonda. Può sostituire uno di questi attacchi con Artiglio Esiliante.' },
         { name: 'Esplosione Immonda', desc: 'Attacco in mischia o a distanza: +9 a colpire, portata 1,5 m oppure gittata 36 m.\nColpito: 31 (4d12 + 5) danni necrotici.', atkHit: '+9', atkDmgs: [{ f: '4d12+5', t: 'necrotici' }] },
         { name: 'Artiglio Esiliante', desc: '(Richiede il Tomo delle Anime) Attacco in mischia: +9 a colpire, portata 1,5 m.\nColpito: 10 (2d4 + 5) danni taglienti più 19 (3d12) danni psichici.\nSe il bersaglio è una creatura, deve superare un tiro salvezza su Carisma CD 17 o venire imprigionato in un semipiano all\'interno del Tomo delle Anime (condizione Incapacitato; ripete il TS alla fine di ogni proprio turno). Con un successo fugge e riappare nello spazio che occupava (o nel più vicino libero). Se fallisce tre TS nel semipiano, resta vincolato permanentemente al tomo e può essere liberato solo riducendo il tomo a 0 punti ferita.', atkHit: '+9', atkDmgs: [{ f: '2d4+5', t: 'taglienti' }, { f: '3d12', t: 'psichici' }] },
-        { name: 'Incantare', desc: 'L\'arcanaloth lancia uno dei seguenti incantesimi senza componenti materiali, usando l\'Intelligenza come caratteristica da incantatore (CD 17).\n\nA volontà: Alterare Sé (Alter Self), Individuazione del Magico (Detect Magic), Identificare (Identify), Mano Magica (Mage Hand), Prestidigitazione (Prestidigitation).\n\n1 volta al giorno ciascuno: Contattare Altri Piani (Contact Other Plane), Individuazione dei Pensieri (Detect Thoughts), Porta Dimensionale (Dimension Door), Mente Vuota (Mind Blank).' }
+        { name: 'Incantare', desc: 'L\'arcanaloth lancia uno dei seguenti incantesimi senza componenti materiali, usando l\'Intelligenza come caratteristica da incantatore (CD 17).\n\nA volontà: Alterare Sé Stesso (Alter Self), Individuazione del Magico (Detect Magic), Identificare (Identify), Mano Magica (Mage Hand), Prestidigitazione (Prestidigitation).\n\n1 volta al giorno ciascuno: Contattare Altri Piani (Contact Other Plane), Individuazione dei Pensieri (Detect Thoughts), Porta Dimensionale (Dimension Door), Vuoto Mentale (Mind Blank).' }
       ],
       bonusActions: [
         { name: 'Teletrasporto', desc: 'L\'arcanaloth si teletrasporta fino a 9 metri in uno spazio libero che può vedere.' }
@@ -352,7 +352,7 @@
       dmgResist: ['Freddo', 'Fuoco', 'Psichico'], dmgImmune: [], dmgVulner: [],
       condImmune: ['Ammaliato', 'Esausto', 'Spaventato'],
       traits: [
-        { name: 'Magia del Circolo', desc: 'Finché si trova entro 9 metri da almeno altre due megere alleate, l\'arcistrega può lanciare uno dei seguenti incantesimi senza componenti materiali, usando l\'Intelligenza come caratteristica da incantatore (CD 19): Augurio (Augury), Trova Famiglio (Find Familiar), Identificare (Identify), Individuare Oggetto (Locate Object), Scrutare (Scrying), Servitore Invisibile (Unseen Servant).\nDopo aver usato questo tratto, deve completare un riposo lungo prima di poterlo usare di nuovo.' },
+        { name: 'Magia del Circolo', desc: 'Finché si trova entro 9 metri da almeno altre due megere alleate, l\'arcistrega può lanciare uno dei seguenti incantesimi senza componenti materiali, usando l\'Intelligenza come caratteristica da incantatore (CD 19): Presagio (Augury), Trova Famiglio (Find Familiar), Identificare (Identify), Localizza Oggetto (Locate Object), Scrutare (Scrying), Servitore Inosservato (Unseen Servant).\nDopo aver usato questo tratto, deve completare un riposo lungo prima di poterlo usare di nuovo.' },
         { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe fallisce un tiro salvezza, l\'arcistrega può scegliere di superarlo invece.' },
         { name: 'Resistenza Magica', desc: 'L\'arcistrega ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
         { name: 'Fuga Rancorosa', desc: 'Quando l\'arcistrega scende a 0 punti ferita, muore soltanto se si trova entro 9 metri dal proprio anatema. In caso contrario scende invece a 1 punto ferita, si teletrasporta in un semipiano innocuo e non può ritornare sul piano che ha lasciato per 2d6 giorni.\nQuando scompare, ogni creatura entro 18 metri dal punto in cui si trovava viene maledetta. Finché dura la maledizione la creatura ha svantaggio alle prove di caratteristica e ai tiri salvezza, e l\'arcistrega ne conosce la posizione in qualunque punto del multiverso.' }
@@ -503,7 +503,7 @@
       ],
       bonusActions: [],
       reactions: [
-        { name: 'Rimprovero Infernale (2/Giorno)', desc: 'L\'azer lancia Rimprovero Infernale (Hellish Rebuke) in risposta al normale innesco dell\'incantesimo, usando la stessa caratteristica da incantatore di Incantare.' }
+        { name: 'Intimorire Infernale (2/Giorno)', desc: 'L\'azer lancia Intimorire Infernale (Hellish Rebuke) in risposta al normale innesco dell\'incantesimo, usando la stessa caratteristica da incantatore di Incantare.' }
       ],
       legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'Armi e oggetti personali forgiati nelle fornaci azer.' }],
@@ -936,7 +936,7 @@
         { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con Incantesimi, lanciando Freccia Acida di Melf (versione di 3° livello).' },
         { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +11 a colpire, portata 3 metri.\nColpito: 13 (2d6 + 6) danni taglienti più 4 (1d8) danni da acido.', atkHit: '+11', atkDmgs: [{ f: '2d6+6', t: 'taglienti' }, { f: '1d8', t: 'acido' }] },
         { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 18. Ogni creatura in una linea lunga 18 metri e larga 1,5 metri.\nFallimento: 54 (12d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '12d8', t: 'acido' }] },
-        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 17, +9 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Paura, Freccia Acida di Melf (versione di 3° livello).\n\n1/Giorno ciascuno: Parlare con i Morti, Sfera Vitriolica.' }
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 17, +9 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Paura, Freccia Acida di Melf (versione di 3° livello).\n\n1/Giorno ciascuno: Parlare con i Morti, Sfera al Vetriolo.' }
       ],
       bonusActions: [],
       reactions: [],
@@ -967,7 +967,7 @@
         { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con Incantesimi, lanciando Freccia Acida di Melf (versione di 4° livello).' },
         { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +15 a colpire, portata 4,5 metri.\nColpito: 17 (2d8 + 8) danni taglienti più 9 (2d8) danni da acido.', atkHit: '+15', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '2d8', t: 'acido' }] },
         { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 22. Ogni creatura in una linea lunga 27 metri e larga 3 metri.\nFallimento: 67 (15d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '15d8', t: 'acido' }] },
-        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 21, +13 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Paura, Freccia Acida di Melf (versione di 4° livello).\n\n1/Giorno ciascuno: Creare Non Morti, Parlare con i Morti, Sfera Vitriolica (versione di 5° livello).' }
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 21, +13 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Paura, Freccia Acida di Melf (versione di 4° livello).\n\n1/Giorno ciascuno: Creare Non Morti, Parlare con i Morti, Sfera al Vetriolo (versione di 5° livello).' }
       ],
       bonusActions: [],
       reactions: [],
@@ -1370,7 +1370,7 @@
         { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +11 a colpire, portata 3 metri.\nColpito: 17 (2d10 + 6) danni taglienti più 4 (1d8) danni da fuoco.', atkHit: '+11', atkDmgs: [{ f: '2d10+6', t: 'taglienti' }, { f: '1d8', t: 'fuoco' }] },
         { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 18, ogni creatura nella linea del soffio.\nFallimento: 45 (10d8) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '10d8', t: 'fuoco' }] },
         { name: 'Soffio del Sonno', desc: 'Tiro Salvezza su Costituzione: CD 18. Ogni creatura in un cono di 18 metri.\nFallimento: il bersaglio ottiene la condizione Incapacitato fino alla fine del suo turno successivo e poi ripete il tiro salvezza.\nSecondo Fallimento: il bersaglio ottiene la condizione Privo di Sensi per 10 minuti. L\'effetto termina se subisce danni o viene svegliato.' },
-        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 16).\n\nA volontà: Individuazione del Magico, Illusione Minore, Raggio Rovente, Cambiare Forma (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali.\n\n1/Giorno ciascuno: Individuazione dei Pensieri, Controllare il Clima.' }
+        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 16).\n\nA volontà: Individuazione del Magico, Illusione Minore, Raggio Rovente, Trasformazione (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali.\n\n1/Giorno ciascuno: Individuazione dei Pensieri, Controllare Tempo Atmosferico.' }
       ],
       bonusActions: [],
       reactions: [],
@@ -1401,7 +1401,7 @@
         { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +14 a colpire, portata 4,5 metri.\nColpito: 19 (2d10 + 8) danni taglienti più 7 (2d6) danni da fuoco.', atkHit: '+14', atkDmgs: [{ f: '2d10+8', t: 'taglienti' }, { f: '2d6', t: 'fuoco' }] },
         { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 21. Ogni creatura in una linea lunga 27 metri.\nFallimento: 58 (13d8) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '13d8', t: 'fuoco' }] },
         { name: 'Soffio del Sonno', desc: 'Tiro Salvezza su Costituzione: CD 21. Ogni creatura in un cono di 27 metri.\nFallimento: il bersaglio ottiene la condizione Incapacitato fino alla fine del suo turno successivo e poi ripete il tiro salvezza.\nSecondo Fallimento: il bersaglio ottiene la condizione Privo di Sensi per 10 minuti. L\'effetto termina se subisce danni o viene svegliato.' },
-        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 20).\n\nA volontà: Individuazione del Magico, Illusione Minore, Raggio Rovente (versione di 3° livello), Cambiare Forma (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali.\n\n1/Giorno ciascuno: Controllare il Clima, Individuazione dei Pensieri.' }
+        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 20).\n\nA volontà: Individuazione del Magico, Illusione Minore, Raggio Rovente (versione di 3° livello), Trasformazione (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali.\n\n1/Giorno ciascuno: Controllare Tempo Atmosferico, Individuazione dei Pensieri.' }
       ],
       bonusActions: [],
       reactions: [],
@@ -1475,17 +1475,17 @@
         { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
       ],
       actions: [
-        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire un attacco con un uso di Soffio di Repulsione oppure con il lancio di Dardo Guida (versione di 2° livello).' },
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire un attacco con un uso di Soffio di Repulsione oppure con il lancio di Dardo Tracciante (versione di 2° livello).' },
         { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +12 a colpire, portata 3 metri.\nColpito: 16 (2d8 + 7) danni taglienti più 5 (1d10) danni da fulmine.', atkHit: '+12', atkDmgs: [{ f: '2d8+7', t: 'taglienti' }, { f: '1d10', t: 'fulmine' }] },
         { name: 'Soffio di Fulmine (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 19. Ogni creatura in una linea lunga 27 metri e larga 1,5 metri.\nFallimento: 55 (10d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '10d10', t: 'fulmine' }] },
         { name: 'Soffio di Repulsione', desc: 'Tiro Salvezza su Forza: CD 19. Ogni creatura in un cono di 9 metri.\nFallimento: il bersaglio viene spinto fino a 18 metri direttamente lontano dal drago e ottiene la condizione Prono.' },
-        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 17, +10 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Dardo Guida (versione di 2° livello), Cambiare Forma (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali, Taumaturgia.\n\n1/Giorno ciascuno: Individuazione dei Pensieri, Respirare Sott\'Acqua.' }
+        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 17, +10 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Dardo Tracciante (versione di 2° livello), Trasformazione (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali, Taumaturgia.\n\n1/Giorno ciascuno: Individuazione dei Pensieri, Respirare Sott’Acqua.' }
       ],
       bonusActions: [],
       reactions: [],
       legendaryActions: [
         { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
-        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Guida (versione di 2° livello).' },
+        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Tracciante (versione di 2° livello).' },
         { name: 'Balzo', desc: 'Il drago si muove fino a metà della propria velocità ed effettua un attacco Lacerazione.', atkHit: '+12', atkDmgs: [{ f: '2d8+7', t: 'taglienti' }, { f: '1d10', t: 'fulmine' }] },
         { name: 'Tuonoclap', desc: 'Tiro Salvezza su Costituzione: CD 17. Ogni creatura entro una sfera di raggio 6 metri centrata in un punto che il drago può vedere entro 27 metri.\nFallimento: 10 (3d6) danni da tuono e il bersaglio ottiene la condizione Assordato fino alla fine del suo turno successivo.', atkDmgs: [{ f: '3d6', t: 'tuono' }] }
       ],
@@ -1507,17 +1507,17 @@
         { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
       ],
       actions: [
-        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire un attacco con un uso di Soffio di Repulsione oppure con il lancio di Dardo Guida (versione di 2° livello).' },
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire un attacco con un uso di Soffio di Repulsione oppure con il lancio di Dardo Tracciante (versione di 2° livello).' },
         { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +16 a colpire, portata 4,5 metri.\nColpito: 18 (2d8 + 9) danni taglienti più 9 (2d8) danni da fulmine.', atkHit: '+16', atkDmgs: [{ f: '2d8+9', t: 'taglienti' }, { f: '2d8', t: 'fulmine' }] },
         { name: 'Soffio di Fulmine (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 23. Ogni creatura in una linea lunga 36 metri e larga 3 metri.\nFallimento: 82 (15d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '15d10', t: 'fulmine' }] },
         { name: 'Soffio di Repulsione', desc: 'Tiro Salvezza su Forza: CD 23. Ogni creatura in un cono di 9 metri.\nFallimento: il bersaglio viene spinto fino a 18 metri direttamente lontano dal drago e ottiene la condizione Prono.' },
-        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 22, +14 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Dardo Guida (versione di 2° livello), Cambiare Forma (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali, Taumaturgia.\n\n1/Giorno ciascuno: Individuazione dei Pensieri, Controllare l\'Acqua, Scrutare, Respirare Sott\'Acqua.' }
+        { name: 'Incantesimi', desc: 'Il drago lancia i seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 22, +14 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Dardo Tracciante (versione di 2° livello), Trasformazione (solo Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta), Parlare con gli Animali, Taumaturgia.\n\n1/Giorno ciascuno: Individuazione dei Pensieri, Controllare Acqua, Scrutare, Respirare Sott’Acqua.' }
       ],
       bonusActions: [],
       reactions: [],
       legendaryActions: [
         { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
-        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Guida (versione di 2° livello).' },
+        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Tracciante (versione di 2° livello).' },
         { name: 'Balzo', desc: 'Il drago si muove fino a metà della propria velocità ed effettua un attacco Lacerazione.', atkHit: '+16', atkDmgs: [{ f: '2d8+9', t: 'taglienti' }, { f: '2d8', t: 'fulmine' }] },
         { name: 'Tuonoclap', desc: 'Tiro Salvezza su Costituzione: CD 22. Ogni creatura entro una sfera di raggio 6 metri centrata in un punto che il drago può vedere entro 36 metri.\nFallimento: 13 (3d8) danni da tuono e il bersaglio ottiene la condizione Assordato fino alla fine del suo turno successivo.', atkDmgs: [{ f: '3d8', t: 'tuono' }] }
       ],
@@ -1631,7 +1631,7 @@
       actions: [
         { name: 'Multiattacco', desc: 'Il bullywug effettua due attacchi con il Bastone della Palude. Può sostituire uno qualsiasi di questi attacchi con l\'uso di Incantare per lanciare Raggio di Infermità.' },
         { name: 'Bastone della Palude', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 7 (1d8 + 3) danni contundenti più 10 (3d6) danni da veleno.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'contundenti' }, { f: '3d6', t: 'veleno' }] },
-        { name: 'Incantare', desc: 'Il bullywug lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 13, +5 a colpire con gli attacchi con incantesimo).\n\nA volontà: Luci Danzanti, Artigianato Druidico, Raggio di Infermità.\n\n1/Giorno ciascuno: Parlare con le Piante, Sfera Vitriolica.' }
+        { name: 'Incantare', desc: 'Il bullywug lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 13, +5 a colpire con gli attacchi con incantesimo).\n\nA volontà: Luci Danzanti, Artificio Druidico, Raggio di Infermità.\n\n1/Giorno ciascuno: Parlare con i Vegetali, Sfera al Vetriolo.' }
       ],
       bonusActions: [
         { name: 'Balzo', desc: 'Il bullywug salta fino a 9 metri spendendo 3 metri di movimento.' }
@@ -1680,7 +1680,7 @@
         { name: 'Multiattacco', desc: 'Il cambion effettua due attacchi, usando Artiglio o Raggio di Fuoco in qualsiasi combinazione.' },
         { name: 'Artiglio', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 8 (1d8 + 4) danni taglienti più 7 (2d6) danni da fuoco.', atkHit: '+7', atkDmgs: [{ f: '1d8+4', t: 'taglienti' }, { f: '2d6', t: 'fuoco' }] },
         { name: 'Raggio di Fuoco', desc: 'Attacco con incantesimo a distanza: +7 a colpire, gittata 36 metri.\nColpito: 13 (3d6 + 3) danni da fuoco.', atkHit: '+7', atkDmgs: [{ f: '3d6+3', t: 'fuoco' }] },
-        { name: 'Incantesimi', desc: 'Il cambion lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 14).\n\n2/Giorno ciascuno: Alterare Sé Stesso, Comando (versione di 3° livello), Individuazione del Magico.\n\n1/Giorno ciascuno: Dominare Persone (versione di 8° livello), Trasporto Planare (solo su sé stesso).' }
+        { name: 'Incantesimi', desc: 'Il cambion lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 14).\n\n2/Giorno ciascuno: Alterare Sé Stesso, Comando (versione di 3° livello), Individuazione del Magico.\n\n1/Giorno ciascuno: Dominare Persone (versione di 8° livello), Spostamento Planare (solo su sé stesso).' }
       ],
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Reliquie e oggetti legati alla fonte del potere immondo del cambion.' }],
@@ -1723,7 +1723,7 @@
         { name: 'Multiattacco', desc: 'Il centauro effettua due attacchi, usando Bastone della Foresta o Raggio Solare in qualsiasi combinazione.' },
         { name: 'Bastone della Foresta', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 13 (2d8 + 4) danni contundenti più 14 (4d6) danni da veleno.', atkHit: '+7', atkDmgs: [{ f: '2d8+4', t: 'contundenti' }, { f: '4d6', t: 'veleno' }] },
         { name: 'Raggio Solare', desc: 'Attacco con incantesimo a distanza: +7 a colpire, gittata 27 metri.\nColpito: 14 (3d6 + 4) danni radiosi e il bersaglio ottiene la condizione Accecato fino all\'inizio del turno successivo del centauro.', atkHit: '+7', atkDmgs: [{ f: '3d6+4', t: 'radiosi' }] },
-        { name: 'Incantesimi', desc: 'Il centauro lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 15).\n\nA volontà: Arte Druidica, Parlare con gli Animali.' }
+        { name: 'Incantesimi', desc: 'Il centauro lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 15).\n\nA volontà: Artificio Druidico, Parlare con gli Animali.' }
       ],
       bonusActions: [
         { name: 'Sentiero Intralciante (Ricarica 5-6)', desc: 'Il centauro si muove fino alla propria velocità senza provocare attacchi di opportunità. Ogni creatura entro 1,5 metri dal centauro durante il movimento è bersaglio del seguente effetto.\nTiro Salvezza su Forza: CD 15.\nFallimento: 11 (2d6 + 4) danni contundenti e il bersaglio ottiene la condizione Trattenuto fino alla fine del suo turno successivo.', atkDmgs: [{ f: '2d6+4', t: 'contundenti' }] }
@@ -1925,7 +1925,7 @@
         { name: 'Multiattacco', desc: 'Il gigante effettua due attacchi, usando Mazza Tonante o Nube del Tuono in qualsiasi combinazione. Può sostituire uno degli attacchi con un uso di Incantesimi per lanciare Nube di Nebbia.' },
         { name: 'Mazza Tonante', desc: 'Attacco con arma da mischia: +12 a colpire, portata 3 metri.\nColpito: 21 (3d8 + 8) danni contundenti più 7 (2d6) danni da tuono.', atkHit: '+12', atkDmgs: [{ f: '3d8+8', t: 'contundenti' }, { f: '2d6', t: 'tuono' }] },
         { name: 'Nube del Tuono', desc: 'Attacco con arma a distanza: +12 a colpire, gittata 72 metri.\nColpito: 18 (3d6 + 8) danni da tuono e il bersaglio subisce la condizione Incapacitato fino alla fine del suo turno successivo.', atkHit: '+12', atkDmgs: [{ f: '3d6+8', t: 'tuono' }] },
-        { name: 'Incantesimi', desc: 'Il gigante lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 15).\n\nA volontà: Individuazione del Magico, Nube di Nebbia, Luce.\n\n1/Giorno ciascuno: Controllare il Tempo Atmosferico, Forma Gassosa, Telecinesi.' }
+        { name: 'Incantesimi', desc: 'Il gigante lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 15).\n\nA volontà: Individuazione del Magico, Nube di Nebbia, Luce.\n\n1/Giorno ciascuno: Controllare Tempo Atmosferico, Forma Gassosa, Telecinesi.' }
       ],
       bonusActions: [
         { name: 'Passo Velato', desc: 'Il gigante lancia l\'incantesimo Passo Velato, usando la stessa caratteristica da incantatore di Incantesimi.' }
@@ -2086,18 +2086,18 @@
         { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
       ],
       actions: [
-        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi con Artiglio. Può sostituire un attacco con un uso di Soffio Rallentante oppure con il lancio di Picco Mentale (versione di 4° livello) tramite Incantesimi.' },
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi con Artiglio. Può sostituire un attacco con un uso di Soffio Rallentante oppure con il lancio di Aculeo Mentale (versione di 4° livello) tramite Incantesimi.' },
         { name: 'Artiglio', desc: 'Attacco con arma da mischia: +11 a colpire, portata 3 metri.\nColpito: 17 (2d10 + 6) danni taglienti più 4 (1d8) danni da acido.', atkHit: '+11', atkDmgs: [{ f: '2d10+6', t: 'taglienti' }, { f: '1d8', t: 'acido' }] },
         { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 18. Ogni creatura in una linea lunga 18 metri e larga 1,5 metri.\nFallimento: 54 (12d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '12d8', t: 'acido' }] },
         { name: 'Soffio Rallentante', desc: 'Tiro Salvezza su Costituzione: CD 18. Ogni creatura in un cono di 18 metri.\nFallimento: fino alla fine del suo turno successivo il bersaglio non può effettuare Reazioni, ha la velocità dimezzata e durante il proprio turno può compiere un\'Azione oppure un\'Azione Bonus, ma non entrambe.' },
-        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 17).\n\nA volontà: Individuazione del Magico, Picco Mentale (versione di 4° livello), Illusione Minore, Mutaforma (solo forma di Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta).\n\n1/Giorno ciascuno: Restaurazione Superiore, Immagine Maggiore.' }
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 17).\n\nA volontà: Individuazione del Magico, Aculeo Mentale (versione di 4° livello), Illusione Minore, Trasformazione (solo forma di Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta).\n\n1/Giorno ciascuno: Ristorare Superiore, Immagine Maggiore.' }
       ],
       bonusActions: [],
       reactions: [],
       legendaryActions: [
         { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
         { name: 'Magia Esilarante', desc: 'Tiro Salvezza su Carisma: CD 17, una creatura che il drago può vedere entro 27 metri.\nFallimento: 24 (7d6) danni psichici e, fino alla fine del suo turno successivo, ogni volta che il bersaglio effettua una prova di caratteristica o un tiro per colpire tira anche 1d6 e ne sottrae il risultato.\nIl drago non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.', atkDmgs: [{ f: '7d6', t: 'psichici' }] },
-        { name: 'Scossa Mentale', desc: 'Il drago usa Incantesimi per lanciare Picco Mentale (versione di 4° livello). Non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.' },
+        { name: 'Scossa Mentale', desc: 'Il drago usa Incantesimi per lanciare Aculeo Mentale (versione di 4° livello). Non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.' },
         { name: 'Balzo', desc: 'Il drago si muove fino a metà della propria velocità ed effettua un attacco con Artiglio.', atkHit: '+11', atkDmgs: [{ f: '2d10+6', t: 'taglienti' }, { f: '1d8', t: 'acido' }] }
       ],
       drop: [{ name: 'Arcani', desc: 'Doni e ricordi cari al drago, più reliquie magiche raccolte dalla sua vasta rete di amici.' }],
@@ -2117,18 +2117,18 @@
         { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
       ],
       actions: [
-        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi con Artiglio. Può sostituire un attacco con un uso di Soffio Rallentante oppure con il lancio di Picco Mentale (versione di 5° livello) tramite Incantesimi.' },
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi con Artiglio. Può sostituire un attacco con un uso di Soffio Rallentante oppure con il lancio di Aculeo Mentale (versione di 5° livello) tramite Incantesimi.' },
         { name: 'Artiglio', desc: 'Attacco con arma da mischia: +15 a colpire, portata 4,5 metri.\nColpito: 19 (2d10 + 8) danni taglienti più 9 (2d8) danni da acido.', atkHit: '+15', atkDmgs: [{ f: '2d10+8', t: 'taglienti' }, { f: '2d8', t: 'acido' }] },
         { name: 'Soffio Acido (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 22. Ogni creatura in una linea lunga 27 metri e larga 3 metri.\nFallimento: 63 (14d8) danni da acido. Successo: metà danni.', atkDmgs: [{ f: '14d8', t: 'acido' }] },
         { name: 'Soffio Rallentante', desc: 'Tiro Salvezza su Costituzione: CD 22. Ogni creatura in un cono di 27 metri.\nFallimento: fino alla fine del suo turno successivo il bersaglio non può effettuare Reazioni, ha la velocità dimezzata e durante il proprio turno può compiere un\'Azione oppure un\'Azione Bonus, ma non entrambe.' },
-        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 21).\n\nA volontà: Individuazione del Magico, Picco Mentale (versione di 5° livello), Illusione Minore, Mutaforma (solo forma di Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta).\n\n1/Giorno ciascuno: Restaurazione Superiore, Immagine Maggiore, Immagine Proiettata.' }
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 21).\n\nA volontà: Individuazione del Magico, Aculeo Mentale (versione di 5° livello), Illusione Minore, Trasformazione (solo forma di Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta).\n\n1/Giorno ciascuno: Ristorare Superiore, Immagine Maggiore, Immagine Proiettata.' }
       ],
       bonusActions: [],
       reactions: [],
       legendaryActions: [
         { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il drago può usare una sola azione leggendaria alla volta, alla fine del turno di un\'altra creatura. Recupera gli utilizzi spesi all\'inizio del proprio turno.' },
         { name: 'Magia Esilarante', desc: 'Tiro Salvezza su Carisma: CD 21, una creatura che il drago può vedere entro 36 metri.\nFallimento: 31 (9d6) danni psichici e, fino alla fine del suo turno successivo, ogni volta che il bersaglio effettua una prova di caratteristica o un tiro per colpire tira anche 1d8 e ne sottrae il risultato.\nIl drago non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.', atkDmgs: [{ f: '9d6', t: 'psichici' }] },
-        { name: 'Scossa Mentale', desc: 'Il drago usa Incantesimi per lanciare Picco Mentale (versione di 5° livello). Non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.' },
+        { name: 'Scossa Mentale', desc: 'Il drago usa Incantesimi per lanciare Aculeo Mentale (versione di 5° livello). Non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.' },
         { name: 'Balzo', desc: 'Il drago si muove fino a metà della propria velocità ed effettua un attacco con Artiglio.', atkHit: '+15', atkDmgs: [{ f: '2d10+8', t: 'taglienti' }, { f: '2d8', t: 'acido' }] }
       ],
       drop: [{ name: 'Arcani', desc: 'Doni e ricordi cari al drago, più reliquie magiche accumulate nei secoli nelle sue accoglienti tane.' }],
@@ -2151,10 +2151,10 @@
       actions: [
         { name: 'Morso', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 11 (1d12 + 5) danni perforanti e il bersaglio ottiene la condizione Avvelenato fino alla fine del turno successivo del couatl.', atkHit: '+7', atkDmgs: [{ f: '1d12+5', t: 'perforanti' }] },
         { name: 'Costrizione', desc: 'Tiro Salvezza su Forza: CD 15, una creatura Media o più piccola che il couatl può vedere entro 1,5 metri.\nFallimento: 8 (1d6 + 5) danni contundenti; il bersaglio ottiene la condizione Afferrato (CD 13 per sfuggire) e la condizione Trattenuto finché la presa non termina.', atkDmgs: [{ f: '1d6+5', t: 'contundenti' }] },
-        { name: 'Incantesimi', desc: 'Il couatl lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 15).\n\nA volontà: Individuazione del Bene e del Male, Individuazione del Magico, Individuazione dei Pensieri, Mutaforma (solo forma di Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta).\n\n1/Giorno ciascuno: Creare Cibo e Acqua, Sogno, Restaurazione Superiore, Scrutare, Sonno.' }
+        { name: 'Incantesimi', desc: 'Il couatl lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 15).\n\nA volontà: Individuazione del Bene e del Male, Individuazione del Magico, Individuazione dei Pensieri, Trasformazione (solo forma di Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta).\n\n1/Giorno ciascuno: Creare Cibo e Acqua, Sogno, Ristorare Superiore, Scrutare, Sonno.' }
       ],
       bonusActions: [
-        { name: 'Aiuto Divino (2/Giorno)', desc: 'Il couatl lancia Benedizione, Restaurazione Minore oppure Santuario, senza componenti materiali e usando la stessa caratteristica da incantatore degli Incantesimi.' }
+        { name: 'Aiuto Divino (2/Giorno)', desc: 'Il couatl lancia Benedizione, Ristorare Inferiore oppure Santuario, senza componenti materiali e usando la stessa caratteristica da incantatore degli Incantesimi.' }
       ],
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Segreti divini, profezie e reliquie sacre custodite dal couatl, forse perfino il suo meraviglioso uovo dai colori dell\'arcobaleno.' }],
@@ -2353,7 +2353,7 @@
       ],
       bonusActions: [],
       reactions: [
-        { name: 'Rimprovero Infernale', desc: 'Il cultista lancia Rimprovero Infernale in risposta al suo innesco, usando la stessa caratteristica da incantatore degli Incantesimi.' }
+        { name: 'Intimorire Infernale', desc: 'Il cultista lancia Intimorire Infernale in risposta al suo innesco, usando la stessa caratteristica da incantatore degli Incantesimi.' }
       ],
       legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Corazza e reliquie infernali legate al patrono immondo.' }],
@@ -2429,7 +2429,7 @@
         { name: 'Multiattacco', desc: 'Il dao effettua tre attacchi con Maglio di Terra oppure due attacchi con Esplosione Terrestre.' },
         { name: 'Maglio di Terra', desc: 'Attacco con arma da mischia: +10 a colpire, portata 1,5 metri.\nColpito: 20 (4d6 + 6) danni contundenti. Se il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Prono.', atkHit: '+10', atkDmgs: [{ f: '4d6+6', t: 'contundenti' }] },
         { name: 'Esplosione Terrestre', desc: 'Attacco con arma a distanza: +10 a colpire, gittata 36 metri.\nColpito: 15 (2d8 + 6) danni contundenti.\nColpito o Mancato: la terra esplode dallo spazio del bersaglio. Tiro Salvezza su Destrezza: CD 16, ogni creatura in un\'emanazione di 3 metri che parte dal bersaglio (incluso il bersaglio).\nFallimento: 10 (3d6) danni da tuono.', atkHit: '+10', atkDmgs: [{ f: '2d8+6', t: 'contundenti' }, { f: '3d6', t: 'tuono' }] },
-        { name: 'Incantesimi', desc: 'Il dao lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 16).\n\nA volontà: Individuazione del Bene e del Male, Individuazione del Magico, Plasmare Pietra.\n\n1/Giorno ciascuno: Forma Gassosa, Invisibilità, Muovere il Terreno, Passapareti, Traslazione Planare, Linguaggi, Muro di Pietra.' }
+        { name: 'Incantesimi', desc: 'Il dao lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 16).\n\nA volontà: Individuazione del Bene e del Male, Individuazione del Magico, Scolpire Pietra.\n\n1/Giorno ciascuno: Forma Gassosa, Invisibilità, Muovere il Terreno, Passapareti, Spostamento Planare, Linguaggi, Muro di Pietra.' }
       ],
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Strumenti', desc: 'Tesori della terra: gemme grezze, gioielli forgiati da metalli puri e meravigliosi fossili.' }],
