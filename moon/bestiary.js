@@ -1972,6 +1972,39 @@
       legendaryActions: [],
       drop: [],
       notes: 'Volatili Maledetti con il Potere della Pietrificazione\n\nHabitat: Praterie\nTesoro: Nessuno\n\nPiù audaci delle loro cugine minori, le cockatrici reggenti traboccano di energia magica instabile che utilizzano per trattenere i nemici lontani.\n\n' + COCKATRICE_LORE
+    },
+    {
+      id: 'preset_colosso', name: 'Colosso', emoji: '🗿', rarity: 'legendary',
+      type: 'Costrutto', size: 'Mastodontica', alignment: 'Senza Allineamento',
+      ac: 23, hp: 553, hpCur: 553, hpTemp: 0, hpDice: '27d20+270', init: 16,
+      speed: '18 m', cr: '25', xp: '',
+      str: 30, dex: 11, con: 30, intl: 3, wis: 11, cha: 8,
+      savesOverride: { str: '', dex: '8', con: '', intl: '', wis: '8', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Vista del Vero', value: 90, unit: 'm' }], languages: ['Comprende Celestiale e Comune ma non può parlare'],
+      dmgResist: ['Necrotico', 'Radioso'], dmgImmune: ['Veleno', 'Psichico'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato', 'Paralizzato', 'Pietrificato', 'Avvelenato', 'Stordito', 'Privo di Sensi'],
+      traits: [
+        { name: 'Forma Immutabile', desc: 'Il colosso non può mutare forma.' },
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno)\nSe il colosso fallisce un tiro salvezza, può scegliere di superarlo invece.' },
+        { name: 'Resistenza Magica', desc: 'Il colosso ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Assediante Mostruoso', desc: 'Il colosso infligge danni doppi a oggetti e strutture.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il colosso effettua tre attacchi, usando Schianto o Raggio Radioso in qualsiasi combinazione.' },
+        { name: 'Schianto', desc: 'Attacco con arma da mischia: +18 a colpire, portata 6 metri.\nColpito: 32 (4d10 + 10) danni contundenti e il colosso spinge il bersaglio fino a 6 metri in linea retta lontano da sé.', atkHit: '+18', atkDmgs: [{ f: '4d10+10', t: 'contundenti' }] },
+        { name: 'Raggio Radioso', desc: 'Attacco con arma a distanza: +18 a colpire, gittata 90 metri.\nColpito: 22 (4d10) danni radiosi. Se il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Prono.', atkHit: '+18', atkDmgs: [{ f: '4d10', t: 'radiosi' }] },
+        { name: 'Raggio Divino (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 26, effettuato da ogni creatura in una linea lunga 90 metri e larga 3 metri.\nFallimento: 65 (10d12) danni radiosi. Successo: metà danni.\nFallimento o Successo: una creatura ridotta a 0 punti ferita da questo raggio si disintegra in polvere, lasciando dietro di sé qualsiasi oggetto magico che indossava o trasportava.', atkDmgs: [{ f: '10d12', t: 'radiosi' }] }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round)', desc: 'Immediatamente dopo il turno di un\'altra creatura, il colosso può spendere un utilizzo per una delle azioni leggendarie seguenti. Recupera tutti gli utilizzi spesi all\'inizio di ciascuno dei suoi turni.' },
+        { name: 'Castigo', desc: 'Il colosso effettua un attacco con Raggio Radioso.', atkHit: '+18', atkDmgs: [{ f: '4d10', t: 'radiosi' }] },
+        { name: 'Pestata', desc: 'Il colosso si muove fino a metà della propria velocità senza provocare attacchi di opportunità e può effettuare un attacco Schianto in qualsiasi momento durante quel movimento.', atkHit: '+18', atkDmgs: [{ f: '4d10+10', t: 'contundenti' }] }
+      ],
+      drop: [{ name: 'Reliquie', desc: 'Il possente cristallo divino nel cuore del colosso e reliquie sacre dei suoi creatori.' }],
+      notes: 'Titanico Vascello del Potere Divino\n\nHabitat: Qualsiasi\nTesoro: Reliquie\n\nI colossi sono enormi Costrutti creati dai devoti per riflettere la natura di una divinità, benevola o malvagia che sia. Pulsano di incredibile magia e manifestano la volontà divina sulla terra.\n\nSchiere di artigiani fedeli forgiano un colosso in una forma che onori la loro divinità, quindi invocano quel dio affinché infonda vita alla statua. Questo arduo processo può richiedere decenni e coinvolgere centinaia di lavoratori. Se la divinità favorisce la creazione, il possente cristallo nel cuore del costrutto pulsa di potere divino e il colosso si erge per proteggere i fedeli o realizzare la volontà del dio.\n\nLa maggior parte dei colossi fu creata in epoche remote e ora giace dormiente in terre selvagge e isolate, risvegliandosi soltanto quando viene disturbata o richiamata a servire ancora una volta.'
     }
   ];
 
