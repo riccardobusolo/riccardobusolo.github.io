@@ -1848,6 +1848,34 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Antichi tesori magici raccolti senza sosta dal chuul nel corso delle ere.' }],
       notes: 'Servitore Chitinoso di Poteri Primordiali\n\nHabitat: Costa, Palude, Sottosuolo\nTesoro: Reliquie\n\nI chuul ebbero origine in epoche dimenticate, quando gli aboleth e altre strane entità governavano imperi alieni sotto le onde. Gli aboleth trasformarono numerosi predatori degli abissi in servitori capaci di avventurarsi oltre i mari per reclamare altra magia e nuove creature da sfruttare. I chuul sono i più duraturi tra questi bizzarri servitori.\n\nMolti chuul servono signori aboleth, eseguendone i capricci nei mari senza luce e nelle paludi primordiali. Altri obbediscono a nuovi padroni aberranti, come beholder, grell o illithid. Alcuni seguono invece i propri impulsi, raccogliendo senza sosta antichi tesori magici o interpretando ordini vecchi di ere in modi bizzarri. Qualunque sia il loro scopo, i chuul intrappolano le creature nelle loro enormi chele prima di rendere impotenti i nemici con i tentacoli paralizzanti.\n\nI chuul non invecchiano e possono restare dormienti in luoghi nascosti per millenni, finché minacce, antichi ordini o strane compulsioni non li risvegliano.'
+    },
+    {
+      id: 'preset_golem_argilla', name: 'Golem d\'Argilla', emoji: '🗿', rarity: 'rare',
+      type: 'Costrutto', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 14, hp: 123, hpCur: 123, hpTemp: 0, hpDice: '13d10+52', init: 3,
+      speed: '9 m', cr: '9', xp: '',
+      str: 20, dex: 9, con: 18, intl: 3, wis: 8, cha: 1,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 9,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune più un\'altra lingua'],
+      dmgResist: ['Contundente', 'Perforante', 'Tagliente'], dmgImmune: ['Acido', 'Veleno', 'Psichico'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato', 'Paralizzato', 'Pietrificato', 'Avvelenato'],
+      traits: [
+        { name: 'Assorbimento dell\'Acido', desc: 'Ogni volta che il golem subisce danni da acido, non subisce alcun danno e recupera invece un numero di punti ferita pari ai danni da acido che avrebbe subito.' },
+        { name: 'Furia', desc: 'Ogni volta che il golem inizia il proprio turno Ferito (Bloodied), tira 1d6. Con un 6, il golem entra in Furia.\nMentre è in Furia, in ciascuno dei suoi turni attacca la creatura più vicina che riesce a vedere; se non ne ha nessuna a portata, attacca un oggetto. Rimane in Furia finché non viene distrutto o non è più Ferito.' },
+        { name: 'Forma Immutabile', desc: 'Il golem non può cambiare forma.' },
+        { name: 'Resistenza Magica', desc: 'Il golem ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il golem effettua due attacchi Schianto, oppure tre attacchi Schianto se in questo turno ha usato Accelerazione.' },
+        { name: 'Schianto', desc: 'Attacco con arma da mischia: +9 a colpire, portata 1,5 metri.\nColpito: 10 (1d10 + 5) danni contundenti più 6 (1d12) danni da acido. Inoltre il massimo dei punti ferita del bersaglio diminuisce di un ammontare pari ai danni da acido subiti.', atkHit: '+9', atkDmgs: [{ f: '1d10+5', t: 'contundenti' }, { f: '1d12', t: 'acido' }] }
+      ],
+      bonusActions: [
+        { name: 'Accelerazione (Ricarica 5-6)', desc: 'Il golem effettua le azioni Scatto e Disimpegno.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Materiali sacri e reliquie magiche impiegati nella creazione del golem (argilla di un sito sacro, mattoni di una rovina magica).' }],
+      notes: 'Guardiano della Casa e del Focolare\n\nHabitat: Urbano\nTesoro: Reliquie\n\nI golem d\'argilla sono difensori magici creati da terra e argilla per proteggere luoghi o comunità. I materiali impiegati nella loro creazione provengono dalle vicinanze del luogo che proteggono e spesso hanno un significato speciale per i loro creatori, come argilla di un sito sacro o mattoni recuperati da una rovina magica. Alcuni golem sono scolpiti con maestria per assomigliare a esseri viventi, altri possiedono soltanto forme vagamente umanoidi.\n\nQuesti golem obbediscono agli ordini dei loro creatori e proteggono ciò che i loro padroni apprezzano di più. Alcuni continuano a seguire tali ordini molto tempo dopo la morte dei loro creatori.\n\n— Ordini del Golem d\'Argilla (tira 1d4) —\nIl golem segue ordini per...\n1. Bloccare il cammino di chiunque entri in un luogo con un\'arma sguainata.\n2. Difendere qualsiasi membro della famiglia o della comunità del suo creatore minacciato in sua presenza.\n3. Impedire a qualsiasi immondo di attraversare un ponte.\n4. Allontanare chiunque entri nel laboratorio del suo creatore.'
     }
   ];
 
