@@ -2132,7 +2132,7 @@
       notes: 'Draghi della Curiosità e della Comunità\n\nHabitat: Colline\nTesoro: Arcani\n\nI draghi di rame antichi usano calore umano e affidabilità per influenzare il mondo nel corso del tempo. Aprono le loro accoglienti tane agli amici come rifugi di apprendimento e risate per i giovani e per chi è nel bisogno. Vigilano contro le minacce future e vi si oppongono, mentre favoriscono santuari di semplice bontà.\n\n' + DRAGHI_RAME_LORE + '\n\n' + DRAGHI_RAME_TANA + '\n\n(Affrontato nella propria tana, il drago vale 41.000 PE.)'
     },
     {
-      id: 'preset_couatl', name: 'Couatl', emoji: '🌈', rarity: 'uncommon',
+      id: 'preset_couatl', name: 'Couatl', emoji: '🌈', rarity: 'rare',
       type: 'Celestiale', size: 'Media', alignment: 'Legale Buono',
       ac: 19, hp: 60, hpCur: 60, hpTemp: 0, hpDice: '8d8+24', init: 5,
       speed: '9 m, Volare 27 m', cr: '4', xp: '',
