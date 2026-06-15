@@ -49,6 +49,7 @@
   var BULETTE_LORE = 'Conosciute anche come "squali di terra", le bulette sono predatori ossessivi che scavano sottoterra, balzano sopra gli ostacoli e irrompono attraverso di essi all\'inseguimento delle loro prede. Scavano rapidamente appena sotto la superficie del terreno. Quando percepiscono un movimento, erompono dal sottosuolo tentando di catturare le prede nelle loro enormi fauci.';
   var BULLYWUG_LORE = 'I bullywug, incarnazioni fatate delle terre paludose, proteggono le selvagge distese fangose e si considerano favoriti dal cosmo per tale ruolo. Queste creature delle dimensioni di un umano, simili a rospi o rane, intrattengono stretti rapporti con le altre creature della palude.';
   var CENTAURI_LORE = 'I centauri sono difensori delle foreste, delle pianure e dei luoghi intrisi di potere primordiale. Con la parte superiore del corpo simile a quella degli umani e la parte inferiore simile a quella dei cavalli, i centauri si lanciano in battaglia contro chiunque minacci i loro alleati.';
+  var COCKATRICE_LORE = 'Le cockatrici combinano le caratteristiche di galli iracondi e rettili affamati. Pietrificano coloro che mordono: il più lieve dei loro colpi di becco può trasformare la preda in pietra.';
   var PRESETS = [
     {
       id: 'preset_aarakocra_aeromante', name: 'Aarakocra Aeromante', emoji: '🦅', rarity: 'uncommon',
@@ -1927,6 +1928,50 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Arcani', desc: 'Favolosi tesori magici a misura di gigante, raccolti da ogni angolo del mondo o creati dal gigante stesso.' }],
       notes: 'Gigante delle Altezze Più Sublimi\n\nHabitat: Montagna\nTesoro: Arcani\n\nI giganti delle nuvole usano il potere dei cieli per osservare e influenzare sottilmente il mondo. Assomigliano a esseri umani con capelli che vanno dall\'argento al blu e pelle dalle sfumature simili alle nuvole, dal bianco abbagliante ai colori del crepuscolo. Canini ricurvi sporgono dalle loro mascelle superiori oltre il labbro inferiore. In battaglia combattono con armi avvolte da nubi tempestose e lanciano fragorose teste di tuono.\n\nLa maggior parte abita cittadelle che coronano immense montagne oppure palazzi magici che fluttuano tra le nuvole. Molti credono di possedere uno status o uno scopo altrettanto elevati: alcuni si considerano esseri quasi divini che possono manipolare e derubare impunemente le creature terrestri; altri sostengono che la loro lunga vita e il loro posto tra le nuvole concedano prospettive uniche, perciò registrano ciò che osservano nel mondo sottostante senza interferire. In entrambi i casi possiedono spesso favolosi tesori magici, ottenuti in ogni angolo del mondo oppure creati da loro stessi (e a misura di gigante).'
+    },
+    {
+      id: 'preset_cockatrice', name: 'Cockatrice', emoji: '🐓', rarity: 'uncommon',
+      type: 'Mostruosità', size: 'Piccola', alignment: 'Senza Allineamento',
+      ac: 11, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '5d6+5', init: 1,
+      speed: '6 m, Volare 12 m', cr: '1/2', xp: '',
+      str: 6, dex: 12, con: 12, intl: 2, wis: 13, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 11,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: ['Pietrificato'],
+      traits: [],
+      actions: [
+        { name: 'Morso Pietrificante', desc: 'Attacco con arma da mischia: +3 a colpire, portata 1,5 metri.\nColpito: 3 (1d4 + 1) danni perforanti. Se il bersaglio è una creatura, effettua un Tiro Salvezza su Costituzione (CD 11).\nPrimo Fallimento: il bersaglio ottiene la condizione Trattenuto e ripete il tiro salvezza alla fine del suo turno successivo se è ancora Trattenuto, terminando l\'effetto con un successo.\nSecondo Fallimento: il bersaglio ottiene la condizione Pietrificato (per 24 ore) al posto di Trattenuto.', atkHit: '+3', atkDmgs: [{ f: '1d4+1', t: 'perforanti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Volatili Maledetti con il Potere della Pietrificazione\n\nHabitat: Praterie\nTesoro: Nessuno\n\nLe cockatrici spesso cercano di appropriarsi di strutture appariscenti — come rovine e fattorie isolate — usandole come posatoi.\n\n' + COCKATRICE_LORE
+    },
+    {
+      id: 'preset_cockatrice_reggente', name: 'Cockatrice Reggente', emoji: '🐓', rarity: 'uncommon',
+      type: 'Mostruosità', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 15, hp: 136, hpCur: 136, hpTemp: 0, hpDice: '16d10+48', init: 2,
+      speed: '9 m, Volare 18 m', cr: '8', xp: '',
+      str: 19, dex: 14, con: 16, intl: 3, wis: 16, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '6', cha: '' },
+      skillOverrides: {}, passivePerception: 13,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: ['Pietrificato'],
+      traits: [
+        { name: 'Sorvolare', desc: 'La cockatrice non provoca attacchi di opportunità quando vola fuori dalla portata di un nemico.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'La cockatrice effettua un attacco con Morso Pietrificante e due attacchi con Artigli.' },
+        { name: 'Morso Pietrificante', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 13 (2d8 + 4) danni perforanti. Se il bersaglio è una creatura, effettua un Tiro Salvezza su Costituzione (CD 14).\nPrimo Fallimento: il bersaglio ottiene la condizione Trattenuto e ripete il tiro salvezza alla fine del suo turno successivo se è ancora Trattenuto, terminando l\'effetto con un successo.\nSecondo Fallimento: il bersaglio ottiene la condizione Pietrificato al posto di Trattenuto.', atkHit: '+7', atkDmgs: [{ f: '2d8+4', t: 'perforanti' }] },
+        { name: 'Artigli', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 18 (4d6 + 4) danni taglienti.', atkHit: '+7', atkDmgs: [{ f: '4d6+4', t: 'taglienti' }] }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Contraccolpo Magico', desc: 'Innesco: una creatura entro 36 metri dalla cockatrice le infligge danni.\nRisposta: la creatura effettua un Tiro Salvezza su Destrezza (CD 14).\nFallimento: 13 (3d6 + 3) danni da forza.', atkDmgs: [{ f: '3d6+3', t: 'forza' }] }
+      ],
+      legendaryActions: [],
+      drop: [],
+      notes: 'Volatili Maledetti con il Potere della Pietrificazione\n\nHabitat: Praterie\nTesoro: Nessuno\n\nPiù audaci delle loro cugine minori, le cockatrici reggenti traboccano di energia magica instabile che utilizzano per trattenere i nemici lontani.\n\n' + COCKATRICE_LORE
     }
   ];
 
