@@ -2474,6 +2474,71 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Diffusore di Malattie a Due Teste\n\nHabitat: Deserto\nTesoro: Nessuno\n\nI cani della morte sono una piaga delle terre aride che abitano. Questi feroci canidi a due teste tendono imboscate alle creature che percepiscono come più deboli di loro, privilegiando i feriti e gli infermi. Attaccano con sconsiderata aggressività, cercando di infettare quante più creature possibile con le loro mascelle malate. Se vengono scacciati, i cani della morte rimangono nei pressi delle loro vittime, lasciando che l\'infezione indebolisca la preda prima di colpire nuovamente.\n\nLe leggende collegano i cani della morte a malvagie divinità della morte, all\'oltretomba e a sovrani maledetti. Queste storie si basano sul morbo diffuso dai cani della morte. I sintomi seguenti sono puramente narrativi e non modificano gli effetti del Morso; scompaiono quando la vittima non è più Avvelenata dal morso.\n\nSintomi del Morbo del Cane della Morte (1d6):\n1 — Segni di mascelle canine compaiono sul corpo della vittima, come se fosse ancora dilaniata dai morsi.\n2 — Il corpo della vittima si inaridisce, come se fosse costantemente esposto al calore del deserto.\n3 — La vittima è distratta da ululati lontani o sussurri indistinti che soltanto lei può udire.\n4 — La carne della vittima imputridisce come quella di un cadavere.\n5 — Un prurito incessante, come se avesse pulci o granelli di sabbia sotto la pelle.\n6 — Simboli malvagi compaiono gradualmente e si diffondono sul corpo della vittima.\n\n«E i suoi dolori perseguiteranno la tua terra come cani affamati, finché i mari non diverranno sabbia e il sole non si consumerà in cenere.»\n— Frammento di tavoletta del Deserto Splendente'
+    },
+    {
+      id: 'preset_cavaliere_della_morte', name: 'Cavaliere della Morte', emoji: '⚔️', rarity: 'epic',
+      type: 'Non Morto', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 20, hp: 199, hpCur: 199, hpTemp: 0, hpDice: '21d8+105', init: 12,
+      speed: '9 m', cr: '17', xp: '',
+      str: 20, dex: 11, con: 20, intl: 12, wis: 16, cha: 18,
+      savesOverride: { str: '', dex: '6', con: '', intl: '', wis: '9', cha: '' },
+      skillOverrides: {}, passivePerception: 13,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Abissale', 'Comune'],
+      dmgResist: [], dmgImmune: ['Necrotico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Esausto', 'Spaventato', 'Avvelenato'],
+      traits: [
+        { name: 'Resistenza Leggendaria (3/Giorno)', desc: 'Se il cavaliere della morte fallisce un tiro salvezza, può scegliere di superarlo invece.' },
+        { name: 'Resistenza alla Magia', desc: 'Il cavaliere della morte ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Maresciallo dei Non Morti', desc: 'Le creature non morte scelte dal cavaliere della morte (escluso sé stesso) entro un\'emanazione di 18 metri originata da lui hanno vantaggio ai tiri per colpire e ai tiri salvezza. Non può usare questo tratto se possiede la condizione Incapacitato.' },
+        { name: 'Restaurazione Non Morta', desc: 'Se il cavaliere della morte viene distrutto prima di aver espiato il proprio male, ottiene un nuovo corpo in 1d10 giorni, tornando in vita con tutti i suoi punti ferita. Il nuovo corpo appare in un luogo significativo per il cavaliere della morte.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il cavaliere della morte effettua tre attacchi con Lama del Terrore.' },
+        { name: 'Lama del Terrore', desc: 'Attacco con arma da mischia: +11 a colpire, portata 1,5 metri.\nColpito: 12 (2d6 + 5) danni taglienti più 13 (3d8) danni necrotici.', atkHit: '+11', atkDmgs: [{ f: '2d6+5', t: 'taglienti' }, { f: '3d8', t: 'necrotici' }] },
+        { name: 'Globo di Fuoco Infernale (Ricarica 5–6)', desc: 'Tiro Salvezza su Destrezza: CD 18, ogni creatura in una sfera di raggio 6 metri centrata su un punto che il cavaliere della morte può vedere entro 36 metri.\nFallimento: 35 (10d6) danni da fuoco più 35 (10d6) danni necrotici.\nSuccesso: metà danni.', atkDmgs: [{ f: '10d6', t: 'fuoco' }, { f: '10d6', t: 'necrotici' }] },
+        { name: 'Incantare', desc: 'Il cavaliere della morte lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 18).\n\nA volontà: Comando, Destriero Fantomatico.\n\n2/Giorno ciascuno: Onda Distruttiva (necrotica), Dissolvi Magie.' }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Parata', desc: 'Innesco: il cavaliere della morte viene colpito da un tiro per colpire in mischia mentre impugna un\'arma.\nRisposta: aggiunge +6 alla propria CA contro quell\'attacco, facendolo potenzialmente mancare.' }
+      ],
+      legendaryActions: [
+        { name: 'Usi (3 per round)', desc: 'Immediatamente dopo il turno di un\'altra creatura, il cavaliere della morte può spendere un utilizzo per compiere una delle azioni seguenti. Recupera tutti gli utilizzi spesi all\'inizio di ciascuno dei propri turni.' },
+        { name: 'Autorità Terrificante', desc: 'Il cavaliere della morte usa Incantare per lanciare Comando. Non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.' },
+        { name: 'Parola Letale', desc: 'Tiro Salvezza su Costituzione: CD 18, una creatura che il cavaliere della morte può vedere entro 36 metri.\nFallimento: 17 (5d6) danni necrotici e il massimo dei punti ferita del bersaglio diminuisce di un ammontare pari ai danni subiti.\nFallimento o Successo: non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.', atkDmgs: [{ f: '5d6', t: 'necrotici' }] },
+        { name: 'Affondo', desc: 'Il cavaliere della morte si muove fino a metà della propria Velocità ed effettua un attacco con Lama del Terrore.' }
+      ],
+      drop: [{ name: 'Armamenti', desc: 'Le armi e l\'armatura del cavaliere della morte.' }],
+      notes: 'Comandante Infestato di Legioni Immortali\n\nHabitat: Qualsiasi\nTesoro: Armamenti\n\nCampioni del male, i cavalieri della morte sono signori della guerra scheletrici rivestiti d\'armatura. Combinando una devastante maestria marziale e una magia blasfema, questi tiranni immortali guidano legioni empie contro i viventi o covano nelle loro cittadelle maledette. Ogni cavaliere della morte è perseguitato da un\'eredità di tragedia e disonore che lo spinge a commettere mali ancora più grandi.\n\nI cavalieri della morte sono combattenti letali e comandanti dominatori dal passato tetro. Alcuni si sforzano di spezzare le maledizioni che li condannano alla non morte, sebbene le loro anime egoiste li incatenino eternamente al proprio destino. Altri, come l\'infame Lord Soth, rimuginano per secoli tra lugubri rovine, destandosi all\'azione soltanto quando qualcosa riaccende la loro malvagità imperitura.'
+    },
+    {
+      id: 'preset_aspirante_cavaliere_della_morte', name: 'Aspirante Cavaliere della Morte', emoji: '🗡️', rarity: 'rare',
+      type: 'Non Morto', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 20, hp: 178, hpCur: 178, hpTemp: 0, hpDice: '21d8+84', init: 4,
+      speed: '9 m', cr: '11', xp: '',
+      str: 20, dex: 10, con: 18, intl: 10, wis: 12, cha: 16,
+      savesOverride: { str: '', dex: '4', con: '', intl: '', wis: '5', cha: '' },
+      skillOverrides: {}, passivePerception: 11,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Abissale', 'Comune'],
+      dmgResist: [], dmgImmune: ['Necrotico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Esausto', 'Spaventato', 'Avvelenato'],
+      traits: [
+        { name: 'Resistenza alla Magia', desc: 'L\'aspirante ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Maresciallo dei Non Morti', desc: 'Le creature non morte scelte dall\'aspirante (escluso sé stesso) entro un\'emanazione di 18 metri originata da lui hanno vantaggio ai tiri per colpire e ai tiri salvezza. Non può usare questo tratto se possiede la condizione Incapacitato.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'aspirante effettua tre attacchi con Lama del Terrore.' },
+        { name: 'Lama del Terrore', desc: 'Attacco con arma da mischia: +9 a colpire, portata 1,5 metri.\nColpito: 14 (2d8 + 5) danni taglienti più 10 (3d6) danni necrotici.', atkHit: '+9', atkDmgs: [{ f: '2d8+5', t: 'taglienti' }, { f: '3d6', t: 'necrotici' }] },
+        { name: 'Globo di Fuoco Infernale (Ricarica 5–6)', desc: 'Tiro Salvezza su Destrezza: CD 15, ogni creatura in una sfera di raggio 6 metri centrata su un punto che l\'aspirante può vedere entro 36 metri.\nFallimento: 21 (6d6) danni da fuoco più 21 (6d6) danni necrotici.\nSuccesso: metà danni.', atkDmgs: [{ f: '6d6', t: 'fuoco' }, { f: '6d6', t: 'necrotici' }] },
+        { name: 'Incantare', desc: 'L\'aspirante lancia uno dei seguenti incantesimi usando il Carisma come caratteristica da incantatore (CD 15).\n\nA volontà: Destriero Fantomatico.\n\n1/Giorno ciascuno: Onda Distruttiva (necrotica), Dissolvi Magie.' }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Parata', desc: 'Innesco: l\'aspirante viene colpito da un tiro per colpire in mischia mentre impugna un\'arma.\nRisposta: aggiunge +4 alla propria CA contro quell\'attacco, facendolo potenzialmente mancare.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Le armi e l\'armatura dell\'aspirante cavaliere della morte.' }],
+      notes: 'Comandante Infestato di Legioni Immortali\n\nHabitat: Qualsiasi\nTesoro: Armamenti\n\nCampioni del male, i cavalieri della morte sono signori della guerra scheletrici rivestiti d\'armatura. Combinando una devastante maestria marziale e una magia blasfema, questi tiranni immortali guidano legioni empie contro i viventi o covano nelle loro cittadelle maledette. Ogni cavaliere della morte è perseguitato da un\'eredità di tragedia e disonore che lo spinge a commettere mali ancora più grandi.\n\nQuando il capo di un ordine malvagio ascende a cavaliere della morte, i suoi devoti seguaci potrebbero unirsi a lui nella sua esistenza maledetta come aspiranti cavalieri della morte. Questi seguaci possiedono una parte del potere del loro signore e servono come facevano in vita, obbedendo fedelmente ai decreti del cavaliere della morte e annunciandone la terribile volontà.'
     }
   ];
 
