@@ -47,6 +47,11 @@ window.SPELLS_IT = {
     description: "Sussurrando agli spiriti della natura, crei uno tra diversi effetti minori: un piccolo predittore meteorologico sensoriale innocuo, fai sbocciare istantaneamente un fiore, crei un effetto sensoriale istantaneo innocuo, oppure accendi o spegni istantaneamente una candela, una torcia o un piccolo falò.",
     higherLevels: null
   },
+  "Elementalism": {
+    name: "Elementalismo",
+    description: "Eserciti il controllo sugli elementi, creando uno dei seguenti effetti entro gittata. Richiamo dell'Aria: crei una brezza abbastanza forte da increspare un tessuto, sollevare la polvere, far frusciare le foglie e chiudere porte e persiane aperte, il tutto in un Cubo di 1,5 metri. Richiamo della Terra: crei un sottile velo di polvere o sabbia che ricopre le superfici in un quadrato di 1,5 metri di lato, oppure fai comparire una singola parola scritta nella tua calligrafia in una zona di terra o sabbia. Richiamo del Fuoco: crei una sottile nube di braci innocue e fumo colorato e profumato in un Cubo di 1,5 metri, in grado di accendere candele, torce o lampade nell'area. Richiamo dell'Acqua: crei uno spruzzo di fredda foschia che inumidisce leggermente creature e oggetti in un Cubo di 1,5 metri, oppure crei 1 tazza d'acqua pulita. Scolpire Elemento: fai assumere a terra, sabbia, fuoco, fumo, foschia o acqua che possano stare in un Cubo di 30 centimetri una forma grezza per 1 ora.",
+    higherLevels: null
+  },
   "Eldritch Blast": {
     name: "Deflagrazione Occulta",
     description: "Un raggio di energia crepitante sfreccia verso una creatura entro la gittata. Esegui un attacco a distanza con incantesimo. Se colpisci, il bersaglio subisce 1d10 danni da forza.",

@@ -71,7 +71,7 @@
       actions: [
         { name: 'Multiattacco', desc: 'L\'aarakocra effettua due attacchi con il Bastone del Vento e può utilizzare Incantare per lanciare Folata di Vento.' },
         { name: 'Bastone del Vento', desc: 'Attacco con arma da mischia o a distanza: +5 a colpire.\nPortata 1,5 m oppure gittata 36/72 m.\nColpito: 7 (1d8 + 3) danni contundenti più 11 (2d10) danni da fulmine.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'contundenti' }, { f: '2d10', t: 'fulmine' }] },
-        { name: 'Incantare', desc: 'L\'aarakocra lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 13 per i tiri salvezza).\n\nA volontà: Controllo Elementale (Elementalism), Folata di Vento (Gust of Wind), Mano Magica (Mage Hand), Messaggio (Message).\n\n1 volta al giorno: Fulmine (Lightning Bolt).' }
+        { name: 'Incantare', desc: 'L\'aarakocra lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 13 per i tiri salvezza).\n\nA volontà: Elementalismo (Elementalism), Folata di Vento (Gust of Wind), Mano Magica (Mage Hand), Messaggio (Message).\n\n1 volta al giorno: Fulmine (Lightning Bolt).' }
       ],
       bonusActions: [],
       reactions: [
@@ -1222,7 +1222,7 @@
         { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con un uso di Incantesimi per lanciare Frantumare.' },
         { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +12 a colpire, portata 3 metri.\nColpito: 16 (2d8 + 7) danni taglienti più 5 (1d10) danni da fulmine.', atkHit: '+12', atkDmgs: [{ f: '2d8+7', t: 'taglienti' }, { f: '1d10', t: 'fulmine' }] },
         { name: 'Soffio Fulminante (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 19. Ogni creatura in una linea lunga 27 metri e larga 1,5 metri.\nFallimento: 60 (11d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '11d10', t: 'fulmine' }] },
-        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 18, +10 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Invisibilità, Mano Magica, Frantumare.\n\n1/Giorno ciascuno: Scrutare, Messaggio Onirico.' }
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 18, +10 a colpire con gli attacchi con incantesimo).\n\nA volontà: Individuazione del Magico, Invisibilità, Mano Magica, Frantumare.\n\n1/Giorno ciascuno: Scrutare, Inviare.' }
       ],
       bonusActions: [],
       reactions: [],
@@ -1252,7 +1252,7 @@
         { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con un uso di Incantesimi per lanciare Frantumare (versione di 3° livello).' },
         { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +16 a colpire, portata 4,5 metri.\nColpito: 18 (2d8 + 9) danni taglienti più 11 (2d10) danni da fulmine.', atkHit: '+16', atkDmgs: [{ f: '2d8+9', t: 'taglienti' }, { f: '2d10', t: 'fulmine' }] },
         { name: 'Soffio Fulminante (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 23. Ogni creatura in una linea lunga 36 metri e larga 3 metri.\nFallimento: 88 (16d10) danni da fulmine. Successo: metà danni.', atkDmgs: [{ f: '16d10', t: 'fulmine' }] },
-        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 22).\n\nA volontà: Individuazione del Magico, Invisibilità, Mano Magica, Frantumare (versione di 3° livello).\n\n1/Giorno ciascuno: Scrutare, Messaggio Onirico.' }
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando Carisma come caratteristica da incantatore (CD 22).\n\nA volontà: Individuazione del Magico, Invisibilità, Mano Magica, Frantumare (versione di 3° livello).\n\n1/Giorno ciascuno: Scrutare, Inviare.' }
       ],
       bonusActions: [],
       reactions: [],
