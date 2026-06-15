@@ -2130,6 +2130,32 @@
       ],
       drop: [{ name: 'Arcani', desc: 'Doni e ricordi cari al drago, più reliquie magiche accumulate nei secoli nelle sue accoglienti tane.' }],
       notes: 'Draghi della Curiosità e della Comunità\n\nHabitat: Colline\nTesoro: Arcani\n\nI draghi di rame antichi usano calore umano e affidabilità per influenzare il mondo nel corso del tempo. Aprono le loro accoglienti tane agli amici come rifugi di apprendimento e risate per i giovani e per chi è nel bisogno. Vigilano contro le minacce future e vi si oppongono, mentre favoriscono santuari di semplice bontà.\n\n' + DRAGHI_RAME_LORE + '\n\n' + DRAGHI_RAME_TANA + '\n\n(Affrontato nella propria tana, il drago vale 41.000 PE.)'
+    },
+    {
+      id: 'preset_couatl', name: 'Couatl', emoji: '🌈', rarity: 'uncommon',
+      type: 'Celestiale', size: 'Media', alignment: 'Legale Buono',
+      ac: 19, hp: 60, hpCur: 60, hpTemp: 0, hpDice: '8d8+24', init: 5,
+      speed: '9 m, Volare 27 m', cr: '4', xp: '',
+      str: 16, dex: 20, con: 17, intl: 18, wis: 20, cha: 18,
+      savesOverride: { str: '', dex: '', con: '5', intl: '', wis: '7', cha: '' },
+      skillOverrides: {}, passivePerception: 15,
+      senses: [{ type: 'Vista del Vero', value: 36, unit: 'm' }], languages: ['Tutte le lingue', 'Telepatia 36 m'],
+      dmgResist: ['Contundente', 'Perforante', 'Tagliente'], dmgImmune: ['Psichico', 'Radioso'], dmgVulner: [],
+      condImmune: [],
+      traits: [
+        { name: 'Mente Protetta', desc: 'I pensieri del couatl non possono essere letti con alcun mezzo e le altre creature possono comunicare telepaticamente con lui solo se il couatl lo consente.' }
+      ],
+      actions: [
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 11 (1d12 + 5) danni perforanti e il bersaglio ottiene la condizione Avvelenato fino alla fine del turno successivo del couatl.', atkHit: '+7', atkDmgs: [{ f: '1d12+5', t: 'perforanti' }] },
+        { name: 'Costrizione', desc: 'Tiro Salvezza su Forza: CD 15, una creatura Media o più piccola che il couatl può vedere entro 1,5 metri.\nFallimento: 8 (1d6 + 5) danni contundenti; il bersaglio ottiene la condizione Afferrato (CD 13 per sfuggire) e la condizione Trattenuto finché la presa non termina.', atkDmgs: [{ f: '1d6+5', t: 'contundenti' }] },
+        { name: 'Incantesimi', desc: 'Il couatl lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 15).\n\nA volontà: Individuazione del Bene e del Male, Individuazione del Magico, Individuazione dei Pensieri, Mutaforma (solo forma di Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta).\n\n1/Giorno ciascuno: Creare Cibo e Acqua, Sogno, Restaurazione Superiore, Scrutare, Sonno.' }
+      ],
+      bonusActions: [
+        { name: 'Aiuto Divino (2/Giorno)', desc: 'Il couatl lancia Benedizione, Restaurazione Minore oppure Santuario, senza componenti materiali e usando la stessa caratteristica da incantatore degli Incantesimi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Segreti divini, profezie e reliquie sacre custodite dal couatl, forse perfino il suo meraviglioso uovo dai colori dell\'arcobaleno.' }],
+      notes: 'Manifestazione Guardiana del Divino\n\nHabitat: Deserto, Foresta, Prateria, Urbano\nTesoro: Reliquie\n\nIncarnazioni della profezia e custodi dei segreti divini, i couatl fanno sì che il destino si svolga come dovrebbe. Assomigliano a serpenti con ali dai colori dell\'arcobaleno, e ciascuno è la manifestazione di un decreto divino, di una verità o di un fato che una giusta divinità vuole resti immutabile per sempre. La maggior parte dei couatl appare in luoghi di antico potere, dove protegge magie nascoste o garantisce che eventi profetizzati avvengano — o non avvengano. Più raramente vigilano su comunità o percorrono il mondo sotto mentite spoglie, interpretando presagi o manipolando gli eventi affinché il destino segua il corso appropriato.\n\nMotivati da mandati eterni, i couatl talvolta si comportano in modi imperscrutabili o apparentemente ostili. Sono inflessibili e intransigenti, poiché la loro esistenza è legata in modo fondamentale alle direttive divine, ma arrecano danno alle altre creature soltanto quando è assolutamente necessario per raggiungere obiettivi divini.\n\nOgni couatl attraversa un periodo di rinnovamento al termine di un\'era: quando l\'era volge alla fine, depone un meraviglioso uovo dai colori dell\'arcobaleno e poi muore. Per un certo periodo il suo compito rimane senza custode; trascorso questo tempo, dallo stesso uovo si schiude il medesimo couatl, completamente cresciuto e rinnovato per servire per un\'altra era.'
     }
   ];
 
