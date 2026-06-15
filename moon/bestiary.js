@@ -2005,6 +2005,26 @@
       ],
       drop: [{ name: 'Reliquie', desc: 'Il possente cristallo divino nel cuore del colosso e reliquie sacre dei suoi creatori.' }],
       notes: 'Titanico Vascello del Potere Divino\n\nHabitat: Qualsiasi\nTesoro: Reliquie\n\nI colossi sono enormi Costrutti creati dai devoti per riflettere la natura di una divinità, benevola o malvagia che sia. Pulsano di incredibile magia e manifestano la volontà divina sulla terra.\n\nSchiere di artigiani fedeli forgiano un colosso in una forma che onori la loro divinità, quindi invocano quel dio affinché infonda vita alla statua. Questo arduo processo può richiedere decenni e coinvolgere centinaia di lavoratori. Se la divinità favorisce la creazione, il possente cristallo nel cuore del costrutto pulsa di potere divino e il colosso si erge per proteggere i fedeli o realizzare la volontà del dio.\n\nLa maggior parte dei colossi fu creata in epoche remote e ora giace dormiente in terre selvagge e isolate, risvegliandosi soltanto quando viene disturbata o richiamata a servire ancora una volta.'
+    },
+    {
+      id: 'preset_popolano', name: 'Popolano', emoji: '🧑', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 10, hp: 4, hpCur: 4, hpTemp: 0, hpDice: '1d8', init: 0,
+      speed: '9 m', cr: '0', xp: '',
+      str: 10, dex: 10, con: 10, intl: 10, wis: 10, cha: 10,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Addestramento', desc: 'Il popolano possiede competenza in un\'abilità a scelta del DM e ha Vantaggio ogni volta che effettua una prova di caratteristica usando quell\'abilità.' }
+      ],
+      actions: [
+        { name: 'Randello', desc: 'Attacco con arma da mischia: +2 a colpire, portata 1,5 metri.\nColpito: 2 (1d4) danni contundenti.', atkHit: '+2', atkDmgs: [{ f: '1d4', t: 'contundenti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Beni Personali', desc: 'Un randello e i modesti effetti personali del popolano.' }],
+      notes: 'Gente Comune\n\nHabitat: Qualsiasi\nTesoro: Individuale\n\nI popolani costituiscono la maggioranza delle persone che non perseguono talenti magici, addestramenti straordinari o una vita d\'avventura. Alcuni sono individui generosi e disponibili, mentre altri sono più cauti nel condividere ciò che possiedono.\n\n— Mestieri e ruoli (esempi) —\nArtista, Fornaio, Oste, Fabbro, Macellaio, Prigioniero, Carpentiere, Naufrago, Calzolaio, Cuoco, Tintore, Contadino, Pescatore, Costruttore di frecce, Imbroglione, Pettegolo, Eremita, Teppista, Cacciatore, Locandiere, Manovale, Lampionaio, Muratore, Mercante, Minatore, Vagabondo, Paziente, Pellegrino, Resurrezionista, Rivoltoso, Scriba, Servitore, Pastore, Studente, Sarto, Conciatore, Banditore, Tessitore, Ragazzo.\n\n(Resurrezionista: storicamente un trafugatore di cadaveri che vendeva corpi a medici e anatomisti.)'
     }
   ];
 
