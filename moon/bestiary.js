@@ -2653,6 +2653,33 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Felino Predatore dall\'Aspetto Ingannatore\n\nHabitat: Foresta\nTesoro: Nessuno\n\nUna bestia distorcente assomiglia a una pantera magra a sei zampe, con un tentacolo uncinato che spunta da ciascuna spalla. Questo predatore utilizza una magia innata per distorcere la luce, facendo apparire sé stesso a diversi metri di distanza dalla sua posizione reale.\n\nLe bestie distorcenti cacciano non solo per nutrirsi, ma anche perché amano uccidere. Una volta che iniziano a inseguire una preda, non possono essere scoraggiate finché non viene uccisa la preda o la bestia stessa. Sebbene abitino comunemente fitte foreste, possono inseguire viaggiatori per grandi distanze e persino fino a città o sotterranei. Più astute di semplici animali, queste creature possono tendere imboscate o restare nascoste per giorni per abbattere la loro preda.\n\nTalvolta le bestie distorcenti inseguono le loro prede attraverso portali verso altri piani di esistenza. Per questo motivo possono essere trovate in tutto il multiverso, specialmente nei mondi del Piano Materiale, nella Coltre Oscura (Shadowfell) e nel Feywild. Questi cacciatori irrequieti possono distruggere l\'equilibrio naturale di una regione e portare altre creature all\'estinzione: per questo molti circoli druidici e folletti considerano le bestie distorcenti una minaccia mortale.\n\n«La furia omicida di una bestia distorcente è adatta solo agli incubi, come ho imparato dopo essere sopravvissuto a stento a una sua imboscata. Sono certo che quella creatura mi stia ancora dando la caccia.»\n— Jen-Ahb, naturalista e sopravvissuto a una bestia distorcente'
+    },
+    {
+      id: 'preset_djinni', name: 'Djinni', emoji: '🌬️', rarity: 'epic',
+      type: 'Elementale', size: 'Grande', alignment: 'Neutrale',
+      ac: 17, hp: 218, hpCur: 218, hpTemp: 0, hpDice: '19d10+114', init: 2,
+      speed: '9 m, Volare 27 m (fluttuare)', cr: '11', xp: '',
+      str: 21, dex: 15, con: 22, intl: 15, wis: 16, cha: 20,
+      savesOverride: { str: '', dex: '6', con: '', intl: '', wis: '7', cha: '' },
+      skillOverrides: {}, passivePerception: 13,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Primordiale (Auran)'],
+      dmgResist: [], dmgImmune: ['Fulmine', 'Tuono'], dmgVulner: [],
+      condImmune: [],
+      traits: [
+        { name: 'Restaurazione Elementale', desc: 'Se il djinni muore al di fuori del Piano Elementale dell\'Aria, il suo corpo si dissolve in nebbia ed esso ottiene un nuovo corpo in 1d4 giorni, tornando in vita con tutti i suoi punti ferita da qualche parte sul Piano dell\'Aria.' },
+        { name: 'Resistenza alla Magia', desc: 'Il djinni ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Desideri', desc: 'Il djinni ha una probabilità del 30% di conoscere l\'incantesimo Desiderio. Se lo conosce, può lanciarlo soltanto per conto di una creatura non genio che esprima un desiderio in un modo che il djinni possa comprendere. Lanciandolo per tale creatura, non subisce alcuno stress dell\'incantesimo. Dopo averlo lanciato tre volte, non può farlo di nuovo per 365 giorni.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il djinni effettua tre attacchi, usando Lama della Tempesta o Dardo della Tempesta in qualsiasi combinazione.' },
+        { name: 'Lama della Tempesta', desc: 'Attacco con arma da mischia: +9 a colpire, portata 1,5 metri.\nColpito: 12 (2d6 + 5) danni taglienti più 7 (2d6) danni da fulmine.', atkHit: '+9', atkDmgs: [{ f: '2d6+5', t: 'taglienti' }, { f: '2d6', t: 'fulmine' }] },
+        { name: 'Dardo della Tempesta', desc: 'Attacco con arma a distanza: +9 a colpire, gittata 36 metri.\nColpito: 13 (3d8) danni da tuono.\nSe il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Prono.', atkHit: '+9', atkDmgs: [{ f: '3d8', t: 'tuono' }] },
+        { name: 'Creare Turbine', desc: 'Il djinni evoca un turbine in un punto che può vedere entro 36 metri. Il turbine riempie un cilindro di raggio 6 metri e altezza 18 metri centrato su quel punto e permane finché il djinni mantiene la Concentrazione. All\'inizio di ciascuno dei suoi turni il djinni può spostare il turbine fino a 6 metri.\nQuando il turbine entra nello spazio di una creatura, o una creatura vi entra, quella creatura deve effettuare un Tiro Salvezza su Forza CD 17 (una sola volta per turno; il djinni ne è immune).\nFallimento: finché si trova nel turbine il bersaglio ottiene la condizione Trattenuto e si muove insieme al turbine. All\'inizio di ciascuno dei suoi turni il bersaglio Trattenuto subisce 21 (6d6) danni da tuono.\nAlla fine di ciascuno dei suoi turni il bersaglio ripete il tiro salvezza, terminando l\'effetto su sé stesso con un successo.' },
+        { name: 'Incantare', desc: 'Il djinni lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 17).\n\nA volontà: Individuazione del Bene e del Male, Individuazione del Magico.\n\n2/Giorno ciascuno: Creare Cibo e Acqua (può creare vino al posto dell\'acqua), Linguaggi, Camminare nel Vento.\n\n1/Giorno ciascuno: Creazione, Forma Gassosa, Invisibilità, Immagine Maggiore, Spostamento Planare.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Tesori raccolti nei palazzi aerei e nelle città fluttuanti: arcani, opere d\'arte e ricchezze di mille piani.' }],
+      notes: 'Genio dell\'Aria\n\nHabitat: Costa, Piano Elementale dell\'Aria\nTesoro: Arcani\n\nIn quanto geni dei venti e dei cieli, i djinni incarnano libertà e potenza. Possono controllare il vento e viaggiare rapidi come una brezza. Possono essere sereni come nuvole alla deriva o tempestosi come una burrasca, ma la maggior parte dei djinni ama la libertà e desidera scoprire le meraviglie del multiverso. I djinni conoscono spesso numerose storie e amano condividerle con chi offre in cambio altri racconti interessanti.\n\nSebbene molti djinni creino palazzi aerei sulle coste battute dalle tempeste o tra le alte nubi, innumerevoli altri abitano il Piano Elementale dell\'Aria. Nelle loro città fluttuanti raccolgono racconti ed esperienze da tutti i piani dell\'esistenza, condividendoli in favolosi forum, biblioteche e teatri. La più grande di queste città è la Cittadella del Ghiaccio e dell\'Acciaio, le cui torri scolpite dal vento custodiscono un tesoro di conoscenze e ricchezze grande quanto una città, al di là di ogni immaginazione.'
     }
   ];
 
