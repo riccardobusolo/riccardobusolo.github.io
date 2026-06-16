@@ -2806,6 +2806,34 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Demoni della Frenesia e della Volgarità\n\nHabitat: Abisso (Planare)\nTesoro: Nessuno\n\nServitori e vittime di demoni più potenti, i dretch incarnano istinti meschini, impulsi caotici e violente pulsioni. Esistono in numeri insondabili nelle profondità dell\'Abisso, dove le loro orde fetide riempiono vasti eserciti demoniaci.\n\nGli sciami di dretch talvolta sfuggono all\'Abisso raggiungendo altri piani di esistenza, oppure fanno parte di un\'invasione demoniaca. Senza una guida, questi rozzi demoni devastano e depredano con crudele entusiasmo.\n\n«Ah, le infinite meraviglie dell\'Abisso. Se c\'è qualcosa che non ti piace, la troverai qui.»\n— Jaranda, esperta dell\'Abisso'
+    },
+    {
+      id: 'preset_drider', name: 'Drider', emoji: '🕷️', rarity: 'uncommon',
+      type: 'Mostruosità', size: 'Grande', alignment: 'Caotico Malvagio',
+      ac: 19, hp: 123, hpCur: 123, hpTemp: 0, hpDice: '13d10+52', init: 4,
+      speed: '9 m, Scalare 9 m', cr: '6', xp: '',
+      str: 16, dex: 19, con: 18, intl: 13, wis: 16, cha: 12,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '6', furtivita: '10' }, passivePerception: 16,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Elfico', 'Sottocomune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: [],
+      traits: [
+        { name: 'Arrampicata del Ragno', desc: 'Il drider può scalare superfici difficili, inclusi i soffitti, senza dover effettuare prove di caratteristica.' },
+        { name: 'Sensibilità alla Luce Solare', desc: 'Mentre si trova alla luce del sole, il drider ha svantaggio alle prove di caratteristica e ai tiri per colpire.' },
+        { name: 'Camminatore delle Ragnatele', desc: 'Il drider ignora le restrizioni al movimento causate dalle ragnatele e conosce la posizione di qualsiasi altra creatura in contatto con la stessa ragnatela.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drider effettua tre attacchi usando Zampa Anteriore o Raffica Velenosa in qualsiasi combinazione.' },
+        { name: 'Zampa Anteriore', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 13 (2d8 + 4) danni perforanti.', atkHit: '+7', atkDmgs: [{ f: '2d8+4', t: 'perforanti' }] },
+        { name: 'Raffica Velenosa', desc: 'Attacco con arma a distanza: +6 a colpire, gittata 36 metri.\nColpito: 13 (3d6 + 3) danni da veleno.', atkHit: '+6', atkDmgs: [{ f: '3d6+3', t: 'veleno' }] }
+      ],
+      bonusActions: [
+        { name: 'Magia della Regina Ragno (Ricarica 5–6)', desc: 'Il drider lancia Oscurità, Luminescenza oppure Ragnatela senza componenti materiali, usando la Saggezza come caratteristica da incantatore (CD 14).' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Armi e armature, spesso bottino delle prede e dei nemici catturati nelle sue ragnatele.' }],
+      notes: 'Cacciatore Aracnide del Sottosuolo\n\nHabitat: Foresta, Sottosuolo\nTesoro: Armamenti\n\nI drider combinano le caratteristiche dei drow e dei ragni giganti. La malvagia dea Lolth ama trasformare i suoi adoratori drow in drider, come benedizione o maledizione. Questi drider spesso diventano servitori fanatici della loro dea, oppure vengono sopraffatti dalla trasformazione e vivono soltanto per soddisfare i loro istinti predatori aracnidi.\n\nI drider possono comparire anche quando intere comunità vengono trasformate dall\'ira di una divinità malvagia o da altri mezzi magici, oppure possono costituire parte della popolazione naturale di un mondo. La maggior parte vive sottoterra o in foreste fitte, dove può sfruttare al meglio le proprie caratteristiche aracnidi.\n\nMetamorfosi del Drider (1d6) — il drider ha ottenuto la sua forma come...\n1 — Una benedizione da una divinità degli assassini, delle terre selvagge pericolose o del Sottosuolo.\n2 — Una maledizione lanciata da una potente megèra, una strega vendicativa o un misterioso artefatto.\n3 — Un esperimento di un aboleth, di un illithid o di un altro manipolatore della vita.\n4 — Un mezzo magico per sfuggire a un disastro o a un destino peggiore.\n5 — Una mutazione dovuta all\'esposizione a energie planari caotiche o a strane radiazioni del Sottosuolo.\n6 — Una punizione inflitta da una divinità rancorosa, come Lolth o la Regina dell\'Aria e delle Tenebre.'
     }
   ];
 
