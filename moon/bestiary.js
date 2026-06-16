@@ -2570,6 +2570,37 @@
       ],
       drop: [{ name: 'Qualsiasi', desc: 'Tesori e arcana accumulati nella tana, spesso accanto ai resti dei servitori non morti del tiranno.' }],
       notes: 'Beholder Oltre la Morte\n\nHabitat: Sottosuolo\nTesoro: Qualsiasi\n\n(Affrontato nella propria tana, il tiranno della morte vale 13.000 PE.)\n\nUn tiranno della morte è un beholder che persegue obiettivi aberranti oltre la propria morte. Dieci singolarità magiche — tutto ciò che resta dei suoi occhi magici — orbitano attorno al suo fluttuante cranio ciclopico, mentre lo sguardo colmo d\'odio della sua orbita oculare centrale soffoca la vita e risveglia i morti.\n\nI beholder tipicamente si trasformano in tiranni della morte nel corso degli anni, quando i loro sogni si fissano sulla morte, su apoteosi morbose o su viaggi verso reami inospitali alla vita. Alcuni sorgono dai cadaveri di beholder uccisi o per esposizione a strane magie o alle radiazioni del Sottosuolo. Talvolta i beholder perseguono intenzionalmente questo stato non morto, proprio come alcuni maghi depravati ricercano la lichità, sebbene ciò sia raro: la maggior parte dei beholder già si considera un essere perfetto.\n\nIndipendentemente da come vengano a esistere, impulsi bizzarri guidano la loro esistenza immortale. Le loro motivazioni tendono a essere estreme o al di là della comprensione delle creature viventi.\n\n«Un gruppo di minuscole luci discese da una oscura crepa nel soffitto. Queste scintille proiettavano un bagliore inquietante sull\'enorme cranio alieno sospeso sotto di loro.»\n— Diario di Jastus Hollowquill, esploratore di Sottomonte\n\n— Tana del Tiranno della Morte —\nI tiranni della morte si annidano nelle profondità del Sottosuolo, nei labirinti di tunnel che occupavano in vita o nelle tane dei beholder che hanno conquistato. Queste tane sono prive di vita, poiché i tiranni della morte trasformano i loro servitori in orrori non morti. La regione entro 1 miglio (1,6 km) dalla tana è deformata dalla loro presenza, generando i seguenti effetti regionali.\n\nInfusione di Energia Negativa: ogni volta che una creatura entro 1 miglio dalla tana recupera punti ferita tramite un incantesimo, sottrae 1d10 al numero di punti ferita recuperati.\n\nScopofobia: le creature entro 1 miglio dalla tana si sentono costantemente osservate. Qualsiasi creatura (eccetto il tiranno della morte e i suoi alleati) che completa un Riposo Breve entro 1 miglio dalla tana deve superare un Tiro Salvezza su Saggezza CD 15 oppure non ottiene alcun beneficio da quel riposo.\n\nSe il tiranno della morte muore o sposta altrove la propria tana, questi effetti terminano immediatamente.'
+    },
+    {
+      id: 'preset_demilich', name: 'Demilich', emoji: '☠️', rarity: 'epic',
+      type: 'Non Morto', size: 'Minuscola', alignment: 'Neutrale Malvagio',
+      ac: 20, hp: 180, hpCur: 180, hpTemp: 0, hpDice: '72d4', init: 17,
+      speed: '1,5 m, Volare 9 m (fluttuare)', cr: '18', xp: '',
+      str: 1, dex: 20, con: 10, intl: 20, wis: 17, cha: 20,
+      savesOverride: { str: '', dex: '11', con: '6', intl: '11', wis: '9', cha: '' },
+      skillOverrides: {}, passivePerception: 13,
+      senses: [{ type: 'Vista del Vero', value: 36, unit: 'm' }], languages: [],
+      dmgResist: ['Contundente', 'Perforante', 'Tagliente'], dmgImmune: ['Necrotico', 'Veleno', 'Psichico'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Assordato', 'Esausto', 'Spaventato', 'Paralizzato', 'Pietrificato', 'Avvelenato', 'Prono', 'Stordito'],
+      traits: [
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il demilich fallisce un tiro salvezza, può scegliere di superarlo invece.' },
+        { name: 'Restaurazione Non Morta', desc: 'Se il demilich viene distrutto, si riforma e recupera tutti i suoi punti ferita in 1d10 giorni, a meno che non venga lanciato l\'incantesimo Desiderio sui suoi resti.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il demilich effettua tre attacchi con Esplosione Necrotica.' },
+        { name: 'Esplosione Necrotica', desc: 'Attacco con arma da mischia o a distanza: +11 a colpire, portata 1,5 metri oppure gittata 36 metri.\nColpito: 24 (7d6) danni necrotici.', atkHit: '+11', atkDmgs: [{ f: '7d6', t: 'necrotici' }] },
+        { name: 'Ululato (Ricarica 5–6)', desc: 'Tiro Salvezza su Costituzione: CD 19, ogni creatura in un\'emanazione di 9 metri originata dal demilich.\nFallimento: 70 (20d6) danni psichici.\nFallimento o Successo: il bersaglio acquisisce la condizione Spaventato fino all\'inizio del turno successivo del demilich.', atkDmgs: [{ f: '20d6', t: 'psichici' }] }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi (3 per round, 4 nella Tana)', desc: 'Il demilich può usare una sola azione leggendaria alla volta, immediatamente dopo il turno di un\'altra creatura. Recupera tutti gli usi spesi all\'inizio del proprio turno.' },
+        { name: 'Risucchio di Energia', desc: 'Tiro Salvezza su Costituzione: CD 19, una creatura che il demilich può vedere entro 36 metri.\nFallimento: il massimo dei punti ferita del bersaglio diminuisce di 14 (4d6).\nFallimento o Successo: il demilich non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.' },
+        { name: 'Volo di Polvere Sepolcrale', desc: 'Il demilich vola fino alla propria velocità di volo, spargendo polvere tombale. Ogni creatura entro 1,5 metri dal demilich mentre si muove deve effettuare un Tiro Salvezza su Costituzione CD 19.\nFallimento: il bersaglio acquisisce la condizione Accecato fino alla fine del turno successivo del demilich.\nFallimento o Successo: il demilich non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.' },
+        { name: 'Necrosi', desc: 'Il demilich effettua un attacco con Esplosione Necrotica.', atkHit: '+11', atkDmgs: [{ f: '7d6', t: 'necrotici' }] }
+      ],
+      drop: [{ name: 'Arcani', desc: 'Gemme e sigilli arcani incastonati nel teschio, e i tesori accumulati nel santuario intrappolato del demilich.' }],
+      notes: 'Ciò che si Trova Oltre la Lichità\n\nHabitat: Qualsiasi\nTesoro: Arcani\n\n(Affrontato nella propria tana, il demilich vale 22.000 PE.)\n\nUn demilich è un teschio che custodisce i resti dell\'essenza malvagia di un lich. Se il peso dell\'immortalità sopraffà un lich, la sua coscienza si ripiega su sé stessa mentre il corpo si decompone. Ma se i suoi resti vengono disturbati, un demilich si risveglia. I demilich appaiono solitamente come teschi adornati di gemme o sigilli arcani.\n\n— Tana del Demilich —\nI demilich custodiscono gelosamente i loro santuari colmi di trappole mortali. Il più famigerato di questi è la Tomba degli Orrori, la tana dell\'infame Acererak. La regione entro 1 miglio dalla tana è deformata dalla presenza del demilich, generando i seguenti effetti regionali.\n\nDominio Snervante: ogni volta che una creatura diversa dal demilich o dai suoi alleati completa un Riposo Lungo entro 1 miglio dalla tana, deve superare un Tiro Salvezza su Costituzione CD 20 oppure il suo massimo dei punti ferita viene ridotto di 1d4. La riduzione dura finché la creatura non completa un Riposo Lungo al di fuori di quell\'area.\n\nInterdizione dei Viaggi: le creature non possono usare teletrasporto o viaggi planari per entrare o uscire dalla tana.\n\nSe il demilich muore o sposta altrove la propria tana, questi effetti terminano immediatamente.'
     }
   ];
 
