@@ -2601,6 +2601,34 @@
       ],
       drop: [{ name: 'Arcani', desc: 'Gemme e sigilli arcani incastonati nel teschio, e i tesori accumulati nel santuario intrappolato del demilich.' }],
       notes: 'Ciò che si Trova Oltre la Lichità\n\nHabitat: Qualsiasi\nTesoro: Arcani\n\n(Affrontato nella propria tana, il demilich vale 22.000 PE.)\n\nUn demilich è un teschio che custodisce i resti dell\'essenza malvagia di un lich. Se il peso dell\'immortalità sopraffà un lich, la sua coscienza si ripiega su sé stessa mentre il corpo si decompone. Ma se i suoi resti vengono disturbati, un demilich si risveglia. I demilich appaiono solitamente come teschi adornati di gemme o sigilli arcani.\n\n— Tana del Demilich —\nI demilich custodiscono gelosamente i loro santuari colmi di trappole mortali. Il più famigerato di questi è la Tomba degli Orrori, la tana dell\'infame Acererak. La regione entro 1 miglio dalla tana è deformata dalla presenza del demilich, generando i seguenti effetti regionali.\n\nDominio Snervante: ogni volta che una creatura diversa dal demilich o dai suoi alleati completa un Riposo Lungo entro 1 miglio dalla tana, deve superare un Tiro Salvezza su Costituzione CD 20 oppure il suo massimo dei punti ferita viene ridotto di 1d4. La riduzione dura finché la creatura non completa un Riposo Lungo al di fuori di quell\'area.\n\nInterdizione dei Viaggi: le creature non possono usare teletrasporto o viaggi planari per entrare o uscire dalla tana.\n\nSe il demilich muore o sposta altrove la propria tana, questi effetti terminano immediatamente.'
+    },
+    {
+      id: 'preset_deva', name: 'Deva', emoji: '😇', rarity: 'epic',
+      type: 'Celestiale', size: 'Media', alignment: 'Legale Buono',
+      ac: 17, hp: 229, hpCur: 229, hpTemp: 0, hpDice: '27d8+108', init: 4,
+      speed: '9 m, Volare 27 m (fluttuare)', cr: '10', xp: '',
+      str: 18, dex: 18, con: 18, intl: 17, wis: 20, cha: 20,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '9', cha: '9' },
+      skillOverrides: { intuizione: '9', percezione: '9' }, passivePerception: 19,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Tutti', 'Telepatia 36 m'],
+      dmgResist: ['Radioso'], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato'],
+      traits: [
+        { name: 'Restaurazione Esaltata', desc: 'Se il deva muore al di fuori del Monte Celestia, il suo corpo scompare ed esso ottiene istantaneamente un nuovo corpo, tornando in vita con tutti i suoi punti ferita da qualche parte sul Monte Celestia.' },
+        { name: 'Resistenza alla Magia', desc: 'Il deva ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il deva effettua due attacchi con Mazza Sacra.' },
+        { name: 'Mazza Sacra', desc: 'Attacco con arma da mischia: +8 a colpire, portata 1,5 metri.\nColpito: 7 (1d6 + 4) danni contundenti più 18 (4d8) danni radiosi.', atkHit: '+8', atkDmgs: [{ f: '1d6+4', t: 'contundenti' }, { f: '4d8', t: 'radiosi' }] },
+        { name: 'Incantare', desc: 'Il deva lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 17).\n\nA volontà: Individuazione del Bene e del Male, Trasformazione (solo forma di Bestia o Umanoide; nessun PF temporaneo e nessuna concentrazione richiesta).\n\n1/Giorno ciascuno: Comunione, Rianimare Morti.' }
+      ],
+      bonusActions: [
+        { name: 'Aiuto Divino (2/Giorno)', desc: 'Il deva lancia Cura Ferite, Ristorare Inferiore oppure Rimuovi Maledizione, usando la stessa caratteristica da incantatore di Incantare.' }
+      ],
+      reactions: [],
+      legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie sacre e oggetti benedetti affidati al deva o lasciati ai mortali ritenuti degni.' }],
+      notes: 'Messaggero Angelico che Cambia il Mondo\n\nHabitat: Planare (Piani Superiori)\nTesoro: Reliquie\n\nI deva sono emissari della volontà divina. Questi messaggeri immortali assumono l\'aspetto di bestie mistiche o di mortali alati idealizzati. Come tutti gli angeli, le loro vere forme sono conosciute soltanto dalle divinità che servono.\n\nPiuttosto che consegnare una corrispondenza letterale da parte di un dio, un deva comunica ai mortali un\'allegoria o una missione, incaricandoli di portare qualcosa al suo luogo legittimo. Sebbene l\'angelo possa essere invocato nei momenti di bisogno, esso incoraggia l\'eroismo dei mortali. Se i campioni scelti da un deva portano a termine il loro incarico, sperimentano una rivelazione oppure il mondo viene cambiato in accordo con il proposito divino.\n\nMessaggi del Deva (1d6) — il deva incarica un mortale di consegnare...\n1 — Il corpo di un eroe che necessita di redenzione.\n2 — La cura per una piaga in una terra lontana.\n3 — Uno scrigno sacro che non deve essere aperto.\n4 — Un\'arma magica utilizzabile soltanto da un vero eroe.\n5 — Una giovane pianta che appassisce se esposta all\'ira.\n6 — Qualcuno proveniente da un altro mondo con uno scopo profetizzato ma privo di memoria.'
     }
   ];
 
