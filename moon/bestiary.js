@@ -2763,6 +2763,49 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Qualsiasi', desc: 'Il tesoro sommerso accumulato negli abissi: relitti, carichi affondati e tributi di pirati e popoli del mare.' }],
       notes: 'Antico Sovrano dei Regni Sottomarini\n\nHabitat: Costiero, Subacqueo\nTesoro: Qualsiasi\n\nI draghi tartaruga sono creature possenti con gusci così grandi da poter essere scambiati per isole e mascelle capaci di spezzare le navi come fossero ramoscelli. Mentre alcuni di questi draghi acquatici vivono pacificamente nelle profondità marine, altri sorvegliano gelosamente vasti territori con il loro soffio bollente e rivendicano tutto ciò che affonda negli abissi o naviga sulle onde. Occasionalmente stringono accordi con pirati, popoli acquatici o religioni oceaniche in cambio di tributi destinati ai loro tesori sommersi.\n\nMolti draghi tartaruga vivono in covi isolati o in rovine profonde sotto il mare e potrebbero non essere avvistati dagli abitanti della superficie per generazioni. Come gli animali da cui prendono il nome, possono vivere eccezionalmente a lungo: alcuni ricordano le meraviglie di ere passate o individui straordinari transitati nei loro domini molto tempo fa. Tali draghi possono essere convinti a condividere le proprie storie o a offrire guida attraverso i loro territori in cambio di tesori che non hanno mai visto sul fondo dell\'oceano.'
+    },
+    {
+      id: 'preset_dretch', name: 'Dretch', emoji: '👹', rarity: 'common',
+      type: 'Immondo', size: 'Piccola', alignment: 'Caotico Malvagio',
+      ac: 11, hp: 18, hpCur: 18, hpTemp: 0, hpDice: '4d6+4', init: 0,
+      speed: '6 m', cr: '1/4', xp: '',
+      str: 12, dex: 11, con: 12, intl: 5, wis: 8, cha: 3,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 9,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Abissale', 'Telepatia 18 m (solo con chi comprende l\'Abissale)'],
+      dmgResist: ['Freddo', 'Fuoco', 'Fulmine'], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Artigliare', desc: 'Attacco con arma da mischia: +3 a colpire, portata 1,5 metri.\nColpito: 4 (1d6 + 1) danni taglienti.', atkHit: '+3', atkDmgs: [{ f: '1d6+1', t: 'taglienti' }] },
+        { name: 'Nube Fetida (1/Giorno)', desc: 'Tiro Salvezza su Costituzione: CD 11, ogni creatura in un\'emanazione di 3 metri originata dal dretch.\nFallimento: il bersaglio ottiene la condizione Avvelenato fino alla fine del suo turno successivo. Mentre è Avvelenata, una creatura può effettuare solo un\'azione oppure un\'azione bonus nel proprio turno (non entrambe) e non può effettuare reazioni.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Demoni della Frenesia e della Volgarità\n\nHabitat: Abisso (Planare)\nTesoro: Nessuno\n\nServitori e vittime di demoni più potenti, i dretch incarnano istinti meschini, impulsi caotici e violente pulsioni. Esistono in numeri insondabili nelle profondità dell\'Abisso, dove le loro orde fetide riempiono vasti eserciti demoniaci.\n\nI dretch solitari servono altri demoni o malvagi utilizzatori di magia. Sono erratici, sudici e violenti, e mostrano scarso istinto di autoconservazione.\n\n«Ah, le infinite meraviglie dell\'Abisso. Se c\'è qualcosa che non ti piace, la troverai qui.»\n— Jaranda, esperta dell\'Abisso'
+    },
+    {
+      id: 'preset_sciame_dretch', name: 'Sciame di Dretch', emoji: '👹', rarity: 'common',
+      type: 'Immondo', size: 'Grande', alignment: 'Caotico Malvagio',
+      ac: 12, hp: 45, hpCur: 45, hpTemp: 0, hpDice: '6d10+12', init: 0,
+      speed: '12 m', cr: '4', xp: '',
+      str: 14, dex: 11, con: 14, intl: 5, wis: 8, cha: 3,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 9,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Abissale', 'Telepatia 18 m (solo con chi comprende l\'Abissale)'],
+      dmgResist: ['Contundente', 'Freddo', 'Fuoco', 'Fulmine', 'Perforante', 'Tagliente'], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Spaventato', 'Afferrato', 'Paralizzato', 'Pietrificato', 'Avvelenato', 'Prono', 'Trattenuto', 'Stordito'],
+      traits: [
+        { name: 'Aura Fetida', desc: 'Tiro Salvezza su Costituzione: CD 12, qualsiasi creatura che inizi il proprio turno in un\'emanazione di 3 metri originata dallo sciame.\nFallimento: il bersaglio ottiene la condizione Avvelenato fino all\'inizio del suo turno successivo. Mentre è Avvelenato può effettuare soltanto un\'azione oppure un\'azione bonus nel proprio turno (non entrambe) e non può effettuare reazioni.' },
+        { name: 'Sciame', desc: 'Lo sciame può occupare lo spazio di un\'altra creatura e viceversa, e può attraversare qualsiasi apertura sufficientemente grande per una creatura Piccola.\nLo sciame non può recuperare punti ferita né ottenere punti ferita temporanei.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Lo sciame effettua due attacchi con Artigliare.' },
+        { name: 'Artigliare', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 12 (3d6 + 2) danni taglienti, oppure 9 (3d4 + 2) danni taglienti se lo sciame è Insanguinato.', atkHit: '+4', atkDmgs: [{ f: '3d6+2', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Demoni della Frenesia e della Volgarità\n\nHabitat: Abisso (Planare)\nTesoro: Nessuno\n\nServitori e vittime di demoni più potenti, i dretch incarnano istinti meschini, impulsi caotici e violente pulsioni. Esistono in numeri insondabili nelle profondità dell\'Abisso, dove le loro orde fetide riempiono vasti eserciti demoniaci.\n\nGli sciami di dretch talvolta sfuggono all\'Abisso raggiungendo altri piani di esistenza, oppure fanno parte di un\'invasione demoniaca. Senza una guida, questi rozzi demoni devastano e depredano con crudele entusiasmo.\n\n«Ah, le infinite meraviglie dell\'Abisso. Se c\'è qualcosa che non ti piace, la troverai qui.»\n— Jaranda, esperta dell\'Abisso'
     }
   ];
 
