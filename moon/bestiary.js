@@ -2834,6 +2834,31 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'Armi e armature, spesso bottino delle prede e dei nemici catturati nelle sue ragnatele.' }],
       notes: 'Cacciatore Aracnide del Sottosuolo\n\nHabitat: Foresta, Sottosuolo\nTesoro: Armamenti\n\nI drider combinano le caratteristiche dei drow e dei ragni giganti. La malvagia dea Lolth ama trasformare i suoi adoratori drow in drider, come benedizione o maledizione. Questi drider spesso diventano servitori fanatici della loro dea, oppure vengono sopraffatti dalla trasformazione e vivono soltanto per soddisfare i loro istinti predatori aracnidi.\n\nI drider possono comparire anche quando intere comunità vengono trasformate dall\'ira di una divinità malvagia o da altri mezzi magici, oppure possono costituire parte della popolazione naturale di un mondo. La maggior parte vive sottoterra o in foreste fitte, dove può sfruttare al meglio le proprie caratteristiche aracnidi.\n\nMetamorfosi del Drider (1d6) — il drider ha ottenuto la sua forma come...\n1 — Una benedizione da una divinità degli assassini, delle terre selvagge pericolose o del Sottosuolo.\n2 — Una maledizione lanciata da una potente megèra, una strega vendicativa o un misterioso artefatto.\n3 — Un esperimento di un aboleth, di un illithid o di un altro manipolatore della vita.\n4 — Un mezzo magico per sfuggire a un disastro o a un destino peggiore.\n5 — Una mutazione dovuta all\'esposizione a energie planari caotiche o a strane radiazioni del Sottosuolo.\n6 — Una punizione inflitta da una divinità rancorosa, come Lolth o la Regina dell\'Aria e delle Tenebre.'
+    },
+    {
+      id: 'preset_druido', name: 'Druido', emoji: '🌿', rarity: 'uncommon',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 13, hp: 44, hpCur: 44, hpTemp: 0, hpDice: '8d8+8', init: 1,
+      speed: '9 m', cr: '2', xp: '',
+      str: 10, dex: 12, con: 13, intl: 12, wis: 16, cha: 11,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { medicina: '5', natura: '3', percezione: '5' }, passivePerception: 15,
+      senses: [], languages: ['Comune', 'Druidico', 'Silvano'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il druido effettua due attacchi usando Bastone di Vite o Fuoco Fatato Verdeggiante in qualsiasi combinazione.' },
+        { name: 'Bastone di Vite', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 7 (1d8 + 3) danni contundenti più 2 (1d4) danni da veleno.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'contundenti' }, { f: '1d4', t: 'veleno' }] },
+        { name: 'Fuoco Fatato Verdeggiante', desc: 'Attacco con incantesimo a distanza: +5 a colpire, gittata 27 metri.\nColpito: 10 (3d6) danni radiosi.', atkHit: '+5', atkDmgs: [{ f: '3d6', t: 'radiosi' }] },
+        { name: 'Incantesimi', desc: 'Il druido lancia uno dei seguenti incantesimi usando la Saggezza come caratteristica da incantatore (CD 13).\n\nA volontà: Artificio Druidico, Parlare con gli Animali.\n\n2/Giorno ciascuno: Intralciare, Onda Tonante.\n\n1/Giorno ciascuno: Animale Messaggero, Passo Veloce, Bagliore Lunare.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [
+        { name: 'Equipaggiamento', desc: 'Armatura di cuoio borchiato e bastone di vite.' },
+        { name: 'Reliquie', desc: 'Reliquie naturali e oggetti rituali del druido.' }
+      ],
+      notes: 'Custode e Saggio della Natura\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\nEquipaggiamento: armatura di cuoio borchiato\n\nI druidi usano la magia primordiale, insegnamenti tradizionali e legami con animali ed esseri ancestrali per proteggere il mondo naturale e guarirne i mali. Questi incantatori possono essere eremiti devoti a una particolare terra oppure membri di un\'organizzazione mistica.\n\nTradizioni Druidiche (1d6) — il druido è...\n1 — Un vendicatore che colpisce le civiltà distruttive e coloro che abusano della natura.\n2 — Una guida che aiuta i viaggiatori a orientarsi nei domini delle Bestie, delle Fate o delle Piante.\n3 — Un eremita che lavora da solo per proteggere le terre, i mari o i cieli che considera la propria casa.\n4 — Un guaritore che viaggia per il mondo sanando disastri naturali, magici o causati dall\'uomo.\n5 — Parte di un\'organizzazione informale che aderisce a rituali senza tempo e custodisce segreti naturali.\n6 — Un guardiano che veglia sulle fondamenta della realtà e protegge dalle minacce extraplanari.'
     }
   ];
 
