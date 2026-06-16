@@ -2629,6 +2629,30 @@
       legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Reliquie sacre e oggetti benedetti affidati al deva o lasciati ai mortali ritenuti degni.' }],
       notes: 'Messaggero Angelico che Cambia il Mondo\n\nHabitat: Planare (Piani Superiori)\nTesoro: Reliquie\n\nI deva sono emissari della volontà divina. Questi messaggeri immortali assumono l\'aspetto di bestie mistiche o di mortali alati idealizzati. Come tutti gli angeli, le loro vere forme sono conosciute soltanto dalle divinità che servono.\n\nPiuttosto che consegnare una corrispondenza letterale da parte di un dio, un deva comunica ai mortali un\'allegoria o una missione, incaricandoli di portare qualcosa al suo luogo legittimo. Sebbene l\'angelo possa essere invocato nei momenti di bisogno, esso incoraggia l\'eroismo dei mortali. Se i campioni scelti da un deva portano a termine il loro incarico, sperimentano una rivelazione oppure il mondo viene cambiato in accordo con il proposito divino.\n\nMessaggi del Deva (1d6) — il deva incarica un mortale di consegnare...\n1 — Il corpo di un eroe che necessita di redenzione.\n2 — La cura per una piaga in una terra lontana.\n3 — Uno scrigno sacro che non deve essere aperto.\n4 — Un\'arma magica utilizzabile soltanto da un vero eroe.\n5 — Una giovane pianta che appassisce se esposta all\'ira.\n6 — Qualcuno proveniente da un altro mondo con uno scopo profetizzato ma privo di memoria.'
+    },
+    {
+      id: 'preset_bestia_distorcente', name: 'Bestia Distorcente', emoji: '🐆', rarity: 'uncommon',
+      type: 'Mostruosità', size: 'Grande', alignment: 'Legale Malvagio',
+      ac: 13, hp: 76, hpCur: 76, hpTemp: 0, hpDice: '9d10+27', init: 4,
+      speed: '12 m', cr: '3', xp: '',
+      str: 18, dex: 15, con: 16, intl: 6, wis: 12, cha: 8,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 11,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Silvano (comprende ma non parla)'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: [],
+      traits: [
+        { name: 'Elusione', desc: 'Se la bestia distorcente è soggetta a un effetto che le consente di effettuare un tiro salvezza per subire soltanto metà danni, non subisce alcun danno se supera il tiro salvezza e soltanto metà danni se lo fallisce.\nNon può usare questo tratto se possiede la condizione Incapacitato.' },
+        { name: 'Distorsione', desc: 'I tiri per colpire contro la bestia distorcente hanno svantaggio, poiché essa proietta un\'illusione che la fa apparire vicina, ma non coincidente, con la sua posizione reale.\nQuesto tratto è soppresso mentre la bestia distorcente possiede la condizione Incapacitato.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'La bestia distorcente effettua un attacco con Artigliata e un attacco con Tentacolo.' },
+        { name: 'Artigliata', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 9 (1d10 + 4) danni taglienti.\nSe il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Prono.', atkHit: '+6', atkDmgs: [{ f: '1d10+4', t: 'taglienti' }] },
+        { name: 'Tentacolo', desc: 'Attacco con arma da mischia: +6 a colpire, portata 3 metri.\nColpito: 11 (2d6 + 4) danni perforanti.', atkHit: '+6', atkDmgs: [{ f: '2d6+4', t: 'perforanti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Felino Predatore dall\'Aspetto Ingannatore\n\nHabitat: Foresta\nTesoro: Nessuno\n\nUna bestia distorcente assomiglia a una pantera magra a sei zampe, con un tentacolo uncinato che spunta da ciascuna spalla. Questo predatore utilizza una magia innata per distorcere la luce, facendo apparire sé stesso a diversi metri di distanza dalla sua posizione reale.\n\nLe bestie distorcenti cacciano non solo per nutrirsi, ma anche perché amano uccidere. Una volta che iniziano a inseguire una preda, non possono essere scoraggiate finché non viene uccisa la preda o la bestia stessa. Sebbene abitino comunemente fitte foreste, possono inseguire viaggiatori per grandi distanze e persino fino a città o sotterranei. Più astute di semplici animali, queste creature possono tendere imboscate o restare nascoste per giorni per abbattere la loro preda.\n\nTalvolta le bestie distorcenti inseguono le loro prede attraverso portali verso altri piani di esistenza. Per questo motivo possono essere trovate in tutto il multiverso, specialmente nei mondi del Piano Materiale, nella Coltre Oscura (Shadowfell) e nel Feywild. Questi cacciatori irrequieti possono distruggere l\'equilibrio naturale di una regione e portare altre creature all\'estinzione: per questo molti circoli druidici e folletti considerano le bestie distorcenti una minaccia mortale.\n\n«La furia omicida di una bestia distorcente è adatta solo agli incubi, come ho imparato dopo essere sopravvissuto a stento a una sua imboscata. Sono certo che quella creatura mi stia ancora dando la caccia.»\n— Jen-Ahb, naturalista e sopravvissuto a una bestia distorcente'
     }
   ];
 
