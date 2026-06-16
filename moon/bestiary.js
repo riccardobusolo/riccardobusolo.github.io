@@ -2680,6 +2680,31 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Arcani', desc: 'Tesori raccolti nei palazzi aerei e nelle città fluttuanti: arcani, opere d\'arte e ricchezze di mille piani.' }],
       notes: 'Genio dell\'Aria\n\nHabitat: Costa, Piano Elementale dell\'Aria\nTesoro: Arcani\n\nIn quanto geni dei venti e dei cieli, i djinni incarnano libertà e potenza. Possono controllare il vento e viaggiare rapidi come una brezza. Possono essere sereni come nuvole alla deriva o tempestosi come una burrasca, ma la maggior parte dei djinni ama la libertà e desidera scoprire le meraviglie del multiverso. I djinni conoscono spesso numerose storie e amano condividerle con chi offre in cambio altri racconti interessanti.\n\nSebbene molti djinni creino palazzi aerei sulle coste battute dalle tempeste o tra le alte nubi, innumerevoli altri abitano il Piano Elementale dell\'Aria. Nelle loro città fluttuanti raccolgono racconti ed esperienze da tutti i piani dell\'esistenza, condividendoli in favolosi forum, biblioteche e teatri. La più grande di queste città è la Cittadella del Ghiaccio e dell\'Acciaio, le cui torri scolpite dal vento custodiscono un tesoro di conoscenze e ricchezze grande quanto una città, al di là di ogni immaginazione.'
+    },
+    {
+      id: 'preset_doppelganger', name: 'Doppelganger', emoji: '🎭', rarity: 'uncommon',
+      type: 'Mostruosità', size: 'Media', alignment: 'Neutrale',
+      ac: 14, hp: 52, hpCur: 52, hpTemp: 0, hpDice: '8d8+16', init: 4,
+      speed: '9 m', cr: '3', xp: '',
+      str: 11, dex: 18, con: 14, intl: 11, wis: 12, cha: 14,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { inganno: '6', intuizione: '3' }, passivePerception: 11,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune (più altre tre lingue)'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Ammaliato'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il doppelganger effettua due attacchi con Colpo e usa Aspetto Inquietante se disponibile.' },
+        { name: 'Colpo', desc: 'Attacco con arma da mischia: +6 a colpire (con vantaggio durante il primo round di ogni combattimento), portata 1,5 metri.\nColpito: 11 (2d6 + 4) danni contundenti.', atkHit: '+6', atkDmgs: [{ f: '2d6+4', t: 'contundenti' }] },
+        { name: 'Leggere i Pensieri', desc: 'Il doppelganger lancia Individuazione dei Pensieri senza componenti, usando il Carisma come caratteristica da incantatore (CD del tiro salvezza 12).' },
+        { name: 'Aspetto Inquietante (Ricarica 6)', desc: 'Tiro Salvezza su Saggezza: CD 12, ogni creatura entro un\'emanazione di 4,5 metri originata dal doppelganger che possa vederlo.\nFallimento: il bersaglio ottiene la condizione Spaventato e ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l\'effetto su sé stesso con un successo. Dopo 1 minuto, il bersaglio supera automaticamente il tiro salvezza.' }
+      ],
+      bonusActions: [
+        { name: 'Mutaforma', desc: 'Il doppelganger si trasforma in un Umanoide Medio o Piccolo, oppure ritorna alla sua forma autentica. Le sue statistiche di gioco, eccetto la taglia, rimangono invariate in ogni forma. Qualsiasi equipaggiamento che indossa o trasporta non viene trasformato.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Individuale', desc: 'Oggetti, monete e gettoni sottratti alle vittime di cui ha rubato l\'identità.' }],
+      notes: 'Mutaforma Infiltratore\n\nHabitat: Sottosuolo, Urbano\nTesoro: Individuale\n\nI doppelganger sono esseri soprannaturali capaci di mutare forma assumendo l\'aspetto di qualsiasi umanoide. Le loro capacità di leggere la mente li aiutano a creare travestimenti quasi perfetti e a carpire segreti da menti prive di difese. Talvolta usano il proprio potere di metamorfosi in modi più palesi, trasformandosi in forme inquietanti per spaventare i nemici.\n\nGli obiettivi di un doppelganger possono essere legati alle sue misteriose origini magiche oppure a scopi più mercenari.\n\nInganni del Doppelganger (1d6) — il doppelganger trama per...\n1 — Seminare il caos nel tempio di una divinità che lo ha maledetto costringendolo a vivere senza una vera forma.\n2 — Nascondere le prove di una vasta cospirazione.\n3 — Controllare una comunità attraverso la paura, fingendosi un leggendario uomo nero.\n4 — Sostituire un nobile per godere di uno stile di vita decadente.\n5 — Spiare dei maghi per imparare a completare la propria creazione magica difettosa.\n6 — Ottenere una posizione influente, agendo come agente dormiente per un\'invasione di doppelganger.\n\n«Incontrare sé stessi è il modo più sicuro per capire che non si è affascinanti quanto si pensa.»\n— Qualcuno che afferma di essere Lorhirin di Fearchor Keep'
     }
   ];
 
