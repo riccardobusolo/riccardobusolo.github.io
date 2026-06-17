@@ -3789,6 +3789,30 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Reliquie', desc: 'Reliquie e oggetti notevoli accumulati ingannando e divorando le sue vittime.' }],
       notes: 'Demone dell\'Illusione e dell\'Intrappolamento\n\nHabitat: Planare (Abisso)\nTesoro: Reliquie\n\nI glabrezu incarnano l\'inganno e l\'astuzia predatoria. Questi demoni scaltri sanno che le trappole più efficaci sono quelle che gli individui preparano per sé stessi. Nonostante enormi chele e una fisicità travolgente, eccellono nell\'uso dell\'adulazione e della manipolazione per spingere le vittime a isolarsi e a danneggiare gli altri.\n\nNell\'Abisso agiscono come cacciatori solitari o come consiglieri ingannevoli di demoni più potenti. Cercano vie d\'accesso al Piano Materiale e si compiacciono di essere evocati dagli incantatori: servono con entusiasmo i mortali mentre li tentano a tradire i propri alleati e a indulgere in fantasie megalomani. Un glabrezu si sforza di uccidere il proprio evocatore una volta che questi abbia commesso azioni imperdonabili e la sua anima sia ormai destinata all\'Abisso.\n\n«La vita del tuo compagno, oppure ciò che hai cercato attraverso l\'infinito? Fai la tua scelta.»\n— Gerrzog, glabrezu della Scala Infinita'
+    },
+    {
+      id: 'preset_gladiatore', name: 'Gladiatore', emoji: '🏟️', rarity: 'uncommon',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 16, hp: 112, hpCur: 112, hpTemp: 0, hpDice: '15d8+45', init: 5,
+      speed: '9 m', cr: '5', xp: '',
+      str: 18, dex: 15, con: 16, intl: 10, wis: 12, cha: 15,
+      savesOverride: { str: '7', dex: '5', con: '6', intl: '', wis: '4', cha: '' },
+      skillOverrides: { atletica: '10', intrattenere: '5' }, passivePerception: 11,
+      senses: [], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il gladiatore effettua tre attacchi con Lancia. Può sostituire uno degli attacchi con un uso di Colpo di Scudo.' },
+        { name: 'Lancia', desc: 'Attacco con arma da mischia o a distanza: +7 a colpire, portata 1,5 metri oppure gittata 6/18 metri.\nColpito: 11 (2d6 + 4) danni perforanti.', atkHit: '+7', atkDmgs: [{ f: '2d6+4', t: 'perforanti' }] },
+        { name: 'Colpo di Scudo', desc: 'Tiro Salvezza su Forza CD 15, contro una creatura entro 1,5 metri che il gladiatore può vedere.\nFallimento: 9 (2d4 + 4) danni contundenti. Se il bersaglio è una creatura Media o più piccola, ottiene la condizione Prono.', atkDmgs: [{ f: '2d4+4', t: 'contundenti' }] }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Parata', desc: 'Innesco: il gladiatore viene colpito da un tiro per colpire in mischia mentre impugna un\'arma.\nRisposta: il gladiatore aggiunge 3 alla propria CA contro quell\'attacco, potenzialmente facendolo mancare.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Scudo, tre lance e armatura di cuoio borchiato.' }],
+      notes: 'Competitore e Lottatore da Premio\n\nHabitat: Qualsiasi\nTesoro: Armamenti, Individuale\n\nI gladiatori sono combattenti professionisti che si misurano tra loro, contro mostri e in altre sfide per intrattenere il pubblico. Mentre alcuni combattono semplicemente per sopravvivere, altri amano l\'emozione dell\'esibizione — e tutti conoscono l\'importanza della teatralità per mantenere gli spettatori entusiasti.\n\nTeatralità del Gladiatore (1d6) — durante una competizione, il gladiatore...\n1 — Dedica la propria imminente vittoria a una divinità, a un sovrano, a un nobile amato o a un membro del pubblico.\n2 — Indossa una maschera e un mantello a tema mostruoso.\n3 — Giudica se il proprio avversario combatte con onore.\n4 — Guida il pubblico in un canto trionfale.\n5 — Cerca di reclamare un trofeo dal nemico sconfitto.\n6 — Segue i consigli del pubblico, dei presagi o di un animale domestico.\n\nIn un\'arena sottomarina, la folla impazzisce mentre un gladiatore trionfa su un calamaro gigante.'
     }
   ];
 
