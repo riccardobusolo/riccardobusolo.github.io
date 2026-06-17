@@ -3029,22 +3029,22 @@
     var upBtn = sb.querySelector('.best__sb-up');
     var dnBtn = sb.querySelector('.best__sb-down');
     if (!track || !thumb) return;
-    var raf = 0;
+    var raf = 0, INSET = 3;
     function update() {
       raf = 0;
       var vh = cards.clientHeight, ch = cards.scrollHeight, st = cards.scrollTop;
-      var th = track.clientHeight;
+      var avail = track.clientHeight - INSET * 2;
       if (ch - vh <= 1) {
-        thumb.style.height = th + 'px';
-        thumb.style.top = '0px';
+        thumb.style.height = avail + 'px';
+        thumb.style.top = INSET + 'px';
         thumb.classList.add('best__sb-thumb--idle');
         return;
       }
       thumb.classList.remove('best__sb-thumb--idle');
-      var thumbH = Math.max(26, Math.round(th * vh / ch));
-      var maxTop = th - thumbH;
+      var thumbH = Math.max(24, Math.round(avail * vh / ch));
+      var maxTop = avail - thumbH;
       thumb.style.height = thumbH + 'px';
-      thumb.style.top = Math.round(maxTop * st / (ch - vh)) + 'px';
+      thumb.style.top = (INSET + Math.round(maxTop * st / (ch - vh))) + 'px';
     }
     function schedule() { if (!raf) raf = requestAnimationFrame(update); }
     cards.addEventListener('scroll', schedule, { passive: true });
@@ -3069,8 +3069,8 @@
     thumb.addEventListener('pointerdown', function (e) {
       if (cards.scrollHeight - cards.clientHeight <= 1) return;
       e.preventDefault();
-      var startY = e.clientY, startTop = parseFloat(thumb.style.top) || 0;
-      var maxTop = track.clientHeight - thumb.offsetHeight;
+      var startY = e.clientY, startTop = (parseFloat(thumb.style.top) || INSET) - INSET;
+      var maxTop = track.clientHeight - INSET * 2 - thumb.offsetHeight;
       var range = cards.scrollHeight - cards.clientHeight;
       try { thumb.setPointerCapture(e.pointerId); } catch (_) {}
       thumb.classList.add('best__sb-thumb--drag');
@@ -3089,8 +3089,8 @@
       var r = track.getBoundingClientRect();
       var range = cards.scrollHeight - cards.clientHeight;
       function frac(clientY) {
-        var maxTop = track.clientHeight - thumb.offsetHeight;
-        var nt = Math.max(0, Math.min(maxTop, clientY - r.top - thumb.offsetHeight / 2));
+        var maxTop = track.clientHeight - INSET * 2 - thumb.offsetHeight;
+        var nt = Math.max(0, Math.min(maxTop, clientY - r.top - INSET - thumb.offsetHeight / 2));
         return maxTop > 0 ? nt / maxTop : 0;
       }
       // 1) il pollice raggiunge (animato) il punto cliccato, centrandosi sul cursore.
@@ -3624,10 +3624,10 @@
     '.best__sb-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(127,127,127,.16)}' +
     '.best__sb-btn:active{transform:scale(.86)}' +
     '.best__sb-track{flex:1 1 0;min-height:0;position:relative;width:8px;background:rgba(127,127,127,.14);border:1px solid var(--border);border-radius:5px;cursor:var(--cur-pointer)}' +
-    '.best__sb-thumb{position:absolute;left:1px;right:1px;top:0;min-height:26px;border-radius:5px;background:var(--gold);box-shadow:0 0 6px -1px var(--gold);cursor:var(--cur-pointer);transition:filter .12s,opacity .12s}' +
-    '.best__sb-thumb:hover{filter:brightness(1.12)}' +
-    '.best__sb-thumb--drag{cursor:var(--cur-grabbing);filter:brightness(1.18)}' +
-    '.best__sb-thumb--idle{opacity:.34;box-shadow:none}' +
+    '.best__sb-thumb{position:absolute;left:1px;right:1px;top:3px;min-height:24px;border-radius:5px;background:var(--muted);opacity:.5;cursor:var(--cur-pointer);transition:opacity .12s}' +
+    '.best__sb-thumb:hover{opacity:.78}' +
+    '.best__sb-thumb--drag{cursor:var(--cur-grabbing);opacity:.92}' +
+    '.best__sb-thumb--idle{opacity:.28}' +
     '.best__right{flex:1 1 0;min-width:0;overflow:hidden auto;scrollbar-width:none;-ms-overflow-style:none;padding:10px 12px}' +
     '.best__right::-webkit-scrollbar{width:0;height:0;display:none}' +
     '.best__placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.74rem;line-height:1.6;padding:20px}' +
