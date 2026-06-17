@@ -3084,6 +3084,30 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Attrezzi', desc: 'Attrezzi e oggetti recuperati dalle prede avvolte nei bozzoli e dai resti accumulati nella tana.' }],
       notes: 'Rapitore Aracnide Velenoso\n\nHabitat: Foresta\nTesoro: Attrezzi\n\nCacciatori simili a ragni, gli ettercap si nascondono nelle profondità delle foreste e cercano prede da trascinare nelle loro tane soffocate dalle ragnatele. Questi predatori feroci possiedono tratti aracnidi e corpi bipedi e gobbi, e sono tristemente noti per i loro morsi velenosi e per la capacità di lanciare ragnatele per intrappolare le vittime.\n\nGli ettercap spesso cacciano in piccoli gruppi insieme a ragni giganti e sciami di ragni. Depredano frequentemente l\'ambiente circostante oltre misura: se lasciati indisturbati, possono riempire interi boschi con le loro ragnatele e con i resti avvolti nei bozzoli delle vecchie prede, entrando in conflitto con le Fate. Gli ettercap rancorosi escono spesso dai loro rifugi per tormentare e nutrirsi delle Fate, preferendo minacciare creature più piccole come pixie e spiritelli. Raramente divorano in fretta altre creature senzienti: preferiscono avvolgere le vittime in bozzoli e terrorizzarle per giorni.\n\nGli ettercap evitano il fuoco, che può bruciare rapidamente le loro ragnatele e gli alberi morti nei quali costruiscono le loro dimore.'
+    },
+    {
+      id: 'preset_ettin', name: 'Ettin', emoji: '🧌', rarity: 'common',
+      type: 'Gigante', size: 'Grande', alignment: 'Caotico Malvagio',
+      ac: 12, hp: 85, hpCur: 85, hpTemp: 0, hpDice: '10d10+30', init: -1,
+      speed: '12 m', cr: '4', xp: '',
+      str: 21, dex: 8, con: 17, intl: 6, wis: 10, cha: 8,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '4' }, passivePerception: 14,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Gigante'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Accecato', 'Ammaliato', 'Assordato', 'Spaventato', 'Stordito', 'Privo di Sensi'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'ettin effettua un attacco con Ascia Bipenne e un attacco con Mazzafrusto Ferrato.' },
+        { name: 'Ascia Bipenne', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 14 (2d8 + 5) danni taglienti.\nSe il bersaglio è una creatura Grande o più piccola, ottiene la condizione Prono.', atkHit: '+7', atkDmgs: [{ f: '2d8+5', t: 'taglienti' }] },
+        { name: 'Mazzafrusto Ferrato', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 14 (2d8 + 5) danni perforanti, e il bersaglio ha svantaggio al prossimo tiro per colpire che effettua prima della fine del suo turno successivo.', atkHit: '+7', atkDmgs: [{ f: '2d8+5', t: 'perforanti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [
+        { name: 'Equipaggiamento', desc: 'Ascia Bipenne e Mazzafrusto Ferrato.' },
+        { name: 'Individuale', desc: 'Monete e oggetti raccolti dalle prede e dagli alleati.' }
+      ],
+      notes: 'Gigante Bicefalo Attaccabrighe\n\nHabitat: Colline, Montagne, Sottosuolo\nTesoro: Individuale\nEquipaggiamento: Ascia Bipenne, Mazzafrusto Ferrato\n\nGli ettin sono Giganti fisicamente potenti dotati di due teste. Sebbene molti presentino caratteristiche simili a quelle dei giganti delle colline, altri possiedono tratti più bestiali o insoliti, come zanne, piccole corna oppure un unico occhio su ciascuna testa.\n\nGli ettin si alleano frequentemente con altri Giganti o con gruppi che ne apprezzano la forza, come giganti delle colline, banditi od ogre. Alcuni possiedono legami mistici con le terre che abitano e potrebbero custodire segreti preziosi per druidi o Fate.\n\nOgni testa di ettin possiede una personalità distinta. Ciò rende alcuni ettin litigiosi sia con sé stessi sia con gli altri, ma molti funzionano come una squadra. Una testa potrebbe avere un proprio nome, oppure entrambe potrebbero riferirsi a sé stesse come a un unico individuo, usando un solo nome o una fusione dei due.\n\nInterazioni dell\'Ettin (1d8) — le teste dell\'ettin stanno...\n1 — Incitandosi a vicenda in preparazione a un conflitto o a una sfida.\n2 — Discutendo sui piani per una battaglia, la cena o come trascorrere la giornata.\n3 — Criticandosi a vicenda mentre svolgono compiti separati.\n4 — Impegnate in una gara di sguardi.\n5 — Facendo educata conversazione come se si incontrassero per la prima volta.\n6 — Ignorandosi ostentatamente.\n7 — Parlando sopra una trama sempre più contorta.\n8 — Cercando di tenersi sveglie a vicenda.\n\n«Il doppio della malizia, dell\'aggressività e dell\'appetito: l\'ettin dimostra che avere due teste non significa necessariamente averne una migliore.»\n— Bertrand, Inquisitore del Fuoco Mentale'
     }
   ];
 
