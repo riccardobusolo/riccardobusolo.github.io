@@ -3056,6 +3056,34 @@
       legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'Armatura infernale, la Spada Avvizzente e la corda magica dell\'erinni.' }],
       notes: 'Diavolo della Vendetta e dell\'Ira Giusta\n\nHabitat: Nove Inferi (Planare)\nTesoro: Armamenti\n\nLe erinni, note anche come furie, sono diavoli alati rivestiti di armature infernali. Questi angeli caduti infliggono una forma spietata di giustizia divina, dando la caccia agli spergiuri e trascinando i giustamente dannati nei Nove Inferi tramite le loro corde magiche. Pochi riescono a scorgere ciò che si cela all\'interno delle loro armature, e le erinni fanno in modo che chiunque vi riesca non possa mai raccontare ciò che ha visto.\n\nLe erinni servono spesso gli arcidiavoli e difendono l\'ordine dei Nove Inferi contro intrusi e fuggitivi. Sebbene siano inclini a esplosioni d\'ira, collaborano bene con gli altri diavoli, e talvolta cacciano in gruppi di tre, costruendosi una fama temibile.\n\nQuando non sono al servizio di un padrone infernale, le erinni danno la caccia alle anime malvagie, inseguendo le prede senza tregua attraverso il multiverso e per ere intere. Possono essere evocate per servire incantatori malvagi, ma ascoltano anche giuramenti e maledizioni pronunciati nel loro nome: in rari casi, un mortale offeso che invochi con giusta collera può essere udito da un\'erinni che compare per vendicarlo. Una volta evocata, un\'erinni non se ne va senza reclamare l\'anima della preda oppure quella del mortale che l\'ha chiamata.'
+    },
+    {
+      id: 'preset_ettercap', name: 'Ettercap', emoji: '🕸️', rarity: 'common',
+      type: 'Mostruosità', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 13, hp: 44, hpCur: 44, hpTemp: 0, hpDice: '8d8+8', init: 2,
+      speed: '9 m, Scalare 9 m', cr: '2', xp: '',
+      str: 14, dex: 15, con: 13, intl: 7, wis: 12, cha: 8,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '3', furtivita: '4', sopravvivenza: '3' }, passivePerception: 13,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: [],
+      traits: [
+        { name: 'Scalata del Ragno', desc: 'L\'ettercap può scalare superfici difficili, compresi i soffitti, senza dover effettuare prove di caratteristica.' },
+        { name: 'Camminatore delle Ragnatele', desc: 'L\'ettercap ignora le restrizioni al movimento causate dalle ragnatele e conosce la posizione di qualsiasi altra creatura a contatto con la stessa ragnatela.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'ettercap effettua un attacco con Morso e un attacco con Artiglio.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 5 (1d6 + 2) danni perforanti più 2 (1d4) danni da veleno, e il bersaglio ottiene la condizione Avvelenato fino all\'inizio del turno successivo dell\'ettercap.', atkHit: '+4', atkDmgs: [{ f: '1d6+2', t: 'perforanti' }, { f: '1d4', t: 'veleno' }] },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 7 (2d4 + 2) danni taglienti.', atkHit: '+4', atkDmgs: [{ f: '2d4+2', t: 'taglienti' }] },
+        { name: 'Filamento di Ragnatela (Ricarica 5–6)', desc: 'Tiro Salvezza su Destrezza: CD 12, una creatura Grande o più piccola che l\'ettercap può vedere entro 9 metri.\nFallimento: il bersaglio ottiene la condizione Trattenuto finché la ragnatela non viene distrutta (la ragnatela ha CA 10, 5 PF, vulnerabilità al fuoco e immunità a contundente, veleno e psichico).' }
+      ],
+      bonusActions: [
+        { name: 'Riavvolgere', desc: 'L\'ettercap trascina verso di sé, fino a 7,5 metri in linea retta, una creatura entro 9 metri Trattenuta dalla sua ragnatela.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Attrezzi', desc: 'Attrezzi e oggetti recuperati dalle prede avvolte nei bozzoli e dai resti accumulati nella tana.' }],
+      notes: 'Rapitore Aracnide Velenoso\n\nHabitat: Foresta\nTesoro: Attrezzi\n\nCacciatori simili a ragni, gli ettercap si nascondono nelle profondità delle foreste e cercano prede da trascinare nelle loro tane soffocate dalle ragnatele. Questi predatori feroci possiedono tratti aracnidi e corpi bipedi e gobbi, e sono tristemente noti per i loro morsi velenosi e per la capacità di lanciare ragnatele per intrappolare le vittime.\n\nGli ettercap spesso cacciano in piccoli gruppi insieme a ragni giganti e sciami di ragni. Depredano frequentemente l\'ambiente circostante oltre misura: se lasciati indisturbati, possono riempire interi boschi con le loro ragnatele e con i resti avvolti nei bozzoli delle vecchie prede, entrando in conflitto con le Fate. Gli ettercap rancorosi escono spesso dai loro rifugi per tormentare e nutrirsi delle Fate, preferendo minacciare creature più piccole come pixie e spiritelli. Raramente divorano in fretta altre creature senzienti: preferiscono avvolgere le vittime in bozzoli e terrorizzarle per giorni.\n\nGli ettercap evitano il fuoco, che può bruciare rapidamente le loro ragnatele e gli alberi morti nei quali costruiscono le loro dimore.'
     }
   ];
 
