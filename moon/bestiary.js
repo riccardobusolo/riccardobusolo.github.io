@@ -3257,6 +3257,30 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Arcani', desc: 'Conoscenze proibite e materiali del creatore: appunti necromantici, strumenti chirurgici e componenti arcane.' }],
       notes: 'Carne Morta a Cui è Stata Donata Nuova Vita\n\nHabitat: Qualsiasi\nTesoro: Arcani\n\nI golem di carne sono raccolte grossolanamente umanoidi di parti del corpo unite tramite magia abusata o strane scienze. Servono i loro creatori sconsiderati, ma molti possiedono ricordi frammentari e istinti ereditati dalle parti che li compongono. Se feriti, questi golem possono impazzire furiosamente e sfogare la propria confusione su qualsiasi cosa vedano, inclusi i loro creatori.\n\nI golem di carne appaiono in forme molto diverse tra loro.\n\nCaratteristiche del Golem di Carne (1d6) — il golem di carne possiede...\n1 — Parti animali mescolate tra quelle umanoidi.\n2 — Un travestimento fatto di trucco e abiti pesanti.\n3 — Parti mancanti e interiora esposte.\n4 — Parti che svolgono ruoli non previsti, come un corpo composto da decine di mani.\n5 — Tratti perfetti accentuati da splendide cuciture.\n6 — Meccanismi visibili, mantici e motori.\n\n«La barriera tra il mortale e il divino è in frantumi: aperta è la strada verso nuovi dèi. Io sono colei che ha invaso il divino. Non con una lancia, ma con un punto di sutura. Non con la mia eresia, ma con il mio cuore.»\n— Viktra Mordenheim, Signora Oscura di Lamordia'
+    },
+    {
+      id: 'preset_flumph', name: 'Flumph', emoji: '🪼', rarity: 'rare',
+      type: 'Aberrazione', size: 'Piccola', alignment: 'Legale Buono',
+      ac: 12, hp: 7, hpCur: 7, hpTemp: 0, hpDice: '2d6', init: 2,
+      speed: '1,5 m, Volare 9 m (fluttuare)', cr: '1/8', xp: '',
+      str: 6, dex: 15, con: 10, intl: 14, wis: 14, cha: 11,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { arcano: '4', storia: '4', religione: '4' }, passivePerception: 12,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comprende il Sottocomune (non parla)', 'Telepatia 18 m'],
+      dmgResist: [], dmgImmune: [], dmgVulner: ['Psichico'],
+      condImmune: [],
+      traits: [
+        { name: 'Telepatia Avanzata', desc: 'Il flumph percepisce il contenuto di qualsiasi comunicazione telepatica entro 18 metri da lui.' },
+        { name: 'Debolezza da Prono', desc: 'Se il flumph ottiene la condizione Prono, tira un dado: con un risultato dispari ottiene anche la condizione Incapacitato. Alla fine di ciascuno dei suoi turni effettua un tiro salvezza su Destrezza CD 10, terminando la condizione Incapacitato con un successo.' },
+        { name: 'Schermo Telepatico', desc: 'I pensieri del flumph non possono essere letti in alcun modo e la magia non può rilevarne la posizione né osservarlo a distanza.' }
+      ],
+      actions: [
+        { name: 'Tentacolo', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 4 (1d4 + 2) danni da acido.', atkHit: '+4', atkDmgs: [{ f: '1d4+2', t: 'acido' }] },
+        { name: 'Spruzzo Maleodorante (1/Giorno)', desc: 'Tiro Salvezza su Destrezza: CD 10, una creatura che il flumph può vedere entro 4,5 metri.\nFallimento: il bersaglio viene ricoperto da un liquido dall\'odore nauseabondo, emana un fetore per 1d4 ore e ottiene la condizione Avvelenato per tutta la durata del fetore. Le altre creature ottengono la condizione Avvelenato mentre si trovano entro un\'emanazione di 1,5 metri originata dal bersaglio contaminato.\nIl bersaglio può rimuovere il fetore facendo un bagno durante un riposo breve o lungo.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Conoscenze psioniche e curiosità del Sottosuolo, doni di un alleato dalle buone intenzioni.' }],
+      notes: 'Strano Alleato Proveniente da un Luogo Strano\n\nHabitat: Sottosuolo\nTesoro: Arcani\n\nBizzarre creature con scopi aberranti abitano il Sottosuolo; i flumph sono tra le poche che si dimostrano d\'aiuto agli estranei. Queste creature tentacolate e telepatiche si muovono nell\'aria con brevi getti propulsivi, espellendo gas che producono il suono da cui deriva il loro nome. Invece di parlare, comunicano telepaticamente e cambiando colore per riflettere il proprio stato d\'animo.\n\nI flumph vivono in regioni cariche di energia psichica o nei pressi di creature dotate di poteri psionici. Si nutrono innocuamente di energie psichiche ma, nel farlo, incontrano spesso esseri pericolosi come aboleth e mind flayer. Sebbene generalmente evitino il combattimento, aiutano spesso gli avventurieri in difficoltà: un aiuto non sempre pratico, ma sempre bene intenzionato.\n\nAssistenza del Flumph (1d6) — il flumph aiuta...\n1 — Cucinando un pasto a base di prelibatezze del Sottosuolo.\n2 — Eseguendo una canzone psichica o una "poesia olfattiva".\n3 — Recuperando e curando avventurieri caduti.\n4 — Rivelando la posizione di oggetti magici utili.\n5 — Servendo da guida verso il covo nascosto di un nemico.\n6 — Elargendo incoraggiamenti e lodi in quantità eccessive.\n\nColori ed Emozioni del Flumph (le estremità cambiano colore col suo stato emotivo):\n• Blu scuro — Tristezza\n• Blu chiaro — Felicità\n• Verde — Curiosità\n• Magenta — Sconosciuta (raramente osservata; forse senza equivalente umano)\n• Arancione — Confusione\n• Rosa — Divertimento\n• Viola — Paura\n• Rosso — Rabbia\n• Verde acqua — Serenità\n• Giallo — Eccitazione'
     }
   ];
 
