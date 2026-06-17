@@ -3477,6 +3477,52 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Qualsiasi', desc: 'Detriti non digeriti delle vittime — monete, gemme e oggetti che galleggiano nella melma trasparente.' }],
       notes: 'Blocco di Melma che Ripulisce i Dungeon\n\nHabitat: Sottosuolo\nTesoro: Qualsiasi\n\nMasse tremolanti di melma acida, i cubi gelatinosi avanzano ondeggiando attraverso strette caverne e dungeon, inglobando tutto ciò che trovano sul loro cammino. Queste melme sono naturalmente trasparenti, il che le rende difficili da individuare quando rimangono immobili.\n\nCreature e oggetti intrappolati al loro interno vengono lentamente dissolti. Talvolta detriti non digeriti galleggiano all\'interno di un cubo, fornendo indizi sui suoi pasti precedenti.\n\nDetriti del Cubo Gelatinoso (1d6) — all\'interno del cubo galleggia...\n1 — Un forziere o un mimic recentemente intrappolato.\n2 — Una raccolta di bolle o pietre che ricordano degli occhi.\n3 — La chiave di una porta o di un cofano nelle vicinanze.\n4 — Un\'arma notevole che necessita di riparazioni.\n5 — Lo scheletro di un famoso avventuriero.\n6 — Una tavoletta recante un messaggio misterioso.'
+    },
+    {
+      id: 'preset_ghast', name: 'Ghast', emoji: '🪦', rarity: 'common',
+      type: 'Non Morto', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 13, hp: 36, hpCur: 36, hpTemp: 0, hpDice: '8d8', init: 3,
+      speed: '9 m', cr: '2', xp: '',
+      str: 16, dex: 17, con: 10, intl: 11, wis: 10, cha: 8,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '2', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune'],
+      dmgResist: ['Necrotico'], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Avvelenato'],
+      traits: [
+        { name: 'Fetore', desc: 'Tiro Salvezza su Costituzione CD 10, per ogni creatura che inizia il proprio turno in un\'emanazione di 1,5 metri originata dal ghast.\nFallimento: il bersaglio ottiene la condizione Avvelenato fino all\'inizio del suo turno successivo.\nSuccesso: il bersaglio è immune al Fetore di quel ghast per 24 ore.' }
+      ],
+      actions: [
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 7 (1d8 + 3) danni perforanti più 9 (2d8) danni necrotici.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'perforanti' }, { f: '2d8', t: 'necrotici' }] },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 10 (2d6 + 3) danni taglienti.\nSe il bersaglio è una creatura diversa da un Non Morto: Tiro Salvezza su Costituzione CD 10 — Fallimento: ottiene la condizione Paralizzato fino alla fine del suo turno successivo.', atkHit: '+5', atkDmgs: [{ f: '2d6+3', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Ricchezze saccheggiate da cripte e sepolcri, accumulate dal branco.' }],
+      notes: 'Tiranni tra i Cadaveri\n\nHabitat: Palude, Sottosuolo, Urbano\nTesoro: Qualsiasi\n\nI ghast sono cadaveri non morti dall\'odore nauseabondo, strettamente imparentati con i ghoul. Bramano i vizi di cui godevano in vita tanto quanto la carne in decomposizione.\n\nI ghast organizzano spesso i ghoul in branchi per saccheggiare cripte e rubare le ricchezze custodite al loro interno.'
+    },
+    {
+      id: 'preset_ghast_necromante', name: 'Ghast Necromante', emoji: '🪄', rarity: 'uncommon',
+      type: 'Non Morto', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 16, hp: 97, hpCur: 97, hpTemp: 0, hpDice: '15d8+30', init: 3,
+      speed: '9 m', cr: '6', xp: '',
+      str: 16, dex: 17, con: 14, intl: 18, wis: 14, cha: 8,
+      savesOverride: { str: '', dex: '', con: '5', intl: '', wis: '5', cha: '' },
+      skillOverrides: {}, passivePerception: 12,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Abissale', 'Comune'],
+      dmgResist: [], dmgImmune: ['Necrotico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Avvelenato'],
+      traits: [
+        { name: 'Fetore', desc: 'Tiro Salvezza su Costituzione CD 13, per ogni creatura che inizia il proprio turno in un\'emanazione di 1,5 metri originata dal ghast.\nFallimento: il bersaglio ottiene la condizione Avvelenato fino all\'inizio del suo turno successivo.\nSuccesso: il bersaglio è immune al Fetore di quel ghast per 24 ore.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il ghast effettua due attacchi Necrosi Orrifica. Può sostituire uno degli attacchi con un attacco Artiglio.' },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 13 (3d6 + 3) danni taglienti.\nSe il bersaglio non è un Non Morto, ottiene la condizione Paralizzato fino alla fine del suo turno successivo.', atkHit: '+6', atkDmgs: [{ f: '3d6+3', t: 'taglienti' }] },
+        { name: 'Necrosi Orrifica', desc: 'Attacco con arma da mischia o a distanza: +7 a colpire, portata 1,5 metri o gittata 36 metri.\nColpito: 15 (2d10 + 4) danni necrotici e il bersaglio ottiene la condizione Spaventato fino alla fine del suo turno successivo.', atkHit: '+7', atkDmgs: [{ f: '2d10+4', t: 'necrotici' }] },
+        { name: 'Lancio di Incantesimi', desc: 'Il ghast lancia uno dei seguenti incantesimi, senza componenti materiali e usando Intelligenza come caratteristica da incantatore:\nA volontà: Parlare con i Morti, Taumaturgia' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Reliquie empie e ricchezze trafugate dai sepolcri, oltre a componenti per le sue magie necromantiche.' }],
+      notes: 'Tiranni tra i Cadaveri\n\nHabitat: Palude, Sottosuolo, Urbano\nTesoro: Qualsiasi\n\nI ghast sono cadaveri non morti dall\'odore nauseabondo, strettamente imparentati con i ghoul. Bramano i vizi di cui godevano in vita tanto quanto la carne in decomposizione.\n\nI ghast necromanti (Ghast Gravecaller) brandiscono magie empie e conversano con i cadaveri. Possono persino fingersi lich o vampiri.'
     }
   ];
 
