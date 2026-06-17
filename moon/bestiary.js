@@ -3144,9 +3144,9 @@
     h += '</div>';
     h += '<div class="best__cardswrap"><div class="best__cards"></div>' +
       '<div class="best__sb">' +
-      '<button class="best__sb-btn best__sb-up" type="button" title="Scorri tutto in cima" aria-label="Scorri tutto in cima"><svg viewBox="0 0 10 10" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,4.6 5,1.6 8,4.6"/><polyline points="2,8 5,5 8,8"/></svg></button>' +
+      '<button class="best__sb-btn best__sb-up" type="button" title="Scorri tutto in cima" aria-label="Scorri tutto in cima"><svg viewBox="0 0 10 10" width="8" height="8" style="display:block" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5,5 5,2.5 7.5,5"/><polyline points="2.5,7.5 5,5 7.5,7.5"/></svg></button>' +
       '<div class="best__sb-track"><div class="best__sb-thumb"></div></div>' +
-      '<button class="best__sb-btn best__sb-down" type="button" title="Scorri tutto in fondo" aria-label="Scorri tutto in fondo"><svg viewBox="0 0 10 10" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,2 5,5 8,2"/><polyline points="2,5.4 5,8.4 8,5.4"/></svg></button>' +
+      '<button class="best__sb-btn best__sb-down" type="button" title="Scorri tutto in fondo" aria-label="Scorri tutto in fondo"><svg viewBox="0 0 10 10" width="8" height="8" style="display:block" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5,2.5 5,5 7.5,2.5"/><polyline points="2.5,5 5,7.5 7.5,5"/></svg></button>' +
       '</div></div>';
     left.innerHTML = h;
     fillCards();
