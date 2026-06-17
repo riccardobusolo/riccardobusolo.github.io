@@ -3027,6 +3027,35 @@
       ],
       drop: [{ name: 'Reliquie', desc: 'Reliquie sacre o blasfeme intrise di potere divino, lasciate dalla progenie di un dio.' }],
       notes: 'Scione degli Dei\n\nHabitat: Qualsiasi\nTesoro: Reliquie\n\n(Celestiale o Immondo a seconda del genitore divino: celestiale per le divinità dei Piani Superiori, immondo per quelle dei Piani Inferiori.)\n\nGli empirei sono la progenie delle divinità. Pur non essendo dèi, possiedono influenza e poteri divini legati ai loro genitori. Eredi della potenza divina, sono esseri idealizzati dalla forma umanoide. I loro rapporti con i creatori possono essere come tra genitori e figli, sovrani e servitori, inventori e creazioni. Pur essendo profondamente influenzati dai loro patroni, possiedono libero arbitrio.\n\nGli empirei celestiali sono tipicamente nobili e cercano di dimostrarsi degni della propria discendenza divina, servendo i loro genitori o sostenendone cause e campioni. Gli empirei immondi sono generalmente malvagi e opportunisti, e cercano di reclamare il potere dei genitori: alcuni forgiano empie armate o governano reami nascosti come parodie di veri dèi, altri tentano di sfuggire alle proprie famiglie maledette.\n\n«Un giorno potrei diventare il dio delle tempeste: comandare innumerevoli seguaci, rispondere alle preghiere, cambiare interi mondi... ma fino ad allora farò ciò che mi pare.»\n— Kopoha, Scione delle Tempeste'
+    },
+    {
+      id: 'preset_erinni', name: 'Erinni', emoji: '🪽', rarity: 'epic',
+      type: 'Immondo', size: 'Media', alignment: 'Legale Malvagio',
+      ac: 18, hp: 178, hpCur: 178, hpTemp: 0, hpDice: '21d8+84', init: 7,
+      speed: '9 m, Volare 18 m', cr: '12', xp: '',
+      str: 18, dex: 16, con: 18, intl: 14, wis: 14, cha: 18,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '6', persuasione: '8' }, passivePerception: 16,
+      senses: [{ type: 'Vista del Vero', value: 36, unit: 'm' }], languages: ['Infernale', 'Telepatia 36 m'],
+      dmgResist: ['Freddo'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
+      condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Restaurazione Diabolica', desc: 'Se l\'erinni muore al di fuori dei Nove Inferi, il suo corpo scompare in una nube di fumo sulfureo ed essa ottiene istantaneamente un nuovo corpo, tornando in vita con tutti i suoi punti ferita in qualche luogo dei Nove Inferi.' },
+        { name: 'Resistenza Magica', desc: 'L\'erinni ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Corda Magica', desc: 'L\'erinni possiede una corda magica. Finché la porta con sé, può usare l\'azione Corda Intrappolante.\nLa corda ha CA 20, 90 PF e immunità ai danni da veleno e psichici. Si trasforma in polvere se ridotta a 0 PF, se resta ad almeno 1,5 metri dall\'erinni per 1 ora o più, oppure se l\'erinni muore.\nSe danneggiata o distrutta, l\'erinni può ripristinarla completamente al termine di un riposo breve o lungo.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'erinni effettua tre attacchi con Spada Avvizzente e può usare Corda Intrappolante.' },
+        { name: 'Spada Avvizzente', desc: 'Attacco con arma da mischia: +8 a colpire, portata 1,5 metri.\nColpito: 13 (2d8 + 4) danni taglienti più 11 (2d10) danni necrotici.', atkHit: '+8', atkDmgs: [{ f: '2d8+4', t: 'taglienti' }, { f: '2d10', t: 'necrotici' }] },
+        { name: 'Corda Intrappolante', desc: 'Richiede la Corda Magica.\nTiro Salvezza su Forza: CD 16, una creatura che l\'erinni può vedere entro 36 metri.\nFallimento: 14 (4d6) danni da forza e il bersaglio ottiene la condizione Trattenuto, finché la corda non viene distrutta, finché l\'erinni non usa un\'azione bonus per liberarlo, oppure finché l\'erinni non usa di nuovo Corda Intrappolante.', atkDmgs: [{ f: '4d6', t: 'forza' }] }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Parata', desc: 'Innesco: l\'erinni viene colpita da un tiro per colpire in mischia mentre impugna un\'arma.\nRisposta: aggiunge +4 alla propria CA contro quell\'attacco, facendolo potenzialmente mancare.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Armatura infernale, la Spada Avvizzente e la corda magica dell\'erinni.' }],
+      notes: 'Diavolo della Vendetta e dell\'Ira Giusta\n\nHabitat: Nove Inferi (Planare)\nTesoro: Armamenti\n\nLe erinni, note anche come furie, sono diavoli alati rivestiti di armature infernali. Questi angeli caduti infliggono una forma spietata di giustizia divina, dando la caccia agli spergiuri e trascinando i giustamente dannati nei Nove Inferi tramite le loro corde magiche. Pochi riescono a scorgere ciò che si cela all\'interno delle loro armature, e le erinni fanno in modo che chiunque vi riesca non possa mai raccontare ciò che ha visto.\n\nLe erinni servono spesso gli arcidiavoli e difendono l\'ordine dei Nove Inferi contro intrusi e fuggitivi. Sebbene siano inclini a esplosioni d\'ira, collaborano bene con gli altri diavoli, e talvolta cacciano in gruppi di tre, costruendosi una fama temibile.\n\nQuando non sono al servizio di un padrone infernale, le erinni danno la caccia alle anime malvagie, inseguendo le prede senza tregua attraverso il multiverso e per ere intere. Possono essere evocate per servire incantatori malvagi, ma ascoltano anche giuramenti e maledizioni pronunciati nel loro nome: in rari casi, un mortale offeso che invochi con giusta collera può essere udito da un\'erinni che compare per vendicarlo. Una volta evocata, un\'erinni non se ne va senza reclamare l\'anima della preda oppure quella del mortale che l\'ha chiamata.'
     }
   ];
 
