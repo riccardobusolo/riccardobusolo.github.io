@@ -3618,6 +3618,76 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Coro Vorace dell\'Irrealtà\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nLe madri gorgoglianti si nutrono incessantemente dei propri corpi ameboidi e li rigenerano continuamente: masse amorfe ribollenti di occhi, denti e strani organi. Questi orrori che piegano la mente cantano e urlano, ridono e piangono con una cacofonia di voci che spaziano dal disturbantemente innaturale allo sconvolgentemente familiare. Esistono soltanto per nutrirsi e per riversare il proprio disprezzo verso la realtà, con le loro numerose fauci grondanti di saliva proveniente da altri mondi.\n\nLe madri gorgoglianti nascono in vari modi spiacevoli.\n\nOrigini della Madre Gorgogliante (1d6) — la madre gorgogliante è...\n1 — Un\'altra creatura deformata da una magia pericolosa.\n2 — Un\'appendice autonoma di una divinità caotica, di un\'entità del Reame Remoto o di un orrore nato dalle stelle.\n3 — L\'esperimento di un manipolatore aberrante.\n4 — Parte del ciclo vitale di un\'altra Aberrazione.\n5 — Un mutaforma che ha perso il controllo dei propri poteri.\n6 — Qualcuno maledetto da un culto o da una divinità vendicativa.\n\n«Ahimè, gli Antichi Elfi commisero un errore fatale. Quando la cometa Lacrima del Drago fece ritorno, il grande Portale — ancora sintonizzato sul remoto reame di entità aliene legate alla cometa — si aprì nuovamente. E ciò che emerse, ululando oscenità, cantò fame innominabili in un mondo impreparato.»\n— Dal Libro del Portale, rinvenuto presso il Picco della Tempesta di Fuoco'
+    },
+    {
+      id: 'preset_githyanki_guerriero', name: 'Guerriero Githyanki', emoji: '👽', rarity: 'uncommon',
+      type: 'Aberrazione', size: 'Media', alignment: 'Legale Malvagio',
+      ac: 17, hp: 49, hpCur: 49, hpTemp: 0, hpDice: '9d8+9', init: 4,
+      speed: '9 m', cr: '3', xp: '',
+      str: 15, dex: 14, con: 12, intl: 13, wis: 13, cha: 10,
+      savesOverride: { str: '', dex: '', con: '3', intl: '3', wis: '3', cha: '' },
+      skillOverrides: {}, passivePerception: 11,
+      senses: [], languages: ['Comune', 'Gith'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il githyanki effettua due attacchi con Lama Psionica.' },
+        { name: 'Lama Psionica', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 9 (2d6 + 2) danni taglienti più 7 (2d6) danni psichici.', atkHit: '+4', atkDmgs: [{ f: '2d6+2', t: 'taglienti' }, { f: '2d6', t: 'psichici' }] },
+        { name: 'Incantesimi', desc: 'Il githyanki lancia uno dei seguenti incantesimi, senza componenti e usando Intelligenza come caratteristica da incantatore:\nA volontà: Mano Magica (la mano è invisibile)\n2/giorno ciascuno: Anti-Individuazione (solo su sé stesso)' }
+      ],
+      bonusActions: [
+        { name: 'Passo Velato (2/giorno)', desc: 'Il githyanki lancia Passo Velato senza componenti e usando la stessa caratteristica da incantatore di Incantesimi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Armatura a mezza piastra e la lama psionica del guerriero.' }],
+      notes: 'Invasori del Piano Astrale\n\nHabitat: Planare (Piano Astrale)\nTesoro: Armamenti\n\nI guerrieri githyanki utilizzano capacità psioniche per accrescere la propria abilità in battaglia.\n\nI githyanki erano un tempo un popolo ordinario, ma le azioni di un malvagio impero di divoratori della mente hanno impresso il conflitto nel loro stesso essere. Creature umanoidi alte e magre, possiedono orecchie seghettate e una pelle maculata tra sfumature di giallo, verde e marrone.\n\nStoria dei Gith — Molto tempo fa un popolo umanoide fu conquistato da un impero di divoratori della mente (illithid), che lo manipolarono con orrori indicibili, evoluzione forzata e rimodellamento psichico. Una figura chiamata Gith emerse tra i prigionieri e guidò la ribellione che sconfisse gli illithid e frantumò il loro vasto impero.\n\nLa vittoria ebbe però breve durata: il leader Zerthimon sfidò Gith, sostenendo che la sua sete di vendetta e conquista fosse una programmazione mentale imposta dagli illithid. Il popolo si divise nei githyanki («seguaci di Gith») e nei githzerai («coloro che rinnegano Gith»), in un conflitto che dura ancora oggi.\n\nQuando Gith morì, la sua consigliera Vlaakith assunse il comando; la sua stirpe è proseguita fino all\'attuale sovrana, Vlaakith la Regina Lich, tiranna non morta che costringe il suo popolo a guerre senza fine contro illithid, githzerai e chiunque minacci la supremazia githyanki.\n\n«Uccidere nel nome di Vlaakith è il nostro più grande servizio. Morire nel suo nome è il nostro ultimo atto di riverenza.»\n— Meldavh, cavaliere githyanki'
+    },
+    {
+      id: 'preset_githyanki_cavaliere', name: 'Cavaliere Githyanki', emoji: '🤺', rarity: 'rare',
+      type: 'Aberrazione', size: 'Media', alignment: 'Legale Malvagio',
+      ac: 18, hp: 117, hpCur: 117, hpTemp: 0, hpDice: '18d8+36', init: 5,
+      speed: '9 m', cr: '8', xp: '',
+      str: 16, dex: 14, con: 15, intl: 14, wis: 14, cha: 15,
+      savesOverride: { str: '', dex: '', con: '5', intl: '5', wis: '5', cha: '' },
+      skillOverrides: {}, passivePerception: 12,
+      senses: [], languages: ['Comune', 'Gith'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il githyanki effettua tre attacchi con Spada d\'Argento. Può sostituire uno degli attacchi con l\'uso di Incantesimi per lanciare Telecinesi, se disponibile.' },
+        { name: 'Spada d\'Argento', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 10 (2d6 + 3) danni taglienti più 14 (4d6) danni psichici.\nColpo Critico: se il bersaglio si trova in un corpo astrale (come tramite Proiezione Astrale), il githyanki può recidere il cordone argentato che lo collega al suo corpo materiale invece di infliggere danni.', atkHit: '+6', atkDmgs: [{ f: '2d6+3', t: 'taglienti' }, { f: '4d6', t: 'psichici' }] },
+        { name: 'Incantesimi', desc: 'Il githyanki lancia uno dei seguenti incantesimi, senza componenti e usando Intelligenza come caratteristica da incantatore (CD incantesimi 13):\nA volontà: Mano Magica (la mano è invisibile)\n2/giorno ciascuno: Anti-Individuazione (solo su sé stesso), Linguaggi\n1/giorno ciascuno: Spostamento Planare, Telecinesi' }
+      ],
+      bonusActions: [
+        { name: 'Passo Velato (2/giorno)', desc: 'Il githyanki lancia Passo Velato senza componenti e usando la stessa caratteristica da incantatore di Incantesimi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Spada d\'Argento', desc: 'Lama d\'argento sacra ai githyanki, capace di recidere il cordone argentato di chi viaggia in proiezione astrale.' }, { name: 'Armatura a piastre', desc: 'L\'armatura del cavaliere githyanki.' }],
+      notes: 'Invasori del Piano Astrale\n\nHabitat: Planare (Piano Astrale)\nTesoro: Armamenti\n\nI cavalieri githyanki impugnano spade d\'argento per uccidere gli utilizzatori di magia che sfruttano Proiezione Astrale per introdursi nei territori githyanki del Piano Astrale. Queste lame d\'argento sono sacre ai githyanki, e i non githyanki che ne rivendicano il possesso vengono spesso braccati da cavalieri furiosi.\n\nI githyanki erano un tempo un popolo ordinario, ma le azioni di un malvagio impero di divoratori della mente hanno impresso il conflitto nel loro stesso essere. Creature umanoidi alte e magre, possiedono orecchie seghettate e una pelle maculata tra sfumature di giallo, verde e marrone.\n\nStoria dei Gith — Molto tempo fa un popolo umanoide fu conquistato da un impero di divoratori della mente (illithid), che lo manipolarono con orrori indicibili, evoluzione forzata e rimodellamento psichico. Una figura chiamata Gith emerse tra i prigionieri e guidò la ribellione che sconfisse gli illithid e frantumò il loro vasto impero.\n\nLa vittoria ebbe però breve durata: il leader Zerthimon sfidò Gith, sostenendo che la sua sete di vendetta e conquista fosse una programmazione mentale imposta dagli illithid. Il popolo si divise nei githyanki («seguaci di Gith») e nei githzerai («coloro che rinnegano Gith»), in un conflitto che dura ancora oggi.\n\nQuando Gith morì, la sua consigliera Vlaakith assunse il comando; la sua stirpe è proseguita fino all\'attuale sovrana, Vlaakith la Regina Lich, tiranna non morta che costringe il suo popolo a guerre senza fine contro illithid, githzerai e chiunque minacci la supremazia githyanki.\n\n«Uccidere nel nome di Vlaakith è il nostro più grande servizio. Morire nel suo nome è il nostro ultimo atto di riverenza.»\n— Meldavh, cavaliere githyanki'
+    },
+    {
+      id: 'preset_githyanki_dracomante', name: 'Dracomante Githyanki', emoji: '☄️', rarity: 'epic',
+      type: 'Aberrazione', size: 'Media', alignment: 'Legale Malvagio',
+      ac: 18, hp: 255, hpCur: 255, hpTemp: 0, hpDice: '30d8+120', init: 8,
+      speed: '9 m, Volare 9 m (fluttuare)', cr: '16', xp: '',
+      str: 10, dex: 16, con: 18, intl: 20, wis: 16, cha: 18,
+      savesOverride: { str: '', dex: '8', con: '9', intl: '10', wis: '8', cha: '' },
+      skillOverrides: { arcano: '10', percezione: '8' }, passivePerception: 18,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }], languages: ['Comune', 'Draconico', 'Gith'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il githyanki effettua tre attacchi Colpo Draconico.' },
+        { name: 'Colpo Draconico', desc: 'Attacco con arma da mischia o a distanza: +10 a colpire, portata 3 metri oppure gittata 36 metri.\nColpito: 12 (2d6 + 5) danni taglienti più 17 (5d6) danni da fuoco, e il bersaglio ottiene la condizione Spaventato fino all\'inizio del turno successivo del githyanki.', atkHit: '+10', atkDmgs: [{ f: '2d6+5', t: 'taglienti' }, { f: '5d6', t: 'fuoco' }] },
+        { name: 'Soffio Draconico Evocato (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza CD 18, per ogni creatura in un cono di 27 metri.\nFallimento: 27 (6d8) danni da fuoco più 27 (6d8) danni da forza.\nSuccesso: metà danni.', atkDmgs: [{ f: '6d8', t: 'fuoco' }, { f: '6d8', t: 'forza' }] },
+        { name: 'Incantesimi', desc: 'Il githyanki lancia uno dei seguenti incantesimi, senza componenti e usando Intelligenza come caratteristica da incantatore (CD incantesimi 18, +10 a colpire con gli attacchi di incantesimo):\nA volontà: Mano Magica (la mano è invisibile)\n2/giorno ciascuno: Anti-Individuazione (solo su sé stesso), Spostamento Planare, Linguaggi' }
+      ],
+      bonusActions: [
+        { name: 'Passo Velato (3/giorno)', desc: 'Il githyanki lancia Passo Velato senza componenti e usando la stessa caratteristica da incantatore di Incantesimi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'L\'equipaggiamento da guerra del dracomante e i favori dei suoi alleati draghi rossi.' }],
+      notes: 'Invasori del Piano Astrale\n\nHabitat: Planare (Piano Astrale)\nTesoro: Armamenti\n\nUna delle ultime imprese di Gith fu stringere un\'alleanza tra i githyanki e la dea drago Tiamat. Da allora il drago rosso Ephelomon, consorte della Regina dei Draghi, e i suoi simili sono alleati dei githyanki. I dracomanti githyanki mantengono questo patto e coltivano talenti magici che completano la potenza dei draghi rossi.\n\nI githyanki erano un tempo un popolo ordinario, ma le azioni di un malvagio impero di divoratori della mente hanno impresso il conflitto nel loro stesso essere. Creature umanoidi alte e magre, possiedono orecchie seghettate e una pelle maculata tra sfumature di giallo, verde e marrone.\n\nStoria dei Gith — Molto tempo fa un popolo umanoide fu conquistato da un impero di divoratori della mente (illithid), che lo manipolarono con orrori indicibili, evoluzione forzata e rimodellamento psichico. Una figura chiamata Gith emerse tra i prigionieri e guidò la ribellione che sconfisse gli illithid e frantumò il loro vasto impero.\n\nLa vittoria ebbe però breve durata: il leader Zerthimon sfidò Gith, sostenendo che la sua sete di vendetta e conquista fosse una programmazione mentale imposta dagli illithid. Il popolo si divise nei githyanki («seguaci di Gith») e nei githzerai («coloro che rinnegano Gith»), in un conflitto che dura ancora oggi.\n\nQuando Gith morì, la sua consigliera Vlaakith assunse il comando; la sua stirpe è proseguita fino all\'attuale sovrana, Vlaakith la Regina Lich, tiranna non morta che costringe il suo popolo a guerre senza fine contro illithid, githzerai e chiunque minacci la supremazia githyanki.\n\n«Uccidere nel nome di Vlaakith è il nostro più grande servizio. Morire nel suo nome è il nostro ultimo atto di riverenza.»\n— Meldavh, cavaliere githyanki'
     }
   ];
 
