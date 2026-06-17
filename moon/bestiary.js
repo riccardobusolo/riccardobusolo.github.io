@@ -3523,6 +3523,33 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Qualsiasi', desc: 'Reliquie empie e ricchezze trafugate dai sepolcri, oltre a componenti per le sue magie necromantiche.' }],
       notes: 'Tiranni tra i Cadaveri\n\nHabitat: Palude, Sottosuolo, Urbano\nTesoro: Qualsiasi\n\nI ghast sono cadaveri non morti dall\'odore nauseabondo, strettamente imparentati con i ghoul. Bramano i vizi di cui godevano in vita tanto quanto la carne in decomposizione.\n\nI ghast necromanti (Ghast Gravecaller) brandiscono magie empie e conversano con i cadaveri. Possono persino fingersi lich o vampiri.'
+    },
+    {
+      id: 'preset_fantasma', name: 'Fantasma', emoji: '🫥', rarity: 'uncommon',
+      type: 'Non Morto', size: 'Media', alignment: 'Neutrale',
+      ac: 11, hp: 45, hpCur: 45, hpTemp: 0, hpDice: '10d8', init: 1,
+      speed: '1,5 m, Volare 12 m (fluttuare)', cr: '4', xp: '',
+      str: 7, dex: 13, con: 10, intl: 10, wis: 12, cha: 17,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 11,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune', 'Un\'altra lingua'],
+      dmgResist: ['Acido', 'Contundente', 'Freddo', 'Fuoco', 'Fulmine', 'Perforante', 'Tagliente', 'Tuono'],
+      dmgImmune: ['Necrotico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato', 'Afferrato', 'Paralizzato', 'Pietrificato', 'Avvelenato', 'Prono', 'Trattenuto'],
+      traits: [
+        { name: 'Vista Eterea', desc: 'Il fantasma può vedere fino a 18 metri nel Piano Etereo quando si trova sul Piano Materiale.' },
+        { name: 'Movimento Incorporeo', desc: 'Il fantasma può muoversi attraverso creature e oggetti come se fossero terreno difficile. Subisce 5 (1d10) danni da forza se termina il proprio turno all\'interno di un oggetto.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il fantasma effettua due attacchi Tocco Avvizzente.' },
+        { name: 'Tocco Avvizzente', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 19 (3d10 + 3) danni necrotici.', atkHit: '+5', atkDmgs: [{ f: '3d10+3', t: 'necrotici' }] },
+        { name: 'Forma Eterea', desc: 'Il fantasma lancia l\'incantesimo Forma Eterea, senza richiedere componenti materiali, somatiche o verbali e usando Carisma come caratteristica da incantatore. Il fantasma è visibile sul Piano Materiale quando si trova sull\'Orlo Etereo e viceversa, ma non può influenzare né essere influenzato da nulla che si trovi sull\'altro piano.' },
+        { name: 'Volto Orrifico', desc: 'Tiro Salvezza su Saggezza CD 13, per ogni creatura entro un cono di 18 metri che possa vedere il fantasma e che non sia un Non Morto.\nFallimento: 10 (2d6 + 3) danni psichici e il bersaglio ottiene la condizione Spaventato fino all\'inizio del turno successivo del fantasma.\nSuccesso: il bersaglio è immune al Volto Orrifico di questo fantasma per 24 ore.', atkDmgs: [{ f: '2d6+3', t: 'psichici' }] },
+        { name: 'Possessione (Ricarica 6)', desc: 'Tiro Salvezza su Carisma CD 13, contro un umanoide che il fantasma può vedere entro 1,5 metri.\nFallimento: il bersaglio viene posseduto dal fantasma; il fantasma scompare e il bersaglio ottiene la condizione Incapacitato e perde il controllo del proprio corpo. Il fantasma ne assume il controllo, ma il bersaglio mantiene la consapevolezza di ciò che accade. Il fantasma non può essere bersaglio di attacchi, incantesimi o altri effetti, eccetto quelli che prendono di mira specificamente i Non Morti. Le statistiche del fantasma restano invariate, tranne che usa la Velocità del bersaglio e i suoi modificatori di Forza, Destrezza e Costituzione.\nLa possessione dura finché il corpo non scende a 0 punti ferita oppure finché il fantasma non lo lascia con un\'Azione Bonus. Quando termina, il fantasma appare in uno spazio libero entro 1,5 metri dal bersaglio, che diventa immune alla Possessione di questo fantasma per 24 ore.\nSuccesso: il bersaglio è immune alla Possessione di questo fantasma per 24 ore.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Oggetti legati alla vita passata del fantasma o agli affari incompiuti che lo trattengono nel mondo.' }],
+      notes: 'Anima Perduta e Spirito Inquieto\n\nHabitat: Sottosuolo, Urbano\nTesoro: Qualsiasi\n\nI fantasmi sorgono quando creature viventi muoiono in uno stato di estrema emozione oppure dopo aver lasciato incompiuto un compito importante. Questi spiriti incorporei infestano luoghi per loro significativi, permanendovi finché i loro affari non sono conclusi o finché non vengono messi a riposo.\n\nI fantasmi appaiono tipicamente come versioni semitrasparenti delle creature che erano in vita, sebbene alcuni mostrino i segni della ferita che li ha uccisi o presentino deformazioni da incubo nelle loro forme. Molti reagiscono in modo estremo ad azioni, oggetti o individui che ricordano loro aspetti della propria vita carichi di forte significato emotivo. I fantasmi particolarmente disperati o vendicativi possono possedere i viventi per realizzare i propri scopi.'
     }
   ];
 
