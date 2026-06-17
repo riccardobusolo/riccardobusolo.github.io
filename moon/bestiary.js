@@ -3764,6 +3764,31 @@
       legendaryActions: [],
       drop: [{ name: 'Arcani', desc: 'Potenti focalizzatori psionici, sapere planare e oggetti arcani custoditi dallo psion.' }],
       notes: 'Esploratori ai Confini della Realtà\n\nHabitat: Planare (Limbo)\nTesoro: Arcani, Individuale\n\nQuesti potenti psion supervisionano i santuari githzerai, studiano enigmatici fenomeni planari e guidano le rrakkma — incursioni nelle colonie dei divoratori della mente per uccidere gli illithid e scoprire i segreti della trasformazione degli antichi gith.\n\nI githzerai sono esseri umanoidi alti e magri, fisicamente identici ai githyanki, con cui condividono l\'origine come creature trasformate dai divoratori della mente. Sapendo di essere stati manipolati nel corpo e nella mente dagli oppressori illithid, invece di cedere a quella programmazione seguono gli insegnamenti del loro primo leader, Zerthimon, e rimodellano mente e corpo per trovare la pace.\n\nI githzerai creano psichicamente santuari sereni e nascosti nelle regioni caotiche del multiverso. La maggior parte di queste roccaforti fluttua nel Limbo, ma enclave si trovano anche nell\'Abisso, nel Caos Elementale e nel Feywild. Vi affinano le capacità psioniche, accumulano conoscenza ed evitano githyanki e divoratori della mente.\n\nConflitti dei Gith (1d8) — i personaggi sono...\n1 — Chiamati a consegnare un messaggio o un misterioso pacco a Vlaakith la Regina Lich, o da parte sua.\n2 — Convinti da un divoratore dell\'intelletto travestito a cercare un elusivo leader gith.\n3 — Invitati ad aiutare githzerai in fuga dai githyanki che hanno distrutto il loro santuario.\n4 — Incaricati di rinnovare o sabotare l\'alleanza dei githyanki con i draghi rossi.\n5 — Invitati a cacciare gli illithid insieme ai githyanki.\n6 — Costretti a scoprire una spia gith in una comunità planare o su una nave incantata.\n7 — Inviati a scoprire l\'ultima posizione conosciuta dell\'eroe Gith o di Zerthimon.\n8 — Incaricati di restituire al suo popolo la lama di un cavaliere githyanki caduto.\n\n«Noi githzerai desideriamo una sfida, affinché, quando Zerthimon ritornerà, ci trovi pronti. Per questo abbiamo viaggiato nel Limbo Ululante per farne la nostra casa.»\n— Zaerith Menyar-Ag-Gith, leader githzerai'
+    },
+    {
+      id: 'preset_glabrezu', name: 'Glabrezu', emoji: '🦀', rarity: 'uncommon',
+      type: 'Immondo', size: 'Grande', alignment: 'Caotico Malvagio',
+      ac: 17, hp: 189, hpCur: 189, hpTemp: 0, hpDice: '18d10+90', init: 6,
+      speed: '12 m', cr: '9', xp: '',
+      str: 20, dex: 15, con: 21, intl: 19, wis: 17, cha: 16,
+      savesOverride: { str: '9', dex: '', con: '9', intl: '', wis: '7', cha: '7' },
+      skillOverrides: { inganno: '7', percezione: '7' }, passivePerception: 17,
+      senses: [{ type: 'Vista del Vero', value: 36, unit: 'm' }], languages: ['Abissale', 'Telepatia 36 m'],
+      dmgResist: ['Freddo', 'Fuoco', 'Fulmine'], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Restaurazione Demoniaca', desc: 'Se il glabrezu muore al di fuori dell\'Abisso, il suo corpo si dissolve in icore e ottiene immediatamente un nuovo corpo, tornando in vita con tutti i suoi punti ferita da qualche parte nell\'Abisso.' },
+        { name: 'Resistenza Magica', desc: 'Il glabrezu ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il glabrezu effettua due attacchi Chela e usa Pestone oppure Incantesimi.' },
+        { name: 'Chela', desc: 'Attacco con arma da mischia: +9 a colpire, portata 3 metri.\nColpito: 16 (2d10 + 5) danni taglienti. Se il bersaglio è una creatura Media o più piccola, ottiene la condizione Afferrato (fuga CD 15) da una delle due chele del glabrezu.', atkHit: '+9', atkDmgs: [{ f: '2d10+5', t: 'taglienti' }] },
+        { name: 'Pestone', desc: 'Tiro Salvezza su Destrezza CD 17, contro una creatura afferrata dal glabrezu.\nFallimento: 15 (3d6 + 5) danni contundenti.\nSuccesso: metà danni.', atkDmgs: [{ f: '3d6+5', t: 'contundenti' }] },
+        { name: 'Incantesimi', desc: 'Il glabrezu lancia uno dei seguenti incantesimi, senza componenti materiali e usando Intelligenza come caratteristica da incantatore (CD incantesimi 16):\nA volontà: Oscurità, Individuazione del Magico, Dissolvi Magie\n1/giorno ciascuno: Confusione, Volare, Parola del Potere Stordire' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Reliquie e oggetti notevoli accumulati ingannando e divorando le sue vittime.' }],
+      notes: 'Demone dell\'Illusione e dell\'Intrappolamento\n\nHabitat: Planare (Abisso)\nTesoro: Reliquie\n\nI glabrezu incarnano l\'inganno e l\'astuzia predatoria. Questi demoni scaltri sanno che le trappole più efficaci sono quelle che gli individui preparano per sé stessi. Nonostante enormi chele e una fisicità travolgente, eccellono nell\'uso dell\'adulazione e della manipolazione per spingere le vittime a isolarsi e a danneggiare gli altri.\n\nNell\'Abisso agiscono come cacciatori solitari o come consiglieri ingannevoli di demoni più potenti. Cercano vie d\'accesso al Piano Materiale e si compiacciono di essere evocati dagli incantatori: servono con entusiasmo i mortali mentre li tentano a tradire i propri alleati e a indulgere in fantasie megalomani. Un glabrezu si sforza di uccidere il proprio evocatore una volta che questi abbia commesso azioni imperdonabili e la sua anima sia ormai destinata all\'Abisso.\n\n«La vita del tuo compagno, oppure ciò che hai cercato attraverso l\'infinito? Fai la tua scelta.»\n— Gerrzog, glabrezu della Scala Infinita'
     }
   ];
 
