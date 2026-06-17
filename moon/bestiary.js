@@ -3017,6 +3017,69 @@
     }
   }
 
+  /* Scrollbar custom della LISTA mostri (.best__cards): sottile ma evidente,
+     sempre presente (anche quando non scrollabile → pollice pieno e attenuato),
+     con pulsante "in cima" e "in fondo". NON tocca la colonna descrizione. */
+  function setupBestScrollbar(left) {
+    var cards = left.querySelector('.best__cards');
+    var sb = left.querySelector('.best__sb');
+    if (!cards || !sb) return;
+    var track = sb.querySelector('.best__sb-track');
+    var thumb = sb.querySelector('.best__sb-thumb');
+    var upBtn = sb.querySelector('.best__sb-up');
+    var dnBtn = sb.querySelector('.best__sb-down');
+    if (!track || !thumb) return;
+    var raf = 0;
+    function update() {
+      raf = 0;
+      var vh = cards.clientHeight, ch = cards.scrollHeight, st = cards.scrollTop;
+      var th = track.clientHeight;
+      if (ch - vh <= 1) {
+        thumb.style.height = th + 'px';
+        thumb.style.top = '0px';
+        thumb.classList.add('best__sb-thumb--idle');
+        return;
+      }
+      thumb.classList.remove('best__sb-thumb--idle');
+      var thumbH = Math.max(26, Math.round(th * vh / ch));
+      var maxTop = th - thumbH;
+      thumb.style.height = thumbH + 'px';
+      thumb.style.top = Math.round(maxTop * st / (ch - vh)) + 'px';
+    }
+    function schedule() { if (!raf) raf = requestAnimationFrame(update); }
+    cards.addEventListener('scroll', schedule, { passive: true });
+    if (typeof ResizeObserver === 'function') { try { new ResizeObserver(schedule).observe(cards); } catch (_) {} }
+    if (typeof MutationObserver === 'function') { try { new MutationObserver(schedule).observe(cards, { childList: true, subtree: true }); } catch (_) {} }
+    if (upBtn) upBtn.addEventListener('click', function () { try { cards.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) { cards.scrollTop = 0; } });
+    if (dnBtn) dnBtn.addEventListener('click', function () { try { cards.scrollTo({ top: cards.scrollHeight, behavior: 'smooth' }); } catch (_) { cards.scrollTop = cards.scrollHeight; } });
+    thumb.addEventListener('pointerdown', function (e) {
+      if (cards.scrollHeight - cards.clientHeight <= 1) return;
+      e.preventDefault();
+      var startY = e.clientY, startTop = parseFloat(thumb.style.top) || 0;
+      var maxTop = track.clientHeight - thumb.offsetHeight;
+      var range = cards.scrollHeight - cards.clientHeight;
+      try { thumb.setPointerCapture(e.pointerId); } catch (_) {}
+      thumb.classList.add('best__sb-thumb--drag');
+      function move(ev) {
+        var nt = Math.max(0, Math.min(maxTop, startTop + (ev.clientY - startY)));
+        cards.scrollTop = (maxTop > 0 ? nt / maxTop : 0) * range;
+      }
+      function up() { thumb.classList.remove('best__sb-thumb--drag'); document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up); }
+      document.addEventListener('pointermove', move);
+      document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', up);
+    });
+    track.addEventListener('pointerdown', function (e) {
+      if (e.target === thumb || cards.scrollHeight - cards.clientHeight <= 1) return;
+      var r = track.getBoundingClientRect();
+      var maxTop = track.clientHeight - thumb.offsetHeight;
+      var nt = Math.max(0, Math.min(maxTop, e.clientY - r.top - thumb.offsetHeight / 2));
+      var range = cards.scrollHeight - cards.clientHeight;
+      try { cards.scrollTo({ top: (maxTop > 0 ? nt / maxTop : 0) * range, behavior: 'smooth' }); } catch (_) { cards.scrollTop = (maxTop > 0 ? nt / maxTop : 0) * range; }
+    });
+    update();
+  }
+
   function renderLeftInto(left) {
     ensureBestScrollPersist(left);
     var isCustom = view.tab === 'custom';
@@ -3049,10 +3112,16 @@
     }
     h += '</div>';
     h += '</div>';
-    h += '<div class="best__cards"></div>';
+    h += '<div class="best__cardswrap"><div class="best__cards"></div>' +
+      '<div class="best__sb">' +
+      '<button class="best__sb-btn best__sb-up" type="button" title="Scorri tutto in cima" aria-label="Scorri tutto in cima">▲</button>' +
+      '<div class="best__sb-track"><div class="best__sb-thumb"></div></div>' +
+      '<button class="best__sb-btn best__sb-down" type="button" title="Scorri tutto in fondo" aria-label="Scorri tutto in fondo">▼</button>' +
+      '</div></div>';
     left.innerHTML = h;
     fillCards();
     updateFilterChrome();
+    setupBestScrollbar(left);
   }
 
   /* Bottone-filtro compatto (apre/chiude il pannello relativo). */
@@ -3517,8 +3586,18 @@
     '#bestiaryBody{padding:0;display:flex;flex-direction:row;align-items:stretch;overflow:hidden}' +
     '.best__left{flex:1 1 0;display:flex;flex-direction:column;min-width:0;overflow:hidden;padding:8px;border-right:1px solid var(--border)}' +
     '.best__head{flex:0 0 auto}' +
-    '.best__cards{flex:1 1 0;min-height:0;overflow:hidden auto;scrollbar-width:none;-ms-overflow-style:none}' +
+    '.best__cardswrap{flex:1 1 0;min-height:0;display:flex;flex-direction:row;gap:6px}' +
+    '.best__cards{flex:1 1 0;min-width:0;min-height:0;overflow:hidden auto;scrollbar-width:none;-ms-overflow-style:none}' +
     '.best__cards::-webkit-scrollbar{width:0;height:0;display:none}' +
+    '.best__sb{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:5px;width:15px;padding:1px 0}' +
+    '.best__sb-btn{flex:0 0 auto;width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid var(--border);background:var(--bg3);color:var(--muted);border-radius:4px;font-size:7px;line-height:1;cursor:var(--cur-pointer);transition:all .12s}' +
+    '.best__sb-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(127,127,127,.16)}' +
+    '.best__sb-btn:active{transform:scale(.88)}' +
+    '.best__sb-track{flex:1 1 0;min-height:0;position:relative;width:9px;background:rgba(127,127,127,.14);border:1px solid var(--border);border-radius:6px;cursor:var(--cur-pointer)}' +
+    '.best__sb-thumb{position:absolute;left:1px;right:1px;top:0;min-height:26px;border-radius:6px;background:var(--gold);box-shadow:0 0 6px -1px var(--gold);cursor:grab;transition:filter .12s,opacity .12s}' +
+    '.best__sb-thumb:hover{filter:brightness(1.12)}' +
+    '.best__sb-thumb--drag{cursor:grabbing;filter:brightness(1.18)}' +
+    '.best__sb-thumb--idle{opacity:.34;box-shadow:none;cursor:default}' +
     '.best__right{flex:1 1 0;min-width:0;overflow:hidden auto;scrollbar-width:none;-ms-overflow-style:none;padding:10px 12px}' +
     '.best__right::-webkit-scrollbar{width:0;height:0;display:none}' +
     '.best__placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.74rem;line-height:1.6;padding:20px}' +
