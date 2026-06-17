@@ -3231,6 +3231,32 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Arcani', desc: 'Conoscenze arcane e frammenti delle ricerche magiche dell\'incantatore defunto.' }],
       notes: 'Teschio Ardente Ossessionato dalla Magia\n\nHabitat: Sottosuolo\nTesoro: Arcani\n\nI teschi fiammeggianti sono teschi volanti che ardono di fuoco magico e degli arcani solo parzialmente ricordati di incantatori defunti. Sorgono dai resti di utilizzatori della magia morti, rianimati da sinistri necromanti o le cui ricerche magiche li spingono oltre la morte stessa.\n\nI teschi fiammeggianti possono servire come guardiani per i loro creatori oppure perseguire ambizioni rimaste incompiute in vita. Attaccano i nemici con incantesimi distruttivi e raffiche di fuoco, brandendo la magia senza necessitare della maggior parte delle componenti.\n\nI teschi fiammeggianti assumono forme diverse, da teschi con tratti quasi umani a teschi con alterazioni terrificanti o bestiali. Le loro fiamme variano nel colore e diventano più intense quando sono adirati.\n\nDettagli del Teschio Fiammeggiante (1d6) — il teschio fiammeggiante presenta...\n1 — Diagrammi arcani incisi sulla superficie.\n2 — Fiamme che formano tratti drammatici, corna o capelli.\n3 — Frammenti fratturati che volano all\'unisono.\n4 — Una piastra di ferro imbullonata sulla bocca.\n5 — Un trauma cranico letale.\n6 — Denti di animali non corrispondenti tra loro.\n\n«Non ho mai avuto bisogno del calore. Non ho mai avuto bisogno di un corpo. La mia volontà è sufficiente, e il mio lavoro sarà l\'eredità che renderà degno ogni sacrificio.»\n— Trenzia, Teschio Fiammeggiante di Sottomonte'
+    },
+    {
+      id: 'preset_golem_carne', name: 'Golem di Carne', emoji: '🧟', rarity: 'uncommon',
+      type: 'Costrutto', size: 'Media', alignment: 'Neutrale',
+      ac: 9, hp: 127, hpCur: 127, hpTemp: 0, hpDice: '15d8+60', init: -1,
+      speed: '9 m', cr: '5', xp: '',
+      str: 19, dex: 9, con: 18, intl: 6, wis: 10, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comprende Comune e un\'altra lingua (non parla)'],
+      dmgResist: [], dmgImmune: ['Fulmine', 'Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato', 'Paralizzato', 'Pietrificato', 'Avvelenato'],
+      traits: [
+        { name: 'Avversione al Fuoco', desc: 'Se il golem subisce danni da fuoco, ha svantaggio ai tiri per colpire e alle prove di caratteristica fino alla fine del suo turno successivo.' },
+        { name: 'Furia', desc: 'Ogni volta che il golem inizia il proprio turno Ferito (a metà dei punti ferita o meno), tira 1d6: con un risultato di 6 entra in furia.\nDurante ogni turno in furia, il golem attacca la creatura più vicina che riesce a vedere; se nessuna è raggiungibile, attacca un oggetto. Resta in furia finché non viene distrutto o finché non è più Ferito.\nIl creatore del golem, se entro 18 metri e in grado di farsi udire, può usare un\'azione per tentare una prova di Carisma (Persuasione) CD 15: se riesce, il golem smette di essere in furia fino all\'inizio del suo turno successivo, momento in cui ritira per Furia se è ancora Ferito.' },
+        { name: 'Forma Immutabile', desc: 'Il golem non può cambiare forma.' },
+        { name: 'Assorbimento del Fulmine', desc: 'Ogni volta che il golem subisce danni da fulmine, recupera un numero di punti ferita pari ai danni da fulmine inflitti.' },
+        { name: 'Resistenza Magica', desc: 'Il golem ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il golem effettua due attacchi con Schianto.' },
+        { name: 'Schianto', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 13 (2d8 + 4) danni contundenti più 4 (1d8) danni da fulmine.', atkHit: '+7', atkDmgs: [{ f: '2d8+4', t: 'contundenti' }, { f: '1d8', t: 'fulmine' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Conoscenze proibite e materiali del creatore: appunti necromantici, strumenti chirurgici e componenti arcane.' }],
+      notes: 'Carne Morta a Cui è Stata Donata Nuova Vita\n\nHabitat: Qualsiasi\nTesoro: Arcani\n\nI golem di carne sono raccolte grossolanamente umanoidi di parti del corpo unite tramite magia abusata o strane scienze. Servono i loro creatori sconsiderati, ma molti possiedono ricordi frammentari e istinti ereditati dalle parti che li compongono. Se feriti, questi golem possono impazzire furiosamente e sfogare la propria confusione su qualsiasi cosa vedano, inclusi i loro creatori.\n\nI golem di carne appaiono in forme molto diverse tra loro.\n\nCaratteristiche del Golem di Carne (1d6) — il golem di carne possiede...\n1 — Parti animali mescolate tra quelle umanoidi.\n2 — Un travestimento fatto di trucco e abiti pesanti.\n3 — Parti mancanti e interiora esposte.\n4 — Parti che svolgono ruoli non previsti, come un corpo composto da decine di mani.\n5 — Tratti perfetti accentuati da splendide cuciture.\n6 — Meccanismi visibili, mantici e motori.\n\n«La barriera tra il mortale e il divino è in frantumi: aperta è la strada verso nuovi dèi. Io sono colei che ha invaso il divino. Non con una lancia, ma con un punto di sutura. Non con la mia eresia, ma con il mio cuore.»\n— Viktra Mordenheim, Signora Oscura di Lamordia'
     }
   ];
 
