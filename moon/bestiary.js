@@ -3302,6 +3302,30 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Qualsiasi', desc: 'Tesori e reliquie magiche raccolti tra le rovine delle antiche città fomorian.' }],
       notes: 'Gigante Maledetto dell\'Oscurità\n\nHabitat: Sottosuolo\nTesoro: Qualsiasi\n\nUn tempo famosi per la loro attitudine alla magia, i fomorian sono giganti afflitti da una maledizione fatata. Nella loro superbia, furono ingannati e spinti a invadere il Feywild per reclamarne la magia. Quando gli arcifey che governavano quel reame si unirono contro di loro, i fomorian furono respinti e colpiti da una maledizione soprannaturale che rese i loro corpi uguali alle loro anime malvagie.\n\nDa allora dimorano nel Sottosuolo tra le rovine delle loro città magiche. La maledizione degli arcifey continua a tormentarli, infliggendo loro cancri erranti, organi contorti e altre sofferenze ancora più strane.\n\nPiuttosto che espiare le proprie colpe, i fomorian sfruttano la magia della loro maledizione e la rivolgono contro gli altri.\n\nDeformazioni Fomorian (1d4) — la maledizione del fomorian provoca...\n1 — Pustole colorate che si spostano sul corpo.\n2 — Sudorazione eccessiva di fluidi dai colori dell\'arcobaleno.\n3 — Chiazze di capelli che si agitano e si contorcono.\n4 — Vene che si gonfiano e si muovono sotto la pelle.\n\n«Il Padre di Tutti Annam bandì suo figlio Karontor per il ruolo che ebbe nell\'assalto fomorian al Feywild. Quel giorno l\'Ordinamento — la gerarchia dei giganti e dei loro dèi — cambiò per sempre, e i fomorian non ne fecero più parte.»\n— Bigby'
+    },
+    {
+      id: 'preset_gigante_gelo', name: 'Gigante del Gelo', emoji: '❄️', rarity: 'rare',
+      type: 'Gigante', size: 'Enorme', alignment: 'Neutrale Malvagio',
+      ac: 15, hp: 149, hpCur: 149, hpTemp: 0, hpDice: '13d12+65', init: 2,
+      speed: '12 m', cr: '8', xp: '',
+      str: 23, dex: 9, con: 21, intl: 9, wis: 10, cha: 12,
+      savesOverride: { str: '', dex: '', con: '8', intl: '', wis: '3', cha: '4' },
+      skillOverrides: { atletica: '9', percezione: '3' }, passivePerception: 13,
+      senses: [], languages: ['Gigante'],
+      dmgResist: [], dmgImmune: ['Freddo'], dmgVulner: [],
+      condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il gigante effettua due attacchi, usando Ascia del Gelo o Grande Arco in qualsiasi combinazione.' },
+        { name: 'Ascia del Gelo', desc: 'Attacco con arma da mischia: +9 a colpire, portata 3 metri.\nColpito: 19 (2d12 + 6) danni taglienti più 9 (2d8) danni da freddo.', atkHit: '+9', atkDmgs: [{ f: '2d12+6', t: 'taglienti' }, { f: '2d8', t: 'freddo' }] },
+        { name: 'Grande Arco', desc: 'Attacco con arma a distanza: +9 a colpire, gittata 45/180 metri.\nColpito: 17 (2d10 + 6) danni perforanti più 7 (2d6) danni da freddo, e la Velocità del bersaglio è ridotta di 3 metri fino alla fine del suo turno successivo.', atkHit: '+9', atkDmgs: [{ f: '2d10+6', t: 'perforanti' }, { f: '2d6', t: 'freddo' }] }
+      ],
+      bonusActions: [
+        { name: 'Grido di Guerra (Ricarica 5–6)', desc: 'Il gigante, oppure una creatura a sua scelta che esso può vedere o udire, ottiene 15 (2d10 + 5) punti ferita temporanei e ha vantaggio ai tiri per colpire fino all\'inizio del turno successivo del gigante.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Ascia del Gelo, grandi archi e bottino accumulato nelle razzie.' }],
+      notes: 'Gigante del Ghiaccio e della Neve\n\nHabitat: Artico, Montagne\nTesoro: Armamenti\n\nDalle vette glaciali delle montagne e dalle vaste tundre sorgono le dimore dei giganti del gelo. Questi giganti hanno pelle e capelli dalle tonalità gelide. La loro naturale immunità al freddo permette loro di prosperare in luoghi inospitali per quasi tutte le altre creature, e la sfruttano nella caccia e in battaglia, rinvigorendo i propri alleati con terrificanti grida di guerra.\n\nI giganti del gelo spesso viaggiano per grandi distanze alla ricerca di cibo e beni, diventando spesso razziatori dalla reputazione violenta. Altri conducono una vita più pacifica, cacciando prede titaniche o creando rifugi nel gelo, spesso caratterizzati da sorgenti termali o gare sulla neve.\n\nTalvolta i giganti del gelo stringono alleanze con Fate gelide o con giganti del fuoco del sottosuolo, servendo come guardiani dei loro reami in cambio di tesori, armi e manufatti.\n\n«La gente piccola possiede a malapena qualcosa che valga la pena saccheggiare, quindi non dovrebbe lamentarsi troppo quando glielo prendiamo.»\n— Jarl Grugnur, Gigante del Gelo'
     }
   ];
 
