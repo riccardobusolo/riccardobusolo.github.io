@@ -3281,6 +3281,27 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Arcani', desc: 'Conoscenze psioniche e curiosità del Sottosuolo, doni di un alleato dalle buone intenzioni.' }],
       notes: 'Strano Alleato Proveniente da un Luogo Strano\n\nHabitat: Sottosuolo\nTesoro: Arcani\n\nBizzarre creature con scopi aberranti abitano il Sottosuolo; i flumph sono tra le poche che si dimostrano d\'aiuto agli estranei. Queste creature tentacolate e telepatiche si muovono nell\'aria con brevi getti propulsivi, espellendo gas che producono il suono da cui deriva il loro nome. Invece di parlare, comunicano telepaticamente e cambiando colore per riflettere il proprio stato d\'animo.\n\nI flumph vivono in regioni cariche di energia psichica o nei pressi di creature dotate di poteri psionici. Si nutrono innocuamente di energie psichiche ma, nel farlo, incontrano spesso esseri pericolosi come aboleth e mind flayer. Sebbene generalmente evitino il combattimento, aiutano spesso gli avventurieri in difficoltà: un aiuto non sempre pratico, ma sempre bene intenzionato.\n\nAssistenza del Flumph (1d6) — il flumph aiuta...\n1 — Cucinando un pasto a base di prelibatezze del Sottosuolo.\n2 — Eseguendo una canzone psichica o una "poesia olfattiva".\n3 — Recuperando e curando avventurieri caduti.\n4 — Rivelando la posizione di oggetti magici utili.\n5 — Servendo da guida verso il covo nascosto di un nemico.\n6 — Elargendo incoraggiamenti e lodi in quantità eccessive.\n\nColori ed Emozioni del Flumph (le estremità cambiano colore col suo stato emotivo):\n• Blu scuro — Tristezza\n• Blu chiaro — Felicità\n• Verde — Curiosità\n• Magenta — Sconosciuta (raramente osservata; forse senza equivalente umano)\n• Arancione — Confusione\n• Rosa — Divertimento\n• Viola — Paura\n• Rosso — Rabbia\n• Verde acqua — Serenità\n• Giallo — Eccitazione'
+    },
+    {
+      id: 'preset_fomorian', name: 'Fomorian', emoji: '🗿', rarity: 'uncommon',
+      type: 'Gigante', size: 'Enorme', alignment: 'Caotico Malvagio',
+      ac: 14, hp: 172, hpCur: 172, hpTemp: 0, hpDice: '15d12+75', init: 0,
+      speed: '12 m', cr: '8', xp: '',
+      str: 23, dex: 10, con: 20, intl: 9, wis: 14, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '8', furtivita: '3' }, passivePerception: 18,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Gigante', 'Sottocomune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il fomorian effettua due attacchi con Grande Clava. Può sostituire uno di questi attacchi con un uso di Esagono Deformante, se disponibile.' },
+        { name: 'Grande Clava', desc: 'Attacco con arma da mischia: +9 a colpire, portata 4,5 metri.\nColpito: 24 (4d8 + 6) danni contundenti.', atkHit: '+9', atkDmgs: [{ f: '4d8+6', t: 'contundenti' }] },
+        { name: 'Esagono Deformante (Ricarica 4–6)', desc: 'Tiro Salvezza su Saggezza: CD 16, una creatura che il fomorian può vedere entro 36 metri.\nFallimento: 21 (6d6) danni psichici e il bersaglio ottiene 1 livello di Affaticamento.\nSuccesso: metà danni.', atkDmgs: [{ f: '6d6', t: 'psichici' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Tesori e reliquie magiche raccolti tra le rovine delle antiche città fomorian.' }],
+      notes: 'Gigante Maledetto dell\'Oscurità\n\nHabitat: Sottosuolo\nTesoro: Qualsiasi\n\nUn tempo famosi per la loro attitudine alla magia, i fomorian sono giganti afflitti da una maledizione fatata. Nella loro superbia, furono ingannati e spinti a invadere il Feywild per reclamarne la magia. Quando gli arcifey che governavano quel reame si unirono contro di loro, i fomorian furono respinti e colpiti da una maledizione soprannaturale che rese i loro corpi uguali alle loro anime malvagie.\n\nDa allora dimorano nel Sottosuolo tra le rovine delle loro città magiche. La maledizione degli arcifey continua a tormentarli, infliggendo loro cancri erranti, organi contorti e altre sofferenze ancora più strane.\n\nPiuttosto che espiare le proprie colpe, i fomorian sfruttano la magia della loro maledizione e la rivolgono contro gli altri.\n\nDeformazioni Fomorian (1d4) — la maledizione del fomorian provoca...\n1 — Pustole colorate che si spostano sul corpo.\n2 — Sudorazione eccessiva di fluidi dai colori dell\'arcobaleno.\n3 — Chiazze di capelli che si agitano e si contorcono.\n4 — Vene che si gonfiano e si muovono sotto la pelle.\n\n«Il Padre di Tutti Annam bandì suo figlio Karontor per il ruolo che ebbe nell\'assalto fomorian al Feywild. Quel giorno l\'Ordinamento — la gerarchia dei giganti e dei loro dèi — cambiò per sempre, e i fomorian non ne fecero più parte.»\n— Bigby'
     }
   ];
 
