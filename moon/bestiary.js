@@ -3185,6 +3185,27 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Spirito Primordiale del Calore e della Fiamma\n\nHabitat: Deserto, Piano Elementale del Fuoco\nTesoro: Nessuno\n\nGli elementali del fuoco sorgono quando spiriti del Piano Elementale del Fuoco abitano fiamme, braci ardenti e fumo surriscaldato. Questi esseri sono tangibili nonostante siano composti in gran parte da fiamme e particelle, e possono usare i loro arti incandescenti per dare fuoco a nemici e materiali infiammabili.\n\nArdono tipicamente in tonalità di arancione e rosso, ma sono possibili anche altri colori. Sul Piano Materiale, la maggior parte viene evocata tramite mezzi magici, oppure appare presso fenditure che collegano il piano natale alle profondità desertiche, ai vulcani, agli incendi boschivi o ai flussi di magma.\n\nComposizioni dell\'Elementale del Fuoco (1d8) — il corpo dell\'elementale presenta...\n1 — Gas colorati e surriscaldati.\n2 — Una colonna di fiamma diabolica o divina.\n3 — Forme crepitanti che ricordano animali, immondi, scheletri, spiritelli o altri esseri.\n4 — Fiamme prevalentemente bianche, blu oppure di un colore più insolito.\n5 — La forma di un umanoide sereno o tormentato.\n6 — Fumo che forma simboli o figure inquietanti.\n7 — Fuliggine che odora di cedro, chiodi di garofano, incenso o carne arrostita.\n8 — Vortici di cenere e detriti in fiamme.\n\n«Tutti gli elementi si inchinano al fuoco. La terra più resistente si scioglie. L\'acqua bolle. Persino l\'aria prende fuoco. Siamo tutti anime di fiamma e sappiamo ciò che significa bruciare.»\n— Marrake l\'Incandescente, Sovrano degli Efreeti'
+    },
+    {
+      id: 'preset_gigante_fuoco', name: 'Gigante del Fuoco', emoji: '⚒️', rarity: 'rare',
+      type: 'Gigante', size: 'Enorme', alignment: 'Legale Malvagio',
+      ac: 18, hp: 162, hpCur: 162, hpTemp: 0, hpDice: '13d12+78', init: 3,
+      speed: '9 m', cr: '9', xp: '',
+      str: 25, dex: 9, con: 23, intl: 10, wis: 14, cha: 13,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { atletica: '11', percezione: '6' }, passivePerception: 16,
+      senses: [], languages: ['Gigante'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [],
+      condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il gigante effettua due attacchi, usando Spada Fiammeggiante o Lancio di Martello in qualsiasi combinazione.' },
+        { name: 'Spada Fiammeggiante', desc: 'Attacco con arma da mischia: +11 a colpire, portata 3 metri.\nColpito: 21 (4d6 + 7) danni taglienti più 10 (3d6) danni da fuoco.', atkHit: '+11', atkDmgs: [{ f: '4d6+7', t: 'taglienti' }, { f: '3d6', t: 'fuoco' }] },
+        { name: 'Lancio di Martello', desc: 'Attacco con arma a distanza: +11 a colpire, gittata 18/72 metri.\nColpito: 23 (3d10 + 7) danni contundenti più 4 (1d8) danni da fuoco, e il bersaglio viene spinto fino a 4,5 metri in linea retta lontano dal gigante e ha svantaggio al prossimo tiro per colpire che effettua prima della fine del suo turno successivo.', atkHit: '+11', atkDmgs: [{ f: '3d10+7', t: 'contundenti' }, { f: '1d8', t: 'fuoco' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Spada Fiammeggiante, martelli da guerra e armi forgiate nelle fortezze-fucine.' }],
+      notes: 'Gigante delle Profondità Fumanti\n\nHabitat: Montagne, Sottosuolo\nTesoro: Armamenti\n\nI giganti del fuoco abitano le cavità sotterranee e i fiumi di magma delle profondità montuose. Lì utilizzano il calore e le ricchezze del sottosuolo per forgiare meraviglie, da titaniche armi da guerra a delicate opere d\'arte. Possiedono corporature massicce, pelle dai colori simili alla roccia e capelli simili a fiamme.\n\nLa maggior parte dei giganti del fuoco vive in montagne vulcanicamente attive o in vaste profondità cavernose che ospitano le loro fortezze-fucine. I giganti del fuoco malvagi tendono ad avere una mentalità marziale e possono forgiare eserciti per conquistare i vicini e impadronirsi di risorse preziose. I più moderati commerciano le proprie creazioni in cambio di ciò di cui hanno bisogno e potrebbero condividere le antiche tecniche degli artigiani giganti con altri popoli.\n\nIn entrambi i casi, i giganti del fuoco sono inclini a intraprendere progetti ambiziosi e raramente apprezzano le interruzioni nei loro titanici laboratori.'
     }
   ];
 
