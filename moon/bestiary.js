@@ -3160,6 +3160,31 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Attrezzi', desc: 'Piccoli ninnoli, oggetti luccicanti e curiosità raccolte durante i loro scherzi.' }],
       notes: 'Burloni Draconici Stravaganti\n\nHabitat: Foresta\nTesoro: Attrezzi\n\nI draghi fatati sono burloni grandi quanto un gatto, con caratteristiche draconiche, ali simili a quelle delle farfalle e scaglie dai colori caldi da giovani e dalle tonalità fredde in età adulta.\n\nI giovani draghi fatati ricorrono rapidamente al loro soffio euforizzante contro individui scortesi o troppo rigidi.'
+    },
+    {
+      id: 'preset_elementale_fuoco', name: 'Elementale del Fuoco', emoji: '🔥', rarity: 'rare',
+      type: 'Elementale', size: 'Grande', alignment: 'Neutrale',
+      ac: 13, hp: 93, hpCur: 93, hpTemp: 0, hpDice: '11d10+33', init: 3,
+      speed: '15 m', cr: '5', xp: '',
+      str: 10, dex: 17, con: 16, intl: 6, wis: 10, cha: 7,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Primordiale (Ignan)'],
+      dmgResist: ['Contundente', 'Perforante', 'Tagliente'], dmgImmune: ['Fuoco', 'Veleno'], dmgVulner: [],
+      condImmune: ['Esausto', 'Afferrato', 'Paralizzato', 'Pietrificato', 'Avvelenato', 'Prono', 'Trattenuto', 'Privo di Sensi'],
+      traits: [
+        { name: 'Aura di Fuoco', desc: 'Alla fine di ciascun turno dell\'elementale, ogni creatura entro un\'emanazione di 3 metri originata da esso subisce 5 (1d10) danni da fuoco. Creature e oggetti infiammabili nell\'emanazione prendono fuoco.' },
+        { name: 'Forma di Fuoco', desc: 'L\'elementale può muoversi attraverso uno spazio stretto largo fino a 2,5 cm senza spendere movimento aggiuntivo e può entrare nello spazio di una creatura e fermarsi lì. La prima volta in un turno che entra nello spazio di una creatura, quella creatura subisce 5 (1d10) danni da fuoco.' },
+        { name: 'Illuminazione', desc: 'L\'elementale emette luce intensa in un raggio di 9 metri e luce fioca per altri 9 metri.' },
+        { name: 'Vulnerabilità all\'Acqua', desc: 'L\'elementale subisce 3 (1d6) danni da freddo per ogni 1,5 metri che percorre nell\'acqua o per ogni circa 4 litri d\'acqua rovesciati su di esso.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'elementale effettua due attacchi con Bruciare.' },
+        { name: 'Bruciare', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 10 (2d6 + 3) danni da fuoco. Se il bersaglio è una creatura o un oggetto infiammabile, prende fuoco.', atkHit: '+6', atkDmgs: [{ f: '2d6+3', t: 'fuoco' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Spirito Primordiale del Calore e della Fiamma\n\nHabitat: Deserto, Piano Elementale del Fuoco\nTesoro: Nessuno\n\nGli elementali del fuoco sorgono quando spiriti del Piano Elementale del Fuoco abitano fiamme, braci ardenti e fumo surriscaldato. Questi esseri sono tangibili nonostante siano composti in gran parte da fiamme e particelle, e possono usare i loro arti incandescenti per dare fuoco a nemici e materiali infiammabili.\n\nArdono tipicamente in tonalità di arancione e rosso, ma sono possibili anche altri colori. Sul Piano Materiale, la maggior parte viene evocata tramite mezzi magici, oppure appare presso fenditure che collegano il piano natale alle profondità desertiche, ai vulcani, agli incendi boschivi o ai flussi di magma.\n\nComposizioni dell\'Elementale del Fuoco (1d8) — il corpo dell\'elementale presenta...\n1 — Gas colorati e surriscaldati.\n2 — Una colonna di fiamma diabolica o divina.\n3 — Forme crepitanti che ricordano animali, immondi, scheletri, spiritelli o altri esseri.\n4 — Fiamme prevalentemente bianche, blu oppure di un colore più insolito.\n5 — La forma di un umanoide sereno o tormentato.\n6 — Fumo che forma simboli o figure inquietanti.\n7 — Fuliggine che odora di cedro, chiodi di garofano, incenso o carne arrostita.\n8 — Vortici di cenere e detriti in fiamme.\n\n«Tutti gli elementi si inchinano al fuoco. La terra più resistente si scioglie. L\'acqua bolle. Persino l\'aria prende fuoco. Siamo tutti anime di fiamma e sappiamo ciò che significa bruciare.»\n— Marrake l\'Incandescente, Sovrano degli Efreeti'
     }
   ];
 
