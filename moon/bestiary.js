@@ -3688,6 +3688,82 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'L\'equipaggiamento da guerra del dracomante e i favori dei suoi alleati draghi rossi.' }],
       notes: 'Invasori del Piano Astrale\n\nHabitat: Planare (Piano Astrale)\nTesoro: Armamenti\n\nUna delle ultime imprese di Gith fu stringere un\'alleanza tra i githyanki e la dea drago Tiamat. Da allora il drago rosso Ephelomon, consorte della Regina dei Draghi, e i suoi simili sono alleati dei githyanki. I dracomanti githyanki mantengono questo patto e coltivano talenti magici che completano la potenza dei draghi rossi.\n\nI githyanki erano un tempo un popolo ordinario, ma le azioni di un malvagio impero di divoratori della mente hanno impresso il conflitto nel loro stesso essere. Creature umanoidi alte e magre, possiedono orecchie seghettate e una pelle maculata tra sfumature di giallo, verde e marrone.\n\nStoria dei Gith — Molto tempo fa un popolo umanoide fu conquistato da un impero di divoratori della mente (illithid), che lo manipolarono con orrori indicibili, evoluzione forzata e rimodellamento psichico. Una figura chiamata Gith emerse tra i prigionieri e guidò la ribellione che sconfisse gli illithid e frantumò il loro vasto impero.\n\nLa vittoria ebbe però breve durata: il leader Zerthimon sfidò Gith, sostenendo che la sua sete di vendetta e conquista fosse una programmazione mentale imposta dagli illithid. Il popolo si divise nei githyanki («seguaci di Gith») e nei githzerai («coloro che rinnegano Gith»), in un conflitto che dura ancora oggi.\n\nQuando Gith morì, la sua consigliera Vlaakith assunse il comando; la sua stirpe è proseguita fino all\'attuale sovrana, Vlaakith la Regina Lich, tiranna non morta che costringe il suo popolo a guerre senza fine contro illithid, githzerai e chiunque minacci la supremazia githyanki.\n\n«Uccidere nel nome di Vlaakith è il nostro più grande servizio. Morire nel suo nome è il nostro ultimo atto di riverenza.»\n— Meldavh, cavaliere githyanki'
+    },
+    {
+      id: 'preset_githzerai_monaco', name: 'Monaco Githzerai', emoji: '🧘', rarity: 'uncommon',
+      type: 'Aberrazione', size: 'Media', alignment: 'Legale Neutrale',
+      ac: 14, hp: 38, hpCur: 38, hpTemp: 0, hpDice: '7d8+7', init: 4,
+      speed: '12 m', cr: '2', xp: '',
+      str: 12, dex: 15, con: 12, intl: 13, wis: 14, cha: 10,
+      savesOverride: { str: '3', dex: '4', con: '', intl: '3', wis: '4', cha: '' },
+      skillOverrides: { intuizione: '4', percezione: '4' }, passivePerception: 14,
+      senses: [], languages: ['Comune', 'Gith'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il githzerai effettua due attacchi Colpo Psionico.' },
+        { name: 'Colpo Psionico', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 6 (1d8 + 2) danni contundenti più 9 (2d8) danni psichici.', atkHit: '+4', atkDmgs: [{ f: '1d8+2', t: 'contundenti' }, { f: '2d8', t: 'psichici' }] },
+        { name: 'Incantesimi', desc: 'Il githzerai lancia uno dei seguenti incantesimi senza componenti, usando Saggezza come caratteristica da incantatore:\nA volontà: Mano Magica (la mano è invisibile)\n1/giorno: Vedere Invisibilità' }
+      ],
+      bonusActions: [
+        { name: 'Salto Potenziato Psionicamente (2/giorno)', desc: 'Il githzerai lancia Saltare senza componenti e usando la stessa caratteristica da incantatore di Incantesimi.' }
+      ],
+      reactions: [
+        { name: 'Difesa Psionica (2/giorno)', desc: 'Il githzerai lancia Caduta Morbida oppure Scudo in risposta al relativo innesco dell\'incantesimo, senza componenti e usando la stessa caratteristica da incantatore di Incantesimi.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Focalizzatori psionici e oggetti arcani individuali portati dal monaco.' }],
+      notes: 'Esploratori ai Confini della Realtà\n\nHabitat: Planare (Limbo)\nTesoro: Arcani, Individuale\n\nI monaci githzerai perseguono il controllo della propria mente perfezionando talenti fisici e psionici. Si incontrano anche oltre i santuari, mentre mettono alla prova sé stessi negli estremi più pericolosi del multiverso.\n\nI githzerai sono esseri umanoidi alti e magri, fisicamente identici ai githyanki, con cui condividono l\'origine come creature trasformate dai divoratori della mente. Sapendo di essere stati manipolati nel corpo e nella mente dagli oppressori illithid, invece di cedere a quella programmazione seguono gli insegnamenti del loro primo leader, Zerthimon, e rimodellano mente e corpo per trovare la pace.\n\nI githzerai creano psichicamente santuari sereni e nascosti nelle regioni caotiche del multiverso. La maggior parte di queste roccaforti fluttua nel Limbo, ma enclave si trovano anche nell\'Abisso, nel Caos Elementale e nel Feywild. Vi affinano le capacità psioniche, accumulano conoscenza ed evitano githyanki e divoratori della mente.\n\nConflitti dei Gith (1d8) — i personaggi sono...\n1 — Chiamati a consegnare un messaggio o un misterioso pacco a Vlaakith la Regina Lich, o da parte sua.\n2 — Convinti da un divoratore dell\'intelletto travestito a cercare un elusivo leader gith.\n3 — Invitati ad aiutare githzerai in fuga dai githyanki che hanno distrutto il loro santuario.\n4 — Incaricati di rinnovare o sabotare l\'alleanza dei githyanki con i draghi rossi.\n5 — Invitati a cacciare gli illithid insieme ai githyanki.\n6 — Costretti a scoprire una spia gith in una comunità planare o su una nave incantata.\n7 — Inviati a scoprire l\'ultima posizione conosciuta dell\'eroe Gith o di Zerthimon.\n8 — Incaricati di restituire al suo popolo la lama di un cavaliere githyanki caduto.\n\n«Noi githzerai desideriamo una sfida, affinché, quando Zerthimon ritornerà, ci trovi pronti. Per questo abbiamo viaggiato nel Limbo Ululante per farne la nostra casa.»\n— Zaerith Menyar-Ag-Gith, leader githzerai'
+    },
+    {
+      id: 'preset_githzerai_zerth', name: 'Zerth Githzerai', emoji: '☯️', rarity: 'rare',
+      type: 'Aberrazione', size: 'Media', alignment: 'Legale Neutrale',
+      ac: 17, hp: 84, hpCur: 84, hpTemp: 0, hpDice: '13d8+26', init: 7,
+      speed: '12 m', cr: '6', xp: '',
+      str: 13, dex: 18, con: 15, intl: 16, wis: 17, cha: 12,
+      savesOverride: { str: '4', dex: '7', con: '', intl: '6', wis: '6', cha: '' },
+      skillOverrides: { arcano: '6', intuizione: '6', percezione: '6' }, passivePerception: 16,
+      senses: [], languages: ['Comune', 'Gith'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il githzerai effettua due attacchi Colpo Psionico.' },
+        { name: 'Colpo Psionico', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 11 (2d6 + 4) danni contundenti più 13 (3d8) danni psichici.', atkHit: '+7', atkDmgs: [{ f: '2d6+4', t: 'contundenti' }, { f: '3d8', t: 'psichici' }] },
+        { name: 'Incantesimi', desc: 'Il githzerai lancia uno dei seguenti incantesimi senza componenti, usando Saggezza come caratteristica da incantatore (CD incantesimi 14):\nA volontà: Mano Magica (la mano è invisibile)\n1/giorno ciascuno: Immagine Maggiore (versione di 6° livello), Spostamento Planare, Vedere Invisibilità' }
+      ],
+      bonusActions: [
+        { name: 'Salto Potenziato Psionicamente (2/giorno)', desc: 'Il githzerai lancia Saltare senza componenti e usando la stessa caratteristica da incantatore di Incantesimi.' }
+      ],
+      reactions: [
+        { name: 'Difesa Psionica (2/giorno)', desc: 'Il githzerai lancia Caduta Morbida oppure Scudo in risposta al relativo innesco dell\'incantesimo, senza componenti e usando la stessa caratteristica da incantatore di Incantesimi.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Reliquie psioniche e oggetti arcani individuali dello zerth.' }],
+      notes: 'Esploratori ai Confini della Realtà\n\nHabitat: Planare (Limbo)\nTesoro: Arcani, Individuale\n\nGli zerth githzerai incarnano la disciplina predicata da Zerthimon. Il loro controllo psionico li aiuta a proteggere il proprio popolo e a viaggiare tra i piani senza timore di essere inseguiti da githyanki o divoratori della mente.\n\nI githzerai sono esseri umanoidi alti e magri, fisicamente identici ai githyanki, con cui condividono l\'origine come creature trasformate dai divoratori della mente. Sapendo di essere stati manipolati nel corpo e nella mente dagli oppressori illithid, invece di cedere a quella programmazione seguono gli insegnamenti del loro primo leader, Zerthimon, e rimodellano mente e corpo per trovare la pace.\n\nI githzerai creano psichicamente santuari sereni e nascosti nelle regioni caotiche del multiverso. La maggior parte di queste roccaforti fluttua nel Limbo, ma enclave si trovano anche nell\'Abisso, nel Caos Elementale e nel Feywild. Vi affinano le capacità psioniche, accumulano conoscenza ed evitano githyanki e divoratori della mente.\n\nConflitti dei Gith (1d8) — i personaggi sono...\n1 — Chiamati a consegnare un messaggio o un misterioso pacco a Vlaakith la Regina Lich, o da parte sua.\n2 — Convinti da un divoratore dell\'intelletto travestito a cercare un elusivo leader gith.\n3 — Invitati ad aiutare githzerai in fuga dai githyanki che hanno distrutto il loro santuario.\n4 — Incaricati di rinnovare o sabotare l\'alleanza dei githyanki con i draghi rossi.\n5 — Invitati a cacciare gli illithid insieme ai githyanki.\n6 — Costretti a scoprire una spia gith in una comunità planare o su una nave incantata.\n7 — Inviati a scoprire l\'ultima posizione conosciuta dell\'eroe Gith o di Zerthimon.\n8 — Incaricati di restituire al suo popolo la lama di un cavaliere githyanki caduto.\n\n«Noi githzerai desideriamo una sfida, affinché, quando Zerthimon ritornerà, ci trovi pronti. Per questo abbiamo viaggiato nel Limbo Ululante per farne la nostra casa.»\n— Zaerith Menyar-Ag-Gith, leader githzerai'
+    },
+    {
+      id: 'preset_githzerai_psion', name: 'Psion Githzerai', emoji: '🌀', rarity: 'epic',
+      type: 'Aberrazione', size: 'Media', alignment: 'Legale Neutrale',
+      ac: 18, hp: 169, hpCur: 169, hpTemp: 0, hpDice: '26d8+52', init: 8,
+      speed: '12 m, Volare 12 m (fluttuare)', cr: '12', xp: '',
+      str: 12, dex: 18, con: 15, intl: 19, wis: 18, cha: 14,
+      savesOverride: { str: '5', dex: '8', con: '', intl: '8', wis: '8', cha: '' },
+      skillOverrides: { arcano: '8', intuizione: '8', percezione: '8' }, passivePerception: 18,
+      senses: [], languages: ['Comune', 'Gith'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il githzerai effettua tre attacchi Distorsione Psichica.' },
+        { name: 'Distorsione Psichica', desc: 'Attacco con arma da mischia o a distanza: +8 a colpire, portata 1,5 metri oppure gittata 36 metri.\nColpito: 26 (4d10 + 4) danni psichici, e il bersaglio subisce un effetto a scelta del githzerai:\nA) ottiene la condizione Ammaliato fino all\'inizio del turno successivo del githzerai;\nB) ottiene la condizione Prono, purché sia una creatura Grande o più piccola.', atkHit: '+8', atkDmgs: [{ f: '4d10+4', t: 'psichici' }] },
+        { name: 'Incantesimi', desc: 'Il githzerai lancia uno dei seguenti incantesimi senza componenti, usando Intelligenza come caratteristica da incantatore (CD incantesimi 16):\nA volontà: Mano Magica (la mano è invisibile)\n1/giorno ciascuno: Spostamento Planare, Vedere Invisibilità' }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Difesa Psionica', desc: 'Il githzerai lancia Caduta Morbida oppure Scudo in risposta al relativo innesco dell\'incantesimo, senza componenti e usando la stessa caratteristica da incantatore di Incantesimi.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Potenti focalizzatori psionici, sapere planare e oggetti arcani custoditi dallo psion.' }],
+      notes: 'Esploratori ai Confini della Realtà\n\nHabitat: Planare (Limbo)\nTesoro: Arcani, Individuale\n\nQuesti potenti psion supervisionano i santuari githzerai, studiano enigmatici fenomeni planari e guidano le rrakkma — incursioni nelle colonie dei divoratori della mente per uccidere gli illithid e scoprire i segreti della trasformazione degli antichi gith.\n\nI githzerai sono esseri umanoidi alti e magri, fisicamente identici ai githyanki, con cui condividono l\'origine come creature trasformate dai divoratori della mente. Sapendo di essere stati manipolati nel corpo e nella mente dagli oppressori illithid, invece di cedere a quella programmazione seguono gli insegnamenti del loro primo leader, Zerthimon, e rimodellano mente e corpo per trovare la pace.\n\nI githzerai creano psichicamente santuari sereni e nascosti nelle regioni caotiche del multiverso. La maggior parte di queste roccaforti fluttua nel Limbo, ma enclave si trovano anche nell\'Abisso, nel Caos Elementale e nel Feywild. Vi affinano le capacità psioniche, accumulano conoscenza ed evitano githyanki e divoratori della mente.\n\nConflitti dei Gith (1d8) — i personaggi sono...\n1 — Chiamati a consegnare un messaggio o un misterioso pacco a Vlaakith la Regina Lich, o da parte sua.\n2 — Convinti da un divoratore dell\'intelletto travestito a cercare un elusivo leader gith.\n3 — Invitati ad aiutare githzerai in fuga dai githyanki che hanno distrutto il loro santuario.\n4 — Incaricati di rinnovare o sabotare l\'alleanza dei githyanki con i draghi rossi.\n5 — Invitati a cacciare gli illithid insieme ai githyanki.\n6 — Costretti a scoprire una spia gith in una comunità planare o su una nave incantata.\n7 — Inviati a scoprire l\'ultima posizione conosciuta dell\'eroe Gith o di Zerthimon.\n8 — Incaricati di restituire al suo popolo la lama di un cavaliere githyanki caduto.\n\n«Noi githzerai desideriamo una sfida, affinché, quando Zerthimon ritornerà, ci trovi pronti. Per questo abbiamo viaggiato nel Limbo Ululante per farne la nostra casa.»\n— Zaerith Menyar-Ag-Gith, leader githzerai'
     }
   ];
 
