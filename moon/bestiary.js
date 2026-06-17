@@ -3326,6 +3326,92 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'Ascia del Gelo, grandi archi e bottino accumulato nelle razzie.' }],
       notes: 'Gigante del Ghiaccio e della Neve\n\nHabitat: Artico, Montagne\nTesoro: Armamenti\n\nDalle vette glaciali delle montagne e dalle vaste tundre sorgono le dimore dei giganti del gelo. Questi giganti hanno pelle e capelli dalle tonalità gelide. La loro naturale immunità al freddo permette loro di prosperare in luoghi inospitali per quasi tutte le altre creature, e la sfruttano nella caccia e in battaglia, rinvigorendo i propri alleati con terrificanti grida di guerra.\n\nI giganti del gelo spesso viaggiano per grandi distanze alla ricerca di cibo e beni, diventando spesso razziatori dalla reputazione violenta. Altri conducono una vita più pacifica, cacciando prede titaniche o creando rifugi nel gelo, spesso caratterizzati da sorgenti termali o gare sulla neve.\n\nTalvolta i giganti del gelo stringono alleanze con Fate gelide o con giganti del fuoco del sottosuolo, servendo come guardiani dei loro reami in cambio di tesori, armi e manufatti.\n\n«La gente piccola possiede a malapena qualcosa che valga la pena saccheggiare, quindi non dovrebbe lamentarsi troppo quando glielo prendiamo.»\n— Jarl Grugnur, Gigante del Gelo'
+    },
+    {
+      id: 'preset_fungo_spora_gassosa', name: 'Fungo a Spora Gassosa', emoji: '🍄', rarity: 'common',
+      type: 'Pianta', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 8, hp: 13, hpCur: 13, hpTemp: 0, hpDice: '9d10-36', init: -5,
+      speed: '1,5 m, Volare 3 m (fluttuare)', cr: '1/2', xp: '',
+      str: 5, dex: 1, con: 3, intl: 1, wis: 1, cha: 1,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 5,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Accecato', 'Ammaliato', 'Assordato', 'Spaventato', 'Paralizzato', 'Avvelenato', 'Prono'],
+      traits: [
+        { name: 'Esplosione Mortale', desc: 'La spora gassosa esplode quando muore.\nTiro Salvezza su Costituzione: CD 10, ogni creatura in un\'emanazione di 6 metri originata dalla spora gassosa.\nFallimento: 10 (3d6) danni da veleno e la condizione Avvelenato per 1d12 ore. Se l\'Avvelenato non viene rimosso, al termine del periodo il bersaglio muore e genera 2d4 piccoli funghi a spora gassosa con 1 PF; dopo 2d6 giorni essi diventano Grandi e hanno 13 PF.' }
+      ],
+      actions: [
+        { name: 'Viticcio', desc: 'Attacco con arma da mischia: +0 a colpire, portata 1,5 metri.\nColpito: 3 (1d6) danni da veleno e il bersaglio ottiene la condizione Avvelenato fino alla fine del suo turno successivo.', atkHit: '+0', atkDmgs: [{ f: '1d6', t: 'veleno' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Spore Letali e Polipi Predatori\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nL\'umido e privo di sole Sottosuolo è un terreno fertile per la crescita di funghi strani e pericolosi.\n\nLe spore gassose sono funghi fluttuanti sferici, con escrescenze rizomatose e protuberanze che ricordano i peduncoli oculari e gli occhi dei beholder. Se distrutta, una spora gassosa esplode in una nube velenosa che può infettare le creature e ucciderle nel giro di poche ore; i cadaveri infetti generano nuove spore gassose che raggiungono la taglia completa in pochi giorni.'
+    },
+    {
+      id: 'preset_fungo_urlatore', name: 'Fungo Urlatore', emoji: '🍄', rarity: 'common',
+      type: 'Pianta', size: 'Media', alignment: 'Senza Allineamento',
+      ac: 5, hp: 13, hpCur: 13, hpTemp: 0, hpDice: '3d8', init: -5,
+      speed: '1,5 m', cr: '0', xp: '0',
+      str: 1, dex: 1, con: 10, intl: 1, wis: 3, cha: 1,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 6,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Accecato', 'Ammaliato', 'Assordato', 'Spaventato'],
+      traits: [],
+      actions: [],
+      bonusActions: [],
+      reactions: [
+        { name: 'Urlo', desc: 'Innesco: una creatura o una fonte di luce intensa si muove entro 9 metri dall\'urlatore.\nRisposta: l\'urlatore emette un urlo udibile entro 90 metri da sé per 1 minuto o finché non muore.' }
+      ],
+      legendaryActions: [],
+      drop: [],
+      notes: 'Spore Letali e Polipi Predatori\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nL\'umido e privo di sole Sottosuolo è un terreno fertile per la crescita di funghi strani e pericolosi.\n\nSe esposti alla luce o altrimenti disturbati, i funghi urlatori emettono un rumore acuto da cui deriva il loro nome. Questo lamento può allertare altre creature o attirare predatori.'
+    },
+    {
+      id: 'preset_fungo_viola', name: 'Fungo Viola', emoji: '🍄', rarity: 'common',
+      type: 'Pianta', size: 'Media', alignment: 'Senza Allineamento',
+      ac: 5, hp: 18, hpCur: 18, hpTemp: 0, hpDice: '4d8', init: -5,
+      speed: '1,5 m', cr: '1/4', xp: '',
+      str: 3, dex: 1, con: 10, intl: 1, wis: 3, cha: 1,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 6,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Accecato', 'Ammaliato', 'Assordato', 'Spaventato'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il fungo effettua due attacchi con Tocco Marcescente.' },
+        { name: 'Tocco Marcescente', desc: 'Attacco con arma da mischia: +2 a colpire, portata 3 metri.\nColpito: 4 (1d8) danni necrotici.', atkHit: '+2', atkDmgs: [{ f: '1d8', t: 'necrotici' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Spore Letali e Polipi Predatori\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nL\'umido e privo di sole Sottosuolo è un terreno fertile per la crescita di funghi strani e pericolosi.\n\nLenti ma mobili, i funghi viola fanno marcire qualsiasi carne tocchino con i loro viticci flagellanti.'
+    },
+    {
+      id: 'preset_necrohulk_funghi_viola', name: 'Necrohulk di Funghi Viola', emoji: '🍄', rarity: 'rare',
+      type: 'Pianta', size: 'Grande', alignment: 'Neutrale Malvagio',
+      ac: 17, hp: 123, hpCur: 123, hpTemp: 0, hpDice: '13d10+52', init: 4,
+      speed: '12 m', cr: '7', xp: '',
+      str: 19, dex: 12, con: 18, intl: 7, wis: 14, cha: 10,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 12,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: ['Necrotico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Accecato', 'Ammaliato', 'Assordato', 'Spaventato', 'Avvelenato'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il necrohulk effettua due attacchi con Schianto Marcescente.' },
+        { name: 'Schianto Marcescente', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 9 (1d10 + 4) danni contundenti più 7 (2d6) danni necrotici.', atkHit: '+7', atkDmgs: [{ f: '1d10+4', t: 'contundenti' }, { f: '2d6', t: 'necrotici' }] },
+        { name: 'Bomba di Spore (Ricarica 5–6)', desc: 'Tiro Salvezza su Costituzione: CD 15, ogni creatura in una sfera di raggio 6 metri centrata su un punto che il necrohulk può vedere entro 18 metri.\nFallimento: 28 (8d6) danni necrotici e la condizione Avvelenato fino all\'inizio del turno successivo del necrohulk; mentre è così Avvelenato, il bersaglio non può recuperare punti ferita.\nSuccesso: metà danni.', atkDmgs: [{ f: '8d6', t: 'necrotici' }] }
+      ],
+      bonusActions: [
+        { name: 'Assorbire Corpo', desc: 'Tiro Salvezza su Forza: CD 15, una creatura Media o Piccola che il necrohulk può vedere entro 1,5 metri.\nFallimento: il bersaglio viene trascinato nello spazio del necrohulk e innestato sul suo corpo (un solo bersaglio innestato alla volta). Mentre è innestato, il bersaglio ha la condizione Trattenuto, ha svantaggio ai tiri salvezza su Costituzione e si muove insieme al necrohulk. Se muore mentre è innestato, il suo corpo viene distrutto e il necrohulk recupera 10 PF.\nIl bersaglio innestato, oppure una creatura entro 1,5 metri dal necrohulk, può usare un\'azione per superare una prova di Forza (Atletica) CD 15, liberandosi in uno spazio non occupato entro 1,5 metri.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Spore Letali e Polipi Predatori\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nL\'umido e privo di sole Sottosuolo è un terreno fertile per la crescita di funghi strani e pericolosi.\n\nUn necrohulk di funghi viola si forma quando una colonia di funghi viola infesta e anima un grande ammasso di materia in decomposizione. Questo necrohulk attacca le prede e diffonde spore fungine per la colonia.'
     }
   ];
 
