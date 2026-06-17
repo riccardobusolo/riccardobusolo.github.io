@@ -3108,6 +3108,58 @@
         { name: 'Individuale', desc: 'Monete e oggetti raccolti dalle prede e dagli alleati.' }
       ],
       notes: 'Gigante Bicefalo Attaccabrighe\n\nHabitat: Colline, Montagne, Sottosuolo\nTesoro: Individuale\nEquipaggiamento: Ascia Bipenne, Mazzafrusto Ferrato\n\nGli ettin sono Giganti fisicamente potenti dotati di due teste. Sebbene molti presentino caratteristiche simili a quelle dei giganti delle colline, altri possiedono tratti più bestiali o insoliti, come zanne, piccole corna oppure un unico occhio su ciascuna testa.\n\nGli ettin si alleano frequentemente con altri Giganti o con gruppi che ne apprezzano la forza, come giganti delle colline, banditi od ogre. Alcuni possiedono legami mistici con le terre che abitano e potrebbero custodire segreti preziosi per druidi o Fate.\n\nOgni testa di ettin possiede una personalità distinta. Ciò rende alcuni ettin litigiosi sia con sé stessi sia con gli altri, ma molti funzionano come una squadra. Una testa potrebbe avere un proprio nome, oppure entrambe potrebbero riferirsi a sé stesse come a un unico individuo, usando un solo nome o una fusione dei due.\n\nInterazioni dell\'Ettin (1d8) — le teste dell\'ettin stanno...\n1 — Incitandosi a vicenda in preparazione a un conflitto o a una sfida.\n2 — Discutendo sui piani per una battaglia, la cena o come trascorrere la giornata.\n3 — Criticandosi a vicenda mentre svolgono compiti separati.\n4 — Impegnate in una gara di sguardi.\n5 — Facendo educata conversazione come se si incontrassero per la prima volta.\n6 — Ignorandosi ostentatamente.\n7 — Parlando sopra una trama sempre più contorta.\n8 — Cercando di tenersi sveglie a vicenda.\n\n«Il doppio della malizia, dell\'aggressività e dell\'appetito: l\'ettin dimostra che avere due teste non significa necessariamente averne una migliore.»\n— Bertrand, Inquisitore del Fuoco Mentale'
+    },
+    {
+      id: 'preset_drago_fatato_adulto', name: 'Drago Fatato Adulto', emoji: '🦋', rarity: 'rare',
+      type: 'Drago', size: 'Minuscola', alignment: 'Caotico Buono',
+      ac: 15, hp: 35, hpCur: 35, hpTemp: 0, hpDice: '10d4+10', init: 5,
+      speed: '3 m, Volare 18 m', cr: '2', xp: '',
+      str: 3, dex: 20, con: 13, intl: 14, wis: 12, cha: 16,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { arcano: '4', percezione: '3', furtivita: '7' }, passivePerception: 13,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico', 'Silvano', 'Telepatia 18 m (solo draghi fatati)'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: [],
+      traits: [
+        { name: 'Resistenza Magica', desc: 'Il drago ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +7 a colpire, portata 1,5 metri.\nColpito: 7 (1d4 + 5) danni perforanti più 3 (1d6) danni psichici.', atkHit: '+7', atkDmgs: [{ f: '1d4+5', t: 'perforanti' }, { f: '1d6', t: 'psichici' }] },
+        { name: 'Soffio Euforico (Ricarica 5–6)', desc: 'Tiro Salvezza su Saggezza: CD 13, ogni creatura in un cono di 4,5 metri.\nFallimento: il bersaglio ottiene la condizione Incapacitato e ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l\'effetto con un successo; dopo 1 minuto il successo è automatico. Mentre è Incapacitato, usa tutto il proprio movimento in ciascun turno per spostarsi in una direzione casuale.' },
+        { name: 'Lancio di Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 13).\n\nA volontà: Luci Danzanti, Mano Magica, Illusione Minore.\n\n1/Giorno ciascuno: Terreno Illusorio, Metamorfosi.' }
+      ],
+      bonusActions: [
+        { name: 'Invisibilità Superiore', desc: 'Il drago lancia Invisibilità Superiore su sé stesso, senza componenti, usando la stessa caratteristica da incantatore del Lancio di Incantesimi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Attrezzi', desc: 'Piccoli ninnoli, oggetti luccicanti e curiosità raccolte durante i loro scherzi.' }],
+      notes: 'Burloni Draconici Stravaganti\n\nHabitat: Foresta\nTesoro: Attrezzi\n\nI draghi fatati sono burloni grandi quanto un gatto, con caratteristiche draconiche, ali simili a quelle delle farfalle e scaglie dai colori caldi da giovani e dalle tonalità fredde in età adulta.\n\nGli scherzi dei draghi fatati adulti tendono a condurre gli altri verso persone bisognose o verso torti da correggere.'
+    },
+    {
+      id: 'preset_drago_fatato_giovane', name: 'Drago Fatato Giovane', emoji: '🦋', rarity: 'uncommon',
+      type: 'Drago', size: 'Minuscola', alignment: 'Caotico Buono',
+      ac: 13, hp: 21, hpCur: 21, hpTemp: 0, hpDice: '6d4+6', init: 3,
+      speed: '3 m, Volare 18 m', cr: '1', xp: '',
+      str: 3, dex: 16, con: 12, intl: 12, wis: 12, cha: 14,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { arcano: '3', percezione: '3', furtivita: '5' }, passivePerception: 13,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico', 'Silvano', 'Telepatia 18 m (solo draghi fatati)'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: [],
+      traits: [
+        { name: 'Resistenza Magica', desc: 'Il drago ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 5 (1d4 + 3) danni perforanti più 2 (1d4) danni psichici.', atkHit: '+5', atkDmgs: [{ f: '1d4+3', t: 'perforanti' }, { f: '1d4', t: 'psichici' }] },
+        { name: 'Soffio Euforico (Ricarica 5–6)', desc: 'Tiro Salvezza su Saggezza: CD 12, ogni creatura in un cono di 4,5 metri.\nFallimento: il bersaglio ottiene la condizione Incapacitato fino alla fine del suo turno successivo e usa tutto il proprio movimento nel turno per spostarsi in una direzione casuale.' },
+        { name: 'Lancio di Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 12).\n\nA volontà: Luci Danzanti, Mano Magica, Illusione Minore.' }
+      ],
+      bonusActions: [
+        { name: 'Invisibilità Superiore', desc: 'Il drago lancia Invisibilità Superiore su sé stesso, senza componenti, usando la stessa caratteristica da incantatore del Lancio di Incantesimi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Attrezzi', desc: 'Piccoli ninnoli, oggetti luccicanti e curiosità raccolte durante i loro scherzi.' }],
+      notes: 'Burloni Draconici Stravaganti\n\nHabitat: Foresta\nTesoro: Attrezzi\n\nI draghi fatati sono burloni grandi quanto un gatto, con caratteristiche draconiche, ali simili a quelle delle farfalle e scaglie dai colori caldi da giovani e dalle tonalità fredde in età adulta.\n\nI giovani draghi fatati ricorrono rapidamente al loro soffio euforizzante contro individui scortesi o troppo rigidi.'
     }
   ];
 
