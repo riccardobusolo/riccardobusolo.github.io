@@ -3813,6 +3813,98 @@
       legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'Scudo, tre lance e armatura di cuoio borchiato.' }],
       notes: 'Competitore e Lottatore da Premio\n\nHabitat: Qualsiasi\nTesoro: Armamenti, Individuale\n\nI gladiatori sono combattenti professionisti che si misurano tra loro, contro mostri e in altre sfide per intrattenere il pubblico. Mentre alcuni combattono semplicemente per sopravvivere, altri amano l\'emozione dell\'esibizione — e tutti conoscono l\'importanza della teatralità per mantenere gli spettatori entusiasti.\n\nTeatralità del Gladiatore (1d6) — durante una competizione, il gladiatore...\n1 — Dedica la propria imminente vittoria a una divinità, a un sovrano, a un nobile amato o a un membro del pubblico.\n2 — Indossa una maschera e un mantello a tema mostruoso.\n3 — Giudica se il proprio avversario combatte con onore.\n4 — Guida il pubblico in un canto trionfale.\n5 — Cerca di reclamare un trofeo dal nemico sconfitto.\n6 — Segue i consigli del pubblico, dei presagi o di un animale domestico.\n\nIn un\'arena sottomarina, la folla impazzisce mentre un gladiatore trionfa su un calamaro gigante.'
+    },
+    {
+      id: 'preset_gnoll_guerriero', name: 'Guerriero Gnoll', emoji: '🏹', rarity: 'common',
+      type: 'Immondo', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 15, hp: 27, hpCur: 27, hpTemp: 0, hpDice: '6d8', init: 1,
+      speed: '9 m', cr: '1/2', xp: '',
+      str: 14, dex: 12, con: 11, intl: 6, wis: 10, cha: 7,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Gnoll'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Dilaniare', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 5 (1d6 + 2) danni perforanti.', atkHit: '+4', atkDmgs: [{ f: '1d6+2', t: 'perforanti' }] },
+        { name: 'Arco d\'Ossa', desc: 'Attacco con arma a distanza: +3 a colpire, gittata 45/180 metri.\nColpito: 6 (1d10 + 1) danni perforanti.', atkHit: '+3', atkDmgs: [{ f: '1d10+1', t: 'perforanti' }] }
+      ],
+      bonusActions: [
+        { name: 'Furia Omicida (1/giorno)', desc: 'Immediatamente dopo aver inflitto danni a una creatura che è già Insanguinata, lo gnoll si muove fino a metà della sua Velocità ed effettua un attacco Dilaniare.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Arco e armi d\'osso, oltre al bottino raffazzonato del guerriero.' }],
+      notes: 'Immondi in Carne Ferina\n\nHabitat: Deserto, Foresta, Prateria, Colline\nTesoro: Armamenti, Individuale\n\nI guerrieri gnoll bramano massacri senza fine, ma si annoiano rapidamente delle prede che uccidono e dei tesori che saccheggiano. L\'idea che qualcun altro possa possedere ciò che considerano loro li riempie di rabbia, spingendoli a distruggere ciò che non possono portare via.\n\nI primi gnoll nacquero da iene che si nutrirono di carne contaminata dall\'Abisso. La loro corruzione e la loro violenza deliziarono il signore dei demoni Yeenoghu, che ne incoraggiò la diffusione e li sparse attraverso il multiverso. Da allora gli gnoll sono i servitori ghignanti di Yeenoghu, esistendo unicamente per portare rovina e banchettare con ciò che resta.\n\n«Yeenoghu considera gli gnoll non come la sua progenie, ma come vermi deliberatamente liberati per infestare una carcassa disprezzata. Sono una putrefazione perniciosa che la Bestia della Macellazione diffonde nei mondi mortali. Qualunque cosa fossero un tempo, sono stati rifatti e ora appartengono a lui.»\n— Iggwilv, Demonomicon di Iggwilv'
+    },
+    {
+      id: 'preset_gnoll_signore_branco', name: 'Signore del Branco Gnoll', emoji: '👑', rarity: 'uncommon',
+      type: 'Immondo', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 15, hp: 49, hpCur: 49, hpTemp: 0, hpDice: '9d8+9', init: 4,
+      speed: '9 m', cr: '2', xp: '',
+      str: 16, dex: 14, con: 13, intl: 8, wis: 11, cha: 9,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Gnoll'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Lo gnoll effettua due attacchi, usando Frusta d\'Ossa o Giavellotto d\'Ossa in qualsiasi combinazione, e utilizza Incitare la Furia Omicida se disponibile.' },
+        { name: 'Frusta d\'Ossa', desc: 'Attacco con arma da mischia: +5 a colpire, portata 3 metri.\nColpito: 8 (2d4 + 3) danni taglienti.', atkHit: '+5', atkDmgs: [{ f: '2d4+3', t: 'taglienti' }] },
+        { name: 'Giavellotto d\'Ossa', desc: 'Attacco con arma a distanza: +5 a colpire, gittata 9/36 metri.\nColpito: 7 (1d8 + 3) danni perforanti.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'perforanti' }] },
+        { name: 'Incitare la Furia Omicida (Ricarica 5-6)', desc: 'Lo gnoll sceglie un\'altra creatura che può vedere entro 18 metri e che possiede l\'Azione Bonus Furia Omicida. Il bersaglio può usare la propria Reazione per effettuare un attacco in mischia.' }
+      ],
+      bonusActions: [
+        { name: 'Furia Omicida (2/giorno)', desc: 'Immediatamente dopo aver inflitto danni a una creatura che è già Insanguinata, lo gnoll si muove fino a metà della sua Velocità ed effettua un attacco Frusta d\'Ossa.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Frusta e giavellotti d\'osso, e il meglio del bottino strappato al branco.' }],
+      notes: 'Immondi in Carne Ferina\n\nHabitat: Deserto, Foresta, Prateria, Colline\nTesoro: Armamenti, Individuale\n\nElevandosi sopra gli altri gnoll grazie a ferocia e forza fisica, i signori del branco terrorizzano gli gnoll più deboli affinché li servano, spingendoli a grandi atti di violenza per poi reclamare il meglio del bottino dei propri servitori.\n\nI primi gnoll nacquero da iene che si nutrirono di carne contaminata dall\'Abisso. La loro corruzione e la loro violenza deliziarono il signore dei demoni Yeenoghu, che ne incoraggiò la diffusione e li sparse attraverso il multiverso. Da allora gli gnoll sono i servitori ghignanti di Yeenoghu, esistendo unicamente per portare rovina e banchettare con ciò che resta.\n\n«Yeenoghu considera gli gnoll non come la sua progenie, ma come vermi deliberatamente liberati per infestare una carcassa disprezzata. Sono una putrefazione perniciosa che la Bestia della Macellazione diffonde nei mondi mortali. Qualunque cosa fossero un tempo, sono stati rifatti e ora appartengono a lui.»\n— Iggwilv, Demonomicon di Iggwilv'
+    },
+    {
+      id: 'preset_gnoll_zanna_yeenoghu', name: 'Zanna di Yeenoghu', emoji: '🦷', rarity: 'uncommon',
+      type: 'Immondo', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 14, hp: 71, hpCur: 71, hpTemp: 0, hpDice: '11d8+22', init: 4,
+      speed: '9 m', cr: '4', xp: '',
+      str: 17, dex: 15, con: 15, intl: 10, wis: 11, cha: 13,
+      savesOverride: { str: '', dex: '', con: '4', intl: '', wis: '2', cha: '3' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Abissale', 'Gnoll'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Lo gnoll effettua un attacco Morso e due attacchi Flagello d\'Ossa.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 6 (1d6 + 3) danni perforanti più 7 (2d6) danni da veleno, e il bersaglio ottiene la condizione Avvelenato fino all\'inizio del turno successivo dello gnoll.', atkHit: '+5', atkDmgs: [{ f: '1d6+3', t: 'perforanti' }, { f: '2d6', t: 'veleno' }] },
+        { name: 'Flagello d\'Ossa', desc: 'Attacco con arma da mischia: +5 a colpire, portata 3 metri.\nColpito: 7 (1d8 + 3) danni perforanti.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'perforanti' }] }
+      ],
+      bonusActions: [
+        { name: 'Furia Omicida (2/giorno)', desc: 'Immediatamente dopo aver inflitto danni a una creatura che è già Insanguinata, lo gnoll si muove fino a metà della sua Velocità ed effettua un attacco Morso.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Armi d\'osso e macabri feticci dedicati a Yeenoghu.' }],
+      notes: 'Immondi in Carne Ferina\n\nHabitat: Deserto, Foresta, Prateria, Colline\nTesoro: Armamenti, Individuale\n\nPosseduti da vestigia demoniache del signore dei demoni Yeenoghu, le zanne di Yeenoghu dirigono il caos dei branchi gnoll. Cercano macabri presagi inviati dal signore dei demoni e si sforzano di interpretarne gli obiettivi crudeli.\n\nI primi gnoll nacquero da iene che si nutrirono di carne contaminata dall\'Abisso. La loro corruzione e la loro violenza deliziarono il signore dei demoni Yeenoghu, che ne incoraggiò la diffusione e li sparse attraverso il multiverso. Da allora gli gnoll sono i servitori ghignanti di Yeenoghu, esistendo unicamente per portare rovina e banchettare con ciò che resta.\n\n«Yeenoghu considera gli gnoll non come la sua progenie, ma come vermi deliberatamente liberati per infestare una carcassa disprezzata. Sono una putrefazione perniciosa che la Bestia della Macellazione diffonde nei mondi mortali. Qualunque cosa fossero un tempo, sono stati rifatti e ora appartengono a lui.»\n— Iggwilv, Demonomicon di Iggwilv'
+    },
+    {
+      id: 'preset_gnoll_maniaco', name: 'Maniaco Gnoll', emoji: '🌑', rarity: 'rare',
+      type: 'Immondo', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 16, hp: 135, hpCur: 135, hpTemp: 0, hpDice: '18d8+54', init: 4,
+      speed: '9 m', cr: '8', xp: '',
+      str: 16, dex: 12, con: 17, intl: 14, wis: 15, cha: 17,
+      savesOverride: { str: '6', dex: '', con: '6', intl: '', wis: '5', cha: '6' },
+      skillOverrides: { percezione: '5' }, passivePerception: 15,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Abissale', 'Comune', 'Gnoll'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Lo gnoll effettua due attacchi Colpo Abissale.' },
+        { name: 'Colpo Abissale', desc: 'Attacco con arma da mischia o a distanza: +6 a colpire, portata 1,5 metri oppure gittata 18 metri.\nColpito: 20 (5d6 + 3) danni da veleno.', atkHit: '+6', atkDmgs: [{ f: '5d6+3', t: 'veleno' }] },
+        { name: 'Fame di Yeenoghu (Ricarica 5-6)', desc: 'Lo gnoll evoca un cubo di Oscurità magica di 9 metri di lato, originato da un punto che può vedere entro 18 metri. L\'effetto dura 1 minuto oppure finché termina la concentrazione dello gnoll, e l\'area è terreno difficile.\nTiro Salvezza su Destrezza CD 14, per qualsiasi creatura che inizi il proprio turno nell\'area o vi entri per la prima volta in un turno.\nFallimento: 28 (8d6) danni necrotici, e lo gnoll (oppure una creatura a sua scelta che esso può vedere) ottiene 10 punti ferita temporanei.\nSuccesso: metà danni.', atkDmgs: [{ f: '8d6', t: 'necrotici' }] }
+      ],
+      bonusActions: [
+        { name: 'Furia Omicida (2/giorno)', desc: 'Immediatamente dopo aver inflitto danni a una creatura che è già Insanguinata, lo gnoll si muove fino a metà della sua Velocità ed effettua un attacco Colpo Abissale.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Resti d\'osso e reliquie demoniache intrise della fame di Yeenoghu.' }],
+      notes: 'Immondi in Carne Ferina\n\nHabitat: Deserto, Foresta, Prateria, Colline\nTesoro: Armamenti, Individuale\n\nI maniaci gnoll sono berserker sorti da gnoll nutriti ritualmente con carne corrotta dall\'Abisso. Incarnando la fame devastatrice di Yeenoghu, si gettano in battaglia incuranti della sopravvivenza o della propria vita, arrivando persino a divorare altri gnoll.\n\nI primi gnoll nacquero da iene che si nutrirono di carne contaminata dall\'Abisso. La loro corruzione e la loro violenza deliziarono il signore dei demoni Yeenoghu, che ne incoraggiò la diffusione e li sparse attraverso il multiverso. Da allora gli gnoll sono i servitori ghignanti di Yeenoghu, esistendo unicamente per portare rovina e banchettare con ciò che resta.\n\n«Yeenoghu considera gli gnoll non come la sua progenie, ma come vermi deliberatamente liberati per infestare una carcassa disprezzata. Sono una putrefazione perniciosa che la Bestia della Macellazione diffonde nei mondi mortali. Qualunque cosa fossero un tempo, sono stati rifatti e ora appartengono a lui.»\n— Iggwilv, Demonomicon di Iggwilv'
     }
   ];
 
