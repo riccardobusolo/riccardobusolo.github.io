@@ -3085,11 +3085,27 @@
     });
     track.addEventListener('pointerdown', function (e) {
       if (e.target === thumb || cards.scrollHeight - cards.clientHeight <= 1) return;
+      e.preventDefault();
       var r = track.getBoundingClientRect();
-      var maxTop = track.clientHeight - thumb.offsetHeight;
-      var nt = Math.max(0, Math.min(maxTop, e.clientY - r.top - thumb.offsetHeight / 2));
       var range = cards.scrollHeight - cards.clientHeight;
-      animTo((maxTop > 0 ? nt / maxTop : 0) * range);
+      function frac(clientY) {
+        var maxTop = track.clientHeight - thumb.offsetHeight;
+        var nt = Math.max(0, Math.min(maxTop, clientY - r.top - thumb.offsetHeight / 2));
+        return maxTop > 0 ? nt / maxTop : 0;
+      }
+      // 1) il pollice raggiunge (animato) il punto cliccato, centrandosi sul cursore.
+      animTo(frac(e.clientY) * range);
+      // 2) il grab resta ingaggiato: tenendo premuto e muovendo, il pollice segue il cursore.
+      try { thumb.setPointerCapture(e.pointerId); } catch (_) {}
+      thumb.classList.add('best__sb-thumb--drag');
+      function move(ev) {
+        if (anim) { cancelAnimationFrame(anim); anim = 0; }
+        cards.scrollTop = frac(ev.clientY) * range;
+      }
+      function up() { thumb.classList.remove('best__sb-thumb--drag'); document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up); }
+      document.addEventListener('pointermove', move);
+      document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', up);
     });
     update();
   }
