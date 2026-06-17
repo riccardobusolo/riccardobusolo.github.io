@@ -3550,6 +3550,51 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Qualsiasi', desc: 'Oggetti legati alla vita passata del fantasma o agli affari incompiuti che lo trattengono nel mondo.' }],
       notes: 'Anima Perduta e Spirito Inquieto\n\nHabitat: Sottosuolo, Urbano\nTesoro: Qualsiasi\n\nI fantasmi sorgono quando creature viventi muoiono in uno stato di estrema emozione oppure dopo aver lasciato incompiuto un compito importante. Questi spiriti incorporei infestano luoghi per loro significativi, permanendovi finché i loro affari non sono conclusi o finché non vengono messi a riposo.\n\nI fantasmi appaiono tipicamente come versioni semitrasparenti delle creature che erano in vita, sebbene alcuni mostrino i segni della ferita che li ha uccisi o presentino deformazioni da incubo nelle loro forme. Molti reagiscono in modo estremo ad azioni, oggetti o individui che ricordano loro aspetti della propria vita carichi di forte significato emotivo. I fantasmi particolarmente disperati o vendicativi possono possedere i viventi per realizzare i propri scopi.'
+    },
+    {
+      id: 'preset_ghoul', name: 'Ghoul', emoji: '🦴', rarity: 'common',
+      type: 'Non Morto', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 12, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '5d8', init: 2,
+      speed: '9 m', cr: '1', xp: '',
+      str: 13, dex: 15, con: 10, intl: 7, wis: 10, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Avvelenato'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il ghoul effettua due attacchi Morso.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 5 (1d6 + 2) danni perforanti più 3 (1d6) danni necrotici.', atkHit: '+4', atkDmgs: [{ f: '1d6+2', t: 'perforanti' }, { f: '1d6', t: 'necrotici' }] },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 4 (1d4 + 2) danni taglienti.\nSe il bersaglio è una creatura che non sia un Non Morto o un elfo: Tiro Salvezza su Costituzione CD 10 — Fallimento: ottiene la condizione Paralizzato fino alla fine del suo turno successivo.', atkHit: '+4', atkDmgs: [{ f: '1d4+2', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Reliquie e ricchezze trafugate dalle tombe saccheggiate dal branco.' }],
+      notes: 'Divoratori dei Morti\n\nHabitat: Palude, Sottosuolo, Urbano\nTesoro: Qualsiasi\n\nBranchi di ghoul infestano gli angoli putridi del mondo, cacciando voracemente cadaveri e coloro che presto diventeranno cadaveri. Questi corpi animati e smunti, dotati di lingue innaturalmente lunghe, dimorano in catacombe e rovine, dove divorano il contenuto delle tombe e paralizzano i nemici con i loro artigli feroci.\n\nI ghoul sorgono dai corpi di cannibali e malvagi consumati da appetiti perversi. Formano branchi uniti dalla stessa voracità.\n\n«Su una piana di denti, in un tempio d\'immondizia, il Re Affamato non spreca alcun boccone. Ogni bara è un banchetto. Ogni lastra funeraria un piatto da portata. Ora è il momento del festino!»\n— Invocazione di Doresain, Re dei Ghoul'
+    },
+    {
+      id: 'preset_ghoul_lacedon', name: 'Ghoul Lacedon', emoji: '🌊', rarity: 'common',
+      type: 'Non Morto', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 12, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '5d8', init: 2,
+      speed: '9 m, Nuotare 9 m', cr: '1', xp: '',
+      str: 13, dex: 15, con: 10, intl: 7, wis: 10, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune'],
+      dmgResist: ['Freddo'], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Avvelenato'],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il ghoul effettua due attacchi Morso Gelido.' },
+        { name: 'Morso Gelido', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 9 (2d6 + 2) danni da freddo, e la Velocità del bersaglio diminuisce di 1,5 metri fino all\'inizio del turno successivo del ghoul.', atkHit: '+4', atkDmgs: [{ f: '2d6+2', t: 'freddo' }] },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 4 (1d4 + 2) danni taglienti.\nSe il bersaglio è una creatura che non sia un Non Morto o un elfo: Tiro Salvezza su Costituzione CD 10 — Fallimento: ottiene la condizione Paralizzato fino alla fine del suo turno successivo.', atkHit: '+4', atkDmgs: [{ f: '1d4+2', t: 'taglienti' }] }
+      ],
+      bonusActions: [
+        { name: 'Corsa Acquatica', desc: 'Mentre si trova sott\'acqua, il ghoul può muoversi fino a metà della sua Velocità di Nuotare senza provocare attacchi di opportunità.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Bottino sottratto a relitti e annegati, custodito nei fondali infestati dal branco.' }],
+      notes: 'Divoratori dei Morti\n\nHabitat: Palude, Sottosuolo, Urbano\nTesoro: Qualsiasi\n\nBranchi di ghoul infestano gli angoli putridi del mondo, cacciando voracemente cadaveri e coloro che presto diventeranno cadaveri. Questi corpi animati e smunti, dotati di lingue innaturalmente lunghe, dimorano in catacombe e rovine, dove divorano il contenuto delle tombe e paralizzano i nemici con i loro artigli feroci.\n\nI lacedon sono ghoul acquatici dalla pelle flaccida e cadente. Spesso sorgono dai cadaveri di pirati avidi, di coloro che morirono di fame su isole deserte o di furfanti che trovarono la morte per annegamento.\n\n«Su una piana di denti, in un tempio d\'immondizia, il Re Affamato non spreca alcun boccone. Ogni bara è un banchetto. Ogni lastra funeraria un piatto da portata. Ora è il momento del festino!»\n— Invocazione di Doresain, Re dei Ghoul'
     }
   ];
 
