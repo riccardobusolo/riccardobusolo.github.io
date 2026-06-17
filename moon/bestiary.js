@@ -3595,6 +3595,29 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Qualsiasi', desc: 'Bottino sottratto a relitti e annegati, custodito nei fondali infestati dal branco.' }],
       notes: 'Divoratori dei Morti\n\nHabitat: Palude, Sottosuolo, Urbano\nTesoro: Qualsiasi\n\nBranchi di ghoul infestano gli angoli putridi del mondo, cacciando voracemente cadaveri e coloro che presto diventeranno cadaveri. Questi corpi animati e smunti, dotati di lingue innaturalmente lunghe, dimorano in catacombe e rovine, dove divorano il contenuto delle tombe e paralizzano i nemici con i loro artigli feroci.\n\nI lacedon sono ghoul acquatici dalla pelle flaccida e cadente. Spesso sorgono dai cadaveri di pirati avidi, di coloro che morirono di fame su isole deserte o di furfanti che trovarono la morte per annegamento.\n\n«Su una piana di denti, in un tempio d\'immondizia, il Re Affamato non spreca alcun boccone. Ogni bara è un banchetto. Ogni lastra funeraria un piatto da portata. Ora è il momento del festino!»\n— Invocazione di Doresain, Re dei Ghoul'
+    },
+    {
+      id: 'preset_madre_gorgogliante', name: 'Madre Gorgogliante', emoji: '🗣️', rarity: 'uncommon',
+      type: 'Aberrazione', size: 'Media', alignment: 'Caotico Neutrale',
+      ac: 9, hp: 52, hpCur: 52, hpTemp: 0, hpDice: '7d8+21', init: -1,
+      speed: '6 m, Nuotare 6 m', cr: '2', xp: '',
+      str: 10, dex: 8, con: 16, intl: 3, wis: 10, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Prono'],
+      traits: [
+        { name: 'Terreno Aberrante', desc: 'Il terreno entro un\'emanazione di 3 metri originata dalla madre è terreno difficile.' },
+        { name: 'Borbottio Incoerente', desc: 'La madre balbetta e farfuglia in modo incomprensibile, finché non ottiene la condizione Incapacitato.\nTiro Salvezza su Saggezza CD 10, per qualsiasi creatura che inizi il proprio turno entro 6 metri dalla madre mentre essa sta borbottando.\nFallimento: il bersaglio tira 1d8 per determinare cosa fa durante il turno corrente:\n1-4. Non fa nulla.\n5-6. Non compie né un\'Azione né un\'Azione Bonus e usa tutto il proprio movimento per spostarsi in una direzione casuale.\n7-8. Effettua un attacco in mischia contro una creatura determinata casualmente entro la sua portata, oppure non fa nulla se non può effettuare tale attacco.' }
+      ],
+      actions: [
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +2 a colpire, portata 1,5 metri.\nColpito: 7 (2d6) danni perforanti. Se il bersaglio è una creatura Media o più piccola, ottiene la condizione Prono.\nIl bersaglio muore se viene ridotto a 0 punti ferita da questo attacco e il suo corpo viene assorbito dalla madre, lasciando dietro di sé soltanto l\'equipaggiamento.', atkHit: '+2', atkDmgs: [{ f: '2d6', t: 'perforanti' }] },
+        { name: 'Sputo Accecante (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza CD 10, per ogni creatura in una sfera con raggio di 3 metri centrata su un punto entro 9 metri.\nFallimento: 7 (2d6) danni radiosi e il bersaglio ottiene la condizione Accecato fino alla fine del turno successivo della madre.', atkDmgs: [{ f: '2d6', t: 'radiosi' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Coro Vorace dell\'Irrealtà\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nLe madri gorgoglianti si nutrono incessantemente dei propri corpi ameboidi e li rigenerano continuamente: masse amorfe ribollenti di occhi, denti e strani organi. Questi orrori che piegano la mente cantano e urlano, ridono e piangono con una cacofonia di voci che spaziano dal disturbantemente innaturale allo sconvolgentemente familiare. Esistono soltanto per nutrirsi e per riversare il proprio disprezzo verso la realtà, con le loro numerose fauci grondanti di saliva proveniente da altri mondi.\n\nLe madri gorgoglianti nascono in vari modi spiacevoli.\n\nOrigini della Madre Gorgogliante (1d6) — la madre gorgogliante è...\n1 — Un\'altra creatura deformata da una magia pericolosa.\n2 — Un\'appendice autonoma di una divinità caotica, di un\'entità del Reame Remoto o di un orrore nato dalle stelle.\n3 — L\'esperimento di un manipolatore aberrante.\n4 — Parte del ciclo vitale di un\'altra Aberrazione.\n5 — Un mutaforma che ha perso il controllo dei propri poteri.\n6 — Qualcuno maledetto da un culto o da una divinità vendicativa.\n\n«Ahimè, gli Antichi Elfi commisero un errore fatale. Quando la cometa Lacrima del Drago fece ritorno, il grande Portale — ancora sintonizzato sul remoto reame di entità aliene legate alla cometa — si aprì nuovamente. E ciò che emerse, ululando oscenità, cantò fame innominabili in un mondo impreparato.»\n— Dal Libro del Portale, rinvenuto presso il Picco della Tempesta di Fuoco'
     }
   ];
 
