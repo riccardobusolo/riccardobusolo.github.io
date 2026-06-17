@@ -2859,6 +2859,34 @@
         { name: 'Reliquie', desc: 'Reliquie naturali e oggetti rituali del druido.' }
       ],
       notes: 'Custode e Saggio della Natura\n\nHabitat: Qualsiasi\nTesoro: Individuale, Reliquie\nEquipaggiamento: armatura di cuoio borchiato\n\nI druidi usano la magia primordiale, insegnamenti tradizionali e legami con animali ed esseri ancestrali per proteggere il mondo naturale e guarirne i mali. Questi incantatori possono essere eremiti devoti a una particolare terra oppure membri di un\'organizzazione mistica.\n\nTradizioni Druidiche (1d6) — il druido è...\n1 — Un vendicatore che colpisce le civiltà distruttive e coloro che abusano della natura.\n2 — Una guida che aiuta i viaggiatori a orientarsi nei domini delle Bestie, delle Fate o delle Piante.\n3 — Un eremita che lavora da solo per proteggere le terre, i mari o i cieli che considera la propria casa.\n4 — Un guaritore che viaggia per il mondo sanando disastri naturali, magici o causati dall\'uomo.\n5 — Parte di un\'organizzazione informale che aderisce a rituali senza tempo e custodisce segreti naturali.\n6 — Un guardiano che veglia sulle fondamenta della realtà e protegge dalle minacce extraplanari.'
+    },
+    {
+      id: 'preset_driade', name: 'Driade', emoji: '🌳', rarity: 'uncommon',
+      type: 'Fata', size: 'Media', alignment: 'Neutrale',
+      ac: 16, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '5d8', init: 1,
+      speed: '9 m', cr: '1', xp: '',
+      str: 10, dex: 12, con: 11, intl: 14, wis: 15, cha: 18,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '4', furtivita: '5' }, passivePerception: 14,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Elfico', 'Silvano'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [],
+      condImmune: [],
+      traits: [
+        { name: 'Resistenza Magica', desc: 'La driade ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Parlare con Bestie e Piante', desc: 'La driade può comunicare con Bestie e Piante come se condividessero una lingua comune.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'La driade effettua un attacco con Frusta di Liane o Esplosione di Spine, e può usare Incantesimi per lanciare Charme sui Mostri.' },
+        { name: 'Frusta di Liane', desc: 'Attacco con arma da mischia: +6 a colpire, portata 3 metri.\nColpito: 8 (1d8 + 4) danni taglienti.', atkHit: '+6', atkDmgs: [{ f: '1d8+4', t: 'taglienti' }] },
+        { name: 'Esplosione di Spine', desc: 'Attacco con arma a distanza: +6 a colpire, gittata 18 metri.\nColpito: 7 (1d6 + 4) danni perforanti.', atkHit: '+6', atkDmgs: [{ f: '1d6+4', t: 'perforanti' }] },
+        { name: 'Incantesimi', desc: 'La driade lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 14).\n\nA volontà: Amicizia con gli Animali, Charme sui Mostri (dura 24 ore e termina anticipatamente se la driade lo lancia di nuovo), Artificio Druidico.\n\n1/Giorno ciascuno: Intralciare, Passare Senza Tracce.' }
+      ],
+      bonusActions: [
+        { name: 'Passo Arboreo', desc: 'Se si trova entro 1,5 metri da un albero di taglia Grande o superiore, la driade si teletrasporta in uno spazio libero entro 1,5 metri da un secondo albero di taglia Grande o superiore situato entro 18 metri dall\'albero precedente.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Doni della foresta e oggetti lasciati da chi ha stretto patti con lei, custoditi presso il suo albero o santuario.' }],
+      notes: 'Guardiana della Natura Legata a un Albero\n\nHabitat: Foresta\nTesoro: Qualsiasi\n\nLe driadi, custodi delle terre boschive, si spostano magicamente da albero ad albero e da radice a ramo, tormentando gli intrusi con liane e spine aggrovigliate. La maggior parte di questi esseri elusivi possiede un legame speciale con una particolare pianta o con un santuario naturale che protegge. Alcune condividono persino somiglianze fisiche con le piante a cui sono più connesse.\n\nUna driade può ammalarsi o morire se la sua pianta o il suo santuario vengono distrutti, recuperando la salute soltanto se essi vengono guariti o sostituiti magicamente.\n\nSantuari della Driade (1d6) — la driade dimora e protegge...\n1 — Una colonia clonale estesa per ettari: un boschetto di alberi identici e interconnessi.\n2 — Un albero simile a una fortezza, come un baobab o una sequoia.\n3 — Una serratura vivente: una pianta che sigilla un male sottostante o blocca l\'accesso a un dungeon.\n4 — Un albero solitario sulla cima di una montagna battuta dal vento o nel mezzo di una foresta pietrificata.\n5 — Una pianta dai frutti magici o dai semi straordinari.\n6 — Un tumulo ambulante o un treant nel quale (o attorno al quale) la driade vive, come simbionte fatato.'
     }
   ];
 
