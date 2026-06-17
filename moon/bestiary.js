@@ -2887,6 +2887,30 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Qualsiasi', desc: 'Doni della foresta e oggetti lasciati da chi ha stretto patti con lei, custoditi presso il suo albero o santuario.' }],
       notes: 'Guardiana della Natura Legata a un Albero\n\nHabitat: Foresta\nTesoro: Qualsiasi\n\nLe driadi, custodi delle terre boschive, si spostano magicamente da albero ad albero e da radice a ramo, tormentando gli intrusi con liane e spine aggrovigliate. La maggior parte di questi esseri elusivi possiede un legame speciale con una particolare pianta o con un santuario naturale che protegge. Alcune condividono persino somiglianze fisiche con le piante a cui sono più connesse.\n\nUna driade può ammalarsi o morire se la sua pianta o il suo santuario vengono distrutti, recuperando la salute soltanto se essi vengono guariti o sostituiti magicamente.\n\nSantuari della Driade (1d6) — la driade dimora e protegge...\n1 — Una colonia clonale estesa per ettari: un boschetto di alberi identici e interconnessi.\n2 — Un albero simile a una fortezza, come un baobab o una sequoia.\n3 — Una serratura vivente: una pianta che sigilla un male sottostante o blocca l\'accesso a un dungeon.\n4 — Un albero solitario sulla cima di una montagna battuta dal vento o nel mezzo di una foresta pietrificata.\n5 — Una pianta dai frutti magici o dai semi straordinari.\n6 — Un tumulo ambulante o un treant nel quale (o attorno al quale) la driade vive, come simbionte fatato.'
+    },
+    {
+      id: 'preset_elementale_terra', name: 'Elementale della Terra', emoji: '🪨', rarity: 'rare',
+      type: 'Elementale', size: 'Grande', alignment: 'Neutrale',
+      ac: 17, hp: 147, hpCur: 147, hpTemp: 0, hpDice: '14d10+70', init: -1,
+      speed: '9 m, Scavare 9 m', cr: '5', xp: '',
+      str: 20, dex: 8, con: 20, intl: 5, wis: 10, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }, { type: 'Percezione Tellurica', value: 18, unit: 'm' }], languages: ['Primordiale (Terran)'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: ['Tuono'],
+      condImmune: ['Esausto', 'Paralizzato', 'Pietrificato', 'Avvelenato', 'Privo di Sensi'],
+      traits: [
+        { name: 'Attraversare la Terra', desc: 'L\'elementale può scavare attraverso terra e pietra non lavorate e non magiche. Mentre lo fa, non disturba il materiale attraverso cui passa.' },
+        { name: 'Mostro d\'Assedio', desc: 'L\'elementale infligge danni doppi a oggetti e strutture.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'elementale effettua due attacchi, usando Schianto o Lancio di Roccia in qualsiasi combinazione.' },
+        { name: 'Schianto', desc: 'Attacco con arma da mischia: +8 a colpire, portata 3 metri.\nColpito: 14 (2d8 + 5) danni contundenti.', atkHit: '+8', atkDmgs: [{ f: '2d8+5', t: 'contundenti' }] },
+        { name: 'Lancio di Roccia', desc: 'Attacco con arma a distanza: +8 a colpire, gittata 18 metri.\nColpito: 8 (1d6 + 5) danni contundenti.\nSe il bersaglio è una creatura di taglia Grande o inferiore, ottiene la condizione Prono.', atkHit: '+8', atkDmgs: [{ f: '1d6+5', t: 'contundenti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Spirito Primordiale di Terra e Pietra\n\nHabitat: Montagna, Piano Elementale della Terra, Sottosuolo\nTesoro: Nessuno\n\nGli spiriti primordiali provenienti dal Piano Elementale della Terra si fondono con rocce e minerali per formare elementali della terra. Questi esseri possiedono arti possenti e lineamenti rozzi, talvolta impreziositi da vene minerarie, gemme, cristalli, striature colorate o piante viventi.\n\nSul Piano Materiale, gli elementali della terra spesso servono coloro che li evocano, oppure appaiono in regioni influenzate dal loro piano natale, come nodi cristallini, linee di faglia cariche di energia o vene di pietra magica. Si muovono senza sforzo attraverso la roccia e possono ridurre in rovina intere strutture con i loro potenti pugni.\n\nLa composizione di un elementale non ne modifica le statistiche né ha valore monetario, ma rende ogni esemplare unico.\n\nComposizioni dell\'Elementale della Terra (1d8) — il corpo dell\'elementale presenta...\n1 — Formazioni minerali dai colori vivaci.\n2 — Magma raffreddato accumulato in masse fuse.\n3 — Erba, muschio o radici vegetali.\n4 — Cumuli di torba o materia in decomposizione.\n5 — Monticelli di sabbia disseminati di conchiglie.\n6 — Macerie o frammenti di una struttura in rovina.\n7 — Evidenti striature o bande di colore.\n8 — Vene di ferro o di altri minerali metallici.\n\n«Le fondamenta delle nostre case, la forza delle nostre armi, i depositi dei nostri più grandi segreti: la terra non è altro che la presa stessa della realtà. È l\'elemento più potente. Questo non può essere negato.»\n— Kabril la Bussola Perfetta, sovrano dao'
     }
   ];
 
