@@ -3050,8 +3050,22 @@
     cards.addEventListener('scroll', schedule, { passive: true });
     if (typeof ResizeObserver === 'function') { try { new ResizeObserver(schedule).observe(cards); } catch (_) {} }
     if (typeof MutationObserver === 'function') { try { new MutationObserver(schedule).observe(cards, { childList: true, subtree: true }); } catch (_) {} }
-    if (upBtn) upBtn.addEventListener('click', function () { try { cards.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) { cards.scrollTop = 0; } });
-    if (dnBtn) dnBtn.addEventListener('click', function () { try { cards.scrollTo({ top: cards.scrollHeight, behavior: 'smooth' }); } catch (_) { cards.scrollTop = cards.scrollHeight; } });
+    var anim = 0;
+    function animTo(to) {
+      if (anim) cancelAnimationFrame(anim);
+      var from = cards.scrollTop, change = to - from;
+      if (Math.abs(change) < 1) { cards.scrollTop = to; anim = 0; return; }
+      var dur = Math.min(300, Math.max(140, Math.abs(change) * 0.2)), t0 = 0;
+      function step(ts) {
+        if (!t0) t0 = ts;
+        var p = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+        cards.scrollTop = from + change * e;
+        anim = p < 1 ? requestAnimationFrame(step) : 0;
+      }
+      anim = requestAnimationFrame(step);
+    }
+    if (upBtn) upBtn.addEventListener('click', function () { animTo(0); });
+    if (dnBtn) dnBtn.addEventListener('click', function () { animTo(cards.scrollHeight - cards.clientHeight); });
     thumb.addEventListener('pointerdown', function (e) {
       if (cards.scrollHeight - cards.clientHeight <= 1) return;
       e.preventDefault();
@@ -3075,7 +3089,7 @@
       var maxTop = track.clientHeight - thumb.offsetHeight;
       var nt = Math.max(0, Math.min(maxTop, e.clientY - r.top - thumb.offsetHeight / 2));
       var range = cards.scrollHeight - cards.clientHeight;
-      try { cards.scrollTo({ top: (maxTop > 0 ? nt / maxTop : 0) * range, behavior: 'smooth' }); } catch (_) { cards.scrollTop = (maxTop > 0 ? nt / maxTop : 0) * range; }
+      animTo((maxTop > 0 ? nt / maxTop : 0) * range);
     });
     update();
   }
@@ -3114,9 +3128,9 @@
     h += '</div>';
     h += '<div class="best__cardswrap"><div class="best__cards"></div>' +
       '<div class="best__sb">' +
-      '<button class="best__sb-btn best__sb-up" type="button" title="Scorri tutto in cima" aria-label="Scorri tutto in cima">▲</button>' +
+      '<button class="best__sb-btn best__sb-up" type="button" title="Scorri tutto in cima" aria-label="Scorri tutto in cima"><svg viewBox="0 0 10 10" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,4.6 5,1.6 8,4.6"/><polyline points="2,8 5,5 8,8"/></svg></button>' +
       '<div class="best__sb-track"><div class="best__sb-thumb"></div></div>' +
-      '<button class="best__sb-btn best__sb-down" type="button" title="Scorri tutto in fondo" aria-label="Scorri tutto in fondo">▼</button>' +
+      '<button class="best__sb-btn best__sb-down" type="button" title="Scorri tutto in fondo" aria-label="Scorri tutto in fondo"><svg viewBox="0 0 10 10" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,2 5,5 8,2"/><polyline points="2,5.4 5,8.4 8,5.4"/></svg></button>' +
       '</div></div>';
     left.innerHTML = h;
     fillCards();
@@ -3586,18 +3600,18 @@
     '#bestiaryBody{padding:0;display:flex;flex-direction:row;align-items:stretch;overflow:hidden}' +
     '.best__left{flex:1 1 0;display:flex;flex-direction:column;min-width:0;overflow:hidden;padding:8px;border-right:1px solid var(--border)}' +
     '.best__head{flex:0 0 auto}' +
-    '.best__cardswrap{flex:1 1 0;min-height:0;display:flex;flex-direction:row;gap:6px}' +
+    '.best__cardswrap{flex:1 1 0;min-height:0;display:flex;flex-direction:row;gap:3px}' +
     '.best__cards{flex:1 1 0;min-width:0;min-height:0;overflow:hidden auto;scrollbar-width:none;-ms-overflow-style:none}' +
     '.best__cards::-webkit-scrollbar{width:0;height:0;display:none}' +
-    '.best__sb{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:5px;width:15px;padding:1px 0}' +
-    '.best__sb-btn{flex:0 0 auto;width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid var(--border);background:var(--bg3);color:var(--muted);border-radius:4px;font-size:7px;line-height:1;cursor:var(--cur-pointer);transition:all .12s}' +
+    '.best__sb{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;width:12px;padding:0}' +
+    '.best__sb-btn{flex:0 0 auto;width:12px;height:12px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid var(--border);background:var(--bg3);color:var(--muted);border-radius:3px;line-height:0;cursor:var(--cur-pointer);transition:all .12s}' +
     '.best__sb-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(127,127,127,.16)}' +
-    '.best__sb-btn:active{transform:scale(.88)}' +
-    '.best__sb-track{flex:1 1 0;min-height:0;position:relative;width:9px;background:rgba(127,127,127,.14);border:1px solid var(--border);border-radius:6px;cursor:var(--cur-pointer)}' +
-    '.best__sb-thumb{position:absolute;left:1px;right:1px;top:0;min-height:26px;border-radius:6px;background:var(--gold);box-shadow:0 0 6px -1px var(--gold);cursor:grab;transition:filter .12s,opacity .12s}' +
+    '.best__sb-btn:active{transform:scale(.86)}' +
+    '.best__sb-track{flex:1 1 0;min-height:0;position:relative;width:8px;background:rgba(127,127,127,.14);border:1px solid var(--border);border-radius:5px;cursor:var(--cur-pointer)}' +
+    '.best__sb-thumb{position:absolute;left:1px;right:1px;top:0;min-height:26px;border-radius:5px;background:var(--gold);box-shadow:0 0 6px -1px var(--gold);cursor:var(--cur-pointer);transition:filter .12s,opacity .12s}' +
     '.best__sb-thumb:hover{filter:brightness(1.12)}' +
-    '.best__sb-thumb--drag{cursor:grabbing;filter:brightness(1.18)}' +
-    '.best__sb-thumb--idle{opacity:.34;box-shadow:none;cursor:default}' +
+    '.best__sb-thumb--drag{cursor:var(--cur-grabbing);filter:brightness(1.18)}' +
+    '.best__sb-thumb--idle{opacity:.34;box-shadow:none}' +
     '.best__right{flex:1 1 0;min-width:0;overflow:hidden auto;scrollbar-width:none;-ms-overflow-style:none;padding:10px 12px}' +
     '.best__right::-webkit-scrollbar{width:0;height:0;display:none}' +
     '.best__placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.74rem;line-height:1.6;padding:20px}' +
