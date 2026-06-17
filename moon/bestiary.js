@@ -3432,6 +3432,28 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Qualsiasi', desc: 'Gemme, minerali e tesori incastonati nel corpo roccioso, e segreti custoditi nelle profondità della terra.' }],
       notes: 'Occhi e Orecchie della Terra\n\nHabitat: Colline, Montagne\nTesoro: Qualsiasi\n\nEsseri di roccia vivente, i galeb duhr cercano l\'armonia con la terra e danno voce alle vibrazioni della pietra. I loro corpi rocciosi possiedono arti e tratti facciali accentuati da gemme, minerali e altri tesori rinvenibili nel terreno circostante.\n\nI galeb duhr sono di fatto immortali, con una durata di vita paragonabile a quella delle montagne. Non percepiscono il tempo né il pericolo come le specie dalla vita più breve, ed evitano i pericoli nascondendosi. Quando si rivelano, parlano e agiscono con ponderatezza, ma spesso conoscono molto del territorio circostante e dei segreti nascosti nelle profondità della terra.\n\nQuando vengono spinti all\'azione, si scagliano contro i nemici e animano i massi vicini affinché facciano lo stesso.\n\nAlcuni abitanti delle montagne li considerano alleati distaccati e potrebbero affidare a questi esseri longevi segreti o tesori destinati alle generazioni future. Altri parlano dei loro canti — armonizzazioni appena udibili eseguite da gruppi di galeb duhr — che si dice influenzino terremoti ed eruzioni vulcaniche.'
+    },
+    {
+      id: 'preset_gargolla', name: 'Gargolla', emoji: '🏰', rarity: 'uncommon',
+      type: 'Elementale', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 15, hp: 67, hpCur: 67, hpTemp: 0, hpDice: '9d8+27', init: 2,
+      speed: '9 m, Volare 18 m', cr: '2', xp: '',
+      str: 15, dex: 11, con: 16, intl: 6, wis: 11, cha: 7,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '4' }, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Primordiale (Terran)'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Esausto', 'Pietrificato', 'Avvelenato'],
+      traits: [
+        { name: 'Attacco in Picchiata', desc: 'La gargolla non provoca attacchi di opportunità quando vola fuori dalla portata di un nemico.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'La gargolla effettua due attacchi con Artiglio.' },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 7 (2d4 + 2) danni taglienti.', atkHit: '+4', atkDmgs: [{ f: '2d4+2', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Tesori accumulati nei covi elevati e oggetti rubati alle vittime delle imboscate.' }],
+      notes: 'Sentinella Scolpita Nascosta in Piena Vista\n\nHabitat: Sottosuolo, Urbano\nTesoro: Qualsiasi\n\nLe gargolle sono sculture abitate da spiriti elementali. Ali e magia consentono ai loro pesanti corpi di pietra di volare, e spesso si appollaiano dove possono confondersi tra architetture elaborate, formazioni rocciose o semplici statue.\n\nServono generalmente gli incantatori che le hanno evocate nei loro corpi di pietra, ma se lasciate a sé stesse potrebbero dedicarsi a scherzi crudeli e rubare tesori da accumulare nei loro covi elevati.\n\nSculture di Gargolla (1d6) — la gargolla è scolpita per assomigliare a...\n1 — Un cherubino dai lineamenti eternamente sorridenti.\n2 — Una figura rozzamente scolpita o modellata naturalmente.\n3 — Una figura danneggiata o deturpata da parti non corrispondenti.\n4 — Un essere simile a un drago con scaglie di pietra levigata.\n5 — Un immondo dall\'aspetto gotico con corna e coda.\n6 — Un elemento utile, come un podio decorato o una colonna.\n\nAgguati: prive di necessità biologiche e dotate di pazienza soprannaturale, le gargolle possono rimanere immobili per mesi, rivelandosi solo quando le condizioni sono perfette per attaccare.\n\nMimetizzazione della Gargolla (1d8) — la gargolla si nasconde tra...\n1 — Nodi e cortecce di un albero gigantesco.\n2 — Monumenti in un cimitero o memoriale.\n3 — Affioramenti rocciosi su una scogliera o una formazione di pietra.\n4 — Le vittime pietrificate di un basilisco o di una medusa.\n5 — Bassorilievi su un portale o un muro scolpito.\n6 — Macerie in una rovina o in una discarica.\n7 — Stalattiti o ghiaccioli sul soffitto di una caverna.\n8 — Statue su un castello, una magione o un tempio.\n\n«Dove il male attraversa il Piano Elementale della Terra, macchia la roccia e corrompe il suolo. La malizia svanisce tra gli altri elementi, ma nell\'oscuro sottosuolo assume forma e si trasforma in incubi.»\n— Tiv, Studioso dei Piani Elementali'
     }
   ];
 
