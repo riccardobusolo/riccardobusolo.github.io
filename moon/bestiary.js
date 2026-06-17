@@ -3412,6 +3412,26 @@
       reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Spore Letali e Polipi Predatori\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nL\'umido e privo di sole Sottosuolo è un terreno fertile per la crescita di funghi strani e pericolosi.\n\nUn necrohulk di funghi viola si forma quando una colonia di funghi viola infesta e anima un grande ammasso di materia in decomposizione. Questo necrohulk attacca le prede e diffonde spore fungine per la colonia.'
+    },
+    {
+      id: 'preset_galeb_duhr', name: 'Galeb Duhr', emoji: '⛰️', rarity: 'uncommon',
+      type: 'Elementale', size: 'Media', alignment: 'Neutrale',
+      ac: 16, hp: 123, hpCur: 123, hpTemp: 0, hpDice: '13d8+65', init: 2,
+      speed: '4,5 m (9 m rotolando, 18 m in discesa)', cr: '6', xp: '',
+      str: 20, dex: 14, con: 20, intl: 11, wis: 12, cha: 11,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 11,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }, { type: 'Percezione Tellurica', value: 18, unit: 'm' }], languages: ['Primordiale (Terran)'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato', 'Paralizzato', 'Pietrificato', 'Avvelenato'],
+      traits: [],
+      actions: [
+        { name: 'Schianto Valanga', desc: 'Attacco con arma da mischia: +8 a colpire, portata 1,5 metri.\nColpito: 12 (2d6 + 5) danni contundenti.\nSe il bersaglio è una creatura Grande o più piccola e il galeb duhr si è mosso di almeno 6 metri in linea retta verso di esso immediatamente prima di colpirlo, subisce ulteriori 7 (2d6) danni contundenti e ottiene la condizione Prono.', atkHit: '+8', atkDmgs: [{ f: '2d6+5', t: 'contundenti' }] },
+        { name: 'Animare Massi (1/Giorno)', desc: 'Il galeb duhr anima magicamente uno o due massi che può vedere entro 18 metri.\nOgni masso usa il blocco statistiche del Galeb Duhr, eccetto che ha Intelligenza e Carisma pari a 1 e non dispone di questa azione. Il masso agisce subito dopo il galeb duhr con lo stesso valore di iniziativa e gli obbedisce.\nUn masso rimane animato per 1 minuto oppure finché esso o il galeb duhr non muoiono.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Gemme, minerali e tesori incastonati nel corpo roccioso, e segreti custoditi nelle profondità della terra.' }],
+      notes: 'Occhi e Orecchie della Terra\n\nHabitat: Colline, Montagne\nTesoro: Qualsiasi\n\nEsseri di roccia vivente, i galeb duhr cercano l\'armonia con la terra e danno voce alle vibrazioni della pietra. I loro corpi rocciosi possiedono arti e tratti facciali accentuati da gemme, minerali e altri tesori rinvenibili nel terreno circostante.\n\nI galeb duhr sono di fatto immortali, con una durata di vita paragonabile a quella delle montagne. Non percepiscono il tempo né il pericolo come le specie dalla vita più breve, ed evitano i pericoli nascondendosi. Quando si rivelano, parlano e agiscono con ponderatezza, ma spesso conoscono molto del territorio circostante e dei segreti nascosti nelle profondità della terra.\n\nQuando vengono spinti all\'azione, si scagliano contro i nemici e animano i massi vicini affinché facciano lo stesso.\n\nAlcuni abitanti delle montagne li considerano alleati distaccati e potrebbero affidare a questi esseri longevi segreti o tesori destinati alle generazioni future. Altri parlano dei loro canti — armonizzazioni appena udibili eseguite da gruppi di galeb duhr — che si dice influenzino terremoti ed eruzioni vulcaniche.'
     }
   ];
 
