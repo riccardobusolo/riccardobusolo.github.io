@@ -2911,6 +2911,32 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [],
       notes: 'Spirito Primordiale di Terra e Pietra\n\nHabitat: Montagna, Piano Elementale della Terra, Sottosuolo\nTesoro: Nessuno\n\nGli spiriti primordiali provenienti dal Piano Elementale della Terra si fondono con rocce e minerali per formare elementali della terra. Questi esseri possiedono arti possenti e lineamenti rozzi, talvolta impreziositi da vene minerarie, gemme, cristalli, striature colorate o piante viventi.\n\nSul Piano Materiale, gli elementali della terra spesso servono coloro che li evocano, oppure appaiono in regioni influenzate dal loro piano natale, come nodi cristallini, linee di faglia cariche di energia o vene di pietra magica. Si muovono senza sforzo attraverso la roccia e possono ridurre in rovina intere strutture con i loro potenti pugni.\n\nLa composizione di un elementale non ne modifica le statistiche né ha valore monetario, ma rende ogni esemplare unico.\n\nComposizioni dell\'Elementale della Terra (1d8) — il corpo dell\'elementale presenta...\n1 — Formazioni minerali dai colori vivaci.\n2 — Magma raffreddato accumulato in masse fuse.\n3 — Erba, muschio o radici vegetali.\n4 — Cumuli di torba o materia in decomposizione.\n5 — Monticelli di sabbia disseminati di conchiglie.\n6 — Macerie o frammenti di una struttura in rovina.\n7 — Evidenti striature o bande di colore.\n8 — Vene di ferro o di altri minerali metallici.\n\n«Le fondamenta delle nostre case, la forza delle nostre armi, i depositi dei nostri più grandi segreti: la terra non è altro che la presa stessa della realtà. È l\'elemento più potente. Questo non può essere negato.»\n— Kabril la Bussola Perfetta, sovrano dao'
+    },
+    {
+      id: 'preset_efreeti', name: 'Efreeti', emoji: '🔥', rarity: 'epic',
+      type: 'Elementale', size: 'Grande', alignment: 'Neutrale',
+      ac: 17, hp: 212, hpCur: 212, hpTemp: 0, hpDice: '17d10+119', init: 1,
+      speed: '12 m, Volare 18 m (fluttuare)', cr: '11', xp: '',
+      str: 22, dex: 12, con: 24, intl: 16, wis: 15, cha: 19,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '6', cha: '8' },
+      skillOverrides: {}, passivePerception: 12,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Primordiale (Ignan)'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [],
+      condImmune: [],
+      traits: [
+        { name: 'Restaurazione Elementale', desc: 'Se l\'efreeti muore al di fuori del Piano Elementale del Fuoco, il suo corpo si dissolve in cenere ed esso ottiene un nuovo corpo dopo 14 giorni, tornando in vita con tutti i suoi punti ferita da qualche parte sul Piano Elementale del Fuoco.' },
+        { name: 'Resistenza Magica', desc: 'L\'efreeti ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Desideri', desc: 'L\'efreeti ha il 30% di probabilità di conoscere l\'incantesimo Desiderio. Se lo conosce, può lanciarlo soltanto per conto di una creatura che non sia un genio e che comunichi un desiderio in un modo comprensibile all\'efreeti. Lanciandolo per quella creatura, non subisce alcuno degli effetti di stress associati all\'incantesimo. Dopo averlo lanciato tre volte, non può più farlo per 365 giorni.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'efreeti effettua tre attacchi, usando Lama Rovente o Scagliare Fiamma in qualsiasi combinazione.' },
+        { name: 'Lama Rovente', desc: 'Attacco con arma da mischia: +10 a colpire, portata 1,5 metri.\nColpito: 13 (2d6 + 6) danni taglienti più 13 (2d12) danni da fuoco.', atkHit: '+10', atkDmgs: [{ f: '2d6+6', t: 'taglienti' }, { f: '2d12', t: 'fuoco' }] },
+        { name: 'Scagliare Fiamma', desc: 'Attacco con arma a distanza: +8 a colpire, gittata 36 metri.\nColpito: 24 (7d6) danni da fuoco.', atkHit: '+8', atkDmgs: [{ f: '7d6', t: 'fuoco' }] },
+        { name: 'Incantesimi', desc: 'L\'efreeti lancia uno dei seguenti incantesimi senza componenti materiali, usando il Carisma come caratteristica da incantatore (CD 16).\n\nA volontà: Individuazione del Magico, Elementalismo.\n\n1/Giorno ciascuno: Forma Gassosa, Invisibilità, Immagine Maggiore, Spostamento Planare, Linguaggi, Muro di Fuoco (versione di 7° livello).' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Armi e tesori forgiati nel fuoco elementale: lame roventi, ottoni lavorati e ricchezze della Città dell\'Ottone.' }],
+      notes: 'Genio del Fuoco\n\nHabitat: Deserto, Piano Elementale del Fuoco\nTesoro: Armamenti\n\nGli efreeti bruciano dell\'energia e dell\'imprevedibilità del fuoco. La loro magia innata consente loro di evocare fiamme dal nulla e di plasmare tesori all\'interno di inferni magici. Molti efreeti godono di una reputazione malvagia, poiché la loro natura volubile e il gusto per gli incendi spettacolari possono risultare distruttivi. Altri, invece, amano la bellezza del fuoco, dalla delicatezza della fiamma di una candela alle meraviglie condivise dei fuochi d\'artificio. Questi geni possono aiutare i mortali in cambio di tesori o della liberazione di Elementali prigionieri.\n\nSu molti mondi gli efreeti abitano deserti torridi e regioni vulcaniche. Coloro che risiedono nel Piano Elementale del Fuoco costruiscono città incredibili tra mari di fiamme e minerali fusi. La più celebre è la leggendaria Città dell\'Ottone, una metropoli splendente tra le più meravigliose del multiverso, dove la magia attenua il calore estremo del piano, rendendola un importante centro di commercio tra i piani di esistenza.\n\n«Immagina mari di platino e fiamme liquide, il Pilastro Cremisi con fuochi abbastanza ardenti da marchiare gli dèi, e le infinite delizie della Città dell\'Ottone. Ora immagina ciò che il mio padrone offre...»\n— Veyisvevayn, araldo mephit del magma'
     }
   ];
 
