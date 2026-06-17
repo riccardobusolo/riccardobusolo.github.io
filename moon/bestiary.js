@@ -3206,6 +3206,31 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'Spada Fiammeggiante, martelli da guerra e armi forgiate nelle fortezze-fucine.' }],
       notes: 'Gigante delle Profondità Fumanti\n\nHabitat: Montagne, Sottosuolo\nTesoro: Armamenti\n\nI giganti del fuoco abitano le cavità sotterranee e i fiumi di magma delle profondità montuose. Lì utilizzano il calore e le ricchezze del sottosuolo per forgiare meraviglie, da titaniche armi da guerra a delicate opere d\'arte. Possiedono corporature massicce, pelle dai colori simili alla roccia e capelli simili a fiamme.\n\nLa maggior parte dei giganti del fuoco vive in montagne vulcanicamente attive o in vaste profondità cavernose che ospitano le loro fortezze-fucine. I giganti del fuoco malvagi tendono ad avere una mentalità marziale e possono forgiare eserciti per conquistare i vicini e impadronirsi di risorse preziose. I più moderati commerciano le proprie creazioni in cambio di ciò di cui hanno bisogno e potrebbero condividere le antiche tecniche degli artigiani giganti con altri popoli.\n\nIn entrambi i casi, i giganti del fuoco sono inclini a intraprendere progetti ambiziosi e raramente apprezzano le interruzioni nei loro titanici laboratori.'
+    },
+    {
+      id: 'preset_teschio_fiammeggiante', name: 'Teschio Fiammeggiante', emoji: '🔮', rarity: 'uncommon',
+      type: 'Non Morto', size: 'Minuscola', alignment: 'Neutrale Malvagio',
+      ac: 13, hp: 40, hpCur: 40, hpTemp: 0, hpDice: '9d4+18', init: 3,
+      speed: '1,5 m, Volare 12 m (fluttuare)', cr: '4', xp: '',
+      str: 1, dex: 17, con: 14, intl: 16, wis: 10, cha: 11,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { arcano: '5', percezione: '2' }, passivePerception: 12,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune (più altre due lingue)'],
+      dmgResist: [], dmgImmune: ['Fuoco', 'Necrotico', 'Veleno'], dmgVulner: [],
+      condImmune: ['Ammaliato', 'Esausto', 'Spaventato', 'Paralizzato', 'Avvelenato', 'Prono'],
+      traits: [
+        { name: 'Illuminazione', desc: 'Il teschio fiammeggiante emette luce intensa in un raggio di 4,5 metri e luce fioca per altri 4,5 metri.' },
+        { name: 'Resistenza Magica', desc: 'Il teschio fiammeggiante ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Restaurazione Non Morta', desc: 'Se il teschio fiammeggiante viene distrutto, recupera tutti i suoi punti ferita dopo 1 ora, a meno che non venga asperso con Acqua Benedetta o che sui suoi resti venga lanciato l\'incantesimo Dissolvi il Bene e il Male.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il teschio fiammeggiante effettua due attacchi con Raggio di Fuoco.' },
+        { name: 'Raggio di Fuoco', desc: 'Attacco con arma da mischia o a distanza: +5 a colpire, portata 1,5 metri o gittata 18 metri.\nColpito: 13 (3d6 + 3) danni da fuoco.', atkHit: '+5', atkDmgs: [{ f: '3d6+3', t: 'fuoco' }] },
+        { name: 'Lancio di Incantesimi', desc: 'Il teschio fiammeggiante lancia uno dei seguenti incantesimi, senza componenti somatiche o materiali, usando l\'Intelligenza come caratteristica da incantatore (CD 13).\n\nA volontà: Mano Magica.\n\n2/Giorno: Dardo Incantato (versione di 2° livello).\n\n1/Giorno: Palla di Fuoco.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcani', desc: 'Conoscenze arcane e frammenti delle ricerche magiche dell\'incantatore defunto.' }],
+      notes: 'Teschio Ardente Ossessionato dalla Magia\n\nHabitat: Sottosuolo\nTesoro: Arcani\n\nI teschi fiammeggianti sono teschi volanti che ardono di fuoco magico e degli arcani solo parzialmente ricordati di incantatori defunti. Sorgono dai resti di utilizzatori della magia morti, rianimati da sinistri necromanti o le cui ricerche magiche li spingono oltre la morte stessa.\n\nI teschi fiammeggianti possono servire come guardiani per i loro creatori oppure perseguire ambizioni rimaste incompiute in vita. Attaccano i nemici con incantesimi distruttivi e raffiche di fuoco, brandendo la magia senza necessitare della maggior parte delle componenti.\n\nI teschi fiammeggianti assumono forme diverse, da teschi con tratti quasi umani a teschi con alterazioni terrificanti o bestiali. Le loro fiamme variano nel colore e diventano più intense quando sono adirati.\n\nDettagli del Teschio Fiammeggiante (1d6) — il teschio fiammeggiante presenta...\n1 — Diagrammi arcani incisi sulla superficie.\n2 — Fiamme che formano tratti drammatici, corna o capelli.\n3 — Frammenti fratturati che volano all\'unisono.\n4 — Una piastra di ferro imbullonata sulla bocca.\n5 — Un trauma cranico letale.\n6 — Denti di animali non corrispondenti tra loro.\n\n«Non ho mai avuto bisogno del calore. Non ho mai avuto bisogno di un corpo. La mia volontà è sufficiente, e il mio lavoro sarà l\'eredità che renderà degno ogni sacrificio.»\n— Trenzia, Teschio Fiammeggiante di Sottomonte'
     }
   ];
 
