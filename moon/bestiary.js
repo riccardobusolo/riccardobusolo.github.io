@@ -2969,6 +2969,32 @@
       ],
       drop: [],
       notes: 'La Fine e l\'Inizio delle Ere\n\nHabitat: Caos Elementale (Planare)\nTesoro: Nessuno\n\nOltre i confini dei Piani Elementali, le forze primordiali si scontrano senza fine nel Caos Elementale. Nella vastità e nella violenza di questo reame infuriano i cataclismi elementali, entità generate dalle forze grezze del multiverso e immerse in poteri elementali dissonanti. Questi esseri di conflitto primordiale annientano quasi tutto ciò che incontrano e seminano le rovine lasciate sul loro cammino con il potenziale per nuove creazioni.\n\nI cataclismi elementali raramente sfuggono al Caos Elementale; quando accade è di solito a causa di una perturbazione planare o delle evocazioni di cultisti nichilisti. Nei mondi del Piano Materiale creano scie di distruzione capaci di alterare intere regioni, distruggendo città e gettando nazioni nel caos. Detestano tutto ciò che deturpa visibilmente la natura — miniere o monumenti, fortezze o città — ma riversano la rabbia più intensa sulle opere di metallo e sugli ingranaggi. Mentre seminano distruzione, ululano condanne e intonano parole di dissoluzione nelle lingue dei Piani Interni.\n\nPoco può fermare un cataclisma elementale. Chi vi si oppone spesso tenta di invertire il rituale che l\'ha evocato, di attirarlo attraverso una frattura planare oppure di evocare un altro titano nella speranza che i due si distruggano a vicenda. Quando i loro disastri si placano, il territorio viene permeato da nuova vita o da mutamenti ambientali.\n\nAlterazioni Elementali (1d8) — il cataclisma lascia dietro di sé...\n1 — Un drastico aumento o calo della temperatura.\n2 — Un\'enorme barriera corallina o una foresta fungina.\n3 — Una tempesta o un vortice senza fine.\n4 — Un passaggio verso il Sottosuolo o un portale per un Piano Elementale.\n5 — Una popolazione di animali primordiali o precedentemente estinti.\n6 — Una foresta pluviale in rapida crescita.\n7 — Un fiume dove prima non ce n\'era alcuno.\n8 — Una serie di spettacolari formazioni rocciose.'
+    },
+    {
+      id: 'preset_iota_empirea', name: 'Iota Empirea', emoji: '✨', rarity: 'uncommon',
+      type: 'Celestiale', size: 'Media', alignment: 'Neutrale',
+      ac: 13, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '5d8', init: 2,
+      speed: '1,5 m, Volare 9 m (fluttuare)', cr: '1', xp: '',
+      str: 1, dex: 14, con: 10, intl: 15, wis: 16, cha: 16,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { storia: '4', intuizione: '5', percezione: '5' }, passivePerception: 15,
+      senses: [{ type: 'Vista del Vero', value: 9, unit: 'm' }], languages: ['Tutti'],
+      dmgResist: ['Contundente', 'Perforante', 'Tagliente'], dmgImmune: [], dmgVulner: [],
+      condImmune: ['Prono'],
+      traits: [
+        { name: 'Movimento Incorporeo', desc: 'L\'iota può attraversare creature e oggetti come se fossero terreno difficile. Subisce 5 (1d10) danni da forza se termina il proprio turno all\'interno di un oggetto.' },
+        { name: 'Resistenza Magica', desc: 'L\'iota ha vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' }
+      ],
+      actions: [
+        { name: 'Colpo Ultraterreno', desc: 'Attacco con arma da mischia o a distanza: +5 a colpire, portata 1,5 metri o gittata 9 metri.\nColpito: 7 (1d8 + 3) danni necrotici oppure radiosi (a scelta dell\'iota).', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'necrotici o radiosi' }] },
+        { name: 'Incantesimi', desc: 'L\'iota lancia uno dei seguenti incantesimi senza componenti materiali, usando la Saggezza come caratteristica da incantatore.\n\n1/Giorno ciascuno: Benedizione, Ristorare Inferiore (come azione).' }
+      ],
+      bonusActions: [
+        { name: 'Parola Guaritrice (1/Giorno)', desc: 'L\'iota lancia Parola Guaritrice usando la stessa caratteristica da incantatore di Incantesimi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Glifi divini, schegge di luce o piccole icone della divinità da cui l\'iota proviene.' }],
+      notes: 'Progenie degli Dei\n\nHabitat: Qualsiasi\nTesoro: Reliquie\n\n(Celestiale o Immondo a seconda del genitore divino: celestiale per le divinità dei Piani Superiori, immondo per quelle dei Piani Inferiori.)\n\nGli empirei sono la progenie delle divinità. Pur non essendo essi stessi dèi, possiedono influenza divina e poteri legati ai loro genitori divini.\n\nLe iota empiree sono i pensieri, i ricordi o le attenzioni indirette delle divinità, personificati e dotati di una certa autonomia. Simili a glifi fluttuanti, scintille di colore, icone della divinità o forme bizzarre, questi esseri sono messaggeri degli dèi e assistenti dei loro servitori. Le iota possiedono conoscenze e personalità proprie, anche se potrebbero conoscere poco più dei reami e dei desideri dei loro creatori.\n\nInfluenze dell\'Empireo (1d6) — l\'iota possiede caratteristiche che sono...\n1 — Equilibrate, naturalistiche o che ricordano occhi che osservano.\n2 — Colorate, ombrose o fluide, oppure che variano a seconda dell\'osservatore.\n3 — Confortanti e gentili, o che richiamano piacevoli ricordi.\n4 — Parti scollegate, pensieri visibili o forme erratiche.\n5 — Simili a macchine, stoiche, simmetriche o evocative del giudizio.\n6 — Macabre, minacciose o mostruose, oppure che incarnano le paure dell\'osservatore.\n\n«Un giorno potrei essere il dio delle tempeste: guidare innumerevoli seguaci, rispondere alle preghiere, cambiare mondi interi. Ma fino ad allora farò ciò che mi pare.»\n— Kopoha, progenie delle tempeste'
     }
   ];
 
