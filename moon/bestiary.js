@@ -3905,6 +3905,99 @@
       reactions: [], legendaryActions: [],
       drop: [{ name: 'Armamenti', desc: 'Resti d\'osso e reliquie demoniache intrise della fame di Yeenoghu.' }],
       notes: 'Immondi in Carne Ferina\n\nHabitat: Deserto, Foresta, Prateria, Colline\nTesoro: Armamenti, Individuale\n\nGli gnoll demoniaci sono berserker sorti da gnoll nutriti ritualmente con carne corrotta dall\'Abisso. Incarnando la fame devastatrice di Yeenoghu, si gettano in battaglia incuranti della sopravvivenza o della propria vita, arrivando persino a divorare altri gnoll.\n\nI primi gnoll nacquero da iene che si nutrirono di carne contaminata dall\'Abisso. La loro corruzione e la loro violenza deliziarono il signore dei demoni Yeenoghu, che ne incoraggiò la diffusione e li sparse attraverso il multiverso. Da allora gli gnoll sono i servitori ghignanti di Yeenoghu, esistendo unicamente per portare rovina e banchettare con ciò che resta.\n\n«Yeenoghu considera gli gnoll non come la sua progenie, ma come vermi deliberatamente liberati per infestare una carcassa disprezzata. Sono una putrefazione perniciosa che la Bestia della Macellazione diffonde nei mondi mortali. Qualunque cosa fossero un tempo, sono stati rifatti e ora appartengono a lui.»\n— Iggwilv, Demonomicon di Iggwilv'
+    },
+    {
+      id: 'preset_goblin_gregario', name: 'Gregario Goblin', emoji: '🃏', rarity: 'common',
+      type: 'Fata', size: 'Piccola', alignment: 'Caotico Neutrale',
+      ac: 12, hp: 7, hpCur: 7, hpTemp: 0, hpDice: '2d6', init: 2,
+      speed: '9 m', cr: '1/8', xp: '',
+      str: 8, dex: 15, con: 10, intl: 10, wis: 8, cha: 8,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '6' }, passivePerception: 9,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune', 'Goblin'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Pugnale', desc: 'Attacco con arma da mischia o a distanza: +4 a colpire, portata 1,5 metri oppure gittata 6/18 metri.\nColpito: 4 (1d4 + 2) danni perforanti.', atkHit: '+4', atkDmgs: [{ f: '1d4+2', t: 'perforanti' }] }
+      ],
+      bonusActions: [
+        { name: 'Fuga Agile', desc: 'Il goblin effettua l\'azione Disimpegno o Nascondersi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Attrezzi', desc: 'Tre pugnali e cianfrusaglie raccolte qua e là.' }],
+      notes: 'Imbroglioni Selvaggi e Piantagrane\n\nHabitat: Foresta, Prateria, Colline, Planare (Acheronte, Feywild), Sottosuolo\nTesoro: Attrezzi, Individuale\n\nI gregari goblin amano partecipare ai piani distruttivi di capi astuti, ma sono rapidi a fuggire quando devono affrontare le conseguenze delle proprie azioni.\n\nI goblin sono incarnazioni del Feywild della sconsideratezza e della rovina. Si compiacciono della distruzione: più forte è il rumore, più energico è il caos e più contorta è la situazione, meglio è. Le loro incursioni sono spesso tanto un\'occasione per appiccare incendi e tormentare il bestiame quanto parte di piani più ampi.\n\nI goblin obbediscono a chi realizza i piani più sfrenati: menti geniali delle razzie, pomposi incantatori o chi sa fare il maggior baccano. Hobgoblin e altri umanoidi potenti possono comandarne gruppi turbolenti, indirizzandone la distruttività verso banditismo, sabotaggio o guerra.\n\nLa divinità Maglubiyet afferma di essere il dio di goblin, hobgoblin e bugbear e, sul Campo di Battaglia Infinito di Acheronte, comanda innumerevoli legioni goblinoidi. In ere lontane trasferì una popolazione di goblinoidi dal Feywild al suo reame nei Piani Esterni; da allora orde di questi goblin più marziali sono prosperate, e alcune hanno raggiunto il Piano Materiale per seminare rovina in preparazione alla conquista del loro dio.\n\n«Bree-yark!»\n— Traduzione approssimativa dal Goblin al Comune: «Ehi, stupido!»'
+    },
+    {
+      id: 'preset_goblin_guerriero', name: 'Guerriero Goblin', emoji: '🪖', rarity: 'common',
+      type: 'Fata', size: 'Piccola', alignment: 'Caotico Neutrale',
+      ac: 15, hp: 10, hpCur: 10, hpTemp: 0, hpDice: '3d6', init: 2,
+      speed: '9 m', cr: '1/4', xp: '',
+      str: 8, dex: 15, con: 10, intl: 10, wis: 8, cha: 8,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '6' }, passivePerception: 9,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune', 'Goblin'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Scimitarra', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 5 (1d6 + 2) danni taglienti; più 2 (1d4) danni taglienti se il tiro per colpire aveva vantaggio.', atkHit: '+4', atkDmgs: [{ f: '1d6+2', t: 'taglienti' }] },
+        { name: 'Arco Corto', desc: 'Attacco con arma a distanza: +4 a colpire, gittata 24/96 metri.\nColpito: 5 (1d6 + 2) danni perforanti; più 2 (1d4) danni perforanti se il tiro per colpire aveva vantaggio.', atkHit: '+4', atkDmgs: [{ f: '1d6+2', t: 'perforanti' }] }
+      ],
+      bonusActions: [
+        { name: 'Fuga Agile', desc: 'Il goblin effettua l\'azione Disimpegno o Nascondersi.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Armatura di cuoio, scimitarra, scudo e arco corto.' }],
+      notes: 'Imbroglioni Selvaggi e Piantagrane\n\nHabitat: Foresta, Prateria, Colline, Planare (Acheronte, Feywild), Sottosuolo\nTesoro: Attrezzi, Individuale\n\nI guerrieri goblin eccellono nel causare guai. Quelli al servizio di Maglubiyet possiedono maggiore disciplina e tendono a ritirarsi per preparare imboscate.\n\nI goblin sono incarnazioni del Feywild della sconsideratezza e della rovina. Si compiacciono della distruzione: più forte è il rumore, più energico è il caos e più contorta è la situazione, meglio è. Le loro incursioni sono spesso tanto un\'occasione per appiccare incendi e tormentare il bestiame quanto parte di piani più ampi.\n\nI goblin obbediscono a chi realizza i piani più sfrenati: menti geniali delle razzie, pomposi incantatori o chi sa fare il maggior baccano. Hobgoblin e altri umanoidi potenti possono comandarne gruppi turbolenti, indirizzandone la distruttività verso banditismo, sabotaggio o guerra.\n\nLa divinità Maglubiyet afferma di essere il dio di goblin, hobgoblin e bugbear e, sul Campo di Battaglia Infinito di Acheronte, comanda innumerevoli legioni goblinoidi. In ere lontane trasferì una popolazione di goblinoidi dal Feywild al suo reame nei Piani Esterni; da allora orde di questi goblin più marziali sono prosperate, e alcune hanno raggiunto il Piano Materiale per seminare rovina in preparazione alla conquista del loro dio.\n\n«Bree-yark!»\n— Traduzione approssimativa dal Goblin al Comune: «Ehi, stupido!»'
+    },
+    {
+      id: 'preset_goblin_capo', name: 'Capo Goblin', emoji: '🎖️', rarity: 'common',
+      type: 'Fata', size: 'Piccola', alignment: 'Caotico Neutrale',
+      ac: 17, hp: 21, hpCur: 21, hpTemp: 0, hpDice: '6d6', init: 2,
+      speed: '9 m', cr: '1', xp: '',
+      str: 10, dex: 15, con: 10, intl: 10, wis: 8, cha: 10,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '6' }, passivePerception: 9,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune', 'Goblin'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il goblin effettua due attacchi, usando Scimitarra o Arco Corto in qualsiasi combinazione.' },
+        { name: 'Scimitarra', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 5 (1d6 + 2) danni taglienti; più 2 (1d4) danni taglienti se il tiro per colpire aveva vantaggio.', atkHit: '+4', atkDmgs: [{ f: '1d6+2', t: 'taglienti' }] },
+        { name: 'Arco Corto', desc: 'Attacco con arma a distanza: +4 a colpire, gittata 24/96 metri.\nColpito: 5 (1d6 + 2) danni perforanti; più 2 (1d4) danni perforanti se il tiro per colpire aveva vantaggio.', atkHit: '+4', atkDmgs: [{ f: '1d6+2', t: 'perforanti' }] }
+      ],
+      bonusActions: [
+        { name: 'Fuga Agile', desc: 'Il goblin effettua l\'azione Disimpegno o Nascondersi.' }
+      ],
+      reactions: [
+        { name: 'Deviare Attacco', desc: 'Innesco: una creatura che il goblin può vedere effettua un tiro per colpire contro di lui.\nRisposta: il goblin sceglie un alleato Piccolo o Medio entro 1,5 metri da sé. Il goblin e quell\'alleato si scambiano di posto e l\'alleato diventa invece il bersaglio dell\'attacco.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Equipaggiamento', desc: 'Cotta di maglia, scimitarra, scudo e arco corto.' }],
+      notes: 'Imbroglioni Selvaggi e Piantagrane\n\nHabitat: Foresta, Prateria, Colline, Planare (Acheronte, Feywild), Sottosuolo\nTesoro: Attrezzi, Individuale\n\nI capi goblin sono spesso i goblin più fantasiosi, distruttivi o autoritari. Grazie a una combinazione di fortuna, codardia e spietatezza, evitano i pericoli a spese dei propri seguaci.\n\nI goblin sono incarnazioni del Feywild della sconsideratezza e della rovina. Si compiacciono della distruzione: più forte è il rumore, più energico è il caos e più contorta è la situazione, meglio è. Le loro incursioni sono spesso tanto un\'occasione per appiccare incendi e tormentare il bestiame quanto parte di piani più ampi.\n\nI goblin obbediscono a chi realizza i piani più sfrenati: menti geniali delle razzie, pomposi incantatori o chi sa fare il maggior baccano. Hobgoblin e altri umanoidi potenti possono comandarne gruppi turbolenti, indirizzandone la distruttività verso banditismo, sabotaggio o guerra.\n\nLa divinità Maglubiyet afferma di essere il dio di goblin, hobgoblin e bugbear e, sul Campo di Battaglia Infinito di Acheronte, comanda innumerevoli legioni goblinoidi. In ere lontane trasferì una popolazione di goblinoidi dal Feywild al suo reame nei Piani Esterni; da allora orde di questi goblin più marziali sono prosperate, e alcune hanno raggiunto il Piano Materiale per seminare rovina in preparazione alla conquista del loro dio.\n\n«Bree-yark!»\n— Traduzione approssimativa dal Goblin al Comune: «Ehi, stupido!»'
+    },
+    {
+      id: 'preset_goblin_malefico', name: 'Malefico Goblin', emoji: '🪬', rarity: 'uncommon',
+      type: 'Fata', size: 'Piccola', alignment: 'Caotico Neutrale',
+      ac: 13, hp: 45, hpCur: 45, hpTemp: 0, hpDice: '10d6+10', init: 3,
+      speed: '9 m', cr: '3', xp: '',
+      str: 8, dex: 16, con: 12, intl: 16, wis: 10, cha: 10,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { rapidita: '5', furtivita: '7' }, passivePerception: 10,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune', 'Goblin'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il goblin effettua due attacchi Bastone Maledetto. Può sostituire un attacco con un uso di Incantesimi.' },
+        { name: 'Bastone Maledetto', desc: 'Attacco con arma da mischia o a distanza: +5 a colpire, portata 1,5 metri oppure gittata 18 metri.\nColpito: 12 (2d8 + 3) danni psichici.', atkHit: '+5', atkDmgs: [{ f: '2d8+3', t: 'psichici' }] },
+        { name: 'Incantesimi', desc: 'Il goblin lancia uno dei seguenti incantesimi usando Intelligenza come caratteristica da incantatore (CD incantesimi 13):\nA volontà: Illusione Minore\n1/giorno ciascuno: Cecità/Sordità, Luminescenza, Unto' }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Malocchio', desc: 'Innesco: una creatura che il goblin può vedere lo colpisce con un tiro per colpire.\nRisposta — Tiro Salvezza su Saggezza CD 13, per la creatura che ha innescato l\'effetto.\nFallimento: l\'attacco manca invece di colpire.' }
+      ],
+      legendaryActions: [],
+      drop: [{ name: 'Attrezzi', desc: 'Bastone maledetto e ammennicoli magici da finto arcimago.' }],
+      notes: 'Imbroglioni Selvaggi e Piantagrane\n\nHabitat: Foresta, Prateria, Colline, Planare (Acheronte, Feywild), Sottosuolo\nTesoro: Attrezzi, Individuale\n\nI malefici goblin utilizzano magie appariscenti e destabilizzanti. Molti sono teatrali e si vestono e si comportano imitando in modo esagerato i grandi arcimaghi.\n\nI goblin sono incarnazioni del Feywild della sconsideratezza e della rovina. Si compiacciono della distruzione: più forte è il rumore, più energico è il caos e più contorta è la situazione, meglio è. Le loro incursioni sono spesso tanto un\'occasione per appiccare incendi e tormentare il bestiame quanto parte di piani più ampi.\n\nI goblin obbediscono a chi realizza i piani più sfrenati: menti geniali delle razzie, pomposi incantatori o chi sa fare il maggior baccano. Hobgoblin e altri umanoidi potenti possono comandarne gruppi turbolenti, indirizzandone la distruttività verso banditismo, sabotaggio o guerra.\n\nLa divinità Maglubiyet afferma di essere il dio di goblin, hobgoblin e bugbear e, sul Campo di Battaglia Infinito di Acheronte, comanda innumerevoli legioni goblinoidi. In ere lontane trasferì una popolazione di goblinoidi dal Feywild al suo reame nei Piani Esterni; da allora orde di questi goblin più marziali sono prosperate, e alcune hanno raggiunto il Piano Materiale per seminare rovina in preparazione alla conquista del loro dio.\n\n«Bree-yark!»\n— Traduzione approssimativa dal Goblin al Comune: «Ehi, stupido!»'
     }
   ];
 
