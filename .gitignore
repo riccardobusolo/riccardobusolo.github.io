@@ -1,5 +1,7 @@
 # Local Claude Code helpers (scripts, worktrees, launch config)
 .claude/
 
-# Local manual PDFs — too large for git, must be hosted elsewhere or kept local
-moon/risorse/*.pdf
+# Local resources — D&D manuals (large/copyrighted PDFs, incl. a 141MB file that
+# exceeds GitHub's 100MB limit) and personal character backups. Kept local only.
+# NB: the previous pattern moon/risorse/*.pdf did NOT match PDFs in subfolders.
+moon/risorse/
