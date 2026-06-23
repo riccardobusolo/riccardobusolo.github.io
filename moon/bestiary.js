@@ -38,6 +38,7 @@
   var BANDITI_TAIL = BANDITI_LORE + '\n\n' + BANDITI_MOTIV;
   var BERSERKER_LORE = 'Consumati dall\'adrenalina della battaglia, i berserker sono invasori spericolati, combattenti da arena e guerrieri feroci che vivono per il conflitto. La loro furia li rende avversari temibili, capaci di ignorare il dolore e combattere fino all\'ultimo respiro.';
   var DRAGHI_NERI_LORE = 'I draghi neri traggono piacere dalla sofferenza e dalla rovina. A differenza di altri draghi cromatici, che tramano per ottenere potere e ricchezze, essi desiderano distruggere tutto ciò che vedono e dominare le macerie che restano.\n\nSono creature terrificanti, caratterizzate da corna ricurve e da visi scheletrici che ricordano teschi demoniaci. Prediligono paludi stagnanti, rovine in rovina e luoghi corrotti dalla magia o dal degrado ambientale. Il loro soffio acido deturpa il territorio, consumando antiche statue e lasciando nella natura ferite permanenti.\n\nI draghi neri accumulano simboli di speranza infranta e reliquie di imperi caduti. Più un tesoro è desiderato o prezioso, maggiore è il piacere che provano nel possederlo, soprattutto se sono stati loro a causarne la perdita.';
+  var DRAGHI_ORO_LORE = 'I draghi d\'oro si adoperano per rendere il mondo un posto migliore. I più potenti tra i draghi metallici, queste creature maestose e ispiratrici si sforzano di proteggere tutto ciò che è buono e di piegare il destino verso un futuro più luminoso.\n\nLa loro natura benevola non impedisce ai draghi d\'oro di combattere quando necessario; essi esalano fiamme splendenti e magie indebolenti per sconfiggere i propri nemici.\n\nI draghi d\'oro prediligono praterie e foreste incontaminate, dimorando spesso vicino a meraviglie naturali mozzafiato o proteggendo monumenti di antiche civiltà. Nelle loro tane accumulano monete e gemme, ma spesso impiegano i loro tesori per perseguire obiettivi più elevati. Usano frequentemente le proprie ricchezze per acquistare libri rari, pagare informatori o finanziare avventurieri idealisti.';
   var BLIGHTS_LORE = 'I blights sono piante maligne nate da un male profondamente radicato. Le loro forme nodose e deformi presentano tratti inquietanti che ricordano arti umani e fauci fameliche. Si nascondono tra la vegetazione comune e tendono imboscate a tutte le creature che non appartengono al regno vegetale.\n\nSebbene alcuni blights agiscano autonomamente, la maggior parte serve le forze oscure che li hanno generati oppure creature malvagie capaci di dominare la natura. La magia che li crea spesso contamina anche la flora circostante, facendo proliferare rovi, liane e alberi contorti che invadono sentieri e campi, soffocano pozzi e ruscelli e costringono gli animali ad abbandonare il proprio habitat naturale.\n\nPer questo motivo, la comparsa dei blights è spesso il primo segnale di una corruzione più grande che si sta diffondendo.';
   var DRAGHI_BLU_LORE = 'Arroganti e imperiosi, i draghi blu sono draghi cromatici che bramano il controllo e raccolgono seguaci proprio come altri draghi accumulano tesori. Cercano di trasformare i propri territori in imperi, domini che intere nazioni temano.\n\nI draghi blu possiedono tratti affilati, corna perforanti e scaglie che variano dal colore dello zaffiro alle tonalità dei cieli tempestosi. Vivono nei deserti e nelle terre aride, in particolare nelle regioni caratterizzate da spettacolari pinnacoli rocciosi dai quali possono osservare per chilometri.\n\nScelgono di costruire le loro tane vicino a luoghi dal forte valore simbolico, come fortezze giganti abbandonate, colossi di imperi caduti o monumenti eretti dai loro seguaci.\n\nLe insegne del potere sovrano e i capolavori artistici riempiono i tesori dei draghi blu. Questi draghi non mostrano interesse per tesori comuni o imperfetti: preferiscono gemme uniche nel loro genere, corone appartenute a sovrani decaduti e oggetti magici capaci di diffondere la loro influenza.';
   var DRAGHI_BLU_TANA = '— Tane dei Draghi Blu —\nI draghi blu vivono in terre aride. Le loro tane possono essere trappole mortali progettate per intrappolare gli invasori oppure ostentate fortezze da cui pianificano la propria dominazione. La regione entro 1 miglio dalla tana di un drago blu adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nVoragini: ogni volta che una creatura nell\'area (diversa dal drago e dai suoi alleati) completa un Riposo Lungo, tira 1d20; con un 1 una voragine si apre sotto di essa, che deve superare un Tiro Salvezza su Destrezza CD 15 oppure precipitare per 2d4 × 10 piedi.\n\nTempeste Malevole: tempeste di sabbia e temporali infuriano entro 1 miglio dalla tana e l\'area è Leggermente Oscurata.\n\nSe il drago muore o sposta la propria tana altrove, questi effetti terminano immediatamente.';
@@ -979,6 +980,116 @@
       ],
       drop: [{ name: 'Reliquie', desc: 'Reliquie di imperi caduti e simboli di speranza infranta accumulati nei secoli dal drago.' }],
       notes: 'Draghi della Decadenza e della Disperazione\n\nHabitat: Palude\nTesoro: Reliquie\n\n' + DRAGHI_NERI_LORE + '\n\n— Effetti della Tana —\nUn drago nero antico altera il territorio entro 1,5 km dalla sua tana.\n\nFoschia Acrida: una nebbia soffocante e maleodorante copre l\'area, che diventa Leggermente Oscurata; il viaggio richiede il doppio del tempo per chiunque non sia il drago o i suoi alleati.\n\nAcque Corrotte: le fonti d\'acqua entro 1,5 km dalla tana sono contaminate soprannaturalmente. Una creatura che beve quell\'acqua deve superare un Tiro Salvezza su Costituzione CD 15 oppure ottenere la condizione Avvelenato per 1 ora.\n\nSe il drago muore o abbandona la tana, questi effetti cessano immediatamente.\n\n(Affrontato nella propria tana, il drago vale 41.000 PE.)'
+    },
+    {
+      id: 'preset_cucciolo_drago_oro', name: 'Cucciolo di Drago d\'Oro', emoji: '🐲', rarity: 'legendary',
+      type: 'Drago', size: 'Media', alignment: 'Legale Buono',
+      ac: 17, hp: 60, hpCur: 60, hpTemp: 0, hpDice: '8d8+24', init: 4,
+      speed: '9 m, Volare 18 m, Nuotare 9 m', cr: '3', xp: '',
+      str: 19, dex: 14, con: 17, intl: 14, wis: 11, cha: 16,
+      savesOverride: { str: '', dex: '4', con: '', intl: '', wis: '2', cha: '' },
+      skillOverrides: { percezione: '4', furtivita: '4' }, passivePerception: 14,
+      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua due attacchi Lacerazione.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 9 (1d10 + 4) danni taglienti.', atkHit: '+6', atkDmgs: [{ f: '1d10+4', t: 'taglienti' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 13, ogni creatura in un cono di 4,5 metri.\nFallimento: 22 (4d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '4d10', t: 'fuoco' }] },
+        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 13, ogni creatura in un cono di 4,5 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 2 (1d4) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcana', desc: 'Monete e gemme, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
+      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\n' + DRAGHI_ORO_LORE
+    },
+    {
+      id: 'preset_giovane_drago_oro', name: 'Giovane Drago d\'Oro', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Grande', alignment: 'Legale Buono',
+      ac: 18, hp: 178, hpCur: 178, hpTemp: 0, hpDice: '17d10+85', init: 6,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '10', xp: '',
+      str: 23, dex: 14, con: 21, intl: 16, wis: 13, cha: 20,
+      savesOverride: { str: '', dex: '6', con: '', intl: '', wis: '5', cha: '' },
+      skillOverrides: { intuizione: '5', percezione: '9', persuasione: '9', furtivita: '6' }, passivePerception: 19,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con un uso di Soffio Indebolente.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +10 a colpire, portata 3 metri.\nColpito: 17 (2d10 + 6) danni taglienti.', atkHit: '+10', atkDmgs: [{ f: '2d10+6', t: 'taglienti' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 17, ogni creatura in un cono di 9 metri.\nFallimento: 55 (10d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '10d10', t: 'fuoco' }] },
+        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 17, ogni creatura in un cono di 9 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 3 (1d6) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcana', desc: 'Monete e gemme, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
+      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\nI giovani draghi d\'oro hanno già intravisto i veri mali del mondo e intraprendono una crociata per contrastarli. Spesso cercano soluzioni dirette e coraggiose ai problemi.\n\n' + DRAGHI_ORO_LORE
+    },
+    {
+      id: 'preset_drago_oro_adulto', name: 'Drago d\'Oro Adulto', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Enorme', alignment: 'Legale Buono',
+      ac: 19, hp: 243, hpCur: 243, hpTemp: 0, hpDice: '18d12+126', init: 14,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '17', xp: '',
+      str: 27, dex: 14, con: 25, intl: 16, wis: 15, cha: 24,
+      savesOverride: { str: '', dex: '8', con: '', intl: '', wis: '8', cha: '' },
+      skillOverrides: { intuizione: '8', percezione: '14', persuasione: '13', furtivita: '8' }, passivePerception: 24,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' },
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con (A) un uso di Incantesimi per lanciare Dardo Tracciante (versione di 2° livello) oppure (B) Soffio Indebolente.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +14 a colpire, portata 3 metri.\nColpito: 17 (2d8 + 8) danni taglienti più 4 (1d8) danni da fuoco.', atkHit: '+14', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '1d8', t: 'fuoco' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 21, ogni creatura in un cono di 18 metri.\nFallimento: 66 (12d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '12d10', t: 'fuoco' }] },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza richiedere componenti materiali e usa Carisma come caratteristica da incantatore (CD degli incantesimi 21):\n\nA volontà: Individuazione del Magico, Dardo Tracciante (versione di 2° livello), Trasformazione (solo forma di Bestia o Umanoide; l\'incantesimo non concede punti ferita temporanei e non richiede concentrazione né punti ferita temporanei per essere mantenuto).\n\n1 volta al giorno ciascuno: Colpo Infuocato, Zona di Verità.' },
+        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 21, ogni creatura in un cono di 18 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 3 (1d6) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi di Azione Leggendaria: 3 (4 nella Tana)', desc: 'Immediatamente dopo il turno di un\'altra creatura, il drago può spendere un uso per compiere una delle azioni seguenti. Recupera tutti gli usi spesi all\'inizio di ogni suo turno.' },
+        { name: 'Esiliare', desc: 'Tiro Salvezza su Carisma: CD 21, una creatura che il drago può vedere entro 36 metri.\nFallimento: 10 (3d6) danni da forza e il bersaglio ottiene la condizione Incapacitato ed è trasportato in un semipiano innocuo fino all\'inizio del turno successivo del drago; a quel punto riappare in uno spazio libero scelto dal drago entro 36 metri.\nFallimento o Successo: il drago non può usare di nuovo questa azione fino all\'inizio del suo prossimo turno.', atkDmgs: [{ f: '3d6', t: 'forza' }] },
+        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Tracciante (versione di 2° livello).' },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della sua Velocità ed effettua un attacco Lacerazione.', atkHit: '+14', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '1d8', t: 'fuoco' }] }
+      ],
+      drop: [{ name: 'Arcana', desc: 'Monete e gemme, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
+      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\nI draghi d\'oro adulti agiscono con sottigliezza, cambiando spesso forma per assumere l\'aspetto di animali innocui o coltivando identità fittizie che consentano loro di passare per comuni mortali.\n\n' + DRAGHI_ORO_LORE + '\n\n— Effetti della Tana —\nLa regione attorno alla tana di un drago d\'oro adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti.\n\nMessaggero dei Sogni: mentre si trova nella propria tana, il drago può lanciare Sogno senza componenti materiali e usando Carisma come caratteristica da incantatore; può scegliere come bersaglio qualsiasi creatura entro 10 chilometri dalla tana.\n\nNebbia Profetica: l\'area entro 1 miglio dalla tana è Leggermente Oscurata da una nebbia opalescente. Finché si trovano in quell\'area, le creature non possono essere sorprese, poiché la nebbia turbinante assume forme che avvertono dei pericoli imminenti.\n\nSe il drago muore o sposta altrove la propria tana, questi effetti terminano immediatamente.\n\n(Affrontato nella propria tana, il drago vale 20.000 PE.)'
+    },
+    {
+      id: 'preset_drago_oro_antico', name: 'Drago d\'Oro Antico', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Mastodontica', alignment: 'Legale Buono',
+      ac: 22, hp: 546, hpCur: 546, hpTemp: 0, hpDice: '28d20+252', init: 16,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '24', xp: '',
+      str: 30, dex: 14, con: 29, intl: 18, wis: 17, cha: 28,
+      savesOverride: { str: '', dex: '9', con: '', intl: '', wis: '10', cha: '' },
+      skillOverrides: { intuizione: '10', percezione: '17', persuasione: '16', furtivita: '9' }, passivePerception: 27,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' },
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con (A) un uso di Incantesimi per lanciare Dardo Tracciante (versione di 4° livello) oppure (B) Soffio Indebolente.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +17 a colpire, portata 4,5 metri.\nColpito: 19 (2d8 + 10) danni taglienti più 9 (2d8) danni da fuoco.', atkHit: '+17', atkDmgs: [{ f: '2d8+10', t: 'taglienti' }, { f: '2d8', t: 'fuoco' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 24, ogni creatura in un cono di 27 metri.\nFallimento: 71 (13d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '13d10', t: 'fuoco' }] },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza richiedere componenti materiali e usa Carisma come caratteristica da incantatore (CD degli incantesimi 24):\n\nA volontà: Individuazione del Magico, Dardo Tracciante (versione di 4° livello), Trasformazione (solo forma di Bestia o Umanoide; l\'incantesimo non concede punti ferita temporanei e non richiede concentrazione né punti ferita temporanei per essere mantenuto).\n\n1 volta al giorno ciascuno: Colpo Infuocato (versione di 6° livello), Parola del Ritiro, Zona di Verità.' },
+        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 24, ogni creatura in un cono di 27 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 5 (1d10) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi di Azione Leggendaria: 3 (4 nella Tana)', desc: 'Immediatamente dopo il turno di un\'altra creatura, il drago può spendere un uso per compiere una delle azioni seguenti. Recupera tutti gli usi spesi all\'inizio di ogni suo turno.' },
+        { name: 'Esiliare', desc: 'Tiro Salvezza su Carisma: CD 24, una creatura che il drago può vedere entro 36 metri.\nFallimento: 24 (7d6) danni da forza e il bersaglio ottiene la condizione Incapacitato ed è trasportato in un semipiano innocuo fino all\'inizio del turno successivo del drago; a quel punto riappare in uno spazio libero scelto dal drago entro 36 metri.\nFallimento o Successo: il drago non può usare di nuovo questa azione fino all\'inizio del suo prossimo turno.', atkDmgs: [{ f: '7d6', t: 'forza' }] },
+        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Tracciante (versione di 4° livello).' },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della sua Velocità ed effettua un attacco Lacerazione.', atkHit: '+17', atkDmgs: [{ f: '2d8+10', t: 'taglienti' }, { f: '2d8', t: 'fuoco' }] }
+      ],
+      drop: [{ name: 'Arcana', desc: 'Monete e gemme accumulate nei secoli, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
+      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\nGli antichi draghi d\'oro sono saggi e misteriosi. Molti aiutano gruppi virtuosi, guidandoli in segreto o sostenendoli da lontano. Solo quando la posta in gioco raggiunge il massimo essi si rivelano in tutta la loro maestà.\n\n' + DRAGHI_ORO_LORE + '\n\n— Effetti della Tana —\nLa regione attorno alla tana di un drago d\'oro adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti.\n\nMessaggero dei Sogni: mentre si trova nella propria tana, il drago può lanciare Sogno senza componenti materiali e usando Carisma come caratteristica da incantatore; può scegliere come bersaglio qualsiasi creatura entro 10 chilometri dalla tana.\n\nNebbia Profetica: l\'area entro 1 miglio dalla tana è Leggermente Oscurata da una nebbia opalescente. Finché si trovano in quell\'area, le creature non possono essere sorprese, poiché la nebbia turbinante assume forme che avvertono dei pericoli imminenti.\n\nSe il drago muore o sposta altrove la propria tana, questi effetti terminano immediatamente.\n\n(Affrontato nella propria tana, il drago vale 75.000 PE.)'
     },
     {
       id: 'preset_melma_nera', name: 'Melma Nera', emoji: '⚫', rarity: 'common',
