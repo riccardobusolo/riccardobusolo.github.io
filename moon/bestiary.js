@@ -39,6 +39,10 @@
   var BERSERKER_LORE = 'Consumati dall\'adrenalina della battaglia, i berserker sono invasori spericolati, combattenti da arena e guerrieri feroci che vivono per il conflitto. La loro furia li rende avversari temibili, capaci di ignorare il dolore e combattere fino all\'ultimo respiro.';
   var DRAGHI_NERI_LORE = 'I draghi neri traggono piacere dalla sofferenza e dalla rovina. A differenza di altri draghi cromatici, che tramano per ottenere potere e ricchezze, essi desiderano distruggere tutto ciò che vedono e dominare le macerie che restano.\n\nSono creature terrificanti, caratterizzate da corna ricurve e da visi scheletrici che ricordano teschi demoniaci. Prediligono paludi stagnanti, rovine in rovina e luoghi corrotti dalla magia o dal degrado ambientale. Il loro soffio acido deturpa il territorio, consumando antiche statue e lasciando nella natura ferite permanenti.\n\nI draghi neri accumulano simboli di speranza infranta e reliquie di imperi caduti. Più un tesoro è desiderato o prezioso, maggiore è il piacere che provano nel possederlo, soprattutto se sono stati loro a causarne la perdita.';
   var DRAGHI_ORO_LORE = 'I draghi d\'oro si adoperano per rendere il mondo un posto migliore. I più potenti tra i draghi metallici, queste creature maestose e ispiratrici si sforzano di proteggere tutto ciò che è buono e di piegare il destino verso un futuro più luminoso.\n\nLa loro natura benevola non impedisce ai draghi d\'oro di combattere quando necessario; essi esalano fiamme splendenti e magie indebolenti per sconfiggere i propri nemici.\n\nI draghi d\'oro prediligono praterie e foreste incontaminate, dimorando spesso vicino a meraviglie naturali mozzafiato o proteggendo monumenti di antiche civiltà. Nelle loro tane accumulano monete e gemme, ma spesso impiegano i loro tesori per perseguire obiettivi più elevati. Usano frequentemente le proprie ricchezze per acquistare libri rari, pagare informatori o finanziare avventurieri idealisti.';
+  var GORGONI_LORE = 'Simili a possenti tori rivestiti di piastre di ferro, i gorgoni sono automi semoventi che cercano di distruggere chiunque entri nei loro territori. Oltre a incornare i nemici con le loro letali corna e a calpestarli sotto gli zoccoli ferrati, i gorgoni esalano getti di gas nocivo.\n\nI gorgoni vengono creati dagli incantatori per servire come guardiani. Il processo di creazione è lungo e pericoloso: un metodo richiede lo scheletro di un toro, il sangue di una medusa e il cervello di un basilisco fusi in una struttura di ferro incantato. Se il processo fallisce, dai materiali emerge un gas pietrificante che crea una minaccia magica capace di riempire una struttura e permanere per anni.\n\nQuando gli incantatori creano gorgoni, spesso li incantano affinché ignorino coloro che si presentano davanti alla creatura con una specifica chiave di comando, solitamente una parola d\'ordine o un particolare segnale. Una volta assegnato alla difesa di un\'area, il gorgone attacca chiunque vi entri finché questi non fugga o venga distrutto. Se qualcuno fornisce la corretta chiave di comando, il mostro ignora quell\'intruso finché rimane nel suo campo visivo. Tuttavia, se l\'intruso esce dalla vista del gorgone e poi ritorna senza presentare nuovamente la chiave di comando, il gorgone attacca.\n\nColoro che creano gorgoni si sforzano di rendere volutamente oscure le chiavi di comando. Indizi su di esse potrebbero trovarsi tra gli appunti del creatore del gorgone o nell\'area che il costrutto protegge, magari scarabocchiati come ultimo atto di un intruso pietrificato.\n\nChiavi di Comando del Gorgone (d6) — il gorgone non attaccherà chi:\n1. Lancia uno specifico incantesimo in presenza del gorgone.\n2. Tiene le spalle rivolte al gorgone o si comporta come se non vedesse il mostro.\n3. Offre una bevanda composta da sangue, acqua o vino.\n4. Recita una specifica filastrocca o canta una determinata canzone.\n5. Pronuncia al contrario il nome del suo creatore.\n6. Indossa una maschera, magari a forma di toro o di un animale significativo per il creatore del gorgone.';
+  var DRAGHI_VERDI_LORE = 'Dalle profondità delle foreste proibite, i draghi verdi sussurrano malvagità nel mondo e manipolano la vita di coloro che li ascoltano. Elusivi, intriganti ed egoisti, questi draghi cromatici si nutrono pazientemente delle paure delle creature dalla vita più breve, corrompendole e isolandole. I draghi verdi possono nascondersi in terre selvagge labirintiche per secoli senza rivelarsi; persino i loro seguaci più devoti potrebbero conoscerli soltanto come la voce dei boschi o un sussurro nei loro sogni.\n\nNonostante la loro potenza, la maggior parte dei draghi verdi disprezza la violenza fisica, considerando il combattimento un compito da servitori e preferendo invece attirare gli sciocchi in situazioni pericolose o sfruttabili. Questi draghi collezionano "ninnoli" che incarnano le loro reti di manipolazione e fungono da strumenti di estorsione, come documenti compromettenti, cimeli di famiglia e tesori sentimentali.';
+  var GRICK_LORE = 'I grick sono predatori vermiformi che balzano fuori dal loro nascondiglio — agitando e schioccando i tentacoli — per divorare qualunque preda passi nelle vicinanze. Si nascondono nelle profonde fenditure delle caverne o tra gli animali morti; ossa sparse e gli averi dei loro pasti precedenti sono spesso l\'unica prova della loro presenza.\n\nLe origini dei grick sono incerte, ma alcuni sostengono che queste creature derivino da vermi naturali o da vertebrati simili mutati da fenomeni magici. Molti considerano la presenza di grick in una regione come prova dell\'esistenza di portali verso altri piani di esistenza, di oggetti magici leggendari o di potenti esseri soprannaturali.';
+  var GUARDIE_LORE = 'Le guardie proteggono persone, luoghi e beni, sia per denaro sia per senso del dovere. Possono svolgere i loro compiti con vigilanza oppure con distrazione. Alcune danno l\'allarme al primo segno di pericolo e difendono coloro che sono affidati alla loro protezione a costo della vita. Altre, invece, fuggono senza esitazione se il compenso non è all\'altezza del pericolo che devono affrontare.\n\n«Per distinguere i diversi gruppi di guardiani di Waterdeep, ricordate questo utile promemoria: la Guardia protegge le mura, mentre la Guardia Cittadina sorveglia tutti.»\n— Volothamp Geddarm, leggendario esploratore';
   var BLIGHTS_LORE = 'I blights sono piante maligne nate da un male profondamente radicato. Le loro forme nodose e deformi presentano tratti inquietanti che ricordano arti umani e fauci fameliche. Si nascondono tra la vegetazione comune e tendono imboscate a tutte le creature che non appartengono al regno vegetale.\n\nSebbene alcuni blights agiscano autonomamente, la maggior parte serve le forze oscure che li hanno generati oppure creature malvagie capaci di dominare la natura. La magia che li crea spesso contamina anche la flora circostante, facendo proliferare rovi, liane e alberi contorti che invadono sentieri e campi, soffocano pozzi e ruscelli e costringono gli animali ad abbandonare il proprio habitat naturale.\n\nPer questo motivo, la comparsa dei blights è spesso il primo segnale di una corruzione più grande che si sta diffondendo.';
   var DRAGHI_BLU_LORE = 'Arroganti e imperiosi, i draghi blu sono draghi cromatici che bramano il controllo e raccolgono seguaci proprio come altri draghi accumulano tesori. Cercano di trasformare i propri territori in imperi, domini che intere nazioni temano.\n\nI draghi blu possiedono tratti affilati, corna perforanti e scaglie che variano dal colore dello zaffiro alle tonalità dei cieli tempestosi. Vivono nei deserti e nelle terre aride, in particolare nelle regioni caratterizzate da spettacolari pinnacoli rocciosi dai quali possono osservare per chilometri.\n\nScelgono di costruire le loro tane vicino a luoghi dal forte valore simbolico, come fortezze giganti abbandonate, colossi di imperi caduti o monumenti eretti dai loro seguaci.\n\nLe insegne del potere sovrano e i capolavori artistici riempiono i tesori dei draghi blu. Questi draghi non mostrano interesse per tesori comuni o imperfetti: preferiscono gemme uniche nel loro genere, corone appartenute a sovrani decaduti e oggetti magici capaci di diffondere la loro influenza.';
   var DRAGHI_BLU_TANA = '— Tane dei Draghi Blu —\nI draghi blu vivono in terre aride. Le loro tane possono essere trappole mortali progettate per intrappolare gli invasori oppure ostentate fortezze da cui pianificano la propria dominazione. La regione entro 1 miglio dalla tana di un drago blu adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti regionali.\n\nVoragini: ogni volta che una creatura nell\'area (diversa dal drago e dai suoi alleati) completa un Riposo Lungo, tira 1d20; con un 1 una voragine si apre sotto di essa, che deve superare un Tiro Salvezza su Destrezza CD 15 oppure precipitare per 2d4 × 10 piedi.\n\nTempeste Malevole: tempeste di sabbia e temporali infuriano entro 1 miglio dalla tana e l\'area è Leggermente Oscurata.\n\nSe il drago muore o sposta la propria tana altrove, questi effetti terminano immediatamente.';
@@ -980,116 +984,6 @@
       ],
       drop: [{ name: 'Reliquie', desc: 'Reliquie di imperi caduti e simboli di speranza infranta accumulati nei secoli dal drago.' }],
       notes: 'Draghi della Decadenza e della Disperazione\n\nHabitat: Palude\nTesoro: Reliquie\n\n' + DRAGHI_NERI_LORE + '\n\n— Effetti della Tana —\nUn drago nero antico altera il territorio entro 1,5 km dalla sua tana.\n\nFoschia Acrida: una nebbia soffocante e maleodorante copre l\'area, che diventa Leggermente Oscurata; il viaggio richiede il doppio del tempo per chiunque non sia il drago o i suoi alleati.\n\nAcque Corrotte: le fonti d\'acqua entro 1,5 km dalla tana sono contaminate soprannaturalmente. Una creatura che beve quell\'acqua deve superare un Tiro Salvezza su Costituzione CD 15 oppure ottenere la condizione Avvelenato per 1 ora.\n\nSe il drago muore o abbandona la tana, questi effetti cessano immediatamente.\n\n(Affrontato nella propria tana, il drago vale 41.000 PE.)'
-    },
-    {
-      id: 'preset_cucciolo_drago_oro', name: 'Cucciolo di Drago d\'Oro', emoji: '🐲', rarity: 'legendary',
-      type: 'Drago', size: 'Media', alignment: 'Legale Buono',
-      ac: 17, hp: 60, hpCur: 60, hpTemp: 0, hpDice: '8d8+24', init: 4,
-      speed: '9 m, Volare 18 m, Nuotare 9 m', cr: '3', xp: '',
-      str: 19, dex: 14, con: 17, intl: 14, wis: 11, cha: 16,
-      savesOverride: { str: '', dex: '4', con: '', intl: '', wis: '2', cha: '' },
-      skillOverrides: { percezione: '4', furtivita: '4' }, passivePerception: 14,
-      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico'],
-      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
-      traits: [
-        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' }
-      ],
-      actions: [
-        { name: 'Multiattacco', desc: 'Il drago effettua due attacchi Lacerazione.' },
-        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 9 (1d10 + 4) danni taglienti.', atkHit: '+6', atkDmgs: [{ f: '1d10+4', t: 'taglienti' }] },
-        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 13, ogni creatura in un cono di 4,5 metri.\nFallimento: 22 (4d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '4d10', t: 'fuoco' }] },
-        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 13, ogni creatura in un cono di 4,5 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 2 (1d4) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
-      ],
-      bonusActions: [], reactions: [], legendaryActions: [],
-      drop: [{ name: 'Arcana', desc: 'Monete e gemme, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
-      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\n' + DRAGHI_ORO_LORE
-    },
-    {
-      id: 'preset_giovane_drago_oro', name: 'Giovane Drago d\'Oro', emoji: '🐉', rarity: 'legendary',
-      type: 'Drago', size: 'Grande', alignment: 'Legale Buono',
-      ac: 18, hp: 178, hpCur: 178, hpTemp: 0, hpDice: '17d10+85', init: 6,
-      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '10', xp: '',
-      str: 23, dex: 14, con: 21, intl: 16, wis: 13, cha: 20,
-      savesOverride: { str: '', dex: '6', con: '', intl: '', wis: '5', cha: '' },
-      skillOverrides: { intuizione: '5', percezione: '9', persuasione: '9', furtivita: '6' }, passivePerception: 19,
-      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
-      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
-      traits: [
-        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' }
-      ],
-      actions: [
-        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con un uso di Soffio Indebolente.' },
-        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +10 a colpire, portata 3 metri.\nColpito: 17 (2d10 + 6) danni taglienti.', atkHit: '+10', atkDmgs: [{ f: '2d10+6', t: 'taglienti' }] },
-        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 17, ogni creatura in un cono di 9 metri.\nFallimento: 55 (10d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '10d10', t: 'fuoco' }] },
-        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 17, ogni creatura in un cono di 9 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 3 (1d6) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
-      ],
-      bonusActions: [], reactions: [], legendaryActions: [],
-      drop: [{ name: 'Arcana', desc: 'Monete e gemme, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
-      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\nI giovani draghi d\'oro hanno già intravisto i veri mali del mondo e intraprendono una crociata per contrastarli. Spesso cercano soluzioni dirette e coraggiose ai problemi.\n\n' + DRAGHI_ORO_LORE
-    },
-    {
-      id: 'preset_drago_oro_adulto', name: 'Drago d\'Oro Adulto', emoji: '🐉', rarity: 'legendary',
-      type: 'Drago', size: 'Enorme', alignment: 'Legale Buono',
-      ac: 19, hp: 243, hpCur: 243, hpTemp: 0, hpDice: '18d12+126', init: 14,
-      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '17', xp: '',
-      str: 27, dex: 14, con: 25, intl: 16, wis: 15, cha: 24,
-      savesOverride: { str: '', dex: '8', con: '', intl: '', wis: '8', cha: '' },
-      skillOverrides: { intuizione: '8', percezione: '14', persuasione: '13', furtivita: '8' }, passivePerception: 24,
-      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
-      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
-      traits: [
-        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' },
-        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
-      ],
-      actions: [
-        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con (A) un uso di Incantesimi per lanciare Dardo Tracciante (versione di 2° livello) oppure (B) Soffio Indebolente.' },
-        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +14 a colpire, portata 3 metri.\nColpito: 17 (2d8 + 8) danni taglienti più 4 (1d8) danni da fuoco.', atkHit: '+14', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '1d8', t: 'fuoco' }] },
-        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 21, ogni creatura in un cono di 18 metri.\nFallimento: 66 (12d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '12d10', t: 'fuoco' }] },
-        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza richiedere componenti materiali e usa Carisma come caratteristica da incantatore (CD degli incantesimi 21):\n\nA volontà: Individuazione del Magico, Dardo Tracciante (versione di 2° livello), Trasformazione (solo forma di Bestia o Umanoide; l\'incantesimo non concede punti ferita temporanei e non richiede concentrazione né punti ferita temporanei per essere mantenuto).\n\n1 volta al giorno ciascuno: Colpo Infuocato, Zona di Verità.' },
-        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 21, ogni creatura in un cono di 18 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 3 (1d6) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
-      ],
-      bonusActions: [],
-      reactions: [],
-      legendaryActions: [
-        { name: 'Usi di Azione Leggendaria: 3 (4 nella Tana)', desc: 'Immediatamente dopo il turno di un\'altra creatura, il drago può spendere un uso per compiere una delle azioni seguenti. Recupera tutti gli usi spesi all\'inizio di ogni suo turno.' },
-        { name: 'Esiliare', desc: 'Tiro Salvezza su Carisma: CD 21, una creatura che il drago può vedere entro 36 metri.\nFallimento: 10 (3d6) danni da forza e il bersaglio ottiene la condizione Incapacitato ed è trasportato in un semipiano innocuo fino all\'inizio del turno successivo del drago; a quel punto riappare in uno spazio libero scelto dal drago entro 36 metri.\nFallimento o Successo: il drago non può usare di nuovo questa azione fino all\'inizio del suo prossimo turno.', atkDmgs: [{ f: '3d6', t: 'forza' }] },
-        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Tracciante (versione di 2° livello).' },
-        { name: 'Balzo', desc: 'Il drago si muove fino a metà della sua Velocità ed effettua un attacco Lacerazione.', atkHit: '+14', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '1d8', t: 'fuoco' }] }
-      ],
-      drop: [{ name: 'Arcana', desc: 'Monete e gemme, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
-      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\nI draghi d\'oro adulti agiscono con sottigliezza, cambiando spesso forma per assumere l\'aspetto di animali innocui o coltivando identità fittizie che consentano loro di passare per comuni mortali.\n\n' + DRAGHI_ORO_LORE + '\n\n— Effetti della Tana —\nLa regione attorno alla tana di un drago d\'oro adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti.\n\nMessaggero dei Sogni: mentre si trova nella propria tana, il drago può lanciare Sogno senza componenti materiali e usando Carisma come caratteristica da incantatore; può scegliere come bersaglio qualsiasi creatura entro 10 chilometri dalla tana.\n\nNebbia Profetica: l\'area entro 1 miglio dalla tana è Leggermente Oscurata da una nebbia opalescente. Finché si trovano in quell\'area, le creature non possono essere sorprese, poiché la nebbia turbinante assume forme che avvertono dei pericoli imminenti.\n\nSe il drago muore o sposta altrove la propria tana, questi effetti terminano immediatamente.\n\n(Affrontato nella propria tana, il drago vale 20.000 PE.)'
-    },
-    {
-      id: 'preset_drago_oro_antico', name: 'Drago d\'Oro Antico', emoji: '🐉', rarity: 'legendary',
-      type: 'Drago', size: 'Mastodontica', alignment: 'Legale Buono',
-      ac: 22, hp: 546, hpCur: 546, hpTemp: 0, hpDice: '28d20+252', init: 16,
-      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '24', xp: '',
-      str: 30, dex: 14, con: 29, intl: 18, wis: 17, cha: 28,
-      savesOverride: { str: '', dex: '9', con: '', intl: '', wis: '10', cha: '' },
-      skillOverrides: { intuizione: '10', percezione: '17', persuasione: '16', furtivita: '9' }, passivePerception: 27,
-      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
-      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
-      traits: [
-        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' },
-        { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' }
-      ],
-      actions: [
-        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con (A) un uso di Incantesimi per lanciare Dardo Tracciante (versione di 4° livello) oppure (B) Soffio Indebolente.' },
-        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +17 a colpire, portata 4,5 metri.\nColpito: 19 (2d8 + 10) danni taglienti più 9 (2d8) danni da fuoco.', atkHit: '+17', atkDmgs: [{ f: '2d8+10', t: 'taglienti' }, { f: '2d8', t: 'fuoco' }] },
-        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 24, ogni creatura in un cono di 27 metri.\nFallimento: 71 (13d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '13d10', t: 'fuoco' }] },
-        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza richiedere componenti materiali e usa Carisma come caratteristica da incantatore (CD degli incantesimi 24):\n\nA volontà: Individuazione del Magico, Dardo Tracciante (versione di 4° livello), Trasformazione (solo forma di Bestia o Umanoide; l\'incantesimo non concede punti ferita temporanei e non richiede concentrazione né punti ferita temporanei per essere mantenuto).\n\n1 volta al giorno ciascuno: Colpo Infuocato (versione di 6° livello), Parola del Ritiro, Zona di Verità.' },
-        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 24, ogni creatura in un cono di 27 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 5 (1d10) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
-      ],
-      bonusActions: [],
-      reactions: [],
-      legendaryActions: [
-        { name: 'Usi di Azione Leggendaria: 3 (4 nella Tana)', desc: 'Immediatamente dopo il turno di un\'altra creatura, il drago può spendere un uso per compiere una delle azioni seguenti. Recupera tutti gli usi spesi all\'inizio di ogni suo turno.' },
-        { name: 'Esiliare', desc: 'Tiro Salvezza su Carisma: CD 24, una creatura che il drago può vedere entro 36 metri.\nFallimento: 24 (7d6) danni da forza e il bersaglio ottiene la condizione Incapacitato ed è trasportato in un semipiano innocuo fino all\'inizio del turno successivo del drago; a quel punto riappare in uno spazio libero scelto dal drago entro 36 metri.\nFallimento o Successo: il drago non può usare di nuovo questa azione fino all\'inizio del suo prossimo turno.', atkDmgs: [{ f: '7d6', t: 'forza' }] },
-        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Tracciante (versione di 4° livello).' },
-        { name: 'Balzo', desc: 'Il drago si muove fino a metà della sua Velocità ed effettua un attacco Lacerazione.', atkHit: '+17', atkDmgs: [{ f: '2d8+10', t: 'taglienti' }, { f: '2d8', t: 'fuoco' }] }
-      ],
-      drop: [{ name: 'Arcana', desc: 'Monete e gemme accumulate nei secoli, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
-      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\nGli antichi draghi d\'oro sono saggi e misteriosi. Molti aiutano gruppi virtuosi, guidandoli in segreto o sostenendoli da lontano. Solo quando la posta in gioco raggiunge il massimo essi si rivelano in tutta la loro maestà.\n\n' + DRAGHI_ORO_LORE + '\n\n— Effetti della Tana —\nLa regione attorno alla tana di un drago d\'oro adulto o antico viene alterata dalla sua presenza, producendo i seguenti effetti.\n\nMessaggero dei Sogni: mentre si trova nella propria tana, il drago può lanciare Sogno senza componenti materiali e usando Carisma come caratteristica da incantatore; può scegliere come bersaglio qualsiasi creatura entro 10 chilometri dalla tana.\n\nNebbia Profetica: l\'area entro 1 miglio dalla tana è Leggermente Oscurata da una nebbia opalescente. Finché si trovano in quell\'area, le creature non possono essere sorprese, poiché la nebbia turbinante assume forme che avvertono dei pericoli imminenti.\n\nSe il drago muore o sposta altrove la propria tana, questi effetti terminano immediatamente.\n\n(Affrontato nella propria tana, il drago vale 75.000 PE.)'
     },
     {
       id: 'preset_melma_nera', name: 'Melma Nera', emoji: '⚫', rarity: 'common',
@@ -4109,6 +4003,617 @@
       legendaryActions: [],
       drop: [{ name: 'Attrezzi', desc: 'Bastone maledetto e ammennicoli magici da finto arcimago.' }],
       notes: 'Imbroglioni Selvaggi e Piantagrane\n\nHabitat: Foresta, Prateria, Colline, Planare (Acheronte, Feywild), Sottosuolo\nTesoro: Attrezzi, Individuale\n\nGli sciamani goblin utilizzano magie appariscenti e destabilizzanti. Molti sono teatrali e si vestono e si comportano imitando in modo esagerato i grandi arcimaghi.\n\nI goblin sono incarnazioni del Feywild della sconsideratezza e della rovina. Si compiacciono della distruzione: più forte è il rumore, più energico è il caos e più contorta è la situazione, meglio è. Le loro incursioni sono spesso tanto un\'occasione per appiccare incendi e tormentare il bestiame quanto parte di piani più ampi.\n\nI goblin obbediscono a chi realizza i piani più sfrenati: menti geniali delle razzie, pomposi incantatori o chi sa fare il maggior baccano. Hobgoblin e altri umanoidi potenti possono comandarne gruppi turbolenti, indirizzandone la distruttività verso banditismo, sabotaggio o guerra.\n\nLa divinità Maglubiyet afferma di essere il dio di goblin, hobgoblin e bugbear e, sul Campo di Battaglia Infinito di Acheronte, comanda innumerevoli legioni goblinoidi. In ere lontane trasferì una popolazione di goblinoidi dal Feywild al suo reame nei Piani Esterni; da allora orde di questi goblin più marziali sono prosperate, e alcune hanno raggiunto il Piano Materiale per seminare rovina in preparazione alla conquista del loro dio.\n\n«Bree-yark!»\n— Traduzione approssimativa dal Goblin al Comune: «Ehi, stupido!»'
+    },
+    {
+      id: 'preset_cucciolo_drago_oro', name: 'Cucciolo di Drago d\'Oro', emoji: '🐲', rarity: 'legendary',
+      type: 'Drago', size: 'Media', alignment: 'Legale Buono',
+      ac: 17, hp: 60, hpCur: 60, hpTemp: 0, hpDice: '8d8+24', init: 4,
+      speed: '9 m, Volare 18 m, Nuotare 9 m', cr: '3', xp: '',
+      str: 19, dex: 14, con: 17, intl: 14, wis: 11, cha: 16,
+      savesOverride: { str: '', dex: '4', con: '', intl: '', wis: '2', cha: '' },
+      skillOverrides: { percezione: '4', furtivita: '4' }, passivePerception: 14,
+      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua due attacchi Lacerazione.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 9 (1d10 + 4) danni taglienti.', atkHit: '+6', atkDmgs: [{ f: '1d10+4', t: 'taglienti' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 13, ogni creatura in un cono di 4,5 metri.\nFallimento: 22 (4d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '4d10', t: 'fuoco' }] },
+        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 13, ogni creatura in un cono di 4,5 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 2 (1d4) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcana', desc: 'Monete e gemme, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
+      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\n' + DRAGHI_ORO_LORE
+    },
+    {
+      id: 'preset_giovane_drago_oro', name: 'Giovane Drago d\'Oro', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Grande', alignment: 'Legale Buono',
+      ac: 18, hp: 178, hpCur: 178, hpTemp: 0, hpDice: '17d10+85', init: 6,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '10', xp: '',
+      str: 23, dex: 14, con: 21, intl: 16, wis: 13, cha: 20,
+      savesOverride: { str: '', dex: '6', con: '', intl: '', wis: '5', cha: '' },
+      skillOverrides: { intuizione: '5', percezione: '9', persuasione: '9', furtivita: '6' }, passivePerception: 19,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con un uso di Soffio Indebolente.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +10 a colpire, portata 3 metri.\nColpito: 17 (2d10 + 6) danni taglienti.', atkHit: '+10', atkDmgs: [{ f: '2d10+6', t: 'taglienti' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 17, ogni creatura in un cono di 9 metri.\nFallimento: 55 (10d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '10d10', t: 'fuoco' }] },
+        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 17, ogni creatura in un cono di 9 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 3 (1d6) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcana', desc: 'Monete e gemme, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
+      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\nI giovani draghi d\'oro hanno già intravisto i veri mali del mondo e intraprendono una crociata per contrastarli. Spesso cercano soluzioni dirette e coraggiose ai problemi.\n\n' + DRAGHI_ORO_LORE
+    },
+    {
+      id: 'preset_drago_oro_adulto', name: 'Drago d\'Oro Adulto', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Enorme', alignment: 'Legale Buono',
+      ac: 19, hp: 243, hpCur: 243, hpTemp: 0, hpDice: '18d12+126', init: 14,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '17', xp: '',
+      str: 27, dex: 14, con: 25, intl: 16, wis: 15, cha: 24,
+      savesOverride: { str: '', dex: '8', con: '', intl: '', wis: '8', cha: '' },
+      skillOverrides: { intuizione: '8', percezione: '14', persuasione: '13', furtivita: '8' }, passivePerception: 24,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' },
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' },
+        { name: 'Effetti della Tana', desc: 'La regione attorno alla tana di un drago d\'oro adulto o antico viene alterata dalla sua presenza:\n\nMessaggero dei Sogni: mentre si trova nella propria tana, il drago può lanciare Sogno senza componenti materiali e usando Carisma come caratteristica da incantatore; può scegliere come bersaglio qualsiasi creatura entro 10 chilometri dalla tana.\n\nNebbia Profetica: l\'area entro 1 miglio dalla tana è Leggermente Oscurata da una nebbia opalescente. Finché si trovano in quell\'area, le creature non possono essere sorprese, poiché la nebbia turbinante assume forme che avvertono dei pericoli imminenti.\n\nSe il drago muore o sposta altrove la propria tana, questi effetti terminano immediatamente.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con (A) un uso di Incantesimi per lanciare Dardo Tracciante (versione di 2° livello) oppure (B) Soffio Indebolente.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +14 a colpire, portata 3 metri.\nColpito: 17 (2d8 + 8) danni taglienti più 4 (1d8) danni da fuoco.', atkHit: '+14', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '1d8', t: 'fuoco' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 21, ogni creatura in un cono di 18 metri.\nFallimento: 66 (12d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '12d10', t: 'fuoco' }] },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza richiedere componenti materiali e usa Carisma come caratteristica da incantatore (CD degli incantesimi 21):\n\nA volontà: Individuazione del Magico, Dardo Tracciante (versione di 2° livello), Trasformazione (solo forma di Bestia o Umanoide; l\'incantesimo non concede punti ferita temporanei e non richiede concentrazione né punti ferita temporanei per essere mantenuto).\n\n1 volta al giorno ciascuno: Colpo Infuocato, Zona di Verità.' },
+        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 21, ogni creatura in un cono di 18 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 3 (1d6) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi di Azione Leggendaria: 3 (4 nella Tana)', desc: 'Immediatamente dopo il turno di un\'altra creatura, il drago può spendere un uso per compiere una delle azioni seguenti. Recupera tutti gli usi spesi all\'inizio di ogni suo turno.' },
+        { name: 'Esiliare', desc: 'Tiro Salvezza su Carisma: CD 21, una creatura che il drago può vedere entro 36 metri.\nFallimento: 10 (3d6) danni da forza e il bersaglio ottiene la condizione Incapacitato ed è trasportato in un semipiano innocuo fino all\'inizio del turno successivo del drago; a quel punto riappare in uno spazio libero scelto dal drago entro 36 metri.\nFallimento o Successo: il drago non può usare di nuovo questa azione fino all\'inizio del suo prossimo turno.', atkDmgs: [{ f: '3d6', t: 'forza' }] },
+        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Tracciante (versione di 2° livello).' },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della sua Velocità ed effettua un attacco Lacerazione.', atkHit: '+14', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '1d8', t: 'fuoco' }] }
+      ],
+      drop: [{ name: 'Arcana', desc: 'Monete e gemme, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
+      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\nI draghi d\'oro adulti agiscono con sottigliezza, cambiando spesso forma per assumere l\'aspetto di animali innocui o coltivando identità fittizie che consentano loro di passare per comuni mortali.\n\n' + DRAGHI_ORO_LORE + '\n\n(Affrontato nella propria tana, il drago vale 20.000 PE.)'
+    },
+    {
+      id: 'preset_drago_oro_antico', name: 'Drago d\'Oro Antico', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Mastodontica', alignment: 'Legale Buono',
+      ac: 22, hp: 546, hpCur: 546, hpTemp: 0, hpDice: '28d20+252', init: 16,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '24', xp: '',
+      str: 30, dex: 14, con: 29, intl: 18, wis: 17, cha: 28,
+      savesOverride: { str: '', dex: '9', con: '', intl: '', wis: '10', cha: '' },
+      skillOverrides: { intuizione: '10', percezione: '17', persuasione: '16', furtivita: '9' }, passivePerception: 27,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' },
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di superarlo invece.' },
+        { name: 'Effetti della Tana', desc: 'La regione attorno alla tana di un drago d\'oro adulto o antico viene alterata dalla sua presenza:\n\nMessaggero dei Sogni: mentre si trova nella propria tana, il drago può lanciare Sogno senza componenti materiali e usando Carisma come caratteristica da incantatore; può scegliere come bersaglio qualsiasi creatura entro 10 chilometri dalla tana.\n\nNebbia Profetica: l\'area entro 1 miglio dalla tana è Leggermente Oscurata da una nebbia opalescente. Finché si trovano in quell\'area, le creature non possono essere sorprese, poiché la nebbia turbinante assume forme che avvertono dei pericoli imminenti.\n\nSe il drago muore o sposta altrove la propria tana, questi effetti terminano immediatamente.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Lacerazione. Può sostituire uno degli attacchi con (A) un uso di Incantesimi per lanciare Dardo Tracciante (versione di 4° livello) oppure (B) Soffio Indebolente.' },
+        { name: 'Lacerazione', desc: 'Attacco con arma da mischia: +17 a colpire, portata 4,5 metri.\nColpito: 19 (2d8 + 10) danni taglienti più 9 (2d8) danni da fuoco.', atkHit: '+17', atkDmgs: [{ f: '2d8+10', t: 'taglienti' }, { f: '2d8', t: 'fuoco' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 24, ogni creatura in un cono di 27 metri.\nFallimento: 71 (13d10) danni da fuoco. Successo: metà danni.', atkDmgs: [{ f: '13d10', t: 'fuoco' }] },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza richiedere componenti materiali e usa Carisma come caratteristica da incantatore (CD degli incantesimi 24):\n\nA volontà: Individuazione del Magico, Dardo Tracciante (versione di 4° livello), Trasformazione (solo forma di Bestia o Umanoide; l\'incantesimo non concede punti ferita temporanei e non richiede concentrazione né punti ferita temporanei per essere mantenuto).\n\n1 volta al giorno ciascuno: Colpo Infuocato (versione di 6° livello), Parola del Ritiro, Zona di Verità.' },
+        { name: 'Soffio Indebolente', desc: 'Tiro Salvezza su Forza: CD 24, ogni creatura in un cono di 27 metri che non sia già sotto l\'effetto di questo soffio.\nFallimento: il bersaglio ha Svantaggio alle prove di d20 basate sulla Forza e sottrae 5 (1d10) dai propri tiri per i danni. Ripete il tiro salvezza alla fine di ciascun suo turno, terminando l\'effetto su di sé in caso di successo. Dopo 1 minuto, il successo è automatico.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Usi di Azione Leggendaria: 3 (4 nella Tana)', desc: 'Immediatamente dopo il turno di un\'altra creatura, il drago può spendere un uso per compiere una delle azioni seguenti. Recupera tutti gli usi spesi all\'inizio di ogni suo turno.' },
+        { name: 'Esiliare', desc: 'Tiro Salvezza su Carisma: CD 24, una creatura che il drago può vedere entro 36 metri.\nFallimento: 24 (7d6) danni da forza e il bersaglio ottiene la condizione Incapacitato ed è trasportato in un semipiano innocuo fino all\'inizio del turno successivo del drago; a quel punto riappare in uno spazio libero scelto dal drago entro 36 metri.\nFallimento o Successo: il drago non può usare di nuovo questa azione fino all\'inizio del suo prossimo turno.', atkDmgs: [{ f: '7d6', t: 'forza' }] },
+        { name: 'Luce Guida', desc: 'Il drago usa Incantesimi per lanciare Dardo Tracciante (versione di 4° livello).' },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della sua Velocità ed effettua un attacco Lacerazione.', atkHit: '+17', atkDmgs: [{ f: '2d8+10', t: 'taglienti' }, { f: '2d8', t: 'fuoco' }] }
+      ],
+      drop: [{ name: 'Arcana', desc: 'Monete e gemme accumulate nei secoli, spesso impiegate per scopi più elevati: libri rari, informatori o avventurieri idealisti da finanziare.' }],
+      notes: 'Draghi della Speranza e della Maestà\n\nHabitat: Foresta, Prateria\nTesoro: Arcana\n\nGli antichi draghi d\'oro sono saggi e misteriosi. Molti aiutano gruppi virtuosi, guidandoli in segreto o sostenendoli da lontano. Solo quando la posta in gioco raggiunge il massimo essi si rivelano in tutta la loro maestà.\n\n' + DRAGHI_ORO_LORE + '\n\n(Affrontato nella propria tana, il drago vale 75.000 PE.)'
+    },
+    {
+      id: 'preset_gorgone', name: 'Gorgone', emoji: '🐂', rarity: 'uncommon',
+      type: 'Costrutto', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 19, hp: 114, hpCur: 114, hpTemp: 0, hpDice: '12d10+48', init: 0,
+      speed: '12 m', cr: '5', xp: '',
+      str: 20, dex: 11, con: 18, intl: 2, wis: 12, cha: 7,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '7' }, passivePerception: 17,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: ['Affaticamento', 'Pietrificato'],
+      traits: [],
+      actions: [
+        { name: 'Incornata', desc: 'Attacco con arma da mischia: +8 a colpire, portata 1,5 metri.\nColpito: 18 (2d12 + 5) danni perforanti.\nSe il bersaglio è una creatura Grande o più piccola e il gorgone si è mosso di almeno 6 metri in linea retta verso di essa immediatamente prima del colpo, il bersaglio ottiene la condizione Prono.', atkHit: '+8', atkDmgs: [{ f: '2d12+5', t: 'perforanti' }] },
+        { name: 'Soffio Pietrificante (Ricarica 5-6)', desc: 'Tiro Salvezza su Costituzione: CD 15, ogni creatura in un cono di 9 metri.\nPrimo Fallimento: il bersaglio ottiene la condizione Trattenuto e ripete il tiro salvezza alla fine del suo turno successivo se è ancora Trattenuto, terminando l\'effetto su di sé in caso di successo.\nSecondo Fallimento: il bersaglio ottiene invece la condizione Pietrificato.' }
+      ],
+      bonusActions: [
+        { name: 'Travolgere', desc: 'Tiro Salvezza su Destrezza: CD 16, una creatura entro 1,5 metri che abbia la condizione Prono.\nFallimento: 16 (2d10 + 5) danni contundenti.\nSuccesso: metà danni.', atkDmgs: [{ f: '2d10+5', t: 'contundenti' }] }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Tesoro assortito, spesso disperso tra i resti pietrificati dei nemici e nei luoghi che il gorgone sorveglia.' }],
+      notes: 'Guardiani Taurini dal Soffio Pietrificante\n\nHabitat: Foresta, Prateria, Colline\nTesoro: Qualsiasi\n\nLa maggior parte dei gorgoni è costituita da tori di ferro avvolti in nubi di gas pietrificante. Le loro piastre metalliche variano per lucentezza e colore, dall\'argento levigato al nero corroso. I gorgoni più antichi possono essere coperti di ruggine, ma questo raramente ostacola le loro capacità.\n\nI terreni che essi percorrono sono disseminati dei resti frantumati di nemici pietrificati. Molti gorgoni sopravvivono ai loro creatori per secoli, inducendo alcuni a credere che queste creature abbiano origini e territori naturali. La maggior parte continua invece a seguire antichi ordini, sorvegliando luoghi da tempo caduti in rovina.\n\n' + GORGONI_LORE
+    },
+    {
+      id: 'preset_gorgone_bronzo', name: 'Gorgone di Bronzo', emoji: '🐃', rarity: 'rare',
+      type: 'Costrutto', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 19, hp: 161, hpCur: 161, hpTemp: 0, hpDice: '17d10+68', init: 2,
+      speed: '12 m', cr: '9', xp: '',
+      str: 18, dex: 14, con: 19, intl: 2, wis: 14, cha: 7,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '10' }, passivePerception: 20,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: ['Affaticamento', 'Pietrificato'],
+      traits: [
+        { name: 'Aura di Fiamma', desc: 'Alla fine di ciascun turno del gorgone, ogni creatura entro un\'emanazione di 1,5 metri originata dal gorgone subisce 13 (3d8) danni da fuoco.', atkDmgs: [{ f: '3d8', t: 'fuoco' }] },
+        { name: 'Illuminazione', desc: 'Il gorgone emette Luce Intensa in un raggio di 3 metri e Luce Fioca per ulteriori 3 metri.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il gorgone effettua due attacchi Incornata.' },
+        { name: 'Incornata', desc: 'Attacco con arma da mischia: +8 a colpire, portata 1,5 metri.\nColpito: 11 (2d6 + 4) danni perforanti più 10 (3d6) danni da fuoco.', atkHit: '+8', atkDmgs: [{ f: '2d6+4', t: 'perforanti' }, { f: '3d6', t: 'fuoco' }] },
+        { name: 'Carica Fusa (Ricarica 5-6)', desc: 'Il gorgone si muove fino alla propria Velocità senza provocare Attacchi di Opportunità e può attraversare gli spazi occupati da creature Medie o più piccole.\nOgni volta che il gorgone entra per la prima volta nello spazio di una creatura durante questo movimento, il bersaglio subisce il seguente effetto.\nTiro Salvezza su Destrezza: CD 16.\nFallimento: 13 (2d8 + 4) danni perforanti più 13 (3d8) danni da fuoco, e il bersaglio viene trascinato nello spazio del gorgone ottenendo la condizione Afferrato (CD 14 per sfuggire). Se il gorgone sta già trattenendo una creatura, il bersaglio ottiene invece la condizione Prono.\nFinché la presa non termina, il bersaglio ha la condizione Trattenuto. Quando il gorgone si muove, il bersaglio afferrato si muove con lui senza richiedere movimento aggiuntivo.', atkDmgs: [{ f: '2d8+4', t: 'perforanti' }, { f: '3d8', t: 'fuoco' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Tesoro assortito, spesso tra i resti dei nemici nei siti blasfemi che il gorgone di bronzo sorveglia.' }],
+      notes: 'Guardiani Taurini dal Soffio Pietrificante\n\nHabitat: Foresta, Prateria, Colline\nTesoro: Qualsiasi\n\n«Fra i progetti sparsi del mio eccentrico antenato vi era lo schema di un mostro bovino delle paludi e una nota minacciosa: "Fai di meglio".»\n— Lum il Maestro, Mente di Metallo\n\nI seguaci dell\'arcidiavolo esiliato Moloch modificarono il processo di creazione dei gorgoni per forgiare i propri guardiani diabolici chiamati gorgoni di bronzo.\n\nQuesti gorgoni sono automi cavi dalla forma taurina i cui corpi metallici ardono di un calore intenso. Quando caricano i nemici, le costole della loro struttura si aprono come gabbie per intrappolare le vittime e arrostirle al loro interno.\n\nI gorgoni di bronzo si trovano spesso in siti blasfemi dedicati a Moloch, ad altri arcidiavoli o a divinità assetate di sangue.\n\n' + GORGONI_LORE
+    },
+    {
+      id: 'preset_goristro', name: 'Goristro', emoji: '👹', rarity: 'epic',
+      type: 'Immondo', size: 'Enorme', alignment: 'Caotico Malvagio',
+      ac: 19, hp: 310, hpCur: 310, hpTemp: 0, hpDice: '23d12+161', init: 6,
+      speed: '15 m', cr: '17', xp: '',
+      str: 25, dex: 11, con: 25, intl: 6, wis: 13, cha: 14,
+      savesOverride: { str: '13', dex: '6', con: '13', intl: '', wis: '7', cha: '' },
+      skillOverrides: { percezione: '7', sopravvivenza: '7' }, passivePerception: 17,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Abissale'],
+      dmgResist: ['Freddo', 'Fuoco', 'Fulmine'], dmgImmune: ['Veleno'], dmgVulner: [], condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Restaurazione Demoniaca', desc: 'Se il goristro muore al di fuori dell\'Abisso, il suo corpo si dissolve in icore ed esso ottiene istantaneamente un nuovo corpo, tornando in vita con tutti i suoi punti ferita in un luogo dell\'Abisso.' },
+        { name: 'Resistenza Magica', desc: 'Il goristro ha Vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Mostro d\'Assedio', desc: 'Il goristro infligge il doppio dei danni agli oggetti e alle strutture.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il goristro effettua un attacco Incornata Brutale e due attacchi Schianto.' },
+        { name: 'Incornata Brutale', desc: 'Attacco con arma da mischia: +13 a colpire, portata 3 metri.\nColpito: 40 (6d10 + 7) danni perforanti.\nSe il bersaglio è una creatura Enorme o più piccola, viene spinto fino a 6 metri in linea retta lontano dal goristro e ottiene la condizione Prono.', atkHit: '+13', atkDmgs: [{ f: '6d10+7', t: 'perforanti' }] },
+        { name: 'Schianto', desc: 'Attacco con arma da mischia: +13 a colpire, portata 3 metri.\nColpito: 29 (4d10 + 7) danni contundenti.', atkHit: '+13', atkDmgs: [{ f: '4d10+7', t: 'contundenti' }] }
+      ],
+      bonusActions: [
+        { name: 'Carica', desc: 'Il goristro si muove fino a metà della sua Velocità in linea retta verso un nemico che può vedere.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Resti d\'armi, armature e macchine da guerra dei nemici schiacciati dal demone.' }],
+      notes: 'Demone della Distruzione\n\nHabitat: Planare (Abisso)\nTesoro: Armamenti\n\nTerrificanti per dimensioni e potenza schiacciante, i goristro sono demoni giganteschi capaci di ridurre città in rovina. Questi demoni incarnano l\'anarchia insensata e la distruzione nichilista, e nutrono una particolare avversione per creature o strutture che possano rivaleggiare con loro in grandezza. Castelli, torri, giganti e bestie da guerra sono vittime frequenti della loro furia.\n\nI goristro assomigliano a minotauri primitivi e ricurvi, segnati dalle cicatrici delle guerre dell\'Abisso o dalle ferite inflitte da possenti macchine da guerra. Il loro aspetto riflette quello del loro creatore, Bafomet, il signore dei demoni venerato da molti minotauri malvagi. I goristro percorrono il reame abissale di Bafomet, noto come il Labirinto Infinito, e fanno a pezzi ogni non-demone che incontrano in quell\'immenso labirinto magico.\n\n«Complotta e pianifica, attira in trappola e macchina inganni, ma la superbia non è un\'armatura contro la rovina incarnata, e creature ben più grandi di te sono già cadute sotto l\'assalto dell\'Abisso.»\n— Mellagorus il Demone della Fossa, Inganni e Strategie'
+    },
+    {
+      id: 'preset_melma_grigia', name: 'Melma Grigia', emoji: '🪨', rarity: 'common',
+      type: 'Melma', size: 'Media', alignment: 'Senza Allineamento',
+      ac: 9, hp: 22, hpCur: 22, hpTemp: 0, hpDice: '3d8+9', init: -2,
+      speed: '3 m, Scalare 3 m', cr: '1/2', xp: '',
+      str: 12, dex: 6, con: 16, intl: 1, wis: 6, cha: 2,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '2' }, passivePerception: 8,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: [],
+      dmgResist: ['Acido', 'Freddo', 'Fuoco'], dmgImmune: [], dmgVulner: [], condImmune: ['Accecato', 'Affascinato', 'Assordato', 'Affaticamento', 'Spaventato', 'Afferrato', 'Prono', 'Trattenuto'],
+      traits: [
+        { name: 'Amorfa', desc: 'La melma può muoversi attraverso uno spazio stretto fino a 2,5 centimetri senza spendere movimento aggiuntivo.' },
+        { name: 'Forma Corrosiva', desc: 'Le munizioni non magiche vengono immediatamente distrutte quando colpiscono la melma e le infliggono danni.\nUn\'arma non magica subisce una penalità cumulativa di −1 ai tiri per colpire immediatamente dopo aver inflitto danni alla melma ed essere entrata in contatto con essa. L\'arma viene distrutta se la penalità raggiunge −5.\nLa penalità può essere rimossa lanciando l\'incantesimo Riparare sull\'arma.\nLa melma può divorare in un round fino a 5 centimetri di metallo o legno non magico.' }
+      ],
+      actions: [
+        { name: 'Pseudopode', desc: 'Attacco con arma da mischia: +3 a colpire, portata 1,5 metri.\nColpito: 10 (2d8 + 1) danni da acido.\nL\'armatura non magica indossata dal bersaglio subisce una penalità di −1 alla CA che fornisce. L\'armatura viene distrutta se la penalità riduce la sua CA a 10. La penalità può essere rimossa lanciando l\'incantesimo Riparare sull\'armatura.', atkHit: '+3', atkDmgs: [{ f: '2d8+1', t: 'acido' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Melme Affamate e Fallimenti Magici\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nLe melme grigie sono melme predatorie e corrosive che si confondono facilmente con gli ambienti rocciosi circostanti.\n\nLe melme grigie compaiono in aree influenzate da magie imprevedibili. Gli incantatori che falliscono nel tentativo di vincolare spiriti elementali ai corpi dei Costrutti possono anch\'essi creare accidentalmente delle melme grigie.'
+    },
+    {
+      id: 'preset_melma_grigia_psichica', name: 'Melma Grigia Psichica', emoji: '🧠', rarity: 'common',
+      type: 'Melma', size: 'Media', alignment: 'Senza Allineamento',
+      ac: 9, hp: 37, hpCur: 37, hpTemp: 0, hpDice: '5d8+15', init: -1,
+      speed: '3 m, Scalare 3 m', cr: '1', xp: '',
+      str: 12, dex: 8, con: 16, intl: 10, wis: 6, cha: 2,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '3' }, passivePerception: 8,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: [],
+      dmgResist: ['Acido', 'Freddo', 'Fuoco', 'Psichico'], dmgImmune: [], dmgVulner: [], condImmune: ['Accecato', 'Affascinato', 'Assordato', 'Affaticamento', 'Spaventato', 'Afferrato', 'Prono', 'Trattenuto'],
+      traits: [
+        { name: 'Amorfa', desc: 'La melma può muoversi attraverso uno spazio stretto fino a 2,5 centimetri senza spendere movimento aggiuntivo.' }
+      ],
+      actions: [
+        { name: 'Pseudopode', desc: 'Attacco con arma da mischia: +3 a colpire, portata 1,5 metri.\nColpito: 11 (3d6 + 1) danni da acido e il bersaglio ha Svantaggio ai tiri salvezza su Intelligenza fino alla fine del turno successivo della melma.', atkHit: '+3', atkDmgs: [{ f: '3d6+1', t: 'acido' }] },
+        { name: 'Schianto Psichico', desc: 'Tiro Salvezza su Intelligenza: CD 10, una creatura che la melma può vedere entro 18 metri.\nFallimento: 13 (3d8) danni psichici.', atkDmgs: [{ f: '3d8', t: 'psichici' }] }
+      ],
+      bonusActions: [],
+      reactions: [
+        { name: 'Corrosione Mentale', desc: 'Innesco: la melma fallisce un tiro salvezza contro un incantesimo o un altro effetto magico creato da una creatura.\nRisposta: la creatura che ha generato l\'effetto innescante subisce 3 (1d6) danni psichici.', atkDmgs: [{ f: '1d6', t: 'psichici' }] }
+      ],
+      legendaryActions: [],
+      drop: [],
+      notes: 'Melme Affamate e Fallimenti Magici\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nLe melme grigie sono melme predatorie e corrosive che si confondono facilmente con gli ambienti rocciosi circostanti.\n\nLe melme grigie psichiche manifestano violente capacità psioniche. Queste melme talvolta derivano da tentativi falliti di evocare o creare creature legate al Piano Elementale della Terra, come gargoyle o homunculus.'
+    },
+    {
+      id: 'preset_cucciolo_drago_verde', name: 'Cucciolo di Drago Verde', emoji: '🐲', rarity: 'epic',
+      type: 'Drago', size: 'Media', alignment: 'Legale Malvagio',
+      ac: 17, hp: 38, hpCur: 38, hpTemp: 0, hpDice: '7d8+7', init: 3,
+      speed: '9 m, Volare 18 m, Nuotare 9 m', cr: '2', xp: '',
+      str: 15, dex: 12, con: 13, intl: 14, wis: 11, cha: 13,
+      savesOverride: { str: '', dex: '3', con: '', intl: '', wis: '2', cha: '' },
+      skillOverrides: { percezione: '4', furtivita: '3' }, passivePerception: 14,
+      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Draconico'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [], condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua due attacchi Squarcio.' },
+        { name: 'Squarcio', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 7 (1d10 + 2) danni taglienti più 3 (1d6) danni da veleno.', atkHit: '+4', atkDmgs: [{ f: '1d10+2', t: 'taglienti' }, { f: '1d6', t: 'veleno' }] },
+        { name: 'Soffio Velenoso (Ricarica 5-6)', desc: 'Tiro Salvezza su Costituzione: CD 11, ogni creatura in un cono di 4,5 metri.\nFallimento: 21 (6d6) danni da veleno. Successo: metà danni.', atkDmgs: [{ f: '6d6', t: 'veleno' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcana', desc: 'Documenti compromettenti, cimeli di famiglia e tesori sentimentali — i "ninnoli" che incarnano le reti di manipolazione del drago.' }],
+      notes: 'Draghi dell\'Inganno e della Derisione\n\nHabitat: Foresta\nTesoro: Arcana\n\nI cuccioli di drago verde spesso fungono da pedine nei piani dei draghi più anziani. Spiando gli agenti di quei draghi, i cuccioli apprendono l\'arte della manipolazione. Una volta accumulata influenza e una schiera di servitori, questi giovani draghi partono per reclamare i propri territori e perseguire le loro sinistre ambizioni.\n\n' + DRAGHI_VERDI_LORE
+    },
+    {
+      id: 'preset_giovane_drago_verde', name: 'Giovane Drago Verde', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Grande', alignment: 'Legale Malvagio',
+      ac: 18, hp: 136, hpCur: 136, hpTemp: 0, hpDice: '16d10+48', init: 4,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '8', xp: '',
+      str: 19, dex: 12, con: 17, intl: 16, wis: 13, cha: 15,
+      savesOverride: { str: '', dex: '4', con: '', intl: '', wis: '4', cha: '' },
+      skillOverrides: { inganno: '5', percezione: '7', furtivita: '4' }, passivePerception: 17,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [], condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Squarcio.' },
+        { name: 'Squarcio', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 11 (2d6 + 4) danni taglienti più 7 (2d6) danni da veleno.', atkHit: '+7', atkDmgs: [{ f: '2d6+4', t: 'taglienti' }, { f: '2d6', t: 'veleno' }] },
+        { name: 'Soffio Velenoso (Ricarica 5-6)', desc: 'Tiro Salvezza su Costituzione: CD 14, ogni creatura in un cono di 9 metri.\nFallimento: 42 (12d6) danni da veleno. Successo: metà danni.', atkDmgs: [{ f: '12d6', t: 'veleno' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcana', desc: 'Documenti compromettenti, cimeli di famiglia e tesori sentimentali — i "ninnoli" che incarnano le reti di manipolazione del drago.' }],
+      notes: 'Draghi dell\'Inganno e della Derisione\n\nHabitat: Foresta\nTesoro: Arcana\n\nI giovani draghi verdi controllano spesso gruppi di ettercap, coboldi, ladri o altri servitori codardi. Lo fanno evitando altri draghi malvagi che potrebbero sabotare i loro piani. Gradualmente, opprimendo creature più deboli e accumulando fortune prive di significato, i giovani draghi verdi perseguono modi sempre più ambiziosi di soddisfare il proprio ego.\n\n' + DRAGHI_VERDI_LORE
+    },
+    {
+      id: 'preset_drago_verde_adulto', name: 'Drago Verde Adulto', emoji: '🐉', rarity: 'epic',
+      type: 'Drago', size: 'Enorme', alignment: 'Legale Malvagio',
+      ac: 19, hp: 207, hpCur: 207, hpTemp: 0, hpDice: '18d12+90', init: 11,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '15', xp: '',
+      str: 23, dex: 12, con: 21, intl: 18, wis: 15, cha: 18,
+      savesOverride: { str: '', dex: '6', con: '', intl: '', wis: '7', cha: '' },
+      skillOverrides: { inganno: '9', percezione: '12', persuasione: '9', furtivita: '6' }, passivePerception: 22,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [], condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' },
+        { name: 'Resistenza Leggendaria', desc: '(3/Giorno, oppure 4/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di riuscirlo invece.' },
+        { name: 'Effetti della Tana', desc: 'La regione attorno alla tana di un drago verde adulto o antico è alterata dalla sua presenza:\n\nSpie Bestiali: le Bestie Minuscole ottengono magicamente la capacità di comprendere il Draconico e possono comunicare telepaticamente con il drago finché si trovano entro 1,5 km dalla tana.\n\nBoschetto Velenoso: le piante comuni che crescono entro 1,5 km dalla tana avvelenano l\'aria attorno a loro. Ogni volta che una creatura diversa dal drago o dai suoi alleati completa un Riposo Lungo in quell\'area, deve superare un tiro salvezza su Costituzione CD 15 o acquisire la condizione Avvelenato per 1 ora.\n\nSe il drago muore o sposta altrove la propria tana, questi effetti terminano immediatamente.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Squarcio. Può sostituire un attacco con un uso di Incantesimi per lanciare Aculeo Mentale (versione di 3° livello).' },
+        { name: 'Squarcio', desc: 'Attacco con arma da mischia: +11 a colpire, portata 3 metri.\nColpito: 15 (2d8 + 6) danni taglienti più 7 (2d6) danni da veleno.', atkHit: '+11', atkDmgs: [{ f: '2d8+6', t: 'taglienti' }, { f: '2d6', t: 'veleno' }] },
+        { name: 'Soffio Velenoso (Ricarica 5-6)', desc: 'Tiro Salvezza su Costituzione: CD 18, ogni creatura in un cono di 18 metri.\nFallimento: 56 (16d6) danni da veleno. Successo: metà danni.', atkDmgs: [{ f: '16d6', t: 'veleno' }] },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza richiedere componenti materiali e usando Carisma come caratteristica da incantatore (CD degli incantesimi 17):\n\nA volontà: Individuazione del Magico, Aculeo Mentale (versione di 3° livello).\n\n1/Giorno: Costrizione.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Utilizzi di Azione Leggendaria: 3 (4 nella Tana)', desc: 'Immediatamente dopo il turno di un\'altra creatura, il drago può spendere un utilizzo per compiere una delle azioni seguenti. Recupera tutti gli utilizzi spesi all\'inizio di ogni suo turno.' },
+        { name: 'Invasione Mentale', desc: 'Il drago usa Incantesimi per lanciare Aculeo Mentale (versione di 3° livello).' },
+        { name: 'Miasma Nocivo', desc: 'Tiro Salvezza su Costituzione: CD 17, ogni creatura in una sfera con raggio di 6 metri centrata in un punto che il drago può vedere entro 27 metri.\nFallimento: 7 (2d6) danni da veleno e il bersaglio subisce una penalità di −2 alla CA fino alla fine del suo turno successivo.\nFallimento o Successo: il drago non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.', atkDmgs: [{ f: '2d6', t: 'veleno' }] },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della sua Velocità ed effettua un attacco Squarcio.', atkHit: '+11', atkDmgs: [{ f: '2d8+6', t: 'taglienti' }, { f: '2d6', t: 'veleno' }] }
+      ],
+      drop: [{ name: 'Arcana', desc: 'Documenti compromettenti, cimeli di famiglia e tesori sentimentali — i "ninnoli" che incarnano le reti di manipolazione del drago.' }],
+      notes: 'Draghi dell\'Inganno e della Derisione\n\nHabitat: Foresta\nTesoro: Arcana\n\nLe parole dei draghi verdi adulti sono letali quanto il loro soffio velenoso. Sono brillanti macchinatori che si vantano di influenzare le comunità vicine alle loro tane. Sono ossessionati dalle informazioni e creano vaste reti di spionaggio. Molti di questi draghi cercano metodi magici di sorveglianza o dominio e manipolano gli avventurieri affinché recuperino antichi oggetti magici per aiutarli in tale controllo.\n\n' + DRAGHI_VERDI_LORE + '\n\n(Affrontato nella propria tana, il drago vale 15.000 PE.)'
+    },
+    {
+      id: 'preset_drago_verde_antico', name: 'Antico Drago Verde', emoji: '🐉', rarity: 'legendary',
+      type: 'Drago', size: 'Mastodontica', alignment: 'Legale Malvagio',
+      ac: 21, hp: 402, hpCur: 402, hpTemp: 0, hpDice: '23d20+161', init: 15,
+      speed: '12 m, Volare 24 m, Nuotare 12 m', cr: '22', xp: '',
+      str: 27, dex: 12, con: 25, intl: 20, wis: 17, cha: 22,
+      savesOverride: { str: '', dex: '8', con: '', intl: '', wis: '10', cha: '' },
+      skillOverrides: { inganno: '13', percezione: '17', persuasione: '13', furtivita: '8' }, passivePerception: 27,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }, { type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [], condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Anfibio', desc: 'Il drago può respirare sia aria sia acqua.' },
+        { name: 'Resistenza Leggendaria', desc: '(4/Giorno, oppure 5/Giorno nella Tana)\nSe il drago fallisce un tiro salvezza, può scegliere di riuscirlo invece.' },
+        { name: 'Effetti della Tana', desc: 'La regione attorno alla tana di un drago verde adulto o antico è alterata dalla sua presenza:\n\nSpie Bestiali: le Bestie Minuscole ottengono magicamente la capacità di comprendere il Draconico e possono comunicare telepaticamente con il drago finché si trovano entro 1,5 km dalla tana.\n\nBoschetto Velenoso: le piante comuni che crescono entro 1,5 km dalla tana avvelenano l\'aria attorno a loro. Ogni volta che una creatura diversa dal drago o dai suoi alleati completa un Riposo Lungo in quell\'area, deve superare un tiro salvezza su Costituzione CD 15 o acquisire la condizione Avvelenato per 1 ora.\n\nSe il drago muore o sposta altrove la propria tana, questi effetti terminano immediatamente.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il drago effettua tre attacchi Squarcio. Può sostituire un attacco con un uso di Incantesimi per lanciare Aculeo Mentale (versione di 5° livello).' },
+        { name: 'Squarcio', desc: 'Attacco con arma da mischia: +15 a colpire, portata 4,5 metri.\nColpito: 17 (2d8 + 8) danni taglienti più 10 (3d6) danni da veleno.', atkHit: '+15', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '3d6', t: 'veleno' }] },
+        { name: 'Soffio Velenoso (Ricarica 5-6)', desc: 'Tiro Salvezza su Costituzione: CD 22, ogni creatura in un cono di 27 metri.\nFallimento: 77 (22d6) danni da veleno. Successo: metà danni.', atkDmgs: [{ f: '22d6', t: 'veleno' }] },
+        { name: 'Incantesimi', desc: 'Il drago lancia uno dei seguenti incantesimi senza richiedere componenti materiali e usando Carisma come caratteristica da incantatore (CD degli incantesimi 21):\n\nA volontà: Individuazione del Magico, Aculeo Mentale (versione di 5° livello).\n\n1/Giorno ciascuno: Costrizione, Modificare Memoria.' }
+      ],
+      bonusActions: [],
+      reactions: [],
+      legendaryActions: [
+        { name: 'Utilizzi di Azione Leggendaria: 3 (4 nella Tana)', desc: 'Immediatamente dopo il turno di un\'altra creatura, il drago può spendere un utilizzo per compiere una delle azioni seguenti. Recupera tutti gli utilizzi spesi all\'inizio di ogni suo turno.' },
+        { name: 'Invasione Mentale', desc: 'Il drago usa Incantesimi per lanciare Aculeo Mentale (versione di 5° livello).' },
+        { name: 'Miasma Nocivo', desc: 'Tiro Salvezza su Costituzione: CD 21, ogni creatura in una sfera con raggio di 9 metri centrata in un punto che il drago può vedere entro 27 metri.\nFallimento: 17 (5d6) danni da veleno e il bersaglio subisce una penalità di −2 alla CA fino alla fine del suo turno successivo.\nFallimento o Successo: il drago non può usare di nuovo questa azione fino all\'inizio del suo turno successivo.', atkDmgs: [{ f: '5d6', t: 'veleno' }] },
+        { name: 'Balzo', desc: 'Il drago si muove fino a metà della sua Velocità ed effettua un attacco Squarcio.', atkHit: '+15', atkDmgs: [{ f: '2d8+8', t: 'taglienti' }, { f: '3d6', t: 'veleno' }] }
+      ],
+      drop: [{ name: 'Arcana', desc: 'Documenti compromettenti, cimeli di famiglia e tesori sentimentali — i "ninnoli" accumulati in secoli di manipolazioni dal drago.' }],
+      notes: 'Draghi dell\'Inganno e della Derisione\n\nHabitat: Foresta\nTesoro: Arcana\n\nGli antichi draghi verdi sono creature leggendarie, raramente viste da servitori o nemici. Tramite magia e agenti ben nascosti, questi draghi alimentano sospetti tra alleati e minano nobili opere. Quando i legami si spezzano, i draghi raccolgono ricompense sotto forma di maggiore ricchezza e controllo. Alla fine, le ambizioni degli antichi draghi verdi si estendono oltre i loro territori, poiché cercano il controllo di imperi, reami planari o della morte stessa.\n\n' + DRAGHI_VERDI_LORE + '\n\n(Affrontato nella propria tana, il drago vale 50.000 PE.)'
+    },
+    {
+      id: 'preset_megera_verde', name: 'Megera Verde', emoji: '🧙', rarity: 'uncommon',
+      type: 'Fata', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 17, hp: 82, hpCur: 82, hpTemp: 0, hpDice: '11d8+33', init: 1,
+      speed: '9 m, Nuotare 9 m', cr: '3', xp: '',
+      str: 18, dex: 12, con: 16, intl: 13, wis: 14, cha: 14,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { arcano: '5', inganno: '4', percezione: '4', furtivita: '3' }, passivePerception: 14,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune', 'Elfico', 'Silvano'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Anfibia', desc: 'La megera può respirare sia aria sia acqua.' },
+        { name: 'Magia di Congrega', desc: 'Finché si trova entro 9 metri da almeno due alleate megere, la megera può lanciare uno dei seguenti incantesimi senza richiedere componenti materiali, usando il normale tempo di lancio dell\'incantesimo e utilizzando Intelligenza come caratteristica da incantatore (CD degli incantesimi 11): Presagio, Trova Famiglio, Identificare, Localizza Oggetto, Scrutare oppure Servitore Inosservato. La megera deve completare un Riposo Lungo prima di poter usare di nuovo questo tratto per lanciare quello stesso incantesimo.' },
+        { name: 'Mimetismo', desc: 'La megera può imitare suoni di animali e voci umanoidi. Una creatura che ascolta tali suoni può capire che si tratta di imitazioni solo superando una prova di Saggezza (Intuizione) con CD 14.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'La megera effettua due attacchi Artiglio.' },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 8 (1d8 + 4) danni taglienti più 3 (1d6) danni da veleno.', atkHit: '+6', atkDmgs: [{ f: '1d8+4', t: 'taglienti' }, { f: '1d6', t: 'veleno' }] },
+        { name: 'Incantesimi', desc: 'La megera lancia uno dei seguenti incantesimi senza richiedere componenti materiali e usando Saggezza come caratteristica da incantatore (CD degli incantesimi 12, +4 al tiro per colpire con gli attacchi con incantesimo):\n\nA volontà: Luci Danzanti, Camuffare Sé Stesso (durata 24 ore), Invisibilità (solo su sé stessa e, mentre è invisibile, non lascia tracce), Illusione Minore, Raggio di Infermità (versione di 3° livello).' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Arcana', desc: 'Magia rara e tesori simbolici ottenuti in cambio di segreti e conoscenze proibite.' }],
+      notes: 'Strega Ripugnante delle Terre Selvagge Malvagie\n\nHabitat: Foresta, Collina, Palude\nTesoro: Arcana\n\nLe megere verdi praticano una magia amara per contaminare tutto ciò che è bello e puro. Da sole o in congreghe con altre megere, queste antiche streghe invocano forze inquietanti, diffondendo corruzione e tramando rovina per coloro che guadagnano la loro ira. Le megere verdi sono maestre dell\'inganno e usano illusioni per mascherarsi sotto forme innocue, sperando di attirare gli innocenti nel pericolo. Queste megere spesso attirano le loro vittime nelle loro tane surreali, dove le tengono prigioniere o le cucinano trasformandole in pasti mostruosi.\n\nLe megere verdi conoscono spesso magie strane o segreti dimenticati, come le debolezze dei malvagi, la posizione di tesori perduti o i modi per spezzare maledizioni. Possono scambiare tali conoscenze con magia rara o tesori simbolici.\n\nPatti della Megera Verde (1d6) — una megera verde scambia la sua conoscenza per:\n1. I ricordi di una persona amata appartenenti a un negoziatore.\n2. Il calderone di una megera rivale.\n3. Un favore da riscuotere quando la megera lo desidera.\n4. Un fiore proveniente da un giardino nascosto del Feywild.\n5. Un dono offerto liberamente da uno yugoloth.\n6. Una fiala riempita con le lacrime di un sovrano.'
+    },
+    {
+      id: 'preset_grell', name: 'Grell', emoji: '🐙', rarity: 'common',
+      type: 'Aberrazione', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 12, hp: 55, hpCur: 55, hpTemp: 0, hpDice: '10d8+10', init: 6,
+      speed: '3 m, Volare 9 m (fluttuando)', cr: '3', xp: '',
+      str: 15, dex: 14, con: 13, intl: 12, wis: 11, cha: 9,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '4', furtivita: '6' }, passivePerception: 14,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: ['Linguaggio delle Profondità'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: ['Accecato', 'Prono'],
+      traits: [
+        { name: 'Rapitore', desc: 'Il grell non deve spendere movimento aggiuntivo per spostare una creatura che ha Afferrato.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il grell effettua un attacco con Becco e un attacco con Tentacoli Paralizzanti.' },
+        { name: 'Becco', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 11 (2d8 + 2) danni perforanti.', atkHit: '+4', atkDmgs: [{ f: '2d8+2', t: 'perforanti' }] },
+        { name: 'Tentacoli Paralizzanti', desc: 'Attacco con arma da mischia: +4 a colpire, portata 3 metri.\nColpito: 7 (1d10 + 2) danni perforanti.\nSe il bersaglio è una creatura Media o più piccola, ottiene la condizione Afferrato (CD 12 per sfuggire) da due dei dieci tentacoli del grell. Il bersaglio è inoltre soggetto al seguente effetto.\nTiro Salvezza su Costituzione: CD 11.\nFallimento: il bersaglio ottiene la condizione Avvelenato e ripete il tiro salvezza alla fine di ciascuno dei suoi turni, terminando l\'effetto su sé stesso con un successo. Dopo 1 minuto, il tiro salvezza riesce automaticamente.\nFinché è Avvelenato in questo modo, il bersaglio ottiene anche la condizione Paralizzato.', atkHit: '+4', atkDmgs: [{ f: '1d10+2', t: 'perforanti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Cacciatore Bizzarro che Viaggia tra i Mondi\n\nHabitat: Sottosuolo\nTesoro: Nessuno\n\nCon tentacoli uncinati che spuntano dai loro corpi simili a cervelli, i grell cacciano nelle profondità prive di luce. Questi silenziosi predatori sfidano la gravità, permettendo loro di colpire da posizioni impreviste, e percepiscono ciò che li circonda tramite il suono e i campi elettrici. I loro tentacoli secernono un veleno paralizzante che impedisce alla maggior parte delle creature sorprese da un grell di gridare aiuto prima di essere trascinate nell\'oscurità e divorate.\n\nI grell sono esseri senzienti, ma la loro intelligenza e le loro motivazioni risultano aliene per quasi tutti. In genere cooperano tra loro solo per abbattere prede più potenti. La maggior parte di essi non mostra alcun interesse nel creare oggetti o nel comunicare con altre creature, inclusi i membri della propria specie.\n\nMolti grell ricercano modi per viaggiare tra mondi e piani di esistenza. Talvolta si introducono su vascelli spaziali oppure attraversano portali senza curarsi della loro destinazione.\n\nEsplorazioni dei Grell (1d6) — i grell viaggiano perché sono:\n1. Virus evoluti, ciascuno clone di tutti gli altri grell. Esistono unicamente per nutrirsi e diffondersi.\n2. Le larve di un\'altra creatura e necessitano di ambienti elettricamente carichi per riprodursi.\n3. In fuga da qualche catastrofe o terrore nascosto negli abissi.\n4. Soprannaturalmente legati a voraci entità aliene e fungono da loro appendici per l\'alimentazione.\n5. Residui di un antico male che tornerà quando i grell avranno divorato collettivamente un numero sufficiente di creature.\n6. Privi di anima, ma convinti di poterla ottenere divorando determinate creature.\n\n«Per il cibo, la mia fame digrigna tra i denti. Per il potere, la mia fame stringe nella presa. Ma per ciò che ci viene detto di non conoscere, la mia fame spalanca un becco di rapace e rende la mia mente un muscolo che sa solo masticare.»\n— Evard, Ottavo Occhio del Necrofilosofo'
+    },
+    {
+      id: 'preset_grick', name: 'Grick', emoji: '🪱', rarity: 'common',
+      type: 'Aberrazione', size: 'Media', alignment: 'Senza Allineamento',
+      ac: 14, hp: 54, hpCur: 54, hpTemp: 0, hpDice: '12d8', init: 2,
+      speed: '9 m, Scalare 9 m', cr: '2', xp: '',
+      str: 14, dex: 14, con: 11, intl: 3, wis: 14, cha: 5,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '4' }, passivePerception: 12,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il grick effettua un attacco con Becco e un attacco con Tentacoli.' },
+        { name: 'Becco', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 9 (2d6 + 2) danni perforanti.', atkHit: '+4', atkDmgs: [{ f: '2d6+2', t: 'perforanti' }] },
+        { name: 'Tentacoli', desc: 'Attacco con arma da mischia: +4 a colpire, portata 1,5 metri.\nColpito: 7 (1d10 + 2) danni taglienti.\nSe il bersaglio è una creatura Media o più piccola, ottiene la condizione Afferrato (CD 12 per sfuggire) da tutti e quattro i tentacoli.', atkHit: '+4', atkDmgs: [{ f: '1d10+2', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Ossa sparse e gli averi dei pasti precedenti del grick.' }],
+      notes: 'Vermi Cacciatori delle Tenebre e della Putrefazione\n\nHabitat: Foresta, Sottosuolo\nTesoro: Qualsiasi\n\nI grick tendono a essere cacciatori solitari, ma gli esemplari giovani possono aggirarsi per anni accanto a decine dei loro compagni di covata prima di separarsi gradualmente.\n\n' + GRICK_LORE
+    },
+    {
+      id: 'preset_grick_antico', name: 'Grick Antico', emoji: '🐛', rarity: 'uncommon',
+      type: 'Aberrazione', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 18, hp: 135, hpCur: 135, hpTemp: 0, hpDice: '18d10+36', init: 3,
+      speed: '9 m, Scalare 9 m', cr: '7', xp: '',
+      str: 18, dex: 16, con: 15, intl: 4, wis: 14, cha: 9,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { furtivita: '6' }, passivePerception: 12,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il grick effettua un attacco con Becco, un attacco con Schianto e un attacco con Tentacoli.' },
+        { name: 'Becco', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 22 (4d8 + 4) danni perforanti.', atkHit: '+7', atkDmgs: [{ f: '4d8+4', t: 'perforanti' }] },
+        { name: 'Schianto', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 7 (1d6 + 4) danni contundenti.\nSe il bersaglio è una creatura Grande o più piccola, ottiene la condizione Prono.', atkHit: '+7', atkDmgs: [{ f: '1d6+4', t: 'contundenti' }] },
+        { name: 'Tentacoli', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 15 (2d10 + 4) danni taglienti.\nSe il bersaglio è una creatura Grande o più piccola, ottiene la condizione Afferrato (CD 14 per sfuggire) da tutti e quattro i tentacoli.', atkHit: '+7', atkDmgs: [{ f: '2d10+4', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Ossa e averi accumulati in secoli di pasti del grick antico.' }],
+      notes: 'Vermi Cacciatori delle Tenebre e della Putrefazione\n\nHabitat: Foresta, Sottosuolo\nTesoro: Qualsiasi\n\nI grick possono vivere per secoli, e gli esemplari più anziani crescono fino a dimensioni mostruose. I grick antichi cacciano attivamente invece di limitarsi ad attendere in agguato e non hanno alcuna remora a divorare i grick più piccoli.\n\n' + GRICK_LORE
+    },
+    {
+      id: 'preset_grifone', name: 'Grifone', emoji: '🦅', rarity: 'uncommon',
+      type: 'Mostruosità', size: 'Grande', alignment: 'Senza Allineamento',
+      ac: 12, hp: 59, hpCur: 59, hpTemp: 0, hpDice: '7d10+21', init: 2,
+      speed: '9 m, Volare 24 m', cr: '2', xp: '',
+      str: 18, dex: 15, con: 16, intl: 2, wis: 13, cha: 8,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '5' }, passivePerception: 15,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il grifone effettua due attacchi con Artigliare.' },
+        { name: 'Artigliare', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 8 (1d8 + 4) danni perforanti.\nSe il bersaglio è una creatura Media o più piccola, ottiene la condizione Afferrato (CD 14 per sfuggire) da entrambi gli artigli anteriori del grifone.', atkHit: '+6', atkDmgs: [{ f: '1d8+4', t: 'perforanti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Maestoso Cacciatore della Terra e del Cielo\n\nHabitat: Artico, Costiero, Prateria, Colline, Montagne\nTesoro: Nessuno\n\nI grifoni combinano le caratteristiche dei rapaci e dei grandi felini — più comunemente aquile e leoni — e possiedono la precisione e la ferocia di tali predatori. Razze più rare di grifoni presentano i tratti di condor e pantere, mentre altre ricordano falchi e tigri. Indipendentemente dal loro aspetto, i grifoni sono spesso associati alla regalità e vengono ampiamente chiamati i Signori delle Bestie.\n\nLeggende sui Grifoni (1d6) — le leggende affermano che i grifoni:\n1. Attaccano qualunque cosa voli nei cieli vicino ai loro nidi.\n2. Maledicono i loro uccisori: chi uccide un grifone si attira l\'inimicizia di tutti gli animali.\n3. Depongono uova dotate di straordinarie proprietà curative.\n4. Preferiscono il sapore della carne di cavallo a qualsiasi altra preda.\n5. Servono la prima creatura che vedono dopo la schiusa dell\'uovo.\n6. Non attaccano chi possiede sangue reale.\n\n«La gente pensa che sorvolassimo la città per evitare banderuole, fili del bucato e simili. La verità è che, se i grifoni avessero sentito l\'odore della carne di cavallo marcia appena sotto di loro, la gente avrebbe avuto ben altro di cui preoccuparsi che maghi in volo di gioia e stirgi.»\n— Sildar Hallwinter, membro in congedo della Cavalleria dei Grifoni di Waterdeep'
+    },
+    {
+      id: 'preset_grimlock', name: 'Grimlock', emoji: '🫥', rarity: 'common',
+      type: 'Aberrazione', size: 'Media', alignment: 'Neutrale Malvagio',
+      ac: 11, hp: 11, hpCur: 11, hpTemp: 0, hpDice: '2d8+2', init: 1,
+      speed: '9 m, Scalare 9 m', cr: '1/4', xp: '',
+      str: 16, dex: 12, con: 12, intl: 9, wis: 8, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { atletica: '5', percezione: '3', furtivita: '5' }, passivePerception: 13,
+      senses: [{ type: 'Vista Cieca', value: 9, unit: 'm' }], languages: [],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Randello d\'Osso', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 6 (1d6 + 3) danni contundenti più 2 (1d4) danni psichici.', atkHit: '+5', atkDmgs: [{ f: '1d6+3', t: 'contundenti' }, { f: '1d4', t: 'psichici' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Bottino racimolato durante le incursioni al servizio degli illithid.' }],
+      notes: 'Burattino della Minaccia dei Mind Flayer\n\nHabitat: Sottosuolo\nTesoro: Qualsiasi\n\nI grimlock sono vittime della manipolazione biologica dei mind flayer. Per creare un grimlock, gli illithid catturano umanoidi, li espongono a strane forme di radiazione del Sottosuolo e impiantano nuove direttive nei loro cervelli. Il processo di creazione di un grimlock lacera la mente della creatura al punto che non rimane alcuna traccia della sua precedente personalità.\n\nI grimlock hanno cavità superficiali al posto degli occhi. Un sesto senso permette loro di percepire l\'ambiente circostante. Le energie psichiche derivanti dalla loro trasformazione persistono nei corpi dei grimlock, che incanalano tali forze inquietanti nei loro attacchi.\n\nCompiti dei Grimlock (1d4) — il grimlock serve i mind flayer:\n1. Scavando caverne da usare come avamposti degli illithid.\n2. Nascondendo la minaccia dei mind flayer sotto falsi insediamenti volutamente rozzi e primitivi.\n3. Fingendosi disponibile ad aiutare e attirando i viaggiatori in un ingannevole senso di sicurezza.\n4. Saccheggiando le comunità di superficie e inducendo altre creature a inseguirlo fino alle trappole degli illithid.\n\n«Pensavamo di aver scoperto un nuovo popolo che viveva più in profondità di quanto avessimo ritenuto possibile. La verità era qualcosa di molto peggiore.»\n— Aljayera, Veggente del Sottosuolo'
+    },
+    {
+      id: 'preset_naga_guardiano', name: 'Naga Guardiano', emoji: '🐍', rarity: 'rare',
+      type: 'Celestiale', size: 'Grande', alignment: 'Legale Buono',
+      ac: 18, hp: 136, hpCur: 136, hpTemp: 0, hpDice: '16d10+48', init: 4,
+      speed: '12 m, Scalare 12 m, Nuotare 12 m', cr: '10', xp: '',
+      str: 19, dex: 18, con: 16, intl: 16, wis: 19, cha: 18,
+      savesOverride: { str: '', dex: '8', con: '7', intl: '7', wis: '8', cha: '8' },
+      skillOverrides: { arcano: '11', storia: '11', religione: '11' }, passivePerception: 14,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Celestiale', 'Comune'],
+      dmgResist: [], dmgImmune: ['Veleno'], dmgVulner: [], condImmune: ['Affascinato', 'Paralizzato', 'Avvelenato', 'Trattenuto'],
+      traits: [
+        { name: 'Restaurazione Celestiale', desc: 'Se il naga muore, torna in vita dopo 1d6 giorni e recupera tutti i suoi Punti Ferita, a meno che sui suoi resti non venga lanciato Dissolvi il Bene e il Male.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il naga effettua due attacchi con Morso. Può sostituire uno qualsiasi di questi attacchi con Sputo Velenoso.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +8 a colpire, portata 3 metri.\nColpito: 17 (2d12 + 4) danni perforanti più 22 (4d10) danni da veleno.', atkHit: '+8', atkDmgs: [{ f: '2d12+4', t: 'perforanti' }, { f: '4d10', t: 'veleno' }] },
+        { name: 'Sputo Velenoso', desc: 'Tiro Salvezza su Costituzione: CD 16, una creatura che il naga può vedere entro 18 metri.\nFallimento: 31 (7d8) danni da veleno e il bersaglio ottiene la condizione Accecato fino all\'inizio del turno successivo del naga.\nSuccesso: danni dimezzati.', atkDmgs: [{ f: '7d8', t: 'veleno' }] },
+        { name: 'Incantesimi', desc: 'Il naga lancia uno dei seguenti incantesimi senza richiedere componenti Somatiche o Materiali, usando Saggezza come caratteristica da incantatore (CD 16 per i tiri salvezza contro gli incantesimi):\n\nA volontà: Taumaturgia\n\n1/Giorno ciascuno: Chiaroveggenza, Cura Ferite (versione di 6° livello), Colpo Infuocato (versione di 6° livello), Costrizione, Visione del Vero' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Reliquie', desc: 'Storie, tradizioni e cimeli sacri custoditi dal naga per le generazioni future.' }],
+      notes: 'Custode Serpentino Imperituro del Sapere\n\nHabitat: Deserto, Foresta, Planare (Piani Superiori)\nTesoro: Reliquie\n\nI naga guardiani sono studiosi serpentini immortali dotati di memoria perfetta. Raccolgono la storia e le tradizioni dei popoli tra cui vivono, custodendo i racconti delle loro culture e tramandandoli alle nuove generazioni con assoluta precisione. I naga guardiani che sopravvivono alle civiltà che li hanno ospitati possono indugiare tra le rovine rimaste, preservando le storie di quelle civiltà affinché il loro popolo perduto continui a vivere attraverso di esse.\n\nConoscenze del Naga Guardiano (1d8) — il naga guardiano ricorda:\n1. Le ultime parole di un antico saggio o condottiero.\n2. L\'ubicazione di una città nascosta o di un continente perduto.\n3. Una parola magica, una parola d\'ordine o la risposta a un enigma.\n4. I nomi di tutti coloro che gli hanno raccontato una storia.\n5. Un rituale o un incantesimo altrimenti dimenticato.\n6. Ricette che utilizzano ingredienti regionali.\n7. Storie di dèi dimenticati e spiriti locali.\n8. Le vulnerabilità di un mostro leggendario.'
+    },
+    {
+      id: 'preset_guardia', name: 'Guardia', emoji: '💂', rarity: 'common',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 16, hp: 11, hpCur: 11, hpTemp: 0, hpDice: '2d8+2', init: 1,
+      speed: '9 m', cr: '1/8', xp: '',
+      str: 13, dex: 12, con: 12, intl: 10, wis: 11, cha: 10,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '2' }, passivePerception: 12,
+      senses: [], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Lancia', desc: 'Attacco con arma da mischia o a distanza: +3 a colpire, portata 1,5 metri oppure gittata 6/18 metri.\nColpito: 4 (1d6 + 1) danni perforanti.', atkHit: '+3', atkDmgs: [{ f: '1d6+1', t: 'perforanti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Cotta di maglia, scudo e lancia.' }],
+      notes: 'Sentinelle e Membri della Guardia\n\nHabitat: Qualsiasi\nTesoro: Armamenti, Individuale\n\nLe guardie sono attente e percettive, ma la maggior parte possiede un addestramento marziale limitato. Possono essere buttafuori, vedette, membri della guardia cittadina o altri guerrieri dall\'occhio vigile.\n\n' + GUARDIE_LORE
+    },
+    {
+      id: 'preset_capitano_guardia', name: 'Capitano della Guardia', emoji: '⚔️', rarity: 'uncommon',
+      type: 'Umanoide', size: 'Media', alignment: 'Neutrale',
+      ac: 18, hp: 75, hpCur: 75, hpTemp: 0, hpDice: '10d8+30', init: 4,
+      speed: '9 m', cr: '4', xp: '',
+      str: 18, dex: 14, con: 16, intl: 12, wis: 14, cha: 13,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { atletica: '6', percezione: '4' }, passivePerception: 14,
+      senses: [], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il capitano della guardia effettua due attacchi, con Giavellotto o Spada lunga, in qualsiasi combinazione.' },
+        { name: 'Giavellotto', desc: 'Attacco con arma da mischia o a distanza: +6 a colpire, portata 1,5 metri oppure gittata 9/36 metri.\nColpito: 14 (3d6 + 4) danni perforanti.', atkHit: '+6', atkDmgs: [{ f: '3d6+4', t: 'perforanti' }] },
+        { name: 'Spada Lunga', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 15 (2d10 + 4) danni taglienti.', atkHit: '+6', atkDmgs: [{ f: '2d10+4', t: 'taglienti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Corazza, scudo, spada lunga e 6 giavellotti.' }],
+      notes: 'Sentinelle e Membri della Guardia\n\nHabitat: Qualsiasi\nTesoro: Armamenti, Individuale\n\nI capitani della guardia vantano spesso una notevole esperienza professionale. Possono essere esperte guardie del corpo, custodi di tesori magici, veterani della guardia cittadina o altri sorveglianti di simile levatura.\n\n' + GUARDIE_LORE
+    },
+    {
+      id: 'preset_mezzo_drago', name: 'Mezzo Drago', emoji: '🐲', rarity: 'rare',
+      type: 'Drago', size: 'Media', alignment: 'Neutrale',
+      ac: 18, hp: 105, hpCur: 105, hpTemp: 0, hpDice: '14d8+42', init: 5,
+      speed: '12 m', cr: '5', xp: '',
+      str: 19, dex: 14, con: 16, intl: 10, wis: 15, cha: 14,
+      savesOverride: { str: '', dex: '5', con: '', intl: '', wis: '5', cha: '' },
+      skillOverrides: { atletica: '7', percezione: '5', furtivita: '5' }, passivePerception: 15,
+      senses: [{ type: 'Vista Cieca', value: 3, unit: 'm' }, { type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comune', 'Draconico'],
+      dmgResist: ['Tipo scelto per Origine Draconica (acido/freddo/fuoco/fulmine/veleno)'], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Origine Draconica', desc: 'Il mezzo drago è imparentato con un tipo di drago associato a uno dei seguenti tipi di danno (a scelta del DM): acido, freddo, fuoco, fulmine o veleno. Questa scelta influenza gli altri aspetti del suo blocco statistiche.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il mezzo drago effettua due attacchi con Artiglio.' },
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +7 a colpire, portata 3 metri.\nColpito: 6 (1d4 + 4) danni taglienti più 7 (2d6) danni del tipo scelto per il tratto Origine Draconica.', atkHit: '+7', atkDmgs: [{ f: '1d4+4', t: 'taglienti' }, { f: '2d6', t: 'tipo Origine Draconica' }] },
+        { name: 'Soffio del Drago (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 14, ogni creatura in un cono di 9 metri.\nFallimento: 28 (8d6) danni del tipo scelto per il tratto Origine Draconica.\nSuccesso: danni dimezzati.', atkDmgs: [{ f: '8d6', t: 'tipo Origine Draconica' }] }
+      ],
+      bonusActions: [
+        { name: 'Balzo', desc: 'Il mezzo drago salta fino a 9 metri spendendo 3 metri del proprio movimento.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Armamenti', desc: 'Armi e armature del mezzo drago, intrise di essenza draconica.' }],
+      notes: 'Guerriero Creato dai Draghi\n\nHabitat: Qualsiasi\nTesoro: Armamenti\n\nNati tramite rituali magici che impiegano le essenze dei draghi, i mezzi draghi servono i loro creatori e seguono i propri impulsi draconici. La maggior parte dei mezzi draghi è creata da draghi cromatici che desiderano servitori dotati di una parte della loro stessa potenza e maestosità. I mezzi draghi comandano spesso altri servitori di un drago malvagio oppure agiscono come agenti in terre dove il loro padrone draconico attirerebbe attenzioni indesiderate.\n\nI mezzi draghi condividono tratti caratteriali e obiettivi con il drago da cui hanno avuto origine. Quelli che discendono da draghi cromatici tendono a detestare il proprio creatore anche quando perseguono gli stessi fini. I mezzi draghi con tratti dei draghi metallici sono particolarmente rari, ma possono nascere a causa di incidenti magici, degli esperimenti di incantatori sconsiderati o come ultimo atto di un drago morente.\n\n«Quale benedizione pretende di più e al tempo stesso ispira imprese maggiori del sangue di Tiamat?»\n— Azarr Kul, Signore dei Draghi, mezzo drago'
+    },
+    {
+      id: 'preset_arpia', name: 'Arpia', emoji: '🦅', rarity: 'common',
+      type: 'Mostruosità', size: 'Media', alignment: 'Caotico Malvagio',
+      ac: 11, hp: 38, hpCur: 38, hpTemp: 0, hpDice: '7d8+7', init: 1,
+      speed: '6 m, Volare 12 m', cr: '1', xp: '',
+      str: 12, dex: 13, con: 12, intl: 7, wis: 10, cha: 13,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: {}, passivePerception: 10,
+      senses: [], languages: ['Comune'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Artiglio', desc: 'Attacco con arma da mischia: +3 a colpire, portata 1,5 metri.\nColpito: 6 (2d4 + 1) danni taglienti.', atkHit: '+3', atkDmgs: [{ f: '2d4+1', t: 'taglienti' }] },
+        { name: 'Canto Ammaliatore', desc: 'L\'arpia intona una melodia magica che dura finché mantiene la Concentrazione su di essa.\nTiro Salvezza su Saggezza: CD 11, ogni Umanoide e Gigante entro un\'Emanazione di 90 metri originata dall\'arpia quando il canto ha inizio.\nFallimento: il bersaglio ottiene la condizione Affascinato finché il canto termina e ripete il tiro salvezza alla fine di ciascuno dei propri turni. Mentre è Affascinato, ottiene anche la condizione Incapacitato e ignora il Canto Ammaliatore delle altre arpie. Se si trova a più di 1,5 metri dall\'arpia, durante il suo turno si muove verso di essa seguendo il percorso più diretto possibile, cercando di arrivare entro 1,5 metri. Non evita gli Attacchi di Opportunità; tuttavia, prima di entrare in un terreno dannoso (come lava o una fossa) e ogni volta che subisce danni da una fonte diversa dall\'arpia, ripete il tiro salvezza.\nSuccesso: il bersaglio è immune al Canto Ammaliatore di quella specifica arpia per 24 ore.' }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Qualsiasi', desc: 'Resti e oggetti delle vittime attirate nella tana dell\'arpia.' }],
+      notes: 'Voce Alata di Sventura\n\nHabitat: Costa, Foresta, Colline, Montagne\nTesoro: Qualsiasi\n\nCreature colme d\'odio, le arpie cercano di infliggere sofferenza e di porre fine all\'amore e alla vita. Questi mostri uniscono tratti umanoidi agli artigli e alle ali di rapaci necrofagi. I loro famigerati canti costringono chi li ascolta a seguirle, incurante del pericolo. Le creature ammaliate dal canto di un\'arpia trovano spesso la morte tra i suoi feroci artigli o a causa dei pericoli naturali.\n\nLe arpie dimorano in luoghi remoti e desolati, macchiati da tragedia e disperazione. Alcune leggende sostengono che le arpie abbiano offeso gli dèi e siano state trasformate come punizione; altre raccontano che discendano da tali anime maledette.\n\nOgni arpia possiede un canto unico. Mentre alcuni sono così belli da spezzare il cuore, altri sono striduli e raccapriccianti e soggiogano soltanto chi viene ammaliato dalla loro magia.'
+    },
+    {
+      id: 'preset_segugio_infernale', name: 'Segugio Infernale', emoji: '🐺', rarity: 'uncommon',
+      type: 'Immondo', size: 'Media', alignment: 'Legale Malvagio',
+      ac: 15, hp: 58, hpCur: 58, hpTemp: 0, hpDice: '9d8+18', init: 1,
+      speed: '15 m', cr: '3', xp: '',
+      str: 17, dex: 12, con: 14, intl: 6, wis: 13, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '5' }, passivePerception: 15,
+      senses: [{ type: 'Scurovisione', value: 18, unit: 'm' }], languages: ['Comprende l\'Infernale ma non può parlare'],
+      dmgResist: [], dmgImmune: ['Fuoco'], dmgVulner: [], condImmune: [],
+      traits: [
+        { name: 'Tattiche di Branco', desc: 'Il segugio ha Vantaggio ai tiri per colpire contro una creatura se almeno uno degli alleati del segugio si trova entro 1,5 metri dalla creatura e tale alleato non possiede la condizione Incapacitato.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il segugio effettua due attacchi con Morso.' },
+        { name: 'Morso', desc: 'Attacco con arma da mischia: +5 a colpire, portata 1,5 metri.\nColpito: 7 (1d8 + 3) danni perforanti più 3 (1d6) danni da fuoco.', atkHit: '+5', atkDmgs: [{ f: '1d8+3', t: 'perforanti' }, { f: '1d6', t: 'fuoco' }] },
+        { name: 'Soffio di Fuoco (Ricarica 5-6)', desc: 'Tiro Salvezza su Destrezza: CD 12, ogni creatura in un cono di 4,5 metri.\nFallimento: 17 (5d6) danni da fuoco.\nSuccesso: danni dimezzati.', atkDmgs: [{ f: '5d6', t: 'fuoco' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [],
+      notes: 'Inflessibile Custode dei Piani Inferiori\n\nHabitat: Montagne, Planare (Piani Inferiori), Sottosuolo\nTesoro: Nessuno\n\nGenerati dalle fosse di Acheron, Gehenna e dei Nove Inferi, i segugi infernali impongono l\'ordine spietato di quei reami e danno esecuzione ai capricci dei loro padroni tirannici. Sui loro piani d\'origine, questi tetri canidi fanno sì che le anime non sfuggano ai loro lugubri aldilà. Sul Piano Materiale, i segugi infernali servono normalmente padroni crudeli — come giganti del fuoco e cultisti — che apprezzano la loro ferocia, obbedienza e natura infuocata. I segugi infernali servono altri esseri finché viene loro concessa l\'opportunità di cacciare e uccidere, ma sono pronti a rivoltarsi contro chi li tratta come semplici animali.\n\nI segugi infernali possiedono un\'astuzia superiore a quella dei cani comuni. Sono eccellenti inseguitori e collaborano efficacemente in branco, ricorrendo spesso a imboscate e stratagemmi. Provano piacere nell\'udire le urla delle loro prede mentre vengono avvolte dalle loro fauci roventi e dal loro soffio infuocato. Spesso fanno di tutto per prolungare il terrore delle vittime nei loro ultimi istanti.'
+    },
+    {
+      id: 'preset_orrore_corazzato', name: 'Orrore Corazzato', emoji: '🛡️', rarity: 'uncommon',
+      type: 'Costrutto', size: 'Media', alignment: 'Neutrale',
+      ac: 20, hp: 67, hpCur: 67, hpTemp: 0, hpDice: '9d8+27', init: 3,
+      speed: '9 m, Volare 9 m (fluttuare)', cr: '4', xp: '',
+      str: 18, dex: 13, con: 16, intl: 10, wis: 10, cha: 10,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '4' }, passivePerception: 14,
+      senses: [{ type: 'Vista Cieca', value: 18, unit: 'm' }], languages: ['Comprende il Comune più un\'altra lingua, ma non può parlare'],
+      dmgResist: [], dmgImmune: ['Necrotico', 'Veleno'], dmgVulner: [], condImmune: ['Accecato', 'Affascinato', 'Assordato', 'Sfinito', 'Spaventato', 'Paralizzato', 'Pietrificato', 'Avvelenato', 'Stordito'],
+      traits: [
+        { name: 'Resistenza Magica', desc: 'L\'orrore corazzato ha Vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Immunità agli Incantesimi', desc: 'L\'orrore corazzato è immune a tre incantesimi scelti dal suo creatore. Le scelte tipiche includono Metallo Rovente, Fulmine e Dardo Incantato.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'orrore corazzato effettua due attacchi con Spada Arcana.' },
+        { name: 'Spada Arcana', desc: 'Attacco con arma da mischia: +6 a colpire, portata 1,5 metri.\nColpito: 8 (1d8 + 4) danni taglienti più 5 (1d10) danni da forza.', atkHit: '+6', atkDmgs: [{ f: '1d8+4', t: 'taglienti' }, { f: '1d10', t: 'forza' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Scudo', desc: 'Lo scudo impugnato dall\'orrore corazzato.' }],
+      notes: 'Un\'Armatura con lo Scopo di un Guerriero\n\nHabitat: Qualsiasi\nTesoro: Armamenti\n\nGli orrori corazzati sono armature animate dalla magia. Più che automi privi di ragione, questi gusci corazzati possiedono l\'astuzia dei soldati e una grande resistenza contro la magia distruttiva. Sebbene il loro nome suggerisca intenzioni sinistre, queste creature servono con lealtà i propri creatori. Gli orrori corazzati sono talvolta chiamati anche guardiani d\'acciaio o armature spirituali. La maggior parte non mostra alcun segno di personalità, ma esistono delle eccezioni.\n\nGli orrori corazzati possono svolgere i più svariati incarichi. Tira sulla tabella Direttive dell\'Orrore Corazzato oppure scegli un risultato per ispirare il compito svolto da un orrore corazzato.\n\nDirettive dell\'Orrore Corazzato (1d6) — Esegue ordini per...\n1. Trasportare in volo il palanchino del proprio padrone.\n2. Difendere un tesoro straordinario o un prezioso pezzo d\'armatura incorporandolo nel proprio corpo.\n3. Imitare un eroe morto o imprigionato utilizzandone armatura e armi.\n4. Svolgere il ruolo di lavoratore o servitore.\n5. Servire in una legione composta dalle armature degli antichi difensori di una nazione.\n6. Fare la sentinella in una galleria di armature comuni.'
     }
   ];
 
@@ -4621,9 +5126,10 @@
       '<div class="best__pv-name">' + esc(m.name || '(senza nome)') + '</div>' +
       '<div class="best__pv-sub">' + esc(m.size || '') + (m.size && m.type ? ' ' : '') + esc(m.type || '') + (m.alignment ? ', ' + esc(m.alignment) : '') + '</div></div></div>';
     h += '<div class="best__pv-actions">' +
-      '<button class="best__btn best__btn--add" data-bestadd="' + esc(m.id) + '" type="button">➕ Aggiungi ai Nemici</button>' +
+      '<button class="best__btn best__btn--add" data-bestcombat="' + esc(m.id) + '" type="button">⚔️ Manda a Combat</button>' +
+      '<button class="best__btn best__btn--add" data-bestadd="' + esc(m.id) + '" type="button">➕ Manda a Nemici</button>' +
       (_ro
-        ? '<button class="best__btn" data-bestdup="' + esc(m.id) + '" type="button">⧉ Duplica in personalizzati</button>'
+        ? '<button class="best__btn" data-bestdup="' + esc(m.id) + '" type="button">⧉ Duplica in Personalizzati</button>'
         : '<button class="best__btn" data-bestedit="' + esc(m.id) + '" type="button">✏️ Modifica</button>' +
           '<button class="best__btn best__btn--del" data-bestdel="' + esc(m.id) + '" type="button">🗑 Elimina</button>') +
       '</div>';
@@ -4724,6 +5230,13 @@
       view.curId = nid; render();
       var obj = getById(nid);
       if (obj && window.cmOpenMonsterEditor) window.cmOpenMonsterEditor(obj, window.cmBestiary.save);
+      return;
+    }
+
+    var combatB = e.target.closest('[data-bestcombat]');
+    if (combatB) {
+      var mc = getById(combatB.dataset.bestcombat);
+      if (mc && window.cmAddMonsterToCombat) window.cmAddMonsterToCombat(mc);
       return;
     }
 
