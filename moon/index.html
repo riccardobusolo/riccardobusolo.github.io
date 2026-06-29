@@ -1926,7 +1926,7 @@ input.pg__inp:focus,textarea.pg__inp:focus{cursor:var(--cur-text)}
 /* MAPPA */
 .mp__wb{padding:0!important;display:flex;flex-direction:column;overflow:hidden}
 .mp__layout{flex:1;display:flex;min-height:0;overflow:hidden}
-.mp__sb{width:260px;flex-shrink:0;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.mp__sb{width:260px;max-width:40%;flex-shrink:0;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
 .mp__sb-top{display:flex;gap:4px;padding:8px;border-bottom:1px solid var(--border)}
 .mp__sb-search{flex:1;min-width:0;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 8px;color:var(--text);font-family:var(--mono);font-size:.7rem;line-height:1.2;outline:none;height:28px}
 .mp__sb-search:focus{border-color:var(--gold)}
@@ -2003,9 +2003,9 @@ body.mp-sb-dragging .mp__sb-item:not(.on):not(.mp__sb-item--drag):not(.mp__sb-it
 .mp__vb:hover{color:var(--text);background:var(--bg2)}
 .mp__vb--on{color:var(--gold);border-bottom-color:var(--gold);background:rgba(196,154,50,.04)}
 .mp__view{flex:1;overflow:auto;min-height:0;display:flex;flex-direction:column;position:relative}
-.mp__resizer{flex:0 0 5px;align-self:stretch;cursor:col-resize;background:var(--border);transition:background .12s}
-.mp__resizer:hover{background:var(--gold)}
-.mp__edpanel{width:340px;flex:0 0 auto;min-width:0;display:flex;flex-direction:column;overflow:auto;border-left:1px solid var(--border);background:var(--bg)}
+.mp__resizer{flex:0 0 0px;align-self:stretch;position:relative;z-index:5}
+.mp__resizer::after{content:'';position:absolute;top:0;bottom:0;left:-4px;width:9px;cursor:col-resize}
+.mp__edpanel{width:340px;max-width:40%;flex:0 0 auto;min-width:0;display:flex;flex-direction:column;overflow:auto;border-left:1px solid var(--border);background:var(--bg)}
 .mp__edpanel:empty::before{content:'Seleziona un nodo o un documento per modificarlo';margin:auto;padding:24px;color:var(--muted);font-family:var(--mono);font-size:.7rem;text-align:center;line-height:1.5}
 /* Editor */
 .mp__editor{padding:14px 16px;display:flex;flex-direction:column;gap:10px;height:100%;box-sizing:border-box}
@@ -7793,8 +7793,14 @@ document.addEventListener('mouseup',function(e){var _rs=document.getElementById(
 /* Niente menu contestuale del browser sulla mappa: il tasto destro serve alla selezione ad area. */
 document.getElementById('winMap').addEventListener('contextmenu',function(e){if(e.target.closest('svg.mp__svg'))e.preventDefault();});
 document.getElementById('winMap').addEventListener('wheel',function(e){if(!mapView)return;var svg=e.target.closest('svg.mp__svg');if(!svg)return;e.preventDefault();var rect=svg.getBoundingClientRect();var mx=(e.clientX-rect.left)/Math.max(1,rect.width)*mapView.w+mapView.x;var my=(e.clientY-rect.top)/Math.max(1,rect.height)*mapView.h+mapView.y;var factor=e.deltaY<0?1.15:1/1.15;var newW=mapView.w/factor,newH=mapView.h/factor;if(newW<40||newW>40000)return;mapView.x=mx-(mx-mapView.x)/factor;mapView.y=my-(my-mapView.y)/factor;mapView.w=newW;mapView.h=newH;svg.setAttribute('viewBox',mapView.x+' '+mapView.y+' '+mapView.w+' '+mapView.h);saveMapView()},{passive:false});
+/* Lo zoom/scala della mappa NON deve cambiare quando si ridimensiona una
+   tendina (o la finestra): osserviamo #mpView e, a ogni variazione di
+   dimensione, riadattiamo il viewBox mantenendo costante la scala
+   (px per unità) e il centro inquadrato — così cambia solo QUANTA mappa
+   si vede, non quanto è ingrandita. */
+(function(){var vEl=document.getElementById('mpView');if(!vEl||typeof ResizeObserver==='undefined')return;var pW=0,pH=0;var ro=new ResizeObserver(function(){var W=vEl.clientWidth,H=vEl.clientHeight;if(!W||!H)return;if(pW&&pH&&mapView&&(W!==pW||H!==pH)){var s=Math.min(pW/mapView.w,pH/mapView.h);if(s>0&&isFinite(s)){var cx=mapView.x+mapView.w/2,cy=mapView.y+mapView.h/2;mapView.w=W/s;mapView.h=H/s;mapView.x=cx-mapView.w/2;mapView.y=cy-mapView.h/2;var svg=document.getElementById('mpSvg');if(svg)svg.setAttribute('viewBox',mapView.x+' '+mapView.y+' '+mapView.w+' '+mapView.h);saveMapView();}}pW=W;pH=H;});ro.observe(vEl);})();
 /* Tendine ridimensionabili: navigatore (sx) ed editor (dx). Larghezze persistite. */
-(function(){var sb=document.getElementById('mpSb'),ed=document.getElementById('mpEditor'),hL=document.getElementById('mpResizeL'),hR=document.getElementById('mpResizeR');if(!sb||!ed||!hL||!hR)return;try{var sw=localStorage.getItem('cm_mp_sbw');if(sw)sb.style.width=sw;var ew=localStorage.getItem('cm_mp_edw');if(ew)ed.style.width=ew;}catch(_){}function mk(handle,target,sign){handle.addEventListener('mousedown',function(e){if(e.button!==0)return;e.preventDefault();e.stopPropagation();var sx=e.clientX,sw0=target.getBoundingClientRect().width;document.body.style.cursor='col-resize';document.body.style.userSelect='none';function mv(ev){var w=sw0+sign*(ev.clientX-sx);w=Math.max(150,Math.min(720,w));target.style.width=w+'px';}function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.style.cursor='';document.body.style.userSelect='';try{localStorage.setItem('cm_mp_sbw',sb.style.width||'');localStorage.setItem('cm_mp_edw',ed.style.width||'');}catch(_){}if(typeof renderMap==='function')renderMap();}document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);});}mk(hL,sb,1);mk(hR,ed,-1);})();
+(function(){var sb=document.getElementById('mpSb'),ed=document.getElementById('mpEditor'),hL=document.getElementById('mpResizeL'),hR=document.getElementById('mpResizeR');if(!sb||!ed||!hL||!hR)return;try{var sw=localStorage.getItem('cm_mp_sbw');if(sw)sb.style.width=sw;var ew=localStorage.getItem('cm_mp_edw');if(ew)ed.style.width=ew;}catch(_){}function mk(handle,target,sign){handle.addEventListener('mousedown',function(e){if(e.button!==0)return;e.preventDefault();e.stopPropagation();var sx=e.clientX,sw0=target.getBoundingClientRect().width;var lw=(target.parentElement||target).getBoundingClientRect().width,cap=Math.round(lw*0.4),lo=Math.min(150,cap);document.body.style.cursor='col-resize';document.body.style.userSelect='none';function mv(ev){var w=sw0+sign*(ev.clientX-sx);w=Math.max(lo,Math.min(cap,w));target.style.width=w+'px';}function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.style.cursor='';document.body.style.userSelect='';try{localStorage.setItem('cm_mp_sbw',sb.style.width||'');localStorage.setItem('cm_mp_edw',ed.style.width||'');}catch(_){}if(typeof renderMap==='function')renderMap();}document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);});}mk(hL,sb,1);mk(hR,ed,-1);})();
 /* re-render map on window resize */
 var _mpResizeT=null;window.addEventListener('resize',function(){if(_mpResizeT)clearTimeout(_mpResizeT);_mpResizeT=setTimeout(renderMap,150)});
 /* Drawing modal */
