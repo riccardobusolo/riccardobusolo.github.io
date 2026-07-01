@@ -3768,6 +3768,7 @@ function accSyncUp(silent){
     var ts=Date.now();localStorage.setItem('cm_last_sync',String(ts));
     setMsg('accSyncMsg','\u2705 Caricato nel cloud \u2014 '+new Date(ts).toLocaleTimeString('it-IT'),'ok');
     refreshAccUI();
+    try{_writeStats(_userFsUsage(),_userCldUsage())}catch(e){}
   }).catch(function(err){setMsg('accSyncMsg','Errore: '+err.message,'err')});
 }
 function accSyncDown(silent){
