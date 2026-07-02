@@ -4614,6 +4614,52 @@
       bonusActions: [], reactions: [], legendaryActions: [],
       drop: [{ name: 'Scudo', desc: 'Lo scudo impugnato dall\'orrore corazzato.' }],
       notes: 'Un\'Armatura con lo Scopo di un Guerriero\n\nHabitat: Qualsiasi\nTesoro: Armamenti\n\nGli orrori corazzati sono armature animate dalla magia. Più che automi privi di ragione, questi gusci corazzati possiedono l\'astuzia dei soldati e una grande resistenza contro la magia distruttiva. Sebbene il loro nome suggerisca intenzioni sinistre, queste creature servono con lealtà i propri creatori. Gli orrori corazzati sono talvolta chiamati anche guardiani d\'acciaio o armature spirituali. La maggior parte non mostra alcun segno di personalità, ma esistono delle eccezioni.\n\nGli orrori corazzati possono svolgere i più svariati incarichi. Tira sulla tabella Direttive dell\'Orrore Corazzato oppure scegli un risultato per ispirare il compito svolto da un orrore corazzato.\n\nDirettive dell\'Orrore Corazzato (1d6) — Esegue ordini per...\n1. Trasportare in volo il palanchino del proprio padrone.\n2. Difendere un tesoro straordinario o un prezioso pezzo d\'armatura incorporandolo nel proprio corpo.\n3. Imitare un eroe morto o imprigionato utilizzandone armatura e armi.\n4. Svolgere il ruolo di lavoratore o servitore.\n5. Servire in una legione composta dalle armature degli antichi difensori di una nazione.\n6. Fare la sentinella in una galleria di armature comuni.'
+    },
+    {
+      id: 'preset_hezrou', name: 'Hezrou', emoji: '👹', rarity: 'uncommon',
+      type: 'Immondo', size: 'Grande', alignment: 'Caotico Malvagio',
+      ac: 18, hp: 157, hpCur: 157, hpTemp: 0, hpDice: '15d10+75', init: 6,
+      speed: '9 m', cr: '8', xp: '',
+      str: 19, dex: 17, con: 20, intl: 5, wis: 12, cha: 13,
+      savesOverride: { str: '7', dex: '', con: '8', intl: '', wis: '4', cha: '' },
+      skillOverrides: {}, passivePerception: 11,
+      senses: [{ type: 'Scurovisione', value: 36, unit: 'm' }], languages: ['Abissale', 'Telepatia 36 m'],
+      dmgResist: ['Freddo', 'Fuoco', 'Fulmine'], dmgImmune: ['Veleno'], dmgVulner: [], condImmune: ['Avvelenato'],
+      traits: [
+        { name: 'Restaurazione Demoniaca', desc: 'Se l\'hezrou muore al di fuori dell\'Abisso, il suo corpo si dissolve in icore e ottiene immediatamente un nuovo corpo, tornando in vita con tutti i suoi Punti Ferita da qualche parte nell\'Abisso.' },
+        { name: 'Resistenza Magica', desc: 'L\'hezrou ha Vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.' },
+        { name: 'Puzza', desc: 'Tiro Salvezza su Costituzione: CD 16, ogni creatura che inizia il proprio turno in un\'Emanazione di 3 metri originata dall\'hezrou.\nFallimento: Il bersaglio ottiene la condizione Avvelenato fino all\'inizio del suo turno successivo.' }
+      ],
+      actions: [
+        { name: 'Multiattacco', desc: 'L\'hezrou effettua tre attacchi con Lacerazione.' },
+        { name: 'Lacerazione', desc: 'Attacco con Arma da Mischia: +7 a colpire, portata 1,5 m.\nColpito: 6 (1d4 + 4) danni taglienti più 9 (2d8) danni da veleno.', atkHit: '+7', atkDmgs: [{ f: '1d4+4', t: 'taglienti' }, { f: '2d8', t: 'veleno' }] }
+      ],
+      bonusActions: [
+        { name: 'Balzo', desc: 'L\'hezrou salta fino a 9 metri spendendo 3 metri del proprio movimento.' }
+      ],
+      reactions: [], legendaryActions: [],
+      drop: [{ name: 'Tesoro', desc: 'Qualsiasi.' }],
+      notes: 'Demone dell\'Oscenità e della Furia\n\nHabitat: Planare (Abisso)\nTesoro: Qualsiasi\n\nGli hezrou costituiscono il grosso di molte orde demoniache. Riuniti in orde gracchianti e maleodoranti, questi bruti grandi quanto ogre cercano di schiacciare e divorare i loro nemici. Le loro pelli grondanti sono manifestazioni del male incarnato. Ogni pochi istanti, porzioni della loro pelle viscida esplodono in grottesche trasformazioni: file di zanne irregolari, escrescenze fungine o membra appena formate. Queste inquietanti mutazioni emergono e poi rifluiscono rapidamente.\n\nGli hezrou servono demoni più potenti, come le nalfeshnee e le marilith. Subiscono gli abusi e le intimidazioni di questi demoni più letali, riversandoli poi su orde di dretch e mane più deboli. Questa brutalità prevedibile rende gli hezrou preziosi ingranaggi nella caotica struttura di un\'orda demoniaca.\n\nSul Piano Materiale, o quando vengono lasciati a sé stessi, gli hezrou si abbandonano senza freni a devastazioni distruttive e miopi. Solo la magia e le minacce di padroni più potenti possono contenere la loro furia e costringerli a perseguire piani più grandi. Potenti incantatori ricorrono spesso a coercizioni sinistre, a incantesimi come Cerchio Magico e Vincolo Planare, o ad altre magie per obbligare gli hezrou a servirli.\n\nIncarichi Demoniaci (1d6) — Il Demone È Costretto A...\n1. Forzare un caveau e rubare ciò che contiene.\n2. Profanare un luogo con simboli blasfemi e sangue demoniaco.\n3. Recuperare o procurare in altro modo i materiali necessari per un rituale empio.\n4. Sorvegliare un luogo e uccidere chiunque vi si avvicini.\n5. Dare la caccia a un nemico, distruggendo tutto ciò che si frappone sul cammino del demone.\n6. Intimidire qualcuno affinché obbedisca agli ordini.'
+    },
+    {
+      id: 'preset_gigante_colline', name: 'Gigante delle Colline', emoji: '⛰️', rarity: 'uncommon',
+      type: 'Gigante', size: 'Enorme', alignment: 'Caotico Malvagio',
+      ac: 13, hp: 105, hpCur: 105, hpTemp: 0, hpDice: '10d12+40', init: 2,
+      speed: '12 m', cr: '5', xp: '',
+      str: 21, dex: 8, con: 19, intl: 5, wis: 9, cha: 6,
+      savesOverride: { str: '', dex: '', con: '', intl: '', wis: '', cha: '' },
+      skillOverrides: { percezione: '2' }, passivePerception: 12,
+      senses: [], languages: ['Gigante'],
+      dmgResist: [], dmgImmune: [], dmgVulner: [], condImmune: [],
+      traits: [],
+      actions: [
+        { name: 'Multiattacco', desc: 'Il gigante effettua due attacchi, usando Randello d\'Albero o Lancio di Rifiuti in qualsiasi combinazione.' },
+        { name: 'Randello d\'Albero', desc: 'Attacco con Arma da Mischia: +8 a colpire, portata 3 m.\nColpito: 18 (3d8 + 5) danni contundenti. Se il bersaglio è una creatura di taglia Grande o inferiore, subisce la condizione Prono.', atkHit: '+8', atkDmgs: [{ f: '3d8+5', t: 'contundenti' }] },
+        { name: 'Lancio di Rifiuti', desc: 'Attacco con Arma a Distanza: +8 a colpire, gittata 18/72 m.\nColpito: 16 (2d10 + 5) danni contundenti, e il bersaglio subisce la condizione Avvelenato fino alla fine del suo turno successivo.', atkHit: '+8', atkDmgs: [{ f: '2d10+5', t: 'contundenti' }] }
+      ],
+      bonusActions: [], reactions: [], legendaryActions: [],
+      drop: [{ name: 'Tesoro', desc: 'Armamenti.' }],
+      notes: 'Gigante delle rupi e delle valli\n\nHabitat: Colline\nTesoro: Armamenti\n\nI giganti delle colline vivono tra rupi scoscese e altopiani. Alti tre volte la maggior parte degli umani, questi giganti sfoggiano pelle e capelli in una gamma di tonalità che richiamano la terra e i muschi nei pressi delle loro dimore.\n\nTra valli nascoste, cascate incontaminate e pendii ricchi di selvaggina, i giganti delle colline di solito trovano nella generosità della natura tutto ciò di cui hanno bisogno. Ciò che le terre selvagge non forniscono, i giganti delle colline lo fabbricano, creando abiti, utensili e armi con rocce, legno e pelli. Quando incontrano degli estranei, i giganti delle colline potrebbero mostrarsi sospettosi e protettivi nei confronti dei propri territori, ma alcuni potrebbero essere convinti a condividere le loro ricchezze con viaggiatori disposti a intrattenerli.\n\nDisastri, invasioni o privazioni potrebbero spingere i giganti delle colline ad abbandonare le proprie dimore e a invadere le terre di altri popoli. Alcuni giganti delle colline sfollati potrebbero rubare ciò di cui hanno bisogno o cercare vendetta per le perdite subite seminando rovina tra esseri più piccoli. Altri potrebbero dedicarsi alle razzie oppure servire altri giganti in cambio di protezione.'
     }
   ];
 
