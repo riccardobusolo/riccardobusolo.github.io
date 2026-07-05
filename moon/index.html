@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <script>
-/* Versione mobile (m/): redirect automatico da schermi piccoli/touch, solo a
-   cancello superato (cm_u). Scappatoie: ?desktop=1 blocca il redirect su
-   questo dispositivo (m_forcedesktop, chiave locale non sincronizzata),
-   ?mobile=1 rimuove il blocco. */
+/* Versione mobile (m/): redirect automatico da schermi piccoli/touch,
+   SENZA passare dal finto 404 (il mobile è protetto dal muro di login).
+   Scappatoie: ?desktop=1 blocca il redirect su questo dispositivo
+   (m_forcedesktop, chiave locale non sincronizzata), ?mobile=1 rimuove
+   il blocco. Il cancello con l'enigma resta solo sul desktop. */
 window.__mWantsMobile=function(){try{
   if(localStorage.getItem('m_forcedesktop')==='1')return false;
   var mm=function(s){return window.matchMedia&&window.matchMedia(s).matches};
@@ -17,7 +18,7 @@ window.__mWantsMobile=function(){try{
   var q=location.search;
   if(q.indexOf('mobile=1')>-1)localStorage.removeItem('m_forcedesktop');
   if(q.indexOf('desktop=1')>-1)localStorage.setItem('m_forcedesktop','1');
-  if(localStorage.getItem('cm_u')==='1'&&window.__mWantsMobile())location.replace('m/');
+  if(window.__mWantsMobile())location.replace('m/');
 }catch(e){}})();
 </script>
 <title>Site not found &middot; GitHub Pages</title>
