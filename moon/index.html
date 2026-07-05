@@ -3,6 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<script>
+/* Versione mobile (m/): redirect automatico da schermi piccoli/touch, solo a
+   cancello superato (cm_u). Scappatoie: ?desktop=1 blocca il redirect su
+   questo dispositivo (m_forcedesktop, chiave locale non sincronizzata),
+   ?mobile=1 rimuove il blocco. */
+window.__mWantsMobile=function(){try{
+  if(localStorage.getItem('m_forcedesktop')==='1')return false;
+  var mm=function(s){return window.matchMedia&&window.matchMedia(s).matches};
+  return mm('(max-width:700px)')||(mm('(pointer:coarse)')&&mm('(max-width:820px)'));
+}catch(e){return false}};
+(function(){try{
+  var q=location.search;
+  if(q.indexOf('mobile=1')>-1)localStorage.removeItem('m_forcedesktop');
+  if(q.indexOf('desktop=1')>-1)localStorage.setItem('m_forcedesktop','1');
+  if(localStorage.getItem('cm_u')==='1'&&window.__mWantsMobile())location.replace('m/');
+}catch(e){}})();
+</script>
 <title>Site not found &middot; GitHub Pages</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -3155,7 +3172,7 @@ var EMOJIS=[
 var rm=document.getElementById('rm'),pb=document.getElementById('pb'),pin=document.getElementById('pin'),g4p=document.getElementById('g4p'),app=document.getElementById('app');
 if(localStorage.getItem('cm_u')==='1'){g4p.style.display='none';app.style.transition='none';app.classList.add('on');document.body.style.background='var(--bg)';document.body.style.overflow='hidden';}
 rm.onclick=function(){rm.classList.toggle('on');pb.classList.toggle('on');if(pb.classList.contains('on'))setTimeout(function(){pin.focus()},400)};
-pin.oninput=function(){if(pin.value.toLowerCase().trim()==='moon'){pin.disabled=true;pin.style.color='#8b2020';localStorage.setItem('cm_u','1');setTimeout(function(){g4p.classList.add('out');document.body.style.background='var(--bg)';document.body.style.overflow='hidden';app.classList.add('on')},300)}};
+pin.oninput=function(){if(pin.value.toLowerCase().trim()==='moon'){pin.disabled=true;pin.style.color='#8b2020';localStorage.setItem('cm_u','1');setTimeout(function(){if(window.__mWantsMobile&&window.__mWantsMobile()){location.replace('m/');return}g4p.classList.add('out');document.body.style.background='var(--bg)';document.body.style.overflow='hidden';app.classList.add('on')},300)}};
 pin.onkeydown=function(e){if(e.key==='Enter'){var v=pin.value.toLowerCase().trim();if(v&&v!=='moon'){pin.parentElement.classList.add('pw');setTimeout(function(){pin.parentElement.classList.remove('pw')},350);pin.value=''}}};
 
 /* Windows */

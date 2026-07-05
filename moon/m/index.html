@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no">
+<script>
+/* Cancello: la versione mobile richiede lo sblocco già fatto sul cancello
+   del desktop (cm_u, chiave sincronizzata). Senza, si torna alla pagina
+   principale che mostra il finto 404 con l'enigma. */
+try{if(localStorage.getItem('cm_u')!=='1')location.replace('../')}catch(e){}
+</script>
+<title>Companion</title>
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<meta name="format-detection" content="telephone=no">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Companion">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* Palette = tema "Scuro" della versione desktop (monocromo bianco su nero) */
+:root{color-scheme:dark;--bg:#000;--bg2:#0a0a0a;--bg3:#141414;--bg4:#1c1c1c;--border:rgba(255,255,255,.14);--bh:rgba(255,255,255,.28);--text:#fff;--dim:#bbb;--muted:#888;--red:#fff;--rl:rgba(255,255,255,.08);--rb:rgba(255,255,255,.24);--gold:#fff;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+html{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+button{font-family:inherit;color:inherit;background:none;border:none;touch-action:manipulation;cursor:pointer}
+input,textarea{user-select:text;-webkit-user-select:text;font-family:var(--mono)}
+a{color:var(--text)}
+img{-webkit-user-drag:none}
+
+/* ===== Header ===== */
+.hdr{flex-shrink:0;display:flex;align-items:center;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.hdr__title{font-family:var(--mono);font-size:.82rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--text)}
+
+/* ===== Pagine ===== */
+.main{flex:1;min-height:0;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:none;padding:14px}
+.page--on{display:block}
+.wrap{max-width:480px;margin:0 auto}
+
+/* ===== Tab bar ===== */
+.tabbar{flex-shrink:0;display:flex;background:var(--bg2);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 9px;color:var(--muted);font-family:var(--mono);font-size:.5rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;transition:color .15s}
+.tab i{font-style:normal;font-size:1.3rem;line-height:1;filter:grayscale(1) opacity(.45);transition:filter .15s}
+.tab--on{color:var(--text)}
+.tab--on i{filter:grayscale(1) opacity(1)}
+
+/* ===== Componenti comuni ===== */
+.sec-title{font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text);margin:4px 2px 10px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:12px 13px;margin-bottom:10px}
+.card__t{font-family:var(--mono);font-size:.6rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mbtn{background:var(--bg3);border:1px solid var(--bh);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:.7rem;font-weight:700;padding:12px;text-align:center;display:block;width:100%;text-decoration:none}
+.mbtn:active{background:var(--bg4)}
+.mbtn--dim{border-color:var(--border);color:var(--dim)}
+.mbtn+.mbtn{margin-top:8px}
+.msg{font-family:var(--mono);font-size:.62rem;line-height:1.6;margin-top:8px;min-height:1em}
+.msg--err{color:#f66}
+.msg--ok{color:#9c9}
+.msg--info{color:var(--dim)}
+.empty{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:44px 18px;color:var(--muted)}
+.empty i{font-style:normal;font-size:2.2rem;filter:grayscale(1)}
+.empty p{font-family:var(--mono);font-size:.68rem;line-height:1.7;max-width:300px}
+
+/* ===== Toast ===== */
+.toast{position:fixed;left:50%;bottom:calc(74px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--bg4);border:1px solid var(--bh);border-radius:11px;padding:10px 16px;font-family:var(--mono);font-size:.74rem;color:var(--text);z-index:600;opacity:0;pointer-events:none;transition:all .22s var(--ease);max-width:92vw;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.7)}
+.toast--on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast b{font-weight:700}
+.toast--crit{border-color:rgba(255,255,255,.85)}
+.toast--fail{opacity:.99}
+.toast--fail b{opacity:.6}
+
+/* ===== Conferma ===== */
+.cf{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:22px}
+.cf--on{display:flex}
+.cf__md{background:var(--bg2);border:1px solid var(--bh);border-radius:14px;max-width:340px;width:100%;padding:16px}
+.cf__t{font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.cf__m{font-family:var(--mono);font-size:.68rem;line-height:1.7;color:var(--dim);white-space:pre-line;margin-bottom:14px}
+.cf__row{display:flex;gap:8px}
+.cf__ok{flex:1;background:var(--rl);border:1px solid var(--bh);border-radius:10px;font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--text);padding:11px 0}
+.cf__no{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--muted);padding:11px 0}
+
+/* ===== Dadi ===== */
+.dice{display:flex;flex-direction:column;gap:12px;height:100%;max-width:480px;margin:0 auto}
+.dice__box{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px 12px}
+.dice__lbl{font-family:var(--mono);font-size:.58rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.dice__tot{font-family:var(--mono);font-size:4.4rem;font-weight:700;color:var(--text);line-height:1}
+.dice__tot--pop{animation:dpop .16s var(--ease)}
+@keyframes dpop{from{transform:scale(1.13)}to{transform:scale(1)}}
+.dice__log{display:flex;flex-wrap:wrap;gap:5px;align-items:center;justify-content:center;max-height:132px;overflow-y:auto;padding:2px 4px}
+.dice__hint{font-family:var(--mono);font-size:.64rem;color:var(--muted)}
+.dchip{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--dim);background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 8px;white-space:nowrap}
+.dchip b{font-size:.6rem;font-weight:600;color:var(--muted);margin-right:5px}
+.dchip--max{border-color:rgba(255,255,255,.8);color:var(--text);font-weight:700}
+.dchip--min{opacity:.5}
+.dplus{font-family:var(--mono);font-size:.66rem;color:var(--muted)}
+.dice__grid{flex-shrink:0;display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.die{background:var(--bg3);border:1px solid var(--bh);border-radius:13px;font-family:var(--mono);font-size:1.05rem;font-weight:700;color:var(--text);padding:16px 0;transition:transform .07s,background .07s,border-color .07s}
+.die:active{transform:scale(.93);background:var(--bg4);border-color:#fff}
+.die--w{grid-column:span 2}
+.dice__reset{flex-shrink:0;background:var(--rl);border:1px solid var(--rb);border-radius:13px;color:var(--dim);font-family:var(--mono);font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:13px 0;transition:background .12s}
+.dice__reset:active{background:rgba(255,255,255,.16)}
+
+/* ===== Scheda PG: lista ===== */
+.pg__bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 2px 12px}
+.pg__bar .sec-title{margin:0}
+.pg__add{font-family:var(--mono);font-size:.62rem;font-weight:700;color:var(--text);background:var(--bg2);border:1px solid var(--bh);border-radius:8px;padding:8px 12px}
+.pg__add:active{background:var(--bg3)}
+.newpg{background:var(--bg2);border:1px solid var(--bh);border-radius:13px;padding:13px;margin-bottom:11px}
+.newpg__t{font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--text);margin-bottom:10px}
+.newpg__inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:.8rem;padding:11px 12px;outline:none}
+.newpg__inp:focus{border-color:var(--bh)}
+.newpg__row{display:flex;gap:8px;margin-top:10px}
+.newpg__ok{flex:1;background:var(--rl);border:1px solid var(--bh);border-radius:9px;color:var(--text);font-family:var(--mono);font-size:.7rem;font-weight:700;padding:11px 0}
+.newpg__ok:active{background:rgba(255,255,255,.16)}
+.newpg__no{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--muted);font-family:var(--mono);font-size:.7rem;font-weight:700;padding:11px 0}
+.newpg__no:active{background:var(--bg4)}
+.pgcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:11px 12px;margin-bottom:9px;transition:border-color .15s,background .1s}
+.pgcard--cur{border-color:rgba(255,255,255,.5)}
+.pgcard:active{background:var(--bg3)}
+.pgcard__av{width:46px;height:46px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--muted);overflow:hidden;flex-shrink:0}
+.pgcard__av img{width:100%;height:100%;object-fit:cover}
+.pgcard__av span,.pgs__av span{font-family:var(--mono);font-weight:700;color:var(--text)}
+.pgcard__n{font-family:var(--mono);font-size:.86rem;font-weight:700;color:var(--text)}
+.pgcard__d{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:3px}
+.pgcard__cur{margin-left:auto;flex-shrink:0;font-family:var(--mono);font-size:.52rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);border:1px solid rgba(255,255,255,.4);border-radius:5px;padding:3px 6px}
+.empty .pg__add{margin-top:4px}
+
+/* ===== Scheda PG: scheda ===== */
+.pgs__back{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.66rem;font-weight:600;color:var(--muted);padding:6px 10px 6px 6px;margin-bottom:8px;border-radius:8px}
+.pgs__back:active{background:var(--bg3)}
+.pgs__head{display:flex;align-items:center;gap:13px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.pgs__av{width:64px;height:64px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.7rem;color:var(--muted);overflow:hidden;flex-shrink:0}
+.pgs__av img{width:100%;height:100%;object-fit:cover}
+.pgs__name{font-family:var(--mono);font-size:1.02rem;font-weight:700}
+.pgs__sub{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:4px;line-height:1.5}
+.hp{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:11px 13px;margin-bottom:10px}
+.hp__row{display:flex;align-items:center;gap:9px;font-family:var(--mono)}
+.hp__l{font-size:.56rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);flex:1}
+.hp__v{font-size:1.02rem;font-weight:700}
+.hp__v b{color:var(--text)}
+.hp__v span{color:var(--muted);font-size:.8rem}
+.step{width:38px;height:38px;border-radius:10px;background:var(--bg3);border:1px solid var(--bh);color:var(--text);font-family:var(--mono);font-size:1.15rem;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step:active{background:var(--bg4);border-color:#fff}
+.step--s{width:30px;height:30px;font-size:.95rem;border-radius:8px}
+.hp__bar{height:7px;background:var(--bg4);border-radius:4px;overflow:hidden;margin-top:9px}
+.hp__fill{height:100%;background:linear-gradient(90deg,#666,#fff);border-radius:4px;transition:width .25s var(--ease)}
+.hp__temp{display:flex;align-items:center;gap:9px;margin-top:9px;font-family:var(--mono)}
+.hp__temp .hp__l{flex:1}
+.hp__temp b{font-size:.85rem}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.chip{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:9px 4px;text-align:center}
+.chip__l{font-family:var(--mono);font-size:.5rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.chip__v{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--text);margin-top:4px}
+.strow{display:flex;align-items:center;gap:9px;font-family:var(--mono);padding:7px 0;border-bottom:1px solid var(--border)}
+.strow:last-child{border-bottom:none;padding-bottom:0}
+.strow:first-child{padding-top:0}
+.strow__l{flex:1;font-size:.68rem;color:var(--dim)}
+.strow__v{font-size:.82rem;font-weight:700}
+.dot{width:16px;height:16px;border-radius:50%;border:1px solid var(--bh);background:transparent;padding:0}
+.dot--on{background:#fff;border-color:#fff}
+.dot--f.dot--on{background:var(--muted);border-color:var(--muted)}
+.dots{display:flex;gap:6px;align-items:center}
+.abgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.ab{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:10px 6px;text-align:center;transition:background .1s}
+.ab:active{background:var(--bg3)}
+.ab__l{font-family:var(--mono);font-size:.56rem;font-weight:700;letter-spacing:.14em;color:var(--muted)}
+.ab__m{font-family:var(--mono);font-size:1.25rem;font-weight:700;color:var(--text);margin-top:3px}
+.ab__s{font-family:var(--mono);font-size:.58rem;color:var(--dim);margin-top:2px}
+.skrow{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font-family:var(--mono);padding:8px 2px;border-bottom:1px solid var(--border);background:none}
+.skrow:active{background:var(--bg3)}
+.skrow:last-child{border-bottom:none}
+.skrow__p{width:8px;height:8px;border-radius:50%;border:1px solid var(--bh);flex-shrink:0}
+.skrow__p--1{background:#fff;border-color:#fff}
+.skrow__p--2{background:#fff;border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.skrow__n{flex:1;font-size:.7rem;color:var(--text)}
+.skrow__ab{font-size:.54rem;color:var(--muted);text-transform:uppercase}
+.skrow__b{font-size:.78rem;font-weight:700;min-width:34px;text-align:right}
+.slotrow{display:flex;align-items:center;gap:8px;font-family:var(--mono);padding:6px 0}
+.slotrow__l{font-size:.62rem;color:var(--dim);width:44px;flex-shrink:0}
+.slotrow__pips{flex:1;display:flex;gap:5px;flex-wrap:wrap}
+.pip{width:13px;height:13px;border-radius:4px;border:1px solid var(--bh);background:transparent}
+.pip--on{background:#fff;border-color:#fff}
+.sprow{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font-family:var(--mono);padding:8px 2px;border-bottom:1px solid var(--border);background:none}
+.sprow:active{background:var(--bg3)}
+.sprow:last-child{border-bottom:none}
+.sprow__lvl{font-size:.56rem;font-weight:700;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:2px 5px;min-width:24px;text-align:center;flex-shrink:0}
+.sprow__n{flex:1;font-size:.7rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sprow__tag{font-size:.52rem;color:var(--muted)}
+.sprow__prep{font-size:.9rem;color:var(--muted);padding:2px 6px;flex-shrink:0}
+.sprow__prep--on{color:#fff}
+.acc-sec{width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:11px 2px}
+.acc-sec i{font-style:normal;color:var(--muted);transition:transform .18s;font-size:.7rem}
+.acc-sec.on i{transform:rotate(180deg)}
+.acc-body{display:none;font-family:var(--mono);font-size:.66rem;line-height:1.75;color:var(--dim);white-space:pre-wrap;padding:2px 2px 11px}
+.acc-body.on{display:block}
+.noteta{width:100%;min-height:130px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:.7rem;line-height:1.7;padding:10px 11px;outline:none;resize:vertical}
+.noteta:focus{border-color:var(--bh)}
+.wipnote{margin-top:4px;background:var(--rl);border:1px dashed var(--rb);border-radius:11px;padding:10px 13px;font-family:var(--mono);font-size:.58rem;line-height:1.7;color:var(--dim)}
+
+/* ===== Incantesimi (compendio) ===== */
+.spq{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:11px;color:var(--text);font-size:.78rem;padding:11px 13px;outline:none;margin-bottom:9px}
+.spq:focus{border-color:var(--bh)}
+.lvlchips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:4px;scrollbar-width:none}
+.lvlchips::-webkit-scrollbar{display:none}
+.lvlchip{flex-shrink:0;font-family:var(--mono);font-size:.6rem;font-weight:700;color:var(--muted);background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 11px}
+.lvlchip--on{color:var(--text);border-color:rgba(255,255,255,.55);background:var(--bg3)}
+.spmeta{font-family:var(--mono);font-size:.56rem;color:var(--muted);margin:2px 2px 8px;display:flex;justify-content:space-between;gap:8px}
+.spitem{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:10px 12px;margin-bottom:7px}
+.spitem:active{background:var(--bg3)}
+.spitem__lvl{font-family:var(--mono);font-size:.6rem;font-weight:700;color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:3px 6px;min-width:28px;text-align:center;flex-shrink:0}
+.spitem__n{flex:1;min-width:0}
+.spitem__name{display:block;font-family:var(--mono);font-size:.74rem;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spitem__sub{display:block;font-family:var(--mono);font-size:.56rem;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spitem__k{font-family:var(--mono);font-size:.85rem;color:var(--text);flex-shrink:0}
+.spbanner{font-family:var(--mono);font-size:.6rem;color:var(--dim);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;margin-bottom:9px;line-height:1.6}
+.spbanner b{color:var(--text)}
+
+/* ===== Overlay dettaglio incantesimo ===== */
+.spov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.78);display:none}
+.spov--on{display:block}
+.spov__sheet{position:absolute;left:0;right:0;bottom:0;top:52px;background:var(--bg2);border:1px solid var(--bh);border-bottom:none;border-radius:18px 18px 0 0;display:flex;flex-direction:column;max-width:520px;margin:0 auto}
+.spov__h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:16px 16px 10px;border-bottom:1px solid var(--border)}
+.spov__name{font-family:var(--mono);font-size:.95rem;font-weight:700;line-height:1.35}
+.spov__sub{font-family:var(--mono);font-size:.6rem;color:var(--muted);margin-top:4px}
+.spov__x{font-size:1.35rem;color:var(--muted);padding:2px 8px;flex-shrink:0;line-height:1}
+.spov__body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px 16px}
+.spov__grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
+.spov__f{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:7px 9px}
+.spov__fl{font-family:var(--mono);font-size:.5rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.spov__fv{font-family:var(--mono);font-size:.62rem;color:var(--text);margin-top:3px;line-height:1.45}
+.spov__desc{font-family:var(--mono);font-size:.68rem;line-height:1.8;color:var(--dim);white-space:pre-wrap}
+.spov__desc b{color:var(--text)}
+.spov__foot{flex-shrink:0;padding:11px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);display:flex;gap:8px}
+.spov__act{flex:1;background:var(--rl);border:1px solid var(--bh);border-radius:11px;color:var(--text);font-family:var(--mono);font-size:.68rem;font-weight:700;padding:13px 6px}
+.spov__act:active{background:rgba(255,255,255,.16)}
+.spov__act--dim{background:var(--bg3);border-color:var(--border);color:var(--muted)}
+
+/* ===== Account ===== */
+.acc__kv{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:.64rem;padding:6px 0;border-bottom:1px solid var(--border)}
+.acc__kv:last-child{border-bottom:none}
+.acc__kv span{color:var(--muted)}
+.acc__kv b{color:var(--text);font-weight:600;text-align:right;overflow:hidden;text-overflow:ellipsis}
+.togrow{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:.64rem;color:var(--dim);padding:4px 0}
+.tog{position:relative;width:42px;height:24px;border-radius:13px;background:var(--bg4);border:1px solid var(--bh);transition:background .15s;flex-shrink:0}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:all .18s var(--ease)}
+.tog--on{background:rgba(255,255,255,.25)}
+.tog--on::after{left:20px;background:#fff}
+
+/* ===== Auth wall ===== */
+.wall{position:fixed;inset:0;z-index:800;background:var(--bg);display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(26px + env(safe-area-inset-top)) 18px calc(26px + env(safe-area-inset-bottom))}
+.wall--on{display:block}
+.wall__box{max-width:400px;margin:0 auto}
+.wall__t{font-family:var(--mono);font-size:1rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-align:center;margin-bottom:6px}
+.wall__s{font-family:var(--mono);font-size:.62rem;color:var(--muted);text-align:center;line-height:1.7;margin-bottom:18px}
+.wall__tabs{display:flex;gap:7px;margin-bottom:13px}
+.wall__tab{flex:1;font-family:var(--mono);font-size:.64rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 0}
+.wall__tab.on{color:var(--text);border-color:rgba(255,255,255,.55);background:var(--bg3)}
+.wall__inp{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:.8rem;padding:12px 13px;outline:none;margin-bottom:9px}
+.wall__inp:focus{border-color:var(--bh)}
+.wall__sub{width:100%;background:var(--rl);border:1px solid var(--bh);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:.72rem;font-weight:700;padding:13px 0;margin-top:2px}
+.wall__sub:active{background:rgba(255,255,255,.16)}
+.wall__sub:disabled{opacity:.5}
+.wall__alt{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--dim);font-family:var(--mono);font-size:.68rem;font-weight:600;padding:12px 0;margin-top:9px}
+.wall__alt:active{background:var(--bg3)}
+.wall__link{display:block;text-align:center;font-family:var(--mono);font-size:.6rem;color:var(--muted);margin-top:13px;background:none;border:none;text-decoration:underline;width:100%}
+.wall__priv{display:flex;align-items:flex-start;gap:8px;font-family:var(--mono);font-size:.58rem;color:var(--muted);line-height:1.6;margin:4px 0 9px}
+.wall__priv input{width:16px;height:16px;margin-top:1px;flex-shrink:0}
+
+/* ===== Impostazioni ===== */
+.set__p{font-family:var(--mono);font-size:.63rem;line-height:1.75;color:var(--dim)}
+.set__p+.set__p{margin-top:8px}
+.set__p b{color:var(--text)}
+.set__k{color:var(--text);font-weight:700}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr__title" id="hdrTitle">Dadi</div>
+</header>
+<main class="main">
+
+<section class="page page--on" data-page="dice">
+  <div class="dice">
+    <div class="dice__box">
+      <div class="dice__lbl">Totale</div>
+      <div class="dice__tot" id="dTot">0</div>
+      <div class="dice__log" id="dLog"></div>
+    </div>
+    <div class="dice__grid">
+      <button class="die" data-die="4">d4</button>
+      <button class="die" data-die="6">d6</button>
+      <button class="die" data-die="8">d8</button>
+      <button class="die" data-die="10">d10</button>
+      <button class="die" data-die="12">d12</button>
+      <button class="die" data-die="20">d20</button>
+      <button class="die die--w" data-die="100">d100</button>
+    </div>
+    <button class="dice__reset" id="dReset">Reset</button>
+  </div>
+</section>
+
+<section class="page" data-page="pg"><div class="wrap" id="pgRoot"></div></section>
+
+<section class="page" data-page="spells"><div class="wrap" id="spRoot"></div></section>
+
+<section class="page" data-page="account"><div class="wrap" id="accRoot"></div></section>
+
+<section class="page" data-page="settings">
+  <div class="wrap">
+    <div class="card">
+      <div class="card__t">📲 Installa come app</div>
+      <div class="set__p"><span class="set__k">Android:</span> menu ⋮ di Chrome → <b>Installa app</b> (o &laquo;Aggiungi a schermata Home&raquo;).</div>
+      <div class="set__p"><span class="set__k">iPhone:</span> pulsante Condividi in Safari → <b>Aggiungi alla schermata Home</b>.</div>
+      <div class="set__p">Otterrai l'icona sulla home e l'app a schermo intero, senza le barre del browser.</div>
+    </div>
+    <div class="card">
+      <div class="card__t">✨ Lingua incantesimi</div>
+      <div class="togrow"><span id="spLangLbl">Italiano (con fallback inglese)</span><button class="tog" id="spLangTog" aria-label="Cambia lingua incantesimi"></button></div>
+      <div class="set__p" style="margin-top:6px">Vale per il compendio e per i nuovi incantesimi aggiunti alla scheda. Condivisa con la versione desktop.</div>
+    </div>
+    <div class="card">
+      <div class="card__t">🖥 Versione desktop</div>
+      <div class="set__p">Apre la versione completa. Questo dispositivo non verrà più reindirizzato automaticamente al mobile (per tornare, apri <b>/moon/?mobile=1</b>).</div>
+      <a class="mbtn mbtn--dim" style="margin-top:10px" href="../?desktop=1">Apri la versione desktop</a>
+    </div>
+    <div class="card">
+      <div class="card__t">⚙ Prossimamente</div>
+      <div class="set__p">Qui arriveranno le altre impostazioni specifiche della versione mobile.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+<nav class="tabbar">
+  <button class="tab tab--on" data-tab="dice"><i>🎲</i>Dadi</button>
+  <button class="tab" data-tab="pg"><i>📜</i>Scheda</button>
+  <button class="tab" data-tab="spells"><i>✨</i>Incantesimi</button>
+  <button class="tab" data-tab="account"><i>👤</i>Account</button>
+  <button class="tab" data-tab="settings"><i>⚙️</i>Impostazioni</button>
+</nav>
+
+<!-- Toast condiviso (risultati tiri, conferme rapide) -->
+<div class="toast" id="toast"></div>
+
+<!-- Conferma -->
+<div class="cf" id="cf">
+  <div class="cf__md">
+    <div class="cf__t" id="cfT">Conferma</div>
+    <div class="cf__m" id="cfM"></div>
+    <div class="cf__row"><button class="cf__ok" id="cfOk">OK</button><button class="cf__no" id="cfNo">Annulla</button></div>
+  </div>
+</div>
+
+<!-- Dettaglio incantesimo -->
+<div class="spov" id="spov">
+  <div class="spov__sheet">
+    <div class="spov__h">
+      <div><div class="spov__name" id="spovName"></div><div class="spov__sub" id="spovSub"></div></div>
+      <button class="spov__x" id="spovX" aria-label="Chiudi">×</button>
+    </div>
+    <div class="spov__body">
+      <div class="spov__grid" id="spovGrid"></div>
+      <div class="spov__desc" id="spovDesc"></div>
+    </div>
+    <div class="spov__foot" id="spovFoot"></div>
+  </div>
+</div>
+
+<!-- Auth wall (replica del muro desktop: l'app richiede il login) -->
+<div class="wall" id="wall">
+  <div class="wall__box">
+    <div class="wall__t">Companion</div>
+    <div class="wall__s">Accedi con lo stesso account della versione desktop:<br>i tuoi personaggi ti seguiranno su questo dispositivo.</div>
+    <div class="wall__tabs">
+      <button class="wall__tab on" data-wtab="login">Accedi</button>
+      <button class="wall__tab" data-wtab="reg">Registrati</button>
+    </div>
+    <form id="mwLoginForm" autocomplete="on">
+      <input class="wall__inp" type="email" id="mwLoginEmail" placeholder="Email" autocomplete="email">
+      <input class="wall__inp" type="password" id="mwLoginPass" placeholder="Password" autocomplete="current-password">
+      <button class="wall__sub" type="submit" id="mwLoginSubmit">Accedi</button>
+      <button class="wall__alt" type="button" id="mwLoginGoogle">Continua con Google</button>
+      <button class="wall__link" type="button" id="mwForgot">Password dimenticata?</button>
+      <div class="msg" id="mwLoginMsg"></div>
+    </form>
+    <form id="mwRegForm" style="display:none" autocomplete="on">
+      <input class="wall__inp" type="email" id="mwRegEmail" placeholder="Email" autocomplete="email">
+      <input class="wall__inp" type="password" id="mwRegPass" placeholder="Password (min. 6 caratteri)" autocomplete="new-password">
+      <input class="wall__inp" type="password" id="mwRegPass2" placeholder="Ripeti password" autocomplete="new-password">
+      <label class="wall__priv"><input type="checkbox" id="mwRegPriv"><span>Accetto la Privacy &amp; Cookie Policy: i dati di gioco vengono salvati nel cloud solo per la sincronizzazione tra dispositivi. Testo completo nella versione desktop (Account → Privacy).</span></label>
+      <button class="wall__sub" type="submit" id="mwRegSubmit">Crea account</button>
+      <button class="wall__alt" type="button" id="mwRegGoogle">Continua con Google</button>
+      <div class="msg" id="mwRegMsg"></div>
+    </form>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="../firebase-config.js"></script>
+<script src="../spells.js"></script>
+<script src="../spells_it.js"></script>
+<script>
+/* ============================================================
+ * Companion — app mobile per giocatori.
+ * Condivide con il desktop: localStorage (cm_*), account Firebase,
+ * spells.js/spells_it.js. Tutte le strutture dati sono IDENTICHE a
+ * quelle del desktop (moon/index.html) per compatibilità totale.
+ * ============================================================ */
+
+/* ============ Utility condivise ============ */
+window._mU=(function(){
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+  var toastEl=document.getElementById('toast'),toastT=null;
+  function toast(html,cls,ms){toastEl.innerHTML=html;toastEl.className='toast toast--on'+(cls?' '+cls:'');clearTimeout(toastT);toastT=setTimeout(function(){toastEl.className='toast'},ms||3200)}
+  var cf=document.getElementById('cf');
+  function confirmBox(msg,onOk,opts){opts=opts||{};document.getElementById('cfT').textContent=opts.title||'Conferma';document.getElementById('cfM').textContent=msg;document.getElementById('cfOk').textContent=opts.okLabel||'OK';cf.classList.add('cf--on');
+    function clean(){cf.classList.remove('cf--on');document.getElementById('cfOk').onclick=null;document.getElementById('cfNo').onclick=null;cf.onclick=null}
+    document.getElementById('cfOk').onclick=function(){clean();if(onOk)onOk()};
+    document.getElementById('cfNo').onclick=clean;
+    cf.onclick=function(e){if(e.target===cf)clean()};
+  }
+  return {esc:esc,toast:toast,confirm:confirmBox};
+})();
+
+/* ============ Strato dati PG (stesse chiavi/strutture del desktop) ============ */
+window._mD=(function(){
+  function loadPGs(){try{return JSON.parse(localStorage.getItem('cm_pgs'))||[]}catch(e){return[]}}
+  function savePGs(arr){try{localStorage.setItem('cm_pgs',JSON.stringify(arr))}catch(e){}}
+  function savePG(pg){if(!pg||!pg.id)return;var arr=loadPGs();var f=false;for(var i=0;i<arr.length;i++)if(arr[i].id===pg.id){arr[i]=pg;f=true;break}if(!f)arr.push(pg);savePGs(arr)}
+  function curId(){return localStorage.getItem('cm_pg_curr')||null}
+  function setCur(id){if(id)localStorage.setItem('cm_pg_curr',id);else localStorage.removeItem('cm_pg_curr')}
+  function curPG(){var id=curId();if(!id)return null;var arr=loadPGs();for(var i=0;i<arr.length;i++)if(arr[i].id===id)return arr[i];return null}
+  function mod(v){return Math.floor(((v||10)-10)/2)}
+  function fmt(m){return(m>=0?'+':'')+m}
+  function pb(l){l=l||1;return l<=4?2:l<=8?3:l<=12?4:l<=16?5:6}
+  /* modOverrides: extra ADDITIVI (non sostitutivi), come nel desktop (_pgEffMod) */
+  function effMod(pg,key,auto){var ov=pg.modOverrides&&pg.modOverrides[key];if(ov==null||ov===''||ov==='-')return auto;var n=parseInt(ov,10);if(isNaN(n))return auto;return auto+n}
+  /* Mappa abilità → caratteristica (stesse chiavi italiane del desktop) */
+  var SKILLS=[
+    ['atletica','Atletica','str'],
+    ['acrobazia','Acrobazia','dex'],['furtivita','Furtività','dex'],['rapidita','Rapidità di Mano','dex'],
+    ['arcano','Arcano','intl'],['indagare','Indagare','intl'],['natura','Natura','intl'],['religione','Religione','intl'],['storia','Storia','intl'],
+    ['animali','Addest. Animali','wis'],['intuizione','Intuizione','wis'],['medicina','Medicina','wis'],['percezione','Percezione','wis'],['sopravvivenza','Sopravvivenza','wis'],
+    ['inganno','Inganno','cha'],['intimidire','Intimidire','cha'],['intrattenere','Intrattenere','cha'],['persuasione','Persuasione','cha']
+  ];
+  var ABS=[['str','FOR','Forza'],['dex','DES','Destrezza'],['con','COS','Costituzione'],['intl','INT','Intelligenza'],['wis','SAG','Saggezza'],['cha','CAR','Carisma']];
+  function skillBonus(pg,key,ab){var p=(pg.profs&&pg.profs[key])||0;return effMod(pg,key,mod(pg[ab])+p*pb(pg.lvl))}
+  function saveBonus(pg,ab){var k='save_'+ab;var p=(pg.profs&&pg.profs[k])||0;return effMod(pg,k,mod(pg[ab])+p*pb(pg.lvl))}
+  /* Copia ESATTA della factory newPG() del desktop: un PG creato da mobile
+     deve avere TUTTI i campi con gli stessi default. Se il desktop evolve,
+     aggiornare anche qui. */
+  function newPG(){var st=[];for(var i=0;i<20;i++){st.push([0,0,0,0,0,0,0,0,0])}return{name:'',race:'',cls:'',classKey:'custom',subcls:'',subclassKey:'custom',align:'',bg:'',lvl:1,xp:0,str:10,dex:10,con:10,intl:10,wis:10,cha:10,ac:10,hp:10,hpCur:10,hpTemp:0,init:0,speed:9,speedUnit:'m',hitDie:8,hitDiceLeft:1,insp:0,profs:{},dsc:{s:0,f:0},notes:'',traits:'',ideals:'',bonds:'',flaws:'',features:'',langs:'',equip:'',backstory:'',slotsTable:st,slotsCurrent:[0,0,0,0,0,0,0,0,0],hiddenSlots:[false,false,false,false,false,false,false,false,false],prepSpells:[],spAbil:'cha',spConc:'',spConcDc:10,spDcBonus:0,spAtkBonus:0,cantrips:[],spBook:[[],[],[],[],[],[],[],[],[]],photos:[],appearance:{age:'',height:'',weight:'',eyes:'',hair:'',skin:'',marks:''}}}
+  return {loadPGs:loadPGs,savePG:savePG,curId:curId,setCur:setCur,curPG:curPG,mod:mod,fmt:fmt,pb:pb,effMod:effMod,SKILLS:SKILLS,ABS:ABS,skillBonus:skillBonus,saveBonus:saveBonus,newPG:newPG};
+})();
+
+/* ============ Traduzioni incantesimi (copie fedeli dal desktop) ============ */
+window._mSp=(function(){
+  function _spLang(){return localStorage.getItem('cm_spell_lang')==='en'?'en':'it'}
+  function _trSchool(en){if(_spLang()!=='it')return en;var m={Abjuration:'Abiurazione',Conjuration:'Evocazione',Divination:'Divinazione',Enchantment:'Ammaliamento',Evocation:'Invocazione',Illusion:'Illusione',Necromancy:'Necromanzia',Transmutation:'Trasmutazione'};return m[en]||en}
+  function _trDmgType(en){if(!en)return '';if(_spLang()!=='it')return en;var m={Acid:'Acido',Bludgeoning:'Contundente',Cold:'Freddo',Fire:'Fuoco',Force:'Forza',Lightning:'Fulmine',Necrotic:'Necrotico',Piercing:'Perforante',Poison:'Veleno',Psychic:'Psichico',Radiant:'Radiante',Slashing:'Tagliente',Thunder:'Tuono'};return m[en]||en}
+  function _ftToM(ft){var v=ft/5*1.5;return (v%1===0)?v:v.toFixed(1).replace('.0','').replace('.',',')}
+  function _trCastingTime(en){if(_spLang()!=='it'||!en)return en;var m={'Action':'Azione','Bonus Action':'Azione bonus','Reaction':'Reazione','1 minute':'1 minuto','10 minutes':'10 minuti','1 hour':'1 ora','8 hours':'8 ore','12 hours':'12 ore','24 hours':'24 ore'};if(m[en])return m[en];if(en.indexOf('Reaction,')===0)return 'Reazione, '+en.substring('Reaction, '.length);return en}
+  function _trDuration(en){if(_spLang()!=='it'||!en)return en;var m={'Instantaneous':'Istantanea','Special':'Speciale','Until dispelled':'Finché non dissolto','Until dispelled or triggered':'Finché non dissolto o innescato','1 round':'1 round','1 minute':'1 minuto','10 minutes':'10 minuti','1 hour':'1 ora','8 hours':'8 ore','24 hours':'24 ore','7 days':'7 giorni','10 days':'10 giorni','30 days':'30 giorni'};if(m[en])return m[en];if(en.indexOf('Concentration, up to ')===0){var rest=en.substring('Concentration, up to '.length);return 'Concentrazione, fino a '+(m[rest]||rest)}return en}
+  function _trRange(en){if(_spLang()!=='it'||!en)return en;var direct={'Self':'Incantatore','Touch':'Contatto','Sight':'Vista','Special':'Speciale','Unlimited':'Illimitata'};if(direct[en])return direct[en];var mt;mt=en.match(/^(\d+) feet$/);if(mt)return _ftToM(parseInt(mt[1]))+' metri';mt=en.match(/^(\d+) miles?$/);if(mt){var mi=parseInt(mt[1]);return (mi*1.5)+' km'}var shapeMap={radius:'raggio',sphere:'sfera',cone:'cono',line:'linea',cube:'cubo',cylinder:'cilindro',hemisphere:'emisfera','square':'quadrato'};mt=en.match(/^Self \((\d+)-foot ([a-z]+)\)$/);if(mt){var sh=shapeMap[mt[2]]||mt[2];return 'Incantatore ('+sh+' di '+_ftToM(parseInt(mt[1]))+' metri)'}mt=en.match(/^Self \((\d+)-mile (radius)\)$/);if(mt)return 'Incantatore (raggio di '+(parseInt(mt[1])*1.5)+' km)';return en}
+  var _MATERIAL_PATTERNS=[
+    ['a pinch of dust','un pizzico di polvere'],['a pinch of salt','un pizzico di sale'],['a pinch of sand','un pizzico di sabbia'],['a pinch of ash','un pizzico di cenere'],['a pinch of soot','un pizzico di fuliggine'],['a pinch of dust or a few drops of water','un pizzico di polvere o qualche goccia d\'acqua'],['a small piece of bone','un pezzetto di osso'],['a piece of fine silk','un pezzo di seta fine'],['a piece of cured leather','un pezzo di cuoio conciato'],['a drop of blood','una goccia di sangue'],['a bit of fleece','un fiocco di lana'],['a sprig of mistletoe','un rametto di vischio'],['a holy symbol','un simbolo sacro'],['holy water','acqua santa'],['three nutshells','tre gusci di noce'],['a nutshell','un guscio di noce'],['mistletoe','vischio'],['a small mirror','un piccolo specchio'],['a feather','una piuma'],['a leaf of mistletoe','una foglia di vischio'],['a snake\'s tongue','una lingua di serpente'],['a piece of phosphorus','un pezzo di fosforo'],['a piece of phosphorus, glowworm, or firefly','un pezzo di fosforo, di lucciola o di luccichella'],['a small silver bell','una piccola campanella d\'argento'],['fine wire','filo sottile'],['a few drops of bitumen and a spider','qualche goccia di bitume e un ragno'],['phosphorus or wychwood','fosforo o legno di stregoneria'],['a forked metallic rod worth at least 250 gp','una verga metallica biforcuta del valore di almeno 250 mo'],['a forked metal rod worth at least 250 gp','una verga metallica biforcuta del valore di almeno 250 mo'],['a tiny strip of white cloth','una piccola striscia di stoffa bianca'],['ashes of a burned holy book','ceneri di un libro sacro bruciato'],['a bit of straw','un filo di paglia'],['a drop of pitch','una goccia di pece']
+  ];
+  function _trMaterialDesc(en){
+    if(_spLang()!=='it'||!en)return en;
+    var key=en.toLowerCase().trim();
+    for(var i=0;i<_MATERIAL_PATTERNS.length;i++){if(_MATERIAL_PATTERNS[i][0].toLowerCase()===key)return _MATERIAL_PATTERNS[i][1]}
+    var s=en;
+    s=s.replace(/worth at least (\d+(?:,\d{3})*) gp(?: each)?/gi,'del valore di almeno $1 mo');
+    s=s.replace(/worth (\d+(?:,\d{3})*) gp or more/gi,'del valore di $1 mo o più');
+    s=s.replace(/worth (\d+(?:,\d{3})*) gp/gi,'del valore di $1 mo');
+    s=s.replace(/(\d+(?:,\d{3})*) gp\b/gi,'$1 mo');
+    return s;
+  }
+  function _trComponents(c,spellName){var p=[];if(c.verbal)p.push('V');if(c.somatic)p.push('S');if(c.material)p.push('M');var s=p.join(', ');if(c.material&&c.materialDesc){var md=null;if(_spLang()==='it'&&spellName&&window.SPELLS_IT&&window.SPELLS_IT[spellName]&&window.SPELLS_IT[spellName].materialDesc)md=window.SPELLS_IT[spellName].materialDesc;s+=' ('+(md||_trMaterialDesc(c.materialDesc))+')'}return s}
+  function _ttClass(en){var m={Wizard:'Mago',Sorcerer:'Stregone',Cleric:'Chierico',Druid:'Druido',Bard:'Bardo',Warlock:'Warlock',Paladin:'Paladino',Ranger:'Ranger',Artificer:'Artefice'};return m[en]||en}
+  /* Nome/descrizione visualizzati nella lingua attiva (fallback inglese) */
+  function dispName(sp){if(_spLang()!=='it')return sp.name;var t=(window.SPELLS_IT||{})[sp.name];return (t&&t.name)?t.name:sp.name}
+  function dispDesc(sp){if(_spLang()!=='it')return sp.description||'';var t=(window.SPELLS_IT||{})[sp.name];return (t&&t.description)?t.description:(sp.description||'')}
+  function dispHL(sp){if(_spLang()!=='it')return sp.higherLevels;var t=(window.SPELLS_IT||{})[sp.name];return (t&&t.higherLevels!==undefined)?t.higherLevels:sp.higherLevels}
+  /* Risoluzione nome inglese di un item salvato (copia di _spResolveEn) */
+  function resolveEn(stored){
+    if(!stored)return '';
+    if(stored.nEn)return stored.nEn;
+    var IT=window.SPELLS_IT||{};
+    for(var en in IT){if(IT.hasOwnProperty(en)){var t=IT[en];if(t&&(t.name===stored.n||en===stored.n))return en}}
+    return stored.n||'';
+  }
+  function hasCantrip(pg,spName){var IT=window.SPELLS_IT||{};return (pg.cantrips||[]).some(function(s){if(typeof s==='string'){if(s===spName)return true;var t=IT[spName];return !!(t&&t.name===s)}return resolveEn(s)===spName})}
+  function hasInBook(pg,bl,spName){return ((pg.spBook&&pg.spBook[bl])||[]).some(function(s){return resolveEn(s)===spName})}
+  function knows(pg,sp){if(!pg)return false;return sp.level===0?hasCantrip(pg,sp.name):hasInBook(pg,sp.level-1,sp.name)}
+  /* Costruzione dell'item conosciuto — IDENTICA a _spImportApply del desktop */
+  function buildItem(sp){
+    var lang=_spLang();
+    var t=(window.SPELLS_IT||{})[sp.name];
+    var dn=(lang==='it'&&t&&t.name)?t.name:sp.name;
+    var dd=(lang==='it'&&t&&t.description)?t.description:(sp.description||'');
+    var dh=(lang==='it'&&t&&t.higherLevels!==undefined)?t.higherLevels:sp.higherLevels;
+    var hlLabel=lang==='it'?'Ai livelli superiori':'At Higher Levels';
+    var trDmgT=(lang==='it')?_trDmgType(sp.damageType||''):(sp.damageType||'');
+    var item={n:dn,nEn:sp.name,p:sp.level===0,c:!!sp.concentration,r:!!sp.ritual,ct:_trCastingTime(sp.castingTime||''),rg:_trRange(sp.range||''),cmp:_trComponents(sp.components||{},sp.name),dur:_trDuration(sp.duration||''),desc:dd+(dh?'\n\n'+hlLabel+': '+dh:''),school:_trSchool(sp.school||''),classes:(sp.classes||[]).map(function(cl){return _ttClass(cl)}).join(', '),source:sp.source||'',atkType:sp.attackType||'',saveAbil:sp.saveAbility||'',dmg:sp.damage||'',dmgType:trDmgT};
+    if(sp.level===0)item.langMigrated=true;
+    return item;
+  }
+  function addToPG(pg,sp){
+    if(!pg.cantrips)pg.cantrips=[];
+    if(!pg.spBook)pg.spBook=[[],[],[],[],[],[],[],[],[]];
+    if(sp.level===0){if(hasCantrip(pg,sp.name))return false;pg.cantrips.push(buildItem(sp));return true}
+    var bl=sp.level-1;
+    if(hasInBook(pg,bl,sp.name))return false;
+    pg.spBook[bl].push(buildItem(sp));
+    return true;
+  }
+  function removeFromPG(pg,sp){
+    if(sp.level===0){var i=(pg.cantrips||[]).findIndex(function(s){return typeof s==='string'?(s===sp.name||((window.SPELLS_IT||{})[sp.name]||{}).name===s):resolveEn(s)===sp.name});if(i>-1){pg.cantrips.splice(i,1);return true}return false}
+    var bl=sp.level-1;var arr=(pg.spBook&&pg.spBook[bl])||[];
+    var j=arr.findIndex(function(s){return resolveEn(s)===sp.name});
+    if(j>-1){arr.splice(j,1);return true}
+    return false;
+  }
+  return {lang:_spLang,trSchool:_trSchool,trDmgType:_trDmgType,trCT:_trCastingTime,trDur:_trDuration,trRange:_trRange,trCmp:_trComponents,ttClass:_ttClass,dispName:dispName,dispDesc:dispDesc,dispHL:dispHL,resolveEn:resolveEn,knows:knows,addToPG:addToPG,removeFromPG:removeFromPG};
+})();
+
+/* ============ Router delle tab ============ */
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  var pages=[].slice.call(document.querySelectorAll('.page'));
+  var TITLES={dice:'Dadi',pg:'Scheda',spells:'Incantesimi',account:'Account',settings:'Impostazioni'};
+  var hdrT=document.getElementById('hdrTitle');
+  function show(name){
+    pages.forEach(function(p){p.classList.toggle('page--on',p.getAttribute('data-page')===name)});
+    tabs.forEach(function(t){t.classList.toggle('tab--on',t.getAttribute('data-tab')===name)});
+    hdrT.textContent=TITLES[name]||'';
+    if(name==='pg'&&window._mPgRender)window._mPgRender();
+    if(name==='spells'&&window._mSpRender)window._mSpRender();
+    if(name==='account'&&window._mAccRender)window._mAccRender();
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){show(t.getAttribute('data-tab'))})});
+  window._mShowTab=show;
+})();
+
+/* ============ Dadi ============
+   Nessuna cronologia persistente: somma corrente + log temporaneo dei
+   singoli tiri, azzerati dal pulsante Reset (o chiudendo l'app). */
+(function(){
+  var tot=0,rolls=[];
+  var elT=document.getElementById('dTot'),elL=document.getElementById('dLog');
+  function render(){
+    elT.textContent=tot;
+    if(!rolls.length){elL.innerHTML='<span class="dice__hint">Tocca un dado per tirare</span>';return}
+    var h='';
+    rolls.forEach(function(r,i){
+      if(i>0)h+='<span class="dplus">+</span>';
+      var c='dchip';
+      if(r.v===r.d)c+=' dchip--max';else if(r.v===1)c+=' dchip--min';
+      h+='<span class="'+c+'"><b>d'+r.d+'</b>'+r.v+'</span>';
+    });
+    elL.innerHTML=h;
+    elL.scrollTop=elL.scrollHeight;
+  }
+  [].slice.call(document.querySelectorAll('[data-die]')).forEach(function(b){
+    b.addEventListener('click',function(){
+      var d=parseInt(b.getAttribute('data-die'),10);
+      var v=1+Math.floor(Math.random()*d);
+      rolls.push({d:d,v:v});tot+=v;render();
+      elT.classList.remove('dice__tot--pop');void elT.offsetWidth;elT.classList.add('dice__tot--pop');
+      if(navigator.vibrate)try{navigator.vibrate(10)}catch(e){}
+    });
+  });
+  document.getElementById('dReset').addEventListener('click',function(){tot=0;rolls=[];render()});
+  render();
+})();
+
+/* ============ Scheda PG ============
+   Elenco + creazione (factory identica al desktop) + scheda completa:
+   PF/temp, slot, ispirazione, dadi vita, TS morte modificabili al tavolo;
+   caratteristiche/TS/abilità con tiro d20 al tocco; incantesimi conosciuti
+   con preparazione e rimozione; sezioni informative; note modificabili. */
+(function(){
+  var D=window._mD,U=window._mU,S=window._mSp;
+  var root=document.getElementById('pgRoot');
+  var mode='list';
+  var creating=false;
+  var openSecs={};/* sezioni info espanse */
+  var esc=U.esc;
+  function createPG(name){
+    var pg=D.newPG();
+    pg.id='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+    pg.name=String(name||'').trim()||'Nuovo PG';
+    D.savePG(pg);
+    D.setCur(pg.id);
+    creating=false;mode='sheet';render();
+  }
+  function avatar(pg,cls){
+    var ph=pg.photos&&pg.photos[0];
+    var ini=String(pg.name||'').trim().charAt(0).toUpperCase()||'?';
+    return '<div class="'+cls+'">'+(ph?'<img src="'+esc(ph)+'" alt="">':'<span>'+esc(ini)+'</span>')+'</div>';
+  }
+  function formHtml(){
+    return '<div class="newpg"><div class="newpg__t">Nuovo personaggio</div>'
+      +'<input id="newPgName" class="newpg__inp" type="text" placeholder="Nome del personaggio" maxlength="40" autocomplete="off">'
+      +'<div class="newpg__row"><button class="newpg__ok" data-newpg-ok>Crea</button><button class="newpg__no" data-newpg-cancel>Annulla</button></div></div>';
+  }
+  function render(){
+    var pgs=D.loadPGs();
+    if(mode==='sheet'){
+      var pg=null,id=D.curId();
+      for(var i=0;i<pgs.length;i++)if(pgs[i].id===id){pg=pgs[i];break}
+      if(pg)return renderSheet(pg);
+      mode='list';
+    }
+    renderList(pgs);
+  }
+  function renderList(pgs){
+    if(!pgs.length){
+      root.innerHTML=(creating?formHtml():'')
+        +'<div class="empty"><i>📜</i><p>Nessun personaggio su questo dispositivo.</p>'
+        +(creating?'':'<button class="pg__add" data-newpg>+ Crea il tuo personaggio</button>')
+        +'<p>…oppure accedi dal tab Account: i personaggi del tuo account arriveranno qui.</p></div>';
+      if(creating){var inp=document.getElementById('newPgName');if(inp)inp.focus()}
+      return;
+    }
+    var id=D.curId(),h='<div class="pg__bar"><div class="sec-title">I tuoi personaggi</div><button class="pg__add" data-newpg>+ Nuovo</button></div>'+(creating?formHtml():'');
+    pgs.forEach(function(pg){
+      var sub=[pg.race,pg.cls].filter(Boolean).join(' · ');
+      h+='<button class="pgcard'+(pg.id===id?' pgcard--cur':'')+'" data-pg="'+esc(pg.id)+'">'
+        +avatar(pg,'pgcard__av')
+        +'<div><div class="pgcard__n">'+esc(pg.name||'Senza nome')+'</div><div class="pgcard__d">'+esc(sub||'—')+' · Lv '+(pg.lvl||1)+'</div></div>'
+        +(pg.id===id?'<span class="pgcard__cur">Attivo</span>':'')
+        +'</button>';
+    });
+    root.innerHTML=h;
+    if(creating){var inp2=document.getElementById('newPgName');if(inp2)inp2.focus()}
+  }
+  function dotRow(cur,type,n){var h='';for(var i=0;i<n;i++){h+='<button class="dot'+(type==='f'?' dot--f':'')+(i<cur?' dot--on':'')+'" data-dsc="'+type+':'+i+'"></button>'}return h}
+  function secHtml(key,title,body){
+    if(!body||!String(body).trim())return '';
+    var on=!!openSecs[key];
+    return '<button class="acc-sec'+(on?' on':'')+'" data-sec="'+key+'">'+title+'<i>▼</i></button><div class="acc-body'+(on?' on':'')+'">'+esc(body)+'</div>';
+  }
+  function renderSheet(pg){
+    var mod=D.mod,fmt=D.fmt;
+    var PB=D.pb(pg.lvl);
+    var hpMax=pg.hp||0,hpCur=pg.hpCur!=null?pg.hpCur:hpMax;
+    var pc=hpMax>0?Math.max(0,Math.min(100,Math.round(hpCur/hpMax*100))):0;
+    var sub=[pg.race,pg.cls&&(pg.cls+(pg.subcls?' ('+pg.subcls+')':''))].filter(Boolean).join(' — ');
+    var h='<button class="pgs__back" data-back>‹ Tutti i personaggi</button>';
+    /* Testata */
+    h+='<div class="pgs__head">'+avatar(pg,'pgs__av')
+      +'<div><div class="pgs__name">'+esc(pg.name||'Senza nome')+'</div><div class="pgs__sub">'+esc(sub||'—')+'<br>Livello '+(pg.lvl||1)+(pg.align?' · '+esc(pg.align):'')+' · BC +'+PB+'</div></div></div>';
+    /* PF */
+    h+='<div class="hp">'
+      +'<div class="hp__row"><span class="hp__l">Punti Ferita</span><button class="step" data-hp="-1">−</button><span class="hp__v"><b>'+hpCur+'</b> <span>/ '+hpMax+'</span></span><button class="step" data-hp="1">+</button></div>'
+      +'<div class="hp__bar"><div class="hp__fill" style="width:'+pc+'%"></div></div>'
+      +'<div class="hp__temp"><span class="hp__l">PF Temporanei</span><button class="step step--s" data-hptemp="-1">−</button><b>'+(pg.hpTemp||0)+'</b><button class="step step--s" data-hptemp="1">+</button></div>'
+      +'</div>';
+    /* Chips */
+    h+='<div class="chips">'
+      +'<div class="chip"><div class="chip__l">CA</div><div class="chip__v">'+(pg.ac||10)+'</div></div>'
+      +'<div class="chip"><div class="chip__l">Iniz</div><div class="chip__v">'+fmt(pg.init||0)+'</div></div>'
+      +'<div class="chip"><div class="chip__l">Vel</div><div class="chip__v">'+(pg.speed||9)+' '+esc(pg.speedUnit||'m')+'</div></div>'
+      +'<div class="chip"><div class="chip__l">Perc. pass.</div><div class="chip__v">'+D.effMod(pg,'percezione_passiva',10+D.skillBonus(pg,'percezione','wis'))+'</div></div>'
+      +'</div>';
+    /* Stato: ispirazione / dadi vita / TS morte */
+    var dsc=pg.dsc||{s:0,f:0};
+    h+='<div class="card"><div class="card__t">Stato</div>'
+      +'<div class="strow"><span class="strow__l">✨ Ispirazione Eroica</span><button class="dot'+(pg.insp?' dot--on':'')+'" data-insp style="width:22px;height:22px"></button></div>'
+      +'<div class="strow"><span class="strow__l">Dadi Vita (d'+(pg.hitDie||8)+')</span><button class="step step--s" data-hd="-1">−</button><span class="strow__v">'+(pg.hitDiceLeft!=null?pg.hitDiceLeft:pg.lvl||1)+' / '+(pg.lvl||1)+'</span><button class="step step--s" data-hd="1">+</button></div>'
+      +'<div class="strow"><span class="strow__l">TS Morte — successi</span><span class="dots">'+dotRow(dsc.s||0,'s',3)+'</span></div>'
+      +'<div class="strow"><span class="strow__l">TS Morte — fallimenti</span><span class="dots">'+dotRow(dsc.f||0,'f',3)+'</span></div>'
+      +'</div>';
+    /* Caratteristiche */
+    h+='<div class="card"><div class="card__t">Caratteristiche <span style="font-weight:400;text-transform:none;letter-spacing:0">tocca per tirare</span></div><div class="abgrid" style="margin-bottom:0">';
+    D.ABS.forEach(function(a){
+      var v=pg[a[0]]||10;
+      h+='<button class="ab" data-roll="ab:'+a[0]+'"><div class="ab__l">'+a[1]+'</div><div class="ab__m">'+fmt(mod(v))+'</div><div class="ab__s">'+v+'</div></button>';
+    });
+    h+='</div></div>';
+    /* Tiri salvezza */
+    h+='<div class="card"><div class="card__t">Tiri Salvezza</div>';
+    D.ABS.forEach(function(a){
+      var b=D.saveBonus(pg,a[0]);
+      var p=(pg.profs&&pg.profs['save_'+a[0]])||0;
+      h+='<button class="skrow" data-roll="save:'+a[0]+'"><span class="skrow__p'+(p>0?' skrow__p--'+Math.min(p,2):'')+'"></span><span class="skrow__n">TS '+a[2]+'</span><span class="skrow__b">'+fmt(b)+'</span></button>';
+    });
+    h+='</div>';
+    /* Abilità */
+    h+='<div class="card"><div class="card__t">Abilità</div>';
+    D.SKILLS.forEach(function(s){
+      var b=D.skillBonus(pg,s[0],s[2]);
+      var p=(pg.profs&&pg.profs[s[0]])||0;
+      var abL={str:'FOR',dex:'DES',con:'COS',intl:'INT',wis:'SAG',cha:'CAR'}[s[2]];
+      h+='<button class="skrow" data-roll="skill:'+s[0]+'"><span class="skrow__p'+(p>0?' skrow__p--'+Math.min(p,2):'')+'"></span><span class="skrow__n">'+s[1]+'</span><span class="skrow__ab">'+abL+'</span><span class="skrow__b">'+fmt(b)+'</span></button>';
+    });
+    h+='</div>';
+    /* Incantesimi */
+    var L=Math.max(1,Math.min(20,pg.lvl||1));
+    var slotMax=(pg.slotsTable&&pg.slotsTable[L-1])||[0,0,0,0,0,0,0,0,0];
+    var slotCur=pg.slotsCurrent||[0,0,0,0,0,0,0,0,0];
+    var hasSlots=slotMax.some(function(x){return x>0});
+    var hasSpells=(pg.cantrips&&pg.cantrips.length)||(pg.spBook&&pg.spBook.some(function(a){return a&&a.length}));
+    if(hasSlots||hasSpells){
+      var abM=mod(pg[pg.spAbil||'cha']||10);
+      var cd=8+PB+abM+(parseInt(pg.spDcBonus)||0);
+      var atk=PB+abM+(parseInt(pg.spAtkBonus)||0);
+      var abLbl={str:'FOR',dex:'DES',con:'COS',intl:'INT',wis:'SAG',cha:'CAR'}[pg.spAbil||'cha'];
+      h+='<div class="card"><div class="card__t">Incantesimi <span style="font-weight:400;text-transform:none;letter-spacing:0">'+abLbl+' · CD '+cd+' · Att '+fmt(atk)+'</span></div>';
+      if(hasSlots){
+        for(var sl=0;sl<9;sl++){
+          if(!slotMax[sl])continue;
+          var pips='';
+          for(var p2=0;p2<slotMax[sl];p2++)pips+='<span class="pip'+(p2<(slotCur[sl]||0)?' pip--on':'')+'"></span>';
+          h+='<div class="slotrow"><span class="slotrow__l">Liv '+(sl+1)+'</span><div class="slotrow__pips">'+pips+'</div><button class="step step--s" data-slot="'+sl+':-1">−</button><button class="step step--s" data-slot="'+sl+':1">+</button></div>';
+        }
+        h+='<button class="mbtn mbtn--dim" style="margin-top:8px" data-slotreset>☾ Riposo lungo — ripristina slot</button>';
+      }
+      var spDetBtn=function(bl,idx,sp){
+        var lvlTag=bl<0?'T':String(bl+1);
+        var tags=[];if(sp.c)tags.push('C');if(sp.r)tags.push('R');
+        var prep=bl>=0?'<button class="sprow__prep'+(sp.p?' sprow__prep--on':'')+'" data-prep="'+bl+':'+idx+'" title="Preparato">'+(sp.p?'★':'☆')+'</button>':'';
+        return '<div style="display:flex;align-items:center"><button class="sprow" style="flex:1" data-spdet="'+bl+':'+idx+'"><span class="sprow__lvl">'+lvlTag+'</span><span class="sprow__n">'+esc(sp.n||sp)+'</span>'+(tags.length?'<span class="sprow__tag">'+tags.join('·')+'</span>':'')+'</button>'+prep+'</div>';
+      };
+      if(pg.cantrips&&pg.cantrips.length){
+        h+='<div style="font-family:var(--mono);font-size:.54rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:10px 0 3px">Trucchetti</div>';
+        pg.cantrips.forEach(function(sp,i){h+=spDetBtn(-1,i,typeof sp==='string'?{n:sp}:sp)});
+      }
+      if(pg.spBook)pg.spBook.forEach(function(arr,bl){
+        if(!arr||!arr.length)return;
+        h+='<div style="font-family:var(--mono);font-size:.54rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:10px 0 3px">Livello '+(bl+1)+'</div>';
+        arr.forEach(function(sp,i){h+=spDetBtn(bl,i,sp)});
+      });
+      h+='</div>';
+    }
+    /* Sezioni informative */
+    var ap=pg.appearance||{};
+    var apTxt=[['Età',ap.age],['Altezza',ap.height],['Peso',ap.weight],['Occhi',ap.eyes],['Capelli',ap.hair],['Pelle',ap.skin],['Segni',ap.marks]].filter(function(x){return x[1]}).map(function(x){return x[0]+': '+x[1]}).join('\n');
+    var info=secHtml('traits','Tratti caratteriali',pg.traits)+secHtml('ideals','Ideali',pg.ideals)+secHtml('bonds','Legami',pg.bonds)+secHtml('flaws','Difetti',pg.flaws)+secHtml('features','Privilegi e tratti',pg.features)+secHtml('langs','Linguaggi e competenze',pg.langs)+secHtml('equip','Equipaggiamento',pg.equip)+secHtml('appearance','Aspetto',apTxt)+secHtml('backstory','Storia',pg.backstory);
+    if(info)h+='<div class="card"><div class="card__t">Informazioni</div>'+info+'</div>';
+    /* Note */
+    h+='<div class="card"><div class="card__t">Note</div><textarea class="noteta" id="pgNotes" placeholder="Le tue note…">'+esc(pg.notes||'')+'</textarea></div>';
+    h+='<div class="wipnote">La modifica completa (caratteristiche, competenze, classe, slot…) si fa dalla versione desktop; qui trovi tutto in consultazione e i valori da tavolo modificabili.</div>';
+    root.innerHTML=h;
+    /* Note: salvataggio debounced senza re-render (per non perdere il cursore) */
+    var ta=document.getElementById('pgNotes'),tmr=null;
+    if(ta)ta.addEventListener('input',function(){clearTimeout(tmr);tmr=setTimeout(function(){var p=D.curPG();if(p){p.notes=ta.value;D.savePG(p)}},400)});
+  }
+  /* Tiro d20 con toast */
+  function doRoll(kind,key){
+    var pg=D.curPG();if(!pg)return;
+    var label='',bonus=0;
+    if(kind==='ab'){var a=D.ABS.filter(function(x){return x[0]===key})[0];label=a[2];bonus=D.mod(pg[key]||10)}
+    else if(kind==='save'){var a2=D.ABS.filter(function(x){return x[0]===key})[0];label='TS '+a2[2];bonus=D.saveBonus(pg,key)}
+    else{var s=D.SKILLS.filter(function(x){return x[0]===key})[0];label=s[1];bonus=D.skillBonus(pg,key,s[2])}
+    var roll=1+Math.floor(Math.random()*20);
+    var cls=roll===20?'toast--crit':(roll===1?'toast--fail':'');
+    var extra=roll===20?' — CRITICO!':(roll===1?' — fallimento critico':'');
+    U.toast('🎲 '+U.esc(label)+': d20('+roll+') '+D.fmt(bonus)+' = <b>'+(roll+bonus)+'</b>'+extra,cls);
+    if(navigator.vibrate)try{navigator.vibrate(roll===20?[20,40,20]:10)}catch(e){}
+  }
+  root.addEventListener('click',function(e){
+    var t;
+    if(e.target.closest('[data-back]')){mode='list';render();return}
+    if(e.target.closest('[data-newpg]')){creating=true;render();return}
+    if(e.target.closest('[data-newpg-ok]')){var inp=document.getElementById('newPgName');createPG(inp?inp.value:'');return}
+    if(e.target.closest('[data-newpg-cancel]')){creating=false;render();return}
+    t=e.target.closest('[data-pg]');
+    if(t){D.setCur(t.getAttribute('data-pg'));mode='sheet';render();return}
+    /* --- scheda: modifiche da tavolo --- */
+    var pg;
+    t=e.target.closest('[data-hp]');
+    if(t){pg=D.curPG();if(!pg)return;var d=parseInt(t.getAttribute('data-hp'));var mx=pg.hp||0;var cur=pg.hpCur!=null?pg.hpCur:mx;
+      if(d<0&&(pg.hpTemp||0)>0){pg.hpTemp--}else{pg.hpCur=Math.max(0,Math.min(mx,cur+d))}
+      D.savePG(pg);render();return}
+    t=e.target.closest('[data-hptemp]');
+    if(t){pg=D.curPG();if(!pg)return;pg.hpTemp=Math.max(0,Math.min(99,(pg.hpTemp||0)+parseInt(t.getAttribute('data-hptemp'))));D.savePG(pg);render();return}
+    t=e.target.closest('[data-insp]');
+    if(t){pg=D.curPG();if(!pg)return;pg.insp=pg.insp?0:1;D.savePG(pg);render();return}
+    t=e.target.closest('[data-hd]');
+    if(t){pg=D.curPG();if(!pg)return;var mx2=pg.lvl||1;var cur2=pg.hitDiceLeft!=null?pg.hitDiceLeft:mx2;pg.hitDiceLeft=Math.max(0,Math.min(mx2,cur2+parseInt(t.getAttribute('data-hd'))));D.savePG(pg);render();return}
+    t=e.target.closest('[data-dsc]');
+    if(t){pg=D.curPG();if(!pg)return;var pp=t.getAttribute('data-dsc').split(':');var type=pp[0],idx=parseInt(pp[1]);if(!pg.dsc)pg.dsc={s:0,f:0};var curV=pg.dsc[type]||0;pg.dsc[type]=(idx<curV)?idx:idx+1;D.savePG(pg);render();return}
+    t=e.target.closest('[data-slot]');
+    if(t){pg=D.curPG();if(!pg)return;var sp2=t.getAttribute('data-slot').split(':');var si=parseInt(sp2[0]),dd=parseInt(sp2[1]);var Lc=Math.max(1,Math.min(20,pg.lvl||1))-1;if(!pg.slotsCurrent)pg.slotsCurrent=[0,0,0,0,0,0,0,0,0];var mxS=(pg.slotsTable&&pg.slotsTable[Lc]||[])[si]||0;pg.slotsCurrent[si]=Math.max(0,Math.min(mxS,(pg.slotsCurrent[si]||0)+dd));D.savePG(pg);render();return}
+    t=e.target.closest('[data-slotreset]');
+    if(t){pg=D.curPG();if(!pg)return;var Lr=Math.max(1,Math.min(20,pg.lvl||1))-1;if(!pg.slotsCurrent)pg.slotsCurrent=[0,0,0,0,0,0,0,0,0];for(var x=0;x<9;x++)pg.slotsCurrent[x]=(pg.slotsTable&&pg.slotsTable[Lr]||[])[x]||0;D.savePG(pg);render();U.toast('☾ Slot ripristinati');return}
+    t=e.target.closest('[data-prep]');
+    if(t){pg=D.curPG();if(!pg)return;var pr=t.getAttribute('data-prep').split(':');var bl2=parseInt(pr[0]),i2=parseInt(pr[1]);var it=pg.spBook&&pg.spBook[bl2]&&pg.spBook[bl2][i2];if(it){it.p=!it.p;D.savePG(pg);render()}return}
+    t=e.target.closest('[data-spdet]');
+    if(t){pg=D.curPG();if(!pg)return;var sd=t.getAttribute('data-spdet').split(':');var bl3=parseInt(sd[0]),i3=parseInt(sd[1]);var item=bl3<0?pg.cantrips[i3]:(pg.spBook[bl3]||[])[i3];if(!item)return;if(typeof item==='string')item={n:item};window._mSpShowStored(item,bl3,i3);return}
+    t=e.target.closest('[data-sec]');
+    if(t){var k=t.getAttribute('data-sec');openSecs[k]=!openSecs[k];var pgN=D.curPG();if(pgN)renderSheet(pgN);return}
+    t=e.target.closest('[data-roll]');
+    if(t){var r=t.getAttribute('data-roll').split(':');doRoll(r[0],r[1]);return}
+  });
+  root.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&e.target&&e.target.id==='newPgName'){e.preventDefault();createPG(e.target.value)}
+  });
+  window._mPgRender=render;
+  render();
+})();
+
+/* ============ Overlay dettaglio incantesimo (condiviso) ============ */
+(function(){
+  var U=window._mU,D=window._mD,S=window._mSp;
+  var ov=document.getElementById('spov');
+  var elN=document.getElementById('spovName'),elS=document.getElementById('spovSub'),elG=document.getElementById('spovGrid'),elD=document.getElementById('spovDesc'),elF=document.getElementById('spovFoot');
+  function close(){ov.classList.remove('spov--on')}
+  document.getElementById('spovX').onclick=close;
+  ov.addEventListener('click',function(e){if(e.target===ov)close()});
+  function field(l,v){return v?'<div class="spov__f"><div class="spov__fl">'+l+'</div><div class="spov__fv">'+U.esc(v)+'</div></div>':''}
+  function lvlLabel(lv){return lv===0?'Trucchetto':'Livello '+lv}
+  /* Dal compendio (oggetto SPELLS) */
+  window._mSpShowCatalog=function(sp){
+    var name=S.dispName(sp);
+    elN.textContent=name;
+    if(name!==sp.name)elS.textContent=sp.name+' · '+lvlLabel(sp.level)+' · '+S.trSchool(sp.school||'');
+    else elS.textContent=lvlLabel(sp.level)+' · '+S.trSchool(sp.school||'');
+    elG.innerHTML=field('Tempo di lancio',S.trCT(sp.castingTime||''))+field('Gittata',S.trRange(sp.range||''))+field('Componenti',S.trCmp(sp.components||{},sp.name))+field('Durata',S.trDur(sp.duration||''))+field('Classi',(sp.classes||[]).map(S.ttClass).join(', '))+field('Fonte',sp.source||'')+(sp.damage?field('Danni',sp.damage+(sp.damageType?' ('+S.trDmgType(sp.damageType)+')':'')):'')+(sp.concentration?field('Concentrazione','Sì'):'')+(sp.ritual?field('Rituale','Sì'):'');
+    var d=S.dispDesc(sp),hl=S.dispHL(sp);
+    elD.innerHTML=U.esc(d)+(hl?'\n\n<b>'+(S.lang()==='it'?'Ai livelli superiori':'At Higher Levels')+':</b> '+U.esc(hl):'');
+    var pg=D.curPG();
+    var h='';
+    if(!pg){h='<button class="spov__act spov__act--dim" data-nopg>Nessun PG attivo — selezionalo nella Scheda</button>'}
+    else if(S.knows(pg,sp)){h='<button class="spov__act spov__act--dim" data-spremove>✓ Conosciuto — Rimuovi da '+U.esc(pg.name||'PG')+'</button>'}
+    else{h='<button class="spov__act" data-spadd>+ Aggiungi ai conosciuti di '+U.esc(pg.name||'PG')+'</button>'}
+    elF.innerHTML=h;
+    var bAdd=elF.querySelector('[data-spadd]');
+    if(bAdd)bAdd.onclick=function(){
+      var p=D.curPG();if(!p)return;
+      if(S.addToPG(p,sp)){D.savePG(p);U.toast('✨ <b>'+U.esc(S.dispName(sp))+'</b> aggiunto a '+U.esc(p.name||'PG'));window._mSpShowCatalog(sp);if(window._mSpRender)window._mSpRender();if(window._mPgRender)window._mPgRender()}
+    };
+    var bRem=elF.querySelector('[data-spremove]');
+    if(bRem)bRem.onclick=function(){
+      var p=D.curPG();if(!p)return;
+      U.confirm('Rimuovere "'+S.dispName(sp)+'" dai conosciuti di '+(p.name||'PG')+'?',function(){
+        if(S.removeFromPG(p,sp)){D.savePG(p);U.toast('Rimosso.');window._mSpShowCatalog(sp);if(window._mSpRender)window._mSpRender();if(window._mPgRender)window._mPgRender()}
+      },{title:'Rimuovi incantesimo',okLabel:'Rimuovi'});
+    };
+    var bNo=elF.querySelector('[data-nopg]');
+    if(bNo)bNo.onclick=function(){close();window._mShowTab('pg')};
+    ov.classList.add('spov--on');
+  };
+  /* Da item salvato nella scheda (già tradotto al momento dell'aggiunta) */
+  window._mSpShowStored=function(item,bl,idx){
+    elN.textContent=item.n||'';
+    elS.textContent=(bl<0?'Trucchetto':'Livello '+(bl+1))+(item.school?' · '+item.school:'');
+    elG.innerHTML=field('Tempo di lancio',item.ct)+field('Gittata',item.rg)+field('Componenti',item.cmp)+field('Durata',item.dur)+field('Classi',item.classes)+field('Fonte',item.source)+(item.dmg?field('Danni',item.dmg+(item.dmgType?' ('+item.dmgType+')':'')):'')+(item.c?field('Concentrazione','Sì'):'')+(item.r?field('Rituale','Sì'):'');
+    elD.innerHTML=U.esc(item.desc||'(nessuna descrizione salvata)');
+    var h='';
+    if(bl>=0)h+='<button class="spov__act spov__act--dim" data-sprep>'+(item.p?'★ Preparato — togli':'☆ Segna come preparato')+'</button>';
+    h+='<button class="spov__act spov__act--dim" data-sdel>🗑 Rimuovi</button>';
+    elF.innerHTML=h;
+    var bP=elF.querySelector('[data-sprep]');
+    if(bP)bP.onclick=function(){
+      var p=D.curPG();if(!p)return;
+      var it=p.spBook&&p.spBook[bl]&&p.spBook[bl][idx];
+      if(it){it.p=!it.p;D.savePG(p);window._mSpShowStored(it,bl,idx);if(window._mPgRender)window._mPgRender()}
+    };
+    var bDel=elF.querySelector('[data-sdel]');
+    if(bDel)bDel.onclick=function(){
+      var p=D.curPG();if(!p)return;
+      U.confirm('Rimuovere "'+(item.n||'')+'" dai conosciuti?',function(){
+        if(bl<0)p.cantrips.splice(idx,1);else p.spBook[bl].splice(idx,1);
+        D.savePG(p);close();U.toast('Rimosso.');
+        if(window._mPgRender)window._mPgRender();if(window._mSpRender)window._mSpRender();
+      },{title:'Rimuovi incantesimo',okLabel:'Rimuovi'});
+    };
+    ov.classList.add('spov--on');
+  };
+  window._mSpovClose=close;
+})();
+
+/* ============ Incantesimi (compendio) ============ */
+(function(){
+  var U=window._mU,D=window._mD,S=window._mSp;
+  var root=document.getElementById('spRoot');
+  var q='',lvlF=-1;/* -1 = tutti */
+  function allSpells(){return (typeof SPELLS!=='undefined'&&Array.isArray(SPELLS))?SPELLS:[]}
+  function render(){
+    var list=allSpells();
+    if(!list.length){
+      root.innerHTML='<div class="empty"><i>✨</i><p>Compendio non disponibile (spells.js non caricato).</p></div>';
+      return;
+    }
+    var pg=D.curPG();
+    var qn=q.trim().toLowerCase();
+    var matches=list.filter(function(sp){
+      if(lvlF>-1&&sp.level!==lvlF)return false;
+      if(!qn)return true;
+      if(sp.name.toLowerCase().indexOf(qn)>-1)return true;
+      var t=(window.SPELLS_IT||{})[sp.name];
+      return !!(t&&t.name&&t.name.toLowerCase().indexOf(qn)>-1);
+    });
+    matches.sort(function(a,b){if(a.level!==b.level)return a.level-b.level;return S.dispName(a).localeCompare(S.dispName(b),'it',{sensitivity:'base'})});
+    var h='';
+    h+='<div class="spbanner">'+(pg?('PG attivo: <b>'+U.esc(pg.name||'Senza nome')+'</b> — gli incantesimi si aggiungono ai suoi conosciuti.'):'Nessun PG attivo: aprine uno nella <b>Scheda</b> per aggiungere incantesimi.')+'</div>';
+    h+='<input class="spq" type="search" id="spQ" placeholder="Cerca incantesimo (ITA o ENG)…" value="'+U.esc(q)+'">';
+    h+='<div class="lvlchips">';
+    h+='<button class="lvlchip'+(lvlF===-1?' lvlchip--on':'')+'" data-lvlf="-1">Tutti</button>';
+    h+='<button class="lvlchip'+(lvlF===0?' lvlchip--on':'')+'" data-lvlf="0">Trucchetti</button>';
+    for(var i=1;i<=9;i++)h+='<button class="lvlchip'+(lvlF===i?' lvlchip--on':'')+'" data-lvlf="'+i+'">'+i+'</button>';
+    h+='</div>';
+    h+='<div class="spmeta"><span>'+matches.length+' incantesim'+(matches.length===1?'o':'i')+'</span><span>'+(S.lang()==='it'?'🇮🇹 Italiano':'🇬🇧 English')+'</span></div>';
+    matches.forEach(function(sp){
+      var idx=list.indexOf(sp);
+      var known=pg?S.knows(pg,sp):false;
+      h+='<button class="spitem" data-spidx="'+idx+'">'
+        +'<span class="spitem__lvl">'+(sp.level===0?'T':sp.level)+'</span>'
+        +'<span class="spitem__n"><span class="spitem__name">'+U.esc(S.dispName(sp))+'</span><span class="spitem__sub">'+U.esc(S.trSchool(sp.school||''))+(sp.concentration?' · C':'')+(sp.ritual?' · R':'')+'</span></span>'
+        +(known?'<span class="spitem__k">✓</span>':'')
+        +'</button>';
+    });
+    if(!matches.length)h+='<div class="empty"><i>🔍</i><p>Nessun incantesimo trovato.</p></div>';
+    root.innerHTML=h;
+    var inp=document.getElementById('spQ');
+    if(inp){
+      inp.addEventListener('input',function(){q=inp.value;renderKeepFocus()});
+    }
+  }
+  /* Re-render mantenendo il focus sulla ricerca */
+  function renderKeepFocus(){
+    var hadFocus=document.activeElement&&document.activeElement.id==='spQ';
+    var selStart=hadFocus?document.activeElement.selectionStart:0;
+    render();
+    if(hadFocus){var inp=document.getElementById('spQ');if(inp){inp.focus();try{inp.setSelectionRange(selStart,selStart)}catch(e){}}}
+  }
+  root.addEventListener('click',function(e){
+    var t=e.target.closest('[data-lvlf]');
+    if(t){lvlF=parseInt(t.getAttribute('data-lvlf'));render();return}
+    t=e.target.closest('[data-spidx]');
+    if(t){var sp=allSpells()[parseInt(t.getAttribute('data-spidx'))];if(sp)window._mSpShowCatalog(sp);return}
+  });
+  window._mSpRender=render;
+  render();
+})();
+
+/* ============ Account + sincronizzazione ============
+   Protocollo IDENTICO al desktop: doc Firestore users/{uid} =
+   {data:{tutte le chiavi cm_ e pg_}, updatedAt}; sync-down iniziale se il
+   cloud è più recente di cm_last_sync; auto-sync UP 2.5s dopo ogni
+   localStorage.setItem; statistiche anonime nella collezione stats. */
+(function(){
+  var U=window._mU;
+  var auth=null,db=null,fbReady=false,curUser=null,authReady=false;
+  var root=document.getElementById('accRoot');
+  var wall=document.getElementById('wall');
+  function setMsg(id,txt,kind){var m=document.getElementById(id);if(!m)return;m.textContent=txt||'';m.className='msg'+(kind?' msg--'+kind:'')}
+  function _fbErr(err){
+    var c=err&&err.code||'';
+    if(c==='auth/invalid-email')return'Email non valida.';
+    if(c==='auth/email-already-in-use')return'Email già registrata. Vai su "Accedi" o usa "Password dimenticata".';
+    if(c==='auth/wrong-password'||c==='auth/invalid-credential')return'Email o password errata.';
+    if(c==='auth/user-not-found')return'Utente non trovato. Devi prima registrarti.';
+    if(c==='auth/weak-password')return'Password troppo debole (min. 6 caratteri).';
+    if(c==='auth/network-request-failed')return'Errore di rete. Controlla la connessione.';
+    if(c==='auth/too-many-requests')return'Troppi tentativi falliti. Riprova tra qualche minuto.';
+    if(c==='auth/popup-closed-by-user')return'Finestra Google chiusa prima di completare.';
+    if(c==='auth/popup-blocked')return'Popup Google bloccato dal browser.';
+    if(c==='auth/cancelled-popup-request')return '';
+    if(c==='auth/operation-not-allowed')return'Provider non abilitato in Firebase.';
+    if(c==='auth/account-exists-with-different-credential')return'Email già registrata con un altro provider.';
+    if(c==='auth/user-disabled')return'Account disabilitato.';
+    if(c==='auth/requires-recent-login')return'Per questa azione devi rifare il login di recente.';
+    return err&&err.message||'Errore sconosciuto.';
+  }
+  /* ----- Sync (copie fedeli del desktop) ----- */
+  function _collectLocalData(){var data={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('cm_')!==0&&k.indexOf('pg_')!==0)continue;data[k]=localStorage.getItem(k)}return data}
+  function _restoreLocalData(data){if(!data)return;Object.keys(data).forEach(function(k){if(typeof data[k]==='string')localStorage.setItem(k,data[k])})}
+  function _byteLen(s){if(typeof TextEncoder!=='undefined'){try{return new TextEncoder().encode(s).length}catch(e){}}try{return unescape(encodeURIComponent(s)).length}catch(e){return (s||'').length}}
+  function _isCloudUrl(s){return typeof s==='string'&&s.indexOf('res.cloudinary.com')!==-1}
+  function _userFsUsage(){var data=_collectLocalData();var bytes=_byteLen(JSON.stringify(data));var count=0;Object.keys(data).forEach(function(k){var v=data[k];try{var p=JSON.parse(v);count+=Array.isArray(p)?p.length:1}catch(e){count+=1}});return{bytes:bytes,count:count}}
+  function _userCldUsage(){var bytes=0,count=0,seen={};function walk(node){if(!node||typeof node!=='object')return;if(Array.isArray(node)){for(var i=0;i<node.length;i++)walk(node[i]);return}var hasCloud=false,sz=0;for(var k in node){if(!Object.prototype.hasOwnProperty.call(node,k))continue;var v=node[k];if(typeof v==='string'){if(_isCloudUrl(v)&&!seen[v]){seen[v]=1;count++;hasCloud=true}}else if(typeof v==='number'){if(k==='size'||k==='bytes')sz=v}else if(v&&typeof v==='object')walk(v)}if(hasCloud&&sz>0)bytes+=sz}var data=_collectLocalData();Object.keys(data).forEach(function(k){try{walk(JSON.parse(data[k]))}catch(e){}});return{bytes:bytes,count:count}}
+  function _writeStats(fs,cld){if(!fbReady||!curUser||!db)return Promise.resolve();return db.collection('stats').doc(curUser.uid).set({fsBytes:fs.bytes,fsCount:fs.count,cldBytes:cld.bytes,cldCount:cld.count,at:Date.now()}).catch(function(){})}
+  function accSyncUp(silent){
+    if(!fbReady||!curUser){if(!silent)setMsg('accSyncMsg','Devi accedere prima.','err');return}
+    if(!silent)setMsg('accSyncMsg','Caricamento nel cloud...','info');
+    var data=_collectLocalData();
+    db.collection('users').doc(curUser.uid).set({data:data,updatedAt:Date.now()},{merge:true}).then(function(){
+      var ts=Date.now();localStorage.setItem('cm_last_sync',String(ts));
+      if(!silent)setMsg('accSyncMsg','✅ Caricato nel cloud — '+new Date(ts).toLocaleTimeString('it-IT'),'ok');
+      renderAcc();
+      try{_writeStats(_userFsUsage(),_userCldUsage())}catch(e){}
+    }).catch(function(err){if(!silent)setMsg('accSyncMsg','Errore: '+err.message,'err')});
+  }
+  function accSyncDown(silent){
+    if(!fbReady||!curUser){if(!silent)setMsg('accSyncMsg','Devi accedere prima.','err');return}
+    if(!silent)setMsg('accSyncMsg','Scaricamento dal cloud...','info');
+    db.collection('users').doc(curUser.uid).get().then(function(doc){
+      if(!doc.exists){if(!silent)setMsg('accSyncMsg','Nessun dato nel cloud per questo account.','info');return}
+      var d=doc.data();if(!d||!d.data){if(!silent)setMsg('accSyncMsg','Documento vuoto.','info');return}
+      var doRestore=function(){_restoreLocalData(d.data);localStorage.setItem('cm_last_sync',String(Date.now()));setMsg('accSyncMsg','✅ Dati ripristinati — ricaricamento...','ok');setTimeout(function(){location.reload()},800)};
+      if(silent){doRestore();return}
+      U.confirm('Sostituire i dati locali con quelli del cloud?',doRestore,{title:'Scarica dal cloud',okLabel:'Scarica'});
+    }).catch(function(err){if(!silent)setMsg('accSyncMsg','Errore: '+err.message,'err')});
+  }
+  /* Sync-down iniziale (una volta per sessione), come il desktop */
+  function _accInitialSync(done){
+    if(window._accInitialSyncDone){if(done)done();return}
+    window._accInitialSyncDone=true;
+    if(!fbReady||!curUser){if(done)done();return}
+    db.collection('users').doc(curUser.uid).get().then(function(doc){
+      if(!doc.exists){if(done)done();return}
+      var d=doc.data();
+      if(!d||!d.data||!d.updatedAt){if(done)done();return}
+      var localTs=parseInt(localStorage.getItem('cm_last_sync'))||0;
+      var cloudTs=parseInt(d.updatedAt)||0;
+      if(cloudTs<=localTs){if(done)done();return}
+      _restoreLocalData(d.data);
+      localStorage.setItem('cm_last_sync',String(Date.now()));
+      try{
+        var b=document.createElement('div');
+        b.style.cssText='position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(255,255,255,.92);color:#000;padding:10px 18px;border-radius:8px;font-family:var(--mono,monospace);font-size:.78rem;box-shadow:0 4px 18px rgba(0,0,0,.4)';
+        b.textContent='🔄 Dati più recenti dal cloud — sincronizzazione in corso…';
+        document.body.appendChild(b);
+      }catch(_){}
+      setTimeout(function(){location.reload()},900);
+    }).catch(function(err){console.warn('[sync] check iniziale fallito:',err);if(done)done()});
+  }
+  function accAutoSyncEnabled(){var v=localStorage.getItem('cm_autosync');return v===null?true:v==='1'}
+  var _autoTimer=null;
+  function _armAutoSync(){
+    if(!fbReady||!curUser||!accAutoSyncEnabled())return;
+    if(window._cmAutoSyncHooked)return;window._cmAutoSyncHooked=true;
+    var origSet=localStorage.setItem.bind(localStorage);
+    localStorage.setItem=function(k,v){origSet(k,v);if(!accAutoSyncEnabled()||!curUser)return;if(k==='cm_last_sync'||k==='cm_autosync')return;clearTimeout(_autoTimer);_autoTimer=setTimeout(function(){accSyncUp(true)},2500)};
+  }
+  /* ----- Firebase init ----- */
+  function fbInit(){
+    var cfg=window.cmFirebaseConfig;
+    if(!cfg||!cfg.apiKey){fbReady=false;return false}
+    try{
+      if(typeof firebase==='undefined')return false;
+      if(!firebase.apps.length)firebase.initializeApp(cfg);
+      auth=firebase.auth();db=firebase.firestore();fbReady=true;
+      auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){});
+      /* Esito del sign-in con redirect (fallback Google su mobile) */
+      auth.getRedirectResult().then(function(res){
+        if(res&&res.user){
+          var isNew=res.additionalUserInfo&&res.additionalUserInfo.isNewUser;
+          if(isNew){
+            db.collection('users').doc(res.user.uid).set({consent:{accepted:true,ts:Date.now(),version:'2026-05-02',via:'google-mobile'}},{merge:true}).catch(function(){});
+            setTimeout(function(){accSyncUp(true)},400);
+          }
+        }
+      }).catch(function(err){var m=_fbErr(err);if(m)setMsg('mwLoginMsg',m,'err')});
+      auth.onAuthStateChanged(function(u){
+        curUser=u;authReady=true;
+        renderAcc();updateWall();
+        if(u){
+          _accInitialSync(function(){
+            if(accAutoSyncEnabled())_armAutoSync();
+          });
+        }
+      });
+      return true;
+    }catch(e){console.warn('Firebase init failed:',e);fbReady=false;return false}
+  }
+  /* ----- Wall ----- */
+  function updateWall(){
+    if(localStorage.getItem('cm_dm')==='1'){wall.classList.remove('wall--on');return}
+    if(!fbReady){
+      wall.classList.add('wall--on');
+      setMsg('mwLoginMsg','Firebase non è configurato. L\'app non può funzionare.','err');
+      return;
+    }
+    if(!authReady)return;
+    if(!curUser)wall.classList.add('wall--on');else wall.classList.remove('wall--on');
+  }
+  document.querySelectorAll('[data-wtab]').forEach(function(t){
+    t.onclick=function(){
+      var target=t.getAttribute('data-wtab');
+      document.querySelectorAll('[data-wtab]').forEach(function(x){x.classList.toggle('on',x===t)});
+      document.getElementById('mwLoginForm').style.display=target==='login'?'':'none';
+      document.getElementById('mwRegForm').style.display=target==='reg'?'':'none';
+    };
+  });
+  document.getElementById('mwLoginForm').onsubmit=function(e){
+    e.preventDefault();
+    if(!fbReady){setMsg('mwLoginMsg','Firebase non configurato.','err');return}
+    var email=document.getElementById('mwLoginEmail').value.trim();
+    var pass=document.getElementById('mwLoginPass').value;
+    if(!email||!pass){setMsg('mwLoginMsg','Inserisci email e password.','err');return}
+    var sb=document.getElementById('mwLoginSubmit');sb.disabled=true;sb.textContent='Accesso in corso...';
+    setMsg('mwLoginMsg','Accesso in corso...','info');
+    auth.signInWithEmailAndPassword(email,pass).then(function(){
+      setMsg('mwLoginMsg','Accesso effettuato!','ok');
+      document.getElementById('mwLoginPass').value='';
+      setTimeout(function(){accSyncDown(true)},300);
+    }).catch(function(err){setMsg('mwLoginMsg',_fbErr(err),'err')})
+      .finally(function(){sb.disabled=false;sb.textContent='Accedi'});
+  };
+  document.getElementById('mwRegForm').onsubmit=function(e){
+    e.preventDefault();
+    if(!fbReady){setMsg('mwRegMsg','Firebase non configurato.','err');return}
+    var email=document.getElementById('mwRegEmail').value.trim();
+    var pass=document.getElementById('mwRegPass').value;
+    var pass2=document.getElementById('mwRegPass2').value;
+    var priv=document.getElementById('mwRegPriv').checked;
+    if(!email||!pass||!pass2){setMsg('mwRegMsg','Compila tutti i campi.','err');return}
+    if(pass.length<6){setMsg('mwRegMsg','Password troppo corta (min. 6 caratteri).','err');return}
+    if(pass!==pass2){setMsg('mwRegMsg','Le due password non coincidono.','err');return}
+    if(!priv){setMsg('mwRegMsg','Devi accettare la Privacy & Cookie Policy.','err');return}
+    var sb=document.getElementById('mwRegSubmit');sb.disabled=true;sb.textContent='Creazione...';
+    setMsg('mwRegMsg','Creazione account...','info');
+    auth.createUserWithEmailAndPassword(email,pass).then(function(cred){
+      setMsg('mwRegMsg','Account creato!','ok');
+      document.getElementById('mwRegPass').value='';document.getElementById('mwRegPass2').value='';
+      if(cred&&cred.user){db.collection('users').doc(cred.user.uid).set({consent:{accepted:true,ts:Date.now(),version:'2026-05-02',via:'email-mobile'}},{merge:true}).catch(function(){})}
+      setTimeout(function(){accSyncUp(true)},400);
+    }).catch(function(err){setMsg('mwRegMsg',_fbErr(err),'err')})
+      .finally(function(){sb.disabled=false;sb.textContent='Crea account'});
+  };
+  function googleSignIn(msgId,viaTag,checkPriv){
+    if(!fbReady){setMsg(msgId,'Firebase non configurato.','err');return}
+    if(checkPriv&&!document.getElementById('mwRegPriv').checked){setMsg(msgId,'Devi accettare la Privacy & Cookie Policy prima.','err');return}
+    var prov=new firebase.auth.GoogleAuthProvider();
+    prov.setCustomParameters({prompt:'select_account'});
+    setMsg(msgId,'Apertura Google...','info');
+    auth.signInWithPopup(prov).then(function(res){
+      setMsg(msgId,'Accesso effettuato!','ok');
+      if(res&&res.user){
+        var isNew=res.additionalUserInfo&&res.additionalUserInfo.isNewUser;
+        if(isNew||checkPriv){
+          db.collection('users').doc(res.user.uid).set({consent:{accepted:true,ts:Date.now(),version:'2026-05-02',via:viaTag}},{merge:true}).catch(function(){});
+        }
+        if(isNew){setTimeout(function(){accSyncUp(true)},400)}
+        else{setTimeout(function(){accSyncDown(true)},300)}
+      }
+    }).catch(function(err){
+      if(err&&err.code==='auth/popup-blocked'){auth.signInWithRedirect(prov);return}
+      var msg=_fbErr(err);if(msg)setMsg(msgId,msg,'err');
+    });
+  }
+  document.getElementById('mwLoginGoogle').onclick=function(){googleSignIn('mwLoginMsg','google-login-mobile',false)};
+  document.getElementById('mwRegGoogle').onclick=function(){googleSignIn('mwRegMsg','google-register-mobile',true)};
+  document.getElementById('mwForgot').onclick=function(){
+    if(!fbReady){setMsg('mwLoginMsg','Firebase non configurato.','err');return}
+    var email=document.getElementById('mwLoginEmail').value.trim();
+    if(!email){setMsg('mwLoginMsg','Scrivi prima la tua email qui sopra.','err');document.getElementById('mwLoginEmail').focus();return}
+    setMsg('mwLoginMsg','Invio email di reset...','info');
+    auth.sendPasswordResetEmail(email).then(function(){
+      setMsg('mwLoginMsg','Email di reset inviata. Controlla la tua casella (anche Spam).','ok');
+    }).catch(function(err){setMsg('mwLoginMsg',_fbErr(err),'err')});
+  };
+  /* ----- Tab Account ----- */
+  function renderAcc(){
+    if(!root)return;
+    if(!fbReady){
+      root.innerHTML='<div class="card"><div class="card__t">Account</div><div class="set__p">Firebase non è configurato: sincronizzazione non disponibile.</div></div>';
+      return;
+    }
+    if(!curUser){
+      root.innerHTML='<div class="empty"><i>👤</i><p>Non hai effettuato l\'accesso.</p></div>';
+      return;
+    }
+    var prov='Email/Password';
+    if(curUser.providerData&&curUser.providerData[0]){
+      var pid=curUser.providerData[0].providerId;
+      if(pid==='google.com')prov='Google';
+      else if(pid==='password')prov='Email/Password';
+      else prov=pid;
+    }
+    var lastSync=localStorage.getItem('cm_last_sync');
+    var h='';
+    h+='<div class="card"><div class="card__t">Connesso</div>'
+      +'<div class="acc__kv"><span>Email</span><b>'+U.esc(curUser.email||curUser.uid)+'</b></div>'
+      +'<div class="acc__kv"><span>Accesso</span><b>'+prov+'</b></div>'
+      +'<div class="acc__kv"><span>Ultimo sync</span><b>'+(lastSync?new Date(parseInt(lastSync)).toLocaleString('it-IT'):'mai')+'</b></div>'
+      +'</div>';
+    h+='<div class="card"><div class="card__t">Sincronizzazione</div>'
+      +'<div class="togrow"><span>Sync automatico (2,5s dopo ogni modifica)</span><button class="tog'+(accAutoSyncEnabled()?' tog--on':'')+'" id="accAutoTog"></button></div>'
+      +'<button class="mbtn" style="margin-top:10px" id="accUp">⬆ Carica nel cloud</button>'
+      +'<button class="mbtn mbtn--dim" id="accDown">⬇ Scarica dal cloud</button>'
+      +'<div class="msg" id="accSyncMsg"></div>'
+      +'</div>';
+    h+='<button class="mbtn mbtn--dim" id="accLogout">Esci dall\'account</button>';
+    root.innerHTML=h;
+    var tog=document.getElementById('accAutoTog');
+    if(tog)tog.onclick=function(){
+      localStorage.setItem('cm_autosync',accAutoSyncEnabled()?'0':'1');
+      if(accAutoSyncEnabled())_armAutoSync();
+      renderAcc();
+      setMsg('accSyncMsg',accAutoSyncEnabled()?'✅ Sync automatico attivato':'⚠️ Sync automatico disattivato — ricordati di "Carica nel cloud"','info');
+    };
+    var up=document.getElementById('accUp');if(up)up.onclick=function(){accSyncUp(false)};
+    var down=document.getElementById('accDown');if(down)down.onclick=function(){accSyncDown(false)};
+    var lo=document.getElementById('accLogout');
+    if(lo)lo.onclick=function(){
+      U.confirm('Uscire dall\'account su questo dispositivo?\nI dati locali restano sul telefono.',function(){
+        auth.signOut();
+      },{title:'Esci',okLabel:'Esci'});
+    };
+  }
+  window._mAccRender=renderAcc;
+  window._mAcc={user:function(){return curUser?(curUser.email||curUser.uid):null},syncUp:accSyncUp,syncDown:accSyncDown};
+  fbInit();
+  updateWall();
+  setTimeout(function(){if(!fbReady)updateWall()},800);
+  renderAcc();
+})();
+
+/* ============ Impostazioni: lingua incantesimi ============ */
+(function(){
+  var tog=document.getElementById('spLangTog'),lbl=document.getElementById('spLangLbl');
+  function refresh(){
+    var en=localStorage.getItem('cm_spell_lang')==='en';
+    tog.classList.toggle('tog--on',en);
+    lbl.textContent=en?'English':'Italiano (con fallback inglese)';
+  }
+  tog.onclick=function(){
+    var en=localStorage.getItem('cm_spell_lang')==='en';
+    localStorage.setItem('cm_spell_lang',en?'it':'en');
+    refresh();
+    if(window._mSpRender)window._mSpRender();
+  };
+  refresh();
+})();
+</script>
+</body>
+</html>
