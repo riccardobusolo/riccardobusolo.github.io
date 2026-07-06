@@ -19,7 +19,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;scrollbar-width:none;-ms-overflow-style:none}
+::-webkit-scrollbar{display:none;width:0;height:0}
 /* Palette = tema "Scuro" della versione desktop (monocromo bianco su nero)
    + accenti semantici a colori dove aiutano la UX (PF, TS morte, critici,
    slot, manuali di provenienza). */
@@ -130,8 +131,8 @@ img{-webkit-user-drag:none}
 .mdie:active{transform:scale(.9);background:var(--bg4);border-color:#fff}
 .mdie--pop{animation:mdiePop .36s var(--ease)}
 @keyframes mdiePop{0%{transform:scale(.86)}45%{transform:scale(1.14)}100%{transform:scale(1)}}
-.dice__reset{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(200,64,61,.1);border:1px solid rgba(200,64,61,.35);border-radius:13px;color:#c8403d;font-family:var(--mono);font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:13px 0;transition:background .12s}
-.dice__reset:active{background:rgba(200,64,61,.22)}
+.dice__reset{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(95,166,107,.12);border:1px solid rgba(95,166,107,.4);border-radius:13px;color:var(--c-green);font-family:var(--mono);font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:13px 0;transition:background .12s}
+.dice__reset:active{background:rgba(95,166,107,.24)}
 .dice__reset svg{width:15px;height:15px;flex-shrink:0}
 .dice__hist{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
 .dice__hist-h{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:.58rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
@@ -169,7 +170,7 @@ img{-webkit-user-drag:none}
 .pgcard__av span,.pgs__av span{font-family:var(--mono);font-weight:700;color:var(--text)}
 .pgcard__n{font-family:var(--mono);font-size:.86rem;font-weight:700;color:var(--text)}
 .pgcard__d{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:3px}
-.pgcard__cur{margin-left:auto;flex-shrink:0;font-family:var(--mono);font-size:.52rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--c-gold);border:1px solid rgba(212,175,55,.45);border-radius:5px;padding:3px 6px}
+.pgcard__cur{margin-left:auto;flex-shrink:0;font-family:var(--mono);font-size:.52rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--c-green);border:1px solid rgba(95,166,107,.5);border-radius:5px;padding:3px 6px}
 .empty .pg__add{margin-top:4px}
 
 /* ===== Scheda PG: scheda ===== */
@@ -204,14 +205,14 @@ img{-webkit-user-drag:none}
 .seg{display:flex;gap:6px;margin-bottom:10px}
 .seg__b{flex:1;font-family:var(--mono);font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:9px 0;transition:all .12s}
 .seg__b--on{color:var(--text);border-color:rgba(255,255,255,.5);background:var(--bg3)}
-.hp{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:12px 14px;margin-bottom:10px}
-.hpvals{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+.hp{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:8px 13px 10px;margin-bottom:10px}
+.hpvals{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
 .hpval{display:flex;align-items:center;gap:7px}
-.hpval__ic{font-size:1.25rem;line-height:1}
-.hpval__sep{font-family:var(--mono);font-size:1.35rem;font-weight:300;color:var(--muted)}
-.hpnum{background:none;border:none;outline:none;padding:0;font-family:var(--mono);font-weight:700;color:var(--text);text-align:center;line-height:1;width:3.2ch;font-size:1.7rem}
-.hpnum--max{font-size:1.25rem;color:var(--muted);width:2.8ch}
-.hpnum--temp{font-size:1.7rem;color:var(--c-temp);width:2.6ch}
+.hpval__ic{font-size:1.05rem;line-height:1}
+.hpval__sep{font-family:var(--mono);font-size:1.4rem;font-weight:300;color:var(--muted)}
+.hpnum{background:none;border:none;outline:none;padding:0;font-family:var(--mono);font-weight:700;color:var(--text);text-align:center;line-height:1;width:4ch;font-size:1.4rem}
+.hpnum--max{font-size:1.4rem;color:var(--muted);width:4ch}
+.hpnum--temp{font-size:1.4rem;color:var(--c-temp);width:3.8ch}
 .step{width:38px;height:38px;border-radius:10px;background:var(--bg3);border:1px solid var(--bh);color:var(--text);font-family:var(--mono);font-size:1.15rem;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .step:active{background:var(--bg4);border-color:#fff}
 .step--s{width:30px;height:30px;font-size:.95rem;border-radius:8px}
@@ -224,11 +225,34 @@ img{-webkit-user-drag:none}
 .acrow__r .exh{margin-top:0}
 .initrow{display:flex;align-items:center;gap:8px}
 .initrow__l{flex:1;font-family:var(--mono);font-size:.56rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.initbox{min-width:46px;background:var(--bg3);border:1px solid var(--bh);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:.9rem;font-weight:700;padding:7px 8px;text-align:center}
+.initbox{min-width:46px;background:var(--bg3);border:1px solid var(--bh);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:.9rem;font-weight:700;padding:0 8px;height:30px;display:flex;align-items:center;justify-content:center}
 .initbox:active{background:var(--bg4)}
-.d20btn{flex-shrink:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--bh);border-radius:9px;color:var(--text)}
+.d20btn{flex-shrink:0;width:38px;height:30px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--bh);border-radius:9px;color:var(--text)}
 .d20btn:active{background:var(--bg4)}
-.d20{display:block;width:24px;height:24px}
+.d20{display:block;width:22px;height:22px}
+.moonic{display:block;width:20px;height:20px}
+/* Riga Dadi Vita (configurabile) + Riposo lungo (icona luna) */
+.lrrow{display:flex;align-items:stretch;gap:9px;margin-top:10px}
+.hdbox{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:7px 9px 7px 12px}
+.hdbox__cfg{display:flex;flex-direction:column;align-items:flex-start;gap:3px;background:none;border:none;padding:0;flex-shrink:0}
+.hdbox__l{font-family:var(--mono);font-size:.5rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.hdbox__die{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.84rem;font-weight:700;color:var(--text)}
+.hdbox__die i{font-style:normal;font-size:.6rem;color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:1px 5px;text-transform:uppercase;letter-spacing:.06em}
+.hdbox__cfg:active .hdbox__die i{border-color:var(--bh);color:var(--dim)}
+.hdbox__ctl{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.hdbox__v{font-family:var(--mono);font-size:.86rem;font-weight:700;min-width:42px;text-align:center}
+.lrbtn{flex:0 0 auto;width:52px;padding:0;display:flex;align-items:center;justify-content:center}
+/* Popup configuratore Dadi Vita */
+.hdcfg__body{padding:14px 16px calc(18px + env(safe-area-inset-bottom))}
+.hdcfg__lab{font-family:var(--mono);font-size:.56rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 9px}
+.hdcfg__lab--sp{margin-top:20px}
+.hdseg-row{display:flex;gap:8px}
+.hdseg{flex:1;font-family:var(--mono);font-size:.92rem;font-weight:700;color:var(--muted);background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:13px 0;transition:all .12s}
+.hdseg--on{color:var(--text);border-color:rgba(255,255,255,.55);background:var(--bg4)}
+.hdcfg__mod{display:flex;align-items:center;justify-content:center;gap:22px}
+.hdcfg__modv{font-family:var(--mono);font-size:1.4rem;font-weight:700;min-width:56px;text-align:center}
+.hdcfg__prev{margin-top:18px;font-family:var(--mono);font-size:.62rem;line-height:1.55;color:var(--dim);text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:12px}
+.hdcfg__prev b{color:var(--text);font-size:.74rem}
 .acshield{position:relative;width:80px;height:90px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;background:none;border:none}
 .acshield svg{position:absolute;inset:0;width:100%;height:100%}
 .acshield__bg{fill:var(--bg3);stroke:var(--bh);stroke-width:2.5}
@@ -249,6 +273,14 @@ img{-webkit-user-drag:none}
 .strow__l{flex:1;font-size:.68rem;color:var(--dim)}
 .strow__v{font-size:.82rem;font-weight:700}
 .dot{width:16px;height:16px;border-radius:50%;border:1px solid var(--bh);background:transparent;padding:0}
+/* Riga TS Morte combinata (successi + fallimenti + tiro) */
+.strow--ds{gap:8px}
+.ds__grp{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.ds__ic{font-size:.74rem;font-weight:700;line-height:1;width:12px;text-align:center}
+.ds__ic--s{color:var(--c-green)}
+.ds__ic--f{color:var(--c-red)}
+.ds__roll{flex-shrink:0;width:34px;height:30px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--bh);border-radius:9px;color:var(--text);font-size:1.15rem;line-height:1}
+.ds__roll:active{background:var(--bg4)}
 .dot--s.dot--on{background:var(--c-green);border-color:var(--c-green)}
 .dot--f.dot--on{background:var(--c-red);border-color:var(--c-red)}
 .dot--insp.dot--on{background:var(--c-gold);border-color:var(--c-gold);box-shadow:0 0 9px rgba(212,175,55,.45)}
@@ -267,9 +299,10 @@ img{-webkit-user-drag:none}
 .skgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .skrow{display:flex;align-items:center;gap:7px;width:100%;text-align:left;font-family:var(--mono);padding:7px 2px;border-bottom:1px solid var(--border);background:none}
 .skrow:active{background:var(--bg3)}
-.skrow__p{width:8px;height:8px;border-radius:50%;border:1px solid var(--bh);flex-shrink:0}
-.skrow__p--1{background:#fff;border-color:#fff}
-.skrow__p--2{background:var(--c-gold);border-color:var(--c-gold);box-shadow:0 0 0 2px rgba(212,175,55,.3)}
+.skrow__p{width:22px;height:22px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:none;border:none;padding:0;margin:-3px 0 -3px -3px}
+.skrow__p::before{content:'';display:block;width:14px;height:14px;border-radius:50%;border:1.5px solid var(--bh);box-sizing:border-box}
+.skrow__p--1::before{background:#fff;border-color:#fff}
+.skrow__p--2::before{background:var(--c-gold);border-color:var(--c-gold);box-shadow:0 0 0 2px rgba(212,175,55,.3)}
 .skrow__n{flex:1;font-size:.62rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .skrow__ab{font-size:.46rem;color:var(--muted);text-transform:uppercase;flex-shrink:0}
 .skrow__b{font-size:.7rem;font-weight:700;min-width:28px;text-align:right;flex-shrink:0}
@@ -286,6 +319,8 @@ img{-webkit-user-drag:none}
 .sprow__tag{font-size:.52rem;color:var(--c-viol)}
 .sprow__prep{font-size:.9rem;color:var(--muted);padding:2px 6px;flex-shrink:0}
 .sprow__prep--on{color:var(--c-gold)}
+.sprow__ap{font-size:.85rem;color:var(--muted);padding:2px 5px;flex-shrink:0;opacity:.5;line-height:1}
+.sprow__ap--on{color:var(--c-gold);opacity:1}
 .acc-sec{width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:11px 2px}
 .acc-sec i{font-style:normal;color:var(--muted);transition:transform .18s;font-size:.7rem}
 .acc-sec.on i{transform:rotate(180deg)}
@@ -390,9 +425,15 @@ img{-webkit-user-drag:none}
 .lvxp{display:flex;gap:9px;align-items:flex-start}
 .lvxp>.fld{margin-bottom:0}
 .lvxp .fld__l{display:flex;align-items:center;min-height:16px}
+.lvxp .lvbtn,.lvxp .f-inp{height:32px}
+.lvxp__pb .f-inp{display:flex;align-items:center;justify-content:center;padding-top:0;padding-bottom:0}
 .lvxp__lv{flex:0 0 auto;width:72px}
 .lvxp__pb{flex:0 0 auto;width:52px}
 .lvxp__xp{flex:1;min-width:0}
+.lvxp__insp{flex:0 0 auto;width:56px}
+.inspbtn{width:100%;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--bh);border-radius:8px;color:var(--muted);font-size:1.05rem;line-height:1;cursor:pointer}
+.inspbtn:active{background:var(--bg4)}
+.inspbtn--on{color:var(--c-gold);border-color:var(--c-gold);background:rgba(212,175,55,.12);box-shadow:0 0 9px rgba(212,175,55,.35)}
 .lvbtn{width:100%;background:var(--bg3);border:1px solid var(--bh);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:.84rem;font-weight:700;padding:7px 8px;display:flex;align-items:center;justify-content:center;gap:6px;line-height:1;cursor:pointer}
 .lvbtn:active{background:var(--bg4)}
 .lvbtn::after{content:'\25BE';font-size:.7rem;font-weight:400;color:var(--muted)}
@@ -410,10 +451,53 @@ img{-webkit-user-drag:none}
 .lw__ok:active{background:rgba(255,255,255,.16)}
 .lw__wrap{position:relative}
 .lw__sel{position:absolute;left:16px;right:16px;top:50%;transform:translateY(-50%);height:46px;border-radius:12px;background:var(--bg4);border:1px solid var(--bh);pointer-events:none}
-.lw__scroll{position:relative;z-index:1;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
+.lw__scroll{position:relative;z-index:1;overflow-y:scroll;overflow-x:hidden;touch-action:pan-y;overscroll-behavior:contain;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
 .lw__scroll::-webkit-scrollbar{display:none}
 .lw__it{height:46px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--mono);font-size:1.2rem;font-weight:700;color:var(--muted);transition:color .12s,transform .12s;cursor:pointer}
 .lw__it--on{color:var(--text);transform:scale(1.22)}
+/* Popup configuratore Background */
+.bgc{position:fixed;inset:0;z-index:785;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .22s}
+.bgc--on{opacity:1}
+.bgc__panel{width:100%;max-width:480px;max-height:92vh;background:var(--bg2);border:1px solid var(--bh);border-bottom:none;border-radius:18px 18px 0 0;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .28s var(--ease)}
+.bgc--on .bgc__panel{transform:translateY(0)}
+.bgc__bar{flex-shrink:0;padding:14px 16px 12px;border-bottom:1px solid var(--border)}
+.bgc__t{font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
+.bgc__body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px}
+.bgc__intro{font-family:var(--mono);font-size:.64rem;line-height:1.6;color:var(--dim);margin-bottom:12px}
+.bgc__intro b{color:var(--text)}
+.bgc__sec{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:11px 12px;margin-bottom:9px}
+.bgc__st{font-family:var(--mono);font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bgc__rem{font-size:.56rem;color:var(--c-red);background:rgba(200,64,61,.14);padding:2px 8px;border-radius:8px;white-space:nowrap}
+.bgc__rem--ok{color:var(--c-green);background:rgba(95,166,107,.16)}
+.bgc__ab{display:flex;align-items:center;gap:8px;padding:5px 0;font-family:var(--mono)}
+.bgc__abn{flex:1;font-size:.72rem;font-weight:700;color:var(--text)}
+.bgc__abv{width:30px;text-align:center;font-size:.8rem;font-weight:700;color:var(--c-gold)}
+.bgc__abr{font-size:.64rem;color:var(--muted);min-width:70px;text-align:right}
+.bgc__abr b{color:var(--text);font-size:.86rem}
+.bgc__hint{font-family:var(--mono);font-size:.54rem;color:var(--dim);margin-top:8px;line-height:1.5}
+.bgc__row{display:flex;align-items:center;gap:12px}
+.bgc__rl{flex:1;min-width:0}
+.bgc__rt{font-family:var(--mono);font-size:.68rem;font-weight:700;color:var(--text)}
+.bgc__rd{font-family:var(--mono);font-size:.58rem;color:var(--muted);line-height:1.5;margin-top:3px}
+.tgl{width:44px;height:25px;border-radius:13px;background:var(--bg4);border:1px solid var(--bh);position:relative;flex-shrink:0;transition:background .15s,border-color .15s}
+.tgl::after{content:'';position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:var(--muted);transition:left .16s,background .16s}
+.tgl--on{background:rgba(95,166,107,.28);border-color:var(--c-green)}
+.tgl--on::after{left:21px;background:var(--c-green)}
+.bgc__eq{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:10px 11px;margin-top:7px}
+.bgc__eq--on{border-color:var(--c-green);background:rgba(95,166,107,.1)}
+.bgc__eqr{width:17px;height:17px;border-radius:50%;border:2px solid var(--bh);flex-shrink:0;margin-top:1px}
+.bgc__eq--on .bgc__eqr{border-color:var(--c-green);background:radial-gradient(circle,var(--c-green) 42%,transparent 48%)}
+.bgc__eql{font-family:var(--mono);font-size:.64rem;color:var(--text);min-width:0}
+.bgc__eql b{display:block;font-size:.68rem;margin-bottom:2px}
+.bgc__eql span{color:var(--muted);font-size:.58rem;line-height:1.5}
+.bgc__foot{flex-shrink:0;display:flex;gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border)}
+.bgc__no,.bgc__ok{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--mono);font-size:.72rem;font-weight:700;padding:12px;border-radius:11px;border:1px solid}
+.bgc__no{color:#e0716e;background:rgba(200,64,61,.12);border-color:rgba(200,64,61,.4)}
+.bgc__no:active{background:rgba(200,64,61,.2)}
+.bgc__ok{color:#83cf8d;background:rgba(95,166,107,.15);border-color:rgba(95,166,107,.45)}
+.bgc__ok:active{background:rgba(95,166,107,.25)}
+.bgc__ok--dis{opacity:.38;pointer-events:none}
+.bgi{width:16px;height:16px}
 .slotprog{overflow:auto;max-height:230px;border:1px solid var(--border);border-radius:8px;-webkit-overflow-scrolling:touch}
 .slotprog table{border-collapse:collapse;width:100%;font-family:var(--mono)}
 .slotprog th,.slotprog td{font-size:.56rem;padding:4px 7px;text-align:center;border-bottom:1px solid var(--border);color:var(--dim)}
@@ -1037,6 +1121,7 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
   var creating=false;
   var secTab='chars';     /* 'chars'|'gen'|'stats'|'equip'|'magic'|'info' */
   var lastSheetId=null,open={},idCfgOpen=false;
+  var _swiped=false; /* true durante uno swipe orizzontale: sopprime il click accidentale su pulsanti (tiri, ecc.) */
   var esc=U.esc,saveTmr=null;
   var ABBR={str:'FOR',dex:'DES',con:'COS',intl:'INT',wis:'SAG',cha:'CAR'};
   var ABIL_CYCLE=['','str','dex','con','intl','wis','cha'];
@@ -1073,7 +1158,7 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
   }
   function xlist(pg,k){return k==='eq'?pg.equipList:k==='ft'?pg.featList:pg.noteList}
   var NUMF={str:1,dex:1,con:1,intl:1,wis:1,cha:1,ac:1,hp:1,hpCur:1,hpTemp:1,lvl:1,xp:1,speed:1,initBonus:1};
-  function setField(pg,f,v){if(NUMF[f]){var n=parseInt(v);pg[f]=isNaN(n)?0:n}else pg[f]=v}
+  function setField(pg,f,v){if(NUMF[f]){var n=parseInt(v);pg[f]=isNaN(n)?0:n;if(f==='hpCur'&&pg.hp!=null&&pg.hpCur>pg.hp)pg.hpCur=pg.hp}else pg[f]=v}
   /* Parser formula dadi ("2d6+1d4+3") → {total, detail} */
   function rollDice(formula){var total=0,parts=[];var toks=String(formula||'').replace(/\s+/g,'').match(/[+-]?[^+-]+/g)||[];toks.forEach(function(tok){var sign=1;if(tok.charAt(0)==='+'){tok=tok.slice(1)}else if(tok.charAt(0)==='-'){sign=-1;tok=tok.slice(1)}var dm=tok.match(/^(\d*)d(\d+)$/i);if(dm){var n=parseInt(dm[1]||'1'),f=parseInt(dm[2]);var rs=[];for(var i=0;i<n;i++){var r=1+Math.floor(Math.random()*f);rs.push(r);total+=sign*r}parts.push((sign<0?'−':'')+tok+'('+rs.join('+')+')')}else{var num=parseInt(tok);if(!isNaN(num)){total+=sign*num;parts.push((sign<0?'−':'+')+Math.abs(num))}}});return {total:total,detail:parts.join(' ')}}
   /* ===== Automazione classi D&D 2024 (dati/logica portati dal desktop) ===== */
@@ -1114,8 +1199,55 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
     monk:[{key:'open-hand',label:'Via della Mano Aperta',short:'della Mano Aperta'},{key:'shadow',label:'Via dell\'Ombra',short:'dell\'Ombra'},{key:'four-elements',label:'Via dei Quattro Elementi',short:'dei Quattro Elementi'},{key:'mercy',label:'Via della Misericordia',short:'della Misericordia'},{key:'astral-self',label:'Via del Sé Astrale',short:'del Sé Astrale'}],
     rogue:[{key:'thief',label:'Ladro',short:''},{key:'assassin',label:'Assassino',short:'Assassino'},{key:'arcane-trickster',label:'Mistificatore Arcano',short:'Mistificatore Arcano',slot:'third',known:'ek_at',spAbil:'intl'},{key:'soulknife',label:'Lama dell\'Anima',short:'Lama dell\'Anima'}]
   };
-  var RACES_M=['Aasimar','Dragonide','Elfo','Gnomo','Goliath','Halfling','Nano','Orco','Tiefling','Umano'];
+  var RACES_M=['Aasimar','Dragonide','Elfo Alto','Elfo dei Boschi','Elfo Drow','Gnomo delle Foreste','Gnomo delle Rocce','Goliath','Halfling','Nano','Orco','Tiefling Abissale','Tiefling Ctonio','Tiefling Infernale','Umano'];
   var BGS_M=['Accolito','Artigiano','Ciarlatano','Contadino','Criminale','Eremita','Guardia','Guida','Intrattenitore','Marinaio','Mercante','Nobile','Sapiente','Scriba','Soldato','Viandante'];
+  /* Dati background D&D 2024: ab=caratteristiche, tal=talento, sk=abilità, too=strumenti,
+     a/b=equipaggiamento (i=voci, mo=oro), d=descrizione. */
+  var BG_DATA={
+    'Accolito':{ab:['intl','wis','cha'],tal:'Iniziato alla Magia (Chierico)',sk:['intuizione','religione'],too:'Scorte da calligrafo',a:{i:['Scorte da calligrafo','Libro di preghiere','Simbolo sacro','Pergamena (10 fogli)','Veste'],mo:8},b:{mo:50},d:'Ti sei consacrato al servizio in un tempio, in una città o isolato in un bosco sacro. Lì celebravi riti in onore di un dio o di un pantheon, sotto la guida di un sacerdote, studiando la religione. Grazie a quegli insegnamenti e alla tua devozione hai imparato a incanalare una modesta quantità di potere divino.'},
+    'Artigiano':{ab:['str','dex','intl'],tal:'Artefice',sk:['indagare','persuasione'],too:'Strumenti da artigiano (a scelta)',a:{i:['Strumenti da artigiano','2 borse','Abiti da viaggiatore'],mo:32},b:{mo:50},d:'Hai iniziato spazzando i pavimenti della bottega di un artigiano per poche monete al giorno. Diventato apprendista, hai imparato a creare semplici manufatti e a trattare con i clienti. Il mestiere ti ha donato un occhio attento ai dettagli.'},
+    'Ciarlatano':{ab:['dex','con','cha'],tal:'Abile',sk:['inganno','rapidita'],too:'Arnesi da falsario',a:{i:['Arnesi da falsario','Costume','Abiti eleganti'],mo:15},b:{mo:50},d:'Appena abbastanza grande da ordinare una birra, avevi già uno sgabello preferito in ogni taverna nei dintorni. Viaggiando da una locanda all’altra hai imparato ad approfittarti degli sventurati in cerca di una menzogna rassicurante, di una pozione fasulla o di registri contraffatti.'},
+    'Contadino':{ab:['str','con','wis'],tal:'Robusto',sk:['animali','natura'],too:'Strumenti da falegname',a:{i:['Falcetto','Strumenti da falegname','Borsa da guaritore','Pentola di ferro','Pala','Abiti da viaggiatore'],mo:30},b:{mo:50},d:'Sei cresciuto a stretto contatto con la terra. Anni ad accudire animali e coltivare i campi ti hanno ricompensato con pazienza e buona salute. Nutri un profondo apprezzamento per la generosità della natura e un sano rispetto per la sua furia.'},
+    'Criminale':{ab:['dex','con','intl'],tal:'Allerta',sk:['rapidita','furtivita'],too:'Arnesi da scasso',a:{i:['2 pugnali','Arnesi da scasso','Piede di porco','2 borse','Abiti da viaggiatore'],mo:16},b:{mo:50},d:'Ti sei guadagnato da vivere nei vicoli bui, tagliando borse o svaligiando negozi. Forse facevi parte di una piccola banda di malfattori, oppure eri un lupo solitario, costretto a cavartela da solo contro la gilda dei ladri locale.'},
+    'Eremita':{ab:['con','wis','cha'],tal:'Guaritore',sk:['medicina','religione'],too:'Borsa da erborista',a:{i:['Bastone ferrato','Borsa da erborista','Giaciglio','Libro di filosofia','Lampada','Olio (3 fiasche)','Abiti da viaggiatore'],mo:16},b:{mo:50},d:'Hai trascorso i primi anni in isolamento, in una capanna o in un monastero oltre i confini dell’insediamento più vicino. I tuoi compagni erano le creature della foresta e chi ti portava notizie del mondo. La solitudine ti ha fatto riflettere sui misteri della creazione.'},
+    'Guardia':{ab:['str','intl','wis'],tal:'Allerta',sk:['atletica','percezione'],too:'Set da gioco (a scelta)',a:{i:['Lancia','Balestra leggera','20 quadrelli','Set da gioco','Lanterna schermabile','Manette','Faretra','Abiti da viaggiatore'],mo:12},b:{mo:50},d:'Ti fanno male i piedi quando ricordi le ore trascorse di guardia nella torre. Eri addestrato a tenere un occhio all’esterno delle mura, in cerca di razziatori, e l’altro all’interno, alla ricerca di tagliaborse e piantagrane.'},
+    'Guida':{ab:['dex','con','wis'],tal:'Iniziato alla Magia (Druido)',sk:['furtivita','sopravvivenza'],too:'Strumenti da cartografo',a:{i:['Arco corto','20 frecce','Strumenti da cartografo','Giaciglio','Faretra','Tenda','Abiti da viaggiatore'],mo:3},b:{mo:50},d:'Sei diventato adulto all’aperto, lontano dalle terre civilizzate. La tua casa era ovunque stendessi il giaciglio. Hai imparato a cavartela da solo esplorando le terre selvagge e, di tanto in tanto, guidavi sacerdoti della natura che ti insegnavano i fondamenti della loro magia.'},
+    'Intrattenitore':{ab:['str','dex','cha'],tal:'Musicista',sk:['acrobazia','intrattenere'],too:'Strumento musicale (a scelta)',a:{i:['Strumento musicale','2 costumi','Specchio','Profumo','Abiti da viaggiatore'],mo:11},b:{mo:50},d:'Hai trascorso la giovinezza seguendo fiere e carnevali itineranti, svolgendo lavoretti per musicisti e acrobati in cambio di lezioni. Ancora oggi prosperi grazie agli applausi e senti la nostalgia del palcoscenico.'},
+    'Marinaio':{ab:['str','dex','wis'],tal:'Attaccabrighe da Taverna',sk:['acrobazia','percezione'],too:'Strumenti da navigatore',a:{i:['Pugnale','Strumenti da navigatore','Corda','Abiti da viaggiatore'],mo:20},b:{mo:50},d:'Hai vissuto come uomo di mare, con il vento alle spalle e i ponti ondeggianti sotto i piedi. Ti sei appollaiato sugli sgabelli dei bar di più porti di quanti tu ne ricordi, hai affrontato tempeste possenti e scambiato storie con chi vive sotto le onde.'},
+    'Mercante':{ab:['con','intl','cha'],tal:'Fortunato',sk:['animali','persuasione'],too:'Strumenti da navigatore',a:{i:['Strumenti da navigatore','2 borse','Abiti da viaggiatore'],mo:22},b:{mo:50},d:'Sei stato apprendista di un mercante o di un bottegaio, imparando i fondamenti del commercio. Hai viaggiato molto, guadagnandoti da vivere comprando e vendendo materie prime e opere finite, trasportando merci via nave, carro o carovana.'},
+    'Nobile':{ab:['str','intl','cha'],tal:'Abile',sk:['storia','persuasione'],too:'Set da gioco (a scelta)',a:{i:['Set da gioco','Abiti eleganti','Profumo'],mo:29},b:{mo:50},d:'Sei cresciuto in un castello, circondato da ricchezza, potere e privilegi. La tua famiglia di aristocratici minori ti ha garantito un’istruzione di prim’ordine. Il tempo a corte ti ha insegnato molto sulla capacità di comando.'},
+    'Sapiente':{ab:['con','intl','wis'],tal:'Iniziato alla Magia (Mago)',sk:['arcano','storia'],too:'Scorte da calligrafo',a:{i:['Bastone ferrato','Scorte da calligrafo','Libro di storia','Pergamena (8 fogli)','Veste'],mo:8},b:{mo:50},d:'Hai trascorso gli anni della formazione viaggiando tra manieri e monasteri in cambio dell’accesso alle loro biblioteche. Molte serate a studiare libri e pergamene ti hanno insegnato la storia del multiverso e perfino i rudimenti della magia.'},
+    'Scriba':{ab:['dex','intl','wis'],tal:'Abile',sk:['indagare','percezione'],too:'Scorte da calligrafo',a:{i:['Scorte da calligrafo','Abiti eleganti','Lampada','Olio (3 fiasche)','Pergamena (12 fogli)'],mo:23},b:{mo:50},d:'Hai trascorso la formazione in uno scriptorium o in un’agenzia governativa, imparando a scrivere con mano ferma testi finemente vergati. Presti un’attenzione scrupolosa ai dettagli, il che ti aiuta a evitare errori nei documenti che copi e crei.'},
+    'Soldato':{ab:['str','dex','con'],tal:'Attaccante Selvaggio',sk:['atletica','intimidire'],too:'Set da gioco (a scelta)',a:{i:['Lancia','Arco corto','20 frecce','Set da gioco','Borsa da guaritore','Faretra','Abiti da viaggiatore'],mo:14},b:{mo:50},d:'Hai iniziato ad addestrarti alla guerra appena raggiunta l’età adulta. La battaglia ti scorre nel sangue e a volte esegui istintivamente gli esercizi di combattimento che hai imparato per primi, messi a frutto sul campo per proteggere il regno.'},
+    'Viandante':{ab:['dex','wis','cha'],tal:'Fortunato',sk:['intuizione','furtivita'],too:'Arnesi da scasso',a:{i:['2 pugnali','Arnesi da scasso','Set da gioco','Giaciglio','2 borse','Abiti da viaggiatore'],mo:16},b:{mo:50},d:'Sei cresciuto per strada, tra altri emarginati: alcuni amici, altri rivali. Dormivi dove capitava e svolgevi lavoretti in cambio di cibo, a volte ricorrendo al furto. Eppure non hai mai perso il tuo orgoglio né abbandonato la speranza.'}
+  };
+  var TALENT_DESC={
+    'Allerta':'Talento dell’Origine. Competenza nell’Iniziativa: aggiungi il Bonus di Competenza ai tiri per l’Iniziativa. Scambio di Iniziativa: subito dopo aver tirato l’Iniziativa puoi scambiarla con quella di un alleato consenziente nello stesso combattimento (non se uno dei due è Incapacitato).',
+    'Artefice':'Talento dell’Origine. Competenza in tre strumenti da artigiano a tua scelta dalla tabella Creazione Rapida. Sconto del 20% su ogni oggetto non magico acquistato. Creazione Rapida: a fine Riposo Lungo puoi fabbricare un oggetto dalla tabella (serve competenza negli strumenti associati); dura fino al Riposo Lungo successivo.',
+    'Guaritore':'Talento dell’Origine. Medico da Battaglia: con una borsa da guaritore, consumandone un uso (azione Utilizzare), una creatura entro 1,5 m spende un Dado Vita, lo tira e recupera PF pari al risultato + il tuo Bonus di Competenza. Ritiri di Guarigione: quando tiri un dado di guarigione puoi ripetere gli 1, usando il nuovo risultato.',
+    'Fortunato':'Talento dell’Origine. Punti Fortuna pari al Bonus di Competenza (recuperi a fine Riposo Lungo). Spendi 1 punto per avere Vantaggio a una tua Prova di D20, oppure per imporre Svantaggio a un tiro per colpire effettuato contro di te.',
+    'Iniziato alla Magia':'Talento dell’Origine. Impari due trucchetti dalla lista di Chierico, Druido o Mago (scegli INT, SAG o CAR come caratteristica da incantatore). Impari anche un incantesimo di 1° livello dalla stessa lista, sempre preparato: puoi lanciarlo una volta senza slot (recuperi a fine Riposo Lungo) o con uno slot. Cambio di incantesimo a ogni livello. Ripetibile con una lista diversa.',
+    'Musicista':'Talento dell’Origine. Competenza in tre strumenti musicali a tua scelta. Canzone Incoraggiante: a fine Riposo Breve o Lungo, suonando uno strumento in cui hai competenza, conferisci Ispirazione Eroica a un numero di alleati pari al Bonus di Competenza.',
+    'Attaccante Selvaggio':'Talento dell’Origine. Una volta per turno, quando colpisci un bersaglio con un’arma, puoi tirare due volte i dadi dei danni dell’arma e usare il risultato che preferisci.',
+    'Abile':'Talento dell’Origine. Ottieni competenza in una qualsiasi combinazione di tre abilità o strumenti a tua scelta. Ripetibile.',
+    'Attaccabrighe da Taverna':'Talento dell’Origine. Colpo Senz’Armi Potenziato: infliggi 1d4 + mod. Forza danni contundenti. Ripeti gli 1 sul dado dei danni del Colpo Senz’Armi. Competenza nelle armi improvvisate. Spinta: quando colpisci con un Colpo Senz’Armi durante l’azione Attacco, puoi anche spingere il bersaglio di 1,5 m (una volta per turno).',
+    'Robusto':'Talento dell’Origine. Quando ottieni questo talento, il massimo dei PF aumenta del doppio del tuo livello. A ogni livello successivo, il massimo dei PF aumenta di altri 2.'
+  };
+  var KIT_DESC={
+    'scorte da calligrafo':'Inchiostri, penne, pergamene e sigilli per scrivere e realizzare documenti.',
+    'strumenti da artigiano':'Attrezzi del mestiere per creare e riparare oggetti.',
+    'arnesi da falsario':'Carte, inchiostri e sigilli per contraffare documenti e firme.',
+    'arnesi da scasso':'Grimaldelli e attrezzi per forzare serrature e disinnescare trappole.',
+    'strumento musicale':'Uno strumento con cui suonare musica ed esibirsi.',
+    'strumenti da falegname':'Sega, martello, chiodi e attrezzi per lavorare il legno.',
+    'set da gioco':'Un gioco (dadi, carte o simili) con cui giocare e scommettere.',
+    'strumenti da cartografo':'Compasso, righelli e penne per disegnare e leggere mappe.',
+    'borsa da erborista':'Erbe, garze e strumenti per preparare rimedi e identificare piante.',
+    'strumenti da navigatore':'Sestante, bussola e strumenti per navigare e tracciare rotte.',
+    'borsa da guaritore':'Bende e strumenti per stabilizzare i feriti (dieci usi).'
+  };
+  function talentDesc(name){if(!name)return '';if(name.indexOf('Iniziato alla Magia')===0)return TALENT_DESC['Iniziato alla Magia'];return TALENT_DESC[name]||''}
+  function kitDesc(item){if(!item)return '';var l=item.toLowerCase();for(var k in KIT_DESC){if(l.indexOf(k)===0)return KIT_DESC[k]}return ''}
   var ALIGNS_M=['Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale','Neutrale','Caotico Neutrale','Legale Malvagio','Neutrale Malvagio','Caotico Malvagio'];
   function classByKey(k){for(var i=0;i<CLASSES_M.length;i++)if(CLASSES_M[i].key===k)return CLASSES_M[i];return null}
   function subByKey(ck,sk){if(!ck||!sk||sk==='custom')return null;var arr=SUBCLASSES_M[ck]||[];for(var i=0;i<arr.length;i++)if(arr[i].key===sk)return arr[i];return null}
@@ -1157,16 +1289,19 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
   function classSel(pg){var o=[['custom','Personalizzato']];CLASSES_M.forEach(function(c){if(c.key!=='custom')o.push([c.key,c.label])});return selHtml('classKey',pg.classKey||'custom',o)}
   function subSel(pg){var arr=SUBCLASSES_M[pg.classKey]||[];var o=[['custom','Personalizzato']];arr.forEach(function(s){o.push([s.key,s.label])});return selHtml('subclassKey',pg.subclassKey||'custom',o)}
   function handleSel(key,val){
-    var pg=D.curPG();if(!pg)return;
+    var pg=D.curPG();if(!pg)return;var openBg=false,openRace=false,_oldLvlH=null;
     if(key==='classKey'){pg.classKey=val;pg.cls=classLabel(val);pg.subclassKey='custom';pg.subcls='';classApply(pg);resFresh(pg)}
     else if(key==='subclassKey'){pg.subclassKey=val;pg.subcls=subLabel(pg.classKey,val);classApply(pg);resAdd(pg)}
-    else if(key==='lvl'){pg.lvl=Math.max(1,Math.min(20,parseInt(val)||1));classApply(pg)}
-    else if(key==='race'){pg.race=val}
+    else if(key==='lvl'){_oldLvlH=pg.lvl||1;pg.lvl=Math.max(1,Math.min(20,parseInt(val)||1));classApply(pg)}
+    else if(key==='race'){pg.race=val;if(val&&RACE_DATA[val])openRace=true}
     else if(key==='align'){pg.align=val}
-    else if(key==='bg'){pg.bg=val}
+    else if(key==='bg'){pg.bg=val;if(val&&BG_DATA[val])openBg=true}
     saveNow();
     if(idCfgOpen){if(key==='classKey'||key==='subclassKey')renderIdCfg(D.curPG())}
     else reSheet();
+    if(openBg)openBgConfig(val);
+    if(openRace)openRaceConfig(val);
+    if(_oldLvlH!=null)_raceLevelUpCheck(D.curPG(),_oldLvlH);
   }
   /* ===== Configuratore Identità a schermo intero ===== */
   function renderIdCfg(pg){
@@ -1243,9 +1378,163 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
     head.addEventListener('touchend',function(e){if(!drag)return;drag=false;var dy=e.changedTouches[0].clientY-sy;if(dy>55){applyClose()}else{lw.style.transition='transform .2s var(--ease)';lw.style.transform='translateY(0)';ov.style.background=''}},{passive:true});
     requestAnimationFrame(function(){sc.scrollTop=(cur-min)*IH;hl()});
   }
-  function openLvlWheel(){var pg=D.curPG();if(!pg)return;openWheel({title:'Livello',min:0,max:40,value:pg.lvl,onConfirm:function(v){var p=D.curPG();if(!p)return;p.lvl=v;classApply(p);saveNow();if(idCfgOpen)renderIdCfg(D.curPG());else reSheet()}})}
+  function openLvlWheel(){var pg=D.curPG();if(!pg)return;openWheel({title:'Livello',min:0,max:40,value:pg.lvl,onConfirm:function(v){var p=D.curPG();if(!p)return;var _oldLvlW=p.lvl||1;p.lvl=v;classApply(p);saveNow();if(idCfgOpen)renderIdCfg(D.curPG());else reSheet();_raceLevelUpCheck(D.curPG(),_oldLvlW)}})}
   function openAcWheel(){var pg=D.curPG();if(!pg)return;openWheel({title:'Classe Armatura',min:0,max:30,value:pg.ac,onConfirm:function(v){var p=D.curPG();if(!p)return;p.ac=v;saveNow();reSheet()}})}
   function openInitWheel(){var pg=D.curPG();if(!pg)return;openWheel({title:'Modificatore Iniziativa',min:-10,max:20,value:parseInt(pg.initBonus)||0,onConfirm:function(v){var p=D.curPG();if(!p)return;p.initBonus=v;saveNow();reSheet()}})}
+  /* ===== Popup configuratore Background (D&D 2024) ===== */
+  function _abName(a){for(var i=0;i<D.ABS.length;i++)if(D.ABS[i][0]===a)return D.ABS[i][2];return a}
+  function _skName(s){for(var i=0;i<D.SKILLS.length;i++)if(D.SKILLS[i][0]===s)return D.SKILLS[i][1];return s}
+  var CHKSVG='<svg class="bgi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  var XSVG='<svg class="bgi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+  function openBgConfig(bgName){
+    var data=BG_DATA[bgName],pg=D.curPG();if(!data||!pg)return;if(document.getElementById('bgcfg'))return;
+    var st={abil:{},feat:true,skills:true,tools:true,equip:'A',story:false};
+    data.ab.forEach(function(a){st.abil[a]=0});
+    var ov=document.createElement('div');ov.id='bgcfg';ov.className='bgc';document.body.appendChild(ov);
+    function sum(){var s=0;data.ab.forEach(function(a){s+=st.abil[a]||0});return s}
+    function tgl(on,k){return '<button class="tgl'+(on?' tgl--on':'')+'" data-tgl="'+k+'" type="button"></button>'}
+    function eqOpt(key){
+      var on=st.equip===key,label,detail='';
+      if(key==='none'){label='Non aggiungere equipaggiamento'}
+      else{var eq=key==='A'?data.a:data.b;label='Opzione '+key;var parts=(eq.i||[]).slice();if(eq.mo)parts.push(eq.mo+' MO');detail=parts.join(', ')}
+      return '<button class="bgc__eq'+(on?' bgc__eq--on':'')+'" data-eq="'+key+'" type="button"><span class="bgc__eqr"></span><span class="bgc__eql"><b>'+esc(label)+'</b>'+(detail?'<span>'+esc(detail)+'</span>':'')+'</span></button>';
+    }
+    function draw(){
+      var rem=3-sum();
+      var h='<div class="bgc__panel"><div class="bgc__bar"><div class="bgc__t">🎒 Background: '+esc(bgName)+'</div></div><div class="bgc__body">';
+      h+='<div class="bgc__intro">Hai selezionato il background <b>'+esc(bgName)+'</b>. Scegli cosa applicare al personaggio.</div>';
+      h+='<div class="bgc__sec"><div class="bgc__st"><span>💪 Punteggi di caratteristica</span><span class="bgc__rem'+(rem===0?' bgc__rem--ok':'')+'">da assegnare: '+rem+'</span></div>';
+      data.ab.forEach(function(a){var cur=parseInt(pg[a])||10;var add=st.abil[a]||0;h+='<div class="bgc__ab"><span class="bgc__abn">'+esc(_abName(a))+'</span><button class="step step--s" data-abm="'+a+'">−</button><span class="bgc__abv">+'+add+'</span><button class="step step--s" data-abp="'+a+'">+</button><span class="bgc__abr">'+cur+' → <b>'+(cur+add)+'</b></span></div>'});
+      h+='<div class="bgc__hint">Distribuisci 3 punti: +2 e +1, oppure +1 a ciascuno (max +2 per caratteristica).</div></div>';
+      h+='<div class="bgc__sec bgc__row"><div class="bgc__rl"><div class="bgc__rt">🎖️ Talento</div><div class="bgc__rd">Aggiungi «Talento: '+esc(data.tal)+'» ai Privilegi e Tratti, con la descrizione.</div></div>'+tgl(st.feat,'feat')+'</div>';
+      h+='<div class="bgc__sec bgc__row"><div class="bgc__rl"><div class="bgc__rt">🎯 Competenze abilità</div><div class="bgc__rd">Attiva competenza in '+esc(data.sk.map(_skName).join(' e '))+' (se non già attive).</div></div>'+tgl(st.skills,'skills')+'</div>';
+      h+='<div class="bgc__sec bgc__row"><div class="bgc__rl"><div class="bgc__rt">🛠️ Competenza strumenti</div><div class="bgc__rd">Aggiungi «'+esc(data.too)+'» a Competenze e lingue (scheda Informazioni).</div></div>'+tgl(st.tools,'tools')+'</div>';
+      h+='<div class="bgc__sec"><div class="bgc__st"><span>🎒 Equipaggiamento</span></div>'+eqOpt('A')+eqOpt('B')+eqOpt('none')+'</div>';
+      h+='<div class="bgc__sec bgc__row"><div class="bgc__rl"><div class="bgc__rt">📜 Background e storia</div><div class="bgc__rd">Aggiungi «Background: '+esc(bgName)+'» (con descrizione) a Background e storia.</div></div>'+tgl(st.story,'story')+'</div>';
+      h+='</div><div class="bgc__foot"><button class="bgc__no" data-bgcancel type="button">'+XSVG+' Annulla</button><button class="bgc__ok'+(rem!==0?' bgc__ok--dis':'')+'" data-bgok type="button">'+CHKSVG+' Conferma</button></div></div>';
+      ov.innerHTML=h;
+    }
+    function closeBg(){ov.classList.remove('bgc--on');setTimeout(function(){if(ov.parentNode)ov.remove()},260)}
+    function applyBg(){
+      var p=D.curPG();if(!p)return;
+      data.ab.forEach(function(a){var ad=st.abil[a]||0;if(ad)p[a]=(parseInt(p[a])||10)+ad});
+      if(st.feat){if(!p.featList)p.featList=[];p.featList.push({t:'Talento: '+data.tal,b:talentDesc(data.tal)})}
+      if(st.skills){if(!p.profs)p.profs={};data.sk.forEach(function(sk){if(!(p.profs[sk]>0))p.profs[sk]=1})}
+      if(st.tools){var kd=kitDesc(data.too);var line='Competenza: '+data.too+(kd?' — '+kd:'');p.langs=(p.langs&&p.langs.replace(/\s+$/,'')?p.langs.replace(/\s+$/,'')+'\n':'')+line}
+      if(st.equip==='A'||st.equip==='B'){var eq=st.equip==='A'?data.a:data.b;if(eq.i){if(!p.equipList)p.equipList=[];eq.i.forEach(function(it){p.equipList.push({t:it,b:kitDesc(it)})})}if(eq.mo){if(!p.coins)p.coins={};p.coins.mo=(parseInt(p.coins.mo)||0)+eq.mo}}
+      if(st.story){var bl='Background: '+bgName;p.backstory=(p.backstory&&p.backstory.replace(/\s+$/,'')?p.backstory.replace(/\s+$/,'')+'\n\n':'')+bl+(data.d?'\n'+data.d:'')}
+      saveNow();closeBg();if(idCfgOpen)renderIdCfg(D.curPG());else reSheet();if(U&&U.toast)U.toast('✓ Background '+esc(bgName)+' configurato');
+    }
+    draw();requestAnimationFrame(function(){ov.classList.add('bgc--on')});
+    ov.addEventListener('click',function(e){
+      var t;
+      if(e.target.closest('[data-bgcancel]')){closeBg();return}
+      if((t=e.target.closest('[data-abp]'))){var a=t.getAttribute('data-abp');if(sum()<3&&(st.abil[a]||0)<2){st.abil[a]=(st.abil[a]||0)+1;draw()}return}
+      if((t=e.target.closest('[data-abm]'))){var a2=t.getAttribute('data-abm');if((st.abil[a2]||0)>0){st.abil[a2]--;draw()}return}
+      if((t=e.target.closest('[data-tgl]'))){var k=t.getAttribute('data-tgl');st[k]=!st[k];draw();return}
+      if((t=e.target.closest('[data-eq]'))){st.equip=t.getAttribute('data-eq');draw();return}
+      if(e.target.closest('[data-bgok]')){if(sum()!==3){if(U&&U.toast)U.toast('Assegna tutti e 3 i punti caratteristica');return}applyBg();return}
+    });
+  }
+  /* ===== Configuratore Razza (D&D 2024) ===== */
+  var RACE_DATA={
+    'Aasimar':{speed:9,desc:'Gli aasimar sono mortali che custodiscono nell’anima una scintilla dei Piani Superiori. Discendono da esseri celestiali o ne sono permeati, e possono generare luce, guarigione e furia celestiale. Vivono fino a 160 anni e presentano tratti come lentiggini metalliche, occhi luminosi o un’aureola.',traits:[{t:'Resistenza Celestiale',b:'Possiedi Resistenza ai danni necrotici e ai danni radiosi.'},{t:'Scurovisione',b:'Possiedi Scurovisione entro 18 metri.'},{t:'Mani Guaritrici',b:'Come azione Magia, tocchi una creatura e tiri un numero di d4 pari al tuo Bonus di Competenza: recupera PF pari al totale. Una volta usato, non di nuovo finché non termini un Riposo Lungo.'},{t:'Portatore di Luce',b:'Conosci il trucchetto Luce. Carisma è la tua caratteristica da incantatore per questo trucchetto.'}],cantrips:['Luce'],lfeats:[{lvl:3,t:'Rivelazione Celestiale',b:'Come Azione Bonus ti trasformi (1 minuto, una volta per Riposo Lungo) scegliendo: Ali Celestiali (Velocità di Volare pari alla tua), Radiosità Interiore (Luce intensa entro 3 m + fioca per altri 3 m; a fine turno danni radiosi pari al Bonus di Competenza a chi è entro 3 m) o Sudario Necrotico (creature non alleate entro 3 m: TS Carisma CD 8+mod.CAR+Comp. o Spaventate). Una volta per turno, da trasformato, infliggi danni extra pari al Bonus di Competenza (necrotici o radiosi).'}]},
+    'Gnomo delle Foreste':{speed:9,desc:'Gli gnomi sono un popolo magico, minuto e dagli occhi grandi, creato da divinità dell’invenzione e delle illusioni; vivono circa 425 anni. Gli gnomi delle foreste sono legati alla magia illusoria e alla natura.',traits:[{t:'Scurovisione',b:'Possiedi Scurovisione entro 18 metri.'},{t:'Astuzia Gnomesca',b:'Disponi di Vantaggio ai tiri salvezza su Intelligenza, Saggezza e Carisma.'},{t:'Stirpe: Gnomo delle Foreste',b:'Conosci il trucchetto Illusione Minore e hai sempre preparato Parlare con gli Animali (lanciabile senza slot un numero di volte pari al Bonus di Competenza, recuperi a Riposo Lungo). INT, SAG o CAR è la caratteristica da incantatore (a scelta).'}],cantrips:['Illusione Minore'],spells:[{n:'Parlare con gli Animali',lvl:1}]},
+    'Gnomo delle Rocce':{speed:9,desc:'Gli gnomi sono un popolo magico, minuto e dagli occhi grandi, creato da divinità dell’invenzione; vivono circa 425 anni. Gli gnomi delle rocce sono inventori dal tocco magico.',traits:[{t:'Scurovisione',b:'Possiedi Scurovisione entro 18 metri.'},{t:'Astuzia Gnomesca',b:'Disponi di Vantaggio ai tiri salvezza su Intelligenza, Saggezza e Carisma.'},{t:'Stirpe: Gnomo delle Rocce',b:'Conosci i trucchetti Riparare e Prestidigitazione. Puoi impiegare 10 minuti per creare un minuscolo congegno a orologeria (CA 5, 1 PF) con un effetto di Prestidigitazione, attivabile con un’Azione Bonus; fino a 3 contemporaneamente, si disfa dopo 8 ore.'}],cantrips:['Riparare','Prestidigitazione']},
+    'Goliath':{speed:10.5,desc:'Più alti della maggior parte dei popoli, i goliath discendono dai giganti e portano i loro doni soprannaturali, compresa la capacità di crescere temporaneamente fino a dimensioni gigantesche.',traits:[{t:'Corporatura Possente',b:'Disponi di Vantaggio ai tiri salvezza per terminare la condizione Afferrato. Ai fini della capacità di trasporto sei considerato di una taglia superiore.'}],choices:{label:'Discendenza Gigantesca (usabile Bonus Comp. volte, recuperi a Riposo Lungo)',options:[{t:'Passo della Nuvola (Gigante delle Nuvole)',b:'Come Azione Bonus, ti teletrasporti fino a 9 metri in uno spazio non occupato che puoi vedere.'},{t:'Bruciatura del Fuoco (Gigante del Fuoco)',b:'Quando colpisci un bersaglio e gli infliggi danni, puoi infliggergli anche 1d10 danni da fuoco.'},{t:'Gelo del Freddo (Gigante del Gelo)',b:'Quando colpisci e infliggi danni, infliggi anche 1d6 danni da freddo e riduci la Velocità del bersaglio di 3 m fino al tuo turno successivo.'},{t:'Caduta della Collina (Gigante delle Colline)',b:'Quando colpisci una creatura di taglia Grande o inferiore, puoi imporle la condizione Prono.'},{t:'Resistenza della Pietra (Gigante delle Pietre)',b:'Quando subisci danni, con una Reazione tiri 1d12 + mod. Costituzione e riduci i danni di quel totale.'},{t:'Tuono della Tempesta (Gigante delle Tempeste)',b:'Quando subisci danni da una creatura entro 18 m, con una Reazione infliggi 1d8 danni da tuono a quella creatura.'}]},lfeats:[{lvl:5,t:'Forma Grande',b:'Come Azione Bonus (in uno spazio ampio) diventi di taglia Grande per 10 minuti: Vantaggio alle prove di Forza e Velocità +3 m. Una volta per Riposo Lungo.'}]},
+    'Halfling':{speed:9,desc:'Amati da divinità di casa e focolare, gli halfling sono piccoli come bambini umani ma spesso coraggiosi e avventurosi. Vivono circa 150 anni e sono celebri per la loro «fortuna».',traits:[{t:'Coraggioso',b:'Disponi di Vantaggio ai tiri salvezza per evitare o terminare la condizione Spaventato.'},{t:'Agilità Halfling',b:'Puoi muoverti attraverso lo spazio di qualsiasi creatura di almeno una taglia più grande di te, ma non fermartici.'},{t:'Fortuna',b:'Quando ottieni 1 sul d20 di una Prova di D20, puoi ripetere il tiro; devi usare il nuovo risultato.'},{t:'Furtivo per Natura',b:'Puoi effettuare l’azione Nascondersi anche quando sei oscurato soltanto da una creatura di almeno una taglia più grande di te.'}]},
+    'Umano':{speed:9,desc:'Presenti in tutto il multiverso, gli umani sono numerosi e vari, ambiziosi e intraprendenti, e cercano di realizzare il più possibile negli anni che hanno.',traits:[{t:'Intraprendente',b:'Ottieni Ispirazione Eroica ogni volta che termini un Riposo Lungo.'},{t:'Abile',b:'Ottieni competenza in un’abilità a tua scelta.'},{t:'Versatile',b:'Ottieni un talento dell’Origine a tua scelta (consigliato Abile).'}]},
+    'Orco':{speed:9,desc:'Gli orchi discendono da Gruumsh e ne conservano i doni: resistenza, determinazione e capacità di vedere nell’oscurità. Sono in media alti e robusti, con pelle grigia e canini prominenti.',traits:[{t:'Scarica di Adrenalina',b:'Puoi effettuare l’azione Scatto come Azione Bonus; quando lo fai ottieni PF Temporanei pari al Bonus di Competenza. Usabile un numero di volte pari al Bonus di Competenza, recuperi a Riposo Breve o Lungo.'},{t:'Scurovisione',b:'Possiedi Scurovisione entro 36 metri.'},{t:'Tenacia Implacabile',b:'Quando vieni ridotto a 0 PF ma non ucciso sul colpo, puoi invece rimanere a 1 PF. Una volta per Riposo Lungo.'}]},
+    'Tiefling Abissale':{speed:9,desc:'I tiefling sono legati per sangue a un Immondo dei Piani Inferiori. L’eredità abissale richiama entropia e caos: corna, pelliccia, zanne e odori insoliti sono comuni, con sangue demoniaco nelle vene.',traits:[{t:'Scurovisione',b:'Possiedi Scurovisione entro 18 metri.'},{t:'Presenza Ultraterrena',b:'Conosci il trucchetto Taumaturgia. INT, SAG o CAR è la caratteristica da incantatore (a scelta).'},{t:'Eredità Abissale',b:'Possiedi Resistenza ai danni da veleno.'}],cantrips:['Taumaturgia','Spruzzo Velenoso'],lfeats:[{lvl:3,spell:{n:'Raggio di Infermità',spLvl:1}},{lvl:5,spell:{n:'Blocca Persone',spLvl:2}}]},
+    'Tiefling Ctonio':{speed:9,desc:'I tiefling sono legati per sangue a un Immondo dei Piani Inferiori. L’eredità ctonia avverte l’avidità di Gehenna e la malinconia di Ade: alcuni hanno aspetto cadaverico, altri bellezza ultraterrena.',traits:[{t:'Scurovisione',b:'Possiedi Scurovisione entro 18 metri.'},{t:'Presenza Ultraterrena',b:'Conosci il trucchetto Taumaturgia. INT, SAG o CAR è la caratteristica da incantatore (a scelta).'},{t:'Eredità Ctonia',b:'Possiedi Resistenza ai danni necrotici.'}],cantrips:['Taumaturgia','Tocco Gelido'],lfeats:[{lvl:3,spell:{n:'Vita Falsata',spLvl:1}},{lvl:5,spell:{n:'Raggio di Indebolimento',spLvl:2}}]},
+    'Tiefling Infernale':{speed:9,desc:'I tiefling sono legati per sangue a un Immondo dei Piani Inferiori. L’eredità infernale li collega ai Nove Inferi: corna, spine, code, occhi dorati e un debole odore di zolfo sono comuni, con discendenza diabolica.',traits:[{t:'Scurovisione',b:'Possiedi Scurovisione entro 18 metri.'},{t:'Presenza Ultraterrena',b:'Conosci il trucchetto Taumaturgia. INT, SAG o CAR è la caratteristica da incantatore (a scelta).'},{t:'Eredità Infernale',b:'Possiedi Resistenza ai danni da fuoco.'}],cantrips:['Taumaturgia','Dardo di Fuoco'],lfeats:[{lvl:3,spell:{n:'Intimorire Infernale',spLvl:1}},{lvl:5,spell:{n:'Oscurità',spLvl:2}}]},
+    'Dragonide':{speed:9,desc:'I dragonidi discendono dai draghi e ne portano il sangue: squame colorate, un’arma a soffio e la resistenza al tipo di danno del loro antenato draconico. Sono orgogliosi e tenaci.',traits:[{t:'Scurovisione',b:'Possiedi Scurovisione entro 18 metri.'},{t:'Arma a Soffio',b:'Quando esegui l’azione Attacco, puoi sostituire uno degli attacchi con un soffio: un cono di 4,5 m o una linea lunga 9 m (a tua scelta). Ogni creatura nell’area effettua un tiro salvezza su Destrezza (CD 8 + mod. Costituzione + Bonus di Competenza), subendo 1d10 danni del tipo della tua discendenza (metà se lo supera). I danni salgono a 2d10 al 5° livello, 3d10 all’11° e 4d10 al 17°. Usabile un numero di volte pari al Bonus di Competenza, recuperi a Riposo Lungo.'},{t:'Resistenza ai Danni',b:'Possiedi Resistenza al tipo di danno determinato dalla tua Discendenza Draconica.'}],choices:{label:'Discendenza Draconica (tipo di danno di Arma a Soffio e Resistenza)',options:[{t:'Drago Nero — Acido',b:'Arma a Soffio e Resistenza: danni da acido.'},{t:'Drago Blu — Fulmine',b:'Arma a Soffio e Resistenza: danni da fulmine.'},{t:'Drago d’Ottone — Fuoco',b:'Arma a Soffio e Resistenza: danni da fuoco.'},{t:'Drago di Bronzo — Fulmine',b:'Arma a Soffio e Resistenza: danni da fulmine.'},{t:'Drago di Rame — Acido',b:'Arma a Soffio e Resistenza: danni da acido.'},{t:'Drago d’Oro — Fuoco',b:'Arma a Soffio e Resistenza: danni da fuoco.'},{t:'Drago Verde — Veleno',b:'Arma a Soffio e Resistenza: danni da veleno.'},{t:'Drago Rosso — Fuoco',b:'Arma a Soffio e Resistenza: danni da fuoco.'},{t:'Drago d’Argento — Freddo',b:'Arma a Soffio e Resistenza: danni da freddo.'},{t:'Drago Bianco — Freddo',b:'Arma a Soffio e Resistenza: danni da freddo.'}]},lfeats:[{lvl:5,t:'Volo Draconico',b:'Come Azione Bonus ti spuntano ali spettrali per 10 minuti: ottieni una Velocità di Volare pari alla tua Velocità. Una volta per Riposo Lungo.'}]},
+    'Nano':{speed:9,desc:'I nani sono un popolo robusto e tenace, legato alla pietra e alla forgia. Vivono a lungo, resistono ai veleni e percepiscono la roccia intorno a loro.',traits:[{t:'Scurovisione',b:'Possiedi Scurovisione entro 36 metri.'},{t:'Resistenza Nanica',b:'Possiedi Resistenza ai danni da veleno e Vantaggio ai tiri salvezza per evitare o terminare la condizione Avvelenato.'},{t:'Tenacia Nanica',b:'Il tuo massimo di Punti Ferita aumenta di 1 e aumenta di ulteriori 1 ogni volta che sali di livello.'},{t:'Sapienza della Pietra',b:'Come Azione Bonus ottieni Percezione Tellurica entro 18 m per 10 minuti, finché sei a contatto con una superficie di pietra. Usabile un numero di volte pari al Bonus di Competenza, recuperi a Riposo Lungo.'}]},
+    'Elfo Alto':{speed:9,desc:'Gli elfi sono un popolo longevo e aggraziato, legato alla magia e al Piano Fatato. Gli alti elfi custodiscono la tradizione arcana.',traits:[{t:'Scurovisione',b:'Possiedi Scurovisione entro 18 metri.'},{t:'Retaggio Fatato',b:'Disponi di Vantaggio ai tiri salvezza per evitare o terminare la condizione Affascinato.'},{t:'Sensi Acuti',b:'Ottieni competenza in una abilità a scelta tra Intuizione, Percezione e Sopravvivenza.'},{t:'Trance',b:'Non hai bisogno di dormire e la magia non può farti addormentare; puoi completare un Riposo Lungo in 4 ore.'},{t:'Lignaggio: Alto Elfo',b:'Conosci il trucchetto Prestidigitazione e, quando termini un Riposo Lungo, puoi sostituirlo con un altro trucchetto della lista del Mago. INT, SAG o CAR è la caratteristica da incantatore (a scelta).'}],cantrips:['Prestidigitazione'],lfeats:[{lvl:3,spell:{n:'Individuazione del Magico',spLvl:1}},{lvl:5,spell:{n:'Passo Velato',spLvl:2}}]},
+    'Elfo dei Boschi':{speed:10.5,desc:'Gli elfi sono un popolo longevo e aggraziato, legato alla magia e al Piano Fatato. Gli elfi dei boschi sono rapidi e schivi tra gli alberi.',traits:[{t:'Scurovisione',b:'Possiedi Scurovisione entro 18 metri.'},{t:'Retaggio Fatato',b:'Disponi di Vantaggio ai tiri salvezza per evitare o terminare la condizione Affascinato.'},{t:'Sensi Acuti',b:'Ottieni competenza in una abilità a scelta tra Intuizione, Percezione e Sopravvivenza.'},{t:'Trance',b:'Non hai bisogno di dormire e la magia non può farti addormentare; puoi completare un Riposo Lungo in 4 ore.'},{t:'Lignaggio: Elfo dei Boschi',b:'La tua Velocità è 10,5 m. Conosci il trucchetto Druidismo. INT, SAG o CAR è la caratteristica da incantatore (a scelta).'}],cantrips:['Druidismo'],lfeats:[{lvl:3,spell:{n:'Passo Lungo',spLvl:1}},{lvl:5,spell:{n:'Passo senza Tracce',spLvl:2}}]},
+    'Elfo Drow':{speed:9,desc:'Gli elfi sono un popolo longevo e aggraziato, legato alla magia e al Piano Fatato. I drow discendono dalle profondità e vedono lontano nell’oscurità.',traits:[{t:'Scurovisione',b:'Possiedi Scurovisione entro 36 metri.'},{t:'Retaggio Fatato',b:'Disponi di Vantaggio ai tiri salvezza per evitare o terminare la condizione Affascinato.'},{t:'Sensi Acuti',b:'Ottieni competenza in una abilità a scelta tra Intuizione, Percezione e Sopravvivenza.'},{t:'Trance',b:'Non hai bisogno di dormire e la magia non può farti addormentare; puoi completare un Riposo Lungo in 4 ore.'},{t:'Lignaggio: Drow',b:'La tua Scurovisione è di 36 m. Conosci il trucchetto Luci Danzanti. INT, SAG o CAR è la caratteristica da incantatore (a scelta).'}],cantrips:['Luci Danzanti'],lfeats:[{lvl:3,spell:{n:'Fuoco Fatato',spLvl:1}},{lvl:5,spell:{n:'Oscurità',spLvl:2}}]}
+  };
+  function openRaceConfig(raceName){
+    var data=RACE_DATA[raceName],pg=D.curPG();if(!data||!pg)return;if(document.getElementById('bgcfg'))return;
+    var lvl=pg.lvl||1;var traits=data.traits||[],cants=data.cantrips||[],spells=data.spells||[],lfeats=data.lfeats||[];
+    var st={notes:true,speed:true,traits:{},cants:{},spells:{},lfeats:{},choice:(data.choices?0:null)};
+    traits.forEach(function(_,i){st.traits[i]=true});cants.forEach(function(_,i){st.cants[i]=true});spells.forEach(function(_,i){st.spells[i]=true});lfeats.forEach(function(lf,i){st.lfeats[i]=(lvl>=lf.lvl)});
+    var ov=document.createElement('div');ov.id='bgcfg';ov.className='bgc';document.body.appendChild(ov);
+    function tgl(on,k){return '<button class="tgl'+(on?' tgl--on':'')+'" data-tgl="'+k+'" type="button"></button>'}
+    function draw(){
+      var h='<div class="bgc__panel"><div class="bgc__bar"><div class="bgc__t">🧬 Razza: '+esc(raceName)+'</div></div><div class="bgc__body">';
+      h+='<div class="bgc__intro">Hai selezionato la razza <b>'+esc(raceName)+'</b>. Scegli cosa applicare al personaggio.</div>';
+      h+='<div class="bgc__sec bgc__row"><div class="bgc__rl"><div class="bgc__rt">📝 Descrizione</div><div class="bgc__rd">Aggiungi la descrizione della razza alle Note.</div></div>'+tgl(st.notes,'notes')+'</div>';
+      h+='<div class="bgc__sec bgc__row"><div class="bgc__rl"><div class="bgc__rt">👟 Velocità</div><div class="bgc__rd">Imposta la velocità di movimento a '+data.speed+' m.</div></div>'+tgl(st.speed,'speed')+'</div>';
+      if(data.choices){h+='<div class="bgc__sec"><div class="bgc__st"><span>🧬 '+esc(data.choices.label)+'</span></div>';data.choices.options.forEach(function(o,i){var on=st.choice===i;h+='<button class="bgc__eq'+(on?' bgc__eq--on':'')+'" data-choice="'+i+'" type="button"><span class="bgc__eqr"></span><span class="bgc__eql"><b>'+esc(o.t)+'</b><span>'+esc(o.b)+'</span></span></button>'});h+='</div>';}
+      if(traits.length){h+='<div class="bgc__sec"><div class="bgc__st"><span>⚙️ Tratti → Privilegi e Tratti</span></div>';traits.forEach(function(tr,i){h+='<div class="bgc__row" style="padding:8px 0'+(i?';border-top:1px solid var(--border)':'')+'"><div class="bgc__rl"><div class="bgc__rt">'+esc(tr.t)+'</div><div class="bgc__rd">'+esc(tr.b)+'</div></div>'+tgl(st.traits[i],'t:'+i)+'</div>'});h+='</div>';}
+      if(cants.length||spells.length){h+='<div class="bgc__sec"><div class="bgc__st"><span>✨ Incantesimi razziali</span></div><div class="bgc__rd" style="margin-bottom:4px">Aggiunti alla scheda Incantesimi. Non intaccano il massimo di preparati di classe.</div>';cants.forEach(function(c,i){h+='<div class="bgc__row" style="padding:6px 0"><div class="bgc__rl"><div class="bgc__rt">'+esc(c)+' <span style="color:var(--muted);font-weight:400;text-transform:none">· trucchetto</span></div></div>'+tgl(st.cants[i],'c:'+i)+'</div>'});spells.forEach(function(s,i){h+='<div class="bgc__row" style="padding:6px 0"><div class="bgc__rl"><div class="bgc__rt">'+esc(s.n)+' <span style="color:var(--muted);font-weight:400;text-transform:none">· liv. '+s.lvl+', sempre preparato</span></div></div>'+tgl(st.spells[i],'s:'+i)+'</div>'});h+='</div>';}
+      if(lfeats.length){h+='<div class="bgc__sec"><div class="bgc__st"><span>⭐ Sbloccati per livello</span></div>';lfeats.forEach(function(lf,i){var ok=lvl>=lf.lvl;var title=lf.t||(lf.spell?lf.spell.n:'');if(ok){var desc=lf.t?lf.b:('Incantesimo di livello '+lf.spell.spLvl+', sempre preparato.');h+='<div class="bgc__row" style="padding:8px 0'+(i?';border-top:1px solid var(--border)':'')+'"><div class="bgc__rl"><div class="bgc__rt">'+esc(title)+' <span style="color:var(--c-green);font-weight:400;text-transform:none">· liv. '+lf.lvl+'</span></div><div class="bgc__rd">Sei al livello '+lvl+', in quanto '+esc(raceName)+' puoi aggiungerlo. '+esc(desc)+'</div></div>'+tgl(st.lfeats[i],'lf:'+i)+'</div>';}else{h+='<div class="bgc__row" style="padding:8px 0'+(i?';border-top:1px solid var(--border)':'')+';opacity:.5"><div class="bgc__rl"><div class="bgc__rt">'+esc(title)+'</div><div class="bgc__rd">🔒 Si sblocca al livello '+lf.lvl+' (sei al '+lvl+').</div></div></div>';}});h+='</div>';}
+      h+='</div><div class="bgc__foot"><button class="bgc__no" data-bgcancel type="button">'+XSVG+' Annulla</button><button class="bgc__ok" data-bgok type="button">'+CHKSVG+' Conferma</button></div></div>';
+      ov.innerHTML=h;
+    }
+    function closeR(){ov.classList.remove('bgc--on');setTimeout(function(){if(ov.parentNode)ov.remove()},260)}
+    function applyR(){
+      var p=D.curPG();if(!p)return;var prepAdd=0;
+      if(st.notes){if(!p.noteList)p.noteList=[];p.noteList.push({t:'Razza: '+raceName,b:data.desc||''})}
+      if(st.speed&&data.speed!=null)p.speed=data.speed;
+      traits.forEach(function(tr,i){if(st.traits[i]){if(!p.featList)p.featList=[];p.featList.push({t:tr.t,b:tr.b})}});
+      if(data.choices&&st.choice!=null){var o=data.choices.options[st.choice];if(!p.featList)p.featList=[];p.featList.push({t:o.t,b:o.b})}
+      if(!p.cantrips)p.cantrips=[];if(!p.spBook)p.spBook=[[],[],[],[],[],[],[],[],[]];
+      cants.forEach(function(c,i){if(st.cants[i])p.cantrips.push({n:c,source:'Razza'})});
+      spells.forEach(function(s,i){if(st.spells[i]){var li=Math.max(1,Math.min(9,s.lvl))-1;p.spBook[li].push({n:s.n,p:true,ap:true,source:'Razza'});_addFreeCastResM(p,s.n,pb(p.lvl))}});
+      lfeats.forEach(function(lf,i){if(st.lfeats[i]&&lvl>=lf.lvl){if(lf.spell){var li=Math.max(1,Math.min(9,lf.spell.spLvl))-1;p.spBook[li].push({n:lf.spell.n,p:true,ap:true,source:'Razza'});_addFreeCastResM(p,lf.spell.n,1)}else{if(!p.featList)p.featList=[];p.featList.push({t:lf.t,b:lf.b})}}});
+      if(prepAdd>0)p.spellsPrepMod=(parseInt(p.spellsPrepMod)||0)+prepAdd;
+      saveNow();closeR();if(idCfgOpen)renderIdCfg(D.curPG());else reSheet();if(U&&U.toast)U.toast('✓ Razza '+esc(raceName)+' configurata');
+    }
+    draw();requestAnimationFrame(function(){ov.classList.add('bgc--on')});
+    ov.addEventListener('click',function(e){
+      var t;
+      if(e.target.closest('[data-bgcancel]')){closeR();return}
+      if((t=e.target.closest('[data-choice]'))){st.choice=parseInt(t.getAttribute('data-choice'));draw();return}
+      if((t=e.target.closest('[data-tgl]'))){var k=t.getAttribute('data-tgl');if(k==='notes')st.notes=!st.notes;else if(k==='speed')st.speed=!st.speed;else if(k.indexOf('t:')===0)st.traits[+k.slice(2)]=!st.traits[+k.slice(2)];else if(k.indexOf('c:')===0)st.cants[+k.slice(2)]=!st.cants[+k.slice(2)];else if(k.indexOf('s:')===0)st.spells[+k.slice(2)]=!st.spells[+k.slice(2)];else if(k.indexOf('lf:')===0)st.lfeats[+k.slice(3)]=!st.lfeats[+k.slice(3)];draw();return}
+      if(e.target.closest('[data-bgok]')){applyR();return}
+    });
+  }
+  function _addFreeCastResM(pg,title,max){if(!pg.resources)pg.resources=[];max=parseInt(max)||1;if(max<1)max=1;if(pg.resources.some(function(r){return r&&r.type==='custom'&&r.title===title}))return;pg.resources.push({id:'r_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),type:'custom',title:title,max:max,current:max,modifier:0})}
+  function _lfeatPresent(pg,lf){
+    if(lf.spell){if(!pg.spBook)return false;for(var i=0;i<pg.spBook.length;i++){var a=pg.spBook[i]||[];for(var j=0;j<a.length;j++){if(a[j]&&a[j].n===lf.spell.n)return true}}return false}
+    if(!pg.featList)return false;for(var k=0;k<pg.featList.length;k++){if(pg.featList[k]&&pg.featList[k].t===lf.t)return true}return false;
+  }
+  function openRaceLevelUp(raceName,lfeats,lvl){
+    var pg=D.curPG();if(!pg||!lfeats||!lfeats.length)return;if(document.getElementById('bgcfg'))return;
+    lvl=parseInt(lvl)||1;var st={};lfeats.forEach(function(_,i){st[i]=true});
+    var ov=document.createElement('div');ov.id='bgcfg';ov.className='bgc';document.body.appendChild(ov);
+    function tgl(on,k){return '<button class="tgl'+(on?' tgl--on':'')+'" data-tgl="'+k+'" type="button"></button>'}
+    function draw(){
+      var h='<div class="bgc__panel"><div class="bgc__bar"><div class="bgc__t">⭐ Livello '+lvl+' · '+esc(raceName)+'</div></div><div class="bgc__body">';
+      h+='<div class="bgc__intro">Sei al livello '+lvl+'. In quanto <b>'+esc(raceName)+'</b> puoi aggiungere:</div>';
+      lfeats.forEach(function(lf,i){var title=lf.t||(lf.spell?lf.spell.n:'');var desc=lf.t?lf.b:('Incantesimo di livello '+lf.spell.spLvl+', sempre preparato (non intacca i preparati di classe).');h+='<div class="bgc__sec bgc__row"><div class="bgc__rl"><div class="bgc__rt">'+esc(title)+' <span style="color:var(--c-green);font-weight:400;text-transform:none">· liv. '+lf.lvl+'</span></div><div class="bgc__rd">'+esc(desc)+'</div></div>'+tgl(st[i],i)+'</div>'});
+      h+='</div><div class="bgc__foot"><button class="bgc__no" data-bgcancel type="button">'+XSVG+' Annulla</button><button class="bgc__ok" data-bgok type="button">'+CHKSVG+' Conferma</button></div></div>';
+      ov.innerHTML=h;
+    }
+    function closeR(){ov.classList.remove('bgc--on');setTimeout(function(){if(ov.parentNode)ov.remove()},260)}
+    function applyR(){
+      var p=D.curPG();if(!p)return;var prepAdd=0;
+      lfeats.forEach(function(lf,i){if(!st[i])return;if(lf.spell){if(!p.spBook)p.spBook=[[],[],[],[],[],[],[],[],[]];var li=Math.max(1,Math.min(9,lf.spell.spLvl))-1;p.spBook[li].push({n:lf.spell.n,p:true,ap:true,source:'Razza'});_addFreeCastResM(p,lf.spell.n,1)}else{if(!p.featList)p.featList=[];p.featList.push({t:lf.t,b:lf.b})}});
+      if(prepAdd>0)p.spellsPrepMod=(parseInt(p.spellsPrepMod)||0)+prepAdd;
+      saveNow();closeR();if(idCfgOpen)renderIdCfg(D.curPG());else reSheet();if(U&&U.toast)U.toast('✓ '+esc(raceName)+': livello '+lvl+' applicato');
+    }
+    draw();requestAnimationFrame(function(){ov.classList.add('bgc--on')});
+    ov.addEventListener('click',function(e){
+      var t;
+      if(e.target.closest('[data-bgcancel]')){closeR();return}
+      if((t=e.target.closest('[data-tgl]'))){var k=+t.getAttribute('data-tgl');st[k]=!st[k];draw();return}
+      if(e.target.closest('[data-bgok]')){applyR();return}
+    });
+  }
+  function _raceLevelUpCheck(pg,oldLvl){
+    if(!pg)return;var data=RACE_DATA[pg.race];if(!data||!data.lfeats||!data.lfeats.length)return;
+    var newLvl=parseInt(pg.lvl)||1;oldLvl=parseInt(oldLvl)||0;if(newLvl<=oldLvl)return;
+    var unlocked=data.lfeats.filter(function(lf){return lf.lvl>oldLvl&&lf.lvl<=newLvl&&!_lfeatPresent(pg,lf)});
+    if(!unlocked.length)return;if(document.getElementById('bgcfg'))return;
+    openRaceLevelUp(pg.race,unlocked,newLvl);
+  }
   function createPG(name){
     var pg=D.newPG();
     pg.id='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
@@ -1330,6 +1619,7 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
   function xitemHtml(kind,i,it){var o=!!open[kind+i];return '<div class="xitem'+(o?' xitem--on':'')+'"><div class="xitem__row"><button class="xitem__tog" data-xtog="'+kind+':'+i+'">▸</button><input class="xitem__t" data-xf="'+kind+':'+i+':t" value="'+esc(it.t||'')+'" placeholder="Titolo…"><button class="xitem__del" data-xdel="'+kind+':'+i+'">✕</button></div><div class="xitem__body"><textarea class="f-ta" data-xf="'+kind+':'+i+':b" placeholder="Descrizione…">'+esc(it.b||'')+'</textarea></div></div>'}
   function hpColor(pc){return pc>50?'#5fa66b':(pc>20?'#d4af37':'#c8403d')}
   var D20SVG='<svg class="d20" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M50 7 L87 29 L87 71 L50 93 L13 71 L13 29 Z"/><path d="M50 7 L31 43 M50 7 L69 43 M31 43 L69 43 M13 29 L31 43 M87 29 L69 43 M31 43 L13 71 M69 43 L87 71 M31 43 L50 72 M69 43 L50 72 M13 71 L50 72 M87 71 L50 72 M50 72 L50 93"/></svg>';
+  var MOONSVG='<svg class="moonic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
   function atkHtml(pg,a,i){
     var o=!!open['atk'+i];var isS=a.kind==='spell';var abil=a.abil||'';
     var dmgs=a.damages&&a.damages.length?a.damages:[];
@@ -1339,16 +1629,47 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
     body+='<textarea class="f-ta" style="margin-top:8px;min-height:52px" data-atkf="'+i+':desc" placeholder="Descrizione, gittata, proprietà…">'+esc(a.desc||'')+'</textarea>';
     return '<div class="atk'+(o?' atk--on':'')+'"><div class="atk__top"><button class="atk__kind" data-atkkind="'+i+'" title="Attacco/Incantesimo">'+(isS?'✨':'⚔️')+'</button><input class="atk__name" data-atkf="'+i+':name" value="'+esc(a.name||'')+'" placeholder="Nome"><button class="dbtn" data-atkroll="'+i+'">🎲</button><button class="atk__tog" data-atktog="'+i+'">▸</button><button class="atk__del" data-atkdel="'+i+'">✕</button></div><div class="atk__body">'+body+'</div></div>';
   }
-  function spRowH(bl,idx,sp){var lvlTag=bl<0?'T':String(bl+1);var tags=[];if(sp.c)tags.push('C');if(sp.r)tags.push('R');var prep=bl>=0?'<button class="sprow__prep'+(sp.p?' sprow__prep--on':'')+'" data-prep="'+bl+':'+idx+'">'+(sp.p?'★':'☆')+'</button>':'';return '<div style="display:flex;align-items:center"><button class="sprow" style="flex:1;border-left:3px solid '+S.srcColor(sp.source)+';padding-left:8px;border-radius:4px" data-spdet="'+bl+':'+idx+'"><span class="sprow__lvl">'+lvlTag+'</span><span class="sprow__n">'+esc(sp.n||sp)+'</span>'+(tags.length?'<span class="sprow__tag">'+tags.join('·')+'</span>':'')+'</button>'+prep+'</div>'}
+  function spRowH(bl,idx,sp){var lvlTag=bl<0?'T':String(bl+1);var tags=[];if(sp.c)tags.push('C');if(sp.r)tags.push('R');var prep=bl>=0?'<button class="sprow__prep'+(sp.p?' sprow__prep--on':'')+'" data-prep="'+bl+':'+idx+'">'+(sp.p?'★':'☆')+'</button>':'';var apBtn=bl>=0?'<button class="sprow__ap'+(sp.ap?' sprow__ap--on':'')+'" data-spapm="'+bl+':'+idx+'" title="Sempre preparato: non occupa uno slot dei preparati">∞</button>':'';return '<div style="display:flex;align-items:center"><button class="sprow" style="flex:1;border-left:3px solid '+S.srcColor(sp.source)+';padding-left:8px;border-radius:4px" data-spdet="'+bl+':'+idx+'"><span class="sprow__lvl">'+lvlTag+'</span><span class="sprow__n">'+esc(sp.n||sp)+'</span>'+(tags.length?'<span class="sprow__tag">'+tags.join('·')+'</span>':'')+'</button>'+apBtn+prep+'</div>'}
   /* ===== SEZIONE: Generale (livello/combattimento/stato/attacchi) ===== */
+  function hdMax(pg){return Math.max(0,(pg.lvl||1)+(parseInt(pg&&pg.hdBonus)||0))}
+  function openHDConfig(){
+    var pg=D.curPG();if(!pg||document.getElementById('hdCfg'))return;
+    var die=pg.hitDie||8,bonus=parseInt(pg.hdBonus)||0,DICE=[6,8,10,12];
+    function body(){
+      var seg='';DICE.forEach(function(d){seg+='<button class="hdseg'+(d===die?' hdseg--on':'')+'" data-hddie="'+d+'" type="button">d'+d+'</button>'});
+      var mx=Math.max(0,(pg.lvl||1)+bonus),bTxt=bonus===0?'':(bonus>0?' + '+bonus:' − '+Math.abs(bonus));
+      return '<div class="hdcfg__body"><div class="hdcfg__lab">Tipo di dado vita</div><div class="hdseg-row">'+seg+'</div>'
+        +'<div class="hdcfg__lab hdcfg__lab--sp">Modificatore ai dadi vita massimi</div>'
+        +'<div class="hdcfg__mod"><button class="step" data-hdbonus="-1" type="button">−</button><span class="hdcfg__modv">'+(bonus>0?'+':'')+bonus+'</span><button class="step" data-hdbonus="1" type="button">+</button></div>'
+        +'<div class="hdcfg__prev">Dadi vita massimi: <b>'+mx+'</b><br>'+(pg.lvl||1)+' (livello)'+bTxt+' · dado d'+die+'</div></div>';
+    }
+    var ov=document.createElement('div');ov.id='hdCfg';ov.className='lw-ov';
+    ov.innerHTML='<div class="lw"><div class="lw__head"><div class="lw__grip"></div><div class="lw__bar"><button class="lw__x" data-hdcancel type="button">Annulla</button><div class="lw__t">Dadi Vita</div><button class="lw__ok" data-hdok type="button">Conferma</button></div></div><div id="hdCfgBody">'+body()+'</div></div>';
+    document.body.appendChild(ov);
+    var lw=ov.querySelector('.lw');
+    function refresh(){document.getElementById('hdCfgBody').innerHTML=body()}
+    var closing=false;
+    function close(){if(closing)return;closing=true;lw.style.transition='transform .24s var(--ease)';lw.style.transform='translateY(100%)';ov.style.transition='background .24s';ov.style.background='rgba(0,0,0,0)';setTimeout(function(){ov.remove()},240)}
+    ov.addEventListener('click',function(e){
+      var d=e.target.closest('[data-hddie]');if(d){die=parseInt(d.getAttribute('data-hddie'));refresh();return}
+      var b=e.target.closest('[data-hdbonus]');if(b){bonus=Math.max(-19,Math.min(19,bonus+parseInt(b.getAttribute('data-hdbonus'))));refresh();return}
+      if(e.target.closest('[data-hdcancel]')||e.target===ov){close();return}
+      if(e.target.closest('[data-hdok]')){pg.hitDie=die;pg.hdBonus=bonus;var mx=Math.max(0,(pg.lvl||1)+bonus),cur=pg.hitDiceLeft!=null?pg.hitDiceLeft:mx;pg.hitDiceLeft=Math.max(0,Math.min(mx,cur));saveNow();reSheet();close()}
+    });
+    var head=ov.querySelector('.lw__head'),sy=0,drag=false;
+    head.addEventListener('touchstart',function(e){if(!e.touches||e.touches.length!==1)return;drag=true;sy=e.touches[0].clientY;lw.style.transition='none'},{passive:true});
+    head.addEventListener('touchmove',function(e){if(!drag)return;var dy=e.touches[0].clientY-sy;if(dy<0)dy=0;lw.style.transform='translateY('+dy+'px)';ov.style.background='rgba(0,0,0,'+(0.72*Math.max(.12,1-dy/320))+')'},{passive:true});
+    head.addEventListener('touchend',function(e){if(!drag)return;drag=false;var dy=(e.changedTouches&&e.changedTouches[0].clientY-sy)||0;if(dy>90)close();else{lw.style.transition='transform .2s var(--ease)';lw.style.transform='translateY(0)';ov.style.background='rgba(0,0,0,.72)'}},{passive:true});
+  }
   function secGen(pg){
-    var mod=D.mod,fmt=D.fmt,PB=D.pb(pg.lvl);
+    var mod=D.mod,fmt=D.fmt,PB=D.pb(pg.lvl),mxHD=hdMax(pg);
     var h='';
     h+='<div class="card"><div class="card__t">⭐ Livello & Esperienza</div>'
       +'<div class="lvxp">'
         +'<div class="fld lvxp__lv"><div class="fld__l">Livello</div><button class="lvbtn" data-lvlwheel type="button">'+(pg.lvl==null?1:pg.lvl)+'</button></div>'
         +'<div class="fld lvxp__pb"><div class="fld__l">Comp.</div><div class="f-inp f-inp--c" style="opacity:.7">+'+PB+'</div></div>'
         +'<div class="fld lvxp__xp"><div class="fld__l">Esperienza <button class="xp-help" data-xpinfo type="button" aria-label="Info punti esperienza">?</button></div>'+nin('xp',pg.xp)+'</div>'
+        +'<div class="fld lvxp__insp"><div class="fld__l">Ispiraz.</div><button class="inspbtn'+(pg.insp?' inspbtn--on':'')+'" data-insp type="button" aria-label="Ispirazione Eroica" title="Ispirazione Eroica">★</button></div>'
       +'</div></div>';
     var hpMax=pg.hp||0,hpCur=pg.hpCur!=null?pg.hpCur:hpMax;var pc=hpMax>0?Math.max(0,Math.min(100,Math.round(hpCur/hpMax*100))):0;
     var dexMod=mod(pg.dex||10),ib=parseInt(pg.initBonus)||0;
@@ -1360,15 +1681,13 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
       +'</div>'
       +'<div class="hpbar" data-hpdrag><div class="hpfill" style="width:'+pc+'%;background:'+hpColor(pc)+'"><i class="hpbar__knob"></i></div></div></div>'
       +'<div class="acrow"><button class="acshield" data-acwheel type="button" aria-label="Classe Armatura"><svg viewBox="0 0 100 112" aria-hidden="true"><path class="acshield__bg" d="M14 10 H86 V52 C86 80 68 98 50 106 C32 98 14 80 14 52 Z"/></svg><span class="acshield__v">'+(pg.ac==null?10:pg.ac)+'</span><span class="acshield__l">CA</span></button>'
-      +'<div class="acrow__r"><div class="exh"><span class="exh__l">💀 Esaustione</span><div class="dots">'+exd+'</div></div>'
-      +'<div class="initrow"><span class="initrow__l">⚡ Iniziativa</span><button class="initbox" data-initwheel type="button" title="Modificatore extra">'+fmt(dexMod+ib)+'</button><button class="d20btn" data-roll="init:x" aria-label="Tira iniziativa">'+D20SVG+'</button></div>'
-      +'<button class="mbtn mbtn--dim" data-longrest>☀ Riposo lungo</button></div></div></div>';
+      +'<div class="acrow__r">'
+      +'<div class="initrow"><span class="initrow__l">⚡ Iniziativa</span><button class="initbox" data-initwheel type="button" title="Modificatore extra">'+fmt(dexMod+ib)+'</button><button class="d20btn" data-roll="init:x" aria-label="Tira iniziativa">'+D20SVG+'</button></div></div></div>'
+      +'<div class="lrrow"><div class="hdbox"><button class="hdbox__cfg" data-hdcfg type="button"><span class="hdbox__l">Dadi Vita</span><span class="hdbox__die">d'+(pg.hitDie||8)+'<i>modifica</i></span></button><div class="hdbox__ctl"><button class="step step--s" data-hd="-1" aria-label="Spendi dado vita">−</button><span class="hdbox__v">'+(pg.hitDiceLeft!=null?pg.hitDiceLeft:mxHD)+' / '+mxHD+'</span><button class="step step--s" data-hd="1" aria-label="Recupera dado vita">+</button></div></div><button class="mbtn mbtn--dim lrbtn" data-longrest aria-label="Riposo lungo" title="Riposo lungo">'+MOONSVG+'</button></div></div>';
     var dsc=pg.dsc||{s:0,f:0};
     h+='<div class="card"><div class="card__t">Stato</div>'
-      +'<div class="strow"><span class="strow__l">✨ Ispirazione Eroica</span><button class="dot dot--insp'+(pg.insp?' dot--on':'')+'" data-insp style="width:22px;height:22px"></button></div>'
-      +'<div class="strow"><span class="strow__l">Dadi Vita (d'+(pg.hitDie||8)+')</span><button class="step step--s" data-hd="-1">−</button><span class="strow__v">'+(pg.hitDiceLeft!=null?pg.hitDiceLeft:pg.lvl||1)+' / '+(pg.lvl||1)+'</span><button class="step step--s" data-hd="1">+</button></div>'
-      +'<div class="strow"><span class="strow__l">TS Morte — successi</span><span class="dots">'+dotRow(dsc.s||0,'s',3)+'</span></div>'
-      +'<div class="strow"><span class="strow__l">TS Morte — fallimenti</span><span class="dots">'+dotRow(dsc.f||0,'f',3)+'</span></div></div>';
+      +'<div class="strow"><span class="strow__l">💀 Esaustione</span><span class="dots">'+exd+'</span></div>'
+      +'<div class="strow strow--ds"><span class="strow__l">TS Morte</span><span class="ds__grp"><span class="ds__ic ds__ic--s">✓</span><span class="dots">'+dotRow(dsc.s||0,'s',3)+'</span></span><span class="ds__grp"><span class="ds__ic ds__ic--f">✗</span><span class="dots">'+dotRow(dsc.f||0,'f',3)+'</span></span><button class="ds__roll" data-deathreset type="button" aria-label="Azzera TS Morte" title="Azzera TS Morte">↺</button><button class="ds__roll" data-deathroll type="button" aria-label="Tira TS Morte" title="Tira TS Morte">'+D20SVG+'</button></div></div>';
     h+='<div class="card"><div class="card__t"><span>⚔️ Attacchi & Incantesimi</span><button class="card__add" data-atkadd>+</button></div>';
     if(!pg.attacks.length)h+='<div class="set__p">Nessun attacco. Tocca + per aggiungerne uno.</div>';
     pg.attacks.forEach(function(a,i){h+=atkHtml(pg,a,i)});
@@ -1382,7 +1701,7 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
   /* ===== SEZIONE: Stats (caratteristiche/TS/abilità) ===== */
   function secStats(pg){
     var mod=D.mod,fmt=D.fmt;var h='';
-    h+='<div class="card"><div class="card__t">🎲 Caratteristiche <span style="font-weight:400;text-transform:none;letter-spacing:0">tocca 🎲</span></div><div class="abgrid">';
+    h+='<div class="card"><div class="card__t">🎲 Caratteristiche</div><div class="abgrid">';
     D.ABS.forEach(function(a){var v=pg[a[0]]||10;h+='<div class="ab"><div class="ab__l">'+a[1]+'</div><input class="ab__in" inputmode="numeric" data-f="'+a[0]+'" data-recalc value="'+v+'"><button class="ab__roll" data-roll="ab:'+a[0]+'">'+fmt(mod(v))+' 🎲</button></div>'});
     h+='</div></div>';
     h+='<div class="card"><div class="card__t">📚 Tiri Salvezza</div><div class="skgrid">';
@@ -1439,7 +1758,7 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
     pg.resources.forEach(function(r,i){var info=resComputed(pg,r);var name=r.type==='custom'?('<input class="res__t" data-restitle="'+i+'" value="'+esc(r.title||'')+'" placeholder="Nome">'):('<span class="res__tl">'+esc(info.title||'Risorsa')+'</span>');var maxIn=r.type==='custom'?('<input class="res__mod" inputmode="numeric" data-resmax="'+i+'" data-recalc value="'+(parseInt(r.max)||0)+'" title="max">'):'';h+='<div class="res">'+name+'<button class="step step--s" data-resdec="'+i+'">−</button><span class="res__v">'+info.current+'/'+info.effMax+'</span><button class="step step--s" data-resinc="'+i+'">+</button>'+maxIn+'<button class="res__del" data-resdel="'+i+'">✕</button></div>'});
     h+='</div>';
     var nSp=(pg.cantrips?pg.cantrips.length:0)+pg.spBook.reduce(function(a,arr){return a+(arr?arr.length:0)},0);
-    var prepCount=0;pg.spBook.forEach(function(arr){(arr||[]).forEach(function(s){if(s&&s.p)prepCount++})});
+    var prepCount=0;pg.spBook.forEach(function(arr){(arr||[]).forEach(function(s){if(s&&s.p&&!s.ap)prepCount++})});
     var maxPrep=(parseInt(pg.spellsKnownMax)||0)+(parseInt(pg.spellsPrepMod)||0);
     h+='<div class="card"><div class="card__t"><span>📖 Conosciuti</span>'+(nSp?'<span style="font-weight:400;text-transform:none;letter-spacing:0">'+nSp+' cono.'+(maxPrep>0?' · '+prepCount+'/'+maxPrep+' prep':' · '+prepCount+' prep')+' ★</span>':'')+'</div>';
     if(!nSp)h+='<div class="set__p">Nessun incantesimo.</div>';
@@ -1506,6 +1825,20 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
     if(window._mHist)window._mHist.add({label:label,detail:'d20('+roll+') '+D.fmt(bonus),total:roll+bonus,crit:roll===20,fail:roll===1,kind:'check'});
     if(navigator.vibrate)try{navigator.vibrate(roll===20?[20,40,20]:10)}catch(e){}
   }
+  function doDeathRoll(){
+    var pg=D.curPG();if(!pg)return;if(!pg.dsc)pg.dsc={s:0,f:0};
+    var roll=1+Math.floor(Math.random()*20),cls='',msg='🎲 TS Morte: d20('+roll+') — ';
+    if(roll===20){pg.dsc={s:0,f:0};pg.hpCur=1;cls='toast--crit';msg+='<b>RINVIENI con 1 PF!</b>';}
+    else if(roll===1){pg.dsc.f=Math.min(3,(pg.dsc.f||0)+2);cls='toast--fail';msg+='<b>2 fallimenti!</b>';}
+    else if(roll>=10){pg.dsc.s=Math.min(3,(pg.dsc.s||0)+1);msg+='<b>Successo</b>';}
+    else{pg.dsc.f=Math.min(3,(pg.dsc.f||0)+1);cls='toast--fail';msg+='<b>Fallimento</b>';}
+    if(roll!==20&&(pg.dsc.s||0)>=3)msg+=' · <b>STABILE</b>';
+    if((pg.dsc.f||0)>=3){msg+=' · <b>MORTE</b>';cls='toast--fail';}
+    U.toast(msg,cls,4200);
+    if(window._mHist)window._mHist.add({label:'TS Morte',detail:'d20('+roll+')',total:roll,crit:roll===20,fail:roll===1,kind:'check'});
+    if(navigator.vibrate)try{navigator.vibrate(roll===20?[20,40,20]:roll===1?[40,30,40]:10)}catch(e){}
+    saveNow();reSheet();
+  }
   function rollAttack(pg,a){
     var PB=D.pb(pg.lvl),abM=a.abil?D.mod(pg[a.abil]||10):0,isS=a.kind==='spell';
     var dmgs=a.damages&&a.damages.length?a.damages:[];var sumM=0;dmgs.forEach(function(d){if(!d.off)sumM+=parseInt(d.m)||0});
@@ -1519,6 +1852,7 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
   function reSheet(){var st=pgRoot?pgRoot.scrollTop:0;renderPager();if(pgRoot)pgRoot.scrollTop=st}
   root.addEventListener('click',function(e){
     var t,pg;
+    if(_swiped){_swiped=false;return}
     if(e.target.closest('[data-xpinfo]')){showXpInfo();return}
     if(e.target.closest('[data-lvlwheel]')){openLvlWheel();return}
     if(e.target.closest('[data-acwheel]')){openAcWheel();return}
@@ -1540,16 +1874,22 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
     if(t){pg.insp=pg.insp?0:1;saveNow();reSheet();return}
     t=e.target.closest('[data-exh]');
     if(t){var ei=parseInt(t.getAttribute('data-exh'));var ce=pg.exhaustion||0;pg.exhaustion=Math.max(0,Math.min(6,(ei<ce)?ei:ei+1));saveNow();reSheet();return}
+    t=e.target.closest('[data-hdcfg]');
+    if(t){openHDConfig();return}
     t=e.target.closest('[data-hd]');
-    if(t){var mx2=pg.lvl||1;var cur2=pg.hitDiceLeft!=null?pg.hitDiceLeft:mx2;pg.hitDiceLeft=Math.max(0,Math.min(mx2,cur2+parseInt(t.getAttribute('data-hd'))));saveNow();reSheet();return}
+    if(t){var mx2=hdMax(pg);var cur2=pg.hitDiceLeft!=null?pg.hitDiceLeft:mx2;pg.hitDiceLeft=Math.max(0,Math.min(mx2,cur2+parseInt(t.getAttribute('data-hd'))));saveNow();reSheet();return}
+    t=e.target.closest('[data-deathreset]');
+    if(t){pg.dsc={s:0,f:0};saveNow();reSheet();return}
+    t=e.target.closest('[data-deathroll]');
+    if(t){doDeathRoll();return}
     t=e.target.closest('[data-dsc]');
     if(t){var pp=t.getAttribute('data-dsc').split(':');var ty=pp[0],di=parseInt(pp[1]);if(!pg.dsc)pg.dsc={s:0,f:0};var cv=pg.dsc[ty]||0;pg.dsc[ty]=(di<cv)?di:di+1;saveNow();reSheet();return}
     t=e.target.closest('[data-speedunit]');
     if(t){pg.speedUnit=(pg.speedUnit==='ft')?'m':'ft';saveNow();reSheet();return}
     t=e.target.closest('[data-shortrest]');
-    if(t){var hdL=pg.hitDiceLeft!=null?pg.hitDiceLeft:(pg.lvl||1);if(hdL<=0){U.toast('Nessun dado vita disponibile');return}var die=pg.hitDie||8;var rr=1+Math.floor(Math.random()*die);var cm=D.mod(pg.con||10);var heal=Math.max(0,rr+cm);pg.hitDiceLeft=hdL-1;var mxH=pg.hp||0;pg.hpCur=Math.max(0,Math.min(mxH,(pg.hpCur!=null?pg.hpCur:mxH)+heal));saveNow();reSheet();U.toast('⏳ Riposo breve: d'+die+'('+rr+') '+D.fmt(cm)+' → <b>+'+heal+' PF</b>');return}
+    if(t){var hdL=pg.hitDiceLeft!=null?pg.hitDiceLeft:hdMax(pg);if(hdL<=0){U.toast('Nessun dado vita disponibile');return}var die=pg.hitDie||8;var rr=1+Math.floor(Math.random()*die);var cm=D.mod(pg.con||10);var heal=Math.max(0,rr+cm);pg.hitDiceLeft=hdL-1;var mxH=pg.hp||0;pg.hpCur=Math.max(0,Math.min(mxH,(pg.hpCur!=null?pg.hpCur:mxH)+heal));saveNow();reSheet();U.toast('⏳ Riposo breve: d'+die+'('+rr+') '+D.fmt(cm)+' → <b>+'+heal+' PF</b>');return}
     t=e.target.closest('[data-longrest]');
-    if(t){U.confirm('Riposo lungo?\nPF al massimo, PF temporanei azzerati, slot ripristinati, TS morte azzerati, recuperi metà dei dadi vita.',function(){var p=D.curPG();if(!p)return;p.hpCur=p.hp||0;p.hpTemp=0;p.dsc={s:0,f:0};if((p.exhaustion||0)>0)p.exhaustion=p.exhaustion-1;var Lr=Math.max(1,Math.min(20,p.lvl||1))-1;if(!p.slotsCurrent)p.slotsCurrent=[0,0,0,0,0,0,0,0,0];for(var x=0;x<9;x++)p.slotsCurrent[x]=(p.slotsTable&&p.slotsTable[Lr]||[])[x]||0;var mxD=p.lvl||1;var curD=p.hitDiceLeft!=null?p.hitDiceLeft:mxD;p.hitDiceLeft=Math.min(mxD,curD+Math.max(1,Math.floor(mxD/2)));saveNow();reSheet();U.toast('☀ Riposo lungo completato')},{title:'Riposo lungo',okLabel:'Riposa'});return}
+    if(t){U.confirm('Riposo lungo?\nPF al massimo, PF temporanei azzerati, slot ripristinati, TS morte azzerati, recuperi metà dei dadi vita.',function(){var p=D.curPG();if(!p)return;p.hpCur=p.hp||0;p.hpTemp=0;p.dsc={s:0,f:0};if((p.exhaustion||0)>0)p.exhaustion=p.exhaustion-1;var Lr=Math.max(1,Math.min(20,p.lvl||1))-1;if(!p.slotsCurrent)p.slotsCurrent=[0,0,0,0,0,0,0,0,0];for(var x=0;x<9;x++)p.slotsCurrent[x]=(p.slotsTable&&p.slotsTable[Lr]||[])[x]||0;var mxD=hdMax(p);var curD=p.hitDiceLeft!=null?p.hitDiceLeft:mxD;p.hitDiceLeft=Math.min(mxD,curD+Math.max(1,Math.floor(mxD/2)));saveNow();reSheet();U.toast('🌙 Riposo lungo completato')},{title:'Riposo lungo',okLabel:'Riposa'});return}
     /* attacchi */
     t=e.target.closest('[data-atkadd]');
     if(t){pg.attacks.push({name:'',kind:'',abil:'',damages:[{f:'',t:'',m:0}],desc:''});open['atk'+(pg.attacks.length-1)]=true;saveNow();reSheet();return}
@@ -1597,6 +1937,8 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
     if(t){var ri2=pg.resources[+t.getAttribute('data-resinc')];if(ri2){var i2b=resComputed(pg,ri2);ri2.current=Math.min(i2b.effMax,i2b.current+1);saveNow();reSheet()}return}
     t=e.target.closest('[data-resdel]');
     if(t){pg.resources.splice(+t.getAttribute('data-resdel'),1);saveNow();reSheet();return}
+    t=e.target.closest('[data-spapm]');
+    if(t){var pra=t.getAttribute('data-spapm').split(':');var ba=parseInt(pra[0]),ia=parseInt(pra[1]);var ita=pg.spBook&&pg.spBook[ba]&&pg.spBook[ba][ia];if(ita){ita.ap=!ita.ap;if(ita.ap)ita.p=true;saveNow();reSheet()}return}
     t=e.target.closest('[data-prep]');
     if(t){var pr=t.getAttribute('data-prep').split(':');var b2=parseInt(pr[0]),i4=parseInt(pr[1]);var it2=pg.spBook&&pg.spBook[b2]&&pg.spBook[b2][i4];if(it2){it2.p=!it2.p;saveNow();reSheet()}return}
     t=e.target.closest('[data-spdet]');
@@ -1628,7 +1970,7 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
     var el=e.target;
     if(el.id==='pgPhoto'){var f=el.files&&el.files[0];if(f)compress(f,function(url){if(!url)return;var pg=D.curPG();if(!pg)return;if(!pg.photos)pg.photos=[];pg.photos=[url];saveNow();reSheet()});el.value='';return}
     if(el.dataset.sel!==undefined){handleSel(el.dataset.sel,el.value);return}
-    if(el.dataset.recalc!==undefined){saveNow();reSheet()}
+    if(el.dataset.recalc!==undefined){var _p=D.curPG();if(_p&&_p.hpCur!=null&&_p.hpCur>(_p.hp||0))_p.hpCur=_p.hp||0;saveNow();reSheet()}
   });
   root.addEventListener('focusin',function(e){var t=e.target;if(t&&t.classList&&t.classList.contains('hpnum')){setTimeout(function(){try{t.select()}catch(_){}},0)}});
   root.addEventListener('keydown',function(e){
@@ -1639,7 +1981,7 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
     var page=document.querySelector('.page[data-page="pg"]');if(!page)return;
     var x0=0,y0=0,W=0,lock=0,oi=0,active=false;
     page.addEventListener('touchstart',function(e){
-      active=false;lock=0;
+      active=false;lock=0;_swiped=false;
       if(!e.touches||e.touches.length!==1)return;
       if(e.target.closest('input,textarea,select,.slotprog,.idcfg,.spov,.cf,.hpbar'))return;
       x0=e.touches[0].clientX;y0=e.touches[0].clientY;
@@ -1651,7 +1993,7 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
       var dx=e.touches[0].clientX-x0,dy=e.touches[0].clientY-y0;
       if(lock===0){
         if(Math.abs(dx)<6&&Math.abs(dy)<6)return;
-        if(Math.abs(dx)>Math.abs(dy)+2){lock=1;pgTrack.style.transition='none'}else{lock=-1;return}
+        if(Math.abs(dx)>Math.abs(dy)+2){lock=1;_swiped=true;pgTrack.style.transition='none'}else{lock=-1;return}
       }
       if(lock===1){
         e.preventDefault();
