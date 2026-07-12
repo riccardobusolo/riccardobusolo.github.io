@@ -234,6 +234,7 @@ img{-webkit-user-drag:none}
 .initbox:active{background:var(--bg4)}
 .d20btn{flex-shrink:0;width:38px;height:30px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--bh);border-radius:9px;color:var(--text);font-size:1.05rem;line-height:1}
 .d20btn:active{background:var(--bg4)}
+.d20btn--rst{font-size:1.15rem}
 .d20{display:block;width:22px;height:22px}
 .moonic{display:block;width:20px;height:20px}
 /* Riga Dadi Vita (colonna destra, stile Iniziativa) + Riposo lungo full-width */
@@ -281,8 +282,6 @@ img{-webkit-user-drag:none}
 .ds__ic{font-size:.74rem;font-weight:700;line-height:1;width:12px;text-align:center}
 .ds__ic--s{color:var(--c-green)}
 .ds__ic--f{color:var(--c-red)}
-.ds__roll{flex-shrink:0;width:34px;height:30px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--bh);border-radius:9px;color:var(--text);font-size:1.15rem;line-height:1}
-.ds__roll:active{background:var(--bg4)}
 .dot--s.dot--on{background:var(--c-green);border-color:var(--c-green)}
 .dot--f.dot--on{background:var(--c-red);border-color:var(--c-red)}
 .dot--insp.dot--on{background:var(--c-gold);border-color:var(--c-gold);box-shadow:0 0 9px rgba(212,175,55,.45)}
@@ -1836,12 +1835,12 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
       +'<div class="acrow"><button class="acshield" data-acwheel type="button" aria-label="Classe Armatura"><svg viewBox="0 22 100 88" aria-hidden="true"><path class="acshield__bg" d="M14 28 H86 V52 C86 80 68 98 50 106 C32 98 14 80 14 52 Z"/></svg><span class="acshield__v">'+(pg.ac==null?10:pg.ac)+'</span><span class="acshield__l">CA</span></button>'
       +'<div class="acrow__r">'
       +'<div class="initrow"><span class="initrow__l">⚡ Iniziativa</span><button class="initbox" data-initwheel type="button" title="Modificatore extra">'+fmt(dexMod+ib)+'</button><button class="d20btn" data-roll="init:x" aria-label="Tira iniziativa">'+D20SVG+'</button></div>'
-      +'<div class="initrow"><button class="hdrow__cfg" data-hdcfg type="button"><span class="hdrow__l">Dadi vita</span><span class="hdrow__v">'+(pg.hitDiceLeft!=null?pg.hitDiceLeft:mxHD)+'/'+mxHD+' <i>d'+(pg.hitDie||8)+'</i></span></button><button class="d20btn" data-hdreset type="button" aria-label="Ripristina dadi vita" title="Ripristina dadi vita">↺</button><button class="d20btn" data-shortrest type="button" aria-label="Tira un dado vita" title="Tira un dado vita">'+D20SVG+'</button></div></div></div>'
+      +'<div class="initrow"><button class="hdrow__cfg" data-hdcfg type="button"><span class="hdrow__l">Dadi vita</span><span class="hdrow__v">'+(pg.hitDiceLeft!=null?pg.hitDiceLeft:mxHD)+'/'+mxHD+' <i>d'+(pg.hitDie||8)+'</i></span></button><button class="d20btn d20btn--rst" data-hdreset type="button" aria-label="Ripristina dadi vita" title="Ripristina dadi vita">↺</button><button class="d20btn" data-shortrest type="button" aria-label="Tira un dado vita" title="Tira un dado vita">'+D20SVG+'</button></div></div></div>'
       +'<button class="mbtn hdrest" data-longrest aria-label="Riposo lungo" title="Riposo lungo"><span>Riposo lungo</span>'+MOONSVG+'</button></div>';
     var dsc=pg.dsc||{s:0,f:0};
     h+='<div class="card">'
       +'<div class="strow"><span class="strow__l">💀 Esaustione</span><span class="dots">'+exd+'</span></div>'
-      +'<div class="strow strow--ds"><span class="strow__l">TS Morte</span><span class="ds__grp"><span class="ds__ic ds__ic--s">✓</span><span class="dots">'+dotRow(dsc.s||0,'s',3)+'</span></span><span class="ds__grp"><span class="ds__ic ds__ic--f">✗</span><span class="dots">'+dotRow(dsc.f||0,'f',3)+'</span></span><button class="ds__roll" data-deathreset type="button" aria-label="Azzera TS Morte" title="Azzera TS Morte">↺</button><button class="ds__roll" data-deathroll type="button" aria-label="Tira TS Morte" title="Tira TS Morte">'+D20SVG+'</button></div></div>';
+      +'<div class="strow strow--ds"><span class="strow__l">TS Morte</span><span class="ds__grp"><span class="ds__ic ds__ic--s">✓</span><span class="dots">'+dotRow(dsc.s||0,'s',3)+'</span></span><span class="ds__grp"><span class="ds__ic ds__ic--f">✗</span><span class="dots">'+dotRow(dsc.f||0,'f',3)+'</span></span><button class="d20btn d20btn--rst" data-deathreset type="button" aria-label="Azzera TS Morte" title="Azzera TS Morte">↺</button><button class="d20btn" data-deathroll type="button" aria-label="Tira TS Morte" title="Tira TS Morte">'+D20SVG+'</button></div></div>';
     h+='<div class="card"><div class="card__t"><span>⚔️ Attacchi & Incantesimi</span><button class="card__add" data-atkadd>+</button></div>';
     pg.attacks.forEach(function(a,i){h+=atkHtml(pg,a,i)});
     h+='</div>';
