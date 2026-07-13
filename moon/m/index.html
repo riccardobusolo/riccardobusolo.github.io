@@ -839,14 +839,14 @@ window._mHist=(function(){
 /* ============ Strato dati PG (stesse chiavi/strutture del desktop) ============ */
 window._mD=(function(){
   function loadPGs(){try{return JSON.parse(localStorage.getItem('cm_pgs'))||[]}catch(e){return[]}}
-  function savePGs(arr){try{localStorage.setItem('cm_pgs',JSON.stringify(arr))}catch(e){}}
+  function savePGs(arr){try{localStorage.setItem('cm_pgs',JSON.stringify(arr))}catch(e){}if(window._mSyncSoon)window._mSyncSoon()}
   /* Cache del PG corrente: la scheda mobile modifica in-place lo stesso
      oggetto (edit inline + overlay incantesimi) e lo salva; curPG ritorna
      sempre la stessa reference finché non cambia il PG selezionato. */
   var _cur=null;
   function savePG(pg){if(!pg||!pg.id)return;_cur={id:pg.id,pg:pg};var arr=loadPGs();var f=false;for(var i=0;i<arr.length;i++)if(arr[i].id===pg.id){arr[i]=pg;f=true;break}if(!f)arr.push(pg);savePGs(arr)}
   function curId(){return localStorage.getItem('cm_pg_curr')||null}
-  function setCur(id){if(!_cur||_cur.id!==id)_cur=null;if(id)localStorage.setItem('cm_pg_curr',id);else localStorage.removeItem('cm_pg_curr')}
+  function setCur(id){if(!_cur||_cur.id!==id)_cur=null;if(id)localStorage.setItem('cm_pg_curr',id);else localStorage.removeItem('cm_pg_curr');if(window._mSyncSoon)window._mSyncSoon()}
   function curPG(){var id=curId();if(!id)return null;if(_cur&&_cur.id===id)return _cur.pg;var arr=loadPGs();for(var i=0;i<arr.length;i++)if(arr[i].id===id){_cur={id:id,pg:arr[i]};return arr[i]}return null}
   function mod(v){return Math.floor(((v||10)-10)/2)}
   function fmt(m){return(m>=0?'+':'')+m}
@@ -918,7 +918,7 @@ window._mSp=(function(){
   /* Preferiti: stessa chiave del desktop (cm_spfav = array di nomi inglesi) */
   function favList(){try{return JSON.parse(localStorage.getItem('cm_spfav'))||[]}catch(e){return[]}}
   function favHas(name){return favList().indexOf(name)>-1}
-  function favToggle(name){var f=favList();var i=f.indexOf(name);if(i>-1)f.splice(i,1);else f.push(name);localStorage.setItem('cm_spfav',JSON.stringify(f));return i===-1}
+  function favToggle(name){var f=favList();var i=f.indexOf(name);if(i>-1)f.splice(i,1);else f.push(name);localStorage.setItem('cm_spfav',JSON.stringify(f));if(window._mSyncSoon)window._mSyncSoon();return i===-1}
   /* Costruzione dell'item conosciuto — IDENTICA a _spImportApply del desktop */
   function buildItem(sp){
     var lang=_spLang();
@@ -2541,12 +2541,17 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
   }
   function accAutoSyncEnabled(){var v=localStorage.getItem('cm_autosync');return v===null?true:v==='1'}
   var _autoTimer=null;
-  function _armAutoSync(){
+  /* Auto-sync UP pilotato esplicitamente dalle funzioni di salvataggio via
+     window._mSyncSoon. NON si fa monkey-patch di localStorage.setItem: su Safari
+     mobile la riassegnazione del metodo non attecchisce (fallisce silenziosamente),
+     quindi l'override non veniva mai installato e l'auto-sync non partiva, mentre
+     il caricamento manuale (che chiama accSyncUp direttamente) funzionava. */
+  function _mSyncSoon(){
     if(!fbReady||!curUser||!accAutoSyncEnabled())return;
-    if(window._cmAutoSyncHooked)return;window._cmAutoSyncHooked=true;
-    var origSet=localStorage.setItem.bind(localStorage);
-    localStorage.setItem=function(k,v){origSet(k,v);if(!accAutoSyncEnabled()||!curUser)return;if(k==='cm_last_sync'||k==='cm_autosync')return;clearTimeout(_autoTimer);_autoTimer=setTimeout(function(){accSyncUp(true)},2500)};
+    clearTimeout(_autoTimer);_autoTimer=setTimeout(function(){accSyncUp(true)},2500);
   }
+  window._mSyncSoon=_mSyncSoon;
+  function _armAutoSync(){/* compat: lo scheduler è già esposto via window._mSyncSoon */}
   /* ----- Form di autenticazione (condivise: muro + tab Account) ----- */
   var G_SVG='<svg viewBox="0 0 48 48" width="15" height="15"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
   function authFormsHtml(p){
@@ -2783,7 +2788,7 @@ svg.innerHTML=h;sched()}var sched=window._dieSched(svg,frame,function(){return b
   var mode='list',curId=null,saveTmr=null,flushEdit=null;
   var esc=U.esc;
   function load(){try{return JSON.parse(localStorage.getItem('cm_docs'))||[]}catch(e){return[]}}
-  function save(arr){try{localStorage.setItem('cm_docs',JSON.stringify(arr))}catch(e){}}
+  function save(arr){try{localStorage.setItem('cm_docs',JSON.stringify(arr))}catch(e){}if(window._mSyncSoon)window._mSyncSoon()}
   function notes(){return load().filter(function(d){return d&&d.type!=='folder'})}
   function fmtDate(ts){if(!ts)return '';try{return new Date(ts).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'2-digit'})}catch(e){return ''}}
   function render(){
