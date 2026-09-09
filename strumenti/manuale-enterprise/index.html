@@ -3,1115 +3,1033 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OmniManual — Enterprise Manual & SOP Configurator</title>
-<meta name="description" content="Configuratore professionale di manuali aziendali, SOP e linee guida di conformità per grandi imprese. Generatore di documentazione con anteprima A4, esportazione PDF e standard ISO.">
-<meta name="robots" content="index, follow">
+<title>OmniManual — Enterprise Document Suite</title>
+<meta name="description" content="Suite professionale per la creazione, gestione e configurazione di manuali aziendali e SOP in stile Windows 11 e Microsoft Word.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg-dark: #06060a;
-  --bg-panel: #0c0c12;
-  --bg-card: #111118;
-  --bg-input: #16161f;
-  --bg-hover: #1c1c28;
-  --border: #1e1e2e;
-  --border-focus: #00e0d0;
-  --text-main: #f0f0f8;
-  --text-muted: #a0a0be;
-  --text-dim: #6a6a88;
+  /* Windows 11 / Fluent Light Theme */
+  --win-bg: #f3f3f3;
+  --win-surface: #ffffff;
+  --win-subsurface: #f9f9f9;
+  --win-hover: #eaeaea;
+  --win-active: #e1e1e1;
+  --win-border: #e5e5e5;
+  --win-border-strong: #d1d1d1;
+  --win-accent: #0067c0;
+  --win-accent-hover: #005aa3;
+  --win-accent-light: #e0eef9;
+  --win-accent-border: #b3d7f2;
   
-  /* Brand color default (dynamic via JS) */
-  --brand-color: #00e0d0;
-  --brand-glow: rgba(0, 224, 208, 0.15);
-  --brand-border: rgba(0, 224, 208, 0.3);
+  --text-primary: #1c1c1c;
+  --text-secondary: #5c5c5c;
+  --text-tertiary: #8a8a8a;
+  --text-disabled: #b0b0b0;
 
-  /* Alert / ISO semantic colors */
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --caution: #eab308;
-  --notice: #3b82f6;
-  --safety: #10b981;
+  /* Safety colors */
+  --danger: #d13438;
+  --warning: #f7630c;
+  --caution: #ffaa44;
+  --notice: #0078d4;
+  --safety: #107c41;
 
-  --font-main: 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-main: 'Segoe UI Variable', 'Segoe UI', 'Manrope', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
-  --font-doc: 'Newsreader', Georgia, serif;
+  --font-editor: 'Calibri', 'Segoe UI', Arial, sans-serif;
+  
+  --radius-xs: 4px;
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sheet: 0 12px 36px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-flyout: 0 8px 24px rgba(0, 0, 0, 0.14);
 }
 
 html, body {
   height: 100%;
   font-family: var(--font-main);
-  background: var(--bg-dark);
-  color: var(--text-main);
+  background: var(--win-bg);
+  color: var(--text-primary);
   overflow: hidden;
-  line-height: 1.5;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Background Noise Overlay & Glow */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: .35;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
-}
-body::after {
-  content: '';
-  position: fixed;
-  top: -25%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 800px;
-  height: 500px;
-  background: radial-gradient(ellipse, rgba(0, 224, 208, 0.05) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
+/* ═══════════════════════════════════════════════
+   APP CONTAINER & NAVIGATION
+═══════════════════════════════════════════════ */
+.app-window {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--win-bg);
 }
 
-/* Top Navigation Bar */
-.top-nav {
-  position: relative;
-  z-index: 40;
-  height: 64px;
-  background: rgba(13, 13, 20, 0.85);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border);
+/* Top System Bar */
+.system-titlebar {
+  height: 44px;
+  background: var(--win-surface);
+  border-bottom: 1px solid var(--win-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 16px;
+  user-select: none;
+  z-index: 50;
+  flex-shrink: 0;
 }
 
-.nav-left {
+.titlebar-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
-.site-back-btn {
+.site-back-link {
   display: flex;
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 0.8rem;
-  font-family: var(--font-mono);
-  padding: 6px 12px;
+  font-weight: 500;
+  padding: 4px 10px;
   border-radius: var(--radius-sm);
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border);
-  transition: all 0.2s ease;
+  background: var(--win-subsurface);
+  border: 1px solid var(--win-border);
+  transition: all 0.15s;
 }
-.site-back-btn:hover {
-  color: var(--text-main);
-  border-color: var(--brand-color);
-  background: var(--brand-glow);
+.site-back-link:hover {
+  background: var(--win-hover);
+  color: var(--text-primary);
 }
 
-.brand-badge-group {
+.app-brand-badge {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  letter-spacing: -0.01em;
 }
 
-.logo-symbol {
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--brand-color), #2563eb);
+.app-brand-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: var(--win-accent);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 1.1rem;
-  color: #06060a;
-  box-shadow: 0 0 16px var(--brand-glow);
-}
-
-.nav-title {
   font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: -0.02em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 0.8rem;
 }
 
-.nav-tag {
-  font-size: 0.65rem;
-  font-family: var(--font-mono);
-  background: rgba(0, 224, 208, 0.1);
-  color: var(--brand-color);
-  padding: 2px 8px;
-  border-radius: 20px;
-  border: 1px solid var(--brand-border);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.nav-center {
+.titlebar-center {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
 }
 
-.preset-select-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--bg-card);
-  padding: 4px 10px 4px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+.titlebar-doc-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.preset-select-wrapper label {
+
+.save-badge {
   font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--text-dim);
-  text-transform: uppercase;
-}
-.preset-select {
-  background: transparent;
-  border: none;
-  color: var(--text-main);
-  font-family: var(--font-main);
-  font-size: 0.85rem;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-}
-.preset-select option {
-  background: var(--bg-card);
-  color: var(--text-main);
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.btn {
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #dff6dd;
+  color: #107c41;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem;
-  font-weight: 600;
-  font-family: var(--font-main);
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-.btn-ghost {
-  background: transparent;
-  color: var(--text-muted);
-  border-color: var(--border);
-}
-.btn-ghost:hover {
-  background: var(--bg-hover);
-  color: var(--text-main);
-}
-.btn-primary {
-  background: var(--brand-color);
-  color: #06060a;
-  box-shadow: 0 2px 10px var(--brand-glow);
-}
-.btn-primary:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 4px 18px var(--brand-glow);
-}
-.btn-danger {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.25);
-}
-.btn-danger:hover {
-  background: rgba(239, 68, 68, 0.2);
+  gap: 4px;
+  transition: opacity 0.3s;
 }
 
-/* App Layout Grid */
-.app-container {
-  display: grid;
-  grid-template-columns: 460px 1fr;
-  height: calc(100vh - 64px);
-  position: relative;
-  z-index: 10;
-}
-
-/* Left Editor Panel */
-.editor-pane {
-  background: var(--bg-panel);
-  border-right: 1px solid var(--border);
+.titlebar-right {
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* Quality & Audit Status Header */
-.audit-bar {
-  padding: 12px 18px;
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
 }
-.audit-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.76rem;
-  font-family: var(--font-mono);
-}
-.audit-label { color: var(--text-muted); }
-.audit-score {
-  color: var(--brand-color);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.audit-progress-track {
-  height: 5px;
-  background: var(--bg-input);
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
-}
-.audit-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #3b82f6, var(--brand-color));
-  width: 85%;
-  transition: width 0.4s ease;
-}
 
-/* Editor Tabs */
-.editor-nav-tabs {
-  display: flex;
-  background: rgba(0,0,0,0.2);
-  border-bottom: 1px solid var(--border);
-  padding: 0 12px;
-}
-.nav-tab-btn {
-  flex: 1;
-  padding: 12px 6px;
-  background: transparent;
-  border: none;
-  color: var(--text-dim);
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
+.win-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: var(--font-main);
+  cursor: pointer;
+  border: 1px solid var(--win-border);
+  background: var(--win-surface);
+  color: var(--text-primary);
+  transition: all 0.12s ease;
+  user-select: none;
 }
-.nav-tab-btn:hover { color: var(--text-muted); }
-.nav-tab-btn.active {
-  color: var(--brand-color);
-  border-bottom-color: var(--brand-color);
-  background: rgba(255,255,255,0.015);
+.win-btn:hover {
+  background: var(--win-hover);
+}
+.win-btn:active {
+  background: var(--win-active);
+  transform: scale(0.98);
+}
+.win-btn-primary {
+  background: var(--win-accent);
+  color: #ffffff;
+  border-color: var(--win-accent);
+}
+.win-btn-primary:hover {
+  background: var(--win-accent-hover);
+  color: #ffffff;
 }
 
-/* Tab Scrollable Content */
-.editor-scroll-body {
+/* ═══════════════════════════════════════════════
+   VIEW 1: WINDOWS 11 FILE EXPLORER
+═══════════════════════════════════════════════ */
+#explorerView {
   flex: 1;
-  overflow-y: auto;
-  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-.editor-scroll-body::-webkit-scrollbar { width: 6px; }
-.editor-scroll-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-.config-section {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  overflow: hidden;
+  background: #fafafa;
 }
 
-.section-legend {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
+/* Explorer Command Bar */
+.explorer-commandbar {
+  background: var(--win-surface);
+  border-bottom: 1px solid var(--win-border);
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
-.form-group {
+.commandbar-left {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
 }
-.form-group-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+
+.commandbar-right {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
-.form-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-muted);
+
+.search-box-wrap {
+  position: relative;
+  width: 260px;
+}
+.search-box-wrap svg {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: 6px 12px 6px 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--win-border);
+  background: var(--win-subsurface);
+  font-size: 0.82rem;
+  font-family: var(--font-main);
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.15s;
+}
+.search-input:focus {
+  background: #ffffff;
+  border-color: var(--win-accent);
+  box-shadow: 0 0 0 2px var(--win-accent-light);
+}
+
+.view-mode-selector {
   display: flex;
-  justify-content: space-between;
+  background: var(--win-subsurface);
+  border: 1px solid var(--win-border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+.view-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
   align-items: center;
 }
-.form-label small {
-  color: var(--text-dim);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
+.view-btn.active {
+  background: var(--win-surface);
+  color: var(--win-accent);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
-.form-control {
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  color: var(--text-main);
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-main);
-  font-size: 0.85rem;
-  outline: none;
-  transition: border-color 0.2s;
+
+/* Breadcrumb Bar */
+.explorer-addressbar {
+  background: var(--win-surface);
+  border-bottom: 1px solid var(--win-border);
+  padding: 6px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
 }
-.form-control:focus {
-  border-color: var(--brand-color);
-  box-shadow: 0 0 0 2px var(--brand-glow);
+
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  transition: background 0.1s;
 }
-textarea.form-control {
-  min-height: 80px;
-  resize: vertical;
+.breadcrumb-item:hover {
+  background: var(--win-hover);
+  color: var(--text-primary);
+}
+.breadcrumb-separator {
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+}
+
+/* Explorer Main Content Area */
+.explorer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* Clean Empty State */
+.empty-state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.empty-state-icon-wrap {
+  width: 84px;
+  height: 84px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid var(--win-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--win-accent);
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.empty-state-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.empty-state-desc {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
   line-height: 1.5;
 }
 
-/* Palette Swatches */
-.swatches-grid {
+.empty-state-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 4px;
-}
-.color-swatch {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: transform 0.15s, border-color 0.2s;
-}
-.color-swatch:hover { transform: scale(1.15); }
-.color-swatch.active { border-color: #fff; transform: scale(1.1); box-shadow: 0 0 10px rgba(255,255,255,0.4); }
-
-/* Section Block List & Cards */
-.blocks-container {
-  display: flex;
-  flex-direction: column;
   gap: 12px;
 }
 
-.block-card {
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  transition: border-color 0.2s;
+/* Grid View */
+.files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
 }
-.block-card:hover { border-color: rgba(255,255,255,0.15); }
 
-.block-card-header {
-  padding: 10px 14px;
-  background: rgba(255,255,255,0.02);
+.file-card {
+  background: var(--win-surface);
+  border: 1px solid var(--win-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  box-shadow: var(--shadow-subtle);
+  transition: all 0.15s ease;
+}
+.file-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--win-accent-border);
+  box-shadow: var(--shadow-card);
+  background: #ffffff;
+}
+
+.file-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.file-icon-wrap.folder {
+  background: #fff4ce;
+  color: #ffb900;
+}
+.file-icon-wrap.manual {
+  background: #e1dfdd;
+  color: #2b579a; /* Microsoft Word blue */
+}
+
+.file-meta-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.file-meta-sub {
+  font-size: 0.74rem;
+  color: var(--text-tertiary);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  cursor: pointer;
-  user-select: none;
-  border-bottom: 1px solid transparent;
-}
-.block-card.open .block-card-header {
-  border-bottom-color: var(--border);
 }
 
-.block-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-.block-type-pill {
-  font-size: 0.65rem;
-  font-family: var(--font-mono);
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--bg-hover);
-  color: var(--text-muted);
-}
-.block-type-pill.danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-.block-type-pill.raci { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-.block-type-pill.checklist { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-.block-type-pill.table { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-
-.block-tools {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.tool-btn {
+.file-actions-menu {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   background: transparent;
   border: none;
-  color: var(--text-dim);
+  cursor: pointer;
   padding: 4px;
   border-radius: 4px;
+  color: var(--text-tertiary);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.file-card:hover .file-actions-menu {
+  opacity: 1;
+}
+.file-actions-menu:hover {
+  background: var(--win-hover);
+  color: var(--text-primary);
+}
+
+/* List View */
+.files-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  background: var(--win-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--win-border);
+}
+.files-table th {
+  text-align: left;
+  padding: 10px 16px;
+  background: var(--win-subsurface);
+  border-bottom: 1px solid var(--win-border);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+}
+.files-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--win-border);
+  color: var(--text-primary);
+}
+.files-table tr:hover td {
+  background: var(--win-hover);
   cursor: pointer;
+}
+.table-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════
+   VIEW 2: WORD-STYLE DOCUMENT EDITOR
+═══════════════════════════════════════════════ */
+#editorView {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  background: #eef1f5;
+}
+
+/* Word Ribbon Interface */
+.word-ribbon {
+  background: var(--win-surface);
+  border-bottom: 1px solid var(--win-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 40;
+}
+
+.ribbon-tabs-bar {
+  display: flex;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--win-border);
+  background: var(--win-subsurface);
+}
+
+.ribbon-tab {
+  padding: 7px 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  transition: all 0.12s;
+}
+.ribbon-tab:hover {
+  color: var(--text-primary);
+}
+.ribbon-tab.active {
+  color: var(--win-accent);
+  border-bottom-color: var(--win-accent);
+  background: var(--win-surface);
+  font-weight: 600;
+}
+
+.ribbon-toolbar {
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+  overflow-x: auto;
+}
+
+.ribbon-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 16px;
+  border-right: 1px solid var(--win-border);
+}
+.ribbon-group:last-child {
+  border-right: none;
+}
+
+.ribbon-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  padding: 6px 8px;
+  cursor: pointer;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-family: var(--font-main);
+  transition: all 0.1s;
 }
-.tool-btn:hover { color: var(--text-main); background: var(--bg-hover); }
+.ribbon-btn:hover {
+  background: var(--win-hover);
+  border-color: var(--win-border);
+}
+.ribbon-btn:active, .ribbon-btn.active {
+  background: var(--win-accent-light);
+  border-color: var(--win-accent-border);
+  color: var(--win-accent);
+}
 
-.block-card-body {
-  padding: 14px;
-  display: none;
-  flex-direction: column;
-  gap: 12px;
+.ribbon-select {
+  padding: 5px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--win-border);
+  background: #ffffff;
+  font-size: 0.8rem;
+  font-family: var(--font-main);
+  outline: none;
+  cursor: pointer;
 }
-.block-card.open .block-card-body { display: flex; }
 
-/* Add Block Droplist */
-.add-block-row {
-  display: flex;
-  gap: 8px;
-}
-.add-block-select {
+/* Editor Main Workspace with Left Module Navigator */
+.editor-workspace {
   flex: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  overflow: hidden;
+  position: relative;
 }
 
-/* Right Preview Pane */
-.preview-pane {
-  background: #09090f;
+/* Left Module Navigator Pane */
+.module-nav-pane {
+  background: var(--win-surface);
+  border-right: 1px solid var(--win-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* Preview Toolbar */
-.preview-toolbar {
-  height: 50px;
-  background: rgba(13, 13, 20, 0.95);
-  border-bottom: 1px solid var(--border);
+.module-nav-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--win-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  z-index: 20;
+  background: var(--win-subsurface);
+}
+.module-nav-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
 }
 
-.view-mode-toggle {
+.module-list-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
   display: flex;
-  background: var(--bg-card);
-  padding: 3px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  flex-direction: column;
+  gap: 8px;
 }
-.mode-btn {
+
+.module-item-card {
+  background: var(--win-subsurface);
+  border: 1px solid var(--win-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.12s;
+}
+.module-item-card:hover {
+  border-color: var(--win-accent-border);
+  background: #ffffff;
+}
+.module-item-card.active {
+  background: var(--win-accent-light);
+  border-color: var(--win-accent);
+}
+
+.module-card-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+.module-index-badge {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--win-accent);
+  background: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--win-border);
+}
+.module-card-title {
+  font-size: 0.84rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.module-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0.6;
+}
+.module-item-card:hover .module-card-actions {
+  opacity: 1;
+}
+
+.icon-action-btn {
   background: transparent;
   border: none;
-  color: var(--text-dim);
-  padding: 5px 12px;
-  font-size: 0.75rem;
-  font-family: var(--font-mono);
-  border-radius: 4px;
+  color: var(--text-secondary);
+  padding: 2px 4px;
+  border-radius: 3px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s;
 }
-.mode-btn.active {
-  background: var(--bg-hover);
-  color: var(--brand-color);
-  font-weight: 600;
+.icon-action-btn:hover {
+  background: var(--win-hover);
+  color: var(--text-primary);
 }
 
-.preview-controls {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.zoom-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-}
-.zoom-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  width: 26px;
-  height: 26px;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.zoom-btn:hover { color: var(--text-main); border-color: var(--text-dim); }
-
-.theme-pill-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  cursor: pointer;
-  color: var(--text-muted);
-}
-.theme-pill-toggle:hover { color: var(--text-main); }
-
-/* Document View Area */
+/* Center Document Scroll Viewport */
 .document-viewport {
   flex: 1;
-  overflow: auto;
-  padding: 40px;
+  overflow-y: auto;
+  padding: 36px 20px 80px;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  background: radial-gradient(circle at top, #11111d 0%, #08080d 100%);
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
 }
 
-/* The Document Container (Realistic A4 vs Responsive Web) */
-.doc-sheet {
+/* The A4 Sheet Simulation */
+.a4-sheet {
   width: 100%;
   max-width: 820px;
   min-height: 1120px;
   background: #ffffff;
-  color: #1a1a24;
-  box-shadow: 0 15px 45px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
-  border-radius: 4px;
-  padding: 56px 64px;
-  position: relative;
-  transition: transform 0.2s ease, max-width 0.3s ease;
-  transform-origin: top center;
+  border-radius: 2px;
+  box-shadow: var(--shadow-sheet);
+  padding: 64px 72px;
   display: flex;
   flex-direction: column;
-}
-
-/* Dark Theme for Document when enabled */
-.doc-sheet.theme-dark {
-  background: #111119;
-  color: #e5e5f0;
-  box-shadow: 0 15px 45px rgba(0,0,0,0.8), 0 0 0 1px var(--border);
-}
-
-/* Watermark */
-.doc-watermark {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 7rem;
-  font-weight: 800;
-  font-family: var(--font-main);
-  color: rgba(0, 0, 0, 0.035);
-  transform: rotate(-35deg);
-  pointer-events: none;
-  user-select: none;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  z-index: 1;
-}
-.doc-sheet.theme-dark .doc-watermark {
-  color: rgba(255, 255, 255, 0.03);
-}
-
-/* Document Header Elements */
-.doc-header {
   position: relative;
-  z-index: 2;
-  border-bottom: 2px solid var(--brand-color);
-  padding-bottom: 24px;
-  margin-bottom: 30px;
+  font-family: var(--font-editor);
+  color: #242424;
 }
 
-.doc-top-bar {
+/* Page Header & Footer */
+.sheet-header {
+  border-bottom: 1px solid #dcdcdc;
+  padding-bottom: 12px;
+  margin-bottom: 28px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
-}
-
-.doc-company-brand {
-  display: flex;
   align-items: center;
-  gap: 14px;
-}
-
-.doc-logo-symbol {
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
-  background: var(--brand-color);
-  color: #06060a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 1.4rem;
+  font-size: 0.76rem;
+  color: #767676;
   font-family: var(--font-main);
 }
-
-.doc-company-name {
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+.header-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.76rem;
+  color: #767676;
+  width: 45%;
 }
-.doc-company-dept {
-  font-size: 0.8rem;
-  font-family: var(--font-mono);
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.doc-sheet.theme-dark .doc-company-dept { color: #94a3b8; }
-
-.doc-classification-badge {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
-  color: #334155;
-}
-.doc-classification-badge.confidential {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #dc2626;
-}
-.doc-classification-badge.internal {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  color: #2563eb;
-}
-.doc-classification-badge.restricted {
-  background: #fefce8;
-  border-color: #fef08a;
-  color: #ca8a04;
+.header-input:focus {
+  background: var(--win-accent-light);
+  color: var(--text-primary);
 }
 
-.doc-sheet.theme-dark .doc-classification-badge {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.1);
-  color: #cbd5e1;
-}
-
-.doc-title-h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
-  margin-bottom: 8px;
-}
-
-.doc-subtitle-p {
-  font-size: 1rem;
-  color: #475569;
-  font-weight: 400;
-  max-width: 90%;
-  line-height: 1.5;
-}
-.doc-sheet.theme-dark .doc-subtitle-p { color: #94a3b8; }
-
-/* Metadata Grid Table */
-.doc-meta-table {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 12px 16px;
-  margin-top: 18px;
-}
-.doc-sheet.theme-dark .doc-meta-table {
-  background: #181824;
-  border-color: var(--border);
-}
-.meta-item { display: flex; flex-direction: column; gap: 2px; }
-.meta-item-label {
-  font-size: 0.65rem;
-  font-family: var(--font-mono);
-  color: #64748b;
-  text-transform: uppercase;
-}
-.meta-item-val {
-  font-size: 0.8rem;
-  font-weight: 600;
-  font-family: var(--font-mono);
-}
-
-/* Formal Approval Stamps Box */
-.doc-signatures-box {
-  position: relative;
-  z-index: 2;
-  margin-bottom: 30px;
-  border: 1px dashed #cbd5e1;
-  border-radius: 6px;
-  padding: 12px 16px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  background: #ffffff;
-}
-.doc-sheet.theme-dark .doc-signatures-box {
-  background: #14141e;
-  border-color: var(--border);
-}
-.sig-cell {
+.sheet-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #dcdcdc;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  color: #767676;
+  font-family: var(--font-main);
 }
-.sig-role {
-  font-size: 0.68rem;
+.footer-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.76rem;
+  color: #767676;
+  width: 50%;
+}
+.footer-input:focus {
+  background: var(--win-accent-light);
+  color: var(--text-primary);
+}
+
+.page-num-display {
   font-family: var(--font-mono);
-  color: #64748b;
-  text-transform: uppercase;
-}
-.sig-name {
-  font-size: 0.85rem;
   font-weight: 600;
+  color: #484848;
 }
-.sig-stamp {
+
+/* Module Section Container inside Sheet */
+.doc-module-section {
+  margin-bottom: 36px;
+  position: relative;
+}
+.doc-module-section:last-child {
+  margin-bottom: 0;
+}
+
+.module-header-tag {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.65rem;
+  gap: 6px;
   font-family: var(--font-mono);
-  color: #10b981;
-  font-weight: 600;
-  margin-top: 2px;
-}
-
-/* Dynamic Table of Contents */
-.doc-toc {
-  position: relative;
-  z-index: 2;
-  background: #f8fafc;
-  border-left: 3px solid var(--brand-color);
-  padding: 16px 20px;
-  margin-bottom: 32px;
-  border-radius: 0 6px 6px 0;
-}
-.doc-sheet.theme-dark .doc-toc {
-  background: #161622;
-}
-.toc-title {
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  font-family: var(--font-mono);
-  margin-bottom: 10px;
-  letter-spacing: 0.05em;
-}
-.toc-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.toc-item {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.82rem;
-  color: #334155;
-}
-.doc-sheet.theme-dark .toc-item { color: #cbd5e1; }
-.toc-item-num { font-family: var(--font-mono); font-weight: 600; margin-right: 8px; color: var(--brand-color); }
-.toc-dots { flex: 1; border-bottom: 1px dotted #cbd5e1; margin: 0 8px 4px; }
-.doc-sheet.theme-dark .toc-dots { border-bottom-color: #334155; }
-
-/* Document Section Rendering */
-.doc-body {
-  position: relative;
-  z-index: 2;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
+  color: var(--win-accent);
+  background: var(--win-accent-light);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  border: 1px solid var(--win-accent-border);
 }
 
-.rendered-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  page-break-inside: avoid;
-}
-
-.rendered-section-header {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 6px;
-}
-.doc-sheet.theme-dark .rendered-section-header { border-bottom-color: var(--border); }
-
-.sec-num {
-  font-family: var(--font-mono);
-  font-size: 1.15rem;
+.module-title-h2 {
+  font-size: 1.35rem;
   font-weight: 700;
-  color: var(--brand-color);
+  color: #1a1a1a;
+  outline: none;
+  margin-bottom: 12px;
+  padding: 2px 4px;
+  border-radius: 3px;
 }
-.sec-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+.module-title-h2:focus {
+  background: #f0f6fc;
 }
 
-.rendered-content-text {
-  font-size: 0.92rem;
-  line-height: 1.7;
-  color: #334155;
-  white-space: pre-line;
+.module-editable-body {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #2b2b2b;
+  outline: none;
+  min-height: 90px;
+  padding: 4px;
+  border-radius: 4px;
 }
-.doc-sheet.theme-dark .rendered-content-text { color: #cbd5e1; }
+.module-editable-body:focus {
+  background: #fbfbfb;
+}
 
-/* ANSI / ISO Safety Warning Boxes */
-.safety-box {
+/* Safety Callout Boxes inside Editor */
+.editor-safety-box {
   display: flex;
   border: 2px solid;
   border-radius: 6px;
   overflow: hidden;
-  margin: 10px 0;
-  page-break-inside: avoid;
+  margin: 16px 0;
+  user-select: none;
 }
-.safety-box.danger { border-color: var(--danger); background: #fff5f5; }
-.safety-box.warning { border-color: var(--warning); background: #fffbeb; }
-.safety-box.caution { border-color: var(--caution); background: #fefce8; }
-.safety-box.notice { border-color: var(--notice); background: #eff6ff; }
-.safety-box.safety { border-color: var(--safety); background: #ecfdf5; }
+.editor-safety-box.danger { border-color: var(--danger); background: #fdf3f2; }
+.editor-safety-box.warning { border-color: var(--warning); background: #fff8f5; }
+.editor-safety-box.caution { border-color: var(--caution); background: #fffbf0; }
+.editor-safety-box.notice { border-color: var(--notice); background: #f0f6fc; }
+.editor-safety-box.safety { border-color: var(--safety); background: #f1f9f4; }
 
-.doc-sheet.theme-dark .safety-box.danger { background: rgba(239, 68, 68, 0.1); }
-.doc-sheet.theme-dark .safety-box.warning { background: rgba(245, 158, 11, 0.1); }
-.doc-sheet.theme-dark .safety-box.caution { background: rgba(234, 179, 8, 0.1); }
-.doc-sheet.theme-dark .safety-box.notice { background: rgba(59, 130, 246, 0.1); }
-.doc-sheet.theme-dark .safety-box.safety { background: rgba(16, 185, 129, 0.1); }
-
-.safety-stripe {
+.safety-header-pill {
   width: 90px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: #ffffff;
   font-weight: 800;
-  font-family: var(--font-mono);
   font-size: 0.72rem;
-  text-align: center;
-  padding: 10px 6px;
-  text-transform: uppercase;
+  font-family: var(--font-mono);
   letter-spacing: 0.08em;
+  padding: 10px 6px;
 }
-.safety-box.danger .safety-stripe { background: var(--danger); }
-.safety-box.warning .safety-stripe { background: var(--warning); color: #000; }
-.safety-box.caution .safety-stripe { background: var(--caution); color: #000; }
-.safety-box.notice .safety-stripe { background: var(--notice); }
-.safety-box.safety .safety-stripe { background: var(--safety); }
+.editor-safety-box.danger .safety-header-pill { background: var(--danger); }
+.editor-safety-box.warning .safety-header-pill { background: var(--warning); color: #fff; }
+.editor-safety-box.caution .safety-header-pill { background: var(--caution); color: #000; }
+.editor-safety-box.notice .safety-header-pill { background: var(--notice); }
+.editor-safety-box.safety .safety-header-pill { background: var(--safety); }
 
-.safety-content {
+.safety-body-text {
   flex: 1;
-  padding: 12px 16px;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  color: #1e293b;
-}
-.doc-sheet.theme-dark .safety-content { color: #f1f5f9; }
-.safety-title {
-  font-weight: 700;
-  font-size: 0.9rem;
-  margin-bottom: 4px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  outline: none;
 }
 
-/* RACI Table */
-.raci-table {
+/* Word Tables */
+.word-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 10px 0;
-  font-size: 0.82rem;
-  border: 1px solid #e2e8f0;
+  margin: 16px 0;
+  font-size: 0.88rem;
 }
-.doc-sheet.theme-dark .raci-table { border-color: var(--border); }
-.raci-table th, .raci-table td {
+.word-table th, .word-table td {
+  border: 1px solid #d2d2d2;
   padding: 8px 12px;
-  border: 1px solid #e2e8f0;
   text-align: left;
 }
-.doc-sheet.theme-dark .raci-table th, .doc-sheet.theme-dark .raci-table td { border-color: var(--border); }
-.raci-table th {
-  background: #f8fafc;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  text-transform: uppercase;
+.word-table th {
+  background: #f2f2f2;
   font-weight: 600;
 }
-.doc-sheet.theme-dark .raci-table th { background: #181824; color: #cbd5e1; }
-.raci-badge {
-  display: inline-block;
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-}
-.raci-r { background: #dbeafe; color: #1e40af; }
-.raci-a { background: #fee2e2; color: #991b1b; }
-.raci-c { background: #fef3c7; color: #92400e; }
-.raci-i { background: #e0e7ff; color: #3730a3; }
 
-/* Interactive Checklist */
-.checklist-wrapper {
+/* ═══════════════════════════════════════════════
+   MODAL: MODULE SELECTOR & REUSE BROWSER
+═══════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-dialog {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-flyout);
+  border: 1px solid var(--win-border);
+  width: 90%;
+  max-width: 940px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalScale 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalScale {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--win-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--win-subsurface);
+}
+.modal-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.modal-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  height: 540px;
+}
+
+/* Split Import View: Left List / Right Preview */
+.import-left-pane {
+  width: 320px;
+  border-right: 1px solid var(--win-border);
+  background: var(--win-subsurface);
+  display: flex;
+  flex-direction: column;
+}
+
+.import-selector-box {
+  padding: 12px;
+  border-bottom: 1px solid var(--win-border);
+}
+
+.import-module-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin: 8px 0;
 }
-.checklist-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 8px 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 0.85rem;
-}
-.doc-sheet.theme-dark .checklist-item {
-  background: #161622;
-  border-color: var(--border);
-}
-.checklist-item input[type="checkbox"] {
-  margin-top: 3px;
-  accent-color: var(--brand-color);
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
-}
-.checklist-text { flex: 1; }
-.checklist-time {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #64748b;
-  background: rgba(0,0,0,0.05);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-.doc-sheet.theme-dark .checklist-time { background: rgba(255,255,255,0.08); color: #94a3b8; }
 
-/* Spec Table */
-.spec-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 10px 0;
-  font-size: 0.82rem;
-}
-.spec-table th, .spec-table td {
-  padding: 8px 12px;
-  border: 1px solid #e2e8f0;
-}
-.doc-sheet.theme-dark .spec-table th, .doc-sheet.theme-dark .spec-table td { border-color: var(--border); }
-.spec-table th {
-  background: #f1f5f9;
-  text-align: left;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-}
-.doc-sheet.theme-dark .spec-table th { background: #1c1c2b; color: #cbd5e1; }
-
-/* Document Footer */
-.doc-footer {
-  position: relative;
-  z-index: 2;
-  margin-top: 40px;
-  padding-top: 16px;
-  border-top: 1px solid #e2e8f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: #64748b;
-}
-.doc-sheet.theme-dark .doc-footer { border-top-color: var(--border); color: #94a3b8; }
-
-/* Toast Notifications */
-.toast-msg {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: #181824;
-  color: #f1f1f8;
-  border: 1px solid var(--border);
-  padding: 10px 18px;
+.import-module-item {
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid var(--win-border);
   border-radius: var(--radius-sm);
-  font-size: 0.82rem;
-  font-family: var(--font-main);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 1000;
-  transform: translateY(100px);
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
+  cursor: pointer;
+  transition: all 0.12s;
 }
-.toast-msg.show {
-  transform: translateY(0);
-  opacity: 1;
+.import-module-item:hover {
+  border-color: var(--win-accent-border);
+}
+.import-module-item.selected {
+  border-color: var(--win-accent);
+  background: var(--win-accent-light);
 }
 
-/* ═══════════ PRINT STYLES (@media print) ═══════════ */
+.import-right-preview {
+  flex: 1;
+  background: #f3f3f3;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.preview-sheet-box {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  padding: 32px 36px;
+  border-radius: 4px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--win-border);
+}
+
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--win-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: var(--win-subsurface);
+}
+
+/* Print Rules */
 @media print {
   @page {
     size: A4;
-    margin: 15mm 15mm 15mm 15mm;
+    margin: 15mm;
   }
   body, html {
     background: #fff !important;
@@ -1119,1459 +1037,1287 @@ textarea.form-control {
     height: auto !important;
     overflow: visible !important;
   }
-  body::before { display: none !important; }
-  .top-nav, .editor-pane, .preview-toolbar, .toast-msg {
+  .system-titlebar, .word-ribbon, .module-nav-pane, .modal-overlay {
     display: none !important;
   }
-  .app-container {
+  .app-window, .editor-workspace, .document-viewport {
     display: block !important;
     height: auto !important;
-  }
-  .preview-pane {
-    background: transparent !important;
-  }
-  .document-viewport {
     padding: 0 !important;
     background: transparent !important;
-    overflow: visible !important;
   }
-  .doc-sheet {
-    max-width: 100% !important;
+  .a4-sheet {
     box-shadow: none !important;
     padding: 0 !important;
+    max-width: 100% !important;
     min-height: auto !important;
-    transform: none !important;
-    background: #fff !important;
-    color: #000 !important;
   }
-  .doc-watermark {
-    color: rgba(0, 0, 0, 0.04) !important;
-  }
-  .rendered-section {
+  .doc-module-section {
     page-break-inside: avoid;
-  }
-  .safety-box {
-    page-break-inside: avoid;
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 960px) {
-  .app-container {
-    grid-template-columns: 1fr;
-    height: auto;
-    overflow-y: auto;
-  }
-  .editor-pane {
-    height: 600px;
-  }
-  .document-viewport {
-    padding: 20px 10px;
   }
 }
 </style>
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
-  <header class="top-nav">
-    <div class="nav-left">
-      <a href="/progetti.html#strumenti" class="site-back-btn" title="Torna a Progetti / Strumenti">
-        <svg height="20" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex-shrink:0">
+<div class="app-window">
+  
+  <!-- System Titlebar -->
+  <header class="system-titlebar">
+    <div class="titlebar-left">
+      <a href="/progetti.html#strumenti" class="site-back-link" title="Torna al portfolio">
+        <svg height="16" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle">
           <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
           <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
           <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
           <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
         </svg>
-        <span>Strumenti</span>
+        <span>Portfolio</span>
       </a>
-      <div class="brand-badge-group">
-        <div class="logo-symbol">Ω</div>
-        <div class="nav-title">
-          OmniManual
-          <span class="nav-tag">Enterprise Builder</span>
-        </div>
+
+      <div class="app-brand-badge">
+        <div class="app-brand-icon">W</div>
+        <span>OmniManual</span>
       </div>
     </div>
 
-    <div class="nav-center">
-      <div class="preset-select-wrapper">
-        <label for="templateSelect">Template:</label>
-        <select id="templateSelect" class="preset-select">
-          <option value="sop">SOP — Procedura Operativa ISO 9001</option>
-          <option value="security">Security & Privacy Policy (ISO 27001)</option>
-          <option value="machinery">Manuale Tecnico Impianto / Marcatura CE</option>
-          <option value="onboarding">Guida Dipendenti & Onboarding Corporate</option>
-          <option value="disaster">Crisis Management & Disaster Recovery</option>
-        </select>
-      </div>
+    <div class="titlebar-center">
+      <span id="titlebarDocName" class="titlebar-doc-name">Gestione Manuali Aziendali</span>
+      <span id="saveStatusBadge" class="save-badge" style="display:none">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        Salvato
+      </span>
     </div>
 
-    <div class="nav-right">
-      <button id="importBtn" class="btn btn-ghost" title="Importa file JSON">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Importa
-      </button>
-      <input type="file" id="importFileInput" accept=".json" style="display:none">
-      
-      <button id="exportJsonBtn" class="btn btn-ghost" title="Esporta backup JSON">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        JSON
+    <div class="titlebar-right">
+      <button id="btnBackToExplorer" class="win-btn" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Esplora File
       </button>
 
-      <button id="exportMdBtn" class="btn btn-ghost" title="Esporta file Markdown">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="7 15 7 9 10 12 13 9 13 15"/></svg>
-        Markdown
-      </button>
-
-      <button id="printPdfBtn" class="btn btn-primary" title="Stampa o Salva in PDF">
+      <button id="btnPrintPdf" class="win-btn win-btn-primary" style="display:none">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Stampa / PDF
       </button>
     </div>
   </header>
 
-  <!-- Application Body Grid -->
-  <div class="app-container">
+  <!-- ═══════════════════════════════════════════════
+       VIEW 1: EXPLORER (WINDOWS 11 STYLE)
+  ═══════════════════════════════════════════════ -->
+  <main id="explorerView">
     
-    <!-- LEFT EDITOR PANE -->
-    <aside class="editor-pane">
+    <!-- Command Bar -->
+    <div class="explorer-commandbar">
+      <div class="commandbar-left">
+        <button id="btnNewManual" class="win-btn win-btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nuovo Manuale
+        </button>
+
+        <button id="btnNewFolder" class="win-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+          Nuova Cartella
+        </button>
+
+        <button id="btnExportAll" class="win-btn" title="Esporta backup di tutti i manuali">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Backup JSON
+        </button>
+
+        <button id="btnImportAll" class="win-btn" title="Ripristina da file JSON">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Importa JSON
+        </button>
+        <input type="file" id="importArchiveInput" accept=".json" style="display:none">
+      </div>
+
+      <div class="commandbar-right">
+        <div class="search-box-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchFilesInput" class="search-input" placeholder="Cerca manuali o cartelle...">
+        </div>
+
+        <div class="view-mode-selector">
+          <button id="btnViewGrid" class="view-btn active" title="Vista Griglia">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </button>
+          <button id="btnViewList" class="view-btn" title="Vista Elenco">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Address Bar / Breadcrumb Navigation -->
+    <div class="explorer-addressbar">
+      <span class="breadcrumb-item" data-folder="null">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        I miei Manuali
+      </span>
+      <span id="breadcrumbTrail"></span>
+    </div>
+
+    <!-- Main Explorer Canvas Area -->
+    <div class="explorer-content">
       
-      <!-- Compliance & Quality Check Bar -->
-      <div class="audit-bar">
-        <div class="audit-top">
-          <span class="audit-label">Completezza Documentale:</span>
-          <span id="auditScoreVal" class="audit-score">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            <span id="scoreNumber">92%</span>
-          </span>
+      <!-- Empty State -->
+      <div id="emptyStateBox" class="empty-state-box" style="display:none">
+        <div class="empty-state-icon-wrap">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
         </div>
-        <div class="audit-progress-track">
-          <div id="auditProgressFill" class="audit-progress-fill" style="width:92%"></div>
+        <div class="empty-state-title">Nessun manuale in questa cartella</div>
+        <div class="empty-state-desc">Organizza la tua documentazione aziendale in comode cartelle o crea subito un nuovo manuale con l'editor Word integrato.</div>
+        <div class="empty-state-actions">
+          <button id="btnEmptyNewManual" class="win-btn win-btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nuovo Manuale
+          </button>
+          <button id="btnEmptyNewFolder" class="win-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Nuova Cartella
+          </button>
         </div>
       </div>
 
-      <!-- Navigation Tabs inside Editor -->
-      <div class="editor-nav-tabs">
-        <button class="nav-tab-btn active" data-tab="meta">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
-          Generale
-        </button>
-        <button class="nav-tab-btn" data-tab="brand">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg>
-          Brand & Firme
-        </button>
-        <button class="nav-tab-btn" data-tab="content">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          Moduli & Sezioni
-        </button>
-      </div>
+      <!-- Files Container (Grid / List dynamically filled) -->
+      <div id="filesGrid" class="files-grid"></div>
+      <table id="filesTable" class="files-table" style="display:none">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Data Modifica</th>
+            <th>Tipo</th>
+            <th>Moduli / Elementi</th>
+            <th style="text-align:right">Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="filesTableBody"></tbody>
+      </table>
 
-      <!-- Scrollable Panels -->
-      <div class="editor-scroll-body">
-        
-        <!-- TAB 1: METADATA & GOVERNANCE -->
-        <div id="tab-meta" class="tab-pane-content" style="display:flex; flex-direction:column; gap:16px;">
-          
-          <div class="config-section">
-            <div class="section-legend">Dati Documento</div>
-            
-            <div class="form-group">
-              <label class="form-label" for="docTitle">Titolo del Manuale</label>
-              <input type="text" id="docTitle" class="form-control" placeholder="Es. Procedura Operativa Standard: Controllo Qualità">
-            </div>
+    </div>
 
-            <div class="form-group">
-              <label class="form-label" for="docSubtitle">Sottotitolo o Descrizione</label>
-              <textarea id="docSubtitle" class="form-control" style="min-height:60px;" placeholder="Scopo e ambito del documento..."></textarea>
-            </div>
+  </main>
 
-            <div class="form-group-row">
-              <div class="form-group">
-                <label class="form-label" for="docCode">Codice Univoco</label>
-                <input type="text" id="docCode" class="form-control" placeholder="Es. SOP-2026-QA-012">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="docVersion">Versione</label>
-                <input type="text" id="docVersion" class="form-control" placeholder="Es. 2.4.0">
-              </div>
-            </div>
-
-            <div class="form-group-row">
-              <div class="form-group">
-                <label class="form-label" for="docDate">Data Rilascio</label>
-                <input type="date" id="docDate" class="form-control">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="docReviewDate">Prossima Revisione</label>
-                <input type="date" id="docReviewDate" class="form-control">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="docClassification">Classificazione di Riservatezza</label>
-              <select id="docClassification" class="form-control">
-                <option value="confidential">Strettamente Confidenziale (Strictly Confidential)</option>
-                <option value="internal">Uso Interno Aziendale (Internal Use Only)</option>
-                <option value="restricted">Riservato Reparto (Restricted Access)</option>
-                <option value="public">Documento Pubblico (Public Release)</option>
-              </select>
-            </div>
-
-            <div class="form-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
-              <span class="form-label" style="margin:0;">Filigrana di sfondo (Watermark)</span>
-              <input type="checkbox" id="watermarkToggle" checked style="accent-color:var(--brand-color); width:18px; height:18px;">
-            </div>
-          </div>
-
-        </div>
-
-        <!-- TAB 2: BRANDING & APPROVALS -->
-        <div id="tab-brand" class="tab-pane-content" style="display:none; flex-direction:column; gap:16px;">
-          
-          <div class="config-section">
-            <div class="section-legend">Identità Aziendale</div>
-
-            <div class="form-group">
-              <label class="form-label" for="companyName">Nome Azienda</label>
-              <input type="text" id="companyName" class="form-control" placeholder="Es. Nexus Dynamics S.p.A.">
-            </div>
-
-            <div class="form-group-row">
-              <div class="form-group">
-                <label class="form-label" for="companyDept">Divisione / Reparto</label>
-                <input type="text" id="companyDept" class="form-control" placeholder="Es. Quality Assurance & HSE">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="companySymbol">Monogramma / Logo</label>
-                <input type="text" id="companySymbol" class="form-control" maxlength="2" placeholder="Es. ND o Ω">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Colore Primario Brand</label>
-              <div class="swatches-grid">
-                <div class="color-swatch active" style="background:#00e0d0" data-color="#00e0d0" title="Cyber Cyan"></div>
-                <div class="color-swatch" style="background:#3b82f6" data-color="#3b82f6" title="Corporate Blue"></div>
-                <div class="color-swatch" style="background:#10b981" data-color="#10b981" title="Emerald Quality"></div>
-                <div class="color-swatch" style="background:#f59e0b" data-color="#f59e0b" title="Industrial Amber"></div>
-                <div class="color-swatch" style="background:#ef4444" data-color="#ef4444" title="Crimson Executive"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="config-section">
-            <div class="section-legend">Firmatari & Approvazione Formale</div>
-            
-            <div class="form-group">
-              <label class="form-label" for="authorName">Redattore Tecnico (Author)</label>
-              <input type="text" id="authorName" class="form-control" placeholder="Nome, Ruolo">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="reviewerName">Responsabile QA (Reviewer)</label>
-              <input type="text" id="reviewerName" class="form-control" placeholder="Nome, Ruolo">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="approverName">Approvatore Direzione (Executive)</label>
-              <input type="text" id="approverName" class="form-control" placeholder="Nome, Ruolo">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="approvalStatus">Stato di Approvazione</label>
-              <select id="approvalStatus" class="form-control">
-                <option value="approved">Approvato & Rilasciato (Approved)</option>
-                <option value="review">In Corso di Revisione (Under Review)</option>
-                <option value="draft">Bozza di Lavoro (Draft)</option>
-              </select>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- TAB 3: SECTIONS & MODULES BUILDER -->
-        <div id="tab-content" class="tab-pane-content" style="display:none; flex-direction:column; gap:16px;">
-          
-          <div class="add-block-row">
-            <select id="newBlockType" class="form-control add-block-select">
-              <option value="text">Nuova Sezione Testo / Istruzione</option>
-              <option value="safety">Box Avvertenza di Sicurezza ISO/OSHA</option>
-              <option value="raci">Matrice Ruoli & Responsabilità RACI</option>
-              <option value="checklist">Checklist Operativa Step-by-Step</option>
-              <option value="spec">Tabella Parametri / Specifiche Tecniche</option>
-            </select>
-            <button id="addBlockBtn" class="btn btn-primary">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Aggiungi
-            </button>
-          </div>
-
-          <!-- Dynamic List of Blocks -->
-          <div id="blocksContainer" class="blocks-container">
-            <!-- Populated via JavaScript -->
-          </div>
-
-        </div>
-
-      </div>
-
-    </aside>
-
-    <!-- RIGHT PREVIEW PANE -->
-    <main class="preview-pane">
+  <!-- ═══════════════════════════════════════════════
+       VIEW 2: WORD-STYLE DOCUMENT EDITOR
+  ═══════════════════════════════════════════════ -->
+  <section id="editorView">
+    
+    <!-- Microsoft Word Fluent Ribbon -->
+    <div class="word-ribbon">
       
-      <!-- Preview Toolbar -->
-      <div class="preview-toolbar">
-        <div class="view-mode-toggle">
-          <button class="mode-btn active" data-mode="a4">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>
-            Foglio A4
+      <!-- Ribbon Tabs -->
+      <div class="ribbon-tabs-bar">
+        <button class="ribbon-tab active" data-tab="home">Home</button>
+        <button class="ribbon-tab" data-tab="insert">Inserisci</button>
+        <button class="ribbon-tab" data-tab="layout">Layout & Pagine</button>
+      </div>
+
+      <!-- Tab: Home -->
+      <div id="ribbonTabHome" class="ribbon-toolbar">
+        <div class="ribbon-group">
+          <select id="fontSelect" class="ribbon-select" title="Tipo di carattere">
+            <option value="Calibri" selected>Calibri</option>
+            <option value="Segoe UI">Segoe UI</option>
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Georgia">Georgia</option>
+            <option value="IBM Plex Mono">IBM Plex Mono</option>
+          </select>
+
+          <select id="fontSizeSelect" class="ribbon-select" title="Dimensione">
+            <option value="1">10 pt</option>
+            <option value="2">11 pt</option>
+            <option value="3" selected>12 pt</option>
+            <option value="4">14 pt</option>
+            <option value="5">18 pt</option>
+            <option value="6">24 pt</option>
+          </select>
+        </div>
+
+        <div class="ribbon-group">
+          <button class="ribbon-btn" data-cmd="bold" title="Grassetto (Ctrl+B)"><strong>B</strong></button>
+          <button class="ribbon-btn" data-cmd="italic" title="Corsivo (Ctrl+I)"><em>I</em></button>
+          <button class="ribbon-btn" data-cmd="underline" title="Sottolineato (Ctrl+U)"><u>U</u></button>
+          <button class="ribbon-btn" data-cmd="strikeThrough" title="Barrato"><s>S</s></button>
+        </div>
+
+        <div class="ribbon-group">
+          <button class="ribbon-btn" data-cmd="justifyLeft" title="Allinea a sinistra">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
           </button>
-          <button class="mode-btn" data-mode="web">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            Portale Web
+          <button class="ribbon-btn" data-cmd="justifyCenter" title="Allinea al centro">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="6" x2="3" y2="6"/><line x1="18" y1="12" x2="6" y2="12"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
+          </button>
+          <button class="ribbon-btn" data-cmd="justifyRight" title="Allinea a destra">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="12" x2="9" y2="12"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
           </button>
         </div>
 
-        <div class="preview-controls">
-          <button id="themeToggleBtn" class="theme-pill-toggle">
-            <span id="themeToggleIcon">🌙</span>
-            <span id="themeToggleText">Tema Scuro</span>
-          </button>
+        <div class="ribbon-group">
+          <button class="ribbon-btn" data-cmd="insertUnorderedList" title="Elenco puntato">• Elenco</button>
+          <button class="ribbon-btn" data-cmd="insertOrderedList" title="Elenco numerato">1. Elenco</button>
+        </div>
 
-          <div class="zoom-wrapper">
-            <button id="zoomOutBtn" class="zoom-btn" title="Riduci Zoom">−</button>
-            <span id="zoomLevelText">100%</span>
-            <button id="zoomInBtn" class="zoom-btn" title="Aumenta Zoom">+</button>
-          </div>
+        <div class="ribbon-group">
+          <select id="headingSelect" class="ribbon-select" title="Stile Paragrafo">
+            <option value="p">Testo Normale</option>
+            <option value="h1">Titolo 1 (Grande)</option>
+            <option value="h2">Titolo 2 (Medio)</option>
+            <option value="h3">Titolo 3 (Sottotitolo)</option>
+          </select>
         </div>
       </div>
 
-      <!-- Scrollable Viewport -->
-      <div class="document-viewport">
+      <!-- Tab: Inserisci -->
+      <div id="ribbonTabInsert" class="ribbon-toolbar" style="display:none">
+        <div class="ribbon-group">
+          <button id="btnInsertTable" class="ribbon-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+            Tabella
+          </button>
+        </div>
+
+        <div class="ribbon-group">
+          <button class="ribbon-btn" data-box="danger" style="color:var(--danger)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Pericolo (ISO)
+          </button>
+          <button class="ribbon-btn" data-box="warning" style="color:var(--warning)">Avvertenza</button>
+          <button class="ribbon-btn" data-box="safety" style="color:var(--safety)">Sicurezza / DPI</button>
+          <button class="ribbon-btn" data-box="notice" style="color:var(--notice)">Nota / Avviso</button>
+        </div>
+
+        <div class="ribbon-group">
+          <button id="btnOpenModuleModal" class="win-btn win-btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+            Crea o Importa Modulo
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab: Layout & Pagine -->
+      <div id="ribbonTabLayout" class="ribbon-toolbar" style="display:none">
+        <div class="ribbon-group">
+          <label style="font-size:0.8rem;color:var(--text-secondary)">Numero Pagina:</label>
+          <select id="pageNumFormatSelect" class="ribbon-select">
+            <option value="page_of_total">Pagina X di Y</option>
+            <option value="page_only">Solo Numero (X)</option>
+            <option value="none">Nessuno (Rimuovi)</option>
+          </select>
+        </div>
+
+        <div class="ribbon-group">
+          <label style="font-size:0.8rem;color:var(--text-secondary);display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="hidePageNumFirstPage" checked style="accent-color:var(--win-accent)">
+            Nascondi su prima pagina (Copertina)
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Editor Workspace: Left Modules Navigator + Center Document Sheet -->
+    <div class="editor-workspace">
+      
+      <!-- Left Panel: Module Navigator -->
+      <aside class="module-nav-pane">
+        <div class="module-nav-header">
+          <span class="module-nav-title">Moduli del Manuale</span>
+          <button id="btnSidebarNewModule" class="win-btn" style="padding:4px 8px;font-size:0.75rem" title="Aggiungi o importa modulo">
+            + Modulo
+          </button>
+        </div>
+
+        <div id="moduleNavList" class="module-list-wrap">
+          <!-- Populated dynamically with current manual's modules -->
+        </div>
+      </aside>
+
+      <!-- Center Document Viewport -->
+      <main class="document-viewport">
         
-        <!-- Realistic Rendered Sheet -->
-        <article id="docSheet" class="doc-sheet">
+        <!-- Printable A4 Sheet -->
+        <article id="docSheet" class="a4-sheet">
           
-          <!-- Watermark -->
-          <div id="watermarkEl" class="doc-watermark">CONFIDENZIALE</div>
-
-          <!-- Header -->
-          <header class="doc-header">
-            <div class="doc-top-bar">
-              <div class="doc-company-brand">
-                <div id="pvLogoSymbol" class="doc-logo-symbol">Ω</div>
-                <div>
-                  <div id="pvCompanyName" class="doc-company-name">Nexus Dynamics S.p.A.</div>
-                  <div id="pvCompanyDept" class="doc-company-dept">Quality Assurance & Operations</div>
-                </div>
-              </div>
-              <div id="pvClassificationBadge" class="doc-classification-badge confidential">Strettamente Confidenziale</div>
-            </div>
-
-            <h1 id="pvTitle" class="doc-title-h1">Procedura Operativa Standard: Controllo Qualità e Rilascio Lotti</h1>
-            <p id="pvSubtitle" class="doc-subtitle-p">Linee guida conformi agli standard ISO 9001:2015 per la validazione dei componenti critici di produzione.</p>
-
-            <!-- Metadata Table -->
-            <div class="doc-meta-table">
-              <div class="meta-item">
-                <span class="meta-item-label">Codice Doc</span>
-                <span id="pvDocCode" class="meta-item-val">SOP-2026-QA-012</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-item-label">Versione</span>
-                <span id="pvVersion" class="meta-item-val">v2.4.0</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-item-label">Data Effettiva</span>
-                <span id="pvDate" class="meta-item-val">04/09/2026</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-item-label">Prossima Revisione</span>
-                <span id="pvReviewDate" class="meta-item-val">04/09/2027</span>
-              </div>
-            </div>
-          </header>
-
-          <!-- Formal Signatures Box -->
-          <section class="doc-signatures-box">
-            <div class="sig-cell">
-              <span class="sig-role">Redatto Da</span>
-              <span id="pvAuthor" class="sig-name">Ing. Riccardo Busolo (Lead QA)</span>
-              <span class="sig-stamp">✓ Firmato Digitalmente</span>
-            </div>
-            <div class="sig-cell">
-              <span class="sig-role">Verificato Da</span>
-              <span id="pvReviewer" class="sig-name">Dott.ssa Elena Rossi (HSE Manager)</span>
-              <span class="sig-stamp">✓ Verificato per Conformità</span>
-            </div>
-            <div class="sig-cell">
-              <span class="sig-role">Approvato & Rilasciato</span>
-              <span id="pvApprover" class="sig-name">Direzione Operativa (COO)</span>
-              <span id="pvStatusStamp" class="sig-stamp">✓ Rilascio Ufficiale</span>
-            </div>
-          </section>
-
-          <!-- Table of Contents -->
-          <nav class="doc-toc">
-            <div class="toc-title">Indice dei Contenuti</div>
-            <ul id="pvTocList" class="toc-list">
-              <!-- Dynamically built TOC -->
-            </ul>
-          </nav>
-
-          <!-- Rendered Body Sections -->
-          <div id="pvBodySections" class="doc-body">
-            <!-- Dynamically injected modules -->
+          <!-- Sheet Header -->
+          <div class="sheet-header">
+            <input type="text" id="docHeaderInput" class="header-input" placeholder="Intestazione: Nome Azienda / Reparto..." value="Nexus Dynamics S.p.A. &bull; Divisione HSE">
+            <input type="text" id="docHeaderCodeInput" class="header-input" style="text-align:right" placeholder="Codice Documento..." value="SOP-2026-ENG-01">
           </div>
 
-          <!-- Document Footer -->
-          <footer class="doc-footer">
-            <span>OmniManual Enterprise System &bull; <span id="pvFooterDocCode">SOP-2026-QA-012</span></span>
-            <span>Riproduzione vietata &bull; Uso esclusivo aziendale</span>
-            <span>Pagina 1 di 1</span>
-          </footer>
+          <!-- Modules Container -->
+          <div id="docModulesContainer">
+            <!-- Dynamic module sections injected here -->
+          </div>
+
+          <!-- Sheet Footer -->
+          <div class="sheet-footer">
+            <input type="text" id="docFooterInput" class="footer-input" placeholder="Piè di pagina: Note legali o riservatezza..." value="Uso Interno Riservato &bull; Riproduzione vietata">
+            <span id="docPageNumberDisplay" class="page-num-display">Pagina 1 di 1</span>
+          </div>
 
         </article>
 
+      </main>
+
+    </div>
+
+  </section>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: MODULO VUOTO O IMPORTA DA MANUALE
+═══════════════════════════════════════════════ -->
+<div id="moduleModal" class="modal-overlay">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div class="modal-title">Gestione Nuovo Modulo</div>
+      <button id="btnModalClose" class="icon-action-btn" style="font-size:1.1rem">✕</button>
+    </div>
+
+    <!-- Modal Mode Switcher -->
+    <div style="display:flex;border-bottom:1px solid var(--win-border);background:var(--win-subsurface);padding:0 20px">
+      <button id="tabModeBlank" class="ribbon-tab active">Crea Modulo Vuoto</button>
+      <button id="tabModeImport" class="ribbon-tab">Importa da Manuale Precedente</button>
+    </div>
+
+    <div class="modal-body">
+      
+      <!-- SUB-PANE 1: BLANK MODULE FORM -->
+      <div id="paneBlankModule" style="flex:1;padding:32px;display:flex;flex-direction:column;gap:16px;max-width:500px;margin:0 auto">
+        <div>
+          <label style="font-size:0.84rem;font-weight:600;display:block;margin-bottom:6px">Titolo del Modulo</label>
+          <input type="text" id="blankModuleTitleInput" class="search-input" style="padding:10px 14px;font-size:0.9rem" placeholder="Es. Norme di Sicurezza Operativa e DPI">
+        </div>
+        <div>
+          <label style="font-size:0.84rem;font-weight:600;display:block;margin-bottom:6px">Testo Introduttivo (Opzionale)</label>
+          <textarea id="blankModuleTextInput" class="search-input" style="height:120px;padding:10px 14px;font-size:0.86rem;resize:vertical" placeholder="Inserisci il contenuto iniziale di questo modulo..."></textarea>
+        </div>
       </div>
 
-    </main>
+      <!-- SUB-PANE 2: IMPORT SPLIT VIEW -->
+      <div id="paneImportModule" style="flex:1;display:none;overflow:hidden">
+        
+        <!-- Left: Selector and Modules List -->
+        <div class="import-left-pane">
+          <div class="import-selector-box">
+            <label style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:6px">Seleziona Manuale Origine:</label>
+            <select id="importManualSelect" class="ribbon-select" style="width:100%"></select>
+          </div>
 
+          <div id="importModuleList" class="import-module-list">
+            <!-- Dynamically populated with modules from selected manual -->
+          </div>
+        </div>
+
+        <!-- Right: Live Preview of Selected Module -->
+        <div class="import-right-preview">
+          <div class="preview-sheet-box">
+            <div id="previewModuleBadge" class="module-header-tag">Anteprima Modulo</div>
+            <h3 id="previewModuleTitle" style="font-size:1.2rem;margin-bottom:12px;color:#1c1c1c">Seleziona un modulo</h3>
+            <div id="previewModuleBody" style="font-size:0.88rem;line-height:1.6;color:#4a4a4a">
+              Seleziona un manuale e poi clicca su uno dei suoi moduli nella colonna a sinistra per visualizzarne l'anteprima fedele.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button id="btnModalCancel" class="win-btn">Annulla</button>
+      <button id="btnModalConfirm" class="win-btn win-btn-primary">Aggiungi Modulo</button>
+    </div>
   </div>
+</div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="toast-msg">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e0d0" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-    <span id="toastText">Modifiche salvate automaticamente</span>
-  </div>
+<!-- Application Logic -->
+<script>
+(function() {
+  'use strict';
 
-  <!-- Application Logic -->
-  <script>
-  (function() {
-    'use strict';
+  // ═══════════════════════════════════════════════
+  // STATE MANAGEMENT (VIRTUAL FILE SYSTEM)
+  // ═══════════════════════════════════════════════
+  const STORAGE_KEY = 'omnimanual_vfs_v2';
+  
+  let vfs = {
+    currentFolderId: null, // null = root
+    folders: [],
+    manuals: []
+  };
 
-    // ── PRESET TEMPLATES ──
-    const PRESETS = {
-      sop: {
-        title: "Procedura Operativa Standard: Controllo Qualità e Rilascio Lotti",
-        subtitle: "Protocollo operativo unificato conforme alle normative ISO 9001:2015 per la tracciabilità e la validazione dei lotti di produzione industriale.",
-        docCode: "SOP-2026-QA-012",
-        version: "2.4.0",
-        date: "2026-09-04",
-        reviewDate: "2027-09-04",
-        classification: "confidential",
-        companyName: "Nexus Dynamics S.p.A.",
-        companyDept: "Quality Assurance & Production",
-        companySymbol: "ND",
-        brandColor: "#00e0d0",
-        author: "Ing. Riccardo Busolo (Lead QA)",
-        reviewer: "Dott.ssa Elena Rossi (HSE Specialist)",
-        approver: "Direzione Operativa (COO)",
-        status: "approved",
-        watermark: true,
-        sections: [
-          {
-            id: 'sec_1',
-            type: 'text',
-            title: 'Scopo e Campo di Applicazione',
-            content: 'La presente procedura definisce i criteri operativi standard per la verifica della conformità, il campionamento statistico e il rilascio dei componenti finiti.\nSi applica a tutti gli stabilimenti produttivi del gruppo e vincola i reparti Assemblaggio, Collaudo e Logistica.'
-          },
-          {
-            id: 'sec_2',
-            type: 'safety',
-            title: 'Protocollo di Sicurezza Ambientale e DPI',
-            level: 'warning',
-            content: 'Prima di accedere alla stazione di collaudo ad alta pressione è obbligatorio indossare occhiali di protezione con marcatura EN166 e calzature antistatiche S3. Verificare sempre lo scarico pressione prima di disconnettere i raccordi pneumatici.'
-          },
-          {
-            id: 'sec_3',
-            type: 'checklist',
-            title: 'Procedura Sequenziale di Controllo',
-            items: [
-              { text: 'Verifica integrità imballo e corrispondenza bolla di carico', time: '5 min', done: true },
-              { text: 'Ispezione visiva con lente ottica 10x per assenza micro-cricche', time: '12 min', done: true },
-              { text: 'Test dimensionale al calibro digitale micrometrico (Tolleranza ±0.02mm)', time: '15 min', done: false },
-              { text: 'Registrazione dei dati nel portale ERP aziendale con codice seriale univoco', time: '8 min', done: false }
-            ]
-          },
-          {
-            id: 'sec_4',
-            type: 'raci',
-            title: 'Matrice delle Responsabilità (RACI)',
-            rows: [
-              { task: 'Campionamento componenti a campione', r: 'Operatore QC', a: 'Capo Reparto', c: 'Ingegnere di Processo', i: 'Logistica' },
-              { task: 'Esecuzione test distruttivi e trazione', r: 'Tecnico di Laboratorio', a: 'Lead QA', c: 'Fornitore Materiali', i: 'Direzione Prod.' },
-              { task: 'Firma liberatoria rilascio lotto', r: 'Lead QA', a: 'Direttore Tecnico', c: 'Legal & Compliance', i: 'Tutti' }
-            ]
-          },
-          {
-            id: 'sec_5',
-            type: 'spec',
-            title: 'Parametri e Limiti di Accettabilità',
-            headers: ['Parametro Analizzato', 'Metodo di Prova', 'Valore Nominale', 'Tolleranza Ammessa'],
-            data: [
-              ['Resistenza a trazione', 'ISO 6892-1', '620 MPa', '≥ 580 MPa'],
-              ['Durezza superficiale', 'Rockwell HRC', '45 HRC', '± 2 HRC'],
-              ['Rugosità media (Ra)', 'Rugosimetro 2D', '0.8 µm', 'max 1.2 µm']
-            ]
-          }
-        ]
-      },
+  let currentManual = null;
+  let selectedImportModule = null;
+  let saveTimer = null;
 
-      security: {
-        title: "Policy Aziendale di Sicurezza delle Informazioni & Gestione Credenziali",
-        subtitle: "Norme comportamentali e protocolli tecnici vincolanti conformi allo standard ISO/IEC 27001 e GDPR per la tutela del patrimonio informativo aziendale.",
-        docCode: "POL-SEC-2026-004",
-        version: "3.1.0",
-        date: "2026-09-04",
-        reviewDate: "2027-03-01",
-        classification: "restricted",
-        companyName: "CyberCore Technologies Group",
-        companyDept: "Information Security & CISO Office",
-        companySymbol: "CC",
-        brandColor: "#3b82f6",
-        author: "CISO Office Audit Team",
-        reviewer: "Data Protection Officer (DPO)",
-        approver: "Chief Executive Officer (CEO)",
-        status: "approved",
-        watermark: true,
-        sections: [
-          {
-            id: 'sec_s1',
-            type: 'text',
-            title: 'Obiettivi e Perimetro di Tutela',
-            content: 'La presente policy stabilisce le linee guida per la protezione dei dati sensibili, delle credenziali di accesso e delle postazioni di lavoro.\nIl rispetto è vincolante per tutti i dipendenti, collaboratori esterni e fornitori con accesso alla rete VPN aziendale.'
-          },
-          {
-            id: 'sec_s2',
-            type: 'safety',
-            title: 'Divieto Assoluto di Condivisione Credenziali',
-            level: 'danger',
-            content: 'È severamente proibito cedere, trascrivere su fogli fisici o condividere via email le password di autenticazione e i token MFA. Ogni violazione costituisce grave infrazione disciplinare e comporta la revoca immediata dei permessi informatici.'
-          },
-          {
-            id: 'sec_s3',
-            type: 'checklist',
-            title: 'Checklist di Configurazione Nuova Postazione (Zero Trust)',
-            items: [
-              { text: 'Abilitazione crittografia disco integrale (BitLocker con TPM 2.0)', time: '15 min', done: true },
-              { text: 'Registrazione account su Identity Provider aziendale con Passkey FIDO2', time: '10 min', done: true },
-              { text: 'Installazione e verifica agente EDR (Endpoint Detection & Response)', time: '20 min', done: true },
-              { text: 'Completamento modulo obbligatorio di Cyber Awareness per nuovo assunto', time: '45 min', done: false }
-            ]
-          },
-          {
-            id: 'sec_s4',
-            type: 'raci',
-            title: 'Gestione Incidenti di Sicurezza (RACI)',
-            rows: [
-              { task: 'Rilevazione anomalia / alert phishing', r: 'SOC Tier 1', a: 'CISO', c: 'Dipendente segnalante', i: 'IT Helpdesk' },
-              { task: 'Isolamento host compromesso dalla rete', r: 'Incident Handler', a: 'CISO', c: 'Network Admin', i: 'Management' },
-              { task: 'Notifica al Garante Privacy (entro 72h)', r: 'DPO', a: 'CEO / Legal', c: 'CISO Team', i: 'Autorità Competenti' }
-            ]
-          }
-        ]
-      },
-
-      machinery: {
-        title: "Manuale di Uso, Manutenzione e Sicurezza — Impianto Laser Serie X",
-        subtitle: "Istruzioni per l'operatore e il personale manutentore conformi alla Direttiva Macchine 2006/42/CE e norma EN ISO 12100.",
-        docCode: "MAN-ENG-2026-X80",
-        version: "1.0.4",
-        date: "2026-09-04",
-        reviewDate: "2028-09-04",
-        classification: "internal",
-        companyName: "Vortex Machinery Solutions",
-        companyDept: "Ingegneria Meccanica & Servizio Post-Vendita",
-        companySymbol: "VM",
-        brandColor: "#f59e0b",
-        author: "Ufficio Tecnico Documentazione",
-        reviewer: "Responsabile Sicurezza Macchinari CE",
-        approver: "Direttore Stabilimento",
-        status: "approved",
-        watermark: false,
-        sections: [
-          {
-            id: 'sec_m1',
-            type: 'text',
-            title: 'Descrizione dell Impianto e Destinazione d Uso',
-            content: 'L\'impianto serie X80 è progettato esclusivamente per il taglio laser di lamiere in acciaio al carbonio e leghe leggere.\nQualsiasi utilizzo difforme da quanto specificato solleva il costruttore da qualsiasi responsabilità civile e penale.'
-          },
-          {
-            id: 'sec_m2',
-            type: 'safety',
-            title: 'Pericolo Radiazione Laser Classe 4 e Alta Tensione',
-            level: 'danger',
-            content: 'Radiazione laser invisibile ad alta potenza. L\'esposizione diretta o diffusa provoca cecità immediata e ustioni gravi. Non escludere mai i microswitch di sicurezza dei carter e intervenire solo a impianto sezionato elettricamente (Lock-Out / Tag-Out).'
-          },
-          {
-            id: 'sec_m3',
-            type: 'spec',
-            title: 'Specifiche Tecniche Generali',
-            headers: ['Specifica', 'Unità', 'Valore Nominale', 'Note Operative'],
-            data: [
-              ['Potenza Sorgente Laser Fibra', 'kW', '12.0 kW', 'Raffreddamento a chiller a circuito chiuso'],
-              ['Corsa Asse X / Y', 'mm', '4000 x 2000 mm', 'Velocità max combinata 140 m/min'],
-              ['Pressione Gas di Assistenza (Azoto)', 'bar', '25 bar', 'Purezza minima gas 99.999%']
-            ]
-          },
-          {
-            id: 'sec_m4',
-            type: 'checklist',
-            title: 'Manutenzione Preventiva Settimanale',
-            items: [
-              { text: 'Pulizia lenti di protezione testa ottica con etanolo ottico puro', time: '15 min', done: false },
-              { text: 'Verifica livello liquido di raffreddamento e conducibilità chiller', time: '10 min', done: false },
-              { text: 'Ispezione e ingrassaggio guide a ricircolo di rulli assi X e Y', time: '30 min', done: false }
-            ]
-          }
-        ]
-      },
-
-      onboarding: {
-        title: "Manuale di Benvenuto & Guida Operativa del Dipendente",
-        subtitle: "Cultura aziendale, valori, strumenti digitali e processi amministrativi per i nuovi collaboratori.",
-        docCode: "HR-GUIDE-2026",
-        version: "4.0.0",
-        date: "2026-09-04",
-        reviewDate: "2027-01-15",
-        classification: "internal",
-        companyName: "Innovate Global Corp",
-        companyDept: "People & Talent Management",
-        companySymbol: "IG",
-        brandColor: "#10b981",
-        author: "Team People & Culture",
-        reviewer: "HR Operations Lead",
-        approver: "Head of People",
-        status: "approved",
-        watermark: false,
-        sections: [
-          {
-            id: 'sec_o1',
-            type: 'text',
-            title: 'Benvenuto nel Team',
-            content: 'Siamo entusiasti di averti con noi. La nostra missione è semplificare il lavoro complesso attraverso l\'ingegno e l\'innovazione continua.\nQuesta guida ti aiuterà ad orientarti nelle prime quattro settimane, fornendoti i contatti chiave e le best practice di team.'
-          },
-          {
-            id: 'sec_o2',
-            type: 'checklist',
-            title: 'Roadmap del Primo Mese (I Tuoi Primi Passi)',
-            items: [
-              { text: 'Incontro di benvenuto con il tuo Buddy e presentazione del team', time: 'Giorno 1', done: true },
-              { text: 'Configurazione laptop, casella email e credenziali Slack / Notion', time: 'Giorno 1', done: true },
-              { text: 'One-to-one strategico con il tuo Team Leader per definire gli obiettivi Q3', time: 'Settimana 1', done: false },
-              { text: 'Review di metà periodo e primo feedback bidirezionale informale', time: 'Giorno 30', done: false }
-            ]
-          }
-        ]
-      },
-
-      disaster: {
-        title: "Manuale di Continuità Operativa & Disaster Recovery Plan (BC/DR)",
-        subtitle: "Procedure di emergenza, catena di comando e ripristino delle infrastrutture mission-critical in caso di blocco operativo.",
-        docCode: "DR-PLAN-2026-CORP",
-        version: "2.0.1",
-        date: "2026-09-04",
-        reviewDate: "2027-06-30",
-        classification: "confidential",
-        companyName: "Enterprise Infrastructure Partners",
-        companyDept: "Crisis Management Committee & DevOps",
-        companySymbol: "DR",
-        brandColor: "#ef4444",
-        author: "Disaster Recovery Task Force",
-        reviewer: "Head of Infrastructure",
-        approver: "Comitato di Crisi Direzionale",
-        status: "approved",
-        watermark: true,
-        sections: [
-          {
-            id: 'sec_d1',
-            type: 'safety',
-            title: 'Livello di Allerta 1 — Dichiarazione di Crisi',
-            level: 'danger',
-            content: 'Solo il Disaster Manager o il CEO possono dichiarare lo stato di Disaster Recovery. Una volta attivato, tutti i cambi di codice non correlati al ripristino vengono congelati e la sala operativa virtuale viene attivata entro 15 minuti.'
-          },
-          {
-            id: 'sec_d2',
-            type: 'spec',
-            title: 'Obiettivi di Servizio (SLA di Ripristino)',
-            headers: ['Applicazione / Servizio', 'Livello Criticità', 'RPO (Max Perdita Dati)', 'RTO (Max Tempo Blocco)'],
-            data: [
-              ['Database Transazionale Core', 'Tier 1 (Critico)', '0 secondi (Sync replica)', '< 15 minuti'],
-              ['Portale Web Clienti & API', 'Tier 1 (Critico)', '5 minuti', '< 30 minuti'],
-              ['Sistemi BI & Reportistica Interna', 'Tier 3 (Differibile)', '24 ore', '< 8 ore']
-            ]
-          }
-        ]
+  // Load from LocalStorage
+  function loadVFS() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try {
+        vfs = JSON.parse(raw);
+        if (!vfs.folders) vfs.folders = [];
+        if (!vfs.manuals) vfs.manuals = [];
+      } catch (e) {
+        console.error('Error loading VFS:', e);
       }
+    }
+  }
+
+  function saveVFS() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(vfs));
+    triggerSaveBadge();
+  }
+
+  function triggerSaveBadge() {
+    const badge = document.getElementById('saveStatusBadge');
+    if (!badge) return;
+    badge.style.display = 'inline-flex';
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      badge.style.display = 'none';
+    }, 1800);
+  }
+
+  // ═══════════════════════════════════════════════
+  // DOM REFERENCES
+  // ═══════════════════════════════════════════════
+  const explorerView = document.getElementById('explorerView');
+  const editorView = document.getElementById('editorView');
+  const filesGrid = document.getElementById('filesGrid');
+  const filesTable = document.getElementById('filesTable');
+  const filesTableBody = document.getElementById('filesTableBody');
+  const emptyStateBox = document.getElementById('emptyStateBox');
+  const breadcrumbTrail = document.getElementById('breadcrumbTrail');
+  const searchFilesInput = document.getElementById('searchFilesInput');
+
+  const btnNewManual = document.getElementById('btnNewManual');
+  const btnNewFolder = document.getElementById('btnNewFolder');
+  const btnEmptyNewManual = document.getElementById('btnEmptyNewManual');
+  const btnEmptyNewFolder = document.getElementById('btnEmptyNewFolder');
+  const btnViewGrid = document.getElementById('btnViewGrid');
+  const btnViewList = document.getElementById('btnViewList');
+  const btnBackToExplorer = document.getElementById('btnBackToExplorer');
+  const btnPrintPdf = document.getElementById('btnPrintPdf');
+  const titlebarDocName = document.getElementById('titlebarDocName');
+
+  const docSheet = document.getElementById('docSheet');
+  const docModulesContainer = document.getElementById('docModulesContainer');
+  const docHeaderInput = document.getElementById('docHeaderInput');
+  const docHeaderCodeInput = document.getElementById('docHeaderCodeInput');
+  const docFooterInput = document.getElementById('docFooterInput');
+  const docPageNumberDisplay = document.getElementById('docPageNumberDisplay');
+  const pageNumFormatSelect = document.getElementById('pageNumFormatSelect');
+  const hidePageNumFirstPage = document.getElementById('hidePageNumFirstPage');
+  const moduleNavList = document.getElementById('moduleNavList');
+
+  // Modal elements
+  const moduleModal = document.getElementById('moduleModal');
+  const tabModeBlank = document.getElementById('tabModeBlank');
+  const tabModeImport = document.getElementById('tabModeImport');
+  const paneBlankModule = document.getElementById('paneBlankModule');
+  const paneImportModule = document.getElementById('paneImportModule');
+  const blankModuleTitleInput = document.getElementById('blankModuleTitleInput');
+  const blankModuleTextInput = document.getElementById('blankModuleTextInput');
+  const importManualSelect = document.getElementById('importManualSelect');
+  const importModuleList = document.getElementById('importModuleList');
+  const previewModuleTitle = document.getElementById('previewModuleTitle');
+  const previewModuleBody = document.getElementById('previewModuleBody');
+  const btnModalConfirm = document.getElementById('btnModalConfirm');
+  const btnModalClose = document.getElementById('btnModalClose');
+  const btnModalCancel = document.getElementById('btnModalCancel');
+
+  let currentViewMode = 'grid'; // 'grid' or 'list'
+  let currentModalMode = 'blank'; // 'blank' or 'import'
+
+  // ═══════════════════════════════════════════════
+  // EXPLORER VIEW LOGIC
+  // ═══════════════════════════════════════════════
+  function renderExplorer() {
+    explorerView.style.display = 'flex';
+    editorView.style.display = 'none';
+    btnBackToExplorer.style.display = 'none';
+    btnPrintPdf.style.display = 'none';
+    titlebarDocName.textContent = 'Gestione Manuali Aziendali';
+
+    renderBreadcrumbs();
+
+    const currentFId = vfs.currentFolderId;
+    const query = (searchFilesInput.value || '').trim().toLowerCase();
+
+    // Filter items in current folder
+    const childFolders = vfs.folders.filter(f => f.parentId === currentFId && (!query || f.name.toLowerCase().includes(query)));
+    const childManuals = vfs.manuals.filter(m => m.folderId === currentFId && (!query || m.title.toLowerCase().includes(query)));
+
+    const totalCount = childFolders.length + childManuals.length;
+
+    if (totalCount === 0) {
+      emptyStateBox.style.display = 'flex';
+      filesGrid.style.display = 'none';
+      filesTable.style.display = 'none';
+      return;
+    }
+
+    emptyStateBox.style.display = 'none';
+
+    if (currentViewMode === 'grid') {
+      filesGrid.style.display = 'grid';
+      filesTable.style.display = 'none';
+      renderGrid(childFolders, childManuals);
+    } else {
+      filesGrid.style.display = 'none';
+      filesTable.style.display = 'table';
+      renderTable(childFolders, childManuals);
+    }
+  }
+
+  function renderBreadcrumbs() {
+    breadcrumbTrail.innerHTML = '';
+    let trail = [];
+    let curr = vfs.currentFolderId;
+
+    while (curr) {
+      const f = vfs.folders.find(x => x.id === curr);
+      if (f) {
+        trail.unshift(f);
+        curr = f.parentId;
+      } else {
+        break;
+      }
+    }
+
+    trail.forEach(f => {
+      const sep = document.createElement('span');
+      sep.className = 'breadcrumb-separator';
+      sep.textContent = '>';
+      breadcrumbTrail.appendChild(sep);
+
+      const span = document.createElement('span');
+      span.className = 'breadcrumb-item';
+      span.textContent = f.name;
+      span.addEventListener('click', () => {
+        vfs.currentFolderId = f.id;
+        renderExplorer();
+      });
+      breadcrumbTrail.appendChild(span);
+    });
+  }
+
+  function renderGrid(folders, manuals) {
+    filesGrid.innerHTML = '';
+
+    // Folders
+    folders.forEach(f => {
+      const card = document.createElement('div');
+      card.className = 'file-card';
+      const count = vfs.manuals.filter(m => m.folderId === f.id).length;
+      card.innerHTML = `
+        <div class="file-icon-wrap folder">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="file-meta-name">${escapeHtml(f.name)}</div>
+        <div class="file-meta-sub">
+          <span>${count} elementi</span>
+          <span>Cartella</span>
+        </div>
+        <button class="file-actions-menu" title="Opzioni cartella">⋮</button>
+      `;
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.file-actions-menu')) {
+          e.stopPropagation();
+          handleFolderMenu(f);
+          return;
+        }
+        vfs.currentFolderId = f.id;
+        renderExplorer();
+      });
+      filesGrid.appendChild(card);
+    });
+
+    // Manuals
+    manuals.forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'file-card';
+      const modCount = (m.modules || []).length;
+      card.innerHTML = `
+        <div class="file-icon-wrap manual">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="file-meta-name">${escapeHtml(m.title)}</div>
+        <div class="file-meta-sub">
+          <span>${modCount} ${modCount === 1 ? 'modulo' : 'moduli'}</span>
+          <span>${formatDate(m.updatedAt)}</span>
+        </div>
+        <button class="file-actions-menu" title="Opzioni manuale">⋮</button>
+      `;
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.file-actions-menu')) {
+          e.stopPropagation();
+          handleManualMenu(m);
+          return;
+        }
+        openManualEditor(m);
+      });
+      filesGrid.appendChild(card);
+    });
+  }
+
+  function renderTable(folders, manuals) {
+    filesTableBody.innerHTML = '';
+
+    folders.forEach(f => {
+      const tr = document.createElement('tr');
+      const count = vfs.manuals.filter(m => m.folderId === f.id).length;
+      tr.innerHTML = `
+        <td>
+          <div class="table-name-cell">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffb900"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>${escapeHtml(f.name)}</span>
+          </div>
+        </td>
+        <td>${formatDate(f.createdAt)}</td>
+        <td>Cartella di file</td>
+        <td>${count} elementi</td>
+        <td style="text-align:right">
+          <button class="win-btn btn-folder-del" style="padding:2px 6px">Elimina</button>
+        </td>
+      `;
+      tr.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-folder-del')) {
+          e.stopPropagation();
+          deleteFolder(f.id);
+          return;
+        }
+        vfs.currentFolderId = f.id;
+        renderExplorer();
+      });
+      filesTableBody.appendChild(tr);
+    });
+
+    manuals.forEach(m => {
+      const tr = document.createElement('tr');
+      const modCount = (m.modules || []).length;
+      tr.innerHTML = `
+        <td>
+          <div class="table-name-cell">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2b579a" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>${escapeHtml(m.title)}</span>
+          </div>
+        </td>
+        <td>${formatDate(m.updatedAt)}</td>
+        <td>Manuale Aziendale (.omni)</td>
+        <td>${modCount} moduli</td>
+        <td style="text-align:right">
+          <button class="win-btn btn-doc-del" style="padding:2px 6px">Elimina</button>
+        </td>
+      `;
+      tr.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-doc-del')) {
+          e.stopPropagation();
+          deleteManual(m.id);
+          return;
+        }
+        openManualEditor(m);
+      });
+      filesTableBody.appendChild(tr);
+    });
+  }
+
+  function handleFolderMenu(f) {
+    const action = prompt(`Cartella: "${f.name}"\nScegli un'azione:\n1 = Rinomina\n2 = Elimina`, '1');
+    if (action === '1') {
+      const newName = prompt('Nuovo nome cartella:', f.name);
+      if (newName && newName.trim()) {
+        f.name = newName.trim();
+        saveVFS();
+        renderExplorer();
+      }
+    } else if (action === '2') {
+      deleteFolder(f.id);
+    }
+  }
+
+  function deleteFolder(id) {
+    if (confirm('Eliminare questa cartella e tutti i file al suo interno?')) {
+      vfs.folders = vfs.folders.filter(f => f.id !== id);
+      vfs.manuals = vfs.manuals.filter(m => m.folderId !== id);
+      saveVFS();
+      renderExplorer();
+    }
+  }
+
+  function handleManualMenu(m) {
+    const action = prompt(`Manuale: "${m.title}"\nScegli un'azione:\n1 = Rinomina\n2 = Duplica\n3 = Elimina`, '1');
+    if (action === '1') {
+      const newTitle = prompt('Nuovo titolo manuale:', m.title);
+      if (newTitle && newTitle.trim()) {
+        m.title = newTitle.trim();
+        m.updatedAt = new Date().toISOString();
+        saveVFS();
+        renderExplorer();
+      }
+    } else if (action === '2') {
+      const copy = JSON.parse(JSON.stringify(m));
+      copy.id = 'm_' + Date.now();
+      copy.title += ' (Copia)';
+      copy.updatedAt = new Date().toISOString();
+      vfs.manuals.push(copy);
+      saveVFS();
+      renderExplorer();
+    } else if (action === '3') {
+      deleteManual(m.id);
+    }
+  }
+
+  function deleteManual(id) {
+    if (confirm('Eliminare definitivamente questo manuale?')) {
+      vfs.manuals = vfs.manuals.filter(m => m.id !== id);
+      saveVFS();
+      renderExplorer();
+    }
+  }
+
+  // Create new folder
+  function createNewFolder() {
+    const name = prompt('Nome della nuova cartella:', 'Nuova Cartella');
+    if (!name || !name.trim()) return;
+    vfs.folders.push({
+      id: 'f_' + Date.now(),
+      name: name.trim(),
+      parentId: vfs.currentFolderId,
+      createdAt: new Date().toISOString()
+    });
+    saveVFS();
+    renderExplorer();
+  }
+
+  // Create new manual
+  function createNewManual() {
+    const title = prompt('Titolo del nuovo manuale:', 'Nuovo Manuale Aziendale');
+    if (!title || !title.trim()) return;
+
+    const newDoc = {
+      id: 'm_' + Date.now(),
+      title: title.trim(),
+      folderId: vfs.currentFolderId,
+      updatedAt: new Date().toISOString(),
+      headerText: 'Nexus Dynamics S.p.A. • Divisione Qualità & HSE',
+      headerCode: 'DOC-' + new Date().getFullYear() + '-001',
+      footerText: 'Uso Interno Riservato • Riproduzione Vietata',
+      pageNumFormat: 'page_of_total',
+      hideFirstPageNum: true,
+      modules: [
+        {
+          id: 'mod_' + Date.now() + '_1',
+          title: 'Introduzione e Scopo del Documento',
+          contentHtml: '<p>Il presente manuale definisce le linee guida e le procedure operative standard adottate per garantire conformità, efficienza e sicurezza nei processi aziendali.</p><p>La documentazione è vincolante per tutto il personale operativo e i collaboratori autorizzati.</p>'
+        }
+      ]
     };
 
-    // State
-    let currentData = JSON.parse(JSON.stringify(PRESETS.sop));
-    let zoomLevel = 1.0;
-    let isDocDark = false;
+    vfs.manuals.push(newDoc);
+    saveVFS();
+    openManualEditor(newDoc);
+  }
 
-    // Load from LocalStorage if available
-    const saved = localStorage.getItem('omnimanual_enterprise_doc');
-    if (saved) {
+  // ═══════════════════════════════════════════════
+  // EDITOR VIEW LOGIC
+  // ═══════════════════════════════════════════════
+  function openManualEditor(manual) {
+    currentManual = manual;
+    explorerView.style.display = 'none';
+    editorView.style.display = 'flex';
+    btnBackToExplorer.style.display = 'inline-flex';
+    btnPrintPdf.style.display = 'inline-flex';
+    titlebarDocName.textContent = manual.title;
+
+    docHeaderInput.value = manual.headerText || '';
+    docHeaderCodeInput.value = manual.headerCode || '';
+    docFooterInput.value = manual.footerText || '';
+    pageNumFormatSelect.value = manual.pageNumFormat || 'page_of_total';
+    hidePageNumFirstPage.checked = manual.hideFirstPageNum !== false;
+
+    renderDocumentModules();
+    renderSidebarModulesList();
+    updatePageNumbers();
+  }
+
+  function renderDocumentModules() {
+    docModulesContainer.innerHTML = '';
+    if (!currentManual.modules) currentManual.modules = [];
+
+    currentManual.modules.forEach((mod, idx) => {
+      const section = document.createElement('section');
+      section.className = 'doc-module-section';
+      section.id = 'module_sec_' + mod.id;
+      section.innerHTML = `
+        <div class="module-header-tag">Modulo ${idx + 1}.0</div>
+        <h2 class="module-title-h2" contenteditable="true" spellcheck="false">${escapeHtml(mod.title)}</h2>
+        <div class="module-editable-body" contenteditable="true" spellcheck="true">${mod.contentHtml || '<p>Inizia a scrivere qui...</p>'}</div>
+      `;
+
+      // Sync title edit
+      const titleH2 = section.querySelector('.module-title-h2');
+      titleH2.addEventListener('blur', () => {
+        mod.title = titleH2.textContent.trim() || 'Modulo ' + (idx + 1);
+        saveCurrentManualState();
+        renderSidebarModulesList();
+      });
+
+      // Sync content edit
+      const bodyDiv = section.querySelector('.module-editable-body');
+      bodyDiv.addEventListener('input', () => {
+        mod.contentHtml = bodyDiv.innerHTML;
+        saveCurrentManualState();
+      });
+
+      docModulesContainer.appendChild(section);
+    });
+  }
+
+  function renderSidebarModulesList() {
+    moduleNavList.innerHTML = '';
+    if (!currentManual || !currentManual.modules) return;
+
+    currentManual.modules.forEach((mod, idx) => {
+      const card = document.createElement('div');
+      card.className = 'module-item-card' + (idx === 0 ? ' active' : '');
+      card.dataset.id = mod.id;
+      card.innerHTML = `
+        <div class="module-card-left">
+          <span class="module-index-badge">${idx + 1}</span>
+          <span class="module-card-title">${escapeHtml(mod.title)}</span>
+        </div>
+        <div class="module-card-actions">
+          <button class="icon-action-btn btn-mod-up" title="Sposta su" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>▲</button>
+          <button class="icon-action-btn btn-mod-down" title="Sposta giù" ${idx === currentManual.modules.length - 1 ? 'disabled style="opacity:0.3"' : ''}>▼</button>
+          <button class="icon-action-btn btn-mod-del" title="Elimina modulo" style="color:#d13438">✕</button>
+        </div>
+      `;
+
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.module-card-actions')) return;
+        document.querySelectorAll('.module-item-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        const targetEl = document.getElementById('module_sec_' + mod.id);
+        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      // Up button
+      card.querySelector('.btn-mod-up').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (idx > 0) {
+          const temp = currentManual.modules[idx];
+          currentManual.modules[idx] = currentManual.modules[idx - 1];
+          currentManual.modules[idx - 1] = temp;
+          saveCurrentManualState();
+          renderDocumentModules();
+          renderSidebarModulesList();
+        }
+      });
+
+      // Down button
+      card.querySelector('.btn-mod-down').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (idx < currentManual.modules.length - 1) {
+          const temp = currentManual.modules[idx];
+          currentManual.modules[idx] = currentManual.modules[idx + 1];
+          currentManual.modules[idx + 1] = temp;
+          saveCurrentManualState();
+          renderDocumentModules();
+          renderSidebarModulesList();
+        }
+      });
+
+      // Delete button
+      card.querySelector('.btn-mod-del').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (currentManual.modules.length <= 1) {
+          alert('Il manuale deve contenere almeno un modulo.');
+          return;
+        }
+        if (confirm(`Eliminare il modulo "${mod.title}"?`)) {
+          currentManual.modules.splice(idx, 1);
+          saveCurrentManualState();
+          renderDocumentModules();
+          renderSidebarModulesList();
+        }
+      });
+
+      moduleNavList.appendChild(card);
+    });
+  }
+
+  function saveCurrentManualState() {
+    if (!currentManual) return;
+    currentManual.headerText = docHeaderInput.value;
+    currentManual.headerCode = docHeaderCodeInput.value;
+    currentManual.footerText = docFooterInput.value;
+    currentManual.pageNumFormat = pageNumFormatSelect.value;
+    currentManual.hideFirstPageNum = hidePageNumFirstPage.checked;
+    currentManual.updatedAt = new Date().toISOString();
+
+    saveVFS();
+  }
+
+  function updatePageNumbers() {
+    const fmt = pageNumFormatSelect.value;
+    if (fmt === 'none') {
+      docPageNumberDisplay.style.display = 'none';
+      return;
+    }
+    docPageNumberDisplay.style.display = 'inline';
+    if (fmt === 'page_of_total') {
+      docPageNumberDisplay.textContent = 'Pagina 1 di 1';
+    } else {
+      docPageNumberDisplay.textContent = '1';
+    }
+  }
+
+  // ═══════════════════════════════════════════════
+  // MODAL & MODULE IMPORT LOGIC
+  // ═══════════════════════════════════════════════
+  function openModuleModal() {
+    moduleModal.classList.add('open');
+    setModalMode('blank');
+    blankModuleTitleInput.value = '';
+    blankModuleTextInput.value = '';
+    selectedImportModule = null;
+    populateImportManualDropdown();
+  }
+
+  function closeModuleModal() {
+    moduleModal.classList.remove('open');
+  }
+
+  function setModalMode(mode) {
+    currentModalMode = mode;
+    if (mode === 'blank') {
+      tabModeBlank.classList.add('active');
+      tabModeImport.classList.remove('active');
+      paneBlankModule.style.display = 'flex';
+      paneImportModule.style.display = 'none';
+      btnModalConfirm.textContent = 'Aggiungi Modulo Vuoto';
+    } else {
+      tabModeBlank.classList.remove('active');
+      tabModeImport.classList.add('active');
+      paneBlankModule.style.display = 'none';
+      paneImportModule.style.display = 'flex';
+      btnModalConfirm.textContent = 'Importa Modulo Selezionato';
+    }
+  }
+
+  function populateImportManualDropdown() {
+    importManualSelect.innerHTML = '';
+    const otherManuals = vfs.manuals.filter(m => !currentManual || m.id !== currentManual.id);
+
+    if (otherManuals.length === 0) {
+      importManualSelect.innerHTML = '<option value="">Nessun altro manuale disponibile</option>';
+      importModuleList.innerHTML = '<div style="padding:16px;font-size:0.8rem;color:var(--text-tertiary);text-align:center">Nessun altro manuale da cui estrarre moduli. Creane prima un altro!</div>';
+      previewModuleTitle.textContent = 'Nessun manuale';
+      previewModuleBody.innerHTML = 'Crea prima altri manuali nel programma per poter riutilizzare i loro moduli.';
+      return;
+    }
+
+    otherManuals.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = `${m.title} (${(m.modules || []).length} moduli)`;
+      importManualSelect.appendChild(opt);
+    });
+
+    importManualSelect.addEventListener('change', () => {
+      loadModulesFromSelectedManual(importManualSelect.value);
+    });
+
+    loadModulesFromSelectedManual(otherManuals[0].id);
+  }
+
+  function loadModulesFromSelectedManual(manualId) {
+    importModuleList.innerHTML = '';
+    selectedImportModule = null;
+    const manual = vfs.manuals.find(m => m.id === manualId);
+    if (!manual || !manual.modules || manual.modules.length === 0) {
+      importModuleList.innerHTML = '<div style="padding:12px;font-size:0.8rem;color:var(--text-tertiary)">Questo manuale non contiene moduli.</div>';
+      return;
+    }
+
+    manual.modules.forEach((mod, idx) => {
+      const item = document.createElement('div');
+      item.className = 'import-module-item' + (idx === 0 ? ' selected' : '');
+      item.innerHTML = `
+        <div style="font-weight:600;font-size:0.84rem;margin-bottom:2px">${escapeHtml(mod.title)}</div>
+        <div style="font-size:0.72rem;color:var(--text-tertiary)">Modulo ${idx + 1}</div>
+      `;
+
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.import-module-item').forEach(x => x.classList.remove('selected'));
+        item.classList.add('selected');
+        showModulePreview(mod);
+      });
+
+      importModuleList.appendChild(item);
+    });
+
+    showModulePreview(manual.modules[0]);
+  }
+
+  function showModulePreview(mod) {
+    selectedImportModule = mod;
+    previewModuleTitle.textContent = mod.title;
+    previewModuleBody.innerHTML = mod.contentHtml || '<em>Nessun contenuto in questo modulo.</em>';
+  }
+
+  function confirmAddModule() {
+    if (!currentManual) return;
+
+    if (currentModalMode === 'blank') {
+      const title = blankModuleTitleInput.value.trim() || 'Nuovo Modulo ' + (currentManual.modules.length + 1);
+      const text = blankModuleTextInput.value.trim();
+      const contentHtml = text ? `<p>${escapeHtml(text).replace(/\n/g, '<br>')}</p>` : '<p>Inserisci qui i dettagli operativi del modulo...</p>';
+
+      currentManual.modules.push({
+        id: 'mod_' + Date.now(),
+        title: title,
+        contentHtml: contentHtml
+      });
+    } else {
+      if (!selectedImportModule) {
+        alert('Seleziona prima un modulo dalla lista a sinistra.');
+        return;
+      }
+      // Clone module into current manual
+      currentManual.modules.push({
+        id: 'mod_' + Date.now(),
+        title: selectedImportModule.title,
+        contentHtml: selectedImportModule.contentHtml
+      });
+    }
+
+    saveCurrentManualState();
+    renderDocumentModules();
+    renderSidebarModulesList();
+    closeModuleModal();
+  }
+
+  // ═══════════════════════════════════════════════
+  // WORD RIBBON COMMANDS
+  // ═══════════════════════════════════════════════
+  function setupRibbonEvents() {
+    // Tabs
+    document.querySelectorAll('.ribbon-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        if (tab.closest('#moduleModal')) return; // ignore modal tabs
+        document.querySelectorAll('.ribbon-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        document.getElementById('ribbonTabHome').style.display = 'none';
+        document.getElementById('ribbonTabInsert').style.display = 'none';
+        document.getElementById('ribbonTabLayout').style.display = 'none';
+
+        const t = tab.dataset.tab;
+        if (t === 'home') document.getElementById('ribbonTabHome').style.display = 'flex';
+        else if (t === 'insert') document.getElementById('ribbonTabInsert').style.display = 'flex';
+        else if (t === 'layout') document.getElementById('ribbonTabLayout').style.display = 'flex';
+      });
+    });
+
+    // Formatting buttons
+    document.querySelectorAll('.ribbon-btn[data-cmd]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cmd = btn.dataset.cmd;
+        document.execCommand(cmd, false, null);
+      });
+    });
+
+    // Font family
+    document.getElementById('fontSelect').addEventListener('change', (e) => {
+      document.execCommand('fontName', false, e.target.value);
+    });
+
+    // Font size
+    document.getElementById('fontSizeSelect').addEventListener('change', (e) => {
+      document.execCommand('fontSize', false, e.target.value);
+    });
+
+    // Heading select
+    document.getElementById('headingSelect').addEventListener('change', (e) => {
+      document.execCommand('formatBlock', false, e.target.value);
+    });
+
+    // Safety Callout insertion
+    document.querySelectorAll('.ribbon-btn[data-box]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.box;
+        const labels = {
+          danger: 'PERICOLO',
+          warning: 'AVVISO',
+          caution: 'ATTENZIONE',
+          notice: 'NOTA',
+          safety: 'SICUREZZA'
+        };
+        const boxHtml = `
+          <div class="editor-safety-box ${type}" contenteditable="false">
+            <div class="safety-header-pill">${labels[type]}</div>
+            <div class="safety-body-text" contenteditable="true">Inserisci qui il testo dell'avvertenza di sicurezza normativa...</div>
+          </div><p><br></p>
+        `;
+        document.execCommand('insertHTML', false, boxHtml);
+      });
+    });
+
+    // Insert Table
+    document.getElementById('btnInsertTable').addEventListener('click', () => {
+      const rows = parseInt(prompt('Numero di righe:', '3') || '3', 10);
+      const cols = parseInt(prompt('Numero di colonne:', '3') || '3', 10);
+      if (rows <= 0 || cols <= 0) return;
+
+      let tableHtml = '<table class="word-table"><thead><tr>';
+      for (let c = 0; c < cols; c++) tableHtml += `<th>Intestazione ${c + 1}</th>`;
+      tableHtml += '</tr></thead><tbody>';
+      for (let r = 0; r < rows - 1; r++) {
+        tableHtml += '<tr>';
+        for (let c = 0; c < cols; c++) tableHtml += `<td>Dato ${r + 1}.${c + 1}</td>`;
+        tableHtml += '</tr>';
+      }
+      tableHtml += '</tbody></table><p><br></p>';
+      document.execCommand('insertHTML', false, tableHtml);
+    });
+
+    // Page Number config
+    pageNumFormatSelect.addEventListener('change', () => {
+      saveCurrentManualState();
+      updatePageNumbers();
+    });
+    hidePageNumFirstPage.addEventListener('change', () => {
+      saveCurrentManualState();
+    });
+
+    // Header & Footer inputs sync
+    docHeaderInput.addEventListener('input', saveCurrentManualState);
+    docHeaderCodeInput.addEventListener('input', saveCurrentManualState);
+    docFooterInput.addEventListener('input', saveCurrentManualState);
+  }
+
+  // ═══════════════════════════════════════════════
+  // BINDING ALL GLOBAL LISTENERS
+  // ═══════════════════════════════════════════════
+  btnNewManual.addEventListener('click', createNewManual);
+  btnEmptyNewManual.addEventListener('click', createNewManual);
+  btnNewFolder.addEventListener('click', createNewFolder);
+  btnEmptyNewFolder.addEventListener('click', createNewFolder);
+
+  btnViewGrid.addEventListener('click', () => {
+    currentViewMode = 'grid';
+    btnViewGrid.classList.add('active');
+    btnViewList.classList.remove('active');
+    renderExplorer();
+  });
+  btnViewList.addEventListener('click', () => {
+    currentViewMode = 'list';
+    btnViewList.classList.add('active');
+    btnViewGrid.classList.remove('active');
+    renderExplorer();
+  });
+
+  searchFilesInput.addEventListener('input', renderExplorer);
+
+  document.querySelector('.breadcrumb-item[data-folder="null"]').addEventListener('click', () => {
+    vfs.currentFolderId = null;
+    renderExplorer();
+  });
+
+  btnBackToExplorer.addEventListener('click', () => {
+    saveCurrentManualState();
+    currentManual = null;
+    renderExplorer();
+  });
+
+  btnPrintPdf.addEventListener('click', () => {
+    window.print();
+  });
+
+  // Export all JSON
+  document.getElementById('btnExportAll').addEventListener('click', () => {
+    const dataStr = JSON.stringify(vfs, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'OmniManual_Archivio_' + new Date().toISOString().slice(0, 10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Import JSON
+  const importArchiveInput = document.getElementById('importArchiveInput');
+  document.getElementById('btnImportAll').addEventListener('click', () => importArchiveInput.click());
+  importArchiveInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
       try {
-        currentData = JSON.parse(saved);
-      } catch(e) {
-        console.warn("Could not parse saved storage", e);
-      }
-    }
-
-    // DOM Elements
-    const templateSelect = document.getElementById('templateSelect');
-    const docTitle = document.getElementById('docTitle');
-    const docSubtitle = document.getElementById('docSubtitle');
-    const docCode = document.getElementById('docCode');
-    const docVersion = document.getElementById('docVersion');
-    const docDate = document.getElementById('docDate');
-    const docReviewDate = document.getElementById('docReviewDate');
-    const docClassification = document.getElementById('docClassification');
-    const watermarkToggle = document.getElementById('watermarkToggle');
-
-    const companyName = document.getElementById('companyName');
-    const companyDept = document.getElementById('companyDept');
-    const companySymbol = document.getElementById('companySymbol');
-    const authorName = document.getElementById('authorName');
-    const reviewerName = document.getElementById('reviewerName');
-    const approverName = document.getElementById('approverName');
-    const approvalStatus = document.getElementById('approvalStatus');
-
-    const blocksContainer = document.getElementById('blocksContainer');
-    const addBlockBtn = document.getElementById('addBlockBtn');
-    const newBlockType = document.getElementById('newBlockType');
-
-    const docSheet = document.getElementById('docSheet');
-    const watermarkEl = document.getElementById('watermarkEl');
-    const pvLogoSymbol = document.getElementById('pvLogoSymbol');
-    const pvCompanyName = document.getElementById('pvCompanyName');
-    const pvCompanyDept = document.getElementById('pvCompanyDept');
-    const pvClassificationBadge = document.getElementById('pvClassificationBadge');
-    const pvTitle = document.getElementById('pvTitle');
-    const pvSubtitle = document.getElementById('pvSubtitle');
-    const pvDocCode = document.getElementById('pvDocCode');
-    const pvVersion = document.getElementById('pvVersion');
-    const pvDate = document.getElementById('pvDate');
-    const pvReviewDate = document.getElementById('pvReviewDate');
-    const pvAuthor = document.getElementById('pvAuthor');
-    const pvReviewer = document.getElementById('pvReviewer');
-    const pvApprover = document.getElementById('pvApprover');
-    const pvStatusStamp = document.getElementById('pvStatusStamp');
-    const pvTocList = document.getElementById('pvTocList');
-    const pvBodySections = document.getElementById('pvBodySections');
-    const pvFooterDocCode = document.getElementById('pvFooterDocCode');
-
-    const auditScoreVal = document.getElementById('scoreNumber');
-    const auditProgressFill = document.getElementById('auditProgressFill');
-
-    const toast = document.getElementById('toast');
-    const toastText = document.getElementById('toastText');
-
-    // Show Toast
-    let toastTimer = null;
-    function showToast(msg) {
-      toastText.textContent = msg;
-      toast.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2400);
-    }
-
-    // Save state & trigger render
-    function saveState() {
-      localStorage.setItem('omnimanual_enterprise_doc', JSON.stringify(currentData));
-      renderDocument();
-      updateAuditScore();
-    }
-
-    // Populate Editor fields from currentData
-    function populateForm() {
-      docTitle.value = currentData.title || '';
-      docSubtitle.value = currentData.subtitle || '';
-      docCode.value = currentData.docCode || '';
-      docVersion.value = currentData.version || '';
-      docDate.value = currentData.date || '';
-      docReviewDate.value = currentData.reviewDate || '';
-      docClassification.value = currentData.classification || 'confidential';
-      watermarkToggle.checked = !!currentData.watermark;
-
-      companyName.value = currentData.companyName || '';
-      companyDept.value = currentData.companyDept || '';
-      companySymbol.value = currentData.companySymbol || 'Ω';
-      authorName.value = currentData.author || '';
-      reviewerName.value = currentData.reviewer || '';
-      approverName.value = currentData.approver || '';
-      approvalStatus.value = currentData.status || 'approved';
-
-      // Update color swatches
-      document.querySelectorAll('.color-swatch').forEach(s => {
-        s.classList.toggle('active', s.dataset.color === currentData.brandColor);
-      });
-      document.documentElement.style.setProperty('--brand-color', currentData.brandColor || '#00e0d0');
-
-      renderBlockControls();
-    }
-
-    // Render Blocks in Left Pane Editor
-    function renderBlockControls() {
-      blocksContainer.innerHTML = '';
-      if (!currentData.sections) currentData.sections = [];
-
-      currentData.sections.forEach((sec, idx) => {
-        const card = document.createElement('div');
-        card.className = 'block-card' + (idx === 0 ? ' open' : '');
-        card.dataset.id = sec.id;
-
-        let badgeClass = '';
-        let badgeLabel = 'Testo';
-        if (sec.type === 'safety') { badgeClass = 'danger'; badgeLabel = 'Sicurezza'; }
-        else if (sec.type === 'raci') { badgeClass = 'raci'; badgeLabel = 'RACI'; }
-        else if (sec.type === 'checklist') { badgeClass = 'checklist'; badgeLabel = 'Checklist'; }
-        else if (sec.type === 'spec') { badgeClass = 'table'; badgeLabel = 'Tabella'; }
-
-        card.innerHTML = `
-          <div class="block-card-header">
-            <div class="block-meta">
-              <span class="block-type-pill ${badgeClass}">${badgeLabel}</span>
-              <span>${sec.title || 'Sezione ' + (idx + 1)}</span>
-            </div>
-            <div class="block-tools">
-              <button class="tool-btn move-up" title="Sposta su" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>▲</button>
-              <button class="tool-btn move-down" title="Sposta giù" ${idx === currentData.sections.length - 1 ? 'disabled style="opacity:0.3"' : ''}>▼</button>
-              <button class="tool-btn duplicate" title="Duplica">📋</button>
-              <button class="tool-btn delete" title="Elimina" style="color:#ef4444">✕</button>
-            </div>
-          </div>
-          <div class="block-card-body">
-            <div class="form-group">
-              <label class="form-label">Titolo Sezione</label>
-              <input type="text" class="form-control sec-title-input" value="${escapeHtml(sec.title || '')}">
-            </div>
-            ${getBlockSpecificFields(sec, idx)}
-          </div>
-        `;
-
-        // Toggle Open/Close
-        const header = card.querySelector('.block-card-header');
-        header.addEventListener('click', (e) => {
-          if (e.target.closest('.block-tools')) return;
-          card.classList.toggle('open');
-        });
-
-        // Tool buttons
-        const upBtn = card.querySelector('.move-up');
-        if (upBtn) {
-          upBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (idx > 0) {
-              const temp = currentData.sections[idx];
-              currentData.sections[idx] = currentData.sections[idx - 1];
-              currentData.sections[idx - 1] = temp;
-              saveState();
-              renderBlockControls();
-            }
-          });
-        }
-
-        const downBtn = card.querySelector('.move-down');
-        if (downBtn) {
-          downBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (idx < currentData.sections.length - 1) {
-              const temp = currentData.sections[idx];
-              currentData.sections[idx] = currentData.sections[idx + 1];
-              currentData.sections[idx + 1] = temp;
-              saveState();
-              renderBlockControls();
-            }
-          });
-        }
-
-        const dupBtn = card.querySelector('.duplicate');
-        dupBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const clone = JSON.parse(JSON.stringify(sec));
-          clone.id = 'sec_' + Date.now();
-          clone.title += ' (Copia)';
-          currentData.sections.splice(idx + 1, 0, clone);
-          saveState();
-          renderBlockControls();
-        });
-
-        const delBtn = card.querySelector('.delete');
-        delBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (confirm('Rimuovere questa sezione?')) {
-            currentData.sections.splice(idx, 1);
-            saveState();
-            renderBlockControls();
-          }
-        });
-
-        // Listeners for title
-        const titleInput = card.querySelector('.sec-title-input');
-        titleInput.addEventListener('input', (e) => {
-          sec.title = e.target.value;
-          card.querySelector('.block-meta span:last-child').textContent = sec.title;
-          saveState();
-        });
-
-        attachSpecificListeners(card, sec);
-        blocksContainer.appendChild(card);
-      });
-    }
-
-    function getBlockSpecificFields(sec, idx) {
-      if (sec.type === 'text') {
-        return `
-          <div class="form-group">
-            <label class="form-label">Contenuto Testuale</label>
-            <textarea class="form-control sec-text-content" style="min-height:90px">${escapeHtml(sec.content || '')}</textarea>
-          </div>
-        `;
-      }
-      if (sec.type === 'safety') {
-        return `
-          <div class="form-group-row">
-            <div class="form-group">
-              <label class="form-label">Livello Gravità</label>
-              <select class="form-control sec-safety-level">
-                <option value="danger" ${sec.level === 'danger' ? 'selected' : ''}>PERICOLO (Danger)</option>
-                <option value="warning" ${sec.level === 'warning' ? 'selected' : ''}>AVVERTENZA (Warning)</option>
-                <option value="caution" ${sec.level === 'caution' ? 'selected' : ''}>ATTENZIONE (Caution)</option>
-                <option value="notice" ${sec.level === 'notice' ? 'selected' : ''}>AVVISO (Notice)</option>
-                <option value="safety" ${sec.level === 'safety' ? 'selected' : ''}>DPI / SICUREZZA (Safety First)</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Testo Avvertenza</label>
-            <textarea class="form-control sec-safety-content" style="min-height:75px">${escapeHtml(sec.content || '')}</textarea>
-          </div>
-        `;
-      }
-      if (sec.type === 'checklist') {
-        return `
-          <div class="form-group">
-            <label class="form-label">Elementi Checklist (Uno per riga)</label>
-            <textarea class="form-control sec-checklist-raw" style="min-height:90px" placeholder="Testo elemento | tempo opzionale">${(sec.items || []).map(it => it.text + (it.time ? ' | ' + it.time : '')).join('\n')}</textarea>
-            <small style="color:var(--text-dim);font-size:0.7rem">Formato: Descrizione operazione | 10 min</small>
-          </div>
-        `;
-      }
-      if (sec.type === 'raci') {
-        return `
-          <div class="form-group">
-            <label class="form-label">Righe RACI (Formato: Task | R | A | C | I)</label>
-            <textarea class="form-control sec-raci-raw" style="min-height:90px">${(sec.rows || []).map(r => `${r.task} | ${r.r} | ${r.a} | ${r.c} | ${r.i}`).join('\n')}</textarea>
-          </div>
-        `;
-      }
-      if (sec.type === 'spec') {
-        return `
-          <div class="form-group">
-            <label class="form-label">Intestazioni Colonne (Separate da virgola)</label>
-            <input type="text" class="form-control sec-spec-headers" value="${(sec.headers || []).join(', ')}">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Dati Tabella (Una riga per riga, separata da virgola)</label>
-            <textarea class="form-control sec-spec-rows" style="min-height:90px">${(sec.data || []).map(r => r.join(', ')).join('\n')}</textarea>
-          </div>
-        `;
-      }
-      return '';
-    }
-
-    function attachSpecificListeners(card, sec) {
-      if (sec.type === 'text') {
-        const txt = card.querySelector('.sec-text-content');
-        txt.addEventListener('input', (e) => { sec.content = e.target.value; saveState(); });
-      } else if (sec.type === 'safety') {
-        const lvl = card.querySelector('.sec-safety-level');
-        const txt = card.querySelector('.sec-safety-content');
-        lvl.addEventListener('change', (e) => { sec.level = e.target.value; saveState(); });
-        txt.addEventListener('input', (e) => { sec.content = e.target.value; saveState(); });
-      } else if (sec.type === 'checklist') {
-        const raw = card.querySelector('.sec-checklist-raw');
-        raw.addEventListener('input', (e) => {
-          const lines = e.target.value.split('\n').filter(l => l.trim().length > 0);
-          sec.items = lines.map(line => {
-            const parts = line.split('|').map(p => p.trim());
-            return { text: parts[0], time: parts[1] || '', done: false };
-          });
-          saveState();
-        });
-      } else if (sec.type === 'raci') {
-        const raw = card.querySelector('.sec-raci-raw');
-        raw.addEventListener('input', (e) => {
-          const lines = e.target.value.split('\n').filter(l => l.trim().length > 0);
-          sec.rows = lines.map(l => {
-            const p = l.split('|').map(x => x.trim());
-            return { task: p[0] || 'Attività', r: p[1] || '-', a: p[2] || '-', c: p[3] || '-', i: p[4] || '-' };
-          });
-          saveState();
-        });
-      } else if (sec.type === 'spec') {
-        const head = card.querySelector('.sec-spec-headers');
-        const rows = card.querySelector('.sec-spec-rows');
-        head.addEventListener('input', (e) => {
-          sec.headers = e.target.value.split(',').map(h => h.trim());
-          saveState();
-        });
-        rows.addEventListener('input', (e) => {
-          const lines = e.target.value.split('\n').filter(l => l.trim().length > 0);
-          sec.data = lines.map(l => l.split(',').map(x => x.trim()));
-          saveState();
-        });
-      }
-    }
-
-    // Render Document in Right Preview
-    function renderDocument() {
-      // Header & Metadata
-      pvLogoSymbol.textContent = currentData.companySymbol || 'Ω';
-      pvCompanyName.textContent = currentData.companyName || 'Azienda';
-      pvCompanyDept.textContent = currentData.companyDept || 'Reparto Operativo';
-
-      // Classification Badge
-      const cls = currentData.classification || 'confidential';
-      pvClassificationBadge.className = 'doc-classification-badge ' + cls;
-      const classLabels = {
-        confidential: 'Strettamente Confidenziale',
-        internal: 'Uso Interno Aziendale',
-        restricted: 'Accesso Riservato',
-        public: 'Documento Pubblico'
-      };
-      pvClassificationBadge.textContent = classLabels[cls] || 'Confidenziale';
-
-      // Watermark
-      watermarkEl.style.display = currentData.watermark ? 'flex' : 'none';
-      watermarkEl.textContent = cls.toUpperCase();
-
-      pvTitle.textContent = currentData.title || 'Titolo Manuale';
-      pvSubtitle.textContent = currentData.subtitle || '';
-      pvDocCode.textContent = currentData.docCode || 'DOC-000';
-      pvFooterDocCode.textContent = currentData.docCode || 'DOC-000';
-      pvVersion.textContent = currentData.version || 'v1.0';
-      pvDate.textContent = formatDate(currentData.date);
-      pvReviewDate.textContent = formatDate(currentData.reviewDate);
-
-      // Signatures
-      pvAuthor.textContent = currentData.author || 'Non specificato';
-      pvReviewer.textContent = currentData.reviewer || 'Non specificato';
-      pvApprover.textContent = currentData.approver || 'Non specificato';
-      
-      const st = currentData.status || 'approved';
-      if (st === 'approved') {
-        pvStatusStamp.innerHTML = '✓ Rilascio Ufficiale Approvato';
-        pvStatusStamp.style.color = '#10b981';
-      } else if (st === 'review') {
-        pvStatusStamp.innerHTML = '⟳ In Corso di Revisione';
-        pvStatusStamp.style.color = '#f59e0b';
-      } else {
-        pvStatusStamp.innerHTML = '✎ Bozza Preliminare';
-        pvStatusStamp.style.color = '#64748b';
-      }
-
-      // Dynamic TOC
-      pvTocList.innerHTML = '';
-      (currentData.sections || []).forEach((sec, idx) => {
-        const li = document.createElement('li');
-        li.className = 'toc-item';
-        li.innerHTML = `
-          <span><span class="toc-item-num">${idx + 1}.0</span>${escapeHtml(sec.title || 'Sezione')}</span>
-          <span class="toc-dots"></span>
-          <span style="font-family:var(--font-mono);font-size:0.75rem">pag. 1</span>
-        `;
-        pvTocList.appendChild(li);
-      });
-
-      // Body Sections
-      pvBodySections.innerHTML = '';
-      (currentData.sections || []).forEach((sec, idx) => {
-        const secEl = document.createElement('section');
-        secEl.className = 'rendered-section';
-        secEl.id = 'sec_render_' + idx;
-
-        let innerContent = '';
-
-        if (sec.type === 'text') {
-          innerContent = `<div class="rendered-content-text">${escapeHtml(sec.content || '')}</div>`;
-        } else if (sec.type === 'safety') {
-          const lvl = sec.level || 'warning';
-          const labels = {
-            danger: 'PERICOLO',
-            warning: 'AVVISO',
-            caution: 'ATTENZIONE',
-            notice: 'NOTA',
-            safety: 'SICUREZZA'
-          };
-          innerContent = `
-            <div class="safety-box ${lvl}">
-              <div class="safety-stripe">${labels[lvl]}</div>
-              <div class="safety-content">
-                <div class="safety-title">Norma di Sicurezza & Istruzione Operativa</div>
-                <div>${escapeHtml(sec.content || '')}</div>
-              </div>
-            </div>
-          `;
-        } else if (sec.type === 'checklist') {
-          const itemsHtml = (sec.items || []).map((it, i) => `
-            <div class="checklist-item">
-              <input type="checkbox" id="chk_${idx}_${i}" ${it.done ? 'checked' : ''}>
-              <label for="chk_${idx}_${i}" class="checklist-text">${escapeHtml(it.text)}</label>
-              ${it.time ? `<span class="checklist-time">${escapeHtml(it.time)}</span>` : ''}
-            </div>
-          `).join('');
-          innerContent = `<div class="checklist-wrapper">${itemsHtml}</div>`;
-        } else if (sec.type === 'raci') {
-          const rowsHtml = (sec.rows || []).map(r => `
-            <tr>
-              <td><strong>${escapeHtml(r.task)}</strong></td>
-              <td><span class="raci-badge raci-r">${escapeHtml(r.r)}</span></td>
-              <td><span class="raci-badge raci-a">${escapeHtml(r.a)}</span></td>
-              <td><span class="raci-badge raci-c">${escapeHtml(r.c)}</span></td>
-              <td><span class="raci-badge raci-i">${escapeHtml(r.i)}</span></td>
-            </tr>
-          `).join('');
-          innerContent = `
-            <table class="raci-table">
-              <thead>
-                <tr>
-                  <th>Attività / Decisione</th>
-                  <th>R (Resp)</th>
-                  <th>A (Accountable)</th>
-                  <th>C (Consulted)</th>
-                  <th>I (Informed)</th>
-                </tr>
-              </thead>
-              <tbody>${rowsHtml}</tbody>
-            </table>
-          `;
-        } else if (sec.type === 'spec') {
-          const headsHtml = (sec.headers || []).map(h => `<th>${escapeHtml(h)}</th>`).join('');
-          const rowsHtml = (sec.data || []).map(r => `
-            <tr>${r.map(c => `<td>${escapeHtml(c)}</td>`).join('')}</tr>
-          `).join('');
-          innerContent = `
-            <table class="spec-table">
-              <thead><tr>${headsHtml}</tr></thead>
-              <tbody>${rowsHtml}</tbody>
-            </table>
-          `;
-        }
-
-        secEl.innerHTML = `
-          <div class="rendered-section-header">
-            <span class="sec-num">${idx + 1}.0</span>
-            <h2 class="sec-title">${escapeHtml(sec.title || 'Sezione ' + (idx + 1))}</h2>
-          </div>
-          ${innerContent}
-        `;
-
-        // Checkbox interactive persistence in checklist
-        if (sec.type === 'checklist') {
-          secEl.querySelectorAll('input[type="checkbox"]').forEach((cb, ci) => {
-            cb.addEventListener('change', (e) => {
-              if (sec.items && sec.items[ci]) {
-                sec.items[ci].done = e.target.checked;
-                saveState();
-              }
-            });
-          });
-        }
-
-        pvBodySections.appendChild(secEl);
-      });
-    }
-
-    // Quality Audit Calculator
-    function updateAuditScore() {
-      let score = 0;
-      if (currentData.title && currentData.title.length > 5) score += 20;
-      if (currentData.docCode && currentData.docCode.length > 2) score += 15;
-      if (currentData.author && currentData.approver) score += 20;
-      if (currentData.sections && currentData.sections.length >= 3) score += 25;
-      if (currentData.sections && currentData.sections.some(s => s.type === 'safety')) score += 10;
-      if (currentData.version && currentData.date) score += 10;
-
-      if (score > 100) score = 100;
-      auditScoreVal.textContent = score + '%';
-      auditProgressFill.style.width = score + '%';
-    }
-
-    // Formatting date
-    function formatDate(str) {
-      if (!str) return '—';
-      const p = str.split('-');
-      if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
-      return str;
-    }
-
-    function escapeHtml(text) {
-      if (!text) return '';
-      return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    // ── EVENT LISTENERS ──
-
-    // Navigation Tabs in Editor
-    document.querySelectorAll('.nav-tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        const tabKey = btn.dataset.tab;
-        document.querySelectorAll('.tab-pane-content').forEach(p => p.style.display = 'none');
-        const target = document.getElementById('tab-' + tabKey);
-        if (target) target.style.display = 'flex';
-      });
-    });
-
-    // Form inputs sync
-    docTitle.addEventListener('input', (e) => { currentData.title = e.target.value; saveState(); });
-    docSubtitle.addEventListener('input', (e) => { currentData.subtitle = e.target.value; saveState(); });
-    docCode.addEventListener('input', (e) => { currentData.docCode = e.target.value; saveState(); });
-    docVersion.addEventListener('input', (e) => { currentData.version = e.target.value; saveState(); });
-    docDate.addEventListener('change', (e) => { currentData.date = e.target.value; saveState(); });
-    docReviewDate.addEventListener('change', (e) => { currentData.reviewDate = e.target.value; saveState(); });
-    docClassification.addEventListener('change', (e) => { currentData.classification = e.target.value; saveState(); });
-    watermarkToggle.addEventListener('change', (e) => { currentData.watermark = e.target.checked; saveState(); });
-
-    companyName.addEventListener('input', (e) => { currentData.companyName = e.target.value; saveState(); });
-    companyDept.addEventListener('input', (e) => { currentData.companyDept = e.target.value; saveState(); });
-    companySymbol.addEventListener('input', (e) => { currentData.companySymbol = e.target.value.toUpperCase(); saveState(); });
-    authorName.addEventListener('input', (e) => { currentData.author = e.target.value; saveState(); });
-    reviewerName.addEventListener('input', (e) => { currentData.reviewer = e.target.value; saveState(); });
-    approverName.addEventListener('input', (e) => { currentData.approver = e.target.value; saveState(); });
-    approvalStatus.addEventListener('change', (e) => { currentData.status = e.target.value; saveState(); });
-
-    // Preset selection change
-    templateSelect.addEventListener('change', (e) => {
-      const pKey = e.target.value;
-      if (PRESETS[pKey]) {
-        if (confirm('Caricare il template selezionato? Le modifiche non salvate verranno sovrascritte.')) {
-          currentData = JSON.parse(JSON.stringify(PRESETS[pKey]));
-          populateForm();
-          saveState();
-          showToast('Template ' + templateSelect.options[templateSelect.selectedIndex].text + ' caricato');
-        }
-      }
-    });
-
-    // Brand color swatches
-    document.querySelectorAll('.color-swatch').forEach(sw => {
-      sw.addEventListener('click', () => {
-        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-        sw.classList.add('active');
-        currentData.brandColor = sw.dataset.color;
-        document.documentElement.style.setProperty('--brand-color', currentData.brandColor);
-        saveState();
-      });
-    });
-
-    // Add Block
-    addBlockBtn.addEventListener('click', () => {
-      const type = newBlockType.value;
-      const newSec = {
-        id: 'sec_' + Date.now(),
-        type: type,
-        title: 'Nuova Sezione'
-      };
-
-      if (type === 'text') {
-        newSec.title = 'Istruzione Operativa';
-        newSec.content = 'Inserisci qui le indicazioni dettagliate per gli operatori o il personale...';
-      } else if (type === 'safety') {
-        newSec.title = 'Avviso Normativo di Sicurezza';
-        newSec.level = 'warning';
-        newSec.content = 'Prestare massima attenzione e verificare le linee guida prima di procedere.';
-      } else if (type === 'checklist') {
-        newSec.title = 'Sequenza Operativa di Verifica';
-        newSec.items = [
-          { text: 'Controllo preliminare parametri operativi', time: '5 min', done: false },
-          { text: 'Conferma isolamento energetico o approvazione', time: '10 min', done: false }
-        ];
-      } else if (type === 'raci') {
-        newSec.title = 'Assegnazione Ruoli (RACI)';
-        newSec.rows = [
-          { task: 'Attività operativa standard', r: 'Operatore', a: 'Caporeparto', c: 'Ingegnere', i: 'Tutti' }
-        ];
-      } else if (type === 'spec') {
-        newSec.title = 'Parametri & Specifiche';
-        newSec.headers = ['Parametro', 'Metodo', 'Tolleranza'];
-        newSec.data = [['Pressione', 'Sensore Barometrico', '± 0.2 bar']];
-      }
-
-      currentData.sections.push(newSec);
-      saveState();
-      renderBlockControls();
-      showToast('Sezione aggiunta all\'indice');
-    });
-
-    // View Mode Toggle (A4 vs Web)
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const mode = btn.dataset.mode;
-        if (mode === 'web') {
-          docSheet.style.maxWidth = '1000px';
-          docSheet.style.borderRadius = '12px';
+        const parsed = JSON.parse(ev.target.result);
+        if (parsed.folders && parsed.manuals) {
+          vfs = parsed;
+          saveVFS();
+          renderExplorer();
+          alert('Archivio ripristinato con successo!');
         } else {
-          docSheet.style.maxWidth = '820px';
-          docSheet.style.borderRadius = '4px';
+          alert('Formato file JSON non valido.');
         }
-      });
-    });
-
-    // Dark/Light Theme for Document Preview
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
-    const themeToggleIcon = document.getElementById('themeToggleIcon');
-    const themeToggleText = document.getElementById('themeToggleText');
-
-    themeToggleBtn.addEventListener('click', () => {
-      isDocDark = !isDocDark;
-      docSheet.classList.toggle('theme-dark', isDocDark);
-      if (isDocDark) {
-        themeToggleIcon.textContent = '☀️';
-        themeToggleText.textContent = 'Tema Cartaceo';
-      } else {
-        themeToggleIcon.textContent = '🌙';
-        themeToggleText.textContent = 'Tema Scuro';
+      } catch (err) {
+        alert('Errore nella lettura del file JSON.');
       }
-    });
+    };
+    reader.readAsText(file);
+  });
 
-    // Zoom Controls
-    const zoomInBtn = document.getElementById('zoomInBtn');
-    const zoomOutBtn = document.getElementById('zoomOutBtn');
-    const zoomLevelText = document.getElementById('zoomLevelText');
+  // Modal Buttons
+  document.getElementById('btnOpenModuleModal').addEventListener('click', openModuleModal);
+  document.getElementById('btnSidebarNewModule').addEventListener('click', openModuleModal);
+  btnModalClose.addEventListener('click', closeModuleModal);
+  btnModalCancel.addEventListener('click', closeModuleModal);
+  btnModalConfirm.addEventListener('click', confirmAddModule);
 
-    zoomInBtn.addEventListener('click', () => {
-      if (zoomLevel < 1.4) {
-        zoomLevel = Math.round((zoomLevel + 0.1) * 10) / 10;
-        applyZoom();
-      }
-    });
-    zoomOutBtn.addEventListener('click', () => {
-      if (zoomLevel > 0.6) {
-        zoomLevel = Math.round((zoomLevel - 0.1) * 10) / 10;
-        applyZoom();
-      }
-    });
-    function applyZoom() {
-      docSheet.style.transform = `scale(${zoomLevel})`;
-      zoomLevelText.textContent = Math.round(zoomLevel * 100) + '%';
+  tabModeBlank.addEventListener('click', () => setModalMode('blank'));
+  tabModeImport.addEventListener('click', () => setModalMode('import'));
+
+  // Utilities
+  function formatDate(isoStr) {
+    if (!isoStr) return '—';
+    try {
+      const d = new Date(isoStr);
+      return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } catch(e) {
+      return isoStr;
     }
+  }
 
-    // Print / PDF Button
-    document.getElementById('printPdfBtn').addEventListener('click', () => {
-      window.print();
-    });
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
 
-    // JSON Export
-    document.getElementById('exportJsonBtn').addEventListener('click', () => {
-      const jsonStr = JSON.stringify(currentData, null, 2);
-      const blob = new Blob([jsonStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = (currentData.docCode || 'manuale-enterprise') + '.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Configurazione JSON esportata con successo');
-    });
+  // ═══════════════════════════════════════════════
+  // INITIALIZATION
+  // ═══════════════════════════════════════════════
+  loadVFS();
+  setupRibbonEvents();
+  renderExplorer();
 
-    // JSON Import
-    const importBtn = document.getElementById('importBtn');
-    const importFileInput = document.getElementById('importFileInput');
-    importBtn.addEventListener('click', () => importFileInput.click());
-    importFileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const parsed = JSON.parse(event.target.result);
-          currentData = parsed;
-          populateForm();
-          saveState();
-          showToast('Configurazione importata correttamente!');
-        } catch(err) {
-          alert('Errore nel caricamento del file JSON: formato non valido.');
-        }
-      };
-      reader.readAsText(file);
-    });
-
-    // Markdown Export
-    document.getElementById('exportMdBtn').addEventListener('click', () => {
-      let md = `# ${currentData.title || 'Manuale Aziendale'}\n\n`;
-      md += `**Azienda:** ${currentData.companyName || ''} - ${currentData.companyDept || ''}\n`;
-      md += `**Codice Documento:** ${currentData.docCode || ''} | **Versione:** ${currentData.version || ''}\n`;
-      md += `**Classificazione:** ${currentData.classification || ''}\n`;
-      md += `**Data Rilascio:** ${currentData.date || ''} | **Revisione:** ${currentData.reviewDate || ''}\n\n`;
-      md += `> ${currentData.subtitle || ''}\n\n`;
-      md += `---\n\n## Firme e Approvazioni\n`;
-      md += `- **Redattore:** ${currentData.author || ''}\n`;
-      md += `- **Verificatore QA:** ${currentData.reviewer || ''}\n`;
-      md += `- **Approvatore:** ${currentData.approver || ''} (${currentData.status || ''})\n\n`;
-      md += `---\n\n## Indice delle Sezioni\n\n`;
-
-      (currentData.sections || []).forEach((sec, idx) => {
-        md += `### ${idx + 1}.0 ${sec.title}\n\n`;
-        if (sec.type === 'text') {
-          md += `${sec.content}\n\n`;
-        } else if (sec.type === 'safety') {
-          md += `> **[${(sec.level || 'warning').toUpperCase()}]**: ${sec.content}\n\n`;
-        } else if (sec.type === 'checklist') {
-          (sec.items || []).forEach(it => {
-            md += `- [${it.done ? 'x' : ' '}] ${it.text} ${it.time ? `*(${it.time})*` : ''}\n`;
-          });
-          md += '\n';
-        } else if (sec.type === 'raci') {
-          md += `| Attività | R | A | C | I |\n|---|---|---|---|---|\n`;
-          (sec.rows || []).forEach(r => {
-            md += `| ${r.task} | ${r.r} | ${r.a} | ${r.c} | ${r.i} |\n`;
-          });
-          md += '\n';
-        } else if (sec.type === 'spec') {
-          md += `| ${(sec.headers || []).join(' | ')} |\n`;
-          md += `| ${(sec.headers || []).map(() => '---').join(' | ')} |\n`;
-          (sec.data || []).forEach(r => {
-            md += `| ${r.join(' | ')} |\n`;
-          });
-          md += '\n';
-        }
-      });
-
-      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = (currentData.docCode || 'manuale-enterprise') + '.md';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Documento Markdown esportato');
-    });
-
-    // Initial load
-    populateForm();
-    renderDocument();
-    updateAuditScore();
-
-  })();
-  </script>
+})();
+</script>
 </body>
 </html>
