@@ -463,6 +463,344 @@ input::placeholder {
 }
 
 /* ═══════════════════════════════════════════════
+   LANGUAGE COLUMNS BOARD & VERSIONING
+═══════════════════════════════════════════════ */
+.lang-columns-board {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+  align-items: flex-start;
+  min-height: 440px;
+}
+
+.lang-board-column {
+  width: 360px;
+  min-width: 330px;
+  background: var(--win-surface);
+  border: 1px solid var(--win-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-subtle);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.lang-column-header {
+  padding: 12px 16px;
+  background: var(--win-subsurface);
+  border-bottom: 1px solid var(--win-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.lang-column-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.lang-column-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #ffffff;
+  border: 1px solid var(--win-border);
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: var(--text-secondary);
+}
+
+.lang-column-items {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  max-height: calc(100vh - 240px);
+}
+
+.lang-column-empty {
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* Manual Version Group Card */
+.manual-group-card {
+  background: #ffffff;
+  border: 1px solid var(--win-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  transition: all 0.15s ease;
+  position: relative;
+}
+.manual-group-card:hover {
+  border-color: var(--win-accent-border);
+  box-shadow: var(--shadow-card);
+}
+
+.manual-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.manual-card-heading-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.manual-card-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+  cursor: pointer;
+}
+.manual-card-title:hover {
+  color: var(--win-accent);
+}
+.manual-card-code {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+/* Latest Version Item (Top, Opacity 100%) */
+.version-item-latest {
+  background: var(--win-subsurface);
+  border: 1px solid var(--win-accent-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 1;
+  transition: all 0.12s;
+  gap: 8px;
+}
+.version-item-latest:hover {
+  background: var(--win-accent-light);
+}
+.version-item-latest-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  flex: 1;
+}
+.version-badge-latest {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--win-accent);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+}
+.version-meta-text {
+  font-size: 0.73rem;
+  color: var(--text-secondary);
+}
+.version-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Previous Versions (Under, Opacity 0.65) */
+.prev-versions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px dashed var(--win-border);
+  padding-top: 8px;
+}
+.prev-versions-header {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.version-item-prev {
+  background: #fafafa;
+  border: 1px dashed var(--win-border-strong);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0.65;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.78rem;
+}
+.version-item-prev:hover {
+  opacity: 1;
+  background: var(--win-hover);
+  border-style: solid;
+  border-color: var(--win-accent);
+}
+.version-badge-prev {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #eeeeee;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--text-secondary);
+}
+
+/* Folders Chip Grid */
+.folders-section-wrap {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.folders-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.folders-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.folder-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: var(--win-surface);
+  border: 1px solid var(--win-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.folder-chip:hover {
+  background: var(--win-hover);
+  border-color: var(--win-accent-border);
+}
+.folder-chip-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+/* ═══════════════════════════════════════════════
+   I MIEI MODULI (LIBRERIA MODULI)
+═══════════════════════════════════════════════ */
+.saved-modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.saved-module-card {
+  background: var(--win-surface);
+  border: 1px solid var(--win-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-subtle);
+  transition: all 0.15s ease;
+  position: relative;
+}
+.saved-module-card:hover {
+  border-color: var(--win-accent-border);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+.saved-module-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.saved-module-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs);
+  background: var(--win-accent-light);
+  color: var(--win-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.saved-module-title {
+  font-weight: 600;
+  font-size: 0.88rem;
+  line-height: 1.3;
+}
+.saved-module-source {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+.saved-module-snippet {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  background: var(--win-subsurface);
+  padding: 8px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--win-border);
+  max-height: 52px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.saved-module-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--win-border);
+}
+
+/* History Banner */
+.history-banner {
+  background: #fff8e1;
+  border-bottom: 1px solid #ffd54f;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.84rem;
+  color: #5d4037;
+  z-index: 30;
+}
+
+/* ═══════════════════════════════════════════════
    VIEW 2: WORD-STYLE DOCUMENT EDITOR
 ═══════════════════════════════════════════════ */
 #editorView {
@@ -762,6 +1100,7 @@ input::placeholder {
 
     <div class="titlebar-center">
       <span id="titlebarDocName" class="titlebar-doc-name">Gestione Manuali Aziendali</span>
+      <span id="titlebarDocVersion" class="version-badge-latest" style="display:none">v1.0</span>
       <span id="saveStatusBadge" class="save-badge" style="display:none">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
         Salvato
@@ -772,6 +1111,11 @@ input::placeholder {
       <button id="btnBackToExplorer" class="win-btn" style="display:none">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
         I miei Manuali
+      </button>
+
+      <button id="btnTitlebarNewVersion" class="win-btn" style="display:none" title="Crea nuova versione del manuale">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        + Nuova Versione
       </button>
 
       <button id="btnPrintPdf" class="win-btn win-btn-primary" style="display:none">
@@ -795,6 +1139,12 @@ input::placeholder {
         <span id="manualsCountBadge" class="sidebar-badge">0</span>
       </div>
 
+      <div id="navItemModules" class="sidebar-nav-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>I miei Moduli</span>
+        <span id="modulesCountBadge" class="sidebar-badge">0</span>
+      </div>
+
       <div class="sidebar-heading">Gestione</div>
       <div id="navItemSettings" class="sidebar-nav-item">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -816,23 +1166,23 @@ input::placeholder {
         <div class="commandbar-left">
           <button id="btnOpenNewManualWizard" class="win-btn win-btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Nuovo Manuale
+            <span id="btnPrimaryActionLabel">Nuovo Manuale</span>
           </button>
 
           <button id="btnNewFolder" class="win-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            Nuova Cartella
+            <span id="btnNewFolderLabel">Nuova Cartella</span>
           </button>
         </div>
 
         <div class="commandbar-right">
           <div class="search-box-wrap">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="searchFilesInput" class="search-input" placeholder="Cerca manuali...">
+            <input type="text" id="searchFilesInput" class="search-input" placeholder="Cerca...">
           </div>
 
           <div class="view-mode-selector">
-            <button id="btnViewGrid" class="view-btn active" title="Griglia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+            <button id="btnViewGrid" class="view-btn active" title="Griglia / Colonne"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
             <button id="btnViewList" class="view-btn" title="Elenco"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
           </div>
         </div>
@@ -840,9 +1190,9 @@ input::placeholder {
 
       <!-- Address Bar Breadcrumbs -->
       <div id="explorerAddressBar" class="explorer-addressbar">
-        <span class="breadcrumb-item" data-folder="null">
+        <span class="breadcrumb-item" data-folder="null" id="breadcrumbRootItem">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-          I miei Manuali
+          <span id="breadcrumbRootLabel">I miei Manuali</span>
         </span>
         <span id="breadcrumbTrail"></span>
       </div>
@@ -850,7 +1200,7 @@ input::placeholder {
       <!-- Main Content Area -->
       <div class="explorer-content-body">
 
-        <!-- PANE A: MANUALS & FOLDERS -->
+        <!-- PANE A: MANUALS & FOLDERS (COLONNE DI LINGUA E VERSIONING) -->
         <div id="paneManuals">
           <div id="emptyStateBox" class="empty-state-box" style="display:none">
             <div class="empty-state-icon">
@@ -864,12 +1214,53 @@ input::placeholder {
             </div>
           </div>
 
-          <div id="filesGrid" class="files-grid"></div>
+          <!-- Sottocartelle manuali se presenti -->
+          <div id="foldersSectionManuals" class="folders-section-wrap" style="display:none">
+            <div class="folders-section-title">Cartelle</div>
+            <div id="manualsFolderChips" class="folders-chip-grid"></div>
+          </div>
+
+          <!-- Colonne di Lingua Board -->
+          <div id="langColumnsBoard" class="lang-columns-board"></div>
+
+          <!-- Tabella Elenco Manuali (se vista lista attiva) -->
           <table id="filesTable" class="files-table" style="display:none">
             <thead>
-              <tr><th>Nome</th><th>Data Modifica</th><th>Lingue</th><th>Pagine / Moduli</th><th style="text-align:right">Azioni</th></tr>
+              <tr><th>Nome Manuale</th><th>Ultima Versione</th><th>Data Modifica</th><th>Lingue</th><th>Pagine</th><th style="text-align:right">Azioni</th></tr>
             </thead>
             <tbody id="filesTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- PANE A2: I MIEI MODULI (LIBRERIA MODULI CON CARTELLE) -->
+        <div id="paneModules" style="display:none">
+          <div id="emptyStateModules" class="empty-state-box" style="display:none">
+            <div class="empty-state-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </div>
+            <div class="empty-state-title">Nessun modulo salvato</div>
+            <div class="empty-state-desc">Salva singole pagine e sezioni dai tuoi manuali per riutilizzarle istantaneamente in qualsiasi nuovo documento.</div>
+            <div style="display:flex;gap:10px">
+              <button id="btnEmptyNewModule" class="win-btn win-btn-primary">+ Nuovo Modulo</button>
+              <button id="btnEmptyNewModuleFolder" class="win-btn">+ Nuova Cartella</button>
+            </div>
+          </div>
+
+          <!-- Sottocartelle moduli se presenti -->
+          <div id="foldersSectionModules" class="folders-section-wrap" style="display:none">
+            <div class="folders-section-title">Cartelle Moduli</div>
+            <div id="modulesFolderChips" class="folders-chip-grid"></div>
+          </div>
+
+          <!-- Griglia Moduli Salvati -->
+          <div id="savedModulesGrid" class="saved-modules-grid"></div>
+
+          <!-- Tabella Elenco Moduli (se vista lista attiva) -->
+          <table id="modulesTable" class="files-table" style="display:none">
+            <thead>
+              <tr><th>Modulo</th><th>Origine</th><th>Lingue</th><th>Data Creazione</th><th style="text-align:right">Azioni</th></tr>
+            </thead>
+            <tbody id="modulesTableBody"></tbody>
           </table>
         </div>
 
@@ -1009,6 +1400,10 @@ input::placeholder {
         </div>
 
         <div class="ribbon-group">
+          <button id="btnRibbonSaveToLibrary" class="win-btn" title="Archivia la pagina corrente nella tua libreria di moduli">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Salva nei Miei Moduli
+          </button>
           <button id="btnRibbonNewModule" class="win-btn win-btn-primary">
             + Crea Nuova Pagina / Modulo
           </button>
@@ -1032,6 +1427,20 @@ input::placeholder {
             Nascondi su prima pagina (Copertina)
           </label>
         </div>
+      </div>
+    </div>
+
+    <!-- Banner Versione Storica (se visualizzazione cronologia attiva) -->
+    <div id="historyVersionBanner" class="history-banner" style="display:none">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span>⚠️</span>
+        <span>Stai visualizzando la versione storica archiviata: <strong id="historyVersionLabel"></strong></span>
+        <span id="historyVersionDate" style="color:var(--text-secondary);font-size:0.75rem"></span>
+        <span id="historyVersionNotes" style="font-style:italic;font-size:0.75rem;color:var(--text-secondary)"></span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button id="btnRestoreHistoryVersion" class="win-btn win-btn-primary" style="padding:3px 10px;font-size:0.76rem">Ripristina come Attuale</button>
+        <button id="btnExitHistoryView" class="win-btn" style="padding:3px 10px;font-size:0.76rem">Torna alla Versione Attuale</button>
       </div>
     </div>
 
@@ -1119,7 +1528,8 @@ input::placeholder {
 
     <div style="display:flex;border-bottom:1px solid var(--win-border);background:var(--win-subsurface);padding:0 20px">
       <button id="tabChoiceBlank" class="ribbon-tab active">Pagina Vuota</button>
-      <button id="tabChoiceImport" class="ribbon-tab">Riusa Modulo da Manuale Precedente</button>
+      <button id="tabChoiceLibrary" class="ribbon-tab">Dalla Libreria "I Miei Moduli"</button>
+      <button id="tabChoiceImport" class="ribbon-tab">Riusa da Altro Manuale</button>
     </div>
 
     <div class="modal-body" style="padding:0">
@@ -1133,7 +1543,28 @@ input::placeholder {
         <p style="font-size:0.8rem;color:var(--text-secondary)">Verrà creata una nuova pagina A4 separata con la griglia di colonne corrispondente alle lingue del manuale.</p>
       </div>
 
-      <!-- Option 2: Split Reuse Browser -->
+      <!-- Option 2: From My Modules Library -->
+      <div id="paneChoiceLibrary" style="display:none;height:100%;flex:1;">
+        <div style="width:300px;border-right:1px solid var(--win-border);background:var(--win-subsurface);display:flex;flex-direction:column">
+          <div style="padding:12px;border-bottom:1px solid var(--win-border)">
+            <label style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:6px">Filtra per Cartella:</label>
+            <select id="choiceLibFolderSelect" class="ribbon-select" style="width:100%">
+              <option value="all">Tutti i Moduli</option>
+            </select>
+          </div>
+          <div id="choiceLibModulesList" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+
+        <div style="flex:1;background:#f3f3f3;padding:24px;overflow-y:auto;display:flex;justify-content:center">
+          <div style="width:100%;max-width:540px;background:#ffffff;padding:28px 32px;box-shadow:var(--shadow-card);border:1px solid var(--win-border);border-radius:4px">
+            <div id="choiceLibPreviewTitle" style="font-size:1.15rem;font-weight:700;margin-bottom:6px">Anteprima Modulo Libreria</div>
+            <div id="choiceLibPreviewSource" style="font-size:0.75rem;color:var(--text-tertiary);margin-bottom:14px"></div>
+            <div id="choiceLibPreviewBody" style="font-size:0.88rem;line-height:1.6;color:#333">Seleziona un modulo salvato a sinistra.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 3: Split Reuse Browser -->
       <div id="paneChoiceImport" style="display:none;height:100%;flex:1;">
         <div style="width:300px;border-right:1px solid var(--win-border);background:var(--win-subsurface);display:flex;flex-direction:column">
           <div style="padding:12px;border-bottom:1px solid var(--win-border)">
@@ -1160,6 +1591,98 @@ input::placeholder {
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════
+     MODAL: CREA NUOVA VERSIONE MANUALE
+═══════════════════════════════════════════════ -->
+<div id="modalNewVersion" class="modal-overlay">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div class="modal-title">Crea Nuova Versione del Manuale</div>
+      <button class="win-btn modal-close-btn" style="border:none;background:transparent">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:16px;font-size:0.84rem;color:var(--text-secondary);line-height:1.45">
+        Salva lo stato attuale nella cronologia delle <strong>versioni precedenti</strong> (visibili con stile opaco) e genera la nuova versione attiva in cima alla lista.
+      </div>
+      <div class="form-field">
+        <label>Versione Attuale</label>
+        <input type="text" id="verCurrentLabelInput" disabled style="background:#f4f4f4;color:var(--text-secondary)">
+      </div>
+      <div class="form-field">
+        <label>Nuova Etichetta Versione</label>
+        <input type="text" id="verNextLabelInput" placeholder="Es. v1.1, v2.0">
+      </div>
+      <div class="form-field">
+        <label>Note di Revisione (Opzionale)</label>
+        <input type="text" id="verNotesInput" placeholder="Es. Revisione annuale norme sicurezza, aggiornamento tabelle">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="win-btn modal-close-btn">Annulla</button>
+      <button id="btnConfirmCreateVersion" class="win-btn win-btn-primary">Salva Nuova Versione</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: SALVA MODULO NEI "MIEI MODULI"
+═══════════════════════════════════════════════ -->
+<div id="modalSaveToModules" class="modal-overlay">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div class="modal-title">Salva Modulo nei "Miei Moduli"</div>
+      <button class="win-btn modal-close-btn" style="border:none;background:transparent">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:16px;font-size:0.84rem;color:var(--text-secondary);line-height:1.45">
+        Archivia questa pagina con tutti i suoi testi multilingua nella tua libreria moduli. Potrai riutilizzarla in qualsiasi manuale futuro.
+      </div>
+      <div class="form-field">
+        <label>Titolo del Modulo</label>
+        <input type="text" id="saveModuleTitleInput" placeholder="Es. Avvertenze di Sicurezza DPI">
+      </div>
+      <div class="form-field">
+        <label>Cartella di Destinazione in "I miei Moduli"</label>
+        <select id="saveModuleFolderSelect" class="ribbon-select" style="width:100%"></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="win-btn modal-close-btn">Annulla</button>
+      <button id="btnConfirmSaveToModules" class="win-btn win-btn-primary">Salva nella Libreria</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: NUOVO MODULO DA ZERO IN LIBRERIA
+═══════════════════════════════════════════════ -->
+<div id="modalCreateLibraryModule" class="modal-overlay">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div class="modal-title">Crea Nuovo Modulo nella Libreria</div>
+      <button class="win-btn modal-close-btn" style="border:none;background:transparent">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>Titolo del Modulo</label>
+        <input type="text" id="newLibModuleTitleInput" placeholder="Es. Check-list Manutenzione Giornaliera">
+      </div>
+      <div class="form-field">
+        <label>Cartella Moduli</label>
+        <select id="newLibModuleFolderSelect" class="ribbon-select" style="width:100%"></select>
+      </div>
+      <div class="form-field">
+        <label>Varianti di Lingua:</label>
+        <div id="newLibModuleLangCheckboxes" class="lang-checkbox-grid"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="win-btn modal-close-btn">Annulla</button>
+      <button id="btnConfirmCreateLibModule" class="win-btn win-btn-primary">Crea Modulo</button>
+    </div>
+  </div>
+</div>
+
 <!-- Application Logic -->
 <script>
 (function() {
@@ -1172,8 +1695,11 @@ input::placeholder {
 
   let vfs = {
     currentFolderId: null,
+    currentModuleFolderId: null,
     folders: [],
     manuals: [],
+    moduleFolders: [],
+    savedModules: [],
     trash: [],
     languages: [
       { code: 'it', name: 'Italiano', flag: '🇮🇹' },
@@ -1185,10 +1711,15 @@ input::placeholder {
   };
 
   let currentManual = null;
-  let activeNavSection = 'manuals'; // 'manuals', 'settings', 'trash'
+  let activeNavSection = 'manuals'; // 'manuals', 'modules', 'settings', 'trash'
   let currentViewMode = 'grid'; // 'grid' or 'list'
   let importedDocContent = null;
   let selectedReuseModule = null;
+  let isViewingHistory = false;
+  let activeHistoryVersion = null;
+  let manualTargetForNewVersion = null;
+  let moduleTargetForSave = null;
+  let selectedLibChoiceModule = null;
 
   function loadVFS() {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -1197,8 +1728,16 @@ input::placeholder {
         const parsed = JSON.parse(raw);
         if (parsed.folders) vfs.folders = parsed.folders;
         if (parsed.manuals) vfs.manuals = parsed.manuals;
+        if (parsed.moduleFolders) vfs.moduleFolders = parsed.moduleFolders;
+        if (parsed.savedModules) vfs.savedModules = parsed.savedModules;
         if (parsed.trash) vfs.trash = parsed.trash;
         if (parsed.languages && parsed.languages.length > 0) vfs.languages = parsed.languages;
+
+        // Ensure versioning consistency for existing manuals
+        vfs.manuals.forEach(m => {
+          if (!m.currentVersion) m.currentVersion = 'v1.0';
+          if (!m.versions) m.versions = [];
+        });
       } catch (e) {
         console.error('Failed to load VFS:', e);
       }
@@ -1220,21 +1759,43 @@ input::placeholder {
   const explorerView = document.getElementById('explorerView');
   const editorView = document.getElementById('editorView');
   const paneManuals = document.getElementById('paneManuals');
+  const paneModules = document.getElementById('paneModules');
   const paneSettings = document.getElementById('paneSettings');
   const paneTrash = document.getElementById('paneTrash');
 
   const navItemManuals = document.getElementById('navItemManuals');
+  const navItemModules = document.getElementById('navItemModules');
   const navItemSettings = document.getElementById('navItemSettings');
   const navItemTrash = document.getElementById('navItemTrash');
   const manualsCountBadge = document.getElementById('manualsCountBadge');
+  const modulesCountBadge = document.getElementById('modulesCountBadge');
   const trashCountBadge = document.getElementById('trashCountBadge');
 
-  const emptyStateBox = document.getElementById('emptyStateBox');
-  const filesGrid = document.getElementById('filesGrid');
-  const filesTable = document.getElementById('filesTable');
-  const filesTableBody = document.getElementById('filesTableBody');
+  // Command bar & breadcrumbs
+  const btnPrimaryActionLabel = document.getElementById('btnPrimaryActionLabel');
+  const btnNewFolderLabel = document.getElementById('btnNewFolderLabel');
+  const breadcrumbRootLabel = document.getElementById('breadcrumbRootLabel');
+  const breadcrumbRootItem = document.getElementById('breadcrumbRootItem');
   const breadcrumbTrail = document.getElementById('breadcrumbTrail');
   const searchFilesInput = document.getElementById('searchFilesInput');
+
+  // Manuals Pane Elements
+  const emptyStateBox = document.getElementById('emptyStateBox');
+  const foldersSectionManuals = document.getElementById('foldersSectionManuals');
+  const manualsFolderChips = document.getElementById('manualsFolderChips');
+  const langColumnsBoard = document.getElementById('langColumnsBoard');
+  const filesTable = document.getElementById('filesTable');
+  const filesTableBody = document.getElementById('filesTableBody');
+
+  // Modules Pane Elements
+  const emptyStateModules = document.getElementById('emptyStateModules');
+  const foldersSectionModules = document.getElementById('foldersSectionModules');
+  const modulesFolderChips = document.getElementById('modulesFolderChips');
+  const savedModulesGrid = document.getElementById('savedModulesGrid');
+  const modulesTable = document.getElementById('modulesTable');
+  const modulesTableBody = document.getElementById('modulesTableBody');
+  const btnEmptyNewModule = document.getElementById('btnEmptyNewModule');
+  const btnEmptyNewModuleFolder = document.getElementById('btnEmptyNewModuleFolder');
 
   const btnOpenNewManualWizard = document.getElementById('btnOpenNewManualWizard');
   const btnEmptyNewManual = document.getElementById('btnEmptyNewManual');
@@ -1246,11 +1807,23 @@ input::placeholder {
   const btnHomeNavigator = document.getElementById('btnHomeNavigator');
   const btnPrintPdf = document.getElementById('btnPrintPdf');
   const titlebarDocName = document.getElementById('titlebarDocName');
+  const titlebarDocVersion = document.getElementById('titlebarDocVersion');
+  const btnTitlebarNewVersion = document.getElementById('btnTitlebarNewVersion');
 
+  // History banner elements
+  const historyVersionBanner = document.getElementById('historyVersionBanner');
+  const historyVersionLabel = document.getElementById('historyVersionLabel');
+  const historyVersionDate = document.getElementById('historyVersionDate');
+  const historyVersionNotes = document.getElementById('historyVersionNotes');
+  const btnRestoreHistoryVersion = document.getElementById('btnRestoreHistoryVersion');
+  const btnExitHistoryView = document.getElementById('btnExitHistoryView');
+
+  // Editor elements
   const documentViewport = document.getElementById('documentViewport');
   const moduleNavList = document.getElementById('moduleNavList');
   const pageNumFormatSelect = document.getElementById('pageNumFormatSelect');
   const hidePageNumFirstPage = document.getElementById('hidePageNumFirstPage');
+  const btnRibbonSaveToLibrary = document.getElementById('btnRibbonSaveToLibrary');
 
   // Wizard Modal elements
   const wizardNewManualModal = document.getElementById('wizardNewManualModal');
@@ -1265,15 +1838,42 @@ input::placeholder {
   // Module Choice Modal elements
   const moduleChoiceModal = document.getElementById('moduleChoiceModal');
   const tabChoiceBlank = document.getElementById('tabChoiceBlank');
+  const tabChoiceLibrary = document.getElementById('tabChoiceLibrary');
   const tabChoiceImport = document.getElementById('tabChoiceImport');
   const paneChoiceBlank = document.getElementById('paneChoiceBlank');
+  const paneChoiceLibrary = document.getElementById('paneChoiceLibrary');
   const paneChoiceImport = document.getElementById('paneChoiceImport');
   const blankPageTitleInput = document.getElementById('blankPageTitleInput');
+  const choiceLibFolderSelect = document.getElementById('choiceLibFolderSelect');
+  const choiceLibModulesList = document.getElementById('choiceLibModulesList');
+  const choiceLibPreviewTitle = document.getElementById('choiceLibPreviewTitle');
+  const choiceLibPreviewSource = document.getElementById('choiceLibPreviewSource');
+  const choiceLibPreviewBody = document.getElementById('choiceLibPreviewBody');
   const reuseManualSelect = document.getElementById('reuseManualSelect');
   const reuseModulesList = document.getElementById('reuseModulesList');
   const reusePreviewTitle = document.getElementById('reusePreviewTitle');
   const reusePreviewBody = document.getElementById('reusePreviewBody');
   const btnConfirmAddModule = document.getElementById('btnConfirmAddModule');
+
+  // New Version Modal elements
+  const modalNewVersion = document.getElementById('modalNewVersion');
+  const verCurrentLabelInput = document.getElementById('verCurrentLabelInput');
+  const verNextLabelInput = document.getElementById('verNextLabelInput');
+  const verNotesInput = document.getElementById('verNotesInput');
+  const btnConfirmCreateVersion = document.getElementById('btnConfirmCreateVersion');
+
+  // Save to Modules Modal elements
+  const modalSaveToModules = document.getElementById('modalSaveToModules');
+  const saveModuleTitleInput = document.getElementById('saveModuleTitleInput');
+  const saveModuleFolderSelect = document.getElementById('saveModuleFolderSelect');
+  const btnConfirmSaveToModules = document.getElementById('btnConfirmSaveToModules');
+
+  // Create Library Module Modal elements
+  const modalCreateLibraryModule = document.getElementById('modalCreateLibraryModule');
+  const newLibModuleTitleInput = document.getElementById('newLibModuleTitleInput');
+  const newLibModuleFolderSelect = document.getElementById('newLibModuleFolderSelect');
+  const newLibModuleLangCheckboxes = document.getElementById('newLibModuleLangCheckboxes');
+  const btnConfirmCreateLibModule = document.getElementById('btnConfirmCreateLibModule');
 
   // Settings elements
   const langListContainer = document.getElementById('langListContainer');
@@ -1296,21 +1896,41 @@ input::placeholder {
     editorView.style.display = 'none';
     btnBackToExplorer.style.display = 'none';
     btnPrintPdf.style.display = 'none';
+    btnTitlebarNewVersion.style.display = 'none';
+    titlebarDocVersion.style.display = 'none';
+    historyVersionBanner.style.display = 'none';
     titlebarDocName.textContent = 'Gestione Manuali Aziendali';
 
     manualsCountBadge.textContent = vfs.manuals.length;
+    modulesCountBadge.textContent = vfs.savedModules.length;
     trashCountBadge.textContent = vfs.trash.length;
     trashCountBadge.style.display = vfs.trash.length > 0 ? 'inline-block' : 'none';
 
     if (activeNavSection === 'manuals') {
       paneManuals.style.display = 'block';
+      paneModules.style.display = 'none';
       paneSettings.style.display = 'none';
       paneTrash.style.display = 'none';
       document.getElementById('explorerCommandBar').style.display = 'flex';
       document.getElementById('explorerAddressBar').style.display = 'flex';
+      btnPrimaryActionLabel.textContent = 'Nuovo Manuale';
+      btnNewFolderLabel.textContent = 'Nuova Cartella';
+      breadcrumbRootLabel.textContent = 'I miei Manuali';
       renderManualsExplorer();
+    } else if (activeNavSection === 'modules') {
+      paneManuals.style.display = 'none';
+      paneModules.style.display = 'block';
+      paneSettings.style.display = 'none';
+      paneTrash.style.display = 'none';
+      document.getElementById('explorerCommandBar').style.display = 'flex';
+      document.getElementById('explorerAddressBar').style.display = 'flex';
+      btnPrimaryActionLabel.textContent = 'Nuovo Modulo';
+      btnNewFolderLabel.textContent = 'Nuova Cartella';
+      breadcrumbRootLabel.textContent = 'I miei Moduli';
+      renderModulesExplorer();
     } else if (activeNavSection === 'settings') {
       paneManuals.style.display = 'none';
+      paneModules.style.display = 'none';
       paneSettings.style.display = 'block';
       paneTrash.style.display = 'none';
       document.getElementById('explorerCommandBar').style.display = 'none';
@@ -1318,6 +1938,7 @@ input::placeholder {
       renderLanguageSettings();
     } else if (activeNavSection === 'trash') {
       paneManuals.style.display = 'none';
+      paneModules.style.display = 'none';
       paneSettings.style.display = 'none';
       paneTrash.style.display = 'block';
       document.getElementById('explorerCommandBar').style.display = 'none';
@@ -1325,7 +1946,6 @@ input::placeholder {
       renderTrash();
     }
   }
-
   function renderManualsExplorer() {
     renderBreadcrumbs();
     const currentFId = vfs.currentFolderId;
@@ -1336,22 +1956,56 @@ input::placeholder {
 
     if (childFolders.length === 0 && childManuals.length === 0) {
       emptyStateBox.style.display = 'flex';
-      filesGrid.style.display = 'none';
+      foldersSectionManuals.style.display = 'none';
+      langColumnsBoard.style.display = 'none';
       filesTable.style.display = 'none';
       return;
     }
 
     emptyStateBox.style.display = 'none';
 
-    if (currentViewMode === 'grid') {
-      filesGrid.style.display = 'grid';
-      filesTable.style.display = 'none';
-      renderGrid(childFolders, childManuals);
+    // Render folder chips if any
+    if (childFolders.length > 0) {
+      foldersSectionManuals.style.display = 'flex';
+      renderManualFolderChips(childFolders);
     } else {
-      filesGrid.style.display = 'none';
-      filesTable.style.display = 'table';
-      renderTable(childFolders, childManuals);
+      foldersSectionManuals.style.display = 'none';
     }
+
+    if (currentViewMode === 'grid') {
+      langColumnsBoard.style.display = 'flex';
+      filesTable.style.display = 'none';
+      renderLanguageColumnsBoard(childManuals);
+    } else {
+      langColumnsBoard.style.display = 'none';
+      filesTable.style.display = 'table';
+      renderManualsTable(childFolders, childManuals);
+    }
+  }
+
+  function renderManualFolderChips(folders) {
+    manualsFolderChips.innerHTML = '';
+    folders.forEach(f => {
+      const count = vfs.manuals.filter(m => m.folderId === f.id).length;
+      const chip = document.createElement('div');
+      chip.className = 'folder-chip';
+      chip.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffb900"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span>${escapeHtml(f.name)}</span>
+        <span class="folder-chip-count">(${count})</span>
+        <button class="file-actions-menu" style="position:static;opacity:0.6;padding:0 4px" title="Opzioni cartella">⋮</button>
+      `;
+      chip.addEventListener('click', (e) => {
+        if (e.target.closest('.file-actions-menu')) {
+          e.stopPropagation();
+          handleFolderOptions(f);
+          return;
+        }
+        vfs.currentFolderId = f.id;
+        renderManualsExplorer();
+      });
+      manualsFolderChips.appendChild(chip);
+    });
   }
 
   function renderBreadcrumbs() {
@@ -1382,69 +2036,132 @@ input::placeholder {
     });
   }
 
-  function renderGrid(folders, manuals) {
-    filesGrid.innerHTML = '';
+  function renderLanguageColumnsBoard(manuals) {
+    langColumnsBoard.innerHTML = '';
 
-    folders.forEach(f => {
-      const card = document.createElement('div');
-      card.className = 'file-card';
-      const count = vfs.manuals.filter(m => m.folderId === f.id).length;
-      card.innerHTML = `
-        <div class="file-icon-wrap folder">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+    vfs.languages.forEach(lang => {
+      const col = document.createElement('div');
+      col.className = 'lang-board-column';
+
+      // Manuals that include this language
+      const langManuals = manuals.filter(m => (m.languages || ['it']).includes(lang.code));
+
+      col.innerHTML = `
+        <div class="lang-column-header">
+          <div class="lang-column-title">
+            <span>${lang.flag || '🌐'}</span>
+            <span>${escapeHtml(lang.name)}</span>
+          </div>
+          <span class="lang-column-count">${langManuals.length}</span>
         </div>
-        <div class="file-meta-name">${escapeHtml(f.name)}</div>
-        <div class="file-meta-sub">
-          <span>${count} elementi</span>
-          <span>Cartella</span>
-        </div>
-        <button class="file-actions-menu" title="Opzioni">⋮</button>
+        <div class="lang-column-items"></div>
       `;
-      card.addEventListener('click', (e) => {
-        if (e.target.closest('.file-actions-menu')) {
-          e.stopPropagation();
-          handleFolderOptions(f);
-          return;
-        }
-        vfs.currentFolderId = f.id;
-        renderManualsExplorer();
-      });
-      filesGrid.appendChild(card);
-    });
 
-    manuals.forEach(m => {
-      const card = document.createElement('div');
-      card.className = 'file-card';
-      const modCount = (m.modules || []).length;
-      const langBadges = (m.languages || ['it']).map(code => {
-        const l = vfs.languages.find(x => x.code === code);
-        return `<span class="lang-mini-pill">${l ? l.flag : code.toUpperCase()}</span>`;
-      }).join('');
+      const itemsContainer = col.querySelector('.lang-column-items');
 
-      card.innerHTML = `
-        <div class="file-icon-wrap manual">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        </div>
-        <div class="file-meta-name">${escapeHtml(m.title)}</div>
-        <div class="file-meta-sub">
-          <div class="file-lang-badges">${langBadges}</div>
-          <span>${modCount} pagg.</span>
-        </div>
-        <button class="file-actions-menu" title="Opzioni">⋮</button>
-      `;
-      card.addEventListener('click', (e) => {
-        if (e.target.closest('.file-actions-menu')) {
-          e.stopPropagation();
-          handleManualOptions(m);
-          return;
-        }
-        openManualEditor(m);
-      });
-      filesGrid.appendChild(card);
+      if (langManuals.length === 0) {
+        itemsContainer.innerHTML = '<div class="lang-column-empty">Nessun manuale in questa lingua</div>';
+      } else {
+        langManuals.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'manual-group-card';
+
+          const currentVer = m.currentVersion || 'v1.0';
+          const prevVersions = m.versions || [];
+          const modCount = (m.modules || []).length;
+
+          // Header with Title & Code
+          let cardHtml = `
+            <div class="manual-card-header">
+              <div class="manual-card-heading-left">
+                <span class="manual-card-title" title="Clicca per aprire">${escapeHtml(m.title)}</span>
+                <span class="manual-card-code">${escapeHtml(m.headerCode || 'DOC')}</span>
+              </div>
+              <button class="win-btn btn-manual-options" style="padding:2px 6px;font-size:0.8rem" title="Altre opzioni">⋮</button>
+            </div>
+
+            <!-- In Cima: Ultima Versione (100% Opacità) -->
+            <div class="version-item-latest" title="Apri l'ultima versione del manuale">
+              <div class="version-item-latest-left">
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span class="version-badge-latest">${escapeHtml(currentVer)}</span>
+                  <span style="font-weight:600;font-size:0.76rem;color:var(--text-primary)">Ultima Versione</span>
+                </div>
+                <div class="version-meta-text">Modificato: ${formatDate(m.updatedAt)} • ${modCount} pagg.</div>
+              </div>
+              <div class="version-actions-right">
+                <button class="win-btn btn-open-latest" style="padding:3px 8px;font-size:0.75rem;background:#ffffff">📄 Apri</button>
+                <button class="win-btn win-btn-primary btn-new-version" style="padding:3px 8px;font-size:0.75rem" title="Crea e salva una nuova versione">+ Versione</button>
+              </div>
+            </div>
+          `;
+
+          // Sotto: Versioni Precedenti (Leggermente Opache: opacity: 0.65)
+          if (prevVersions.length > 0) {
+            let prevListHtml = `
+              <div class="prev-versions-section">
+                <div class="prev-versions-header">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>Versioni Precedenti (${prevVersions.length})</span>
+                </div>
+            `;
+
+            prevVersions.forEach((pv, pIdx) => {
+              prevListHtml += `
+                <div class="version-item-prev" data-prev-idx="${pIdx}" title="Clicca per consultare la versione archiviata">
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <span class="version-badge-prev">${escapeHtml(pv.versionLabel)}</span>
+                    <span style="font-size:0.73rem;color:var(--text-secondary)">${formatDate(pv.createdAt)}</span>
+                    ${pv.notes ? `<span style="font-size:0.7rem;color:var(--text-tertiary);font-style:italic">(${escapeHtml(pv.notes)})</span>` : ''}
+                  </div>
+                  <span style="font-size:0.7rem;color:var(--win-accent);font-weight:600">Visualizza ➔</span>
+                </div>
+              `;
+            });
+
+            prevListHtml += `</div>`;
+            cardHtml += prevListHtml;
+          }
+
+          card.innerHTML = cardHtml;
+
+          // Events
+          card.querySelector('.manual-card-title').addEventListener('click', () => openManualEditor(m));
+          card.querySelector('.version-item-latest-left').addEventListener('click', () => openManualEditor(m));
+          card.querySelector('.btn-open-latest').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openManualEditor(m);
+          });
+          card.querySelector('.btn-new-version').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openNewVersionDialog(m);
+          });
+          card.querySelector('.btn-manual-options').addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleManualOptions(m);
+          });
+
+          // Previous version clicks
+          card.querySelectorAll('.version-item-prev').forEach(el => {
+            el.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const pIdx = parseInt(el.dataset.prevIdx, 10);
+              const histVer = prevVersions[pIdx];
+              if (histVer) {
+                openManualHistoryVersion(m, histVer);
+              }
+            });
+          });
+
+          itemsContainer.appendChild(card);
+        });
+      }
+
+      langColumnsBoard.appendChild(col);
     });
   }
 
-  function renderTable(folders, manuals) {
+  function renderManualsTable(folders, manuals) {
     filesTableBody.innerHTML = '';
 
     folders.forEach(f => {
@@ -1457,6 +2174,7 @@ input::placeholder {
             <span>${escapeHtml(f.name)}</span>
           </div>
         </td>
+        <td>—</td>
         <td>${formatDate(f.createdAt)}</td>
         <td>—</td>
         <td>${count} elementi</td>
@@ -1491,14 +2209,21 @@ input::placeholder {
             <span>${escapeHtml(m.title)}</span>
           </div>
         </td>
+        <td><span class="version-badge-latest">${escapeHtml(m.currentVersion || 'v1.0')}</span></td>
         <td>${formatDate(m.updatedAt)}</td>
         <td>${langBadges}</td>
         <td>${modCount} pagg.</td>
         <td style="text-align:right">
+          <button class="win-btn btn-new-ver-tbl" style="padding:2px 6px;font-size:0.75rem">+ Versione</button>
           <button class="win-btn btn-doc-del" style="padding:2px 6px;color:var(--danger)">Cestina</button>
         </td>
       `;
       tr.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-new-ver-tbl')) {
+          e.stopPropagation();
+          openNewVersionDialog(m);
+          return;
+        }
         if (e.target.closest('.btn-doc-del')) {
           e.stopPropagation();
           trashManual(m.id, 'Eliminato dall\'utente');
@@ -1509,6 +2234,353 @@ input::placeholder {
       filesTableBody.appendChild(tr);
     });
   }
+
+  // ═══════════════════════════════════════════════
+  // I MIEI MODULI (LIBRERIA MODULI & CARTELLE)
+  // ═══════════════════════════════════════════════
+  function renderModulesExplorer() {
+    renderModuleBreadcrumbs();
+    const currentFId = vfs.currentModuleFolderId;
+    const query = (searchFilesInput.value || '').trim().toLowerCase();
+
+    const childFolders = vfs.moduleFolders.filter(f => f.parentId === currentFId && (!query || f.name.toLowerCase().includes(query)));
+    const childModules = vfs.savedModules.filter(m => (m.folderId === currentFId || (!currentFId && !m.folderId)) && (!query || m.title.toLowerCase().includes(query)));
+
+    if (childFolders.length === 0 && childModules.length === 0) {
+      emptyStateModules.style.display = 'flex';
+      foldersSectionModules.style.display = 'none';
+      savedModulesGrid.style.display = 'none';
+      modulesTable.style.display = 'none';
+      return;
+    }
+
+    emptyStateModules.style.display = 'none';
+
+    // Render folder chips if any
+    if (childFolders.length > 0) {
+      foldersSectionModules.style.display = 'flex';
+      renderModuleFolderChips(childFolders);
+    } else {
+      foldersSectionModules.style.display = 'none';
+    }
+
+    if (currentViewMode === 'grid') {
+      savedModulesGrid.style.display = 'grid';
+      modulesTable.style.display = 'none';
+      renderSavedModulesGrid(childModules);
+    } else {
+      savedModulesGrid.style.display = 'none';
+      modulesTable.style.display = 'table';
+      renderModulesTable(childFolders, childModules);
+    }
+  }
+
+  function renderModuleFolderChips(folders) {
+    modulesFolderChips.innerHTML = '';
+    folders.forEach(f => {
+      const count = vfs.savedModules.filter(m => m.folderId === f.id).length;
+      const chip = document.createElement('div');
+      chip.className = 'folder-chip';
+      chip.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#0078d4"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span>${escapeHtml(f.name)}</span>
+        <span class="folder-chip-count">(${count})</span>
+        <button class="file-actions-menu" style="position:static;opacity:0.6;padding:0 4px" title="Opzioni cartella">⋮</button>
+      `;
+      chip.addEventListener('click', (e) => {
+        if (e.target.closest('.file-actions-menu')) {
+          e.stopPropagation();
+          handleModuleFolderOptions(f);
+          return;
+        }
+        vfs.currentModuleFolderId = f.id;
+        renderModulesExplorer();
+      });
+      modulesFolderChips.appendChild(chip);
+    });
+  }
+
+  function renderModuleBreadcrumbs() {
+    breadcrumbTrail.innerHTML = '';
+    let trail = [];
+    let curr = vfs.currentModuleFolderId;
+    while (curr) {
+      const f = vfs.moduleFolders.find(x => x.id === curr);
+      if (f) {
+        trail.unshift(f);
+        curr = f.parentId;
+      } else break;
+    }
+    trail.forEach(f => {
+      const sep = document.createElement('span');
+      sep.className = 'breadcrumb-separator';
+      sep.textContent = '>';
+      breadcrumbTrail.appendChild(sep);
+
+      const span = document.createElement('span');
+      span.className = 'breadcrumb-item';
+      span.textContent = f.name;
+      span.addEventListener('click', () => {
+        vfs.currentModuleFolderId = f.id;
+        renderModulesExplorer();
+      });
+      breadcrumbTrail.appendChild(span);
+    });
+  }
+
+  function renderSavedModulesGrid(modules) {
+    savedModulesGrid.innerHTML = '';
+    if (modules.length === 0) {
+      savedModulesGrid.innerHTML = '<div style="font-size:0.85rem;color:var(--text-tertiary);padding:20px;grid-column:1/-1;text-align:center">Nessun modulo in questa cartella. Salva moduli dai tuoi manuali o creane uno nuovo!</div>';
+      return;
+    }
+
+    modules.forEach(sm => {
+      const card = document.createElement('div');
+      card.className = 'saved-module-card';
+
+      const firstText = Object.values(sm.contentByLang || {})[0] || '';
+      const cleanSnippet = firstText.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim() || 'Nessun testo';
+
+      const langBadges = (sm.languages || ['it']).map(code => {
+        const l = vfs.languages.find(x => x.code === code);
+        return `<span class="lang-mini-pill">${l ? l.flag : code.toUpperCase()}</span>`;
+      }).join(' ');
+
+      card.innerHTML = `
+        <div class="saved-module-header">
+          <div class="saved-module-icon">🧩</div>
+          <div style="overflow:hidden">
+            <div class="saved-module-title">${escapeHtml(sm.title)}</div>
+            <div class="saved-module-source">${sm.sourceManualTitle ? 'Origine: ' + escapeHtml(sm.sourceManualTitle) : 'Modulo Autonomo'}</div>
+          </div>
+        </div>
+        <div class="saved-module-snippet">${escapeHtml(cleanSnippet)}</div>
+        <div class="saved-module-footer">
+          <div style="display:flex;gap:4px">${langBadges}</div>
+          <div style="display:flex;gap:6px">
+            <button class="win-btn btn-mod-use" style="padding:2px 8px;font-size:0.75rem">Anteprima</button>
+            <button class="win-btn btn-mod-opts" style="padding:2px 6px">⋮</button>
+          </div>
+        </div>
+      `;
+
+      card.querySelector('.btn-mod-use').addEventListener('click', (e) => {
+        e.stopPropagation();
+        previewSavedModule(sm);
+      });
+
+      card.querySelector('.btn-mod-opts').addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleSavedModuleOptions(sm);
+      });
+
+      savedModulesGrid.appendChild(card);
+    });
+  }
+
+  function renderModulesTable(folders, modules) {
+    modulesTableBody.innerHTML = '';
+
+    folders.forEach(f => {
+      const tr = document.createElement('tr');
+      const count = vfs.savedModules.filter(m => m.folderId === f.id).length;
+      tr.innerHTML = `
+        <td>
+          <div class="table-name-cell">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#0078d4"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>${escapeHtml(f.name)}</span>
+          </div>
+        </td>
+        <td>Cartella</td>
+        <td>—</td>
+        <td>${formatDate(f.createdAt)}</td>
+        <td style="text-align:right">
+          <button class="win-btn btn-mod-folder-del" style="padding:2px 6px">Elimina</button>
+        </td>
+      `;
+      tr.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-mod-folder-del')) {
+          e.stopPropagation();
+          deleteModuleFolder(f.id);
+          return;
+        }
+        vfs.currentModuleFolderId = f.id;
+        renderModulesExplorer();
+      });
+      modulesTableBody.appendChild(tr);
+    });
+
+    modules.forEach(sm => {
+      const tr = document.createElement('tr');
+      const langBadges = (sm.languages || ['it']).map(code => {
+        const l = vfs.languages.find(x => x.code === code);
+        return `<span class="lang-mini-pill">${l ? l.flag : code.toUpperCase()}</span>`;
+      }).join(' ');
+
+      tr.innerHTML = `
+        <td>
+          <div class="table-name-cell">
+            <span style="font-size:1.1rem">🧩</span>
+            <span>${escapeHtml(sm.title)}</span>
+          </div>
+        </td>
+        <td>${escapeHtml(sm.sourceManualTitle || 'Libreria')}</td>
+        <td>${langBadges}</td>
+        <td>${formatDate(sm.createdAt)}</td>
+        <td style="text-align:right">
+          <button class="win-btn btn-tbl-preview" style="padding:2px 6px">Anteprima</button>
+          <button class="win-btn btn-tbl-del" style="padding:2px 6px;color:var(--danger)">Elimina</button>
+        </td>
+      `;
+
+      tr.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-tbl-del')) {
+          e.stopPropagation();
+          deleteSavedModule(sm.id);
+          return;
+        }
+        if (e.target.closest('.btn-tbl-preview')) {
+          e.stopPropagation();
+          previewSavedModule(sm);
+          return;
+        }
+        previewSavedModule(sm);
+      });
+
+      modulesTableBody.appendChild(tr);
+    });
+  }
+
+  function handleModuleFolderOptions(f) {
+    const act = prompt(`Cartella Moduli: "${f.name}"\n1 = Rinomina\n2 = Elimina`, '1');
+    if (act === '1') {
+      const n = prompt('Nuovo nome cartella:', f.name);
+      if (n && n.trim()) {
+        f.name = n.trim();
+        saveVFS();
+        renderModulesExplorer();
+      }
+    } else if (act === '2') {
+      deleteModuleFolder(f.id);
+    }
+  }
+
+  function deleteModuleFolder(id) {
+    if (confirm('Eliminare questa cartella di moduli? I moduli contenuti rimarranno salvati nella radice.')) {
+      vfs.moduleFolders = vfs.moduleFolders.filter(f => f.id !== id);
+      vfs.savedModules.forEach(sm => {
+        if (sm.folderId === id) sm.folderId = null;
+      });
+      saveVFS();
+      renderModulesExplorer();
+    }
+  }
+
+  function handleSavedModuleOptions(sm) {
+    const act = prompt(`Modulo: "${sm.title}"\n1 = Rinomina\n2 = Sposta Cartella\n3 = Elimina`, '1');
+    if (act === '1') {
+      const n = prompt('Nuovo titolo modulo:', sm.title);
+      if (n && n.trim()) {
+        sm.title = n.trim();
+        saveVFS();
+        renderModulesExplorer();
+      }
+    } else if (act === '2') {
+      const foldersList = vfs.moduleFolders.map((f, i) => `${i + 1} = ${f.name}`).join('\n');
+      const pick = prompt(`Scegli cartella di destinazione (0 = Principale):\n0 = Principale\n${foldersList}`, '0');
+      if (pick !== null) {
+        const num = parseInt(pick, 10);
+        if (num === 0) sm.folderId = null;
+        else if (num > 0 && num <= vfs.moduleFolders.length) sm.folderId = vfs.moduleFolders[num - 1].id;
+        saveVFS();
+        renderModulesExplorer();
+      }
+    } else if (act === '3') {
+      deleteSavedModule(sm.id);
+    }
+  }
+
+  function deleteSavedModule(id) {
+    const mod = vfs.savedModules.find(m => m.id === id);
+    if (!mod) return;
+    if (confirm(`Eliminare definitivamente il modulo "${mod.title}" dalla libreria?`)) {
+      vfs.savedModules = vfs.savedModules.filter(m => m.id !== id);
+      saveVFS();
+      renderModulesExplorer();
+    }
+  }
+
+  function previewSavedModule(sm) {
+    let previewText = `MODULO: ${sm.title}\n`;
+    if (sm.sourceManualTitle) previewText += `Origine: ${sm.sourceManualTitle}\n`;
+    previewText += `Data: ${formatDate(sm.createdAt)}\n\n`;
+    const langs = sm.languages || ['it'];
+    langs.forEach(l => {
+      const raw = (sm.contentByLang && sm.contentByLang[l]) || '(Vuoto)';
+      const clean = raw.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+      previewText += `[${l.toUpperCase()}]: ${clean.substring(0, 150)}${clean.length > 150 ? '...' : ''}\n\n`;
+    });
+    alert(previewText);
+  }
+
+  function openCreateLibraryModuleModal() {
+    modalCreateLibraryModule.classList.add('open');
+    newLibModuleTitleInput.value = '';
+    
+    newLibModuleFolderSelect.innerHTML = '<option value="">(Nessuna cartella - Principale)</option>';
+    vfs.moduleFolders.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = f.name;
+      if (f.id === vfs.currentModuleFolderId) opt.selected = true;
+      newLibModuleFolderSelect.appendChild(opt);
+    });
+
+    newLibModuleLangCheckboxes.innerHTML = '';
+    vfs.languages.forEach((l, idx) => {
+      const label = document.createElement('label');
+      label.className = 'lang-check-item';
+      label.innerHTML = `
+        <input type="checkbox" value="${l.code}" ${idx === 0 ? 'checked' : ''}>
+        <span>${l.flag || ''} ${escapeHtml(l.name)}</span>
+      `;
+      newLibModuleLangCheckboxes.appendChild(label);
+    });
+  }
+
+  btnConfirmCreateLibModule.addEventListener('click', () => {
+    const title = newLibModuleTitleInput.value.trim();
+    if (!title) {
+      alert('Inserisci un titolo per il modulo.');
+      return;
+    }
+    const selectedLangs = Array.from(newLibModuleLangCheckboxes.querySelectorAll('input:checked')).map(cb => cb.value);
+    if (selectedLangs.length === 0) {
+      alert('Seleziona almeno una lingua.');
+      return;
+    }
+
+    const contentByLang = {};
+    selectedLangs.forEach(code => {
+      contentByLang[code] = '<p>Inizia a comporre il modulo per la lingua selezionata...</p>';
+    });
+
+    const newSm = {
+      id: 'sm_' + Date.now(),
+      title: title,
+      folderId: newLibModuleFolderSelect.value || null,
+      languages: selectedLangs,
+      contentByLang: contentByLang,
+      sourceManualTitle: null,
+      createdAt: new Date().toISOString()
+    };
+
+    vfs.savedModules.push(newSm);
+    saveVFS();
+    modalCreateLibraryModule.classList.remove('open');
+    renderModulesExplorer();
+  });
 
   function handleFolderOptions(f) {
     const act = prompt(`Cartella: "${f.name}"\n1 = Rinomina\n2 = Elimina`, '1');
@@ -1857,33 +2929,67 @@ input::placeholder {
     wizardNewManualModal.classList.remove('open');
     openManualEditor(newDoc);
   });
-
   // ═══════════════════════════════════════════════
   // EDITOR VIEW (WORD STYLE + CLEAN A4 SHEETS)
   // ═══════════════════════════════════════════════
   function openManualEditor(manual) {
+    isViewingHistory = false;
+    activeHistoryVersion = null;
     currentManual = manual;
     explorerView.style.display = 'none';
     editorView.style.display = 'flex';
     btnBackToExplorer.style.display = 'inline-flex';
     btnPrintPdf.style.display = 'inline-flex';
+    btnTitlebarNewVersion.style.display = 'inline-flex';
     titlebarDocName.textContent = manual.title;
+    titlebarDocVersion.textContent = manual.currentVersion || 'v1.0';
+    titlebarDocVersion.className = 'version-badge-latest';
+    titlebarDocVersion.style.display = 'inline-block';
+    historyVersionBanner.style.display = 'none';
 
     pageNumFormatSelect.value = manual.pageNumFormat || 'page_of_total';
     hidePageNumFirstPage.checked = manual.hideFirstPageNum !== false;
 
-    renderDocumentSheets();
-    renderSidebarModulesList();
+    renderDocumentSheets(false);
+    renderSidebarModulesList(false);
   }
 
-  function renderDocumentSheets() {
+  function openManualHistoryVersion(manual, histVer) {
+    isViewingHistory = true;
+    activeHistoryVersion = histVer;
+    currentManual = manual;
+
+    explorerView.style.display = 'none';
+    editorView.style.display = 'flex';
+    btnBackToExplorer.style.display = 'inline-flex';
+    btnPrintPdf.style.display = 'inline-flex';
+    btnTitlebarNewVersion.style.display = 'none';
+    titlebarDocName.textContent = manual.title;
+    titlebarDocVersion.textContent = (histVer.versionLabel || 'v?') + ' (Archivio)';
+    titlebarDocVersion.className = 'version-badge-prev';
+    titlebarDocVersion.style.display = 'inline-block';
+
+    historyVersionBanner.style.display = 'flex';
+    historyVersionLabel.textContent = histVer.versionLabel || 'v?';
+    historyVersionDate.textContent = formatDate(histVer.createdAt);
+    historyVersionNotes.textContent = histVer.notes ? `• ${histVer.notes}` : '';
+
+    pageNumFormatSelect.value = histVer.pageNumFormat || 'page_of_total';
+    hidePageNumFirstPage.checked = histVer.hideFirstPageNum !== false;
+
+    renderDocumentSheets(true);
+    renderSidebarModulesList(true);
+  }
+
+  function renderDocumentSheets(isReadOnly = false) {
     documentViewport.innerHTML = '';
-    if (!currentManual.modules) currentManual.modules = [];
+    const activeDoc = (isViewingHistory && activeHistoryVersion) ? activeHistoryVersion : currentManual;
+    if (!activeDoc.modules) activeDoc.modules = [];
 
     const langs = currentManual.languages || ['it'];
-    const totalPages = currentManual.modules.length;
+    const totalPages = activeDoc.modules.length;
 
-    currentManual.modules.forEach((mod, idx) => {
+    activeDoc.modules.forEach((mod, idx) => {
       const pageNum = idx + 1;
       const sheet = document.createElement('article');
       sheet.className = 'a4-sheet';
@@ -1892,8 +2998,8 @@ input::placeholder {
       // Page header
       const headerHtml = `
         <div class="sheet-header">
-          <input type="text" class="header-input sheet-header-left" value="${escapeHtml(currentManual.headerText || '')}" placeholder="Intestazione...">
-          <input type="text" class="header-input sheet-header-right" style="text-align:right" value="${escapeHtml(currentManual.headerCode || '')}" placeholder="Codice...">
+          <input type="text" class="header-input sheet-header-left" value="${escapeHtml(activeDoc.headerText || '')}" placeholder="Intestazione..." ${isReadOnly ? 'readonly' : ''}>
+          <input type="text" class="header-input sheet-header-right" style="text-align:right" value="${escapeHtml(activeDoc.headerCode || '')}" placeholder="Codice..." ${isReadOnly ? 'readonly' : ''}>
         </div>
       `;
 
@@ -1904,7 +3010,7 @@ input::placeholder {
         const content = (mod.contentByLang && mod.contentByLang[lCode]) || '<p></p>';
         columnsHtml = `
           <div class="sheet-content-area">
-            <div class="sheet-editable-body" data-lang="${lCode}" contenteditable="true" spellcheck="true">${content}</div>
+            <div class="sheet-editable-body" data-lang="${lCode}" contenteditable="${!isReadOnly}" spellcheck="true">${content}</div>
           </div>
         `;
       } else {
@@ -1916,7 +3022,7 @@ input::placeholder {
           return `
             <div class="lang-column-wrap">
               <div class="lang-col-header">${flag} ${escapeHtml(name)}</div>
-              <div class="sheet-editable-body" data-lang="${lCode}" contenteditable="true" spellcheck="true">${content}</div>
+              <div class="sheet-editable-body" data-lang="${lCode}" contenteditable="${!isReadOnly}" spellcheck="true">${content}</div>
             </div>
           `;
         }).join('');
@@ -1930,8 +3036,8 @@ input::placeholder {
 
       // Page footer & numbering
       let pageNumText = '';
-      const fmt = currentManual.pageNumFormat || 'page_of_total';
-      const hideFirst = currentManual.hideFirstPageNum !== false;
+      const fmt = activeDoc.pageNumFormat || 'page_of_total';
+      const hideFirst = activeDoc.hideFirstPageNum !== false;
 
       if (fmt !== 'none') {
         if (!(hideFirst && pageNum === 1)) {
@@ -1941,90 +3047,81 @@ input::placeholder {
 
       const footerHtml = `
         <div class="sheet-footer">
-          <input type="text" class="footer-input sheet-footer-left" value="${escapeHtml(currentManual.footerText || '')}" placeholder="Piè di pagina...">
+          <input type="text" class="footer-input sheet-footer-left" value="${escapeHtml(activeDoc.footerText || '')}" placeholder="Piè di pagina..." ${isReadOnly ? 'readonly' : ''}>
           <span class="page-num-display">${pageNumText}</span>
         </div>
       `;
 
       sheet.innerHTML = headerHtml + columnsHtml + footerHtml;
 
-      // Natural cursor focus on clicking empty page area
-      sheet.addEventListener('click', (e) => {
-        if (e.target.closest('.sheet-header') || e.target.closest('.sheet-footer') || e.target.closest('.editor-safety-box') || e.target.closest('.word-table') || e.target.closest('input')) {
-          return;
-        }
-        // Find which column was clicked, or fallback to first
-        const colWrap = e.target.closest('.lang-column-wrap');
-        const targetEditable = colWrap ? colWrap.querySelector('.sheet-editable-body') : sheet.querySelector('.sheet-editable-body');
-        if (targetEditable && (!targetEditable.contains(e.target) || e.target === targetEditable)) {
-          placeCaretAtEnd(targetEditable);
-        }
-      });
+      if (!isReadOnly) {
+        // Natural cursor focus on clicking empty page area
+        sheet.addEventListener('click', (e) => {
+          if (e.target.closest('.sheet-header') || e.target.closest('.sheet-footer') || e.target.closest('.editor-safety-box') || e.target.closest('.word-table') || e.target.closest('input')) {
+            return;
+          }
+          const colWrap = e.target.closest('.lang-column-wrap');
+          const targetEditable = colWrap ? colWrap.querySelector('.sheet-editable-body') : sheet.querySelector('.sheet-editable-body');
+          if (targetEditable && (!targetEditable.contains(e.target) || e.target === targetEditable)) {
+            placeCaretAtEnd(targetEditable);
+          }
+        });
 
-      // Sync editable content (input, keyup, blur for safety box edits and table edits)
-      sheet.querySelectorAll('.sheet-editable-body').forEach(bodyDiv => {
-        ['input', 'keyup', 'blur'].forEach(evt => {
-          bodyDiv.addEventListener(evt, () => {
-            const l = bodyDiv.dataset.lang;
-            if (!mod.contentByLang) mod.contentByLang = {};
-            mod.contentByLang[l] = bodyDiv.innerHTML;
-            saveCurrentManual();
+        // Sync editable content
+        sheet.querySelectorAll('.sheet-editable-body').forEach(bodyDiv => {
+          ['input', 'keyup', 'blur'].forEach(evt => {
+            bodyDiv.addEventListener(evt, () => {
+              const l = bodyDiv.dataset.lang;
+              if (!mod.contentByLang) mod.contentByLang = {};
+              mod.contentByLang[l] = bodyDiv.innerHTML;
+              saveCurrentManual();
+            });
           });
         });
-      });
 
-      // Sync headers & footers across manual
-      sheet.querySelector('.sheet-header-left').addEventListener('input', (e) => {
-        currentManual.headerText = e.target.value;
-        syncGlobalSheetText('.sheet-header-left', e.target.value);
-      });
-      sheet.querySelector('.sheet-header-right').addEventListener('input', (e) => {
-        currentManual.headerCode = e.target.value;
-        syncGlobalSheetText('.sheet-header-right', e.target.value);
-      });
-      sheet.querySelector('.sheet-footer-left').addEventListener('input', (e) => {
-        currentManual.footerText = e.target.value;
-        syncGlobalSheetText('.sheet-footer-left', e.target.value);
-      });
+        // Sync headers & footers across manual
+        sheet.querySelector('.sheet-header-left').addEventListener('input', (e) => {
+          currentManual.headerText = e.target.value;
+          syncGlobalSheetText('.sheet-header-left', e.target.value);
+        });
+        sheet.querySelector('.sheet-header-right').addEventListener('input', (e) => {
+          currentManual.headerCode = e.target.value;
+          syncGlobalSheetText('.sheet-header-right', e.target.value);
+        });
+        sheet.querySelector('.sheet-footer-left').addEventListener('input', (e) => {
+          currentManual.footerText = e.target.value;
+          syncGlobalSheetText('.sheet-footer-left', e.target.value);
+        });
+      }
 
       documentViewport.appendChild(sheet);
     });
   }
 
-  function syncGlobalSheetText(selector, val) {
-    document.querySelectorAll(selector).forEach(inp => inp.value = val);
-    saveCurrentManual();
-  }
-
-  function placeCaretAtEnd(el) {
-    el.focus();
-    if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      range.collapse(false);
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  }
-
-  function renderSidebarModulesList() {
+  function renderSidebarModulesList(isReadOnly = false) {
     moduleNavList.innerHTML = '';
-    if (!currentManual || !currentManual.modules) return;
+    const activeDoc = (isViewingHistory && activeHistoryVersion) ? activeHistoryVersion : currentManual;
+    if (!activeDoc || !activeDoc.modules) return;
 
-    currentManual.modules.forEach((mod, idx) => {
+    activeDoc.modules.forEach((mod, idx) => {
       const card = document.createElement('div');
       card.className = 'module-item-card' + (idx === 0 ? ' active' : '');
+      
+      const toolsHtml = isReadOnly ? '' : `
+        <div class="module-card-tools">
+          <button class="win-btn btn-save-mod-lib" style="padding:2px 4px" title="Salva questo modulo nei Miei Moduli">💾</button>
+          <button class="win-btn btn-page-up" style="padding:2px 4px" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>▲</button>
+          <button class="win-btn btn-page-down" style="padding:2px 4px" ${idx === activeDoc.modules.length - 1 ? 'disabled style="opacity:0.3"' : ''}>▼</button>
+          <button class="win-btn btn-page-del" style="padding:2px 4px;color:var(--danger)">✕</button>
+        </div>
+      `;
+
       card.innerHTML = `
         <div style="display:flex;align-items:center;gap:8px;overflow:hidden">
           <span style="font-family:var(--font-mono);font-size:0.75rem;font-weight:700;color:var(--win-accent)">P.${idx + 1}</span>
           <span class="module-card-title">${escapeHtml(mod.title || 'Pagina ' + (idx + 1))}</span>
         </div>
-        <div class="module-card-tools">
-          <button class="win-btn btn-page-up" style="padding:2px 4px" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>▲</button>
-          <button class="win-btn btn-page-down" style="padding:2px 4px" ${idx === currentManual.modules.length - 1 ? 'disabled style="opacity:0.3"' : ''}>▼</button>
-          <button class="win-btn btn-page-del" style="padding:2px 4px;color:var(--danger)">✕</button>
-        </div>
+        ${toolsHtml}
       `;
 
       card.addEventListener('click', (e) => {
@@ -2035,44 +3132,52 @@ input::placeholder {
         if (sheet) sheet.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
 
-      // Up
-      card.querySelector('.btn-page-up').addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (idx > 0) {
-          const t = currentManual.modules[idx];
-          currentManual.modules[idx] = currentManual.modules[idx - 1];
-          currentManual.modules[idx - 1] = t;
-          saveCurrentManual();
-          renderDocumentSheets();
-          renderSidebarModulesList();
-        }
-      });
-      // Down
-      card.querySelector('.btn-page-down').addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (idx < currentManual.modules.length - 1) {
-          const t = currentManual.modules[idx];
-          currentManual.modules[idx] = currentManual.modules[idx + 1];
-          currentManual.modules[idx + 1] = t;
-          saveCurrentManual();
-          renderDocumentSheets();
-          renderSidebarModulesList();
-        }
-      });
-      // Delete page
-      card.querySelector('.btn-page-del').addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (currentManual.modules.length <= 1) {
-          alert('Il manuale deve avere almeno una pagina.');
-          return;
-        }
-        if (confirm(`Eliminare la Pagina ${idx + 1} ("${mod.title}")?`)) {
-          currentManual.modules.splice(idx, 1);
-          saveCurrentManual();
-          renderDocumentSheets();
-          renderSidebarModulesList();
-        }
-      });
+      if (!isReadOnly) {
+        // Save to library
+        card.querySelector('.btn-save-mod-lib').addEventListener('click', (e) => {
+          e.stopPropagation();
+          openSaveModuleToLibraryModal(idx);
+        });
+
+        // Up
+        card.querySelector('.btn-page-up').addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (idx > 0) {
+            const t = currentManual.modules[idx];
+            currentManual.modules[idx] = currentManual.modules[idx - 1];
+            currentManual.modules[idx - 1] = t;
+            saveCurrentManual();
+            renderDocumentSheets(false);
+            renderSidebarModulesList(false);
+          }
+        });
+        // Down
+        card.querySelector('.btn-page-down').addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (idx < currentManual.modules.length - 1) {
+            const t = currentManual.modules[idx];
+            currentManual.modules[idx] = currentManual.modules[idx + 1];
+            currentManual.modules[idx + 1] = t;
+            saveCurrentManual();
+            renderDocumentSheets(false);
+            renderSidebarModulesList(false);
+          }
+        });
+        // Delete page
+        card.querySelector('.btn-page-del').addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (currentManual.modules.length <= 1) {
+            alert('Il manuale deve avere almeno una pagina.');
+            return;
+          }
+          if (confirm(`Eliminare la Pagina ${idx + 1} ("${mod.title}")?`)) {
+            currentManual.modules.splice(idx, 1);
+            saveCurrentManual();
+            renderDocumentSheets(false);
+            renderSidebarModulesList(false);
+          }
+        });
+      }
 
       moduleNavList.appendChild(card);
     });
@@ -2085,27 +3190,281 @@ input::placeholder {
   }
 
   // ═══════════════════════════════════════════════
-  // MODAL: NUOVO MODULO / RIUSO DA PRECEDENTE
+  // VERSIONING & HISTORY BANNER LOGIC
+  // ═══════════════════════════════════════════════
+  function openNewVersionDialog(manual) {
+    manualTargetForNewVersion = manual;
+    modalNewVersion.classList.add('open');
+    const curr = manual.currentVersion || 'v1.0';
+    verCurrentLabelInput.value = curr;
+    
+    // Auto increment patch or minor
+    const match = curr.match(/^v?(\d+)\.(\d+)$/);
+    if (match) {
+      verNextLabelInput.value = `v${match[1]}.${parseInt(match[2], 10) + 1}`;
+    } else {
+      verNextLabelInput.value = 'v1.1';
+    }
+    verNotesInput.value = '';
+  }
+
+  btnConfirmCreateVersion.addEventListener('click', () => {
+    if (!manualTargetForNewVersion) return;
+    const nextVer = verNextLabelInput.value.trim();
+    if (!nextVer) {
+      alert('Inserisci un\'etichetta per la nuova versione (es. v1.1).');
+      return;
+    }
+    if (nextVer === manualTargetForNewVersion.currentVersion) {
+      alert('La nuova versione deve avere un codice diverso da quella attuale.');
+      return;
+    }
+
+    if (!manualTargetForNewVersion.versions) manualTargetForNewVersion.versions = [];
+
+    const archivedVer = {
+      versionLabel: manualTargetForNewVersion.currentVersion || 'v1.0',
+      createdAt: manualTargetForNewVersion.updatedAt || new Date().toISOString(),
+      notes: verNotesInput.value.trim() || 'Archiviazione versione precedente',
+      modules: JSON.parse(JSON.stringify(manualTargetForNewVersion.modules || [])),
+      headerText: manualTargetForNewVersion.headerText,
+      headerCode: manualTargetForNewVersion.headerCode,
+      footerText: manualTargetForNewVersion.footerText,
+      pageNumFormat: manualTargetForNewVersion.pageNumFormat,
+      hideFirstPageNum: manualTargetForNewVersion.hideFirstPageNum
+    };
+
+    manualTargetForNewVersion.versions.unshift(archivedVer);
+    manualTargetForNewVersion.currentVersion = nextVer;
+    manualTargetForNewVersion.updatedAt = new Date().toISOString();
+
+    saveVFS();
+    modalNewVersion.classList.remove('open');
+
+    if (currentManual && currentManual.id === manualTargetForNewVersion.id) {
+      titlebarDocVersion.textContent = nextVer;
+      titlebarDocVersion.style.display = 'inline-block';
+    }
+
+    if (activeNavSection === 'manuals') {
+      renderManualsExplorer();
+    }
+  });
+
+  btnTitlebarNewVersion.addEventListener('click', () => {
+    if (currentManual) {
+      openNewVersionDialog(currentManual);
+    }
+  });
+
+  btnExitHistoryView.addEventListener('click', () => {
+    isViewingHistory = false;
+    activeHistoryVersion = null;
+    if (currentManual) {
+      openManualEditor(currentManual);
+    } else {
+      showExplorer();
+    }
+  });
+
+  btnRestoreHistoryVersion.addEventListener('click', () => {
+    if (!currentManual || !activeHistoryVersion) return;
+    if (confirm(`Ripristinare la versione ${activeHistoryVersion.versionLabel} come versione attiva del manuale? La versione attuale verrà archiviata.`)) {
+      if (!currentManual.versions) currentManual.versions = [];
+      
+      currentManual.versions.unshift({
+        versionLabel: currentManual.currentVersion || 'v1.0',
+        createdAt: currentManual.updatedAt || new Date().toISOString(),
+        notes: `Archiviato prima del ripristino di ${activeHistoryVersion.versionLabel}`,
+        modules: JSON.parse(JSON.stringify(currentManual.modules || [])),
+        headerText: currentManual.headerText,
+        headerCode: currentManual.headerCode,
+        footerText: currentManual.footerText,
+        pageNumFormat: currentManual.pageNumFormat,
+        hideFirstPageNum: currentManual.hideFirstPageNum
+      });
+
+      currentManual.modules = JSON.parse(JSON.stringify(activeHistoryVersion.modules || []));
+      if (activeHistoryVersion.headerText !== undefined) currentManual.headerText = activeHistoryVersion.headerText;
+      if (activeHistoryVersion.headerCode !== undefined) currentManual.headerCode = activeHistoryVersion.headerCode;
+      if (activeHistoryVersion.footerText !== undefined) currentManual.footerText = activeHistoryVersion.footerText;
+      if (activeHistoryVersion.pageNumFormat !== undefined) currentManual.pageNumFormat = activeHistoryVersion.pageNumFormat;
+      if (activeHistoryVersion.hideFirstPageNum !== undefined) currentManual.hideFirstPageNum = activeHistoryVersion.hideFirstPageNum;
+
+      currentManual.currentVersion = activeHistoryVersion.versionLabel + '-ripristino';
+      currentManual.updatedAt = new Date().toISOString();
+      saveVFS();
+
+      isViewingHistory = false;
+      activeHistoryVersion = null;
+      openManualEditor(currentManual);
+    }
+  });
+
+  // ═══════════════════════════════════════════════
+  // SALVATAGGIO MODULO NELLA LIBRERIA "I MIEI MODULI"
+  // ═══════════════════════════════════════════════
+  function openSaveModuleToLibraryModal(moduleIndex) {
+    if (!currentManual || !currentManual.modules || !currentManual.modules[moduleIndex]) return;
+    moduleTargetForSave = currentManual.modules[moduleIndex];
+
+    saveModuleTitleInput.value = moduleTargetForSave.title || `Modulo P.${moduleIndex + 1}`;
+
+    saveModuleFolderSelect.innerHTML = '<option value="">(Nessuna cartella - Principale)</option>';
+    vfs.moduleFolders.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = f.name;
+      saveModuleFolderSelect.appendChild(opt);
+    });
+
+    modalSaveToModules.classList.add('open');
+  }
+
+  btnConfirmSaveToModules.addEventListener('click', () => {
+    if (!moduleTargetForSave) return;
+    const title = saveModuleTitleInput.value.trim() || 'Modulo Senza Titolo';
+    const folderId = saveModuleFolderSelect.value || null;
+
+    const saved = {
+      id: 'sm_' + Date.now(),
+      title: title,
+      folderId: folderId,
+      languages: currentManual.languages ? [...currentManual.languages] : ['it'],
+      contentByLang: JSON.parse(JSON.stringify(moduleTargetForSave.contentByLang || {})),
+      sourceManualTitle: currentManual.title,
+      createdAt: new Date().toISOString()
+    };
+
+    vfs.savedModules.push(saved);
+    saveVFS();
+    modalSaveToModules.classList.remove('open');
+    alert(`Modulo "${title}" salvato correttamente nella libreria "I miei Moduli"!`);
+    modulesCountBadge.textContent = vfs.savedModules.length;
+  });
+
+  btnRibbonSaveToLibrary.addEventListener('click', () => {
+    if (!currentManual || !currentManual.modules || currentManual.modules.length === 0) return;
+    const activeCard = document.querySelector('.module-item-card.active');
+    let idx = 0;
+    if (activeCard) {
+      const cards = Array.from(document.querySelectorAll('.module-item-card'));
+      const i = cards.indexOf(activeCard);
+      if (i >= 0) idx = i;
+    }
+    openSaveModuleToLibraryModal(idx);
+  });
+
+  // ═══════════════════════════════════════════════
+  // MODAL: NUOVO MODULO / LIBRERIA / RIUSO DA PRECEDENTE
   // ═══════════════════════════════════════════════
   function openModuleChoiceModal() {
     moduleChoiceModal.classList.add('open');
     tabChoiceBlank.click();
     blankPageTitleInput.value = 'Pagina ' + (currentManual.modules.length + 1);
     selectedReuseModule = null;
+    selectedLibChoiceModule = null;
     populateReuseManualsDropdown();
   }
 
   tabChoiceBlank.addEventListener('click', () => {
     tabChoiceBlank.classList.add('active');
+    tabChoiceLibrary.classList.remove('active');
     tabChoiceImport.classList.remove('active');
     paneChoiceBlank.style.display = 'flex';
+    paneChoiceLibrary.style.display = 'none';
     paneChoiceImport.style.display = 'none';
   });
 
+  tabChoiceLibrary.addEventListener('click', () => {
+    tabChoiceBlank.classList.remove('active');
+    tabChoiceLibrary.classList.add('active');
+    tabChoiceImport.classList.remove('active');
+    paneChoiceBlank.style.display = 'none';
+    paneChoiceLibrary.style.display = 'flex';
+    paneChoiceImport.style.display = 'none';
+
+    // Populate library folders
+    choiceLibFolderSelect.innerHTML = '<option value="all">Tutti i Moduli</option><option value="root">(Principale senza cartella)</option>';
+    vfs.moduleFolders.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = f.name;
+      choiceLibFolderSelect.appendChild(opt);
+    });
+
+    renderChoiceLibList();
+  });
+
+  choiceLibFolderSelect.addEventListener('change', () => {
+    renderChoiceLibList();
+  });
+
+  function renderChoiceLibList() {
+    choiceLibModulesList.innerHTML = '';
+    const filterFolder = choiceLibFolderSelect.value;
+    let filtered = vfs.savedModules;
+    if (filterFolder === 'root') {
+      filtered = vfs.savedModules.filter(m => !m.folderId);
+    } else if (filterFolder !== 'all') {
+      filtered = vfs.savedModules.filter(m => m.folderId === filterFolder);
+    }
+
+    if (filtered.length === 0) {
+      choiceLibModulesList.innerHTML = '<div style="font-size:0.78rem;color:var(--text-tertiary);padding:10px">Nessun modulo salvato.</div>';
+      choiceLibPreviewTitle.textContent = 'Nessun Modulo';
+      choiceLibPreviewSource.textContent = '';
+      choiceLibPreviewBody.innerHTML = 'Puoi salvare moduli nei "Miei Moduli" durante l\'editing di un manuale con il pulsante "Salva nei Miei Moduli".';
+      selectedLibChoiceModule = null;
+      return;
+    }
+
+    filtered.forEach((sm, idx) => {
+      const item = document.createElement('div');
+      item.style.padding = '8px 10px';
+      item.style.background = '#ffffff';
+      item.style.border = '1px solid var(--win-border)';
+      item.style.borderRadius = 'var(--radius-sm)';
+      item.style.cursor = 'pointer';
+      item.style.fontSize = '0.82rem';
+      item.style.fontWeight = '600';
+      item.innerHTML = `<div>🧩 ${escapeHtml(sm.title)}</div><div style="font-size:0.7rem;color:var(--text-tertiary);font-weight:400">${sm.sourceManualTitle ? escapeHtml(sm.sourceManualTitle) : 'Libreria'}</div>`;
+
+      item.addEventListener('click', () => {
+        choiceLibModulesList.querySelectorAll('div').forEach(d => {
+          if (d.style) d.style.borderColor = 'var(--win-border)';
+        });
+        item.style.borderColor = 'var(--win-accent)';
+        selectChoiceLibModule(sm);
+      });
+
+      choiceLibModulesList.appendChild(item);
+    });
+
+    // Select first by default
+    if (filtered[0]) {
+      selectChoiceLibModule(filtered[0]);
+      if (choiceLibModulesList.firstElementChild) {
+        choiceLibModulesList.firstElementChild.style.borderColor = 'var(--win-accent)';
+      }
+    }
+  }
+
+  function selectChoiceLibModule(sm) {
+    selectedLibChoiceModule = sm;
+    choiceLibPreviewTitle.textContent = sm.title;
+    choiceLibPreviewSource.textContent = sm.sourceManualTitle ? 'Origine: ' + sm.sourceManualTitle + ' • ' + formatDate(sm.createdAt) : 'Data: ' + formatDate(sm.createdAt);
+    const langKey = (currentManual && currentManual.languages && currentManual.languages[0]) || Object.keys(sm.contentByLang || {})[0] || 'it';
+    const content = (sm.contentByLang && sm.contentByLang[langKey]) || Object.values(sm.contentByLang || {})[0] || '<p>Nessun contenuto salvato</p>';
+    choiceLibPreviewBody.innerHTML = content;
+  }
+
   tabChoiceImport.addEventListener('click', () => {
     tabChoiceBlank.classList.remove('active');
+    tabChoiceLibrary.classList.remove('active');
     tabChoiceImport.classList.add('active');
     paneChoiceBlank.style.display = 'none';
+    paneChoiceLibrary.style.display = 'none';
     paneChoiceImport.style.display = 'flex';
   });
 
@@ -2185,6 +3544,25 @@ input::placeholder {
         title: title,
         contentByLang: blankContent
       });
+    } else if (tabChoiceLibrary.classList.contains('active')) {
+      // From My Modules Library
+      if (!selectedLibChoiceModule) {
+        alert('Seleziona prima un modulo dalla libreria a sinistra.');
+        return;
+      }
+      const clone = {
+        id: 'mod_' + Date.now(),
+        title: selectedLibChoiceModule.title,
+        contentByLang: JSON.parse(JSON.stringify(selectedLibChoiceModule.contentByLang || {}))
+      };
+      // Ensure all current manual languages have an entry
+      const currentLangs = currentManual.languages || ['it'];
+      currentLangs.forEach(code => {
+        if (!clone.contentByLang[code]) {
+          clone.contentByLang[code] = Object.values(clone.contentByLang)[0] || '<p></p>';
+        }
+      });
+      currentManual.modules.push(clone);
     } else {
       // Reuse module from previous manual
       if (!selectedReuseModule) {
@@ -2197,8 +3575,8 @@ input::placeholder {
     }
 
     saveCurrentManual();
-    renderDocumentSheets();
-    renderSidebarModulesList();
+    renderDocumentSheets(false);
+    renderSidebarModulesList(false);
     moduleChoiceModal.classList.remove('open');
   });
 
@@ -2310,6 +3688,7 @@ input::placeholder {
     currentManual = null;
     activeNavSection = 'manuals';
     navItemManuals.classList.add('active');
+    navItemModules.classList.remove('active');
     navItemSettings.classList.remove('active');
     navItemTrash.classList.remove('active');
     showExplorer();
@@ -2326,6 +3705,16 @@ input::placeholder {
   navItemManuals.addEventListener('click', () => {
     activeNavSection = 'manuals';
     navItemManuals.classList.add('active');
+    navItemModules.classList.remove('active');
+    navItemSettings.classList.remove('active');
+    navItemTrash.classList.remove('active');
+    showExplorer();
+  });
+
+  navItemModules.addEventListener('click', () => {
+    activeNavSection = 'modules';
+    navItemModules.classList.add('active');
+    navItemManuals.classList.remove('active');
     navItemSettings.classList.remove('active');
     navItemTrash.classList.remove('active');
     showExplorer();
@@ -2335,6 +3724,7 @@ input::placeholder {
     activeNavSection = 'settings';
     navItemSettings.classList.add('active');
     navItemManuals.classList.remove('active');
+    navItemModules.classList.remove('active');
     navItemTrash.classList.remove('active');
     showExplorer();
   });
@@ -2343,46 +3733,83 @@ input::placeholder {
     activeNavSection = 'trash';
     navItemTrash.classList.add('active');
     navItemManuals.classList.remove('active');
+    navItemModules.classList.remove('active');
     navItemSettings.classList.remove('active');
     showExplorer();
   });
 
-  btnOpenNewManualWizard.addEventListener('click', openNewManualWizard);
+  btnOpenNewManualWizard.addEventListener('click', () => {
+    if (activeNavSection === 'modules') {
+      openCreateLibraryModuleModal();
+    } else {
+      openNewManualWizard();
+    }
+  });
   btnEmptyNewManual.addEventListener('click', openNewManualWizard);
+  if (btnEmptyNewModule) {
+    btnEmptyNewModule.addEventListener('click', openCreateLibraryModuleModal);
+  }
 
   btnNewFolder.addEventListener('click', () => {
-    const name = prompt('Nome cartella:', 'Nuova Cartella');
-    if (name && name.trim()) {
-      vfs.folders.push({
-        id: 'f_' + Date.now(),
-        name: name.trim(),
-        parentId: vfs.currentFolderId,
-        createdAt: new Date().toISOString()
-      });
-      saveVFS();
-      renderManualsExplorer();
+    if (activeNavSection === 'modules') {
+      const name = prompt('Nome cartella moduli:', 'Nuova Cartella Moduli');
+      if (name && name.trim()) {
+        vfs.moduleFolders.push({
+          id: 'mf_' + Date.now(),
+          name: name.trim(),
+          parentId: vfs.currentModuleFolderId,
+          createdAt: new Date().toISOString()
+        });
+        saveVFS();
+        renderModulesExplorer();
+      }
+    } else {
+      const name = prompt('Nome cartella:', 'Nuova Cartella');
+      if (name && name.trim()) {
+        vfs.folders.push({
+          id: 'f_' + Date.now(),
+          name: name.trim(),
+          parentId: vfs.currentFolderId,
+          createdAt: new Date().toISOString()
+        });
+        saveVFS();
+        renderManualsExplorer();
+      }
     }
   });
   btnEmptyNewFolder.addEventListener('click', () => btnNewFolder.click());
+  if (btnEmptyNewModuleFolder) {
+    btnEmptyNewModuleFolder.addEventListener('click', () => btnNewFolder.click());
+  }
 
   btnViewGrid.addEventListener('click', () => {
     currentViewMode = 'grid';
     btnViewGrid.classList.add('active');
     btnViewList.classList.remove('active');
-    renderManualsExplorer();
+    if (activeNavSection === 'modules') renderModulesExplorer();
+    else renderManualsExplorer();
   });
   btnViewList.addEventListener('click', () => {
     currentViewMode = 'list';
     btnViewList.classList.add('active');
     btnViewGrid.classList.remove('active');
-    renderManualsExplorer();
+    if (activeNavSection === 'modules') renderModulesExplorer();
+    else renderManualsExplorer();
   });
 
-  searchFilesInput.addEventListener('input', renderManualsExplorer);
+  searchFilesInput.addEventListener('input', () => {
+    if (activeNavSection === 'modules') renderModulesExplorer();
+    else renderManualsExplorer();
+  });
 
-  document.querySelector('.breadcrumb-item[data-folder="null"]').addEventListener('click', () => {
-    vfs.currentFolderId = null;
-    renderManualsExplorer();
+  breadcrumbRootItem.addEventListener('click', () => {
+    if (activeNavSection === 'modules') {
+      vfs.currentModuleFolderId = null;
+      renderModulesExplorer();
+    } else {
+      vfs.currentFolderId = null;
+      renderManualsExplorer();
+    }
   });
 
   btnPrintPdf.addEventListener('click', () => window.print());
