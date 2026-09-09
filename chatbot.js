@@ -162,7 +162,7 @@
       ],
     },
     proj_omnimanual: {
-      msg: '<strong>OmniManual — Enterprise Configurator</strong>\n\nUn configuratore avanzato per la redazione e gestione di documentazione aziendale e industriale:\n\n• <strong>Template pronti</strong>: SOP ISO 9001, Privacy & Sicurezza ISO 27001, Direttiva Macchine CE, Onboarding, Disaster Recovery\n• <strong>Moduli normativi</strong>: box avvertenze OSHA/ANSI, matrici RACI, checklist con tempi, tabelle di collaudo\n• <strong>Anteprima A4 & Web in tempo reale</strong> con filigrane e timbri di validazione\n• <strong>Esportazione professionale</strong>: Stampa/PDF vettoriale, Markdown e backup JSON\n• <strong>100% Client-Side</strong>: i documenti aziendali non lasciano mai il browser.',
+      msg: '<strong>OmniManual — Enterprise Suite</strong>\n\nSuite documentale avanzata in stile Windows 11 e Microsoft Word per la redazione di manuali aziendali e SOP:\n\n• <strong>Interfaccia Fluent & Word</strong>: navigatore a cartelle, ribbon di formattazione, tabelle e fogli A4 reali\n• <strong>Layout multilingua a colonne</strong>: redazione parallela affiancata per qualsiasi variante linguistica\n• <strong>Import documenti</strong>: carica file Word (.docx) e PDF direttamente nell\'editor\n• <strong>Riuso modulare & Cestino</strong>: clona sezioni da manuali precedenti e gestione sicura delle revisioni\n• <strong>100% Client-Side</strong>: la documentazione riservata non lascia mai il browser.',
       options: [
         { label: '🚀 Apri OmniManual', action: 'link', target: 'strumenti/manuale-enterprise/' },
         { label: '← Torna agli strumenti', next: 'proj_strumenti' },

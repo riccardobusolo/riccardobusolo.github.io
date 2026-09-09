@@ -4,10 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OmniManual — Enterprise Document Suite</title>
-<meta name="description" content="Suite professionale per la creazione, gestione e configurazione di manuali aziendali e SOP in stile Windows 11 e Microsoft Word.">
+<meta name="description" content="Suite professionale per la creazione, gestione e configurazione di manuali aziendali e SOP multilingua in stile Windows 11 e Microsoft Word.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- JSZip & PDF.js for Word (.docx) & PDF client-side import -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,7 +35,7 @@
   --text-tertiary: #8a8a8a;
   --text-disabled: #b0b0b0;
 
-  /* Safety colors */
+  /* Semantic safety colors */
   --danger: #d13438;
   --warning: #f7630c;
   --caution: #ffaa44;
@@ -49,7 +53,7 @@
   --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-sheet: 0 12px 36px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
-  --shadow-flyout: 0 8px 24px rgba(0, 0, 0, 0.14);
+  --shadow-flyout: 0 8px 24px rgba(0, 0, 0, 0.16);
 }
 
 html, body {
@@ -62,19 +66,16 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ═══════════════════════════════════════════════
-   APP CONTAINER & NAVIGATION
-═══════════════════════════════════════════════ */
+/* App Window Container */
 .app-window {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: var(--win-bg);
 }
 
-/* Top System Bar */
+/* Top System Titlebar */
 .system-titlebar {
   height: 44px;
   background: var(--win-surface);
@@ -94,10 +95,10 @@ html, body {
   gap: 12px;
 }
 
-.site-back-link {
+.site-back-link, .home-nav-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   text-decoration: none;
   color: var(--text-secondary);
   font-size: 0.8rem;
@@ -106,9 +107,10 @@ html, body {
   border-radius: var(--radius-sm);
   background: var(--win-subsurface);
   border: 1px solid var(--win-border);
+  cursor: pointer;
   transition: all 0.15s;
 }
-.site-back-link:hover {
+.site-back-link:hover, .home-nav-btn:hover {
   background: var(--win-hover);
   color: var(--text-primary);
 }
@@ -119,7 +121,7 @@ html, body {
   gap: 8px;
   font-weight: 600;
   font-size: 0.88rem;
-  letter-spacing: -0.01em;
+  cursor: pointer;
 }
 
 .app-brand-icon {
@@ -140,7 +142,7 @@ html, body {
   color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .titlebar-doc-name {
@@ -188,35 +190,84 @@ html, body {
   transition: all 0.12s ease;
   user-select: none;
 }
-.win-btn:hover {
-  background: var(--win-hover);
-}
-.win-btn:active {
-  background: var(--win-active);
-  transform: scale(0.98);
-}
+.win-btn:hover { background: var(--win-hover); }
+.win-btn:active { background: var(--win-active); transform: scale(0.98); }
 .win-btn-primary {
   background: var(--win-accent);
   color: #ffffff;
   border-color: var(--win-accent);
 }
-.win-btn-primary:hover {
-  background: var(--win-accent-hover);
-  color: #ffffff;
-}
+.win-btn-primary:hover { background: var(--win-accent-hover); color: #ffffff; }
 
 /* ═══════════════════════════════════════════════
-   VIEW 1: WINDOWS 11 FILE EXPLORER
+   VIEW 1: EXPLORER & SHELL
 ═══════════════════════════════════════════════ */
 #explorerView {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 240px 1fr;
   overflow: hidden;
   background: #fafafa;
 }
 
-/* Explorer Command Bar */
+/* Left Sidebar Navigation */
+.explorer-sidebar {
+  background: var(--win-surface);
+  border-right: 1px solid var(--win-border);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px;
+  gap: 4px;
+  user-select: none;
+}
+
+.sidebar-heading {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 8px 12px 4px;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.sidebar-nav-item:hover {
+  background: var(--win-hover);
+  color: var(--text-primary);
+}
+.sidebar-nav-item.active {
+  background: var(--win-accent-light);
+  color: var(--win-accent);
+  font-weight: 600;
+}
+.sidebar-badge {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  background: rgba(0,0,0,0.06);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* Explorer Main Pane */
+.explorer-main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Command Bar */
 .explorer-commandbar {
   background: var(--win-surface);
   border-bottom: 1px solid var(--win-border);
@@ -227,69 +278,35 @@ html, body {
   gap: 12px;
   flex-shrink: 0;
 }
+.commandbar-left { display: flex; align-items: center; gap: 8px; }
+.commandbar-right { display: flex; align-items: center; gap: 12px; }
 
-.commandbar-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.commandbar-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.search-box-wrap {
-  position: relative;
-  width: 260px;
-}
+.search-box-wrap { position: relative; width: 240px; }
 .search-box-wrap svg {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-tertiary);
-  pointer-events: none;
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--text-tertiary); pointer-events: none;
 }
 .search-input {
-  width: 100%;
-  padding: 6px 12px 6px 32px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--win-border);
-  background: var(--win-subsurface);
-  font-size: 0.82rem;
-  font-family: var(--font-main);
-  color: var(--text-primary);
-  outline: none;
-  transition: all 0.15s;
+  width: 100%; padding: 6px 12px 6px 30px; border-radius: var(--radius-sm);
+  border: 1px solid var(--win-border); background: var(--win-subsurface);
+  font-size: 0.82rem; font-family: var(--font-main); color: var(--text-primary);
+  outline: none; transition: all 0.15s;
 }
 .search-input:focus {
-  background: #ffffff;
-  border-color: var(--win-accent);
+  background: #ffffff; border-color: var(--win-accent);
   box-shadow: 0 0 0 2px var(--win-accent-light);
 }
 
 .view-mode-selector {
-  display: flex;
-  background: var(--win-subsurface);
-  border: 1px solid var(--win-border);
-  border-radius: var(--radius-sm);
-  padding: 2px;
+  display: flex; background: var(--win-subsurface);
+  border: 1px solid var(--win-border); border-radius: var(--radius-sm); padding: 2px;
 }
 .view-btn {
-  background: transparent;
-  border: none;
-  padding: 4px 8px;
-  border-radius: var(--radius-xs);
-  cursor: pointer;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
+  background: transparent; border: none; padding: 4px 8px; border-radius: var(--radius-xs);
+  cursor: pointer; color: var(--text-secondary); display: flex; align-items: center;
 }
 .view-btn.active {
-  background: var(--win-surface);
-  color: var(--win-accent);
+  background: var(--win-surface); color: var(--win-accent);
   box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
@@ -300,203 +317,125 @@ html, body {
   padding: 6px 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 0.82rem;
   color: var(--text-secondary);
   flex-shrink: 0;
 }
-
 .breadcrumb-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: var(--radius-xs);
-  transition: background 0.1s;
+  display: inline-flex; align-items: center; gap: 6px;
+  cursor: pointer; padding: 2px 6px; border-radius: var(--radius-xs);
 }
-.breadcrumb-item:hover {
-  background: var(--win-hover);
-  color: var(--text-primary);
-}
-.breadcrumb-separator {
-  color: var(--text-tertiary);
-  font-size: 0.75rem;
-}
+.breadcrumb-item:hover { background: var(--win-hover); color: var(--text-primary); }
+.breadcrumb-separator { color: var(--text-tertiary); font-size: 0.75rem; }
 
-/* Explorer Main Content Area */
-.explorer-content {
+/* Content Scrollable */
+.explorer-content-body {
   flex: 1;
   overflow-y: auto;
   padding: 24px;
 }
 
-/* Clean Empty State */
+/* Empty State */
 .empty-state-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100%;
-  max-width: 460px;
-  margin: 0 auto;
-  padding: 40px 20px;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; height: 100%;
+  max-width: 440px; margin: 0 auto; padding: 40px 20px;
 }
-
-.empty-state-icon-wrap {
-  width: 84px;
-  height: 84px;
-  border-radius: 20px;
-  background: #ffffff;
-  border: 1px solid var(--win-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--win-accent);
-  margin-bottom: 20px;
+.empty-state-icon {
+  width: 80px; height: 80px; border-radius: 20px; background: #ffffff;
+  border: 1px solid var(--win-border); display: flex; align-items: center;
+  justify-content: center; color: var(--win-accent); margin-bottom: 20px;
   box-shadow: var(--shadow-card);
 }
-
-.empty-state-title {
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.empty-state-desc {
-  font-size: 0.86rem;
-  color: var(--text-secondary);
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-
-.empty-state-actions {
-  display: flex;
-  gap: 12px;
-}
+.empty-state-title { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; }
+.empty-state-desc { font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
 
 /* Grid View */
 .files-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 16px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px;
 }
-
 .file-card {
-  background: var(--win-surface);
-  border: 1px solid var(--win-border);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  position: relative;
-  box-shadow: var(--shadow-subtle);
-  transition: all 0.15s ease;
+  background: var(--win-surface); border: 1px solid var(--win-border);
+  border-radius: var(--radius-md); padding: 16px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 12px; position: relative;
+  box-shadow: var(--shadow-subtle); transition: all 0.15s ease;
 }
 .file-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--win-accent-border);
-  box-shadow: var(--shadow-card);
-  background: #ffffff;
+  transform: translateY(-2px); border-color: var(--win-accent-border);
+  box-shadow: var(--shadow-card); background: #ffffff;
 }
-
 .file-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 44px; height: 44px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
 }
-.file-icon-wrap.folder {
-  background: #fff4ce;
-  color: #ffb900;
-}
-.file-icon-wrap.manual {
-  background: #e1dfdd;
-  color: #2b579a; /* Microsoft Word blue */
-}
+.file-icon-wrap.folder { background: #fff4ce; color: #ffb900; }
+.file-icon-wrap.manual { background: #e1dfdd; color: #2b579a; }
 
 .file-meta-name {
-  font-weight: 600;
-  font-size: 0.88rem;
-  color: var(--text-primary);
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  font-weight: 600; font-size: 0.88rem; color: var(--text-primary);
+  line-height: 1.3; overflow: hidden; text-overflow: ellipsis;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 }
-
 .file-meta-sub {
-  font-size: 0.74rem;
-  color: var(--text-tertiary);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  font-size: 0.74rem; color: var(--text-tertiary);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.file-lang-badges { display: flex; gap: 4px; }
+.lang-mini-pill {
+  font-size: 0.65rem; font-family: var(--font-mono); font-weight: 700;
+  background: var(--win-subsurface); border: 1px solid var(--win-border);
+  padding: 1px 4px; border-radius: 3px;
 }
 
 .file-actions-menu {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  color: var(--text-tertiary);
-  opacity: 0;
-  transition: opacity 0.15s;
+  position: absolute; top: 10px; right: 10px; background: transparent;
+  border: none; cursor: pointer; padding: 4px; border-radius: 4px;
+  color: var(--text-tertiary); opacity: 0; transition: opacity 0.15s;
 }
-.file-card:hover .file-actions-menu {
-  opacity: 1;
-}
-.file-actions-menu:hover {
-  background: var(--win-hover);
-  color: var(--text-primary);
-}
+.file-card:hover .file-actions-menu { opacity: 1; }
+.file-actions-menu:hover { background: var(--win-hover); color: var(--text-primary); }
 
-/* List View */
+/* Table View */
 .files-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.84rem;
-  background: var(--win-surface);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid var(--win-border);
+  width: 100%; border-collapse: collapse; font-size: 0.84rem;
+  background: var(--win-surface); border-radius: var(--radius-md);
+  overflow: hidden; border: 1px solid var(--win-border);
 }
 .files-table th {
-  text-align: left;
-  padding: 10px 16px;
-  background: var(--win-subsurface);
-  border-bottom: 1px solid var(--win-border);
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 0.76rem;
-  text-transform: uppercase;
+  text-align: left; padding: 10px 16px; background: var(--win-subsurface);
+  border-bottom: 1px solid var(--win-border); color: var(--text-secondary);
+  font-weight: 600; font-size: 0.76rem; text-transform: uppercase;
 }
 .files-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--win-border);
-  color: var(--text-primary);
+  padding: 12px 16px; border-bottom: 1px solid var(--win-border); color: var(--text-primary);
 }
-.files-table tr:hover td {
-  background: var(--win-hover);
-  cursor: pointer;
+.files-table tr:hover td { background: var(--win-hover); cursor: pointer; }
+.table-name-cell { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+
+/* Language Settings Panel */
+.settings-panel-wrap {
+  max-width: 680px; margin: 0 auto; background: var(--win-surface);
+  border: 1px solid var(--win-border); border-radius: var(--radius-lg);
+  padding: 24px 28px; box-shadow: var(--shadow-subtle);
 }
-.table-name-cell {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 600;
+.settings-panel-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+.settings-panel-desc { font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 20px; }
+
+.lang-list-container {
+  display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px;
 }
+.lang-row-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: var(--win-subsurface); border: 1px solid var(--win-border);
+  border-radius: var(--radius-sm);
+}
+.lang-row-left { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.88rem; }
+.lang-row-code {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--win-accent);
+  background: #ffffff; border: 1px solid var(--win-border); padding: 2px 6px; border-radius: 4px;
+}
+.lang-row-tools { display: flex; align-items: center; gap: 4px; }
 
 /* ═══════════════════════════════════════════════
    VIEW 2: WORD-STYLE DOCUMENT EDITOR
@@ -509,351 +448,162 @@ html, body {
   background: #eef1f5;
 }
 
-/* Word Ribbon Interface */
+/* Word Ribbon Bar */
 .word-ribbon {
   background: var(--win-surface);
   border-bottom: 1px solid var(--win-border);
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  z-index: 40;
+  display: flex; flex-direction: column; flex-shrink: 0; z-index: 40;
 }
-
 .ribbon-tabs-bar {
-  display: flex;
-  padding: 0 16px;
-  border-bottom: 1px solid var(--win-border);
+  display: flex; padding: 0 16px; border-bottom: 1px solid var(--win-border);
   background: var(--win-subsurface);
 }
-
 .ribbon-tab {
-  padding: 7px 16px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  border-bottom: 2px solid transparent;
-  transition: all 0.12s;
+  padding: 7px 16px; font-size: 0.8rem; font-weight: 500; cursor: pointer;
+  border: none; background: transparent; color: var(--text-secondary);
+  border-bottom: 2px solid transparent; transition: all 0.12s;
 }
-.ribbon-tab:hover {
-  color: var(--text-primary);
-}
+.ribbon-tab:hover { color: var(--text-primary); }
 .ribbon-tab.active {
-  color: var(--win-accent);
-  border-bottom-color: var(--win-accent);
-  background: var(--win-surface);
-  font-weight: 600;
+  color: var(--win-accent); border-bottom-color: var(--win-accent);
+  background: var(--win-surface); font-weight: 600;
 }
 
 .ribbon-toolbar {
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-height: 52px;
-  overflow-x: auto;
+  padding: 8px 16px; display: flex; align-items: center; gap: 14px;
+  min-height: 50px; overflow-x: auto;
 }
-
 .ribbon-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding-right: 16px;
+  display: flex; align-items: center; gap: 6px; padding-right: 14px;
   border-right: 1px solid var(--win-border);
 }
-.ribbon-group:last-child {
-  border-right: none;
-}
+.ribbon-group:last-child { border-right: none; }
 
 .ribbon-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--radius-xs);
-  padding: 6px 8px;
-  cursor: pointer;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: 0.8rem;
-  font-family: var(--font-main);
-  transition: all 0.1s;
+  background: transparent; border: 1px solid transparent; border-radius: var(--radius-xs);
+  padding: 6px 8px; cursor: pointer; color: var(--text-primary);
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  font-size: 0.8rem; font-family: var(--font-main); transition: all 0.1s;
 }
-.ribbon-btn:hover {
-  background: var(--win-hover);
-  border-color: var(--win-border);
-}
+.ribbon-btn:hover { background: var(--win-hover); border-color: var(--win-border); }
 .ribbon-btn:active, .ribbon-btn.active {
-  background: var(--win-accent-light);
-  border-color: var(--win-accent-border);
+  background: var(--win-accent-light); border-color: var(--win-accent-border);
   color: var(--win-accent);
 }
-
 .ribbon-select {
-  padding: 5px 8px;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--win-border);
-  background: #ffffff;
-  font-size: 0.8rem;
-  font-family: var(--font-main);
-  outline: none;
-  cursor: pointer;
+  padding: 5px 8px; border-radius: var(--radius-xs); border: 1px solid var(--win-border);
+  background: #ffffff; font-size: 0.8rem; font-family: var(--font-main); outline: none; cursor: pointer;
 }
 
-/* Editor Main Workspace with Left Module Navigator */
+/* Editor Workspace Layout */
 .editor-workspace {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  overflow: hidden;
-  position: relative;
+  flex: 1; display: grid; grid-template-columns: 260px 1fr;
+  overflow: hidden; position: relative;
 }
 
-/* Left Module Navigator Pane */
+/* Left Sidebar: Pages/Modules Navigator */
 .module-nav-pane {
-  background: var(--win-surface);
-  border-right: 1px solid var(--win-border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  background: var(--win-surface); border-right: 1px solid var(--win-border);
+  display: flex; flex-direction: column; overflow: hidden;
 }
-
 .module-nav-header {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--win-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--win-border);
+  display: flex; align-items: center; justify-content: space-between;
   background: var(--win-subsurface);
 }
 .module-nav-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-secondary);
+  font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--text-secondary);
 }
-
 .module-list-wrap {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px;
 }
-
 .module-item-card {
-  background: var(--win-subsurface);
-  border: 1px solid var(--win-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: all 0.12s;
+  background: var(--win-subsurface); border: 1px solid var(--win-border);
+  border-radius: var(--radius-sm); padding: 10px 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
 }
-.module-item-card:hover {
-  border-color: var(--win-accent-border);
-  background: #ffffff;
-}
+.module-item-card:hover { border-color: var(--win-accent-border); background: #ffffff; }
 .module-item-card.active {
-  background: var(--win-accent-light);
-  border-color: var(--win-accent);
-}
-
-.module-card-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  overflow: hidden;
-}
-.module-index-badge {
-  font-size: 0.7rem;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--win-accent);
-  background: #ffffff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid var(--win-border);
+  background: var(--win-accent-light); border-color: var(--win-accent);
 }
 .module-card-title {
-  font-size: 0.84rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.84rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+.module-card-tools { display: flex; align-items: center; gap: 2px; }
 
-.module-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  opacity: 0.6;
-}
-.module-item-card:hover .module-card-actions {
-  opacity: 1;
-}
-
-.icon-action-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  padding: 2px 4px;
-  border-radius: 3px;
-  cursor: pointer;
-}
-.icon-action-btn:hover {
-  background: var(--win-hover);
-  color: var(--text-primary);
-}
-
-/* Center Document Scroll Viewport */
+/* Document Viewport (Vertical sequence of A4 pages) */
 .document-viewport {
-  flex: 1;
-  overflow-y: auto;
-  padding: 36px 20px 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
+  flex: 1; overflow-y: auto; padding: 36px 20px 80px;
+  display: flex; flex-direction: column; align-items: center; gap: 36px;
 }
 
-/* The A4 Sheet Simulation */
+/* Physical A4 Sheet (1 Module = 1 Sheet) */
 .a4-sheet {
-  width: 100%;
-  max-width: 820px;
-  min-height: 1120px;
-  background: #ffffff;
-  border-radius: 2px;
-  box-shadow: var(--shadow-sheet);
-  padding: 64px 72px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  font-family: var(--font-editor);
-  color: #242424;
+  width: 100%; max-width: 820px; min-height: 1120px; background: #ffffff;
+  border-radius: 2px; box-shadow: var(--shadow-sheet); padding: 64px 72px;
+  display: flex; flex-direction: column; position: relative;
+  font-family: var(--font-editor); color: #242424; cursor: text;
 }
 
-/* Page Header & Footer */
+/* Sheet Header & Footer */
 .sheet-header {
-  border-bottom: 1px solid #dcdcdc;
-  padding-bottom: 12px;
-  margin-bottom: 28px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.76rem;
-  color: #767676;
-  font-family: var(--font-main);
+  border-bottom: 1px solid #dcdcdc; padding-bottom: 10px; margin-bottom: 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.76rem; color: #767676; font-family: var(--font-main);
+  user-select: none;
 }
 .header-input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 0.76rem;
-  color: #767676;
-  width: 45%;
+  border: none; background: transparent; outline: none; font-size: 0.76rem;
+  color: #767676; width: 45%;
 }
-.header-input:focus {
-  background: var(--win-accent-light);
-  color: var(--text-primary);
-}
+.header-input:focus { background: var(--win-accent-light); color: var(--text-primary); }
 
 .sheet-footer {
-  margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid #dcdcdc;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.76rem;
-  color: #767676;
-  font-family: var(--font-main);
+  margin-top: auto; padding-top: 14px; border-top: 1px solid #dcdcdc;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.76rem; color: #767676; font-family: var(--font-main);
+  user-select: none;
 }
 .footer-input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 0.76rem;
-  color: #767676;
-  width: 50%;
+  border: none; background: transparent; outline: none; font-size: 0.76rem;
+  color: #767676; width: 50%;
 }
-.footer-input:focus {
-  background: var(--win-accent-light);
-  color: var(--text-primary);
+.footer-input:focus { background: var(--win-accent-light); color: var(--text-primary); }
+.page-num-display { font-family: var(--font-mono); font-weight: 600; color: #484848; }
+
+/* Sheet Editable Body (Free Word-style editing) */
+.sheet-content-area {
+  flex: 1; display: flex; flex-direction: column;
 }
 
-.page-num-display {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: #484848;
+/* Multilang Columns Layout */
+.multilang-columns-grid {
+  display: grid; gap: 24px; flex: 1;
+}
+.lang-column-wrap {
+  display: flex; flex-direction: column;
+}
+.lang-col-header {
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; color: var(--win-accent); background: var(--win-accent-light);
+  padding: 3px 8px; border-radius: 4px; border: 1px solid var(--win-accent-border);
+  margin-bottom: 10px; display: inline-flex; align-items: center; gap: 6px;
+  width: fit-content; user-select: none;
+}
+.sheet-editable-body {
+  flex: 1; outline: none; font-size: 0.95rem; line-height: 1.65; color: #242424;
+  min-height: 200px;
+}
+.sheet-editable-body:empty::before {
+  content: 'Inizia a scrivere o inserisci testo...';
+  color: #a0a0a0; pointer-events: none;
 }
 
-/* Module Section Container inside Sheet */
-.doc-module-section {
-  margin-bottom: 36px;
-  position: relative;
-}
-.doc-module-section:last-child {
-  margin-bottom: 0;
-}
-
-.module-header-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--win-accent);
-  background: var(--win-accent-light);
-  padding: 3px 8px;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  border: 1px solid var(--win-accent-border);
-}
-
-.module-title-h2 {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  outline: none;
-  margin-bottom: 12px;
-  padding: 2px 4px;
-  border-radius: 3px;
-}
-.module-title-h2:focus {
-  background: #f0f6fc;
-}
-
-.module-editable-body {
-  font-size: 0.95rem;
-  line-height: 1.65;
-  color: #2b2b2b;
-  outline: none;
-  min-height: 90px;
-  padding: 4px;
-  border-radius: 4px;
-}
-.module-editable-body:focus {
-  background: #fbfbfb;
-}
-
-/* Safety Callout Boxes inside Editor */
+/* Safety Boxes (with editable title on click) */
 .editor-safety-box {
-  display: flex;
-  border: 2px solid;
-  border-radius: 6px;
-  overflow: hidden;
-  margin: 16px 0;
-  user-select: none;
+  display: flex; border: 2px solid; border-radius: 6px;
+  overflow: hidden; margin: 16px 0;
 }
 .editor-safety-box.danger { border-color: var(--danger); background: #fdf3f2; }
 .editor-safety-box.warning { border-color: var(--warning); background: #fff8f5; }
@@ -862,198 +612,97 @@ html, body {
 .editor-safety-box.safety { border-color: var(--safety); background: #f1f9f4; }
 
 .safety-header-pill {
-  width: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  letter-spacing: 0.08em;
-  padding: 10px 6px;
+  min-width: 100px; display: flex; align-items: center; justify-content: center;
+  color: #ffffff; font-weight: 800; font-size: 0.75rem; font-family: var(--font-mono);
+  letter-spacing: 0.08em; padding: 10px 8px; text-transform: uppercase;
+  outline: none; cursor: text;
 }
 .editor-safety-box.danger .safety-header-pill { background: var(--danger); }
 .editor-safety-box.warning .safety-header-pill { background: var(--warning); color: #fff; }
 .editor-safety-box.caution .safety-header-pill { background: var(--caution); color: #000; }
 .editor-safety-box.notice .safety-header-pill { background: var(--notice); }
 .editor-safety-box.safety .safety-header-pill { background: var(--safety); }
+.safety-header-pill:focus {
+  outline: 2px dashed #ffffff;
+}
 
 .safety-body-text {
-  flex: 1;
-  padding: 10px 14px;
-  font-size: 0.88rem;
-  outline: none;
+  flex: 1; padding: 10px 14px; font-size: 0.9rem; outline: none;
 }
 
 /* Word Tables */
 .word-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 16px 0;
-  font-size: 0.88rem;
+  width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem;
 }
 .word-table th, .word-table td {
-  border: 1px solid #d2d2d2;
-  padding: 8px 12px;
-  text-align: left;
+  border: 1px solid #d2d2d2; padding: 8px 12px; text-align: left;
 }
-.word-table th {
-  background: #f2f2f2;
-  font-weight: 600;
-}
+.word-table th { background: #f2f2f2; font-weight: 600; }
 
 /* ═══════════════════════════════════════════════
-   MODAL: MODULE SELECTOR & REUSE BROWSER
+   MODALS
 ═══════════════════════════════════════════════ */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px); display: none; align-items: center;
+  justify-content: center; z-index: 100;
 }
-.modal-overlay.open {
-  display: flex;
-}
+.modal-overlay.open { display: flex; }
 
 .modal-dialog {
-  background: #ffffff;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-flyout);
-  border: 1px solid var(--win-border);
-  width: 90%;
-  max-width: 940px;
-  max-height: 85vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: modalScale 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #ffffff; border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-flyout); border: 1px solid var(--win-border);
+  width: 90%; max-width: 640px; display: flex; flex-direction: column;
+  overflow: hidden; animation: modalIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
 }
-@keyframes modalScale {
+.modal-dialog.wide { max-width: 920px; height: 80vh; }
+@keyframes modalIn {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
 }
 
 .modal-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--win-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--win-border);
+  display: flex; align-items: center; justify-content: space-between;
   background: var(--win-subsurface);
 }
-.modal-title {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.modal-body {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-  height: 540px;
-}
-
-/* Split Import View: Left List / Right Preview */
-.import-left-pane {
-  width: 320px;
-  border-right: 1px solid var(--win-border);
-  background: var(--win-subsurface);
-  display: flex;
-  flex-direction: column;
-}
-
-.import-selector-box {
-  padding: 12px;
-  border-bottom: 1px solid var(--win-border);
-}
-
-.import-module-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.import-module-item {
-  padding: 10px 12px;
-  background: #ffffff;
-  border: 1px solid var(--win-border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.12s;
-}
-.import-module-item:hover {
-  border-color: var(--win-accent-border);
-}
-.import-module-item.selected {
-  border-color: var(--win-accent);
-  background: var(--win-accent-light);
-}
-
-.import-right-preview {
-  flex: 1;
-  background: #f3f3f3;
-  padding: 24px;
-  overflow-y: auto;
-  display: flex;
-  justify-content: center;
-}
-
-.preview-sheet-box {
-  width: 100%;
-  max-width: 520px;
-  background: #ffffff;
-  padding: 32px 36px;
-  border-radius: 4px;
-  box-shadow: var(--shadow-card);
-  border: 1px solid var(--win-border);
-}
-
+.modal-title { font-size: 1rem; font-weight: 600; }
+.modal-body { padding: 20px; overflow-y: auto; flex: 1; }
 .modal-footer {
-  padding: 12px 20px;
-  border-top: 1px solid var(--win-border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  background: var(--win-subsurface);
+  padding: 12px 20px; border-top: 1px solid var(--win-border);
+  display: flex; justify-content: flex-end; gap: 10px; background: var(--win-subsurface);
 }
+
+.form-field { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+.form-field label { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+.form-field input[type="text"], .form-field select {
+  padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--win-border);
+  font-size: 0.86rem; font-family: var(--font-main); outline: none;
+}
+.form-field input[type="text"]:focus {
+  border-color: var(--win-accent); box-shadow: 0 0 0 2px var(--win-accent-light);
+}
+
+.lang-checkbox-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px; margin-top: 6px;
+}
+.lang-check-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  background: var(--win-subsurface); border: 1px solid var(--win-border);
+  border-radius: var(--radius-sm); cursor: pointer; font-size: 0.84rem;
+}
+.lang-check-item input { accent-color: var(--win-accent); }
 
 /* Print Rules */
 @media print {
-  @page {
-    size: A4;
-    margin: 15mm;
-  }
-  body, html {
-    background: #fff !important;
-    color: #000 !important;
-    height: auto !important;
-    overflow: visible !important;
-  }
-  .system-titlebar, .word-ribbon, .module-nav-pane, .modal-overlay {
-    display: none !important;
-  }
-  .app-window, .editor-workspace, .document-viewport {
-    display: block !important;
-    height: auto !important;
-    padding: 0 !important;
-    background: transparent !important;
-  }
+  @page { size: A4; margin: 15mm; }
+  body, html { background: #fff !important; color: #000 !important; height: auto !important; overflow: visible !important; }
+  .system-titlebar, .word-ribbon, .module-nav-pane, .modal-overlay, .explorer-sidebar, .explorer-commandbar { display: none !important; }
+  .app-window, .editor-workspace, .document-viewport { display: block !important; height: auto !important; padding: 0 !important; background: transparent !important; }
   .a4-sheet {
-    box-shadow: none !important;
-    padding: 0 !important;
-    max-width: 100% !important;
-    min-height: auto !important;
-  }
-  .doc-module-section {
-    page-break-inside: avoid;
+    box-shadow: none !important; padding: 0 !important; max-width: 100% !important;
+    min-height: auto !important; page-break-after: always;
   }
 }
 </style>
@@ -1065,8 +714,13 @@ html, body {
   <!-- System Titlebar -->
   <header class="system-titlebar">
     <div class="titlebar-left">
+      <button id="btnHomeNavigator" class="home-nav-btn" title="Vai alla schermata Home / Explorer">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </button>
+
       <a href="/progetti.html#strumenti" class="site-back-link" title="Torna al portfolio">
-        <svg height="16" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle">
+        <svg height="15" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle">
           <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
           <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
           <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
@@ -1075,7 +729,7 @@ html, body {
         <span>Portfolio</span>
       </a>
 
-      <div class="app-brand-badge">
+      <div id="brandLogoTrigger" class="app-brand-badge">
         <div class="app-brand-icon">W</div>
         <span>OmniManual</span>
       </div>
@@ -1091,8 +745,8 @@ html, body {
 
     <div class="titlebar-right">
       <button id="btnBackToExplorer" class="win-btn" style="display:none">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Esplora File
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        I miei Manuali
       </button>
 
       <button id="btnPrintPdf" class="win-btn win-btn-primary" style="display:none">
@@ -1103,97 +757,141 @@ html, body {
   </header>
 
   <!-- ═══════════════════════════════════════════════
-       VIEW 1: EXPLORER (WINDOWS 11 STYLE)
+       VIEW 1: EXPLORER & SHELL
   ═══════════════════════════════════════════════ -->
   <main id="explorerView">
     
-    <!-- Command Bar -->
-    <div class="explorer-commandbar">
-      <div class="commandbar-left">
-        <button id="btnNewManual" class="win-btn win-btn-primary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Nuovo Manuale
-        </button>
-
-        <button id="btnNewFolder" class="win-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-          Nuova Cartella
-        </button>
-
-        <button id="btnExportAll" class="win-btn" title="Esporta backup di tutti i manuali">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Backup JSON
-        </button>
-
-        <button id="btnImportAll" class="win-btn" title="Ripristina da file JSON">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Importa JSON
-        </button>
-        <input type="file" id="importArchiveInput" accept=".json" style="display:none">
+    <!-- Left Navigation Sidebar -->
+    <aside class="explorer-sidebar">
+      <div class="sidebar-heading">Libreria</div>
+      <div id="navItemManuals" class="sidebar-nav-item active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>I miei Manuali</span>
+        <span id="manualsCountBadge" class="sidebar-badge">0</span>
       </div>
 
-      <div class="commandbar-right">
-        <div class="search-box-wrap">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="searchFilesInput" class="search-input" placeholder="Cerca manuali o cartelle...">
-        </div>
-
-        <div class="view-mode-selector">
-          <button id="btnViewGrid" class="view-btn active" title="Vista Griglia">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          </button>
-          <button id="btnViewList" class="view-btn" title="Vista Elenco">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          </button>
-        </div>
+      <div class="sidebar-heading">Gestione</div>
+      <div id="navItemSettings" class="sidebar-nav-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Varianti di Lingua</span>
       </div>
-    </div>
 
-    <!-- Address Bar / Breadcrumb Navigation -->
-    <div class="explorer-addressbar">
-      <span class="breadcrumb-item" data-folder="null">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        I miei Manuali
-      </span>
-      <span id="breadcrumbTrail"></span>
-    </div>
+      <div id="navItemTrash" class="sidebar-nav-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <span>Cestino</span>
+        <span id="trashCountBadge" class="sidebar-badge" style="display:none">0</span>
+      </div>
+    </aside>
 
-    <!-- Main Explorer Canvas Area -->
-    <div class="explorer-content">
+    <!-- Main Explorer Section -->
+    <div class="explorer-main">
       
-      <!-- Empty State -->
-      <div id="emptyStateBox" class="empty-state-box" style="display:none">
-        <div class="empty-state-icon-wrap">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-        </div>
-        <div class="empty-state-title">Nessun manuale in questa cartella</div>
-        <div class="empty-state-desc">Organizza la tua documentazione aziendale in comode cartelle o crea subito un nuovo manuale con l'editor Word integrato.</div>
-        <div class="empty-state-actions">
-          <button id="btnEmptyNewManual" class="win-btn win-btn-primary">
+      <!-- Command Bar -->
+      <div id="explorerCommandBar" class="explorer-commandbar">
+        <div class="commandbar-left">
+          <button id="btnOpenNewManualWizard" class="win-btn win-btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Nuovo Manuale
           </button>
-          <button id="btnEmptyNewFolder" class="win-btn">
+
+          <button id="btnNewFolder" class="win-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             Nuova Cartella
           </button>
         </div>
+
+        <div class="commandbar-right">
+          <div class="search-box-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchFilesInput" class="search-input" placeholder="Cerca manuali...">
+          </div>
+
+          <div class="view-mode-selector">
+            <button id="btnViewGrid" class="view-btn active" title="Griglia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+            <button id="btnViewList" class="view-btn" title="Elenco"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+          </div>
+        </div>
       </div>
 
-      <!-- Files Container (Grid / List dynamically filled) -->
-      <div id="filesGrid" class="files-grid"></div>
-      <table id="filesTable" class="files-table" style="display:none">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Data Modifica</th>
-            <th>Tipo</th>
-            <th>Moduli / Elementi</th>
-            <th style="text-align:right">Azioni</th>
-          </tr>
-        </thead>
-        <tbody id="filesTableBody"></tbody>
-      </table>
+      <!-- Address Bar Breadcrumbs -->
+      <div id="explorerAddressBar" class="explorer-addressbar">
+        <span class="breadcrumb-item" data-folder="null">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          I miei Manuali
+        </span>
+        <span id="breadcrumbTrail"></span>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="explorer-content-body">
+
+        <!-- PANE A: MANUALS & FOLDERS -->
+        <div id="paneManuals">
+          <div id="emptyStateBox" class="empty-state-box" style="display:none">
+            <div class="empty-state-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            </div>
+            <div class="empty-state-title">Nessun manuale presente</div>
+            <div class="empty-state-desc">Inizia subito creando la tua prima cartella o il tuo primo manuale con layout a colonne multilingua.</div>
+            <div style="display:flex;gap:10px">
+              <button id="btnEmptyNewManual" class="win-btn win-btn-primary">+ Nuovo Manuale</button>
+              <button id="btnEmptyNewFolder" class="win-btn">+ Nuova Cartella</button>
+            </div>
+          </div>
+
+          <div id="filesGrid" class="files-grid"></div>
+          <table id="filesTable" class="files-table" style="display:none">
+            <thead>
+              <tr><th>Nome</th><th>Data Modifica</th><th>Lingue</th><th>Pagine / Moduli</th><th style="text-align:right">Azioni</th></tr>
+            </thead>
+            <tbody id="filesTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- PANE B: LANGUAGE SETTINGS -->
+        <div id="paneSettings" style="display:none">
+          <div class="settings-panel-wrap">
+            <div class="settings-panel-title">Varianti di Lingua Configurate</div>
+            <div class="settings-panel-desc">Definisci le lingue disponibili per i manuali aziendali. All'eliminazione di una lingua con manuali associati, questi verranno spostati nell'area Cestino.</div>
+
+            <div id="langListContainer" class="lang-list-container"></div>
+
+            <div style="background:var(--win-subsurface);border:1px solid var(--win-border);border-radius:var(--radius-sm);padding:14px;margin-top:16px">
+              <div style="font-weight:600;font-size:0.86rem;margin-bottom:10px">Aggiungi Nuova Lingua</div>
+              <div style="display:flex;gap:10px">
+                <input type="text" id="newLangNameInput" class="search-input" placeholder="Nome (es. Spagnolo, Cinese)" style="flex:2">
+                <input type="text" id="newLangCodeInput" class="search-input" placeholder="Codice (es. es, zh)" style="flex:1">
+                <input type="text" id="newLangFlagInput" class="search-input" placeholder="Bandiera (es. 🇪🇸)" style="width:70px;text-align:center">
+                <button id="btnAddLangConfirm" class="win-btn win-btn-primary">Aggiungi</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE C: TRASH (CESTINO) -->
+        <div id="paneTrash" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div>
+              <h2 style="font-size:1.1rem;font-weight:600">Area Cestino</h2>
+              <p style="font-size:0.8rem;color:var(--text-secondary)">Manuali rimossi o archiviati a seguito dell'eliminazione di varianti di lingua.</p>
+            </div>
+            <button id="btnEmptyTrash" class="win-btn" style="color:var(--danger)">Svuota Cestino</button>
+          </div>
+
+          <div id="trashEmptyState" class="empty-state-box" style="display:none">
+            <div class="empty-state-title">Il cestino è vuoto</div>
+            <div class="empty-state-desc">Nessun manuale presente nel cestino.</div>
+          </div>
+
+          <table id="trashTable" class="files-table">
+            <thead>
+              <tr><th>Manuale</th><th>Data Eliminazione</th><th>Motivo</th><th style="text-align:right">Azioni</th></tr>
+            </thead>
+            <tbody id="trashTableBody"></tbody>
+          </table>
+        </div>
+
+      </div>
 
     </div>
 
@@ -1204,10 +902,8 @@ html, body {
   ═══════════════════════════════════════════════ -->
   <section id="editorView">
     
-    <!-- Microsoft Word Fluent Ribbon -->
+    <!-- Word Ribbon -->
     <div class="word-ribbon">
-      
-      <!-- Ribbon Tabs -->
       <div class="ribbon-tabs-bar">
         <button class="ribbon-tab active" data-tab="home">Home</button>
         <button class="ribbon-tab" data-tab="insert">Inserisci</button>
@@ -1217,7 +913,7 @@ html, body {
       <!-- Tab: Home -->
       <div id="ribbonTabHome" class="ribbon-toolbar">
         <div class="ribbon-group">
-          <select id="fontSelect" class="ribbon-select" title="Tipo di carattere">
+          <select id="fontSelect" class="ribbon-select" title="Carattere">
             <option value="Calibri" selected>Calibri</option>
             <option value="Segoe UI">Segoe UI</option>
             <option value="Arial">Arial</option>
@@ -1237,10 +933,10 @@ html, body {
         </div>
 
         <div class="ribbon-group">
-          <button class="ribbon-btn" data-cmd="bold" title="Grassetto (Ctrl+B)"><strong>B</strong></button>
-          <button class="ribbon-btn" data-cmd="italic" title="Corsivo (Ctrl+I)"><em>I</em></button>
-          <button class="ribbon-btn" data-cmd="underline" title="Sottolineato (Ctrl+U)"><u>U</u></button>
-          <button class="ribbon-btn" data-cmd="strikeThrough" title="Barrato"><s>S</s></button>
+          <button class="ribbon-btn" data-cmd="bold"><strong>B</strong></button>
+          <button class="ribbon-btn" data-cmd="italic"><em>I</em></button>
+          <button class="ribbon-btn" data-cmd="underline"><u>U</u></button>
+          <button class="ribbon-btn" data-cmd="strikeThrough"><s>S</s></button>
         </div>
 
         <div class="ribbon-group">
@@ -1256,16 +952,16 @@ html, body {
         </div>
 
         <div class="ribbon-group">
-          <button class="ribbon-btn" data-cmd="insertUnorderedList" title="Elenco puntato">• Elenco</button>
-          <button class="ribbon-btn" data-cmd="insertOrderedList" title="Elenco numerato">1. Elenco</button>
+          <button class="ribbon-btn" data-cmd="insertUnorderedList">• Elenco</button>
+          <button class="ribbon-btn" data-cmd="insertOrderedList">1. Elenco</button>
         </div>
 
         <div class="ribbon-group">
-          <select id="headingSelect" class="ribbon-select" title="Stile Paragrafo">
+          <select id="headingSelect" class="ribbon-select">
             <option value="p">Testo Normale</option>
-            <option value="h1">Titolo 1 (Grande)</option>
-            <option value="h2">Titolo 2 (Medio)</option>
-            <option value="h3">Titolo 3 (Sottotitolo)</option>
+            <option value="h1">Titolo 1</option>
+            <option value="h2">Titolo 2</option>
+            <option value="h3">Titolo 3</option>
           </select>
         </div>
       </div>
@@ -1273,26 +969,23 @@ html, body {
       <!-- Tab: Inserisci -->
       <div id="ribbonTabInsert" class="ribbon-toolbar" style="display:none">
         <div class="ribbon-group">
-          <button id="btnInsertTable" class="ribbon-btn">
+          <button id="btnInsertTable" class="win-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-            Tabella
+            Aggiungi Tabella
           </button>
         </div>
 
         <div class="ribbon-group">
-          <button class="ribbon-btn" data-box="danger" style="color:var(--danger)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            Pericolo (ISO)
-          </button>
+          <span style="font-size:0.75rem;color:var(--text-tertiary);margin-right:2px">Box Normativi:</span>
+          <button class="ribbon-btn" data-box="danger" style="color:var(--danger)">Pericolo</button>
           <button class="ribbon-btn" data-box="warning" style="color:var(--warning)">Avvertenza</button>
-          <button class="ribbon-btn" data-box="safety" style="color:var(--safety)">Sicurezza / DPI</button>
-          <button class="ribbon-btn" data-box="notice" style="color:var(--notice)">Nota / Avviso</button>
+          <button class="ribbon-btn" data-box="safety" style="color:var(--safety)">Sicurezza DPI</button>
+          <button class="ribbon-btn" data-box="notice" style="color:var(--notice)">Avviso</button>
         </div>
 
         <div class="ribbon-group">
-          <button id="btnOpenModuleModal" class="win-btn win-btn-primary">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-            Crea o Importa Modulo
+          <button id="btnRibbonNewModule" class="win-btn win-btn-primary">
+            + Crea Nuova Pagina / Modulo
           </button>
         </div>
       </div>
@@ -1315,51 +1008,25 @@ html, body {
           </label>
         </div>
       </div>
-
     </div>
 
-    <!-- Editor Workspace: Left Modules Navigator + Center Document Sheet -->
+    <!-- Workspace: Module Sidebar + Document Viewport -->
     <div class="editor-workspace">
       
-      <!-- Left Panel: Module Navigator -->
+      <!-- Module Navigator -->
       <aside class="module-nav-pane">
         <div class="module-nav-header">
-          <span class="module-nav-title">Moduli del Manuale</span>
-          <button id="btnSidebarNewModule" class="win-btn" style="padding:4px 8px;font-size:0.75rem" title="Aggiungi o importa modulo">
-            + Modulo
+          <span class="module-nav-title">Pagine del Manuale</span>
+          <button id="btnSidebarNewModule" class="win-btn" style="padding:3px 8px;font-size:0.75rem">
+            + Pagina
           </button>
         </div>
-
-        <div id="moduleNavList" class="module-list-wrap">
-          <!-- Populated dynamically with current manual's modules -->
-        </div>
+        <div id="moduleNavList" class="module-list-wrap"></div>
       </aside>
 
-      <!-- Center Document Viewport -->
-      <main class="document-viewport">
-        
-        <!-- Printable A4 Sheet -->
-        <article id="docSheet" class="a4-sheet">
-          
-          <!-- Sheet Header -->
-          <div class="sheet-header">
-            <input type="text" id="docHeaderInput" class="header-input" placeholder="Intestazione: Nome Azienda / Reparto..." value="Nexus Dynamics S.p.A. &bull; Divisione HSE">
-            <input type="text" id="docHeaderCodeInput" class="header-input" style="text-align:right" placeholder="Codice Documento..." value="SOP-2026-ENG-01">
-          </div>
-
-          <!-- Modules Container -->
-          <div id="docModulesContainer">
-            <!-- Dynamic module sections injected here -->
-          </div>
-
-          <!-- Sheet Footer -->
-          <div class="sheet-footer">
-            <input type="text" id="docFooterInput" class="footer-input" placeholder="Piè di pagina: Note legali o riservatezza..." value="Uso Interno Riservato &bull; Riproduzione vietata">
-            <span id="docPageNumberDisplay" class="page-num-display">Pagina 1 di 1</span>
-          </div>
-
-        </article>
-
+      <!-- Center Document Viewport (Renders A4 sheets) -->
+      <main id="documentViewport" class="document-viewport">
+        <!-- Physical A4 Sheets injected dynamically here -->
       </main>
 
     </div>
@@ -1369,68 +1036,101 @@ html, body {
 </div>
 
 <!-- ═══════════════════════════════════════════════
-     MODAL: MODULO VUOTO O IMPORTA DA MANUALE
+     WIZARD: NUOVO MANUALE (LINGUE & IMPORT FILE)
 ═══════════════════════════════════════════════ -->
-<div id="moduleModal" class="modal-overlay">
+<div id="wizardNewManualModal" class="modal-overlay">
   <div class="modal-dialog">
     <div class="modal-header">
-      <div class="modal-title">Gestione Nuovo Modulo</div>
-      <button id="btnModalClose" class="icon-action-btn" style="font-size:1.1rem">✕</button>
-    </div>
-
-    <!-- Modal Mode Switcher -->
-    <div style="display:flex;border-bottom:1px solid var(--win-border);background:var(--win-subsurface);padding:0 20px">
-      <button id="tabModeBlank" class="ribbon-tab active">Crea Modulo Vuoto</button>
-      <button id="tabModeImport" class="ribbon-tab">Importa da Manuale Precedente</button>
+      <div class="modal-title">Crea Nuovo Manuale Aziendale</div>
+      <button class="win-btn modal-close-btn" style="border:none;background:transparent">✕</button>
     </div>
 
     <div class="modal-body">
-      
-      <!-- SUB-PANE 1: BLANK MODULE FORM -->
-      <div id="paneBlankModule" style="flex:1;padding:32px;display:flex;flex-direction:column;gap:16px;max-width:500px;margin:0 auto">
-        <div>
-          <label style="font-size:0.84rem;font-weight:600;display:block;margin-bottom:6px">Titolo del Modulo</label>
-          <input type="text" id="blankModuleTitleInput" class="search-input" style="padding:10px 14px;font-size:0.9rem" placeholder="Es. Norme di Sicurezza Operativa e DPI">
-        </div>
-        <div>
-          <label style="font-size:0.84rem;font-weight:600;display:block;margin-bottom:6px">Testo Introduttivo (Opzionale)</label>
-          <textarea id="blankModuleTextInput" class="search-input" style="height:120px;padding:10px 14px;font-size:0.86rem;resize:vertical" placeholder="Inserisci il contenuto iniziale di questo modulo..."></textarea>
-        </div>
+      <div class="form-field">
+        <label>Titolo del Manuale</label>
+        <input type="text" id="wizManualTitleInput" placeholder="Es. Manuale di Uso e Manutenzione Impianto">
       </div>
 
-      <!-- SUB-PANE 2: IMPORT SPLIT VIEW -->
-      <div id="paneImportModule" style="flex:1;display:none;overflow:hidden">
-        
-        <!-- Left: Selector and Modules List -->
-        <div class="import-left-pane">
-          <div class="import-selector-box">
-            <label style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:6px">Seleziona Manuale Origine:</label>
-            <select id="importManualSelect" class="ribbon-select" style="width:100%"></select>
-          </div>
+      <div class="form-field">
+        <label>Codice Documento</label>
+        <input type="text" id="wizManualCodeInput" placeholder="Es. SOP-2026-QA-01">
+      </div>
 
-          <div id="importModuleList" class="import-module-list">
-            <!-- Dynamically populated with modules from selected manual -->
+      <div class="form-field">
+        <label>Varianti di Lingua (Colonne parallele):</label>
+        <p style="font-size:0.76rem;color:var(--text-secondary)">Seleziona una o più lingue. Ogni lingua genererà una colonna parallela affiancata all'interno di ogni pagina.</p>
+        <div id="wizLangCheckboxes" class="lang-checkbox-grid"></div>
+      </div>
+
+      <div style="border-top:1px solid var(--win-border);padding-top:16px;margin-top:16px">
+        <label style="font-size:0.82rem;font-weight:600;display:block;margin-bottom:6px">Vuoi partire da un file esistente?</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button id="btnTriggerFileImport" class="win-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Carica Word (.docx) o PDF
+          </button>
+          <span id="importedFileNameNotice" style="font-size:0.78rem;color:var(--text-secondary)">Nessun file caricato</span>
+          <input type="file" id="fileDocxPdfInput" accept=".docx,.pdf,.txt" style="display:none">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="win-btn modal-close-btn">Annulla</button>
+      <button id="btnConfirmCreateManual" class="win-btn win-btn-primary">Crea e Apri Manuale</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: MODULO VUOTO O RIUSO DA MANUALE
+═══════════════════════════════════════════════ -->
+<div id="moduleChoiceModal" class="modal-overlay">
+  <div class="modal-dialog wide">
+    <div class="modal-header">
+      <div class="modal-title">Aggiungi Pagina / Modulo</div>
+      <button class="win-btn modal-close-btn" style="border:none;background:transparent">✕</button>
+    </div>
+
+    <div style="display:flex;border-bottom:1px solid var(--win-border);background:var(--win-subsurface);padding:0 20px">
+      <button id="tabChoiceBlank" class="ribbon-tab active">Pagina Vuota</button>
+      <button id="tabChoiceImport" class="ribbon-tab">Riusa Modulo da Manuale Precedente</button>
+    </div>
+
+    <div class="modal-body" style="padding:0">
+      
+      <!-- Option 1: Blank Page -->
+      <div id="paneChoiceBlank" style="padding:32px;display:flex;flex-direction:column;gap:14px;max-width:480px;margin:0 auto">
+        <div class="form-field">
+          <label>Titolo del Modulo / Pagina</label>
+          <input type="text" id="blankPageTitleInput" placeholder="Es. Procedure di Avvio e Arresto">
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-secondary)">Verrà creata una nuova pagina A4 separata con la griglia di colonne corrispondente alle lingue del manuale.</p>
+      </div>
+
+      <!-- Option 2: Split Reuse Browser -->
+      <div id="paneChoiceImport" style="display:none;height:100%;flex:1;">
+        <div style="width:300px;border-right:1px solid var(--win-border);background:var(--win-subsurface);display:flex;flex-direction:column">
+          <div style="padding:12px;border-bottom:1px solid var(--win-border)">
+            <label style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:6px">Manuale di origine:</label>
+            <select id="reuseManualSelect" class="ribbon-select" style="width:100%"></select>
           </div>
+          <div id="reuseModulesList" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px"></div>
         </div>
 
-        <!-- Right: Live Preview of Selected Module -->
-        <div class="import-right-preview">
-          <div class="preview-sheet-box">
-            <div id="previewModuleBadge" class="module-header-tag">Anteprima Modulo</div>
-            <h3 id="previewModuleTitle" style="font-size:1.2rem;margin-bottom:12px;color:#1c1c1c">Seleziona un modulo</h3>
-            <div id="previewModuleBody" style="font-size:0.88rem;line-height:1.6;color:#4a4a4a">
-              Seleziona un manuale e poi clicca su uno dei suoi moduli nella colonna a sinistra per visualizzarne l'anteprima fedele.
-            </div>
+        <div style="flex:1;background:#f3f3f3;padding:24px;overflow-y:auto;display:flex;justify-content:center">
+          <div style="width:100%;max-width:540px;background:#ffffff;padding:28px 32px;box-shadow:var(--shadow-card);border:1px solid var(--win-border);border-radius:4px">
+            <div id="reusePreviewTitle" style="font-size:1.15rem;font-weight:700;margin-bottom:14px">Anteprima Modulo</div>
+            <div id="reusePreviewBody" style="font-size:0.88rem;line-height:1.6;color:#333">Seleziona un modulo a sinistra.</div>
           </div>
         </div>
-
       </div>
 
     </div>
 
     <div class="modal-footer">
-      <button id="btnModalCancel" class="win-btn">Annulla</button>
-      <button id="btnModalConfirm" class="win-btn win-btn-primary">Aggiungi Modulo</button>
+      <button class="win-btn modal-close-btn">Annulla</button>
+      <button id="btnConfirmAddModule" class="win-btn win-btn-primary">Aggiungi</button>
     </div>
   </div>
 </div>
@@ -1441,122 +1141,175 @@ html, body {
   'use strict';
 
   // ═══════════════════════════════════════════════
-  // STATE MANAGEMENT (VIRTUAL FILE SYSTEM)
+  // STORAGE & STATE
   // ═══════════════════════════════════════════════
-  const STORAGE_KEY = 'omnimanual_vfs_v2';
-  
+  const STORAGE_KEY = 'omnimanual_vfs_v3';
+
   let vfs = {
-    currentFolderId: null, // null = root
+    currentFolderId: null,
     folders: [],
-    manuals: []
+    manuals: [],
+    trash: [],
+    languages: [
+      { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+      { code: 'en', name: 'Inglese', flag: '🇬🇧' },
+      { code: 'de', name: 'Tedesco', flag: '🇩🇪' },
+      { code: 'fr', name: 'Francese', flag: '🇫🇷' },
+      { code: 'es', name: 'Spagnolo', flag: '🇪🇸' }
+    ]
   };
 
   let currentManual = null;
-  let selectedImportModule = null;
-  let saveTimer = null;
+  let activeNavSection = 'manuals'; // 'manuals', 'settings', 'trash'
+  let currentViewMode = 'grid'; // 'grid' or 'list'
+  let importedDocContent = null;
+  let selectedReuseModule = null;
 
-  // Load from LocalStorage
   function loadVFS() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
-        vfs = JSON.parse(raw);
-        if (!vfs.folders) vfs.folders = [];
-        if (!vfs.manuals) vfs.manuals = [];
+        const parsed = JSON.parse(raw);
+        if (parsed.folders) vfs.folders = parsed.folders;
+        if (parsed.manuals) vfs.manuals = parsed.manuals;
+        if (parsed.trash) vfs.trash = parsed.trash;
+        if (parsed.languages && parsed.languages.length > 0) vfs.languages = parsed.languages;
       } catch (e) {
-        console.error('Error loading VFS:', e);
+        console.error('Failed to load VFS:', e);
       }
     }
   }
 
   function saveVFS() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(vfs));
-    triggerSaveBadge();
-  }
-
-  function triggerSaveBadge() {
     const badge = document.getElementById('saveStatusBadge');
-    if (!badge) return;
-    badge.style.display = 'inline-flex';
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      badge.style.display = 'none';
-    }, 1800);
+    if (badge) {
+      badge.style.display = 'inline-flex';
+      setTimeout(() => { badge.style.display = 'none'; }, 1500);
+    }
   }
 
   // ═══════════════════════════════════════════════
-  // DOM REFERENCES
+  // DOM ELEMENTS
   // ═══════════════════════════════════════════════
   const explorerView = document.getElementById('explorerView');
   const editorView = document.getElementById('editorView');
+  const paneManuals = document.getElementById('paneManuals');
+  const paneSettings = document.getElementById('paneSettings');
+  const paneTrash = document.getElementById('paneTrash');
+
+  const navItemManuals = document.getElementById('navItemManuals');
+  const navItemSettings = document.getElementById('navItemSettings');
+  const navItemTrash = document.getElementById('navItemTrash');
+  const manualsCountBadge = document.getElementById('manualsCountBadge');
+  const trashCountBadge = document.getElementById('trashCountBadge');
+
+  const emptyStateBox = document.getElementById('emptyStateBox');
   const filesGrid = document.getElementById('filesGrid');
   const filesTable = document.getElementById('filesTable');
   const filesTableBody = document.getElementById('filesTableBody');
-  const emptyStateBox = document.getElementById('emptyStateBox');
   const breadcrumbTrail = document.getElementById('breadcrumbTrail');
   const searchFilesInput = document.getElementById('searchFilesInput');
 
-  const btnNewManual = document.getElementById('btnNewManual');
-  const btnNewFolder = document.getElementById('btnNewFolder');
+  const btnOpenNewManualWizard = document.getElementById('btnOpenNewManualWizard');
   const btnEmptyNewManual = document.getElementById('btnEmptyNewManual');
+  const btnNewFolder = document.getElementById('btnNewFolder');
   const btnEmptyNewFolder = document.getElementById('btnEmptyNewFolder');
   const btnViewGrid = document.getElementById('btnViewGrid');
   const btnViewList = document.getElementById('btnViewList');
   const btnBackToExplorer = document.getElementById('btnBackToExplorer');
+  const btnHomeNavigator = document.getElementById('btnHomeNavigator');
   const btnPrintPdf = document.getElementById('btnPrintPdf');
   const titlebarDocName = document.getElementById('titlebarDocName');
 
-  const docSheet = document.getElementById('docSheet');
-  const docModulesContainer = document.getElementById('docModulesContainer');
-  const docHeaderInput = document.getElementById('docHeaderInput');
-  const docHeaderCodeInput = document.getElementById('docHeaderCodeInput');
-  const docFooterInput = document.getElementById('docFooterInput');
-  const docPageNumberDisplay = document.getElementById('docPageNumberDisplay');
+  const documentViewport = document.getElementById('documentViewport');
+  const moduleNavList = document.getElementById('moduleNavList');
   const pageNumFormatSelect = document.getElementById('pageNumFormatSelect');
   const hidePageNumFirstPage = document.getElementById('hidePageNumFirstPage');
-  const moduleNavList = document.getElementById('moduleNavList');
 
-  // Modal elements
-  const moduleModal = document.getElementById('moduleModal');
-  const tabModeBlank = document.getElementById('tabModeBlank');
-  const tabModeImport = document.getElementById('tabModeImport');
-  const paneBlankModule = document.getElementById('paneBlankModule');
-  const paneImportModule = document.getElementById('paneImportModule');
-  const blankModuleTitleInput = document.getElementById('blankModuleTitleInput');
-  const blankModuleTextInput = document.getElementById('blankModuleTextInput');
-  const importManualSelect = document.getElementById('importManualSelect');
-  const importModuleList = document.getElementById('importModuleList');
-  const previewModuleTitle = document.getElementById('previewModuleTitle');
-  const previewModuleBody = document.getElementById('previewModuleBody');
-  const btnModalConfirm = document.getElementById('btnModalConfirm');
-  const btnModalClose = document.getElementById('btnModalClose');
-  const btnModalCancel = document.getElementById('btnModalCancel');
+  // Wizard Modal elements
+  const wizardNewManualModal = document.getElementById('wizardNewManualModal');
+  const wizManualTitleInput = document.getElementById('wizManualTitleInput');
+  const wizManualCodeInput = document.getElementById('wizManualCodeInput');
+  const wizLangCheckboxes = document.getElementById('wizLangCheckboxes');
+  const btnTriggerFileImport = document.getElementById('btnTriggerFileImport');
+  const fileDocxPdfInput = document.getElementById('fileDocxPdfInput');
+  const importedFileNameNotice = document.getElementById('importedFileNameNotice');
+  const btnConfirmCreateManual = document.getElementById('btnConfirmCreateManual');
 
-  let currentViewMode = 'grid'; // 'grid' or 'list'
-  let currentModalMode = 'blank'; // 'blank' or 'import'
+  // Module Choice Modal elements
+  const moduleChoiceModal = document.getElementById('moduleChoiceModal');
+  const tabChoiceBlank = document.getElementById('tabChoiceBlank');
+  const tabChoiceImport = document.getElementById('tabChoiceImport');
+  const paneChoiceBlank = document.getElementById('paneChoiceBlank');
+  const paneChoiceImport = document.getElementById('paneChoiceImport');
+  const blankPageTitleInput = document.getElementById('blankPageTitleInput');
+  const reuseManualSelect = document.getElementById('reuseManualSelect');
+  const reuseModulesList = document.getElementById('reuseModulesList');
+  const reusePreviewTitle = document.getElementById('reusePreviewTitle');
+  const reusePreviewBody = document.getElementById('reusePreviewBody');
+  const btnConfirmAddModule = document.getElementById('btnConfirmAddModule');
+
+  // Settings elements
+  const langListContainer = document.getElementById('langListContainer');
+  const newLangNameInput = document.getElementById('newLangNameInput');
+  const newLangCodeInput = document.getElementById('newLangCodeInput');
+  const newLangFlagInput = document.getElementById('newLangFlagInput');
+  const btnAddLangConfirm = document.getElementById('btnAddLangConfirm');
+
+  // Trash elements
+  const trashTable = document.getElementById('trashTable');
+  const trashTableBody = document.getElementById('trashTableBody');
+  const trashEmptyState = document.getElementById('trashEmptyState');
+  const btnEmptyTrash = document.getElementById('btnEmptyTrash');
 
   // ═══════════════════════════════════════════════
-  // EXPLORER VIEW LOGIC
+  // EXPLORER VIEW & NAVIGATION
   // ═══════════════════════════════════════════════
-  function renderExplorer() {
-    explorerView.style.display = 'flex';
+  function showExplorer() {
+    explorerView.style.display = 'grid';
     editorView.style.display = 'none';
     btnBackToExplorer.style.display = 'none';
     btnPrintPdf.style.display = 'none';
     titlebarDocName.textContent = 'Gestione Manuali Aziendali';
 
-    renderBreadcrumbs();
+    manualsCountBadge.textContent = vfs.manuals.length;
+    trashCountBadge.textContent = vfs.trash.length;
+    trashCountBadge.style.display = vfs.trash.length > 0 ? 'inline-block' : 'none';
 
+    if (activeNavSection === 'manuals') {
+      paneManuals.style.display = 'block';
+      paneSettings.style.display = 'none';
+      paneTrash.style.display = 'none';
+      document.getElementById('explorerCommandBar').style.display = 'flex';
+      document.getElementById('explorerAddressBar').style.display = 'flex';
+      renderManualsExplorer();
+    } else if (activeNavSection === 'settings') {
+      paneManuals.style.display = 'none';
+      paneSettings.style.display = 'block';
+      paneTrash.style.display = 'none';
+      document.getElementById('explorerCommandBar').style.display = 'none';
+      document.getElementById('explorerAddressBar').style.display = 'none';
+      renderLanguageSettings();
+    } else if (activeNavSection === 'trash') {
+      paneManuals.style.display = 'none';
+      paneSettings.style.display = 'none';
+      paneTrash.style.display = 'block';
+      document.getElementById('explorerCommandBar').style.display = 'none';
+      document.getElementById('explorerAddressBar').style.display = 'none';
+      renderTrash();
+    }
+  }
+
+  function renderManualsExplorer() {
+    renderBreadcrumbs();
     const currentFId = vfs.currentFolderId;
     const query = (searchFilesInput.value || '').trim().toLowerCase();
 
-    // Filter items in current folder
     const childFolders = vfs.folders.filter(f => f.parentId === currentFId && (!query || f.name.toLowerCase().includes(query)));
     const childManuals = vfs.manuals.filter(m => m.folderId === currentFId && (!query || m.title.toLowerCase().includes(query)));
 
-    const totalCount = childFolders.length + childManuals.length;
-
-    if (totalCount === 0) {
+    if (childFolders.length === 0 && childManuals.length === 0) {
       emptyStateBox.style.display = 'flex';
       filesGrid.style.display = 'none';
       filesTable.style.display = 'none';
@@ -1580,17 +1333,13 @@ html, body {
     breadcrumbTrail.innerHTML = '';
     let trail = [];
     let curr = vfs.currentFolderId;
-
     while (curr) {
       const f = vfs.folders.find(x => x.id === curr);
       if (f) {
         trail.unshift(f);
         curr = f.parentId;
-      } else {
-        break;
-      }
+      } else break;
     }
-
     trail.forEach(f => {
       const sep = document.createElement('span');
       sep.className = 'breadcrumb-separator';
@@ -1602,7 +1351,7 @@ html, body {
       span.textContent = f.name;
       span.addEventListener('click', () => {
         vfs.currentFolderId = f.id;
-        renderExplorer();
+        renderManualsExplorer();
       });
       breadcrumbTrail.appendChild(span);
     });
@@ -1611,7 +1360,6 @@ html, body {
   function renderGrid(folders, manuals) {
     filesGrid.innerHTML = '';
 
-    // Folders
     folders.forEach(f => {
       const card = document.createElement('div');
       card.className = 'file-card';
@@ -1625,40 +1373,44 @@ html, body {
           <span>${count} elementi</span>
           <span>Cartella</span>
         </div>
-        <button class="file-actions-menu" title="Opzioni cartella">⋮</button>
+        <button class="file-actions-menu" title="Opzioni">⋮</button>
       `;
       card.addEventListener('click', (e) => {
         if (e.target.closest('.file-actions-menu')) {
           e.stopPropagation();
-          handleFolderMenu(f);
+          handleFolderOptions(f);
           return;
         }
         vfs.currentFolderId = f.id;
-        renderExplorer();
+        renderManualsExplorer();
       });
       filesGrid.appendChild(card);
     });
 
-    // Manuals
     manuals.forEach(m => {
       const card = document.createElement('div');
       card.className = 'file-card';
       const modCount = (m.modules || []).length;
+      const langBadges = (m.languages || ['it']).map(code => {
+        const l = vfs.languages.find(x => x.code === code);
+        return `<span class="lang-mini-pill">${l ? l.flag : code.toUpperCase()}</span>`;
+      }).join('');
+
       card.innerHTML = `
         <div class="file-icon-wrap manual">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         </div>
         <div class="file-meta-name">${escapeHtml(m.title)}</div>
         <div class="file-meta-sub">
-          <span>${modCount} ${modCount === 1 ? 'modulo' : 'moduli'}</span>
-          <span>${formatDate(m.updatedAt)}</span>
+          <div class="file-lang-badges">${langBadges}</div>
+          <span>${modCount} pagg.</span>
         </div>
-        <button class="file-actions-menu" title="Opzioni manuale">⋮</button>
+        <button class="file-actions-menu" title="Opzioni">⋮</button>
       `;
       card.addEventListener('click', (e) => {
         if (e.target.closest('.file-actions-menu')) {
           e.stopPropagation();
-          handleManualMenu(m);
+          handleManualOptions(m);
           return;
         }
         openManualEditor(m);
@@ -1681,7 +1433,7 @@ html, body {
           </div>
         </td>
         <td>${formatDate(f.createdAt)}</td>
-        <td>Cartella di file</td>
+        <td>—</td>
         <td>${count} elementi</td>
         <td style="text-align:right">
           <button class="win-btn btn-folder-del" style="padding:2px 6px">Elimina</button>
@@ -1694,7 +1446,7 @@ html, body {
           return;
         }
         vfs.currentFolderId = f.id;
-        renderExplorer();
+        renderManualsExplorer();
       });
       filesTableBody.appendChild(tr);
     });
@@ -1702,6 +1454,11 @@ html, body {
     manuals.forEach(m => {
       const tr = document.createElement('tr');
       const modCount = (m.modules || []).length;
+      const langBadges = (m.languages || ['it']).map(code => {
+        const l = vfs.languages.find(x => x.code === code);
+        return `<span class="lang-mini-pill">${l ? l.flag : code.toUpperCase()}</span>`;
+      }).join(' ');
+
       tr.innerHTML = `
         <td>
           <div class="table-name-cell">
@@ -1710,16 +1467,16 @@ html, body {
           </div>
         </td>
         <td>${formatDate(m.updatedAt)}</td>
-        <td>Manuale Aziendale (.omni)</td>
-        <td>${modCount} moduli</td>
+        <td>${langBadges}</td>
+        <td>${modCount} pagg.</td>
         <td style="text-align:right">
-          <button class="win-btn btn-doc-del" style="padding:2px 6px">Elimina</button>
+          <button class="win-btn btn-doc-del" style="padding:2px 6px;color:var(--danger)">Cestina</button>
         </td>
       `;
       tr.addEventListener('click', (e) => {
         if (e.target.closest('.btn-doc-del')) {
           e.stopPropagation();
-          deleteManual(m.id);
+          trashManual(m.id, 'Eliminato dall\'utente');
           return;
         }
         openManualEditor(m);
@@ -1728,105 +1485,356 @@ html, body {
     });
   }
 
-  function handleFolderMenu(f) {
-    const action = prompt(`Cartella: "${f.name}"\nScegli un'azione:\n1 = Rinomina\n2 = Elimina`, '1');
-    if (action === '1') {
-      const newName = prompt('Nuovo nome cartella:', f.name);
-      if (newName && newName.trim()) {
-        f.name = newName.trim();
-        saveVFS();
-        renderExplorer();
-      }
-    } else if (action === '2') {
+  function handleFolderOptions(f) {
+    const act = prompt(`Cartella: "${f.name}"\n1 = Rinomina\n2 = Elimina`, '1');
+    if (act === '1') {
+      const n = prompt('Nuovo nome:', f.name);
+      if (n && n.trim()) { f.name = n.trim(); saveVFS(); renderManualsExplorer(); }
+    } else if (act === '2') {
       deleteFolder(f.id);
     }
   }
 
   function deleteFolder(id) {
-    if (confirm('Eliminare questa cartella e tutti i file al suo interno?')) {
+    if (confirm('Eliminare questa cartella? I manuali al suo interno verranno spostati nel cestino.')) {
       vfs.folders = vfs.folders.filter(f => f.id !== id);
-      vfs.manuals = vfs.manuals.filter(m => m.folderId !== id);
+      const toTrash = vfs.manuals.filter(m => m.folderId === id);
+      toTrash.forEach(m => trashManual(m.id, 'Cartella eliminata'));
       saveVFS();
-      renderExplorer();
+      renderManualsExplorer();
     }
   }
 
-  function handleManualMenu(m) {
-    const action = prompt(`Manuale: "${m.title}"\nScegli un'azione:\n1 = Rinomina\n2 = Duplica\n3 = Elimina`, '1');
-    if (action === '1') {
-      const newTitle = prompt('Nuovo titolo manuale:', m.title);
-      if (newTitle && newTitle.trim()) {
-        m.title = newTitle.trim();
-        m.updatedAt = new Date().toISOString();
-        saveVFS();
-        renderExplorer();
-      }
-    } else if (action === '2') {
-      const copy = JSON.parse(JSON.stringify(m));
-      copy.id = 'm_' + Date.now();
-      copy.title += ' (Copia)';
-      copy.updatedAt = new Date().toISOString();
-      vfs.manuals.push(copy);
+  function handleManualOptions(m) {
+    const act = prompt(`Manuale: "${m.title}"\n1 = Rinomina\n2 = Duplica\n3 = Sposta nel Cestino`, '1');
+    if (act === '1') {
+      const n = prompt('Nuovo titolo:', m.title);
+      if (n && n.trim()) { m.title = n.trim(); m.updatedAt = new Date().toISOString(); saveVFS(); renderManualsExplorer(); }
+    } else if (act === '2') {
+      const clone = JSON.parse(JSON.stringify(m));
+      clone.id = 'm_' + Date.now();
+      clone.title += ' (Copia)';
+      clone.updatedAt = new Date().toISOString();
+      vfs.manuals.push(clone);
       saveVFS();
-      renderExplorer();
-    } else if (action === '3') {
-      deleteManual(m.id);
+      renderManualsExplorer();
+    } else if (act === '3') {
+      trashManual(m.id, 'Spostato manualmente nel cestino');
     }
   }
 
-  function deleteManual(id) {
-    if (confirm('Eliminare definitivamente questo manuale?')) {
-      vfs.manuals = vfs.manuals.filter(m => m.id !== id);
+  function trashManual(id, reason) {
+    const idx = vfs.manuals.findIndex(m => m.id === id);
+    if (idx !== -1) {
+      const m = vfs.manuals.splice(idx, 1)[0];
+      m.deletedAt = new Date().toISOString();
+      m.deletedReason = reason || 'Eliminato';
+      vfs.trash.push(m);
       saveVFS();
-      renderExplorer();
+      showExplorer();
     }
   }
 
-  // Create new folder
-  function createNewFolder() {
-    const name = prompt('Nome della nuova cartella:', 'Nuova Cartella');
-    if (!name || !name.trim()) return;
-    vfs.folders.push({
-      id: 'f_' + Date.now(),
-      name: name.trim(),
-      parentId: vfs.currentFolderId,
-      createdAt: new Date().toISOString()
+  // ═══════════════════════════════════════════════
+  // LANGUAGE SETTINGS & 2-STEP SAFETY CONFIRMATION
+  // ═══════════════════════════════════════════════
+  function renderLanguageSettings() {
+    langListContainer.innerHTML = '';
+    vfs.languages.forEach((l, idx) => {
+      const count = vfs.manuals.filter(m => (m.languages || []).includes(l.code)).length;
+      const row = document.createElement('div');
+      row.className = 'lang-row-item';
+      row.innerHTML = `
+        <div class="lang-row-left">
+          <span>${l.flag || '🌐'}</span>
+          <span>${escapeHtml(l.name)}</span>
+          <span class="lang-row-code">${l.code.toUpperCase()}</span>
+          <span style="font-size:0.75rem;color:var(--text-tertiary);font-weight:400">(${count} manuali)</span>
+        </div>
+        <div class="lang-row-tools">
+          <button class="win-btn btn-lang-up" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>▲</button>
+          <button class="win-btn btn-lang-down" ${idx === vfs.languages.length - 1 ? 'disabled style="opacity:0.3"' : ''}>▼</button>
+          <button class="win-btn btn-lang-del" style="color:var(--danger)">Elimina</button>
+        </div>
+      `;
+
+      // Up
+      row.querySelector('.btn-lang-up').addEventListener('click', () => {
+        if (idx > 0) {
+          const t = vfs.languages[idx];
+          vfs.languages[idx] = vfs.languages[idx - 1];
+          vfs.languages[idx - 1] = t;
+          saveVFS();
+          renderLanguageSettings();
+        }
+      });
+      // Down
+      row.querySelector('.btn-lang-down').addEventListener('click', () => {
+        if (idx < vfs.languages.length - 1) {
+          const t = vfs.languages[idx];
+          vfs.languages[idx] = vfs.languages[idx + 1];
+          vfs.languages[idx + 1] = t;
+          saveVFS();
+          renderLanguageSettings();
+        }
+      });
+      // Delete with 2-Step verification
+      row.querySelector('.btn-lang-del').addEventListener('click', () => {
+        handleDeleteLanguage(l);
+      });
+
+      langListContainer.appendChild(row);
     });
-    saveVFS();
-    renderExplorer();
   }
 
-  // Create new manual
-  function createNewManual() {
-    const title = prompt('Titolo del nuovo manuale:', 'Nuovo Manuale Aziendale');
-    if (!title || !title.trim()) return;
+  function handleDeleteLanguage(lang) {
+    if (vfs.languages.length <= 1) {
+      alert('Non puoi rimuovere l\'unica lingua rimasta.');
+      return;
+    }
+
+    // Step 1: First Confirmation
+    const firstConfirm = confirm(`Sei sicuro di voler cancellare la lingua "${lang.name}" (${lang.code.toUpperCase()})?`);
+    if (!firstConfirm) return;
+
+    // Check if any manuals use this language
+    const associatedManuals = vfs.manuals.filter(m => (m.languages || []).includes(lang.code));
+
+    // Step 2: Critical second confirmation if manuals are present
+    if (associatedManuals.length > 0) {
+      const titlesList = associatedManuals.map((m, i) => `${i + 1}. "${m.title}"`).join('\n');
+      const secondConfirm = confirm(
+        `⚠️ ATTENZIONE: I seguenti ${associatedManuals.length} manuali contengono questa lingua:\n\n${titlesList}\n\nEliminare questa lingua rimuoverà questi manuali e li sposterà nell'area CESTINO.\n\nConfermi l'eliminazione della lingua e lo spostamento dei manuali nel Cestino?`
+      );
+      if (!secondConfirm) return;
+
+      // Trash the manuals
+      associatedManuals.forEach(m => {
+        trashManual(m.id, `Lingua rimossa: ${lang.name}`);
+      });
+    }
+
+    // Remove the language
+    vfs.languages = vfs.languages.filter(l => l.code !== lang.code);
+    saveVFS();
+    renderLanguageSettings();
+  }
+
+  btnAddLangConfirm.addEventListener('click', () => {
+    const name = newLangNameInput.value.trim();
+    const code = newLangCodeInput.value.trim().toLowerCase();
+    const flag = newLangFlagInput.value.trim() || '🌐';
+
+    if (!name || !code) {
+      alert('Inserisci sia il nome che il codice della lingua.');
+      return;
+    }
+    if (vfs.languages.some(l => l.code === code)) {
+      alert('Questa lingua o codice esiste già.');
+      return;
+    }
+
+    vfs.languages.push({ code, name, flag });
+    newLangNameInput.value = '';
+    newLangCodeInput.value = '';
+    newLangFlagInput.value = '';
+    saveVFS();
+    renderLanguageSettings();
+  });
+
+  // ═══════════════════════════════════════════════
+  // TRASH (CESTINO) LOGIC
+  // ═══════════════════════════════════════════════
+  function renderTrash() {
+    trashTableBody.innerHTML = '';
+    if (vfs.trash.length === 0) {
+      trashEmptyState.style.display = 'flex';
+      trashTable.style.display = 'none';
+      return;
+    }
+
+    trashEmptyState.style.display = 'none';
+    trashTable.style.display = 'table';
+
+    vfs.trash.forEach((m, idx) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${escapeHtml(m.title)}</strong></td>
+        <td>${formatDate(m.deletedAt)}</td>
+        <td><span style="font-size:0.75rem;color:var(--text-secondary)">${escapeHtml(m.deletedReason || 'Cestinato')}</span></td>
+        <td style="text-align:right">
+          <button class="win-btn btn-restore" style="padding:2px 8px">Ripristina</button>
+          <button class="win-btn btn-perm-del" style="padding:2px 8px;color:var(--danger)">Elimina Definitivo</button>
+        </td>
+      `;
+
+      // Restore
+      tr.querySelector('.btn-restore').addEventListener('click', () => {
+        vfs.trash.splice(idx, 1);
+        m.folderId = null; // restore to root
+        delete m.deletedAt;
+        delete m.deletedReason;
+        vfs.manuals.push(m);
+        saveVFS();
+        showExplorer();
+      });
+
+      // Permanent delete
+      tr.querySelector('.btn-perm-del').addEventListener('click', () => {
+        if (confirm(`Eliminare definitivamente "${m.title}"?`)) {
+          vfs.trash.splice(idx, 1);
+          saveVFS();
+          renderTrash();
+        }
+      });
+
+      trashTableBody.appendChild(tr);
+    });
+  }
+
+  btnEmptyTrash.addEventListener('click', () => {
+    if (vfs.trash.length === 0) return;
+    if (confirm('Svuotare completamente il cestino? Questa operazione è irreversibile.')) {
+      vfs.trash = [];
+      saveVFS();
+      renderTrash();
+    }
+  });
+
+  // ═══════════════════════════════════════════════
+  // WIZARD CREAZIONE NUOVO MANUALE & CARICAMENTO FILE
+  // ═══════════════════════════════════════════════
+  function openNewManualWizard() {
+    wizardNewManualModal.classList.add('open');
+    wizManualTitleInput.value = '';
+    wizManualCodeInput.value = 'SOP-' + new Date().getFullYear() + '-001';
+    importedDocContent = null;
+    importedFileNameNotice.textContent = 'Nessun file caricato';
+
+    // Render language checkboxes from settings
+    wizLangCheckboxes.innerHTML = '';
+    vfs.languages.forEach((l, idx) => {
+      const label = document.createElement('label');
+      label.className = 'lang-check-item';
+      label.innerHTML = `
+        <input type="checkbox" value="${l.code}" ${idx === 0 ? 'checked' : ''}>
+        <span>${l.flag || ''} ${escapeHtml(l.name)}</span>
+      `;
+      wizLangCheckboxes.appendChild(label);
+    });
+  }
+
+  btnTriggerFileImport.addEventListener('click', () => fileDocxPdfInput.click());
+
+  fileDocxPdfInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    importedFileNameNotice.textContent = 'Elaborazione: ' + file.name + '...';
+
+    const fileName = file.name.toLowerCase();
+    if (fileName.endsWith('.docx')) {
+      try {
+        const zip = await JSZip.loadAsync(file);
+        const docXml = await zip.file('word/document.xml').async('text');
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(docXml, 'text/xml');
+        const paragraphs = xmlDoc.getElementsByTagName('w:p');
+
+        let htmlOut = '';
+        for (let i = 0; i < paragraphs.length; i++) {
+          const textNodes = paragraphs[i].getElementsByTagName('w:t');
+          let pText = '';
+          for (let j = 0; j < textNodes.length; j++) pText += textNodes[j].textContent;
+          if (pText.trim()) htmlOut += `<p>${escapeHtml(pText)}</p>`;
+        }
+
+        importedDocContent = htmlOut || '<p>Contenuto importato da file Word.</p>';
+        importedFileNameNotice.textContent = '✓ ' + file.name;
+        if (!wizManualTitleInput.value.trim()) {
+          wizManualTitleInput.value = file.name.replace('.docx', '');
+        }
+      } catch (err) {
+        alert('Errore nella lettura del file Word .docx: ' + err.message);
+        importedFileNameNotice.textContent = 'Errore importazione';
+      }
+    } else if (fileName.endsWith('.pdf')) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        if (window.pdfjsLib) {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let fullHtml = '';
+          for (let p = 1; p <= pdf.numPages; p++) {
+            const page = await pdf.getPage(p);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(it => it.str).join(' ');
+            if (pageText.trim()) {
+              fullHtml += `<p>${escapeHtml(pageText)}</p>`;
+            }
+          }
+          importedDocContent = fullHtml || '<p>Contenuto estratto da PDF.</p>';
+        } else {
+          importedDocContent = '<p>Testo estratto da file PDF.</p>';
+        }
+        importedFileNameNotice.textContent = '✓ ' + file.name;
+        if (!wizManualTitleInput.value.trim()) {
+          wizManualTitleInput.value = file.name.replace('.pdf', '');
+        }
+      } catch (err) {
+        alert('Errore nella lettura del PDF: ' + err.message);
+        importedFileNameNotice.textContent = 'Errore importazione';
+      }
+    } else {
+      // Plain text or fallback
+      const text = await file.text();
+      importedDocContent = `<p>${escapeHtml(text).replace(/\n/g, '<br>')}</p>`;
+      importedFileNameNotice.textContent = '✓ ' + file.name;
+    }
+  });
+
+  btnConfirmCreateManual.addEventListener('click', () => {
+    const title = wizManualTitleInput.value.trim() || 'Nuovo Manuale';
+    const code = wizManualCodeInput.value.trim() || 'DOC-' + new Date().getFullYear();
+
+    const selectedLangs = Array.from(wizLangCheckboxes.querySelectorAll('input:checked')).map(cb => cb.value);
+    if (selectedLangs.length === 0) {
+      alert('Seleziona almeno una lingua per il manuale.');
+      return;
+    }
+
+    const firstModuleContentByLang = {};
+    selectedLangs.forEach(l => {
+      firstModuleContentByLang[l] = importedDocContent || '<p>Inizia a scrivere qui il contenuto...</p>';
+    });
 
     const newDoc = {
       id: 'm_' + Date.now(),
-      title: title.trim(),
+      title: title,
       folderId: vfs.currentFolderId,
-      updatedAt: new Date().toISOString(),
-      headerText: 'Nexus Dynamics S.p.A. • Divisione Qualità & HSE',
-      headerCode: 'DOC-' + new Date().getFullYear() + '-001',
+      languages: selectedLangs,
+      headerText: 'Nexus Dynamics S.p.A.',
+      headerCode: code,
       footerText: 'Uso Interno Riservato • Riproduzione Vietata',
       pageNumFormat: 'page_of_total',
       hideFirstPageNum: true,
+      updatedAt: new Date().toISOString(),
       modules: [
         {
           id: 'mod_' + Date.now() + '_1',
-          title: 'Introduzione e Scopo del Documento',
-          contentHtml: '<p>Il presente manuale definisce le linee guida e le procedure operative standard adottate per garantire conformità, efficienza e sicurezza nei processi aziendali.</p><p>La documentazione è vincolante per tutto il personale operativo e i collaboratori autorizzati.</p>'
+          title: 'Introduzione',
+          contentByLang: firstModuleContentByLang
         }
       ]
     };
 
     vfs.manuals.push(newDoc);
     saveVFS();
+    wizardNewManualModal.classList.remove('open');
     openManualEditor(newDoc);
-  }
+  });
 
   // ═══════════════════════════════════════════════
-  // EDITOR VIEW LOGIC
+  // EDITOR VIEW (WORD STYLE + CLEAN A4 SHEETS)
   // ═══════════════════════════════════════════════
   function openManualEditor(manual) {
     currentManual = manual;
@@ -1836,48 +1844,143 @@ html, body {
     btnPrintPdf.style.display = 'inline-flex';
     titlebarDocName.textContent = manual.title;
 
-    docHeaderInput.value = manual.headerText || '';
-    docHeaderCodeInput.value = manual.headerCode || '';
-    docFooterInput.value = manual.footerText || '';
     pageNumFormatSelect.value = manual.pageNumFormat || 'page_of_total';
     hidePageNumFirstPage.checked = manual.hideFirstPageNum !== false;
 
-    renderDocumentModules();
+    renderDocumentSheets();
     renderSidebarModulesList();
-    updatePageNumbers();
   }
 
-  function renderDocumentModules() {
-    docModulesContainer.innerHTML = '';
+  function renderDocumentSheets() {
+    documentViewport.innerHTML = '';
     if (!currentManual.modules) currentManual.modules = [];
 
+    const langs = currentManual.languages || ['it'];
+    const totalPages = currentManual.modules.length;
+
     currentManual.modules.forEach((mod, idx) => {
-      const section = document.createElement('section');
-      section.className = 'doc-module-section';
-      section.id = 'module_sec_' + mod.id;
-      section.innerHTML = `
-        <div class="module-header-tag">Modulo ${idx + 1}.0</div>
-        <h2 class="module-title-h2" contenteditable="true" spellcheck="false">${escapeHtml(mod.title)}</h2>
-        <div class="module-editable-body" contenteditable="true" spellcheck="true">${mod.contentHtml || '<p>Inizia a scrivere qui...</p>'}</div>
+      const pageNum = idx + 1;
+      const sheet = document.createElement('article');
+      sheet.className = 'a4-sheet';
+      sheet.id = 'page_sheet_' + mod.id;
+
+      // Page header
+      const headerHtml = `
+        <div class="sheet-header">
+          <input type="text" class="header-input sheet-header-left" value="${escapeHtml(currentManual.headerText || '')}" placeholder="Intestazione...">
+          <input type="text" class="header-input sheet-header-right" style="text-align:right" value="${escapeHtml(currentManual.headerCode || '')}" placeholder="Codice...">
+        </div>
       `;
 
-      // Sync title edit
-      const titleH2 = section.querySelector('.module-title-h2');
-      titleH2.addEventListener('blur', () => {
-        mod.title = titleH2.textContent.trim() || 'Modulo ' + (idx + 1);
-        saveCurrentManualState();
-        renderSidebarModulesList();
+      // Multi-column or single column content area
+      let columnsHtml = '';
+      if (langs.length === 1) {
+        const lCode = langs[0];
+        const content = (mod.contentByLang && mod.contentByLang[lCode]) || '<p></p>';
+        columnsHtml = `
+          <div class="sheet-content-area">
+            <div class="sheet-editable-body" data-lang="${lCode}" contenteditable="true" spellcheck="true">${content}</div>
+          </div>
+        `;
+      } else {
+        const cols = langs.map(lCode => {
+          const lObj = vfs.languages.find(x => x.code === lCode);
+          const flag = lObj ? lObj.flag : '';
+          const name = lObj ? lObj.name : lCode.toUpperCase();
+          const content = (mod.contentByLang && mod.contentByLang[lCode]) || '<p></p>';
+          return `
+            <div class="lang-column-wrap">
+              <div class="lang-col-header">${flag} ${escapeHtml(name)}</div>
+              <div class="sheet-editable-body" data-lang="${lCode}" contenteditable="true" spellcheck="true">${content}</div>
+            </div>
+          `;
+        }).join('');
+
+        columnsHtml = `
+          <div class="multilang-columns-grid" style="grid-template-columns: repeat(${langs.length}, 1fr)">
+            ${cols}
+          </div>
+        `;
+      }
+
+      // Page footer & numbering
+      let pageNumText = '';
+      const fmt = currentManual.pageNumFormat || 'page_of_total';
+      const hideFirst = currentManual.hideFirstPageNum !== false;
+
+      if (fmt !== 'none') {
+        if (!(hideFirst && pageNum === 1)) {
+          pageNumText = fmt === 'page_of_total' ? `Pagina ${pageNum} di ${totalPages}` : `${pageNum}`;
+        }
+      }
+
+      const footerHtml = `
+        <div class="sheet-footer">
+          <input type="text" class="footer-input sheet-footer-left" value="${escapeHtml(currentManual.footerText || '')}" placeholder="Piè di pagina...">
+          <span class="page-num-display">${pageNumText}</span>
+        </div>
+      `;
+
+      sheet.innerHTML = headerHtml + columnsHtml + footerHtml;
+
+      // Natural cursor focus on clicking empty page area
+      sheet.addEventListener('click', (e) => {
+        if (e.target.closest('.sheet-header') || e.target.closest('.sheet-footer') || e.target.closest('.editor-safety-box') || e.target.closest('.word-table') || e.target.closest('input')) {
+          return;
+        }
+        // Find which column was clicked, or fallback to first
+        const colWrap = e.target.closest('.lang-column-wrap');
+        const targetEditable = colWrap ? colWrap.querySelector('.sheet-editable-body') : sheet.querySelector('.sheet-editable-body');
+        if (targetEditable && (!targetEditable.contains(e.target) || e.target === targetEditable)) {
+          placeCaretAtEnd(targetEditable);
+        }
       });
 
-      // Sync content edit
-      const bodyDiv = section.querySelector('.module-editable-body');
-      bodyDiv.addEventListener('input', () => {
-        mod.contentHtml = bodyDiv.innerHTML;
-        saveCurrentManualState();
+      // Sync editable content (input, keyup, blur for safety box edits and table edits)
+      sheet.querySelectorAll('.sheet-editable-body').forEach(bodyDiv => {
+        ['input', 'keyup', 'blur'].forEach(evt => {
+          bodyDiv.addEventListener(evt, () => {
+            const l = bodyDiv.dataset.lang;
+            if (!mod.contentByLang) mod.contentByLang = {};
+            mod.contentByLang[l] = bodyDiv.innerHTML;
+            saveCurrentManual();
+          });
+        });
       });
 
-      docModulesContainer.appendChild(section);
+      // Sync headers & footers across manual
+      sheet.querySelector('.sheet-header-left').addEventListener('input', (e) => {
+        currentManual.headerText = e.target.value;
+        syncGlobalSheetText('.sheet-header-left', e.target.value);
+      });
+      sheet.querySelector('.sheet-header-right').addEventListener('input', (e) => {
+        currentManual.headerCode = e.target.value;
+        syncGlobalSheetText('.sheet-header-right', e.target.value);
+      });
+      sheet.querySelector('.sheet-footer-left').addEventListener('input', (e) => {
+        currentManual.footerText = e.target.value;
+        syncGlobalSheetText('.sheet-footer-left', e.target.value);
+      });
+
+      documentViewport.appendChild(sheet);
     });
+  }
+
+  function syncGlobalSheetText(selector, val) {
+    document.querySelectorAll(selector).forEach(inp => inp.value = val);
+    saveCurrentManual();
+  }
+
+  function placeCaretAtEnd(el) {
+    el.focus();
+    if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
   }
 
   function renderSidebarModulesList() {
@@ -1887,64 +1990,61 @@ html, body {
     currentManual.modules.forEach((mod, idx) => {
       const card = document.createElement('div');
       card.className = 'module-item-card' + (idx === 0 ? ' active' : '');
-      card.dataset.id = mod.id;
       card.innerHTML = `
-        <div class="module-card-left">
-          <span class="module-index-badge">${idx + 1}</span>
-          <span class="module-card-title">${escapeHtml(mod.title)}</span>
+        <div style="display:flex;align-items:center;gap:8px;overflow:hidden">
+          <span style="font-family:var(--font-mono);font-size:0.75rem;font-weight:700;color:var(--win-accent)">P.${idx + 1}</span>
+          <span class="module-card-title">${escapeHtml(mod.title || 'Pagina ' + (idx + 1))}</span>
         </div>
-        <div class="module-card-actions">
-          <button class="icon-action-btn btn-mod-up" title="Sposta su" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>▲</button>
-          <button class="icon-action-btn btn-mod-down" title="Sposta giù" ${idx === currentManual.modules.length - 1 ? 'disabled style="opacity:0.3"' : ''}>▼</button>
-          <button class="icon-action-btn btn-mod-del" title="Elimina modulo" style="color:#d13438">✕</button>
+        <div class="module-card-tools">
+          <button class="win-btn btn-page-up" style="padding:2px 4px" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>▲</button>
+          <button class="win-btn btn-page-down" style="padding:2px 4px" ${idx === currentManual.modules.length - 1 ? 'disabled style="opacity:0.3"' : ''}>▼</button>
+          <button class="win-btn btn-page-del" style="padding:2px 4px;color:var(--danger)">✕</button>
         </div>
       `;
 
       card.addEventListener('click', (e) => {
-        if (e.target.closest('.module-card-actions')) return;
+        if (e.target.closest('.module-card-tools')) return;
         document.querySelectorAll('.module-item-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
-        const targetEl = document.getElementById('module_sec_' + mod.id);
-        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const sheet = document.getElementById('page_sheet_' + mod.id);
+        if (sheet) sheet.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
 
-      // Up button
-      card.querySelector('.btn-mod-up').addEventListener('click', (e) => {
+      // Up
+      card.querySelector('.btn-page-up').addEventListener('click', (e) => {
         e.stopPropagation();
         if (idx > 0) {
-          const temp = currentManual.modules[idx];
+          const t = currentManual.modules[idx];
           currentManual.modules[idx] = currentManual.modules[idx - 1];
-          currentManual.modules[idx - 1] = temp;
-          saveCurrentManualState();
-          renderDocumentModules();
+          currentManual.modules[idx - 1] = t;
+          saveCurrentManual();
+          renderDocumentSheets();
           renderSidebarModulesList();
         }
       });
-
-      // Down button
-      card.querySelector('.btn-mod-down').addEventListener('click', (e) => {
+      // Down
+      card.querySelector('.btn-page-down').addEventListener('click', (e) => {
         e.stopPropagation();
         if (idx < currentManual.modules.length - 1) {
-          const temp = currentManual.modules[idx];
+          const t = currentManual.modules[idx];
           currentManual.modules[idx] = currentManual.modules[idx + 1];
-          currentManual.modules[idx + 1] = temp;
-          saveCurrentManualState();
-          renderDocumentModules();
+          currentManual.modules[idx + 1] = t;
+          saveCurrentManual();
+          renderDocumentSheets();
           renderSidebarModulesList();
         }
       });
-
-      // Delete button
-      card.querySelector('.btn-mod-del').addEventListener('click', (e) => {
+      // Delete page
+      card.querySelector('.btn-page-del').addEventListener('click', (e) => {
         e.stopPropagation();
         if (currentManual.modules.length <= 1) {
-          alert('Il manuale deve contenere almeno un modulo.');
+          alert('Il manuale deve avere almeno una pagina.');
           return;
         }
-        if (confirm(`Eliminare il modulo "${mod.title}"?`)) {
+        if (confirm(`Eliminare la Pagina ${idx + 1} ("${mod.title}")?`)) {
           currentManual.modules.splice(idx, 1);
-          saveCurrentManualState();
-          renderDocumentModules();
+          saveCurrentManual();
+          renderDocumentSheets();
           renderSidebarModulesList();
         }
       });
@@ -1953,167 +2053,139 @@ html, body {
     });
   }
 
-  function saveCurrentManualState() {
+  function saveCurrentManual() {
     if (!currentManual) return;
-    currentManual.headerText = docHeaderInput.value;
-    currentManual.headerCode = docHeaderCodeInput.value;
-    currentManual.footerText = docFooterInput.value;
-    currentManual.pageNumFormat = pageNumFormatSelect.value;
-    currentManual.hideFirstPageNum = hidePageNumFirstPage.checked;
     currentManual.updatedAt = new Date().toISOString();
-
     saveVFS();
   }
 
-  function updatePageNumbers() {
-    const fmt = pageNumFormatSelect.value;
-    if (fmt === 'none') {
-      docPageNumberDisplay.style.display = 'none';
-      return;
-    }
-    docPageNumberDisplay.style.display = 'inline';
-    if (fmt === 'page_of_total') {
-      docPageNumberDisplay.textContent = 'Pagina 1 di 1';
-    } else {
-      docPageNumberDisplay.textContent = '1';
-    }
-  }
-
   // ═══════════════════════════════════════════════
-  // MODAL & MODULE IMPORT LOGIC
+  // MODAL: NUOVO MODULO / RIUSO DA PRECEDENTE
   // ═══════════════════════════════════════════════
-  function openModuleModal() {
-    moduleModal.classList.add('open');
-    setModalMode('blank');
-    blankModuleTitleInput.value = '';
-    blankModuleTextInput.value = '';
-    selectedImportModule = null;
-    populateImportManualDropdown();
+  function openModuleChoiceModal() {
+    moduleChoiceModal.classList.add('open');
+    tabChoiceBlank.click();
+    blankPageTitleInput.value = 'Pagina ' + (currentManual.modules.length + 1);
+    selectedReuseModule = null;
+    populateReuseManualsDropdown();
   }
 
-  function closeModuleModal() {
-    moduleModal.classList.remove('open');
-  }
+  tabChoiceBlank.addEventListener('click', () => {
+    tabChoiceBlank.classList.add('active');
+    tabChoiceImport.classList.remove('active');
+    paneChoiceBlank.style.display = 'flex';
+    paneChoiceImport.style.display = 'none';
+  });
 
-  function setModalMode(mode) {
-    currentModalMode = mode;
-    if (mode === 'blank') {
-      tabModeBlank.classList.add('active');
-      tabModeImport.classList.remove('active');
-      paneBlankModule.style.display = 'flex';
-      paneImportModule.style.display = 'none';
-      btnModalConfirm.textContent = 'Aggiungi Modulo Vuoto';
-    } else {
-      tabModeBlank.classList.remove('active');
-      tabModeImport.classList.add('active');
-      paneBlankModule.style.display = 'none';
-      paneImportModule.style.display = 'flex';
-      btnModalConfirm.textContent = 'Importa Modulo Selezionato';
-    }
-  }
+  tabChoiceImport.addEventListener('click', () => {
+    tabChoiceBlank.classList.remove('active');
+    tabChoiceImport.classList.add('active');
+    paneChoiceBlank.style.display = 'none';
+    paneChoiceImport.style.display = 'flex';
+  });
 
-  function populateImportManualDropdown() {
-    importManualSelect.innerHTML = '';
-    const otherManuals = vfs.manuals.filter(m => !currentManual || m.id !== currentManual.id);
-
+  function populateReuseManualsDropdown() {
+    reuseManualSelect.innerHTML = '';
+    const otherManuals = vfs.manuals.filter(m => m.id !== currentManual.id);
     if (otherManuals.length === 0) {
-      importManualSelect.innerHTML = '<option value="">Nessun altro manuale disponibile</option>';
-      importModuleList.innerHTML = '<div style="padding:16px;font-size:0.8rem;color:var(--text-tertiary);text-align:center">Nessun altro manuale da cui estrarre moduli. Creane prima un altro!</div>';
-      previewModuleTitle.textContent = 'Nessun manuale';
-      previewModuleBody.innerHTML = 'Crea prima altri manuali nel programma per poter riutilizzare i loro moduli.';
+      reuseManualSelect.innerHTML = '<option value="">Nessun altro manuale</option>';
+      reuseModulesList.innerHTML = '<div style="font-size:0.78rem;color:var(--text-tertiary);padding:10px">Nessun altro manuale salvato.</div>';
       return;
     }
 
     otherManuals.forEach(m => {
       const opt = document.createElement('option');
       opt.value = m.id;
-      opt.textContent = `${m.title} (${(m.modules || []).length} moduli)`;
-      importManualSelect.appendChild(opt);
+      opt.textContent = m.title;
+      reuseManualSelect.appendChild(opt);
     });
 
-    importManualSelect.addEventListener('change', () => {
-      loadModulesFromSelectedManual(importManualSelect.value);
+    reuseManualSelect.addEventListener('change', () => {
+      loadReuseModules(reuseManualSelect.value);
     });
 
-    loadModulesFromSelectedManual(otherManuals[0].id);
+    loadReuseModules(otherManuals[0].id);
   }
 
-  function loadModulesFromSelectedManual(manualId) {
-    importModuleList.innerHTML = '';
-    selectedImportModule = null;
-    const manual = vfs.manuals.find(m => m.id === manualId);
-    if (!manual || !manual.modules || manual.modules.length === 0) {
-      importModuleList.innerHTML = '<div style="padding:12px;font-size:0.8rem;color:var(--text-tertiary)">Questo manuale non contiene moduli.</div>';
+  function loadReuseModules(manualId) {
+    reuseModulesList.innerHTML = '';
+    const man = vfs.manuals.find(m => m.id === manualId);
+    if (!man || !man.modules || man.modules.length === 0) {
+      reuseModulesList.innerHTML = '<div style="font-size:0.78rem;color:var(--text-tertiary)">Nessun modulo.</div>';
       return;
     }
 
-    manual.modules.forEach((mod, idx) => {
+    man.modules.forEach((mod, idx) => {
       const item = document.createElement('div');
-      item.className = 'import-module-item' + (idx === 0 ? ' selected' : '');
-      item.innerHTML = `
-        <div style="font-weight:600;font-size:0.84rem;margin-bottom:2px">${escapeHtml(mod.title)}</div>
-        <div style="font-size:0.72rem;color:var(--text-tertiary)">Modulo ${idx + 1}</div>
-      `;
+      item.style.padding = '8px 10px';
+      item.style.background = '#ffffff';
+      item.style.border = '1px solid var(--win-border)';
+      item.style.borderRadius = 'var(--radius-sm)';
+      item.style.cursor = 'pointer';
+      item.style.fontSize = '0.82rem';
+      item.style.fontWeight = '600';
+      item.textContent = `P.${idx + 1} - ${mod.title || 'Senza titolo'}`;
 
       item.addEventListener('click', () => {
-        document.querySelectorAll('.import-module-item').forEach(x => x.classList.remove('selected'));
-        item.classList.add('selected');
-        showModulePreview(mod);
+        reuseModulesList.querySelectorAll('div').forEach(d => d.style.borderColor = 'var(--win-border)');
+        item.style.borderColor = 'var(--win-accent)';
+        selectedReuseModule = mod;
+        reusePreviewTitle.textContent = mod.title;
+        const firstContent = Object.values(mod.contentByLang || {})[0] || '<p>Nessun contenuto</p>';
+        reusePreviewBody.innerHTML = firstContent;
       });
 
-      importModuleList.appendChild(item);
+      reuseModulesList.appendChild(item);
     });
 
-    showModulePreview(manual.modules[0]);
+    // Select first
+    if (man.modules[0]) {
+      selectedReuseModule = man.modules[0];
+      reusePreviewTitle.textContent = man.modules[0].title;
+      const firstContent = Object.values(man.modules[0].contentByLang || {})[0] || '<p>Nessun contenuto</p>';
+      reusePreviewBody.innerHTML = firstContent;
+    }
   }
 
-  function showModulePreview(mod) {
-    selectedImportModule = mod;
-    previewModuleTitle.textContent = mod.title;
-    previewModuleBody.innerHTML = mod.contentHtml || '<em>Nessun contenuto in questo modulo.</em>';
-  }
-
-  function confirmAddModule() {
-    if (!currentManual) return;
-
-    if (currentModalMode === 'blank') {
-      const title = blankModuleTitleInput.value.trim() || 'Nuovo Modulo ' + (currentManual.modules.length + 1);
-      const text = blankModuleTextInput.value.trim();
-      const contentHtml = text ? `<p>${escapeHtml(text).replace(/\n/g, '<br>')}</p>` : '<p>Inserisci qui i dettagli operativi del modulo...</p>';
+  btnConfirmAddModule.addEventListener('click', () => {
+    if (tabChoiceBlank.classList.contains('active')) {
+      // Create blank page
+      const title = blankPageTitleInput.value.trim() || 'Pagina ' + (currentManual.modules.length + 1);
+      const langs = currentManual.languages || ['it'];
+      const blankContent = {};
+      langs.forEach(l => blankContent[l] = '<p></p>');
 
       currentManual.modules.push({
         id: 'mod_' + Date.now(),
         title: title,
-        contentHtml: contentHtml
+        contentByLang: blankContent
       });
     } else {
-      if (!selectedImportModule) {
-        alert('Seleziona prima un modulo dalla lista a sinistra.');
+      // Reuse module from previous manual
+      if (!selectedReuseModule) {
+        alert('Seleziona prima un modulo dalla colonna sinistra.');
         return;
       }
-      // Clone module into current manual
-      currentManual.modules.push({
-        id: 'mod_' + Date.now(),
-        title: selectedImportModule.title,
-        contentHtml: selectedImportModule.contentHtml
-      });
+      const clone = JSON.parse(JSON.stringify(selectedReuseModule));
+      clone.id = 'mod_' + Date.now();
+      currentManual.modules.push(clone);
     }
 
-    saveCurrentManualState();
-    renderDocumentModules();
+    saveCurrentManual();
+    renderDocumentSheets();
     renderSidebarModulesList();
-    closeModuleModal();
-  }
+    moduleChoiceModal.classList.remove('open');
+  });
 
   // ═══════════════════════════════════════════════
-  // WORD RIBBON COMMANDS
+  // RIBBON FORMATTING & TABLE TOOL
   // ═══════════════════════════════════════════════
-  function setupRibbonEvents() {
-    // Tabs
+  function setupRibbon() {
+    // Tab switching
     document.querySelectorAll('.ribbon-tab').forEach(tab => {
       tab.addEventListener('click', () => {
-        if (tab.closest('#moduleModal')) return; // ignore modal tabs
-        document.querySelectorAll('.ribbon-tab').forEach(t => t.classList.remove('active'));
+        if (tab.closest('.modal-dialog')) return;
+        document.querySelectorAll('.word-ribbon .ribbon-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
         document.getElementById('ribbonTabHome').style.display = 'none';
@@ -2130,27 +2202,40 @@ html, body {
     // Formatting buttons
     document.querySelectorAll('.ribbon-btn[data-cmd]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const cmd = btn.dataset.cmd;
-        document.execCommand(cmd, false, null);
+        document.execCommand(btn.dataset.cmd, false, null);
       });
     });
 
-    // Font family
+    // Font & Size
     document.getElementById('fontSelect').addEventListener('change', (e) => {
       document.execCommand('fontName', false, e.target.value);
     });
-
-    // Font size
     document.getElementById('fontSizeSelect').addEventListener('change', (e) => {
       document.execCommand('fontSize', false, e.target.value);
     });
-
-    // Heading select
     document.getElementById('headingSelect').addEventListener('change', (e) => {
       document.execCommand('formatBlock', false, e.target.value);
     });
 
-    // Safety Callout insertion
+    // Insert Table Tool
+    document.getElementById('btnInsertTable').addEventListener('click', () => {
+      const rows = parseInt(prompt('Numero di righe della tabella:', '3') || '3', 10);
+      const cols = parseInt(prompt('Numero di colonne della tabella:', '3') || '3', 10);
+      if (rows <= 0 || cols <= 0) return;
+
+      let tHtml = '<table class="word-table"><thead><tr>';
+      for (let c = 0; c < cols; c++) tHtml += `<th>Intestazione ${c + 1}</th>`;
+      tHtml += '</tr></thead><tbody>';
+      for (let r = 0; r < rows - 1; r++) {
+        tHtml += '<tr>';
+        for (let c = 0; c < cols; c++) tHtml += `<td>Cella ${r + 1}.${c + 1}</td>`;
+        tHtml += '</tr>';
+      }
+      tHtml += '</tbody></table><p><br></p>';
+      document.execCommand('insertHTML', false, tHtml);
+    });
+
+    // Insert Safety Box with EDITABLE TITLE directly on click
     document.querySelectorAll('.ribbon-btn[data-box]').forEach(btn => {
       btn.addEventListener('click', () => {
         const type = btn.dataset.box;
@@ -2158,164 +2243,152 @@ html, body {
           danger: 'PERICOLO',
           warning: 'AVVISO',
           caution: 'ATTENZIONE',
-          notice: 'NOTA',
-          safety: 'SICUREZZA'
+          notice: 'AVVISO',
+          safety: 'SICUREZZA DPI'
         };
         const boxHtml = `
           <div class="editor-safety-box ${type}" contenteditable="false">
-            <div class="safety-header-pill">${labels[type]}</div>
-            <div class="safety-body-text" contenteditable="true">Inserisci qui il testo dell'avvertenza di sicurezza normativa...</div>
+            <div class="safety-header-pill" contenteditable="true" spellcheck="false" title="Clicca per modificare il titolo">${labels[type]}</div>
+            <div class="safety-body-text" contenteditable="true" spellcheck="true">Inserisci qui il testo dell'avvertenza di sicurezza...</div>
           </div><p><br></p>
         `;
         document.execCommand('insertHTML', false, boxHtml);
       });
     });
 
-    // Insert Table
-    document.getElementById('btnInsertTable').addEventListener('click', () => {
-      const rows = parseInt(prompt('Numero di righe:', '3') || '3', 10);
-      const cols = parseInt(prompt('Numero di colonne:', '3') || '3', 10);
-      if (rows <= 0 || cols <= 0) return;
-
-      let tableHtml = '<table class="word-table"><thead><tr>';
-      for (let c = 0; c < cols; c++) tableHtml += `<th>Intestazione ${c + 1}</th>`;
-      tableHtml += '</tr></thead><tbody>';
-      for (let r = 0; r < rows - 1; r++) {
-        tableHtml += '<tr>';
-        for (let c = 0; c < cols; c++) tableHtml += `<td>Dato ${r + 1}.${c + 1}</td>`;
-        tableHtml += '</tr>';
-      }
-      tableHtml += '</tbody></table><p><br></p>';
-      document.execCommand('insertHTML', false, tableHtml);
-    });
-
-    // Page Number config
+    // Page Number settings
     pageNumFormatSelect.addEventListener('change', () => {
-      saveCurrentManualState();
-      updatePageNumbers();
+      if (currentManual) {
+        currentManual.pageNumFormat = pageNumFormatSelect.value;
+        saveCurrentManual();
+        renderDocumentSheets();
+      }
     });
     hidePageNumFirstPage.addEventListener('change', () => {
-      saveCurrentManualState();
+      if (currentManual) {
+        currentManual.hideFirstPageNum = hidePageNumFirstPage.checked;
+        saveCurrentManual();
+        renderDocumentSheets();
+      }
     });
 
-    // Header & Footer inputs sync
-    docHeaderInput.addEventListener('input', saveCurrentManualState);
-    docHeaderCodeInput.addEventListener('input', saveCurrentManualState);
-    docFooterInput.addEventListener('input', saveCurrentManualState);
+    // New module triggers
+    document.getElementById('btnRibbonNewModule').addEventListener('click', openModuleChoiceModal);
+    document.getElementById('btnSidebarNewModule').addEventListener('click', openModuleChoiceModal);
   }
 
   // ═══════════════════════════════════════════════
-  // BINDING ALL GLOBAL LISTENERS
+  // GLOBAL LISTENERS & NAVIGATION
   // ═══════════════════════════════════════════════
-  btnNewManual.addEventListener('click', createNewManual);
-  btnEmptyNewManual.addEventListener('click', createNewManual);
-  btnNewFolder.addEventListener('click', createNewFolder);
-  btnEmptyNewFolder.addEventListener('click', createNewFolder);
+  btnHomeNavigator.addEventListener('click', () => {
+    if (currentManual) saveCurrentManual();
+    currentManual = null;
+    activeNavSection = 'manuals';
+    navItemManuals.classList.add('active');
+    navItemSettings.classList.remove('active');
+    navItemTrash.classList.remove('active');
+    showExplorer();
+  });
+
+  document.getElementById('brandLogoTrigger').addEventListener('click', () => {
+    btnHomeNavigator.click();
+  });
+
+  btnBackToExplorer.addEventListener('click', () => {
+    btnHomeNavigator.click();
+  });
+
+  navItemManuals.addEventListener('click', () => {
+    activeNavSection = 'manuals';
+    navItemManuals.classList.add('active');
+    navItemSettings.classList.remove('active');
+    navItemTrash.classList.remove('active');
+    showExplorer();
+  });
+
+  navItemSettings.addEventListener('click', () => {
+    activeNavSection = 'settings';
+    navItemSettings.classList.add('active');
+    navItemManuals.classList.remove('active');
+    navItemTrash.classList.remove('active');
+    showExplorer();
+  });
+
+  navItemTrash.addEventListener('click', () => {
+    activeNavSection = 'trash';
+    navItemTrash.classList.add('active');
+    navItemManuals.classList.remove('active');
+    navItemSettings.classList.remove('active');
+    showExplorer();
+  });
+
+  btnOpenNewManualWizard.addEventListener('click', openNewManualWizard);
+  btnEmptyNewManual.addEventListener('click', openNewManualWizard);
+
+  btnNewFolder.addEventListener('click', () => {
+    const name = prompt('Nome cartella:', 'Nuova Cartella');
+    if (name && name.trim()) {
+      vfs.folders.push({
+        id: 'f_' + Date.now(),
+        name: name.trim(),
+        parentId: vfs.currentFolderId,
+        createdAt: new Date().toISOString()
+      });
+      saveVFS();
+      renderManualsExplorer();
+    }
+  });
+  btnEmptyNewFolder.addEventListener('click', () => btnNewFolder.click());
 
   btnViewGrid.addEventListener('click', () => {
     currentViewMode = 'grid';
     btnViewGrid.classList.add('active');
     btnViewList.classList.remove('active');
-    renderExplorer();
+    renderManualsExplorer();
   });
   btnViewList.addEventListener('click', () => {
     currentViewMode = 'list';
     btnViewList.classList.add('active');
     btnViewGrid.classList.remove('active');
-    renderExplorer();
+    renderManualsExplorer();
   });
 
-  searchFilesInput.addEventListener('input', renderExplorer);
+  searchFilesInput.addEventListener('input', renderManualsExplorer);
 
   document.querySelector('.breadcrumb-item[data-folder="null"]').addEventListener('click', () => {
     vfs.currentFolderId = null;
-    renderExplorer();
+    renderManualsExplorer();
   });
 
-  btnBackToExplorer.addEventListener('click', () => {
-    saveCurrentManualState();
-    currentManual = null;
-    renderExplorer();
+  btnPrintPdf.addEventListener('click', () => window.print());
+
+  // Modal close buttons
+  document.querySelectorAll('.modal-close-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+    });
   });
 
-  btnPrintPdf.addEventListener('click', () => {
-    window.print();
-  });
-
-  // Export all JSON
-  document.getElementById('btnExportAll').addEventListener('click', () => {
-    const dataStr = JSON.stringify(vfs, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'OmniManual_Archivio_' + new Date().toISOString().slice(0, 10) + '.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  // Import JSON
-  const importArchiveInput = document.getElementById('importArchiveInput');
-  document.getElementById('btnImportAll').addEventListener('click', () => importArchiveInput.click());
-  importArchiveInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const parsed = JSON.parse(ev.target.result);
-        if (parsed.folders && parsed.manuals) {
-          vfs = parsed;
-          saveVFS();
-          renderExplorer();
-          alert('Archivio ripristinato con successo!');
-        } else {
-          alert('Formato file JSON non valido.');
-        }
-      } catch (err) {
-        alert('Errore nella lettura del file JSON.');
-      }
-    };
-    reader.readAsText(file);
-  });
-
-  // Modal Buttons
-  document.getElementById('btnOpenModuleModal').addEventListener('click', openModuleModal);
-  document.getElementById('btnSidebarNewModule').addEventListener('click', openModuleModal);
-  btnModalClose.addEventListener('click', closeModuleModal);
-  btnModalCancel.addEventListener('click', closeModuleModal);
-  btnModalConfirm.addEventListener('click', confirmAddModule);
-
-  tabModeBlank.addEventListener('click', () => setModalMode('blank'));
-  tabModeImport.addEventListener('click', () => setModalMode('import'));
-
-  // Utilities
+  // Utility helpers
   function formatDate(isoStr) {
     if (!isoStr) return '—';
     try {
       const d = new Date(isoStr);
       return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    } catch(e) {
-      return isoStr;
-    }
+    } catch(e) { return isoStr; }
   }
 
   function escapeHtml(str) {
     if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   }
 
   // ═══════════════════════════════════════════════
   // INITIALIZATION
   // ═══════════════════════════════════════════════
   loadVFS();
-  setupRibbonEvents();
-  renderExplorer();
+  setupRibbon();
+  showExplorer();
 
 })();
 </script>
