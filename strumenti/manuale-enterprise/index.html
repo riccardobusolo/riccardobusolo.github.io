@@ -713,6 +713,156 @@ input::placeholder {
 }
 
 /* ═══════════════════════════════════════════════
+   GRIGLIA MANUALI IN ROOT (WINDOWS 11 FLUENT)
+═══════════════════════════════════════════════ */
+.manuals-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.manual-file-card {
+  background: var(--win-surface);
+  border: 1px solid var(--win-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-subtle);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+.manual-file-card:hover {
+  border-color: var(--win-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+.manual-file-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.manual-file-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: #eef4fc;
+  color: #2b579a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.manual-file-meta {
+  flex: 1;
+  overflow: hidden;
+}
+.manual-file-title {
+  font-weight: 600;
+  font-size: 0.94rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.manual-file-code {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+.manual-file-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--win-border);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.manual-file-langs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* ═══════════════════════════════════════════════
+   DETTAGLIO SPECIFICO MANUALE (COLONNE LINGUA)
+═══════════════════════════════════════════════ */
+.manual-detail-header {
+  background: var(--win-surface);
+  border: 1px solid var(--win-border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: var(--shadow-subtle);
+  flex-wrap: wrap;
+}
+.manual-detail-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.btn-back-to-manuals {
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.manual-detail-h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+.manual-detail-code-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--win-subsurface);
+  border: 1px solid var(--win-border);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+}
+.manual-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.add-lang-column-card {
+  min-width: 220px;
+  max-width: 280px;
+  border: 2px dashed var(--win-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 20px;
+  background: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-align: center;
+}
+.add-lang-column-card:hover {
+  border-color: var(--win-accent);
+  background: var(--win-accent-light);
+  color: var(--win-accent);
+}
+
+/* ═══════════════════════════════════════════════
    I MIEI MODULI (LIBRERIA MODULI)
 ═══════════════════════════════════════════════ */
 .saved-modules-grid {
@@ -1220,8 +1370,8 @@ input::placeholder {
             <div id="manualsFolderChips" class="folders-chip-grid"></div>
           </div>
 
-          <!-- Colonne di Lingua Board -->
-          <div id="langColumnsBoard" class="lang-columns-board"></div>
+          <!-- Griglia Manuali (Windows 11 Fluent) -->
+          <div id="manualsCardsGrid" class="manuals-cards-grid"></div>
 
           <!-- Tabella Elenco Manuali (se vista lista attiva) -->
           <table id="filesTable" class="files-table" style="display:none">
@@ -1230,6 +1380,42 @@ input::placeholder {
             </thead>
             <tbody id="filesTableBody"></tbody>
           </table>
+        </div>
+
+        <!-- PANE A-DETAIL: DETTAGLIO SPECIFICO MANUALE (COLONNE DI LINGUA & VERSIONING) -->
+        <div id="paneManualDetail" style="display:none">
+          <div class="manual-detail-header">
+            <div class="manual-detail-title-wrap">
+              <button id="btnBackToManualsRoot" class="win-btn btn-back-to-manuals" title="Torna all'elenco dei manuali">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                Tutti i Manuali
+              </button>
+              <div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <h1 id="manualDetailTitle" class="manual-detail-h1">Titolo Manuale</h1>
+                  <span id="manualDetailCode" class="manual-detail-code-badge">DOC-2026</span>
+                </div>
+                <div id="manualDetailSubmeta" style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px"></div>
+              </div>
+            </div>
+            <div class="manual-detail-actions">
+              <button id="btnManualDetailAddLang" class="win-btn" title="Aggiungi una lingua a questo manuale">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                + Aggiungi Lingua
+              </button>
+              <button id="btnManualDetailNewVersion" class="win-btn" title="Crea e archivia una nuova versione del manuale">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                + Nuova Versione
+              </button>
+              <button id="btnManualDetailOpenEditor" class="win-btn win-btn-primary" title="Apri il manuale nell'editor">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Apri Editor
+              </button>
+            </div>
+          </div>
+
+          <!-- Bacheca Colonne Lingua del Manuale -->
+          <div id="manualDetailLangBoard" class="lang-columns-board"></div>
         </div>
 
         <!-- PANE A2: I MIEI MODULI (LIBRERIA MODULI CON CARTELLE) -->
@@ -1683,6 +1869,31 @@ input::placeholder {
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════
+     MODAL: AGGIUNGI LINGUA A QUESTO MANUALE
+═══════════════════════════════════════════════ -->
+<div id="modalAddLangToManual" class="modal-overlay">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div class="modal-title">Aggiungi Colonna Lingua al Manuale</div>
+      <button class="win-btn modal-close-btn" style="border:none;background:transparent">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:14px;font-size:0.84rem;color:var(--text-secondary);line-height:1.45">
+        Seleziona quale lingua desideri aggiungere a questo specifico manuale. Verrà creata la relativa colonna con la gestione versioni e predisposta la traduzione nelle pagine.
+      </div>
+      <div class="form-field">
+        <label>Lingua da Aggiungere:</label>
+        <select id="selectAddLangToManual" class="ribbon-select" style="width:100%"></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="win-btn modal-close-btn">Annulla</button>
+      <button id="btnConfirmAddLangToManual" class="win-btn win-btn-primary">Aggiungi Lingua</button>
+    </div>
+  </div>
+</div>
+
 <!-- Application Logic -->
 <script>
 (function() {
@@ -1711,6 +1922,7 @@ input::placeholder {
   };
 
   let currentManual = null;
+  let currentDetailManualId = null;
   let activeNavSection = 'manuals'; // 'manuals', 'modules', 'settings', 'trash'
   let currentViewMode = 'grid'; // 'grid' or 'list'
   let importedDocContent = null;
@@ -1759,6 +1971,7 @@ input::placeholder {
   const explorerView = document.getElementById('explorerView');
   const editorView = document.getElementById('editorView');
   const paneManuals = document.getElementById('paneManuals');
+  const paneManualDetail = document.getElementById('paneManualDetail');
   const paneModules = document.getElementById('paneModules');
   const paneSettings = document.getElementById('paneSettings');
   const paneTrash = document.getElementById('paneTrash');
@@ -1779,13 +1992,28 @@ input::placeholder {
   const breadcrumbTrail = document.getElementById('breadcrumbTrail');
   const searchFilesInput = document.getElementById('searchFilesInput');
 
-  // Manuals Pane Elements
+  // Manuals Pane Elements (Root Explorer)
   const emptyStateBox = document.getElementById('emptyStateBox');
   const foldersSectionManuals = document.getElementById('foldersSectionManuals');
   const manualsFolderChips = document.getElementById('manualsFolderChips');
-  const langColumnsBoard = document.getElementById('langColumnsBoard');
+  const manualsCardsGrid = document.getElementById('manualsCardsGrid');
   const filesTable = document.getElementById('filesTable');
   const filesTableBody = document.getElementById('filesTableBody');
+
+  // Specific Manual Detail Elements
+  const btnBackToManualsRoot = document.getElementById('btnBackToManualsRoot');
+  const manualDetailTitle = document.getElementById('manualDetailTitle');
+  const manualDetailCode = document.getElementById('manualDetailCode');
+  const manualDetailSubmeta = document.getElementById('manualDetailSubmeta');
+  const btnManualDetailAddLang = document.getElementById('btnManualDetailAddLang');
+  const btnManualDetailNewVersion = document.getElementById('btnManualDetailNewVersion');
+  const btnManualDetailOpenEditor = document.getElementById('btnManualDetailOpenEditor');
+  const manualDetailLangBoard = document.getElementById('manualDetailLangBoard');
+
+  // Add Language Modal elements
+  const modalAddLangToManual = document.getElementById('modalAddLangToManual');
+  const selectAddLangToManual = document.getElementById('selectAddLangToManual');
+  const btnConfirmAddLangToManual = document.getElementById('btnConfirmAddLangToManual');
 
   // Modules Pane Elements
   const emptyStateModules = document.getElementById('emptyStateModules');
@@ -1907,18 +2135,34 @@ input::placeholder {
     trashCountBadge.style.display = vfs.trash.length > 0 ? 'inline-block' : 'none';
 
     if (activeNavSection === 'manuals') {
-      paneManuals.style.display = 'block';
-      paneModules.style.display = 'none';
-      paneSettings.style.display = 'none';
-      paneTrash.style.display = 'none';
-      document.getElementById('explorerCommandBar').style.display = 'flex';
-      document.getElementById('explorerAddressBar').style.display = 'flex';
-      btnPrimaryActionLabel.textContent = 'Nuovo Manuale';
-      btnNewFolderLabel.textContent = 'Nuova Cartella';
-      breadcrumbRootLabel.textContent = 'I miei Manuali';
-      renderManualsExplorer();
+      if (currentDetailManualId) {
+        // Dettaglio manuale specifico: colonne lingua e versioning
+        paneManuals.style.display = 'none';
+        paneManualDetail.style.display = 'block';
+        paneModules.style.display = 'none';
+        paneSettings.style.display = 'none';
+        paneTrash.style.display = 'none';
+        document.getElementById('explorerCommandBar').style.display = 'none';
+        document.getElementById('explorerAddressBar').style.display = 'flex';
+        renderManualDetailView();
+      } else {
+        // Navigatore principale: cartelle e manuali
+        paneManuals.style.display = 'block';
+        paneManualDetail.style.display = 'none';
+        paneModules.style.display = 'none';
+        paneSettings.style.display = 'none';
+        paneTrash.style.display = 'none';
+        document.getElementById('explorerCommandBar').style.display = 'flex';
+        document.getElementById('explorerAddressBar').style.display = 'flex';
+        btnPrimaryActionLabel.textContent = 'Nuovo Manuale';
+        btnNewFolderLabel.textContent = 'Nuova Cartella';
+        breadcrumbRootLabel.textContent = 'I miei Manuali';
+        renderManualsExplorer();
+      }
     } else if (activeNavSection === 'modules') {
+      currentDetailManualId = null;
       paneManuals.style.display = 'none';
+      paneManualDetail.style.display = 'none';
       paneModules.style.display = 'block';
       paneSettings.style.display = 'none';
       paneTrash.style.display = 'none';
@@ -1929,7 +2173,9 @@ input::placeholder {
       breadcrumbRootLabel.textContent = 'I miei Moduli';
       renderModulesExplorer();
     } else if (activeNavSection === 'settings') {
+      currentDetailManualId = null;
       paneManuals.style.display = 'none';
+      paneManualDetail.style.display = 'none';
       paneModules.style.display = 'none';
       paneSettings.style.display = 'block';
       paneTrash.style.display = 'none';
@@ -1937,7 +2183,9 @@ input::placeholder {
       document.getElementById('explorerAddressBar').style.display = 'none';
       renderLanguageSettings();
     } else if (activeNavSection === 'trash') {
+      currentDetailManualId = null;
       paneManuals.style.display = 'none';
+      paneManualDetail.style.display = 'none';
       paneModules.style.display = 'none';
       paneSettings.style.display = 'none';
       paneTrash.style.display = 'block';
@@ -1946,6 +2194,7 @@ input::placeholder {
       renderTrash();
     }
   }
+
   function renderManualsExplorer() {
     renderBreadcrumbs();
     const currentFId = vfs.currentFolderId;
@@ -1957,7 +2206,7 @@ input::placeholder {
     if (childFolders.length === 0 && childManuals.length === 0) {
       emptyStateBox.style.display = 'flex';
       foldersSectionManuals.style.display = 'none';
-      langColumnsBoard.style.display = 'none';
+      manualsCardsGrid.style.display = 'none';
       filesTable.style.display = 'none';
       return;
     }
@@ -1973,11 +2222,11 @@ input::placeholder {
     }
 
     if (currentViewMode === 'grid') {
-      langColumnsBoard.style.display = 'flex';
+      manualsCardsGrid.style.display = 'grid';
       filesTable.style.display = 'none';
-      renderLanguageColumnsBoard(childManuals);
+      renderManualsGrid(childManuals);
     } else {
-      langColumnsBoard.style.display = 'none';
+      manualsCardsGrid.style.display = 'none';
       filesTable.style.display = 'table';
       renderManualsTable(childFolders, childManuals);
     }
@@ -2029,6 +2278,7 @@ input::placeholder {
       span.className = 'breadcrumb-item';
       span.textContent = f.name;
       span.addEventListener('click', () => {
+        currentDetailManualId = null;
         vfs.currentFolderId = f.id;
         renderManualsExplorer();
       });
@@ -2036,128 +2286,57 @@ input::placeholder {
     });
   }
 
-  function renderLanguageColumnsBoard(manuals) {
-    langColumnsBoard.innerHTML = '';
+  function renderManualsGrid(manuals) {
+    manualsCardsGrid.innerHTML = '';
+    if (manuals.length === 0) {
+      manualsCardsGrid.innerHTML = '<div style="font-size:0.85rem;color:var(--text-tertiary);padding:20px;grid-column:1/-1;text-align:center">Nessun manuale in questa cartella. Clicca "+ Nuovo Manuale" per crearne uno.</div>';
+      return;
+    }
 
-    vfs.languages.forEach(lang => {
-      const col = document.createElement('div');
-      col.className = 'lang-board-column';
+    manuals.forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'manual-file-card';
 
-      // Manuals that include this language
-      const langManuals = manuals.filter(m => (m.languages || ['it']).includes(lang.code));
+      const langBadges = (m.languages || ['it']).map(code => {
+        const l = vfs.languages.find(x => x.code === code);
+        return `<span class="lang-mini-pill">${l ? l.flag : code.toUpperCase()} ${code.toUpperCase()}</span>`;
+      }).join(' ');
 
-      col.innerHTML = `
-        <div class="lang-column-header">
-          <div class="lang-column-title">
-            <span>${lang.flag || '🌐'}</span>
-            <span>${escapeHtml(lang.name)}</span>
+      const modCount = (m.modules || []).length;
+      const verCount = ((m.versions || []).length + 1);
+
+      card.innerHTML = `
+        <div class="manual-file-card-top">
+          <div class="manual-file-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           </div>
-          <span class="lang-column-count">${langManuals.length}</span>
+          <div class="manual-file-meta">
+            <div class="manual-file-title" title="${escapeHtml(m.title)}">${escapeHtml(m.title)}</div>
+            <div class="manual-file-code">${escapeHtml(m.headerCode || 'DOC')} • <span class="version-badge-latest">${escapeHtml(m.currentVersion || 'v1.0')}</span></div>
+          </div>
+          <button class="win-btn btn-card-menu" style="padding:2px 6px;opacity:0.7" title="Opzioni">⋮</button>
         </div>
-        <div class="lang-column-items"></div>
+        <div style="font-size:0.76rem;color:var(--text-secondary);display:flex;align-items:center;gap:6px">
+          <span>${modCount} ${modCount === 1 ? 'pagina' : 'pagine'}</span>
+          <span>•</span>
+          <span>${verCount} ${verCount === 1 ? 'versione' : 'versioni'}</span>
+        </div>
+        <div class="manual-file-card-bottom">
+          <div class="manual-file-langs">${langBadges}</div>
+          <span style="font-size:0.72rem;color:var(--text-tertiary)">${formatDate(m.updatedAt)}</span>
+        </div>
       `;
 
-      const itemsContainer = col.querySelector('.lang-column-items');
+      card.querySelector('.btn-card-menu').addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleManualOptions(m);
+      });
 
-      if (langManuals.length === 0) {
-        itemsContainer.innerHTML = '<div class="lang-column-empty">Nessun manuale in questa lingua</div>';
-      } else {
-        langManuals.forEach(m => {
-          const card = document.createElement('div');
-          card.className = 'manual-group-card';
+      card.addEventListener('click', () => {
+        openManualDetail(m.id);
+      });
 
-          const currentVer = m.currentVersion || 'v1.0';
-          const prevVersions = m.versions || [];
-          const modCount = (m.modules || []).length;
-
-          // Header with Title & Code
-          let cardHtml = `
-            <div class="manual-card-header">
-              <div class="manual-card-heading-left">
-                <span class="manual-card-title" title="Clicca per aprire">${escapeHtml(m.title)}</span>
-                <span class="manual-card-code">${escapeHtml(m.headerCode || 'DOC')}</span>
-              </div>
-              <button class="win-btn btn-manual-options" style="padding:2px 6px;font-size:0.8rem" title="Altre opzioni">⋮</button>
-            </div>
-
-            <!-- In Cima: Ultima Versione (100% Opacità) -->
-            <div class="version-item-latest" title="Apri l'ultima versione del manuale">
-              <div class="version-item-latest-left">
-                <div style="display:flex;align-items:center;gap:6px">
-                  <span class="version-badge-latest">${escapeHtml(currentVer)}</span>
-                  <span style="font-weight:600;font-size:0.76rem;color:var(--text-primary)">Ultima Versione</span>
-                </div>
-                <div class="version-meta-text">Modificato: ${formatDate(m.updatedAt)} • ${modCount} pagg.</div>
-              </div>
-              <div class="version-actions-right">
-                <button class="win-btn btn-open-latest" style="padding:3px 8px;font-size:0.75rem;background:#ffffff">📄 Apri</button>
-                <button class="win-btn win-btn-primary btn-new-version" style="padding:3px 8px;font-size:0.75rem" title="Crea e salva una nuova versione">+ Versione</button>
-              </div>
-            </div>
-          `;
-
-          // Sotto: Versioni Precedenti (Leggermente Opache: opacity: 0.65)
-          if (prevVersions.length > 0) {
-            let prevListHtml = `
-              <div class="prev-versions-section">
-                <div class="prev-versions-header">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  <span>Versioni Precedenti (${prevVersions.length})</span>
-                </div>
-            `;
-
-            prevVersions.forEach((pv, pIdx) => {
-              prevListHtml += `
-                <div class="version-item-prev" data-prev-idx="${pIdx}" title="Clicca per consultare la versione archiviata">
-                  <div style="display:flex;align-items:center;gap:6px">
-                    <span class="version-badge-prev">${escapeHtml(pv.versionLabel)}</span>
-                    <span style="font-size:0.73rem;color:var(--text-secondary)">${formatDate(pv.createdAt)}</span>
-                    ${pv.notes ? `<span style="font-size:0.7rem;color:var(--text-tertiary);font-style:italic">(${escapeHtml(pv.notes)})</span>` : ''}
-                  </div>
-                  <span style="font-size:0.7rem;color:var(--win-accent);font-weight:600">Visualizza ➔</span>
-                </div>
-              `;
-            });
-
-            prevListHtml += `</div>`;
-            cardHtml += prevListHtml;
-          }
-
-          card.innerHTML = cardHtml;
-
-          // Events
-          card.querySelector('.manual-card-title').addEventListener('click', () => openManualEditor(m));
-          card.querySelector('.version-item-latest-left').addEventListener('click', () => openManualEditor(m));
-          card.querySelector('.btn-open-latest').addEventListener('click', (e) => {
-            e.stopPropagation();
-            openManualEditor(m);
-          });
-          card.querySelector('.btn-new-version').addEventListener('click', (e) => {
-            e.stopPropagation();
-            openNewVersionDialog(m);
-          });
-          card.querySelector('.btn-manual-options').addEventListener('click', (e) => {
-            e.stopPropagation();
-            handleManualOptions(m);
-          });
-
-          // Previous version clicks
-          card.querySelectorAll('.version-item-prev').forEach(el => {
-            el.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const pIdx = parseInt(el.dataset.prevIdx, 10);
-              const histVer = prevVersions[pIdx];
-              if (histVer) {
-                openManualHistoryVersion(m, histVer);
-              }
-            });
-          });
-
-          itemsContainer.appendChild(card);
-        });
-      }
-
-      langColumnsBoard.appendChild(col);
+      manualsCardsGrid.appendChild(card);
     });
   }
 
@@ -2229,11 +2408,285 @@ input::placeholder {
           trashManual(m.id, 'Eliminato dall\'utente');
           return;
         }
-        openManualEditor(m);
+        openManualDetail(m.id);
       });
       filesTableBody.appendChild(tr);
     });
   }
+
+  // ═══════════════════════════════════════════════
+  // DETTAGLIO SPECIFICO MANUALE: COLONNE LINGUA E VERSIONING
+  // ═══════════════════════════════════════════════
+  function openManualDetail(manualId) {
+    currentDetailManualId = manualId;
+    activeNavSection = 'manuals';
+    showExplorer();
+  }
+
+  function renderManualDetailView() {
+    const manual = vfs.manuals.find(m => m.id === currentDetailManualId);
+    if (!manual) {
+      currentDetailManualId = null;
+      showExplorer();
+      return;
+    }
+
+    renderDetailBreadcrumbs(manual);
+
+    manualDetailTitle.textContent = manual.title;
+    manualDetailCode.textContent = manual.headerCode || 'DOC';
+    const totalPagg = (manual.modules || []).length;
+    const totalVers = ((manual.versions || []).length + 1);
+    const totalLangs = (manual.languages || []).length;
+    manualDetailSubmeta.textContent = `Modificato: ${formatDate(manual.updatedAt)} • ${totalPagg} pagg. • ${totalVers} ${totalVers === 1 ? 'versione' : 'versioni'} • ${totalLangs} ${totalLangs === 1 ? 'lingua' : 'lingue'}`;
+
+    // Render language columns board FOR THIS SPECIFIC MANUAL
+    manualDetailLangBoard.innerHTML = '';
+
+    const langs = manual.languages || ['it'];
+    langs.forEach(langCode => {
+      const lObj = vfs.languages.find(x => x.code === langCode);
+      const flag = lObj ? lObj.flag : '🌐';
+      const name = lObj ? lObj.name : langCode.toUpperCase();
+
+      const col = document.createElement('div');
+      col.className = 'lang-board-column';
+
+      const prevVersions = manual.versions || [];
+      const currentVer = manual.currentVersion || 'v1.0';
+
+      col.innerHTML = `
+        <div class="lang-column-header">
+          <div class="lang-column-title">
+            <span>${flag}</span>
+            <span>${escapeHtml(name)}</span>
+            <span class="lang-mini-pill">${langCode.toUpperCase()}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="lang-column-count">${prevVersions.length + 1} ver.</span>
+            ${langs.length > 1 ? `<button class="win-btn btn-remove-lang-col" style="padding:1px 5px;font-size:0.75rem;color:var(--danger)" title="Rimuovi questa lingua da questo manuale">✕</button>` : ''}
+          </div>
+        </div>
+        <div class="lang-column-items">
+          <!-- In Cima: Ultima Versione (100% Opacità) -->
+          <div class="version-item-latest" title="Apri l'ultima versione del manuale">
+            <div class="version-item-latest-left">
+              <div style="display:flex;align-items:center;gap:6px">
+                <span class="version-badge-latest">${escapeHtml(currentVer)}</span>
+                <span style="font-weight:600;font-size:0.76rem;color:var(--text-primary)">Ultima Versione</span>
+              </div>
+              <div class="version-meta-text">Modificato: ${formatDate(manual.updatedAt)} • ${totalPagg} pagg.</div>
+            </div>
+            <div class="version-actions-right">
+              <button class="win-btn btn-open-latest" style="padding:3px 8px;font-size:0.75rem;background:#ffffff">📄 Apri</button>
+              <button class="win-btn win-btn-primary btn-new-version" style="padding:3px 8px;font-size:0.75rem" title="Crea e salva una nuova versione">+ Versione</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const itemsContainer = col.querySelector('.lang-column-items');
+
+      // Versioni Precedenti (Opacità 0.65)
+      if (prevVersions.length > 0) {
+        const prevSection = document.createElement('div');
+        prevSection.className = 'prev-versions-section';
+        prevSection.innerHTML = `
+          <div class="prev-versions-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Versioni Precedenti (${prevVersions.length})</span>
+          </div>
+        `;
+
+        prevVersions.forEach((pv, pIdx) => {
+          const itemPrev = document.createElement('div');
+          itemPrev.className = 'version-item-prev';
+          itemPrev.title = 'Clicca per consultare la versione archiviata';
+          itemPrev.innerHTML = `
+            <div style="display:flex;align-items:center;gap:6px">
+              <span class="version-badge-prev">${escapeHtml(pv.versionLabel)}</span>
+              <span style="font-size:0.73rem;color:var(--text-secondary)">${formatDate(pv.createdAt)}</span>
+              ${pv.notes ? `<span style="font-size:0.7rem;color:var(--text-tertiary);font-style:italic">(${escapeHtml(pv.notes)})</span>` : ''}
+            </div>
+            <span style="font-size:0.7rem;color:var(--win-accent);font-weight:600">Visualizza ➔</span>
+          `;
+
+          itemPrev.addEventListener('click', () => {
+            openManualHistoryVersion(manual, pv);
+          });
+
+          prevSection.appendChild(itemPrev);
+        });
+
+        itemsContainer.appendChild(prevSection);
+      }
+
+      // Event listeners for this column
+      const btnRemoveLang = col.querySelector('.btn-remove-lang-col');
+      if (btnRemoveLang) {
+        btnRemoveLang.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handleRemoveLangFromManual(manual, langCode, name);
+        });
+      }
+
+      col.querySelector('.btn-open-latest').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openManualEditor(manual);
+      });
+      col.querySelector('.version-item-latest-left').addEventListener('click', () => {
+        openManualEditor(manual);
+      });
+      col.querySelector('.btn-new-version').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openNewVersionDialog(manual);
+      });
+
+      manualDetailLangBoard.appendChild(col);
+    });
+
+    // Append "+ Aggiungi Colonna Lingua" card at the end of the board
+    const addCard = document.createElement('div');
+    addCard.className = 'add-lang-column-card';
+    addCard.innerHTML = `
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <span>+ Aggiungi Colonna Lingua</span>
+      <span style="font-size:0.72rem;color:var(--text-tertiary);font-weight:400">Attiva un'altra lingua per questo manuale</span>
+    `;
+    addCard.addEventListener('click', () => {
+      openAddLangToManualModal(manual);
+    });
+    manualDetailLangBoard.appendChild(addCard);
+  }
+
+  function renderDetailBreadcrumbs(manual) {
+    breadcrumbTrail.innerHTML = '';
+
+    let trail = [];
+    let curr = manual.folderId;
+    while (curr) {
+      const f = vfs.folders.find(x => x.id === curr);
+      if (f) {
+        trail.unshift(f);
+        curr = f.parentId;
+      } else break;
+    }
+
+    trail.forEach(f => {
+      const sep = document.createElement('span');
+      sep.className = 'breadcrumb-separator';
+      sep.textContent = '>';
+      breadcrumbTrail.appendChild(sep);
+
+      const span = document.createElement('span');
+      span.className = 'breadcrumb-item';
+      span.textContent = f.name;
+      span.addEventListener('click', () => {
+        currentDetailManualId = null;
+        vfs.currentFolderId = f.id;
+        showExplorer();
+      });
+      breadcrumbTrail.appendChild(span);
+    });
+
+    const sep = document.createElement('span');
+    sep.className = 'breadcrumb-separator';
+    sep.textContent = '>';
+    breadcrumbTrail.appendChild(sep);
+
+    const span = document.createElement('span');
+    span.className = 'breadcrumb-item';
+    span.style.fontWeight = '700';
+    span.style.color = 'var(--text-primary)';
+    span.textContent = manual.title;
+    breadcrumbTrail.appendChild(span);
+  }
+
+  function handleRemoveLangFromManual(manual, langCode, langName) {
+    if ((manual.languages || []).length <= 1) {
+      alert('Il manuale deve contenere almeno una lingua.');
+      return;
+    }
+    if (confirm(`Rimuovere la lingua "${langName}" (${langCode.toUpperCase()}) da questo manuale?`)) {
+      manual.languages = manual.languages.filter(c => c !== langCode);
+      manual.updatedAt = new Date().toISOString();
+      saveVFS();
+      renderManualDetailView();
+    }
+  }
+
+  function openAddLangToManualModal(manual) {
+    modalAddLangToManual.classList.add('open');
+    selectAddLangToManual.innerHTML = '';
+
+    const manualLangs = manual.languages || ['it'];
+    const available = vfs.languages.filter(l => !manualLangs.includes(l.code));
+
+    if (available.length === 0) {
+      selectAddLangToManual.innerHTML = '<option value="">Tutte le lingue disponibili sono già attive per questo manuale</option>';
+      btnConfirmAddLangToManual.disabled = true;
+      return;
+    }
+
+    btnConfirmAddLangToManual.disabled = false;
+    available.forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l.code;
+      opt.textContent = `${l.flag || '🌐'} ${l.name} (${l.code.toUpperCase()})`;
+      selectAddLangToManual.appendChild(opt);
+    });
+  }
+
+  btnConfirmAddLangToManual.addEventListener('click', () => {
+    if (!currentDetailManualId) return;
+    const manual = vfs.manuals.find(m => m.id === currentDetailManualId);
+    if (!manual) return;
+
+    const code = selectAddLangToManual.value;
+    if (!code) return;
+
+    if (!manual.languages) manual.languages = ['it'];
+    if (!manual.languages.includes(code)) {
+      manual.languages.push(code);
+
+      // Initialize page content for this language if missing
+      (manual.modules || []).forEach(mod => {
+        if (!mod.contentByLang) mod.contentByLang = {};
+        if (!mod.contentByLang[code]) {
+          mod.contentByLang[code] = Object.values(mod.contentByLang)[0] || '<p></p>';
+        }
+      });
+
+      manual.updatedAt = new Date().toISOString();
+      saveVFS();
+    }
+
+    modalAddLangToManual.classList.remove('open');
+    renderManualDetailView();
+  });
+
+  btnBackToManualsRoot.addEventListener('click', () => {
+    currentDetailManualId = null;
+    showExplorer();
+  });
+
+  btnManualDetailAddLang.addEventListener('click', () => {
+    if (!currentDetailManualId) return;
+    const manual = vfs.manuals.find(m => m.id === currentDetailManualId);
+    if (manual) openAddLangToManualModal(manual);
+  });
+
+  btnManualDetailNewVersion.addEventListener('click', () => {
+    if (!currentDetailManualId) return;
+    const manual = vfs.manuals.find(m => m.id === currentDetailManualId);
+    if (manual) openNewVersionDialog(manual);
+  });
+
+  btnManualDetailOpenEditor.addEventListener('click', () => {
+    if (!currentDetailManualId) return;
+    const manual = vfs.manuals.find(m => m.id === currentDetailManualId);
+    if (manual) openManualEditor(manual);
+  });
 
   // ═══════════════════════════════════════════════
   // I MIEI MODULI (LIBRERIA MODULI & CARTELLE)
@@ -2927,7 +3380,7 @@ input::placeholder {
     vfs.manuals.push(newDoc);
     saveVFS();
     wizardNewManualModal.classList.remove('open');
-    openManualEditor(newDoc);
+    openManualDetail(newDoc.id);
   });
   // ═══════════════════════════════════════════════
   // EDITOR VIEW (WORD STYLE + CLEAN A4 SHEETS)
@@ -3247,7 +3700,11 @@ input::placeholder {
     }
 
     if (activeNavSection === 'manuals') {
-      renderManualsExplorer();
+      if (currentDetailManualId === manualTargetForNewVersion.id) {
+        renderManualDetailView();
+      } else {
+        renderManualsExplorer();
+      }
     }
   });
 
@@ -3686,6 +4143,7 @@ input::placeholder {
   btnHomeNavigator.addEventListener('click', () => {
     if (currentManual) saveCurrentManual();
     currentManual = null;
+    currentDetailManualId = null;
     activeNavSection = 'manuals';
     navItemManuals.classList.add('active');
     navItemModules.classList.remove('active');
@@ -3699,10 +4157,20 @@ input::placeholder {
   });
 
   btnBackToExplorer.addEventListener('click', () => {
-    btnHomeNavigator.click();
+    if (currentManual) {
+      saveCurrentManual();
+      const mid = currentManual.id;
+      currentManual = null;
+      isViewingHistory = false;
+      activeHistoryVersion = null;
+      openManualDetail(mid);
+    } else {
+      btnHomeNavigator.click();
+    }
   });
 
   navItemManuals.addEventListener('click', () => {
+    currentDetailManualId = null;
     activeNavSection = 'manuals';
     navItemManuals.classList.add('active');
     navItemModules.classList.remove('active');
@@ -3807,8 +4275,9 @@ input::placeholder {
       vfs.currentModuleFolderId = null;
       renderModulesExplorer();
     } else {
+      currentDetailManualId = null;
       vfs.currentFolderId = null;
-      renderManualsExplorer();
+      showExplorer();
     }
   });
 
