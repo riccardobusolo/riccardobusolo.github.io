@@ -1,0 +1,2577 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniManual — Enterprise Manual & SOP Configurator</title>
+<meta name="description" content="Configuratore professionale di manuali aziendali, SOP e linee guida di conformità per grandi imprese. Generatore di documentazione con anteprima A4, esportazione PDF e standard ISO.">
+<meta name="robots" content="index, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-dark: #06060a;
+  --bg-panel: #0c0c12;
+  --bg-card: #111118;
+  --bg-input: #16161f;
+  --bg-hover: #1c1c28;
+  --border: #1e1e2e;
+  --border-focus: #00e0d0;
+  --text-main: #f0f0f8;
+  --text-muted: #a0a0be;
+  --text-dim: #6a6a88;
+  
+  /* Brand color default (dynamic via JS) */
+  --brand-color: #00e0d0;
+  --brand-glow: rgba(0, 224, 208, 0.15);
+  --brand-border: rgba(0, 224, 208, 0.3);
+
+  /* Alert / ISO semantic colors */
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --caution: #eab308;
+  --notice: #3b82f6;
+  --safety: #10b981;
+
+  --font-main: 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-doc: 'Newsreader', Georgia, serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-main);
+  background: var(--bg-dark);
+  color: var(--text-main);
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+/* Background Noise Overlay & Glow */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .35;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+}
+body::after {
+  content: '';
+  position: fixed;
+  top: -25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(0, 224, 208, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Top Navigation Bar */
+.top-nav {
+  position: relative;
+  z-index: 40;
+  height: 64px;
+  background: rgba(13, 13, 20, 0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.site-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+.site-back-btn:hover {
+  color: var(--text-main);
+  border-color: var(--brand-color);
+  background: var(--brand-glow);
+}
+
+.brand-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-symbol {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--brand-color), #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #06060a;
+  box-shadow: 0 0 16px var(--brand-glow);
+}
+
+.nav-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-tag {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  background: rgba(0, 224, 208, 0.1);
+  color: var(--brand-color);
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--brand-border);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nav-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.preset-select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  padding: 4px 10px 4px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.preset-select-wrapper label {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.preset-select {
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+}
+.preset-select option {
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font-main);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+.btn-ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+.btn-primary {
+  background: var(--brand-color);
+  color: #06060a;
+  box-shadow: 0 2px 10px var(--brand-glow);
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 18px var(--brand-glow);
+}
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* App Layout Grid */
+.app-container {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  height: calc(100vh - 64px);
+  position: relative;
+  z-index: 10;
+}
+
+/* Left Editor Panel */
+.editor-pane {
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Quality & Audit Status Header */
+.audit-bar {
+  padding: 12px 18px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.audit-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+}
+.audit-label { color: var(--text-muted); }
+.audit-score {
+  color: var(--brand-color);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.audit-progress-track {
+  height: 5px;
+  background: var(--bg-input);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.audit-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, var(--brand-color));
+  width: 85%;
+  transition: width 0.4s ease;
+}
+
+/* Editor Tabs */
+.editor-nav-tabs {
+  display: flex;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 12px;
+}
+.nav-tab-btn {
+  flex: 1;
+  padding: 12px 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.nav-tab-btn:hover { color: var(--text-muted); }
+.nav-tab-btn.active {
+  color: var(--brand-color);
+  border-bottom-color: var(--brand-color);
+  background: rgba(255,255,255,0.015);
+}
+
+/* Tab Scrollable Content */
+.editor-scroll-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.editor-scroll-body::-webkit-scrollbar { width: 6px; }
+.editor-scroll-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.config-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.section-legend {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.form-label small {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+.form-control {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-control:focus {
+  border-color: var(--brand-color);
+  box-shadow: 0 0 0 2px var(--brand-glow);
+}
+textarea.form-control {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* Palette Swatches */
+.swatches-grid {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+.color-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.15s, border-color 0.2s;
+}
+.color-swatch:hover { transform: scale(1.15); }
+.color-swatch.active { border-color: #fff; transform: scale(1.1); box-shadow: 0 0 10px rgba(255,255,255,0.4); }
+
+/* Section Block List & Cards */
+.blocks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.block-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.block-card:hover { border-color: rgba(255,255,255,0.15); }
+
+.block-card-header {
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.02);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+}
+.block-card.open .block-card-header {
+  border-bottom-color: var(--border);
+}
+
+.block-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.block-type-pill {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-hover);
+  color: var(--text-muted);
+}
+.block-type-pill.danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.block-type-pill.raci { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.block-type-pill.checklist { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.block-type-pill.table { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+
+.block-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.tool-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.tool-btn:hover { color: var(--text-main); background: var(--bg-hover); }
+
+.block-card-body {
+  padding: 14px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+.block-card.open .block-card-body { display: flex; }
+
+/* Add Block Droplist */
+.add-block-row {
+  display: flex;
+  gap: 8px;
+}
+.add-block-select {
+  flex: 1;
+}
+
+/* Right Preview Pane */
+.preview-pane {
+  background: #09090f;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Preview Toolbar */
+.preview-toolbar {
+  height: 50px;
+  background: rgba(13, 13, 20, 0.95);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 20;
+}
+
+.view-mode-toggle {
+  display: flex;
+  background: var(--bg-card);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.mode-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.mode-btn.active {
+  background: var(--bg-hover);
+  color: var(--brand-color);
+  font-weight: 600;
+}
+
+.preview-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.zoom-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+.zoom-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.zoom-btn:hover { color: var(--text-main); border-color: var(--text-dim); }
+
+.theme-pill-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.theme-pill-toggle:hover { color: var(--text-main); }
+
+/* Document View Area */
+.document-viewport {
+  flex: 1;
+  overflow: auto;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: radial-gradient(circle at top, #11111d 0%, #08080d 100%);
+}
+
+/* The Document Container (Realistic A4 vs Responsive Web) */
+.doc-sheet {
+  width: 100%;
+  max-width: 820px;
+  min-height: 1120px;
+  background: #ffffff;
+  color: #1a1a24;
+  box-shadow: 0 15px 45px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+  border-radius: 4px;
+  padding: 56px 64px;
+  position: relative;
+  transition: transform 0.2s ease, max-width 0.3s ease;
+  transform-origin: top center;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dark Theme for Document when enabled */
+.doc-sheet.theme-dark {
+  background: #111119;
+  color: #e5e5f0;
+  box-shadow: 0 15px 45px rgba(0,0,0,0.8), 0 0 0 1px var(--border);
+}
+
+/* Watermark */
+.doc-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7rem;
+  font-weight: 800;
+  font-family: var(--font-main);
+  color: rgba(0, 0, 0, 0.035);
+  transform: rotate(-35deg);
+  pointer-events: none;
+  user-select: none;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  z-index: 1;
+}
+.doc-sheet.theme-dark .doc-watermark {
+  color: rgba(255, 255, 255, 0.03);
+}
+
+/* Document Header Elements */
+.doc-header {
+  position: relative;
+  z-index: 2;
+  border-bottom: 2px solid var(--brand-color);
+  padding-bottom: 24px;
+  margin-bottom: 30px;
+}
+
+.doc-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.doc-company-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.doc-logo-symbol {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--brand-color);
+  color: #06060a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.4rem;
+  font-family: var(--font-main);
+}
+
+.doc-company-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.doc-company-dept {
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.doc-sheet.theme-dark .doc-company-dept { color: #94a3b8; }
+
+.doc-classification-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #334155;
+}
+.doc-classification-badge.confidential {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+.doc-classification-badge.internal {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+.doc-classification-badge.restricted {
+  background: #fefce8;
+  border-color: #fef08a;
+  color: #ca8a04;
+}
+
+.doc-sheet.theme-dark .doc-classification-badge {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  color: #cbd5e1;
+}
+
+.doc-title-h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+
+.doc-subtitle-p {
+  font-size: 1rem;
+  color: #475569;
+  font-weight: 400;
+  max-width: 90%;
+  line-height: 1.5;
+}
+.doc-sheet.theme-dark .doc-subtitle-p { color: #94a3b8; }
+
+/* Metadata Grid Table */
+.doc-meta-table {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-top: 18px;
+}
+.doc-sheet.theme-dark .doc-meta-table {
+  background: #181824;
+  border-color: var(--border);
+}
+.meta-item { display: flex; flex-direction: column; gap: 2px; }
+.meta-item-label {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: #64748b;
+  text-transform: uppercase;
+}
+.meta-item-val {
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+/* Formal Approval Stamps Box */
+.doc-signatures-box {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 30px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  background: #ffffff;
+}
+.doc-sheet.theme-dark .doc-signatures-box {
+  background: #14141e;
+  border-color: var(--border);
+}
+.sig-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sig-role {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: #64748b;
+  text-transform: uppercase;
+}
+.sig-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.sig-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: #10b981;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* Dynamic Table of Contents */
+.doc-toc {
+  position: relative;
+  z-index: 2;
+  background: #f8fafc;
+  border-left: 3px solid var(--brand-color);
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  border-radius: 0 6px 6px 0;
+}
+.doc-sheet.theme-dark .doc-toc {
+  background: #161622;
+}
+.toc-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+}
+.toc-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.toc-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #334155;
+}
+.doc-sheet.theme-dark .toc-item { color: #cbd5e1; }
+.toc-item-num { font-family: var(--font-mono); font-weight: 600; margin-right: 8px; color: var(--brand-color); }
+.toc-dots { flex: 1; border-bottom: 1px dotted #cbd5e1; margin: 0 8px 4px; }
+.doc-sheet.theme-dark .toc-dots { border-bottom-color: #334155; }
+
+/* Document Section Rendering */
+.doc-body {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.rendered-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  page-break-inside: avoid;
+}
+
+.rendered-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 6px;
+}
+.doc-sheet.theme-dark .rendered-section-header { border-bottom-color: var(--border); }
+
+.sec-num {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--brand-color);
+}
+.sec-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.rendered-content-text {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: #334155;
+  white-space: pre-line;
+}
+.doc-sheet.theme-dark .rendered-content-text { color: #cbd5e1; }
+
+/* ANSI / ISO Safety Warning Boxes */
+.safety-box {
+  display: flex;
+  border: 2px solid;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 10px 0;
+  page-break-inside: avoid;
+}
+.safety-box.danger { border-color: var(--danger); background: #fff5f5; }
+.safety-box.warning { border-color: var(--warning); background: #fffbeb; }
+.safety-box.caution { border-color: var(--caution); background: #fefce8; }
+.safety-box.notice { border-color: var(--notice); background: #eff6ff; }
+.safety-box.safety { border-color: var(--safety); background: #ecfdf5; }
+
+.doc-sheet.theme-dark .safety-box.danger { background: rgba(239, 68, 68, 0.1); }
+.doc-sheet.theme-dark .safety-box.warning { background: rgba(245, 158, 11, 0.1); }
+.doc-sheet.theme-dark .safety-box.caution { background: rgba(234, 179, 8, 0.1); }
+.doc-sheet.theme-dark .safety-box.notice { background: rgba(59, 130, 246, 0.1); }
+.doc-sheet.theme-dark .safety-box.safety { background: rgba(16, 185, 129, 0.1); }
+
+.safety-stripe {
+  width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-align: center;
+  padding: 10px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.safety-box.danger .safety-stripe { background: var(--danger); }
+.safety-box.warning .safety-stripe { background: var(--warning); color: #000; }
+.safety-box.caution .safety-stripe { background: var(--caution); color: #000; }
+.safety-box.notice .safety-stripe { background: var(--notice); }
+.safety-box.safety .safety-stripe { background: var(--safety); }
+
+.safety-content {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #1e293b;
+}
+.doc-sheet.theme-dark .safety-content { color: #f1f5f9; }
+.safety-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+/* RACI Table */
+.raci-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 0.82rem;
+  border: 1px solid #e2e8f0;
+}
+.doc-sheet.theme-dark .raci-table { border-color: var(--border); }
+.raci-table th, .raci-table td {
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+.doc-sheet.theme-dark .raci-table th, .doc-sheet.theme-dark .raci-table td { border-color: var(--border); }
+.raci-table th {
+  background: #f8fafc;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.doc-sheet.theme-dark .raci-table th { background: #181824; color: #cbd5e1; }
+.raci-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+.raci-r { background: #dbeafe; color: #1e40af; }
+.raci-a { background: #fee2e2; color: #991b1b; }
+.raci-c { background: #fef3c7; color: #92400e; }
+.raci-i { background: #e0e7ff; color: #3730a3; }
+
+/* Interactive Checklist */
+.checklist-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+}
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+.doc-sheet.theme-dark .checklist-item {
+  background: #161622;
+  border-color: var(--border);
+}
+.checklist-item input[type="checkbox"] {
+  margin-top: 3px;
+  accent-color: var(--brand-color);
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+.checklist-text { flex: 1; }
+.checklist-time {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #64748b;
+  background: rgba(0,0,0,0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.doc-sheet.theme-dark .checklist-time { background: rgba(255,255,255,0.08); color: #94a3b8; }
+
+/* Spec Table */
+.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 0.82rem;
+}
+.spec-table th, .spec-table td {
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+}
+.doc-sheet.theme-dark .spec-table th, .doc-sheet.theme-dark .spec-table td { border-color: var(--border); }
+.spec-table th {
+  background: #f1f5f9;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+.doc-sheet.theme-dark .spec-table th { background: #1c1c2b; color: #cbd5e1; }
+
+/* Document Footer */
+.doc-footer {
+  position: relative;
+  z-index: 2;
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: #64748b;
+}
+.doc-sheet.theme-dark .doc-footer { border-top-color: var(--border); color: #94a3b8; }
+
+/* Toast Notifications */
+.toast-msg {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #181824;
+  color: #f1f1f8;
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-family: var(--font-main);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.toast-msg.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ═══════════ PRINT STYLES (@media print) ═══════════ */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm 15mm 15mm 15mm;
+  }
+  body, html {
+    background: #fff !important;
+    color: #000 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  body::before { display: none !important; }
+  .top-nav, .editor-pane, .preview-toolbar, .toast-msg {
+    display: none !important;
+  }
+  .app-container {
+    display: block !important;
+    height: auto !important;
+  }
+  .preview-pane {
+    background: transparent !important;
+  }
+  .document-viewport {
+    padding: 0 !important;
+    background: transparent !important;
+    overflow: visible !important;
+  }
+  .doc-sheet {
+    max-width: 100% !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    transform: none !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .doc-watermark {
+    color: rgba(0, 0, 0, 0.04) !important;
+  }
+  .rendered-section {
+    page-break-inside: avoid;
+  }
+  .safety-box {
+    page-break-inside: avoid;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .app-container {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow-y: auto;
+  }
+  .editor-pane {
+    height: 600px;
+  }
+  .document-viewport {
+    padding: 20px 10px;
+  }
+}
+</style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-nav">
+    <div class="nav-left">
+      <a href="/progetti.html#strumenti" class="site-back-btn" title="Torna a Progetti / Strumenti">
+        <svg height="20" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex-shrink:0">
+          <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+          <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+          <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
+          <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
+        </svg>
+        <span>Strumenti</span>
+      </a>
+      <div class="brand-badge-group">
+        <div class="logo-symbol">Ω</div>
+        <div class="nav-title">
+          OmniManual
+          <span class="nav-tag">Enterprise Builder</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-center">
+      <div class="preset-select-wrapper">
+        <label for="templateSelect">Template:</label>
+        <select id="templateSelect" class="preset-select">
+          <option value="sop">SOP — Procedura Operativa ISO 9001</option>
+          <option value="security">Security & Privacy Policy (ISO 27001)</option>
+          <option value="machinery">Manuale Tecnico Impianto / Marcatura CE</option>
+          <option value="onboarding">Guida Dipendenti & Onboarding Corporate</option>
+          <option value="disaster">Crisis Management & Disaster Recovery</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <button id="importBtn" class="btn btn-ghost" title="Importa file JSON">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Importa
+      </button>
+      <input type="file" id="importFileInput" accept=".json" style="display:none">
+      
+      <button id="exportJsonBtn" class="btn btn-ghost" title="Esporta backup JSON">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        JSON
+      </button>
+
+      <button id="exportMdBtn" class="btn btn-ghost" title="Esporta file Markdown">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="7 15 7 9 10 12 13 9 13 15"/></svg>
+        Markdown
+      </button>
+
+      <button id="printPdfBtn" class="btn btn-primary" title="Stampa o Salva in PDF">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Stampa / PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Application Body Grid -->
+  <div class="app-container">
+    
+    <!-- LEFT EDITOR PANE -->
+    <aside class="editor-pane">
+      
+      <!-- Compliance & Quality Check Bar -->
+      <div class="audit-bar">
+        <div class="audit-top">
+          <span class="audit-label">Completezza Documentale:</span>
+          <span id="auditScoreVal" class="audit-score">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="scoreNumber">92%</span>
+          </span>
+        </div>
+        <div class="audit-progress-track">
+          <div id="auditProgressFill" class="audit-progress-fill" style="width:92%"></div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs inside Editor -->
+      <div class="editor-nav-tabs">
+        <button class="nav-tab-btn active" data-tab="meta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+          Generale
+        </button>
+        <button class="nav-tab-btn" data-tab="brand">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg>
+          Brand & Firme
+        </button>
+        <button class="nav-tab-btn" data-tab="content">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Moduli & Sezioni
+        </button>
+      </div>
+
+      <!-- Scrollable Panels -->
+      <div class="editor-scroll-body">
+        
+        <!-- TAB 1: METADATA & GOVERNANCE -->
+        <div id="tab-meta" class="tab-pane-content" style="display:flex; flex-direction:column; gap:16px;">
+          
+          <div class="config-section">
+            <div class="section-legend">Dati Documento</div>
+            
+            <div class="form-group">
+              <label class="form-label" for="docTitle">Titolo del Manuale</label>
+              <input type="text" id="docTitle" class="form-control" placeholder="Es. Procedura Operativa Standard: Controllo Qualità">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="docSubtitle">Sottotitolo o Descrizione</label>
+              <textarea id="docSubtitle" class="form-control" style="min-height:60px;" placeholder="Scopo e ambito del documento..."></textarea>
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label class="form-label" for="docCode">Codice Univoco</label>
+                <input type="text" id="docCode" class="form-control" placeholder="Es. SOP-2026-QA-012">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="docVersion">Versione</label>
+                <input type="text" id="docVersion" class="form-control" placeholder="Es. 2.4.0">
+              </div>
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label class="form-label" for="docDate">Data Rilascio</label>
+                <input type="date" id="docDate" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="docReviewDate">Prossima Revisione</label>
+                <input type="date" id="docReviewDate" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="docClassification">Classificazione di Riservatezza</label>
+              <select id="docClassification" class="form-control">
+                <option value="confidential">Strettamente Confidenziale (Strictly Confidential)</option>
+                <option value="internal">Uso Interno Aziendale (Internal Use Only)</option>
+                <option value="restricted">Riservato Reparto (Restricted Access)</option>
+                <option value="public">Documento Pubblico (Public Release)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+              <span class="form-label" style="margin:0;">Filigrana di sfondo (Watermark)</span>
+              <input type="checkbox" id="watermarkToggle" checked style="accent-color:var(--brand-color); width:18px; height:18px;">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 2: BRANDING & APPROVALS -->
+        <div id="tab-brand" class="tab-pane-content" style="display:none; flex-direction:column; gap:16px;">
+          
+          <div class="config-section">
+            <div class="section-legend">Identità Aziendale</div>
+
+            <div class="form-group">
+              <label class="form-label" for="companyName">Nome Azienda</label>
+              <input type="text" id="companyName" class="form-control" placeholder="Es. Nexus Dynamics S.p.A.">
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label class="form-label" for="companyDept">Divisione / Reparto</label>
+                <input type="text" id="companyDept" class="form-control" placeholder="Es. Quality Assurance & HSE">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="companySymbol">Monogramma / Logo</label>
+                <input type="text" id="companySymbol" class="form-control" maxlength="2" placeholder="Es. ND o Ω">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Colore Primario Brand</label>
+              <div class="swatches-grid">
+                <div class="color-swatch active" style="background:#00e0d0" data-color="#00e0d0" title="Cyber Cyan"></div>
+                <div class="color-swatch" style="background:#3b82f6" data-color="#3b82f6" title="Corporate Blue"></div>
+                <div class="color-swatch" style="background:#10b981" data-color="#10b981" title="Emerald Quality"></div>
+                <div class="color-swatch" style="background:#f59e0b" data-color="#f59e0b" title="Industrial Amber"></div>
+                <div class="color-swatch" style="background:#ef4444" data-color="#ef4444" title="Crimson Executive"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="config-section">
+            <div class="section-legend">Firmatari & Approvazione Formale</div>
+            
+            <div class="form-group">
+              <label class="form-label" for="authorName">Redattore Tecnico (Author)</label>
+              <input type="text" id="authorName" class="form-control" placeholder="Nome, Ruolo">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reviewerName">Responsabile QA (Reviewer)</label>
+              <input type="text" id="reviewerName" class="form-control" placeholder="Nome, Ruolo">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="approverName">Approvatore Direzione (Executive)</label>
+              <input type="text" id="approverName" class="form-control" placeholder="Nome, Ruolo">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="approvalStatus">Stato di Approvazione</label>
+              <select id="approvalStatus" class="form-control">
+                <option value="approved">Approvato & Rilasciato (Approved)</option>
+                <option value="review">In Corso di Revisione (Under Review)</option>
+                <option value="draft">Bozza di Lavoro (Draft)</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 3: SECTIONS & MODULES BUILDER -->
+        <div id="tab-content" class="tab-pane-content" style="display:none; flex-direction:column; gap:16px;">
+          
+          <div class="add-block-row">
+            <select id="newBlockType" class="form-control add-block-select">
+              <option value="text">Nuova Sezione Testo / Istruzione</option>
+              <option value="safety">Box Avvertenza di Sicurezza ISO/OSHA</option>
+              <option value="raci">Matrice Ruoli & Responsabilità RACI</option>
+              <option value="checklist">Checklist Operativa Step-by-Step</option>
+              <option value="spec">Tabella Parametri / Specifiche Tecniche</option>
+            </select>
+            <button id="addBlockBtn" class="btn btn-primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Aggiungi
+            </button>
+          </div>
+
+          <!-- Dynamic List of Blocks -->
+          <div id="blocksContainer" class="blocks-container">
+            <!-- Populated via JavaScript -->
+          </div>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- RIGHT PREVIEW PANE -->
+    <main class="preview-pane">
+      
+      <!-- Preview Toolbar -->
+      <div class="preview-toolbar">
+        <div class="view-mode-toggle">
+          <button class="mode-btn active" data-mode="a4">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>
+            Foglio A4
+          </button>
+          <button class="mode-btn" data-mode="web">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Portale Web
+          </button>
+        </div>
+
+        <div class="preview-controls">
+          <button id="themeToggleBtn" class="theme-pill-toggle">
+            <span id="themeToggleIcon">🌙</span>
+            <span id="themeToggleText">Tema Scuro</span>
+          </button>
+
+          <div class="zoom-wrapper">
+            <button id="zoomOutBtn" class="zoom-btn" title="Riduci Zoom">−</button>
+            <span id="zoomLevelText">100%</span>
+            <button id="zoomInBtn" class="zoom-btn" title="Aumenta Zoom">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrollable Viewport -->
+      <div class="document-viewport">
+        
+        <!-- Realistic Rendered Sheet -->
+        <article id="docSheet" class="doc-sheet">
+          
+          <!-- Watermark -->
+          <div id="watermarkEl" class="doc-watermark">CONFIDENZIALE</div>
+
+          <!-- Header -->
+          <header class="doc-header">
+            <div class="doc-top-bar">
+              <div class="doc-company-brand">
+                <div id="pvLogoSymbol" class="doc-logo-symbol">Ω</div>
+                <div>
+                  <div id="pvCompanyName" class="doc-company-name">Nexus Dynamics S.p.A.</div>
+                  <div id="pvCompanyDept" class="doc-company-dept">Quality Assurance & Operations</div>
+                </div>
+              </div>
+              <div id="pvClassificationBadge" class="doc-classification-badge confidential">Strettamente Confidenziale</div>
+            </div>
+
+            <h1 id="pvTitle" class="doc-title-h1">Procedura Operativa Standard: Controllo Qualità e Rilascio Lotti</h1>
+            <p id="pvSubtitle" class="doc-subtitle-p">Linee guida conformi agli standard ISO 9001:2015 per la validazione dei componenti critici di produzione.</p>
+
+            <!-- Metadata Table -->
+            <div class="doc-meta-table">
+              <div class="meta-item">
+                <span class="meta-item-label">Codice Doc</span>
+                <span id="pvDocCode" class="meta-item-val">SOP-2026-QA-012</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-item-label">Versione</span>
+                <span id="pvVersion" class="meta-item-val">v2.4.0</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-item-label">Data Effettiva</span>
+                <span id="pvDate" class="meta-item-val">04/09/2026</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-item-label">Prossima Revisione</span>
+                <span id="pvReviewDate" class="meta-item-val">04/09/2027</span>
+              </div>
+            </div>
+          </header>
+
+          <!-- Formal Signatures Box -->
+          <section class="doc-signatures-box">
+            <div class="sig-cell">
+              <span class="sig-role">Redatto Da</span>
+              <span id="pvAuthor" class="sig-name">Ing. Riccardo Busolo (Lead QA)</span>
+              <span class="sig-stamp">✓ Firmato Digitalmente</span>
+            </div>
+            <div class="sig-cell">
+              <span class="sig-role">Verificato Da</span>
+              <span id="pvReviewer" class="sig-name">Dott.ssa Elena Rossi (HSE Manager)</span>
+              <span class="sig-stamp">✓ Verificato per Conformità</span>
+            </div>
+            <div class="sig-cell">
+              <span class="sig-role">Approvato & Rilasciato</span>
+              <span id="pvApprover" class="sig-name">Direzione Operativa (COO)</span>
+              <span id="pvStatusStamp" class="sig-stamp">✓ Rilascio Ufficiale</span>
+            </div>
+          </section>
+
+          <!-- Table of Contents -->
+          <nav class="doc-toc">
+            <div class="toc-title">Indice dei Contenuti</div>
+            <ul id="pvTocList" class="toc-list">
+              <!-- Dynamically built TOC -->
+            </ul>
+          </nav>
+
+          <!-- Rendered Body Sections -->
+          <div id="pvBodySections" class="doc-body">
+            <!-- Dynamically injected modules -->
+          </div>
+
+          <!-- Document Footer -->
+          <footer class="doc-footer">
+            <span>OmniManual Enterprise System &bull; <span id="pvFooterDocCode">SOP-2026-QA-012</span></span>
+            <span>Riproduzione vietata &bull; Uso esclusivo aziendale</span>
+            <span>Pagina 1 di 1</span>
+          </footer>
+
+        </article>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-msg">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e0d0" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toastText">Modifiche salvate automaticamente</span>
+  </div>
+
+  <!-- Application Logic -->
+  <script>
+  (function() {
+    'use strict';
+
+    // ── PRESET TEMPLATES ──
+    const PRESETS = {
+      sop: {
+        title: "Procedura Operativa Standard: Controllo Qualità e Rilascio Lotti",
+        subtitle: "Protocollo operativo unificato conforme alle normative ISO 9001:2015 per la tracciabilità e la validazione dei lotti di produzione industriale.",
+        docCode: "SOP-2026-QA-012",
+        version: "2.4.0",
+        date: "2026-09-04",
+        reviewDate: "2027-09-04",
+        classification: "confidential",
+        companyName: "Nexus Dynamics S.p.A.",
+        companyDept: "Quality Assurance & Production",
+        companySymbol: "ND",
+        brandColor: "#00e0d0",
+        author: "Ing. Riccardo Busolo (Lead QA)",
+        reviewer: "Dott.ssa Elena Rossi (HSE Specialist)",
+        approver: "Direzione Operativa (COO)",
+        status: "approved",
+        watermark: true,
+        sections: [
+          {
+            id: 'sec_1',
+            type: 'text',
+            title: 'Scopo e Campo di Applicazione',
+            content: 'La presente procedura definisce i criteri operativi standard per la verifica della conformità, il campionamento statistico e il rilascio dei componenti finiti.\nSi applica a tutti gli stabilimenti produttivi del gruppo e vincola i reparti Assemblaggio, Collaudo e Logistica.'
+          },
+          {
+            id: 'sec_2',
+            type: 'safety',
+            title: 'Protocollo di Sicurezza Ambientale e DPI',
+            level: 'warning',
+            content: 'Prima di accedere alla stazione di collaudo ad alta pressione è obbligatorio indossare occhiali di protezione con marcatura EN166 e calzature antistatiche S3. Verificare sempre lo scarico pressione prima di disconnettere i raccordi pneumatici.'
+          },
+          {
+            id: 'sec_3',
+            type: 'checklist',
+            title: 'Procedura Sequenziale di Controllo',
+            items: [
+              { text: 'Verifica integrità imballo e corrispondenza bolla di carico', time: '5 min', done: true },
+              { text: 'Ispezione visiva con lente ottica 10x per assenza micro-cricche', time: '12 min', done: true },
+              { text: 'Test dimensionale al calibro digitale micrometrico (Tolleranza ±0.02mm)', time: '15 min', done: false },
+              { text: 'Registrazione dei dati nel portale ERP aziendale con codice seriale univoco', time: '8 min', done: false }
+            ]
+          },
+          {
+            id: 'sec_4',
+            type: 'raci',
+            title: 'Matrice delle Responsabilità (RACI)',
+            rows: [
+              { task: 'Campionamento componenti a campione', r: 'Operatore QC', a: 'Capo Reparto', c: 'Ingegnere di Processo', i: 'Logistica' },
+              { task: 'Esecuzione test distruttivi e trazione', r: 'Tecnico di Laboratorio', a: 'Lead QA', c: 'Fornitore Materiali', i: 'Direzione Prod.' },
+              { task: 'Firma liberatoria rilascio lotto', r: 'Lead QA', a: 'Direttore Tecnico', c: 'Legal & Compliance', i: 'Tutti' }
+            ]
+          },
+          {
+            id: 'sec_5',
+            type: 'spec',
+            title: 'Parametri e Limiti di Accettabilità',
+            headers: ['Parametro Analizzato', 'Metodo di Prova', 'Valore Nominale', 'Tolleranza Ammessa'],
+            data: [
+              ['Resistenza a trazione', 'ISO 6892-1', '620 MPa', '≥ 580 MPa'],
+              ['Durezza superficiale', 'Rockwell HRC', '45 HRC', '± 2 HRC'],
+              ['Rugosità media (Ra)', 'Rugosimetro 2D', '0.8 µm', 'max 1.2 µm']
+            ]
+          }
+        ]
+      },
+
+      security: {
+        title: "Policy Aziendale di Sicurezza delle Informazioni & Gestione Credenziali",
+        subtitle: "Norme comportamentali e protocolli tecnici vincolanti conformi allo standard ISO/IEC 27001 e GDPR per la tutela del patrimonio informativo aziendale.",
+        docCode: "POL-SEC-2026-004",
+        version: "3.1.0",
+        date: "2026-09-04",
+        reviewDate: "2027-03-01",
+        classification: "restricted",
+        companyName: "CyberCore Technologies Group",
+        companyDept: "Information Security & CISO Office",
+        companySymbol: "CC",
+        brandColor: "#3b82f6",
+        author: "CISO Office Audit Team",
+        reviewer: "Data Protection Officer (DPO)",
+        approver: "Chief Executive Officer (CEO)",
+        status: "approved",
+        watermark: true,
+        sections: [
+          {
+            id: 'sec_s1',
+            type: 'text',
+            title: 'Obiettivi e Perimetro di Tutela',
+            content: 'La presente policy stabilisce le linee guida per la protezione dei dati sensibili, delle credenziali di accesso e delle postazioni di lavoro.\nIl rispetto è vincolante per tutti i dipendenti, collaboratori esterni e fornitori con accesso alla rete VPN aziendale.'
+          },
+          {
+            id: 'sec_s2',
+            type: 'safety',
+            title: 'Divieto Assoluto di Condivisione Credenziali',
+            level: 'danger',
+            content: 'È severamente proibito cedere, trascrivere su fogli fisici o condividere via email le password di autenticazione e i token MFA. Ogni violazione costituisce grave infrazione disciplinare e comporta la revoca immediata dei permessi informatici.'
+          },
+          {
+            id: 'sec_s3',
+            type: 'checklist',
+            title: 'Checklist di Configurazione Nuova Postazione (Zero Trust)',
+            items: [
+              { text: 'Abilitazione crittografia disco integrale (BitLocker con TPM 2.0)', time: '15 min', done: true },
+              { text: 'Registrazione account su Identity Provider aziendale con Passkey FIDO2', time: '10 min', done: true },
+              { text: 'Installazione e verifica agente EDR (Endpoint Detection & Response)', time: '20 min', done: true },
+              { text: 'Completamento modulo obbligatorio di Cyber Awareness per nuovo assunto', time: '45 min', done: false }
+            ]
+          },
+          {
+            id: 'sec_s4',
+            type: 'raci',
+            title: 'Gestione Incidenti di Sicurezza (RACI)',
+            rows: [
+              { task: 'Rilevazione anomalia / alert phishing', r: 'SOC Tier 1', a: 'CISO', c: 'Dipendente segnalante', i: 'IT Helpdesk' },
+              { task: 'Isolamento host compromesso dalla rete', r: 'Incident Handler', a: 'CISO', c: 'Network Admin', i: 'Management' },
+              { task: 'Notifica al Garante Privacy (entro 72h)', r: 'DPO', a: 'CEO / Legal', c: 'CISO Team', i: 'Autorità Competenti' }
+            ]
+          }
+        ]
+      },
+
+      machinery: {
+        title: "Manuale di Uso, Manutenzione e Sicurezza — Impianto Laser Serie X",
+        subtitle: "Istruzioni per l'operatore e il personale manutentore conformi alla Direttiva Macchine 2006/42/CE e norma EN ISO 12100.",
+        docCode: "MAN-ENG-2026-X80",
+        version: "1.0.4",
+        date: "2026-09-04",
+        reviewDate: "2028-09-04",
+        classification: "internal",
+        companyName: "Vortex Machinery Solutions",
+        companyDept: "Ingegneria Meccanica & Servizio Post-Vendita",
+        companySymbol: "VM",
+        brandColor: "#f59e0b",
+        author: "Ufficio Tecnico Documentazione",
+        reviewer: "Responsabile Sicurezza Macchinari CE",
+        approver: "Direttore Stabilimento",
+        status: "approved",
+        watermark: false,
+        sections: [
+          {
+            id: 'sec_m1',
+            type: 'text',
+            title: 'Descrizione dell Impianto e Destinazione d Uso',
+            content: 'L\'impianto serie X80 è progettato esclusivamente per il taglio laser di lamiere in acciaio al carbonio e leghe leggere.\nQualsiasi utilizzo difforme da quanto specificato solleva il costruttore da qualsiasi responsabilità civile e penale.'
+          },
+          {
+            id: 'sec_m2',
+            type: 'safety',
+            title: 'Pericolo Radiazione Laser Classe 4 e Alta Tensione',
+            level: 'danger',
+            content: 'Radiazione laser invisibile ad alta potenza. L\'esposizione diretta o diffusa provoca cecità immediata e ustioni gravi. Non escludere mai i microswitch di sicurezza dei carter e intervenire solo a impianto sezionato elettricamente (Lock-Out / Tag-Out).'
+          },
+          {
+            id: 'sec_m3',
+            type: 'spec',
+            title: 'Specifiche Tecniche Generali',
+            headers: ['Specifica', 'Unità', 'Valore Nominale', 'Note Operative'],
+            data: [
+              ['Potenza Sorgente Laser Fibra', 'kW', '12.0 kW', 'Raffreddamento a chiller a circuito chiuso'],
+              ['Corsa Asse X / Y', 'mm', '4000 x 2000 mm', 'Velocità max combinata 140 m/min'],
+              ['Pressione Gas di Assistenza (Azoto)', 'bar', '25 bar', 'Purezza minima gas 99.999%']
+            ]
+          },
+          {
+            id: 'sec_m4',
+            type: 'checklist',
+            title: 'Manutenzione Preventiva Settimanale',
+            items: [
+              { text: 'Pulizia lenti di protezione testa ottica con etanolo ottico puro', time: '15 min', done: false },
+              { text: 'Verifica livello liquido di raffreddamento e conducibilità chiller', time: '10 min', done: false },
+              { text: 'Ispezione e ingrassaggio guide a ricircolo di rulli assi X e Y', time: '30 min', done: false }
+            ]
+          }
+        ]
+      },
+
+      onboarding: {
+        title: "Manuale di Benvenuto & Guida Operativa del Dipendente",
+        subtitle: "Cultura aziendale, valori, strumenti digitali e processi amministrativi per i nuovi collaboratori.",
+        docCode: "HR-GUIDE-2026",
+        version: "4.0.0",
+        date: "2026-09-04",
+        reviewDate: "2027-01-15",
+        classification: "internal",
+        companyName: "Innovate Global Corp",
+        companyDept: "People & Talent Management",
+        companySymbol: "IG",
+        brandColor: "#10b981",
+        author: "Team People & Culture",
+        reviewer: "HR Operations Lead",
+        approver: "Head of People",
+        status: "approved",
+        watermark: false,
+        sections: [
+          {
+            id: 'sec_o1',
+            type: 'text',
+            title: 'Benvenuto nel Team',
+            content: 'Siamo entusiasti di averti con noi. La nostra missione è semplificare il lavoro complesso attraverso l\'ingegno e l\'innovazione continua.\nQuesta guida ti aiuterà ad orientarti nelle prime quattro settimane, fornendoti i contatti chiave e le best practice di team.'
+          },
+          {
+            id: 'sec_o2',
+            type: 'checklist',
+            title: 'Roadmap del Primo Mese (I Tuoi Primi Passi)',
+            items: [
+              { text: 'Incontro di benvenuto con il tuo Buddy e presentazione del team', time: 'Giorno 1', done: true },
+              { text: 'Configurazione laptop, casella email e credenziali Slack / Notion', time: 'Giorno 1', done: true },
+              { text: 'One-to-one strategico con il tuo Team Leader per definire gli obiettivi Q3', time: 'Settimana 1', done: false },
+              { text: 'Review di metà periodo e primo feedback bidirezionale informale', time: 'Giorno 30', done: false }
+            ]
+          }
+        ]
+      },
+
+      disaster: {
+        title: "Manuale di Continuità Operativa & Disaster Recovery Plan (BC/DR)",
+        subtitle: "Procedure di emergenza, catena di comando e ripristino delle infrastrutture mission-critical in caso di blocco operativo.",
+        docCode: "DR-PLAN-2026-CORP",
+        version: "2.0.1",
+        date: "2026-09-04",
+        reviewDate: "2027-06-30",
+        classification: "confidential",
+        companyName: "Enterprise Infrastructure Partners",
+        companyDept: "Crisis Management Committee & DevOps",
+        companySymbol: "DR",
+        brandColor: "#ef4444",
+        author: "Disaster Recovery Task Force",
+        reviewer: "Head of Infrastructure",
+        approver: "Comitato di Crisi Direzionale",
+        status: "approved",
+        watermark: true,
+        sections: [
+          {
+            id: 'sec_d1',
+            type: 'safety',
+            title: 'Livello di Allerta 1 — Dichiarazione di Crisi',
+            level: 'danger',
+            content: 'Solo il Disaster Manager o il CEO possono dichiarare lo stato di Disaster Recovery. Una volta attivato, tutti i cambi di codice non correlati al ripristino vengono congelati e la sala operativa virtuale viene attivata entro 15 minuti.'
+          },
+          {
+            id: 'sec_d2',
+            type: 'spec',
+            title: 'Obiettivi di Servizio (SLA di Ripristino)',
+            headers: ['Applicazione / Servizio', 'Livello Criticità', 'RPO (Max Perdita Dati)', 'RTO (Max Tempo Blocco)'],
+            data: [
+              ['Database Transazionale Core', 'Tier 1 (Critico)', '0 secondi (Sync replica)', '< 15 minuti'],
+              ['Portale Web Clienti & API', 'Tier 1 (Critico)', '5 minuti', '< 30 minuti'],
+              ['Sistemi BI & Reportistica Interna', 'Tier 3 (Differibile)', '24 ore', '< 8 ore']
+            ]
+          }
+        ]
+      }
+    };
+
+    // State
+    let currentData = JSON.parse(JSON.stringify(PRESETS.sop));
+    let zoomLevel = 1.0;
+    let isDocDark = false;
+
+    // Load from LocalStorage if available
+    const saved = localStorage.getItem('omnimanual_enterprise_doc');
+    if (saved) {
+      try {
+        currentData = JSON.parse(saved);
+      } catch(e) {
+        console.warn("Could not parse saved storage", e);
+      }
+    }
+
+    // DOM Elements
+    const templateSelect = document.getElementById('templateSelect');
+    const docTitle = document.getElementById('docTitle');
+    const docSubtitle = document.getElementById('docSubtitle');
+    const docCode = document.getElementById('docCode');
+    const docVersion = document.getElementById('docVersion');
+    const docDate = document.getElementById('docDate');
+    const docReviewDate = document.getElementById('docReviewDate');
+    const docClassification = document.getElementById('docClassification');
+    const watermarkToggle = document.getElementById('watermarkToggle');
+
+    const companyName = document.getElementById('companyName');
+    const companyDept = document.getElementById('companyDept');
+    const companySymbol = document.getElementById('companySymbol');
+    const authorName = document.getElementById('authorName');
+    const reviewerName = document.getElementById('reviewerName');
+    const approverName = document.getElementById('approverName');
+    const approvalStatus = document.getElementById('approvalStatus');
+
+    const blocksContainer = document.getElementById('blocksContainer');
+    const addBlockBtn = document.getElementById('addBlockBtn');
+    const newBlockType = document.getElementById('newBlockType');
+
+    const docSheet = document.getElementById('docSheet');
+    const watermarkEl = document.getElementById('watermarkEl');
+    const pvLogoSymbol = document.getElementById('pvLogoSymbol');
+    const pvCompanyName = document.getElementById('pvCompanyName');
+    const pvCompanyDept = document.getElementById('pvCompanyDept');
+    const pvClassificationBadge = document.getElementById('pvClassificationBadge');
+    const pvTitle = document.getElementById('pvTitle');
+    const pvSubtitle = document.getElementById('pvSubtitle');
+    const pvDocCode = document.getElementById('pvDocCode');
+    const pvVersion = document.getElementById('pvVersion');
+    const pvDate = document.getElementById('pvDate');
+    const pvReviewDate = document.getElementById('pvReviewDate');
+    const pvAuthor = document.getElementById('pvAuthor');
+    const pvReviewer = document.getElementById('pvReviewer');
+    const pvApprover = document.getElementById('pvApprover');
+    const pvStatusStamp = document.getElementById('pvStatusStamp');
+    const pvTocList = document.getElementById('pvTocList');
+    const pvBodySections = document.getElementById('pvBodySections');
+    const pvFooterDocCode = document.getElementById('pvFooterDocCode');
+
+    const auditScoreVal = document.getElementById('scoreNumber');
+    const auditProgressFill = document.getElementById('auditProgressFill');
+
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toastText');
+
+    // Show Toast
+    let toastTimer = null;
+    function showToast(msg) {
+      toastText.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2400);
+    }
+
+    // Save state & trigger render
+    function saveState() {
+      localStorage.setItem('omnimanual_enterprise_doc', JSON.stringify(currentData));
+      renderDocument();
+      updateAuditScore();
+    }
+
+    // Populate Editor fields from currentData
+    function populateForm() {
+      docTitle.value = currentData.title || '';
+      docSubtitle.value = currentData.subtitle || '';
+      docCode.value = currentData.docCode || '';
+      docVersion.value = currentData.version || '';
+      docDate.value = currentData.date || '';
+      docReviewDate.value = currentData.reviewDate || '';
+      docClassification.value = currentData.classification || 'confidential';
+      watermarkToggle.checked = !!currentData.watermark;
+
+      companyName.value = currentData.companyName || '';
+      companyDept.value = currentData.companyDept || '';
+      companySymbol.value = currentData.companySymbol || 'Ω';
+      authorName.value = currentData.author || '';
+      reviewerName.value = currentData.reviewer || '';
+      approverName.value = currentData.approver || '';
+      approvalStatus.value = currentData.status || 'approved';
+
+      // Update color swatches
+      document.querySelectorAll('.color-swatch').forEach(s => {
+        s.classList.toggle('active', s.dataset.color === currentData.brandColor);
+      });
+      document.documentElement.style.setProperty('--brand-color', currentData.brandColor || '#00e0d0');
+
+      renderBlockControls();
+    }
+
+    // Render Blocks in Left Pane Editor
+    function renderBlockControls() {
+      blocksContainer.innerHTML = '';
+      if (!currentData.sections) currentData.sections = [];
+
+      currentData.sections.forEach((sec, idx) => {
+        const card = document.createElement('div');
+        card.className = 'block-card' + (idx === 0 ? ' open' : '');
+        card.dataset.id = sec.id;
+
+        let badgeClass = '';
+        let badgeLabel = 'Testo';
+        if (sec.type === 'safety') { badgeClass = 'danger'; badgeLabel = 'Sicurezza'; }
+        else if (sec.type === 'raci') { badgeClass = 'raci'; badgeLabel = 'RACI'; }
+        else if (sec.type === 'checklist') { badgeClass = 'checklist'; badgeLabel = 'Checklist'; }
+        else if (sec.type === 'spec') { badgeClass = 'table'; badgeLabel = 'Tabella'; }
+
+        card.innerHTML = `
+          <div class="block-card-header">
+            <div class="block-meta">
+              <span class="block-type-pill ${badgeClass}">${badgeLabel}</span>
+              <span>${sec.title || 'Sezione ' + (idx + 1)}</span>
+            </div>
+            <div class="block-tools">
+              <button class="tool-btn move-up" title="Sposta su" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>▲</button>
+              <button class="tool-btn move-down" title="Sposta giù" ${idx === currentData.sections.length - 1 ? 'disabled style="opacity:0.3"' : ''}>▼</button>
+              <button class="tool-btn duplicate" title="Duplica">📋</button>
+              <button class="tool-btn delete" title="Elimina" style="color:#ef4444">✕</button>
+            </div>
+          </div>
+          <div class="block-card-body">
+            <div class="form-group">
+              <label class="form-label">Titolo Sezione</label>
+              <input type="text" class="form-control sec-title-input" value="${escapeHtml(sec.title || '')}">
+            </div>
+            ${getBlockSpecificFields(sec, idx)}
+          </div>
+        `;
+
+        // Toggle Open/Close
+        const header = card.querySelector('.block-card-header');
+        header.addEventListener('click', (e) => {
+          if (e.target.closest('.block-tools')) return;
+          card.classList.toggle('open');
+        });
+
+        // Tool buttons
+        const upBtn = card.querySelector('.move-up');
+        if (upBtn) {
+          upBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (idx > 0) {
+              const temp = currentData.sections[idx];
+              currentData.sections[idx] = currentData.sections[idx - 1];
+              currentData.sections[idx - 1] = temp;
+              saveState();
+              renderBlockControls();
+            }
+          });
+        }
+
+        const downBtn = card.querySelector('.move-down');
+        if (downBtn) {
+          downBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (idx < currentData.sections.length - 1) {
+              const temp = currentData.sections[idx];
+              currentData.sections[idx] = currentData.sections[idx + 1];
+              currentData.sections[idx + 1] = temp;
+              saveState();
+              renderBlockControls();
+            }
+          });
+        }
+
+        const dupBtn = card.querySelector('.duplicate');
+        dupBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const clone = JSON.parse(JSON.stringify(sec));
+          clone.id = 'sec_' + Date.now();
+          clone.title += ' (Copia)';
+          currentData.sections.splice(idx + 1, 0, clone);
+          saveState();
+          renderBlockControls();
+        });
+
+        const delBtn = card.querySelector('.delete');
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (confirm('Rimuovere questa sezione?')) {
+            currentData.sections.splice(idx, 1);
+            saveState();
+            renderBlockControls();
+          }
+        });
+
+        // Listeners for title
+        const titleInput = card.querySelector('.sec-title-input');
+        titleInput.addEventListener('input', (e) => {
+          sec.title = e.target.value;
+          card.querySelector('.block-meta span:last-child').textContent = sec.title;
+          saveState();
+        });
+
+        attachSpecificListeners(card, sec);
+        blocksContainer.appendChild(card);
+      });
+    }
+
+    function getBlockSpecificFields(sec, idx) {
+      if (sec.type === 'text') {
+        return `
+          <div class="form-group">
+            <label class="form-label">Contenuto Testuale</label>
+            <textarea class="form-control sec-text-content" style="min-height:90px">${escapeHtml(sec.content || '')}</textarea>
+          </div>
+        `;
+      }
+      if (sec.type === 'safety') {
+        return `
+          <div class="form-group-row">
+            <div class="form-group">
+              <label class="form-label">Livello Gravità</label>
+              <select class="form-control sec-safety-level">
+                <option value="danger" ${sec.level === 'danger' ? 'selected' : ''}>PERICOLO (Danger)</option>
+                <option value="warning" ${sec.level === 'warning' ? 'selected' : ''}>AVVERTENZA (Warning)</option>
+                <option value="caution" ${sec.level === 'caution' ? 'selected' : ''}>ATTENZIONE (Caution)</option>
+                <option value="notice" ${sec.level === 'notice' ? 'selected' : ''}>AVVISO (Notice)</option>
+                <option value="safety" ${sec.level === 'safety' ? 'selected' : ''}>DPI / SICUREZZA (Safety First)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Testo Avvertenza</label>
+            <textarea class="form-control sec-safety-content" style="min-height:75px">${escapeHtml(sec.content || '')}</textarea>
+          </div>
+        `;
+      }
+      if (sec.type === 'checklist') {
+        return `
+          <div class="form-group">
+            <label class="form-label">Elementi Checklist (Uno per riga)</label>
+            <textarea class="form-control sec-checklist-raw" style="min-height:90px" placeholder="Testo elemento | tempo opzionale">${(sec.items || []).map(it => it.text + (it.time ? ' | ' + it.time : '')).join('\n')}</textarea>
+            <small style="color:var(--text-dim);font-size:0.7rem">Formato: Descrizione operazione | 10 min</small>
+          </div>
+        `;
+      }
+      if (sec.type === 'raci') {
+        return `
+          <div class="form-group">
+            <label class="form-label">Righe RACI (Formato: Task | R | A | C | I)</label>
+            <textarea class="form-control sec-raci-raw" style="min-height:90px">${(sec.rows || []).map(r => `${r.task} | ${r.r} | ${r.a} | ${r.c} | ${r.i}`).join('\n')}</textarea>
+          </div>
+        `;
+      }
+      if (sec.type === 'spec') {
+        return `
+          <div class="form-group">
+            <label class="form-label">Intestazioni Colonne (Separate da virgola)</label>
+            <input type="text" class="form-control sec-spec-headers" value="${(sec.headers || []).join(', ')}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dati Tabella (Una riga per riga, separata da virgola)</label>
+            <textarea class="form-control sec-spec-rows" style="min-height:90px">${(sec.data || []).map(r => r.join(', ')).join('\n')}</textarea>
+          </div>
+        `;
+      }
+      return '';
+    }
+
+    function attachSpecificListeners(card, sec) {
+      if (sec.type === 'text') {
+        const txt = card.querySelector('.sec-text-content');
+        txt.addEventListener('input', (e) => { sec.content = e.target.value; saveState(); });
+      } else if (sec.type === 'safety') {
+        const lvl = card.querySelector('.sec-safety-level');
+        const txt = card.querySelector('.sec-safety-content');
+        lvl.addEventListener('change', (e) => { sec.level = e.target.value; saveState(); });
+        txt.addEventListener('input', (e) => { sec.content = e.target.value; saveState(); });
+      } else if (sec.type === 'checklist') {
+        const raw = card.querySelector('.sec-checklist-raw');
+        raw.addEventListener('input', (e) => {
+          const lines = e.target.value.split('\n').filter(l => l.trim().length > 0);
+          sec.items = lines.map(line => {
+            const parts = line.split('|').map(p => p.trim());
+            return { text: parts[0], time: parts[1] || '', done: false };
+          });
+          saveState();
+        });
+      } else if (sec.type === 'raci') {
+        const raw = card.querySelector('.sec-raci-raw');
+        raw.addEventListener('input', (e) => {
+          const lines = e.target.value.split('\n').filter(l => l.trim().length > 0);
+          sec.rows = lines.map(l => {
+            const p = l.split('|').map(x => x.trim());
+            return { task: p[0] || 'Attività', r: p[1] || '-', a: p[2] || '-', c: p[3] || '-', i: p[4] || '-' };
+          });
+          saveState();
+        });
+      } else if (sec.type === 'spec') {
+        const head = card.querySelector('.sec-spec-headers');
+        const rows = card.querySelector('.sec-spec-rows');
+        head.addEventListener('input', (e) => {
+          sec.headers = e.target.value.split(',').map(h => h.trim());
+          saveState();
+        });
+        rows.addEventListener('input', (e) => {
+          const lines = e.target.value.split('\n').filter(l => l.trim().length > 0);
+          sec.data = lines.map(l => l.split(',').map(x => x.trim()));
+          saveState();
+        });
+      }
+    }
+
+    // Render Document in Right Preview
+    function renderDocument() {
+      // Header & Metadata
+      pvLogoSymbol.textContent = currentData.companySymbol || 'Ω';
+      pvCompanyName.textContent = currentData.companyName || 'Azienda';
+      pvCompanyDept.textContent = currentData.companyDept || 'Reparto Operativo';
+
+      // Classification Badge
+      const cls = currentData.classification || 'confidential';
+      pvClassificationBadge.className = 'doc-classification-badge ' + cls;
+      const classLabels = {
+        confidential: 'Strettamente Confidenziale',
+        internal: 'Uso Interno Aziendale',
+        restricted: 'Accesso Riservato',
+        public: 'Documento Pubblico'
+      };
+      pvClassificationBadge.textContent = classLabels[cls] || 'Confidenziale';
+
+      // Watermark
+      watermarkEl.style.display = currentData.watermark ? 'flex' : 'none';
+      watermarkEl.textContent = cls.toUpperCase();
+
+      pvTitle.textContent = currentData.title || 'Titolo Manuale';
+      pvSubtitle.textContent = currentData.subtitle || '';
+      pvDocCode.textContent = currentData.docCode || 'DOC-000';
+      pvFooterDocCode.textContent = currentData.docCode || 'DOC-000';
+      pvVersion.textContent = currentData.version || 'v1.0';
+      pvDate.textContent = formatDate(currentData.date);
+      pvReviewDate.textContent = formatDate(currentData.reviewDate);
+
+      // Signatures
+      pvAuthor.textContent = currentData.author || 'Non specificato';
+      pvReviewer.textContent = currentData.reviewer || 'Non specificato';
+      pvApprover.textContent = currentData.approver || 'Non specificato';
+      
+      const st = currentData.status || 'approved';
+      if (st === 'approved') {
+        pvStatusStamp.innerHTML = '✓ Rilascio Ufficiale Approvato';
+        pvStatusStamp.style.color = '#10b981';
+      } else if (st === 'review') {
+        pvStatusStamp.innerHTML = '⟳ In Corso di Revisione';
+        pvStatusStamp.style.color = '#f59e0b';
+      } else {
+        pvStatusStamp.innerHTML = '✎ Bozza Preliminare';
+        pvStatusStamp.style.color = '#64748b';
+      }
+
+      // Dynamic TOC
+      pvTocList.innerHTML = '';
+      (currentData.sections || []).forEach((sec, idx) => {
+        const li = document.createElement('li');
+        li.className = 'toc-item';
+        li.innerHTML = `
+          <span><span class="toc-item-num">${idx + 1}.0</span>${escapeHtml(sec.title || 'Sezione')}</span>
+          <span class="toc-dots"></span>
+          <span style="font-family:var(--font-mono);font-size:0.75rem">pag. 1</span>
+        `;
+        pvTocList.appendChild(li);
+      });
+
+      // Body Sections
+      pvBodySections.innerHTML = '';
+      (currentData.sections || []).forEach((sec, idx) => {
+        const secEl = document.createElement('section');
+        secEl.className = 'rendered-section';
+        secEl.id = 'sec_render_' + idx;
+
+        let innerContent = '';
+
+        if (sec.type === 'text') {
+          innerContent = `<div class="rendered-content-text">${escapeHtml(sec.content || '')}</div>`;
+        } else if (sec.type === 'safety') {
+          const lvl = sec.level || 'warning';
+          const labels = {
+            danger: 'PERICOLO',
+            warning: 'AVVISO',
+            caution: 'ATTENZIONE',
+            notice: 'NOTA',
+            safety: 'SICUREZZA'
+          };
+          innerContent = `
+            <div class="safety-box ${lvl}">
+              <div class="safety-stripe">${labels[lvl]}</div>
+              <div class="safety-content">
+                <div class="safety-title">Norma di Sicurezza & Istruzione Operativa</div>
+                <div>${escapeHtml(sec.content || '')}</div>
+              </div>
+            </div>
+          `;
+        } else if (sec.type === 'checklist') {
+          const itemsHtml = (sec.items || []).map((it, i) => `
+            <div class="checklist-item">
+              <input type="checkbox" id="chk_${idx}_${i}" ${it.done ? 'checked' : ''}>
+              <label for="chk_${idx}_${i}" class="checklist-text">${escapeHtml(it.text)}</label>
+              ${it.time ? `<span class="checklist-time">${escapeHtml(it.time)}</span>` : ''}
+            </div>
+          `).join('');
+          innerContent = `<div class="checklist-wrapper">${itemsHtml}</div>`;
+        } else if (sec.type === 'raci') {
+          const rowsHtml = (sec.rows || []).map(r => `
+            <tr>
+              <td><strong>${escapeHtml(r.task)}</strong></td>
+              <td><span class="raci-badge raci-r">${escapeHtml(r.r)}</span></td>
+              <td><span class="raci-badge raci-a">${escapeHtml(r.a)}</span></td>
+              <td><span class="raci-badge raci-c">${escapeHtml(r.c)}</span></td>
+              <td><span class="raci-badge raci-i">${escapeHtml(r.i)}</span></td>
+            </tr>
+          `).join('');
+          innerContent = `
+            <table class="raci-table">
+              <thead>
+                <tr>
+                  <th>Attività / Decisione</th>
+                  <th>R (Resp)</th>
+                  <th>A (Accountable)</th>
+                  <th>C (Consulted)</th>
+                  <th>I (Informed)</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHtml}</tbody>
+            </table>
+          `;
+        } else if (sec.type === 'spec') {
+          const headsHtml = (sec.headers || []).map(h => `<th>${escapeHtml(h)}</th>`).join('');
+          const rowsHtml = (sec.data || []).map(r => `
+            <tr>${r.map(c => `<td>${escapeHtml(c)}</td>`).join('')}</tr>
+          `).join('');
+          innerContent = `
+            <table class="spec-table">
+              <thead><tr>${headsHtml}</tr></thead>
+              <tbody>${rowsHtml}</tbody>
+            </table>
+          `;
+        }
+
+        secEl.innerHTML = `
+          <div class="rendered-section-header">
+            <span class="sec-num">${idx + 1}.0</span>
+            <h2 class="sec-title">${escapeHtml(sec.title || 'Sezione ' + (idx + 1))}</h2>
+          </div>
+          ${innerContent}
+        `;
+
+        // Checkbox interactive persistence in checklist
+        if (sec.type === 'checklist') {
+          secEl.querySelectorAll('input[type="checkbox"]').forEach((cb, ci) => {
+            cb.addEventListener('change', (e) => {
+              if (sec.items && sec.items[ci]) {
+                sec.items[ci].done = e.target.checked;
+                saveState();
+              }
+            });
+          });
+        }
+
+        pvBodySections.appendChild(secEl);
+      });
+    }
+
+    // Quality Audit Calculator
+    function updateAuditScore() {
+      let score = 0;
+      if (currentData.title && currentData.title.length > 5) score += 20;
+      if (currentData.docCode && currentData.docCode.length > 2) score += 15;
+      if (currentData.author && currentData.approver) score += 20;
+      if (currentData.sections && currentData.sections.length >= 3) score += 25;
+      if (currentData.sections && currentData.sections.some(s => s.type === 'safety')) score += 10;
+      if (currentData.version && currentData.date) score += 10;
+
+      if (score > 100) score = 100;
+      auditScoreVal.textContent = score + '%';
+      auditProgressFill.style.width = score + '%';
+    }
+
+    // Formatting date
+    function formatDate(str) {
+      if (!str) return '—';
+      const p = str.split('-');
+      if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+      return str;
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // ── EVENT LISTENERS ──
+
+    // Navigation Tabs in Editor
+    document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const tabKey = btn.dataset.tab;
+        document.querySelectorAll('.tab-pane-content').forEach(p => p.style.display = 'none');
+        const target = document.getElementById('tab-' + tabKey);
+        if (target) target.style.display = 'flex';
+      });
+    });
+
+    // Form inputs sync
+    docTitle.addEventListener('input', (e) => { currentData.title = e.target.value; saveState(); });
+    docSubtitle.addEventListener('input', (e) => { currentData.subtitle = e.target.value; saveState(); });
+    docCode.addEventListener('input', (e) => { currentData.docCode = e.target.value; saveState(); });
+    docVersion.addEventListener('input', (e) => { currentData.version = e.target.value; saveState(); });
+    docDate.addEventListener('change', (e) => { currentData.date = e.target.value; saveState(); });
+    docReviewDate.addEventListener('change', (e) => { currentData.reviewDate = e.target.value; saveState(); });
+    docClassification.addEventListener('change', (e) => { currentData.classification = e.target.value; saveState(); });
+    watermarkToggle.addEventListener('change', (e) => { currentData.watermark = e.target.checked; saveState(); });
+
+    companyName.addEventListener('input', (e) => { currentData.companyName = e.target.value; saveState(); });
+    companyDept.addEventListener('input', (e) => { currentData.companyDept = e.target.value; saveState(); });
+    companySymbol.addEventListener('input', (e) => { currentData.companySymbol = e.target.value.toUpperCase(); saveState(); });
+    authorName.addEventListener('input', (e) => { currentData.author = e.target.value; saveState(); });
+    reviewerName.addEventListener('input', (e) => { currentData.reviewer = e.target.value; saveState(); });
+    approverName.addEventListener('input', (e) => { currentData.approver = e.target.value; saveState(); });
+    approvalStatus.addEventListener('change', (e) => { currentData.status = e.target.value; saveState(); });
+
+    // Preset selection change
+    templateSelect.addEventListener('change', (e) => {
+      const pKey = e.target.value;
+      if (PRESETS[pKey]) {
+        if (confirm('Caricare il template selezionato? Le modifiche non salvate verranno sovrascritte.')) {
+          currentData = JSON.parse(JSON.stringify(PRESETS[pKey]));
+          populateForm();
+          saveState();
+          showToast('Template ' + templateSelect.options[templateSelect.selectedIndex].text + ' caricato');
+        }
+      }
+    });
+
+    // Brand color swatches
+    document.querySelectorAll('.color-swatch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+        currentData.brandColor = sw.dataset.color;
+        document.documentElement.style.setProperty('--brand-color', currentData.brandColor);
+        saveState();
+      });
+    });
+
+    // Add Block
+    addBlockBtn.addEventListener('click', () => {
+      const type = newBlockType.value;
+      const newSec = {
+        id: 'sec_' + Date.now(),
+        type: type,
+        title: 'Nuova Sezione'
+      };
+
+      if (type === 'text') {
+        newSec.title = 'Istruzione Operativa';
+        newSec.content = 'Inserisci qui le indicazioni dettagliate per gli operatori o il personale...';
+      } else if (type === 'safety') {
+        newSec.title = 'Avviso Normativo di Sicurezza';
+        newSec.level = 'warning';
+        newSec.content = 'Prestare massima attenzione e verificare le linee guida prima di procedere.';
+      } else if (type === 'checklist') {
+        newSec.title = 'Sequenza Operativa di Verifica';
+        newSec.items = [
+          { text: 'Controllo preliminare parametri operativi', time: '5 min', done: false },
+          { text: 'Conferma isolamento energetico o approvazione', time: '10 min', done: false }
+        ];
+      } else if (type === 'raci') {
+        newSec.title = 'Assegnazione Ruoli (RACI)';
+        newSec.rows = [
+          { task: 'Attività operativa standard', r: 'Operatore', a: 'Caporeparto', c: 'Ingegnere', i: 'Tutti' }
+        ];
+      } else if (type === 'spec') {
+        newSec.title = 'Parametri & Specifiche';
+        newSec.headers = ['Parametro', 'Metodo', 'Tolleranza'];
+        newSec.data = [['Pressione', 'Sensore Barometrico', '± 0.2 bar']];
+      }
+
+      currentData.sections.push(newSec);
+      saveState();
+      renderBlockControls();
+      showToast('Sezione aggiunta all\'indice');
+    });
+
+    // View Mode Toggle (A4 vs Web)
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mode = btn.dataset.mode;
+        if (mode === 'web') {
+          docSheet.style.maxWidth = '1000px';
+          docSheet.style.borderRadius = '12px';
+        } else {
+          docSheet.style.maxWidth = '820px';
+          docSheet.style.borderRadius = '4px';
+        }
+      });
+    });
+
+    // Dark/Light Theme for Document Preview
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeToggleIcon = document.getElementById('themeToggleIcon');
+    const themeToggleText = document.getElementById('themeToggleText');
+
+    themeToggleBtn.addEventListener('click', () => {
+      isDocDark = !isDocDark;
+      docSheet.classList.toggle('theme-dark', isDocDark);
+      if (isDocDark) {
+        themeToggleIcon.textContent = '☀️';
+        themeToggleText.textContent = 'Tema Cartaceo';
+      } else {
+        themeToggleIcon.textContent = '🌙';
+        themeToggleText.textContent = 'Tema Scuro';
+      }
+    });
+
+    // Zoom Controls
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const zoomLevelText = document.getElementById('zoomLevelText');
+
+    zoomInBtn.addEventListener('click', () => {
+      if (zoomLevel < 1.4) {
+        zoomLevel = Math.round((zoomLevel + 0.1) * 10) / 10;
+        applyZoom();
+      }
+    });
+    zoomOutBtn.addEventListener('click', () => {
+      if (zoomLevel > 0.6) {
+        zoomLevel = Math.round((zoomLevel - 0.1) * 10) / 10;
+        applyZoom();
+      }
+    });
+    function applyZoom() {
+      docSheet.style.transform = `scale(${zoomLevel})`;
+      zoomLevelText.textContent = Math.round(zoomLevel * 100) + '%';
+    }
+
+    // Print / PDF Button
+    document.getElementById('printPdfBtn').addEventListener('click', () => {
+      window.print();
+    });
+
+    // JSON Export
+    document.getElementById('exportJsonBtn').addEventListener('click', () => {
+      const jsonStr = JSON.stringify(currentData, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (currentData.docCode || 'manuale-enterprise') + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Configurazione JSON esportata con successo');
+    });
+
+    // JSON Import
+    const importBtn = document.getElementById('importBtn');
+    const importFileInput = document.getElementById('importFileInput');
+    importBtn.addEventListener('click', () => importFileInput.click());
+    importFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          currentData = parsed;
+          populateForm();
+          saveState();
+          showToast('Configurazione importata correttamente!');
+        } catch(err) {
+          alert('Errore nel caricamento del file JSON: formato non valido.');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Markdown Export
+    document.getElementById('exportMdBtn').addEventListener('click', () => {
+      let md = `# ${currentData.title || 'Manuale Aziendale'}\n\n`;
+      md += `**Azienda:** ${currentData.companyName || ''} - ${currentData.companyDept || ''}\n`;
+      md += `**Codice Documento:** ${currentData.docCode || ''} | **Versione:** ${currentData.version || ''}\n`;
+      md += `**Classificazione:** ${currentData.classification || ''}\n`;
+      md += `**Data Rilascio:** ${currentData.date || ''} | **Revisione:** ${currentData.reviewDate || ''}\n\n`;
+      md += `> ${currentData.subtitle || ''}\n\n`;
+      md += `---\n\n## Firme e Approvazioni\n`;
+      md += `- **Redattore:** ${currentData.author || ''}\n`;
+      md += `- **Verificatore QA:** ${currentData.reviewer || ''}\n`;
+      md += `- **Approvatore:** ${currentData.approver || ''} (${currentData.status || ''})\n\n`;
+      md += `---\n\n## Indice delle Sezioni\n\n`;
+
+      (currentData.sections || []).forEach((sec, idx) => {
+        md += `### ${idx + 1}.0 ${sec.title}\n\n`;
+        if (sec.type === 'text') {
+          md += `${sec.content}\n\n`;
+        } else if (sec.type === 'safety') {
+          md += `> **[${(sec.level || 'warning').toUpperCase()}]**: ${sec.content}\n\n`;
+        } else if (sec.type === 'checklist') {
+          (sec.items || []).forEach(it => {
+            md += `- [${it.done ? 'x' : ' '}] ${it.text} ${it.time ? `*(${it.time})*` : ''}\n`;
+          });
+          md += '\n';
+        } else if (sec.type === 'raci') {
+          md += `| Attività | R | A | C | I |\n|---|---|---|---|---|\n`;
+          (sec.rows || []).forEach(r => {
+            md += `| ${r.task} | ${r.r} | ${r.a} | ${r.c} | ${r.i} |\n`;
+          });
+          md += '\n';
+        } else if (sec.type === 'spec') {
+          md += `| ${(sec.headers || []).join(' | ')} |\n`;
+          md += `| ${(sec.headers || []).map(() => '---').join(' | ')} |\n`;
+          (sec.data || []).forEach(r => {
+            md += `| ${r.join(' | ')} |\n`;
+          });
+          md += '\n';
+        }
+      });
+
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (currentData.docCode || 'manuale-enterprise') + '.md';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Documento Markdown esportato');
+    });
+
+    // Initial load
+    populateForm();
+    renderDocument();
+    updateAuditScore();
+
+  })();
+  </script>
+</body>
+</html>

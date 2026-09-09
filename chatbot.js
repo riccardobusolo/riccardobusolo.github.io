@@ -143,9 +143,10 @@
       ],
     },
     proj_strumenti: {
-      msg: '<strong>Strumenti AI</strong>\n\nDashboard, automazioni e demo tecniche costruite con l\'Intelligenza Artificiale. Soluzioni concrete per problemi reali.\n\nStrumenti disponibili:\n• <strong>PixelForge — Image Converter</strong> — converti, ridimensiona e comprimi immagini direttamente nel browser\n\nIn arrivo:\n• Dashboard Analytics con AI\n• Neural Network Trainer',
+      msg: '<strong>Strumenti & Utility Software</strong>\n\nApplicazioni web e utility pensate per automatizzare compiti e risolvere problemi reali con un design curato e zero dipendenze server.\n\nStrumenti disponibili:\n• <strong>PixelForge — Image Converter</strong> — converti, ridimensiona e comprimi immagini direttamente nel browser\n• <strong>OmniManual — Enterprise Configurator</strong> — configuratore di manuali aziendali, SOP e linee guida ISO con anteprima A4 e PDF',
       options: [
         { label: '🖼️ Prova PixelForge', next: 'proj_pixelforge' },
+        { label: '📄 Prova OmniManual', next: 'proj_omnimanual' },
         { label: '🔬 Vai alla sezione Strumenti', action: 'link', target: 'progetti.html#strumenti' },
         { label: '← Torna ai progetti', next: 'progetti' },
         { label: '← Menu principale', next: 'root' },
@@ -156,6 +157,14 @@
       options: [
         { label: '🚀 Apri PixelForge', action: 'link', target: 'strumenti/pixelforge/' },
         { label: '💻 Cos\'è il Vibe Coding?', next: 'srv_vibecoding' },
+        { label: '← Torna agli strumenti', next: 'proj_strumenti' },
+        { label: '← Menu principale', next: 'root' },
+      ],
+    },
+    proj_omnimanual: {
+      msg: '<strong>OmniManual — Enterprise Configurator</strong>\n\nUn configuratore avanzato per la redazione e gestione di documentazione aziendale e industriale:\n\n• <strong>Template pronti</strong>: SOP ISO 9001, Privacy & Sicurezza ISO 27001, Direttiva Macchine CE, Onboarding, Disaster Recovery\n• <strong>Moduli normativi</strong>: box avvertenze OSHA/ANSI, matrici RACI, checklist con tempi, tabelle di collaudo\n• <strong>Anteprima A4 & Web in tempo reale</strong> con filigrane e timbri di validazione\n• <strong>Esportazione professionale</strong>: Stampa/PDF vettoriale, Markdown e backup JSON\n• <strong>100% Client-Side</strong>: i documenti aziendali non lasciano mai il browser.',
+      options: [
+        { label: '🚀 Apri OmniManual', action: 'link', target: 'strumenti/manuale-enterprise/' },
         { label: '← Torna agli strumenti', next: 'proj_strumenti' },
         { label: '← Menu principale', next: 'root' },
       ],
