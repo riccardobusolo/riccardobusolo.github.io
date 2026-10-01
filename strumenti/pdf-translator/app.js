@@ -1,11 +1,26 @@
 /**
  * app.js — DocuShift AI
- * Controller principale dell'applicazione web: gestione drag & drop, pipeline di traduzione,
- * navigazione visualizzatore PDF affiancato, modale impostazioni e notifiche toast.
+ * Controller minimale: Dark/Light Mode, Popup Setup API, Drag & Drop,
+ * Traduzione e Anteprima Side-by-Side.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Elementi DOM Principali
+  // Theme Toggle
+  const btnThemeToggle = document.getElementById('btn-theme-toggle');
+  let currentTheme = localStorage.getItem('docushift_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  applyTheme(currentTheme);
+
+  function applyTheme(theme) {
+    currentTheme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('docushift_theme', theme);
+  }
+
+  btnThemeToggle.addEventListener('click', () => {
+    applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  });
+
+  // Elementi Principali
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('file-input');
   const fileInfo = document.getElementById('file-info');
@@ -37,6 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const canvasOriginal = document.getElementById('canvas-original');
   const canvasTranslated = document.getElementById('canvas-translated');
 
+  // Elementi Popup Centro Schermata API
+  const apiSetupPopup = document.getElementById('api-setup-popup');
+  const popupGeminiKey = document.getElementById('popup-gemini-key');
+  const btnPopupClipboard = document.getElementById('btn-popup-clipboard');
+  const btnPopupSave = document.getElementById('btn-popup-save');
+  const btnClosePopup = document.getElementById('btn-close-popup');
+
   // Elementi Modale Impostazioni
   const btnOpenSettings = document.getElementById('btn-open-settings');
   const btnCloseSettings = document.getElementById('btn-close-settings');
@@ -51,17 +73,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnTestGemini = document.getElementById('btn-test-gemini');
   const btnTestGroq = document.getElementById('btn-test-groq');
   const selectModel = document.getElementById('select-model');
-  const modelStatusName = document.getElementById('model-status-name');
   const modelStatusQuality = document.getElementById('model-status-quality');
-  const modelStatusDesc = document.getElementById('model-status-desc');
-  const quotaUsedText = document.getElementById('quota-used-text');
   const quotaCountdownText = document.getElementById('quota-countdown-text');
   const quotaBarFill = document.getElementById('quota-bar-fill');
   const checkAutoFallback = document.getElementById('check-auto-fallback');
 
   const btnAddGlossaryRow = document.getElementById('btn-add-glossary-row');
   const btnExportCsv = document.getElementById('btn-export-csv');
-  const btnExportJson = document.getElementById('btn-export-json');
   const btnImportJson = document.getElementById('btn-import-json');
   const glossaryFileInput = document.getElementById('glossary-file-input');
   const excelTableContainer = document.getElementById('excel-table-container');
@@ -77,22 +95,76 @@ document.addEventListener('DOMContentLoaded', () => {
   let translatedPdfBytes = null;
   let currentPage = 1;
   let totalPages = 1;
-  let currentZoom = 1.3;
+  let currentZoom = 1.25;
   let quotaTimerInterval = null;
 
-  // Inizializzazione automatica delle credenziali (Magic Link / config locale)
+  // Inizializzazione automatica Magic Link / config locale
   const autoAuthResult = AIService.initAutoAuth();
   if (autoAuthResult.success) {
     showToast(autoAuthResult.message, 'success');
   }
 
-  // Caricamento configurazioni salvate
   loadSettings();
   renderGlossary();
   startQuotaMonitoring();
 
+  // Controllo startup: se non ci sono API, mostra popup centrale dopo 600ms
+  setTimeout(() => {
+    const keys = AIService.getKeys();
+    if (!keys.gemini && !keys.groq) {
+      openApiPopup();
+    }
+  }, 600);
+
   // =========================================================================
-  // GESTIONE DRAG & DROP E CARICAMENTO FILE
+  // GESTIONE POPUP CENTRALE API
+  // =========================================================================
+  function openApiPopup() {
+    apiSetupPopup.classList.add('active');
+    setTimeout(() => popupGeminiKey.focus(), 150);
+  }
+
+  function closeApiPopup() {
+    apiSetupPopup.classList.remove('active');
+  }
+
+  btnClosePopup.addEventListener('click', closeApiPopup);
+  apiSetupPopup.addEventListener('click', (e) => {
+    if (e.target === apiSetupPopup) closeApiPopup();
+  });
+
+  btnPopupClipboard.addEventListener('click', async () => {
+    try {
+      const res = await AIService.detectKeyFromClipboard();
+      popupGeminiKey.value = res.key;
+      loadSettings();
+      closeApiPopup();
+      showToast('Chiave salvata', 'success');
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+  });
+
+  btnPopupSave.addEventListener('click', () => {
+    const key = popupGeminiKey.value.trim();
+    if (key) {
+      AIService.setKeys(key, undefined);
+      loadSettings();
+      closeApiPopup();
+      showToast('Chiave collegata con successo', 'success');
+    } else {
+      showToast('Inserisci una chiave valida', 'error');
+    }
+  });
+
+  popupGeminiKey.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      btnPopupSave.click();
+    }
+  });
+
+  // =========================================================================
+  // GESTIONE DRAG & DROP E FILE
   // =========================================================================
   dropzone.addEventListener('click', () => fileInput.click());
 
@@ -119,49 +191,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  btnRemoveFile.addEventListener('click', () => {
-    resetLoadedFile();
-  });
+  btnRemoveFile.addEventListener('click', resetLoadedFile);
 
   async function handleFileSelected(file) {
     if (!file || file.type !== 'application/pdf') {
-      showToast('Seleziona un file valido in formato PDF.', 'error');
+      showToast('Seleziona un file PDF.', 'error');
       return;
     }
 
     currentFile = file;
     fileInfoName.textContent = file.name;
     const sizeKB = Math.round(file.size / 1024);
-    fileInfoMeta.textContent = `${sizeKB} KB • Analisi in corso...`;
+    fileInfoMeta.textContent = `${sizeKB} KB`;
     fileInfo.classList.add('active');
     dropzone.style.display = 'none';
 
     try {
       originalPdfBytes = await file.arrayBuffer();
-      // Parsing iniziale per conteggio pagine e testi
       parsedPdfData = await PDFEngine.parsePDF(originalPdfBytes);
       totalPages = parsedPdfData.numPages;
-      fileInfoMeta.textContent = `${sizeKB} KB • ${totalPages} ${totalPages === 1 ? 'Pagina' : 'Pagine'}`;
+      fileInfoMeta.textContent = `${sizeKB} KB • ${totalPages} ${totalPages === 1 ? 'pagina' : 'pagine'}`;
       btnTranslate.disabled = false;
 
-      // Rilevamento automatico della lingua del documento con campionatura testo
+      // Auto-detect lingua
       const sampleText = parsedPdfData.pages
         .flatMap(p => p.blocks)
-        .slice(0, 8)
+        .slice(0, 6)
         .map(b => b.text)
         .join(' ');
 
       if (sampleText.trim().length > 0) {
-        detectedLangText.textContent = 'Analisi lingua sorgente...';
         AIService.detectLanguage(sampleText).then(lang => {
-          detectedLangText.textContent = `Sorgente: ${lang}`;
+          detectedLangText.textContent = lang;
         });
       }
 
-      showToast(`Documento caricato: ${totalPages} pagine pronte per la traduzione.`, 'info');
+      // Se non ci sono API, ricorda di inserirle
+      const keys = AIService.getKeys();
+      if (!keys.gemini && !keys.groq) {
+        openApiPopup();
+      }
     } catch (err) {
-      console.error('Errore parsing PDF:', err);
-      showToast('Errore durante la lettura del file PDF: ' + err.message, 'error');
+      console.error(err);
+      showToast('Errore lettura PDF: ' + err.message, 'error');
       resetLoadedFile();
     }
   }
@@ -175,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fileInfo.classList.remove('active');
     dropzone.style.display = 'block';
     btnTranslate.disabled = true;
-    detectedLangText.textContent = 'Sorgente: Auto-detect (AI)';
+    detectedLangText.textContent = 'Auto-detect';
     progressCard.classList.remove('active');
     viewerSection.classList.remove('active');
   }
@@ -186,11 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
   btnTranslate.addEventListener('click', async () => {
     if (!originalPdfBytes || !parsedPdfData) return;
 
-    // Controllo disponibilità chiave API
     const keys = AIService.getKeys();
     if (!keys.gemini && !keys.groq) {
-      showToast('Inserisci prima la tua chiave API gratuita nelle Impostazioni (in alto a sinistra).', 'error');
-      openModal();
+      openApiPopup();
       return;
     }
 
@@ -199,35 +269,31 @@ document.addEventListener('DOMContentLoaded', () => {
     progressCard.classList.add('active');
     viewerSection.classList.remove('active');
 
-    updateProgress(10, 'Analisi blocchi di testo e coordinate originali...', 1);
+    updateProgress(15, 'Lettura coordinate...', 1);
 
     try {
-      // Step 1: Estrazione e preparazione blocchi
       const allBlocks = parsedPdfData.pages.flatMap(p => p.blocks);
       if (allBlocks.length === 0) {
-        throw new Error('Nessun testo estraibile rilevato nel documento. Potrebbe trattarsi di un PDF scansionato.');
+        throw new Error('Nessun testo estraibile rilevato nel documento.');
       }
 
-      // Step 2: Traduzione AI a batch con regole del glossario
-      updateProgress(30, `Traduzione in corso verso ${targetLang}...`, 2);
+      updateProgress(35, `Traduzione verso ${targetLang}...`, 2);
 
       const glossaryRules = GlossaryManager.getRulesForTarget(targetLang);
       const translationsMap = {};
-      const batchSize = 18; // batch bilanciato per velocità e limiti token
+      const batchSize = 18;
       const totalBatches = Math.ceil(allBlocks.length / batchSize);
 
       for (let i = 0; i < allBlocks.length; i += batchSize) {
         const batch = allBlocks.slice(i, i + batchSize);
         const batchIndex = Math.floor(i / batchSize) + 1;
+        const percent = 35 + Math.round((batchIndex / totalBatches) * 35);
+        updateProgress(percent, `Traduzione (${batchIndex}/${totalBatches})...`, 2);
 
-        const percent = 30 + Math.round((batchIndex / totalBatches) * 35);
-        updateProgress(percent, `Traduzione batch ${batchIndex}/${totalBatches} con ${AIService.getActiveModel().name}...`, 2);
-
-        const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules, (fallbackModel, reason) => {
-          showToast(`Quota limite raggiunta. Attivato Smart Fallback su: ${fallbackModel.name}`, 'info');
+        const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules, (fallbackModel) => {
+          showToast(`Fallback su ${fallbackModel.name}`, 'info');
         });
 
-        // Mappa le traduzioni per id
         translatedBatch.forEach(item => {
           if (item && item.id) {
             translationsMap[item.id] = item.translated;
@@ -235,13 +301,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Step 3: Auto-scaling layout e download Google Fonts
-      updateProgress(75, 'Calcolo auto-scaling del testo e collegamento Google Fonts...', 3);
+      updateProgress(80, 'Auto-scaling layout e font...', 3);
       const minFontScale = parseInt(rangeFontScale.value, 10) / 100;
 
-      // Step 4: Compilazione PDF finale
-      updateProgress(90, 'Compilazione del nuovo file PDF vettoriale...', 4);
-
+      updateProgress(92, 'Compilazione PDF...', 4);
       translatedPdfBytes = await PDFEngine.buildTranslatedPDF(
         originalPdfBytes,
         parsedPdfData.pages,
@@ -249,27 +312,26 @@ document.addEventListener('DOMContentLoaded', () => {
         { minFontScale }
       );
 
-      updateProgress(100, 'Traduzione completata!', 4);
-      setTimeout(() => progressCard.classList.remove('active'), 1500);
+      updateProgress(100, 'Completato', 4);
+      setTimeout(() => progressCard.classList.remove('active'), 1200);
 
-      // Configura Download
+      // Download link
       const blob = new Blob([translatedPdfBytes], { type: 'application/pdf' });
       const downloadUrl = URL.createObjectURL(blob);
       btnDownloadPdf.href = downloadUrl;
       const baseName = currentFile.name.replace(/\.[^/.]+$/, '');
-      btnDownloadPdf.download = `${baseName}_tradotto_${targetLang.toLowerCase()}.pdf`;
+      btnDownloadPdf.download = `${baseName}_${targetLang.toLowerCase()}.pdf`;
 
-      // Mostra visualizzatore affiancato
+      // Viewer
       currentPage = 1;
       viewerSection.classList.add('active');
       await renderViewerPages();
-
       viewerSection.scrollIntoView({ behavior: 'smooth' });
-      showToast('🎉 Documento tradotto con successo con layout preservato!', 'success');
+      showToast('Traduzione completata', 'success');
 
     } catch (err) {
-      console.error('Errore durante la traduzione:', err);
-      showToast('Errore durante la traduzione: ' + err.message, 'error');
+      console.error(err);
+      showToast(err.message, 'error');
       progressCard.classList.remove('active');
     } finally {
       btnTranslate.disabled = false;
@@ -294,10 +356,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // GESTIONE ANTEPRIMA AFFIANCATA (VIEWER)
+  // GESTIONE ANTEPRIMA (VIEWER)
   // =========================================================================
   async function renderViewerPages() {
-    viewerPageIndicator.textContent = `Pagina ${currentPage} di ${totalPages}`;
+    viewerPageIndicator.textContent = `${currentPage} / ${totalPages}`;
     btnPrevPage.disabled = (currentPage <= 1);
     btnNextPage.disabled = (currentPage >= totalPages);
 
@@ -309,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await PDFEngine.renderPageToCanvas(translatedPdfBytes, currentPage, canvasTranslated, currentZoom);
       }
     } catch (e) {
-      console.warn('Errore rendering anteprima pagina:', e);
+      console.warn(e);
     }
   }
 
@@ -328,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnZoomIn.addEventListener('click', async () => {
-    if (currentZoom < 2.5) {
+    if (currentZoom < 2.2) {
       currentZoom += 0.2;
       await renderViewerPages();
     }
@@ -359,7 +421,6 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsModal.classList.remove('active');
   }
 
-  // Tab switching
   modalTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       modalTabs.forEach(t => t.classList.remove('active'));
@@ -375,73 +436,56 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Smart Clipboard Detect Button
   btnClipboardDetect.addEventListener('click', async () => {
     try {
       const res = await AIService.detectKeyFromClipboard();
       loadSettings();
-      showToast(`Chiave ${res.label} rilevata e salvata con successo!`, 'success');
+      showToast(`Chiave ${res.label} salvata`, 'success');
     } catch (err) {
       showToast(err.message, 'error');
     }
   });
 
-  // Copia Magic Link
   btnCopyMagicLink.addEventListener('click', async () => {
     const link = AIService.generateMagicLink('gemini');
     if (!link) {
-      showToast('Inserisci prima una chiave API Gemini da associare al link.', 'error');
+      showToast('Inserisci prima una chiave Gemini', 'error');
       return;
     }
     try {
       await navigator.clipboard.writeText(link);
-      showToast('Magic Link copiato negli appunti! Aprilo da qualsiasi browser per attivare la chiave con 1 click.', 'success');
+      showToast('Magic Link copiato negli appunti', 'success');
     } catch (e) {
-      prompt('Copia il tuo Magic Link personale:', link);
+      prompt('Magic Link:', link);
     }
   });
 
-  // Salvataggio chiavi
   inputGeminiKey.addEventListener('change', () => {
     AIService.setKeys(inputGeminiKey.value, undefined);
-    showToast('Chiave Gemini salvata in locale.', 'info');
+    showToast('Salvato', 'info');
   });
 
   inputGroqKey.addEventListener('change', () => {
     AIService.setKeys(undefined, inputGroqKey.value);
-    showToast('Chiave Groq salvata in locale.', 'info');
+    showToast('Salvato', 'info');
   });
 
-  // Test Connessione
   btnTestGemini.addEventListener('click', async () => {
-    btnTestGemini.disabled = true;
-    btnTestGemini.textContent = 'Verifica...';
+    btnTestGemini.textContent = '...';
     AIService.setKeys(inputGeminiKey.value, undefined);
     const res = await AIService.testConnection('gemini-2.5-flash');
-    btnTestGemini.disabled = false;
     btnTestGemini.textContent = 'Verifica';
-    if (res.ok) {
-      showToast(`Connessione a ${res.model} riuscita con successo!`, 'success');
-    } else {
-      showToast('Test fallito: ' + res.error, 'error');
-    }
+    showToast(res.ok ? 'Connessione riuscita' : 'Test fallito', res.ok ? 'success' : 'error');
   });
 
   btnTestGroq.addEventListener('click', async () => {
-    btnTestGroq.disabled = true;
-    btnTestGroq.textContent = 'Verifica...';
+    btnTestGroq.textContent = '...';
     AIService.setKeys(undefined, inputGroqKey.value);
     const res = await AIService.testConnection('llama-3.3-70b-versatile');
-    btnTestGroq.disabled = false;
     btnTestGroq.textContent = 'Verifica';
-    if (res.ok) {
-      showToast(`Connessione a ${res.model} riuscita con successo!`, 'success');
-    } else {
-      showToast('Test fallito: ' + res.error, 'error');
-    }
+    showToast(res.ok ? 'Connessione riuscita' : 'Test fallito', res.ok ? 'success' : 'error');
   });
 
-  // Cambio Modello
   selectModel.addEventListener('change', () => {
     AIService.setActiveModel(selectModel.value);
     updateModelStatusCard();
@@ -451,7 +495,6 @@ document.addEventListener('DOMContentLoaded', () => {
     AIService.setAutoFallback(checkAutoFallback.checked);
   });
 
-  // Slider Auto-scaling
   rangeFontScale.addEventListener('input', () => {
     fontScaleVal.textContent = `${rangeFontScale.value}%`;
     localStorage.setItem('docushift_min_font_scale', rangeFontScale.value);
@@ -461,6 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const keys = AIService.getKeys();
     inputGeminiKey.value = keys.gemini;
     inputGroqKey.value = keys.groq;
+    popupGeminiKey.value = keys.gemini;
 
     const currentModel = AIService.getActiveModel();
     selectModel.value = currentModel.id;
@@ -476,46 +520,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateModelStatusCard() {
     const model = AIService.getActiveModel();
-    modelStatusName.textContent = model.name;
     modelStatusQuality.textContent = model.qualityLabel;
-    modelStatusDesc.textContent = model.description;
     updateQuotaUI();
   }
 
   function updateQuotaUI() {
     const status = AIService.getQuotaStatus();
-    quotaUsedText.textContent = `${status.used} / ${status.max}`;
     quotaBarFill.style.width = `${status.percentage}%`;
 
-    if (status.percentage >= 80) {
-      quotaBarFill.style.background = 'var(--red)';
-    } else if (status.percentage >= 50) {
-      quotaBarFill.style.background = '#ffd166';
-    } else {
-      quotaBarFill.style.background = 'var(--cyan)';
-    }
-
     if (status.secondsUntilReset > 0) {
-      quotaCountdownText.textContent = `Reset token tra: ${status.secondsUntilReset}s`;
+      quotaCountdownText.textContent = `Reset tra ${status.secondsUntilReset}s`;
     } else {
-      quotaCountdownText.textContent = `Reset quota: Pronto (0 RPM attivi)`;
+      quotaCountdownText.textContent = `Pronto`;
     }
   }
 
   function startQuotaMonitoring() {
     if (quotaTimerInterval) clearInterval(quotaTimerInterval);
-    quotaTimerInterval = setInterval(() => {
-      updateQuotaUI();
-    }, 1000);
+    quotaTimerInterval = setInterval(updateQuotaUI, 1000);
   }
 
   // =========================================================================
   // GESTIONE GLOSSARIO
   // =========================================================================
   function renderGlossary() {
-    GlossaryManager.renderTable(excelTableContainer, () => {
-      // callback on update
-    });
+    GlossaryManager.renderTable(excelTableContainer, () => {});
   }
 
   btnAddGlossaryRow.addEventListener('click', () => {
@@ -525,12 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnExportCsv.addEventListener('click', () => {
     GlossaryManager.exportCSV();
-    showToast('Glossario esportato in formato CSV.', 'info');
-  });
-
-  btnExportJson.addEventListener('click', () => {
-    GlossaryManager.exportJSON();
-    showToast('Glossario esportato in formato JSON.', 'info');
+    showToast('Esportato CSV', 'info');
   });
 
   btnImportJson.addEventListener('click', () => {
@@ -543,13 +567,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const ok = GlossaryManager.importJSON(event.target.result);
-        if (ok) {
+        if (GlossaryManager.importJSON(event.target.result)) {
           renderGlossary();
-          showToast('Glossario importato con successo!', 'success');
+          showToast('Glossario importato', 'success');
         }
       } catch (err) {
-        showToast(err.message, 'error');
+        showToast('File non valido', 'error');
       }
     };
     reader.readAsText(file);
@@ -557,17 +580,17 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =========================================================================
-  // TOAST NOTIFICATIONS
+  // NOTIFICHE TOAST MINIMALI
   // =========================================================================
-  function showToast(message, type = 'info', duration = 4000) {
+  function showToast(message, type = 'info', duration = 3000) {
     const toast = document.createElement('div');
     toast.className = `toast toast--${type}`;
 
-    let icon = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+    let icon = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent);"></span>`;
     if (type === 'success') {
-      icon = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--green)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+      icon = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--status-green);"></span>`;
     } else if (type === 'error') {
-      icon = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+      icon = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--status-red);"></span>`;
     }
 
     toast.innerHTML = `${icon}<span>${escapeHtml(message)}</span>`;
@@ -575,9 +598,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
       toast.style.opacity = '0';
-      toast.style.transform = 'translateY(12px)';
-      toast.style.transition = 'all 0.3s ease';
-      setTimeout(() => toast.remove(), 300);
+      toast.style.transform = 'translateY(8px)';
+      toast.style.transition = 'all 0.25s ease';
+      setTimeout(() => toast.remove(), 250);
     }, duration);
   }
 

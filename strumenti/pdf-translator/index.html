@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DocuShift AI — Traduttore PDF con Conservazione Layout | Riccardo Busolo</title>
-  <meta name="description" content="Traduci file PDF preservando fedelmente layout, immagini e grafica originale con modelli AI gratuiti (Gemini / Groq) e glossario personalizzato stile Excel.">
+  <title>DocuShift AI — Traduttore PDF</title>
+  <meta name="description" content="Traduci documenti PDF preservando fedelmente layout, grafica e immagini con modelli AI gratuiti.">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
@@ -12,34 +12,39 @@
   <!-- Google Fonts: Outfit + JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- Floating Navigation -->
   <header class="header">
     <div class="header__inner">
-      <!-- Pulsante Impostazioni a sinistra -->
-      <button class="header__btn header__btn--settings" id="btn-open-settings" title="Impostazioni, Modelli e Glossario">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        <span>Impostazioni & Modelli</span>
-      </button>
+      <!-- Controlli a sinistra: Tema & Impostazioni -->
+      <div class="header__left">
+        <!-- Switch Tema Chiaro/Scuro -->
+        <button class="icon-btn" id="btn-theme-toggle" title="Cambia tema (Chiaro / Scuro)" aria-label="Cambia tema">
+          <!-- Icona Sole per Dark Mode -->
+          <svg class="theme-icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <!-- Icona Luna per Light Mode -->
+          <svg class="theme-icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
 
-      <!-- Brand centrale -->
+        <!-- Simbolo Impostazioni senza scritte -->
+        <button class="icon-btn" id="btn-open-settings" title="Impostazioni" aria-label="Impostazioni">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+
+      <!-- Centro: Brand Minimal -->
       <a href="#" class="brand">
-        <div class="brand__logo">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        </div>
-        <span class="brand__title">DocuShift AI</span>
-        <span class="brand__badge">Layout Safe</span>
+        <span class="brand__title">DocuShift</span>
       </a>
 
-      <!-- Link Ritorno -->
-      <a href="/progetti.html" class="header__btn">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        <span>Torna a Progetti</span>
+      <!-- Destra: Ritorno a progetti -->
+      <a href="/progetti.html" class="icon-btn" title="Torna a Progetti" aria-label="Torna a Progetti">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </a>
     </div>
   </header>
@@ -47,101 +52,94 @@
   <!-- Main Content -->
   <main class="main">
     
-    <!-- Hero Section -->
+    <!-- Hero Ultra-Minimal -->
     <section class="hero">
-      <div class="hero__badge">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-        <span>100% Client-Side • Modelli AI Gratuiti • Layout Intatto</span>
-      </div>
-      <h1 class="hero__title">Traduci PDF. <span>Senza alterare il design.</span></h1>
-      <p class="hero__desc">
-        Mantieni immagini, grafica e impaginazione al millimetro. L'auto-scaling intelligente adatta i testi per garantire un'estetica perfetta.
-      </p>
+      <h1 class="hero__title">Traduci PDF</h1>
+      <p class="hero__desc">Preserva layout, immagini e grafica.</p>
     </section>
 
     <!-- Upload & Controls Card -->
     <section class="upload-card">
       
-      <!-- Drag & Drop Zone -->
+      <!-- Drag & Drop Zone Minimal -->
       <div class="dropzone" id="dropzone">
         <input type="file" id="file-input" accept="application/pdf" style="display: none;">
         <div class="dropzone__icon">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><polyline points="9 15 12 12 15 15"/></svg>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><polyline points="9 15 12 12 15 15"/></svg>
         </div>
-        <div class="dropzone__title">Rilascia il tuo PDF qui</div>
-        <div class="dropzone__subtitle">oppure tocca per sfogliare i tuoi documenti</div>
-        <div class="dropzone__subtle">Elaborazione 100% privata nel browser. Nessun file lascia il tuo dispositivo.</div>
+        <div class="dropzone__title">Trascina un PDF</div>
+        <div class="dropzone__subtitle">o fai clic per scegliere</div>
       </div>
 
       <!-- File Caricato (Pill Info) -->
       <div class="file-info" id="file-info">
         <div class="file-info__left">
           <div class="file-info__icon">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           </div>
           <div>
             <div class="file-info__name" id="file-info-name">documento.pdf</div>
             <div class="file-info__meta" id="file-info-meta">0 KB • 0 Pagine</div>
           </div>
         </div>
-        <button class="file-info__remove" id="btn-remove-file" title="Rimuovi file">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <button class="file-info__remove" id="btn-remove-file" title="Rimuovi">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
-      <!-- Controls Bar -->
+      <!-- Controls Bar Minimal -->
       <div class="controls-bar">
         <div class="lang-selector-group">
           <!-- Lingua sorgente auto-detect -->
           <div class="lang-badge-detected" id="detected-lang-badge">
-            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--apple-blue); box-shadow:0 0 8px var(--apple-blue-glow);"></span>
-            <span id="detected-lang-text">Sorgente: Auto-detect (AI)</span>
+            <span class="status-dot"></span>
+            <span id="detected-lang-text">Auto-detect</span>
           </div>
 
           <div class="lang-arrow">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
 
           <!-- Selezione Lingua Target -->
           <div class="lang-select-wrap">
             <select id="target-lang-select">
               <option value="Italiano" selected>Italiano</option>
-              <option value="Inglese">Inglese (English)</option>
-              <option value="Spagnolo">Spagnolo (Español)</option>
-              <option value="Francese">Francese (Français)</option>
-              <option value="Tedesco">Tedesco (Deutsch)</option>
-              <option value="Portoghese">Portoghese (Português)</option>
-              <option value="Olandese">Olandese (Nederlands)</option>
-              <option value="Russo">Russo (Русский)</option>
-              <option value="Cinese">Cinese (中文)</option>
-              <option value="Giapponese">Giapponese (日本語)</option>
+              <option value="Inglese">Inglese</option>
+              <option value="Spagnolo">Spagnolo</option>
+              <option value="Francese">Francese</option>
+              <option value="Tedesco">Tedesco</option>
+              <option value="Portoghese">Portoghese</option>
+              <option value="Olandese">Olandese</option>
+              <option value="Russo">Russo</option>
+              <option value="Cinese">Cinese</option>
+              <option value="Giapponese">Giapponese</option>
             </select>
           </div>
         </div>
 
         <!-- Pulsante Traduzione -->
         <button class="btn-translate" id="btn-translate" disabled>
-          <span>Traduci PDF</span>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <span>Traduci</span>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
       </div>
 
     </section>
 
-    <!-- Progress Card -->
+    <!-- Progress Card (Dynamic Island Minimal) -->
     <section class="progress-card" id="progress-card">
       <div class="progress-header">
-        <div class="progress-title" id="progress-title">Elaborazione documento in corso...</div>
+        <div class="progress-title" id="progress-title">Elaborazione...</div>
         <div class="progress-percent" id="progress-percent">0%</div>
       </div>
       <div class="progress-bar-bg">
         <div class="progress-bar-fill" id="progress-bar-fill"></div>
       </div>
       <div class="progress-steps">
-        <div class="progress-step" id="step-1">1. Lettura & Coordinate</div>
-        <div class="progress-step" id="step-2">2. Traduzione AI</div>
-        <div class="progress-step" id="step-3">3. Auto-Scaling Font</div>
-        <div class="progress-step" id="step-4">4. Compilazione PDF</div>
+        <div class="progress-step" id="step-1">1. Lettura</div>
+        <div class="progress-step" id="step-2">2. Traduzione</div>
+        <div class="progress-step" id="step-3">3. Layout</div>
+        <div class="progress-step" id="step-4">4. Compilazione</div>
       </div>
     </section>
 
@@ -149,17 +147,17 @@
     <section class="viewer-section" id="viewer-section">
       <div class="viewer-toolbar">
         <div class="viewer-nav">
-          <button class="viewer-btn" id="btn-prev-page" title="Pagina precedente">◀ Prec</button>
-          <span class="viewer-page-indicator" id="viewer-page-indicator">Pagina 1 di 1</span>
-          <button class="viewer-btn" id="btn-next-page" title="Pagina successiva">Succ ▶</button>
+          <button class="viewer-btn" id="btn-prev-page" title="Precedente">◀</button>
+          <span class="viewer-page-indicator" id="viewer-page-indicator">1 / 1</span>
+          <button class="viewer-btn" id="btn-next-page" title="Successiva">▶</button>
         </div>
 
-        <div style="display: flex; gap: 12px; align-items: center;">
-          <button class="viewer-btn" id="btn-zoom-out" title="Rimpicciolisci">- Zoom</button>
-          <button class="viewer-btn" id="btn-zoom-in" title="Ingrandisci">+ Zoom</button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="viewer-btn" id="btn-zoom-out" title="Rimpicciolisci">-</button>
+          <button class="viewer-btn" id="btn-zoom-in" title="Ingrandisci">+</button>
           <a href="#" class="btn-download-pdf" id="btn-download-pdf" download="documento-tradotto.pdf">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span>Scarica PDF Tradotto</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Scarica</span>
           </a>
         </div>
       </div>
@@ -174,7 +172,7 @@
         </div>
 
         <div class="viewer-pane">
-          <div class="viewer-pane__title" style="color: var(--cyan);">Tradotto con AI (Layout Preservato)</div>
+          <div class="viewer-pane__title" style="color: var(--accent);">Tradotto</div>
           <div class="viewer-pane__canvas-wrap">
             <canvas id="canvas-translated"></canvas>
           </div>
@@ -184,157 +182,155 @@
 
   </main>
 
-  <!-- Modale Impostazioni & Modelli -->
-  <div class="modal-overlay" id="settings-modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h2 class="modal-title">Impostazioni, Modelli e Glossario</h2>
-        <button class="modal-close" id="btn-close-settings" title="Chiudi">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  <!-- =========================================================================
+       Popup Centro Schermata: Setup Chiave API Rapido (se mancante)
+       ========================================================================= -->
+  <div class="modal-overlay" id="api-setup-popup">
+    <div class="modal-card popup-card">
+      <div class="popup-icon">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h3 class="popup-title">Collega Google Gemini</h3>
+      <p class="popup-desc">Per iniziare a tradurre, inserisci la tua chiave API gratuita di Google AI Studio.</p>
+
+      <div class="form-group" style="width: 100%; margin-top: 18px;">
+        <input type="password" id="popup-gemini-key" class="form-input" placeholder="Incolla chiave (AIzaSy...)" autocomplete="off">
+      </div>
+
+      <div class="popup-actions">
+        <button class="btn-secondary" id="btn-popup-clipboard">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Incolla</span>
+        </button>
+        <button class="btn-translate" id="btn-popup-save" style="padding: 10px 24px;">
+          <span>Salva</span>
         </button>
       </div>
 
+      <div class="popup-footer">
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Ottieni chiave gratuita in 30 secondi ↗</a>
+      </div>
+
+      <button class="modal-close popup-close" id="btn-close-popup" title="Chiudi">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Modale Impostazioni (Minimal macOS Preferences Style)
+       ========================================================================= -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">Impostazioni</h2>
+        <button class="modal-close" id="btn-close-settings" title="Chiudi">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Segmented Controls Tabs -->
       <div class="modal-tabs">
-        <button class="modal-tab active" data-tab="tab-models">Modelli AI & Quota</button>
-        <button class="modal-tab" data-tab="tab-glossary">Glossario Stile Excel</button>
-        <button class="modal-tab" data-tab="tab-layout">Layout & Font</button>
+        <button class="modal-tab active" data-tab="tab-models">Modelli & API</button>
+        <button class="modal-tab" data-tab="tab-glossary">Glossario</button>
+        <button class="modal-tab" data-tab="tab-layout">Layout</button>
       </div>
 
       <div class="modal-body">
         
-        <!-- TAB 1: MODELLI & CHIAVI -->
+        <!-- TAB 1: MODELLI & API -->
         <div class="tab-pane active" id="tab-models">
           
-          <div class="alert-box alert-box--info">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            <div>
-              <strong>Configurazione Rapida Automatizzata:</strong> Le chiavi vengono salvate esclusivamente nel tuo browser (`localStorage`) e non vengono mai caricate su GitHub.
-              Puoi cliccare su <em>"Rileva da Appunti"</em> dopo aver copiato la tua chiave, oppure generare il tuo <em>Magic Link</em>.
+          <div class="settings-group">
+            <div class="form-group">
+              <div class="form-header-line">
+                <label class="form-label" for="input-gemini-key">Chiave Gemini (Google AI Studio)</label>
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="link-subtle">Ottieni gratis ↗</a>
+              </div>
+              <div class="form-input-wrap">
+                <input type="password" id="input-gemini-key" class="form-input" placeholder="AIzaSy..." autocomplete="off">
+                <button class="btn-secondary" id="btn-clipboard-detect" title="Incolla da appunti">Incolla</button>
+                <button class="btn-secondary" id="btn-test-gemini">Verifica</button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+              <div class="form-header-line">
+                <label class="form-label" for="input-groq-key">Chiave Groq (Opzionale)</label>
+                <a href="https://console.groq.com/keys" target="_blank" rel="noopener" class="link-subtle">Ottieni ↗</a>
+              </div>
+              <div class="form-input-wrap">
+                <input type="password" id="input-groq-key" class="form-input" placeholder="gsk_..." autocomplete="off">
+                <button class="btn-secondary" id="btn-test-groq">Verifica</button>
+              </div>
             </div>
           </div>
 
-          <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button class="btn-secondary" id="btn-clipboard-detect" style="border-color: var(--cyan); color: var(--cyan);">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              <span>📋 Rileva e Salva da Appunti</span>
-            </button>
-            <button class="btn-secondary" id="btn-copy-magic-link" title="Copia link rapido di attivazione">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              <span>Copia Magic Link Personale</span>
-            </button>
-          </div>
+          <div class="settings-group" style="margin-top: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="select-model">Modello Attivo</label>
+              <select id="select-model" class="form-input" style="width: 100%;">
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Consigliato)</option>
+                <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Groq)</option>
+                <option value="llama-3.1-8b-instant">Llama 3.1 8B (Groq)</option>
+              </select>
+            </div>
 
-          <!-- Chiave Gemini -->
-          <div class="form-group">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <label class="form-label" for="input-gemini-key">Chiave API Google AI Studio (Gemini - Consigliato)</label>
-              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="font-size:0.75rem; color:var(--cyan); font-family:var(--mono); text-decoration:none;">Ottieni gratis in 30 secondi ↗</a>
+            <div class="quota-minimal-line">
+              <span id="model-status-quality" class="quality-badge-subtle">⭐⭐⭐⭐⭐ 5/5</span>
+              <span id="quota-countdown-text" class="quota-countdown">Pronto</span>
             </div>
-            <div class="form-input-wrap">
-              <input type="password" id="input-gemini-key" class="form-input" placeholder="AIzaSy..." autocomplete="off">
-              <button class="btn-secondary" id="btn-test-gemini">Verifica</button>
-            </div>
-          </div>
 
-          <!-- Chiave Groq (Opzionale) -->
-          <div class="form-group">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <label class="form-label" for="input-groq-key">Chiave API Groq Cloud (Opzionale / Riserva)</label>
-              <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="font-size:0.75rem; color:var(--cyan); font-family:var(--mono); text-decoration:none;">Ottieni chiave Groq ↗</a>
-            </div>
-            <div class="form-input-wrap">
-              <input type="password" id="input-groq-key" class="form-input" placeholder="gsk_..." autocomplete="off">
-              <button class="btn-secondary" id="btn-test-groq">Verifica</button>
-            </div>
-          </div>
-
-          <!-- Selezione Modello Attivo -->
-          <div class="form-group">
-            <label class="form-label" for="select-model">Modello Attivo</label>
-            <select id="select-model" class="form-input" style="width: 100%;">
-              <option value="gemini-2.5-flash">Gemini 2.5 Flash — Consigliato (Velocità e rispetto del layout)</option>
-              <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite — Ultra-veloce</option>
-              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy)</option>
-              <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Groq Cloud)</option>
-              <option value="llama-3.1-8b-instant">Llama 3.1 8B (Groq Cloud)</option>
-            </select>
-          </div>
-
-          <!-- Stato Quota e Qualità del Modello Selezionato -->
-          <div class="model-status-card">
-            <div class="model-header-line">
-              <strong id="model-status-name" style="font-size: 0.95rem;">Gemini 2.5 Flash</strong>
-              <span class="quality-badge" id="model-status-quality">⭐⭐⭐⭐⭐ 5/5</span>
-            </div>
-            <p class="model-desc-text" id="model-status-desc">Velocissimo, ideale per preservare la struttura e la brevità dei testi.</p>
-
-            <div class="quota-meter-line">
-              <span>Utilizzo Quota (RPM): <span id="quota-used-text">0 / 15</span></span>
-              <span class="quota-countdown" id="quota-countdown-text">Reset quota: Pronto</span>
-            </div>
-            <div class="quota-bar-bg">
+            <div class="quota-bar-bg" style="margin-top: 8px;">
               <div class="quota-bar-fill" id="quota-bar-fill"></div>
             </div>
 
-            <div style="margin-top: 14px; display: flex; align-items: center; gap: 8px;">
-              <input type="checkbox" id="check-auto-fallback" checked style="accent-color: var(--cyan); cursor: pointer;">
-              <label for="check-auto-fallback" style="font-size: 0.84rem; color: var(--text-dim); cursor: pointer;">
-                <strong>Smart Fallback:</strong> Passa automaticamente a un modello alternativo se la quota viene temporaneamente superata (errore 429).
+            <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="check-auto-fallback" checked style="accent-color: var(--accent); cursor: pointer;">
+              <label for="check-auto-fallback" style="font-size: 0.8rem; color: var(--text-secondary); cursor: pointer;">
+                Smart Fallback automatico
               </label>
             </div>
           </div>
 
+          <!-- Pulsante Magic Link -->
+          <div style="margin-top: 14px; text-align: center;">
+            <button class="btn-subtle" id="btn-copy-magic-link">
+              <span>Copia Magic Link per configurazione rapida</span>
+            </button>
+          </div>
+
         </div>
 
-        <!-- TAB 2: GLOSSARIO EXCEL -->
+        <!-- TAB 2: GLOSSARIO -->
         <div class="tab-pane" id="tab-glossary">
-          
           <div class="excel-toolbar">
             <div class="excel-toolbar__group">
-              <button class="btn-secondary" id="btn-add-glossary-row" style="color: var(--cyan); border-color: rgba(0, 224, 208, 0.3);">
-                + Aggiungi Riga
-              </button>
-              <button class="btn-secondary" id="btn-export-csv">Esporta CSV</button>
-              <button class="btn-secondary" id="btn-export-json">Esporta JSON</button>
+              <button class="btn-secondary" id="btn-add-glossary-row">+ Aggiungi</button>
+              <button class="btn-secondary" id="btn-export-csv">Esporta</button>
             </div>
             <div class="excel-toolbar__group">
-              <button class="btn-secondary" id="btn-import-json">Importa JSON</button>
+              <button class="btn-secondary" id="btn-import-json">Importa</button>
               <input type="file" id="glossary-file-input" accept=".json,.csv" style="display: none;">
             </div>
           </div>
 
-          <!-- Container Tabella Excel -->
           <div id="excel-table-container"></div>
-
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 12px; font-family: var(--mono);">
-            💡 <strong>Suggerimento:</strong> Inserisci una parola in qualsiasi colonna e clicca sull'icona fulmine ⚡ per auto-tradurla in tutte le altre lingue con l'AI. Tutte le parole in questa tabella verranno imposte con priorità assoluta durante la traduzione del PDF.
-          </p>
         </div>
 
-        <!-- TAB 3: LAYOUT & FONT -->
+        <!-- TAB 3: LAYOUT -->
         <div class="tab-pane" id="tab-layout">
-          
-          <div class="form-group">
-            <label class="form-label" for="range-font-scale">
-              Riduzione Minima Dimensione Font (Auto-Scaling): <span id="font-scale-val" style="color: var(--cyan);">70%</span>
-            </label>
-            <input type="range" id="range-font-scale" min="50" max="95" value="70" style="width: 100%; accent-color: var(--cyan);">
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
-              Se la frase tradotta è più lunga dell'originale, il software riduce il font fino a questo valore percentuale per non fuoriuscire dallo spazio originale.
-            </p>
-          </div>
-
-          <div class="model-status-card" style="margin-top: 20px;">
-            <div class="model-header-line">
-              <strong>Motore Tipografico Google Fonts CDN</strong>
-              <span class="quality-badge" style="color: var(--green);">● Attivo</span>
+          <div class="settings-group">
+            <div class="form-group">
+              <div class="form-header-line">
+                <label class="form-label" for="range-font-scale">Riduzione Minima Font</label>
+                <span id="font-scale-val" style="color: var(--accent); font-weight: 500;">70%</span>
+              </div>
+              <input type="range" id="range-font-scale" min="50" max="95" value="70" style="width: 100%; accent-color: var(--accent);">
             </div>
-            <p class="model-desc-text">
-              Il sistema scarica temporaneamente i font TrueType (Outfit, Lora, JetBrains Mono) per supportare nativamente lettere accentate e caratteri speciali Unicode. 
-              Al termine della compilazione del PDF, i font vengono liberati dalla memoria RAM del browser.
-            </p>
           </div>
-
         </div>
 
       </div>
