@@ -169,24 +169,101 @@ const PDFEngine = (() => {
     return groups;
   }
 
+  // Assicura il caricamento dinamico e resiliente di PDFLib con fallback tra CDN
+  async function ensurePDFLibLoaded() {
+    if (typeof window !== 'undefined' && window.PDFLib) {
+      return window.PDFLib;
+    }
+
+    const cdnUrls = [
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js',
+      'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js',
+      'https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js'
+    ];
+
+    for (const url of cdnUrls) {
+      try {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = url;
+          s.crossOrigin = 'anonymous';
+          s.onload = () => resolve();
+          s.onerror = () => reject(new Error(`Failed to load ${url}`));
+          document.head.appendChild(s);
+        });
+        if (typeof window !== 'undefined' && window.PDFLib) {
+          return window.PDFLib;
+        }
+      } catch (err) {
+        console.warn(`[DocuShift PDFEngine] Fallback CDN per PDFLib da ${url}:`, err);
+      }
+    }
+
+    throw new Error('Impossibile caricare la libreria di compilazione PDF (PDFLib). Verifica la connessione a Internet o eventuali blocchi estensioni.');
+  }
+
+  // Assicura il caricamento resiliente di fontkit con fallback tra CDN
+  async function ensureFontkitLoaded() {
+    if (typeof window !== 'undefined' && window.fontkit) {
+      return window.fontkit;
+    }
+
+    const cdnUrls = [
+      'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js',
+      'https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js'
+    ];
+
+    for (const url of cdnUrls) {
+      try {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = url;
+          s.crossOrigin = 'anonymous';
+          s.onload = () => resolve();
+          s.onerror = () => reject(new Error(`Failed to load ${url}`));
+          document.head.appendChild(s);
+        });
+        if (typeof window !== 'undefined' && window.fontkit) {
+          return window.fontkit;
+        }
+      } catch (err) {
+        console.warn(`[DocuShift PDFEngine] Fallback CDN per fontkit da ${url}:`, err);
+      }
+    }
+
+    return (typeof window !== 'undefined' && window.fontkit) ? window.fontkit : null;
+  }
+
   // Costruisce il nuovo documento PDF tradotto preservando immagini e grafica originale
   async function buildTranslatedPDF(originalPdfBytes, pagesData, translationsMap, options = {}) {
-    const { PDFDocument, rgb } = PDFLib;
+    const pdfLibInstance = await ensurePDFLibLoaded();
+    const { PDFDocument, rgb, StandardFonts } = pdfLibInstance;
 
     // Carica il PDF originale per mantenere vettori, immagini e layer
     const pdfDoc = await PDFDocument.load(originalPdfBytes);
 
     // Registra fontkit per supportare TrueType scaricati da Google Fonts
-    if (typeof fontkit !== 'undefined') {
-      pdfDoc.registerFontkit(fontkit);
+    const fkInstance = await ensureFontkitLoaded();
+    if (fkInstance) {
+      try {
+        pdfDoc.registerFontkit(fkInstance);
+      } catch (e) {
+        console.warn('[DocuShift PDFEngine] Registrazione fontkit non riuscita:', e);
+      }
     }
 
-    // Scarica font Google Fonts dinamici
-    const sansBuffer = await fetchFontBuffer('sans');
-    const sansBoldBuffer = await fetchFontBuffer('sansBold');
-
-    const embeddedFontRegular = await pdfDoc.embedFont(sansBuffer);
-    const embeddedFontBold = await pdfDoc.embedFont(sansBoldBuffer);
+    // Scarica font Google Fonts dinamici o usa fallback StandardFonts
+    let embeddedFontRegular, embeddedFontBold;
+    try {
+      const sansBuffer = await fetchFontBuffer('sans');
+      const sansBoldBuffer = await fetchFontBuffer('sansBold');
+      embeddedFontRegular = await pdfDoc.embedFont(sansBuffer);
+      embeddedFontBold = await pdfDoc.embedFont(sansBoldBuffer);
+    } catch (fontErr) {
+      console.warn('[DocuShift PDFEngine] Fallback a font standard integrato:', fontErr);
+      embeddedFontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      embeddedFontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    }
 
     const pdfPages = pdfDoc.getPages();
 
