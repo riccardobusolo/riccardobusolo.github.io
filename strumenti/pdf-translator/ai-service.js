@@ -118,6 +118,48 @@ const AIService = (() => {
     return `${baseUrl}#key=${encodeURIComponent(key)}`;
   }
 
+  // Chiamata con retry automatico ed exponential backoff per gestire picchi di traffico (503 / 429)
+  async function fetchGeminiWithRetry(url, options, maxRetries = 3) {
+    let attempt = 0;
+    let delay = 1500;
+
+    while (true) {
+      attempt++;
+      try {
+        const resp = await fetch(url, options);
+
+        if ((resp.status === 503 || resp.status === 429) && attempt <= maxRetries) {
+          console.warn(`[DocuShift AI] Gemini temporaneamente occupato (HTTP ${resp.status}). Tentativo ${attempt}/${maxRetries} tra ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2;
+          continue;
+        }
+
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+          const errorMsg = data.error?.message || `Errore Google API (${resp.status})`;
+          if (attempt <= maxRetries && (errorMsg.includes('high demand') || errorMsg.includes('Resource has been exhausted') || errorMsg.includes('overloaded'))) {
+            console.warn(`[DocuShift AI] Gemini picco di traffico: ${errorMsg}. Tentativo ${attempt}/${maxRetries} tra ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            delay *= 2;
+            continue;
+          }
+          throw new Error(errorMsg);
+        }
+
+        return data;
+      } catch (err) {
+        if (attempt <= maxRetries && (err.message?.includes('high demand') || err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError'))) {
+          console.warn(`[DocuShift AI] Errore temporaneo: ${err.message}. Tentativo ${attempt}/${maxRetries} tra ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2;
+          continue;
+        }
+        throw err;
+      }
+    }
+  }
+
   // Test di connessione per Gemini 3.8 Flash
   async function testConnection(customKey = null) {
     const key = customKey || getKey();
@@ -126,18 +168,14 @@ const AIService = (() => {
     }
 
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${key}`;
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: 'Rispondi OK' }] }]
-        })
-      });
-
+      // Valida autenticazione e permessi della chiave tramite l'endpoint modelli ufficiale di Google AI.
+      // Questo test consuma 0 token e non subisce i blocchi per picchi di traffico (503 High Demand).
+      const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
+      const resp = await fetch(url);
       const data = await resp.json().catch(() => ({}));
+
       if (!resp.ok) {
-        throw new Error(data.error?.message || `Errore Google API (${resp.status})`);
+        throw new Error(data.error?.message || `API Key non valida o non autorizzata (${resp.status})`);
       }
 
       return { ok: true, model: MODEL_NAME };
@@ -165,7 +203,7 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
 
     recordRequest();
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${key}`;
-    const resp = await fetch(url, {
+    const data = await fetchGeminiWithRetry(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -177,13 +215,8 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
       })
     });
 
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err.error?.message || `Errore Gemini (${resp.status})`);
-    }
-
-    const data = await resp.json();
     const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) throw new Error('Nessuna risposta ricevuta da Gemini');
     return JSON.parse(rawText);
   }
 
@@ -198,7 +231,7 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
     try {
       recordRequest();
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${key}`;
-      const resp = await fetch(url, {
+      const data = await fetchGeminiWithRetry(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -207,10 +240,7 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
         })
       });
 
-      if (resp.ok) {
-        const data = await resp.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Rilevamento automatico';
-      }
+      return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Rilevamento automatico';
     } catch (e) {
       console.warn('Errore auto-detect lingua:', e);
     }
@@ -252,7 +282,7 @@ Esempio output valido:
 
     recordRequest();
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${key}`;
-    const resp = await fetch(url, {
+    const data = await fetchGeminiWithRetry(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -264,13 +294,8 @@ Esempio output valido:
       })
     });
 
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err.error?.message || `Errore HTTP ${resp.status}`);
-    }
-
-    const data = await resp.json();
     const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) throw new Error('Nessuna traduzione ricevuta da Gemini');
     const parsed = JSON.parse(rawText);
     if (Array.isArray(parsed)) return parsed;
     return parsed.translations || parsed.items || Object.values(parsed);
