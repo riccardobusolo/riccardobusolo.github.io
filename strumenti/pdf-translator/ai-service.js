@@ -9,7 +9,7 @@ const AIService = (() => {
   const MODELS = {
     'gemini-1.5-flash': {
       id: 'gemini-1.5-flash',
-      name: 'Gemini 1.5 Flash (Gratuito - Consigliato)',
+      name: 'Gemini 1.5 Flash',
       provider: 'gemini',
       quality: 5,
       qualityLabel: '⭐⭐⭐⭐⭐ 5/5',
@@ -19,7 +19,7 @@ const AIService = (() => {
     },
     'gemini-2.0-flash': {
       id: 'gemini-2.0-flash',
-      name: 'Gemini 2.0 Flash (Gratuito)',
+      name: 'Gemini 2.0 Flash',
       provider: 'gemini',
       quality: 5,
       qualityLabel: '⭐⭐⭐⭐⭐ 5/5',
@@ -225,17 +225,7 @@ const AIService = (() => {
           throw new Error(errMsg);
         }
 
-        // Se la chiamata ha successo, la chiave è autenticata e attiva
-        const available = (modelsData.models || []).map(m => (m.name || '').replace('models/', ''));
-        let verifiedName = 'Gemini 1.5 Flash';
-        if (available.includes(model.id)) {
-          verifiedName = model.name;
-        } else if (available.includes('gemini-1.5-flash')) {
-          setActiveModel('gemini-1.5-flash');
-          verifiedName = 'Gemini 1.5 Flash';
-        }
-
-        return { ok: true, provider: 'gemini', model: verifiedName };
+        return { ok: true, provider: 'gemini', model: model.name };
       } else {
         const resp = await fetch('https://api.groq.com/openai/v1/models', {
           headers: { 'Authorization': `Bearer ${key}` }

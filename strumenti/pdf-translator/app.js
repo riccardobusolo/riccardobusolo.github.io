@@ -483,7 +483,11 @@ document.addEventListener('DOMContentLoaded', () => {
     btnTestGemini.textContent = '...';
     const key = inputGeminiKey.value.trim() || AIService.getKeys().gemini;
     if (key) AIService.setKeys(key, undefined);
-    const res = await AIService.testConnection('gemini-1.5-flash');
+    
+    const selectedModelId = selectModel.value;
+    const testModelId = selectedModelId.startsWith('gemini') ? selectedModelId : 'gemini-1.5-flash';
+    
+    const res = await AIService.testConnection(testModelId);
     btnTestGemini.textContent = 'Verifica';
     if (res.ok) {
       showToast(`Connesso a ${res.model}`, 'success');
@@ -496,7 +500,11 @@ document.addEventListener('DOMContentLoaded', () => {
     btnTestGroq.textContent = '...';
     const key = inputGroqKey.value.trim() || AIService.getKeys().groq;
     if (key) AIService.setKeys(undefined, key);
-    const res = await AIService.testConnection('llama-3.3-70b-versatile');
+    
+    const selectedModelId = selectModel.value;
+    const testModelId = selectedModelId.startsWith('llama') ? selectedModelId : 'llama-3.3-70b-versatile';
+
+    const res = await AIService.testConnection(testModelId);
     btnTestGroq.textContent = 'Verifica';
     if (res.ok) {
       showToast(`Connesso a ${res.model}`, 'success');
@@ -508,6 +516,8 @@ document.addEventListener('DOMContentLoaded', () => {
   selectModel.addEventListener('change', () => {
     AIService.setActiveModel(selectModel.value);
     updateModelStatusCard();
+    const model = AIService.getActiveModel();
+    showToast(`Modello attivo: ${model.name}`, 'info');
   });
 
   checkAutoFallback.addEventListener('change', () => {
