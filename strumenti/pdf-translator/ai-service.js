@@ -143,7 +143,7 @@ const AIService = (() => {
   }
 
   function getActiveModel() {
-    return MODELS[activeModel] || MODELS['gemini-2.5-flash'];
+    return MODELS[activeModel] || MODELS['gemini-1.5-flash'];
   }
 
   function setActiveModel(modelId) {
@@ -215,7 +215,7 @@ const AIService = (() => {
 
     try {
       if (model.provider === 'gemini') {
-        // 1. Verifica validità chiave su endpoint ufficiale Google
+        // Verifica la validità della chiave su Google API (costo 0 token)
         const modelsUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
         const modelsResp = await fetch(modelsUrl);
         const modelsData = await modelsResp.json().catch(() => ({}));
@@ -225,35 +225,17 @@ const AIService = (() => {
           throw new Error(errMsg);
         }
 
-        // 2. Micro-test di generazione
-        const targetModelId = model.id || 'gemini-1.5-flash';
-        const genUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModelId}:generateContent?key=${key}`;
-        const genResp = await fetch(genUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: 'OK' }] }]
-          })
-        });
-
-        if (!genResp.ok) {
-          // Se il modello specifico fallisce, proviamo il modello standard gemini-1.5-flash
-          if (targetModelId !== 'gemini-1.5-flash') {
-            const fbResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ contents: [{ parts: [{ text: 'OK' }] }] })
-            });
-            if (fbResp.ok) {
-              setActiveModel('gemini-1.5-flash');
-              return { ok: true, provider: 'gemini', model: 'Gemini 1.5 Flash' };
-            }
-          }
-          const genErr = await genResp.json().catch(() => ({}));
-          throw new Error(genErr.error?.message || `Errore generazione (${genResp.status})`);
+        // Se la chiamata ha successo, la chiave è autenticata e attiva
+        const available = (modelsData.models || []).map(m => (m.name || '').replace('models/', ''));
+        let verifiedName = 'Gemini 1.5 Flash';
+        if (available.includes(model.id)) {
+          verifiedName = model.name;
+        } else if (available.includes('gemini-1.5-flash')) {
+          setActiveModel('gemini-1.5-flash');
+          verifiedName = 'Gemini 1.5 Flash';
         }
 
-        return { ok: true, provider: 'gemini', model: model.name };
+        return { ok: true, provider: 'gemini', model: verifiedName };
       } else {
         const resp = await fetch('https://api.groq.com/openai/v1/models', {
           headers: { 'Authorization': `Bearer ${key}` }
@@ -416,7 +398,7 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
         lastError = err;
         console.warn(`Tentativo fallito con ${model.name}:`, err.message);
 
-        if (autoFallbackEnabled && (err.message.includes('429') || err.message.includes('quota') || err.message.includes('503'))) {
+        if (autoFallbackEnabled) {
           if (onFallback) {
             onFallback(model, err.message);
           }

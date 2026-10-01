@@ -1022,7 +1022,10 @@ body::before {
 
 .toast {
   pointer-events: auto;
-  padding: 8px 16px;
+  padding: 10px 18px;
+  max-width: min(90vw, 420px);
+  word-break: break-word;
+  line-height: 1.4;
   background: var(--bg-surface-elevated);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-full);
