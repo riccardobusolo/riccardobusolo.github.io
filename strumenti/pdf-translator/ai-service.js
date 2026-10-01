@@ -7,55 +7,55 @@
 const AIService = (() => {
   // Catalogo modelli disponibili
   const MODELS = {
+    'gemini-1.5-flash': {
+      id: 'gemini-1.5-flash',
+      name: 'Gemini 1.5 Flash (Gratuito - Consigliato)',
+      provider: 'gemini',
+      quality: 5,
+      qualityLabel: '⭐⭐⭐⭐⭐ 5/5',
+      maxRPM: 15,
+      maxRPD: 1500,
+      description: 'Modello gratuito ufficiale di Google AI Studio (15 richieste/min).'
+    },
+    'gemini-2.0-flash': {
+      id: 'gemini-2.0-flash',
+      name: 'Gemini 2.0 Flash (Gratuito)',
+      provider: 'gemini',
+      quality: 5,
+      qualityLabel: '⭐⭐⭐⭐⭐ 5/5',
+      maxRPM: 15,
+      maxRPD: 1500,
+      description: 'Nuova generazione Gemini ad altissima velocità.'
+    },
     'gemini-2.5-flash': {
       id: 'gemini-2.5-flash',
       name: 'Gemini 2.5 Flash',
       provider: 'gemini',
       quality: 5,
-      qualityLabel: '⭐⭐⭐⭐⭐ Eccellente (Miglior rapporto qualità/velocità)',
+      qualityLabel: '⭐⭐⭐⭐⭐ 5/5',
       maxRPM: 15,
       maxRPD: 1500,
-      description: 'Velocissimo, ideale per preservare la struttura e la brevità dei testi.'
-    },
-    'gemini-2.5-flash-lite': {
-      id: 'gemini-2.5-flash-lite',
-      name: 'Gemini 2.5 Flash-Lite',
-      provider: 'gemini',
-      quality: 4.5,
-      qualityLabel: '⭐⭐⭐⭐½ Ottimo (Latenza ultra-bassa)',
-      maxRPM: 15,
-      maxRPD: 1500,
-      description: 'Modello ultra-leggero, risposte istantanee per PDF sintetici.'
-    },
-    'gemini-1.5-flash': {
-      id: 'gemini-1.5-flash',
-      name: 'Gemini 1.5 Flash (Legacy)',
-      provider: 'gemini',
-      quality: 4.5,
-      qualityLabel: '⭐⭐⭐⭐½ Molto Buono (Stabile)',
-      maxRPM: 15,
-      maxRPD: 1500,
-      description: 'Versione precedente ampiamente testata con ottimo supporto JSON.'
+      description: 'Modello avanzato con reasoning integrato.'
     },
     'llama-3.3-70b-versatile': {
       id: 'llama-3.3-70b-versatile',
       name: 'Llama 3.3 70B (Groq)',
       provider: 'groq',
       quality: 4.8,
-      qualityLabel: '⭐⭐⭐⭐⭐ Eccellente (Open-weights, 30 RPM)',
+      qualityLabel: '⭐⭐⭐⭐⭐ 4.8/5',
       maxRPM: 30,
       maxRPD: 1000,
-      description: 'Capacità linguistiche di alto livello su hardware ultra-veloce Groq.'
+      description: 'Capacità linguistiche elevate su hardware ultra-veloce Groq (30 RPM).'
     },
     'llama-3.1-8b-instant': {
       id: 'llama-3.1-8b-instant',
       name: 'Llama 3.1 8B (Groq)',
       provider: 'groq',
       quality: 4.0,
-      qualityLabel: '⭐⭐⭐⭐ Buono (Velocità record)',
+      qualityLabel: '⭐⭐⭐⭐ 4/5',
       maxRPM: 30,
       maxRPD: 14400,
-      description: 'Estremamente scattante per testi standard e documenti tecnici.'
+      description: 'Estremamente scattante per testi standard.'
     }
   };
 
@@ -65,7 +65,7 @@ const AIService = (() => {
     groq: []
   };
 
-  let activeModel = localStorage.getItem('docushift_active_model') || 'gemini-2.5-flash';
+  let activeModel = localStorage.getItem('docushift_active_model') || 'gemini-1.5-flash';
   let autoFallbackEnabled = localStorage.getItem('docushift_auto_fallback') !== 'false';
 
   // Inizializzazione automatizzata: Magic Link (#key=... o #gemini_key=...)
@@ -205,46 +205,62 @@ const AIService = (() => {
 
   // Test di connessione con una chiave
   async function testConnection(modelId = activeModel) {
-    const model = MODELS[modelId];
     const keys = getKeys();
+    const model = MODELS[modelId] || getActiveModel();
     const key = model.provider === 'gemini' ? keys.gemini : keys.groq;
 
     if (!key) {
-      return { ok: false, error: `Nessuna chiave API inserita per ${model.provider.toUpperCase()}.` };
+      return { ok: false, error: 'Nessuna chiave API inserita. Incolla prima la chiave.' };
     }
 
     try {
       if (model.provider === 'gemini') {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent?key=${key}`;
-        const resp = await fetch(url, {
+        // 1. Verifica validità chiave su endpoint ufficiale Google
+        const modelsUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
+        const modelsResp = await fetch(modelsUrl);
+        const modelsData = await modelsResp.json().catch(() => ({}));
+        
+        if (!modelsResp.ok) {
+          const errMsg = modelsData.error?.message || `Errore Google API (${modelsResp.status})`;
+          throw new Error(errMsg);
+        }
+
+        // 2. Micro-test di generazione
+        const targetModelId = model.id || 'gemini-1.5-flash';
+        const genUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModelId}:generateContent?key=${key}`;
+        const genResp = await fetch(genUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: 'Rispondi solo con la parola "OK".' }] }]
+            contents: [{ parts: [{ text: 'OK' }] }]
           })
         });
-        if (!resp.ok) {
-          const err = await resp.json().catch(() => ({}));
-          throw new Error(err.error?.message || `Errore HTTP ${resp.status}`);
+
+        if (!genResp.ok) {
+          // Se il modello specifico fallisce, proviamo il modello standard gemini-1.5-flash
+          if (targetModelId !== 'gemini-1.5-flash') {
+            const fbResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ contents: [{ parts: [{ text: 'OK' }] }] })
+            });
+            if (fbResp.ok) {
+              setActiveModel('gemini-1.5-flash');
+              return { ok: true, provider: 'gemini', model: 'Gemini 1.5 Flash' };
+            }
+          }
+          const genErr = await genResp.json().catch(() => ({}));
+          throw new Error(genErr.error?.message || `Errore generazione (${genResp.status})`);
         }
+
         return { ok: true, provider: 'gemini', model: model.name };
       } else {
-        const url = 'https://api.groq.com/openai/v1/chat/completions';
-        const resp = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${key}`
-          },
-          body: JSON.stringify({
-            model: model.id,
-            messages: [{ role: 'user', content: 'Rispondi solo "OK".' }],
-            max_tokens: 5
-          })
+        const resp = await fetch('https://api.groq.com/openai/v1/models', {
+          headers: { 'Authorization': `Bearer ${key}` }
         });
+        const data = await resp.json().catch(() => ({}));
         if (!resp.ok) {
-          const err = await resp.json().catch(() => ({}));
-          throw new Error(err.error?.message || `Errore HTTP ${resp.status}`);
+          throw new Error(data.error?.message || `Errore Groq (${resp.status})`);
         }
         return { ok: true, provider: 'groq', model: model.name };
       }
@@ -366,9 +382,9 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
 
     let currentModelId = activeModel;
     const modelOrder = [
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-lite',
       'gemini-1.5-flash',
+      'gemini-2.0-flash',
+      'gemini-2.5-flash',
       'llama-3.3-70b-versatile',
       'llama-3.1-8b-instant'
     ];

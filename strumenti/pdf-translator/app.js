@@ -145,15 +145,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  btnPopupSave.addEventListener('click', () => {
+  btnPopupSave.addEventListener('click', async () => {
     const key = popupGeminiKey.value.trim();
     if (key) {
       AIService.setKeys(key, undefined);
       loadSettings();
-      closeApiPopup();
-      showToast('Chiave collegata con successo', 'success');
+      btnPopupSave.disabled = true;
+      btnPopupSave.textContent = 'Verifica...';
+      const res = await AIService.testConnection();
+      btnPopupSave.disabled = false;
+      btnPopupSave.textContent = 'Salva';
+      if (res.ok) {
+        closeApiPopup();
+        showToast(`Connesso con successo: ${res.model}`, 'success');
+      } else {
+        showToast(`Verifica fallita: ${res.error}`, 'error', 7000);
+      }
     } else {
-      showToast('Inserisci una chiave valida', 'error');
+      showToast('Inserisci prima la tua chiave API', 'error');
     }
   });
 
@@ -472,18 +481,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnTestGemini.addEventListener('click', async () => {
     btnTestGemini.textContent = '...';
-    AIService.setKeys(inputGeminiKey.value, undefined);
-    const res = await AIService.testConnection('gemini-2.5-flash');
+    const key = inputGeminiKey.value.trim() || AIService.getKeys().gemini;
+    if (key) AIService.setKeys(key, undefined);
+    const res = await AIService.testConnection('gemini-1.5-flash');
     btnTestGemini.textContent = 'Verifica';
-    showToast(res.ok ? 'Connessione riuscita' : 'Test fallito', res.ok ? 'success' : 'error');
+    if (res.ok) {
+      showToast(`Connesso a ${res.model}`, 'success');
+    } else {
+      showToast(`Errore: ${res.error}`, 'error', 7000);
+    }
   });
 
   btnTestGroq.addEventListener('click', async () => {
     btnTestGroq.textContent = '...';
-    AIService.setKeys(undefined, inputGroqKey.value);
+    const key = inputGroqKey.value.trim() || AIService.getKeys().groq;
+    if (key) AIService.setKeys(undefined, key);
     const res = await AIService.testConnection('llama-3.3-70b-versatile');
     btnTestGroq.textContent = 'Verifica';
-    showToast(res.ok ? 'Connessione riuscita' : 'Test fallito', res.ok ? 'success' : 'error');
+    if (res.ok) {
+      showToast(`Connesso a ${res.model}`, 'success');
+    } else {
+      showToast(`Errore: ${res.error}`, 'error', 7000);
+    }
   });
 
   selectModel.addEventListener('change', () => {
