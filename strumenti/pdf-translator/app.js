@@ -148,7 +148,13 @@ document.addEventListener('DOMContentLoaded', () => {
   btnPopupSave.addEventListener('click', async () => {
     const key = popupGeminiKey.value.trim();
     if (key) {
-      AIService.setKeys(key, undefined);
+      if (key.startsWith('AIzaSy')) {
+        AIService.setKeys(key, undefined);
+        AIService.setActiveModel('gemini-1.5-flash');
+      } else {
+        AIService.setKeys(undefined, key);
+        AIService.setActiveModel('llama-3.3-70b-versatile');
+      }
       loadSettings();
       btnPopupSave.disabled = true;
       btnPopupSave.textContent = 'Verifica...';
@@ -159,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         closeApiPopup();
         showToast(`Connesso con successo: ${res.model}`, 'success');
       } else {
-        showToast(`Verifica fallita: ${res.error}`, 'error', 7000);
+        showToast(`Verifica: ${res.error}`, 'error', 7000);
       }
     } else {
       showToast('Inserisci prima la tua chiave API', 'error');
@@ -456,9 +462,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnCopyMagicLink.addEventListener('click', async () => {
-    const link = AIService.generateMagicLink('gemini');
+    const link = AIService.generateMagicLink('groq') || AIService.generateMagicLink('gemini');
     if (!link) {
-      showToast('Inserisci prima una chiave Gemini', 'error');
+      showToast('Inserisci prima una chiave API', 'error');
       return;
     }
     try {
@@ -533,7 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const keys = AIService.getKeys();
     inputGeminiKey.value = keys.gemini;
     inputGroqKey.value = keys.groq;
-    popupGeminiKey.value = keys.gemini;
+    popupGeminiKey.value = keys.groq || keys.gemini;
 
     const currentModel = AIService.getActiveModel();
     selectModel.value = currentModel.id;

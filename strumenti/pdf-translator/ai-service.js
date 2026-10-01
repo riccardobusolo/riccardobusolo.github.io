@@ -5,57 +5,37 @@
  */
 
 const AIService = (() => {
-  // Catalogo modelli disponibili
+  // Catalogo modelli disponibili (Groq Llama 3.3 70B è il candidato principale n.1 gratuito al mondo)
   const MODELS = {
-    'gemini-1.5-flash': {
-      id: 'gemini-1.5-flash',
-      name: 'Gemini 1.5 Flash',
-      provider: 'gemini',
-      quality: 5,
-      qualityLabel: '⭐⭐⭐⭐⭐ 5/5',
-      maxRPM: 15,
-      maxRPD: 1500,
-      description: 'Modello gratuito ufficiale di Google AI Studio (15 richieste/min).'
-    },
-    'gemini-2.0-flash': {
-      id: 'gemini-2.0-flash',
-      name: 'Gemini 2.0 Flash',
-      provider: 'gemini',
-      quality: 5,
-      qualityLabel: '⭐⭐⭐⭐⭐ 5/5',
-      maxRPM: 15,
-      maxRPD: 1500,
-      description: 'Nuova generazione Gemini ad altissima velocità.'
-    },
-    'gemini-2.5-flash': {
-      id: 'gemini-2.5-flash',
-      name: 'Gemini 2.5 Flash',
-      provider: 'gemini',
-      quality: 5,
-      qualityLabel: '⭐⭐⭐⭐⭐ 5/5',
-      maxRPM: 15,
-      maxRPD: 1500,
-      description: 'Modello avanzato con reasoning integrato.'
-    },
     'llama-3.3-70b-versatile': {
       id: 'llama-3.3-70b-versatile',
       name: 'Llama 3.3 70B (Groq)',
       provider: 'groq',
-      quality: 4.8,
-      qualityLabel: '⭐⭐⭐⭐⭐ 4.8/5',
+      quality: 5,
+      qualityLabel: '⭐⭐⭐⭐⭐ 5/5',
       maxRPM: 30,
       maxRPD: 1000,
-      description: 'Capacità linguistiche elevate su hardware ultra-veloce Groq (30 RPM).'
+      description: 'Miglior modello gratuito al mondo per traduzione (Meta Llama 3.3 70B).'
     },
     'llama-3.1-8b-instant': {
       id: 'llama-3.1-8b-instant',
       name: 'Llama 3.1 8B (Groq)',
       provider: 'groq',
-      quality: 4.0,
-      qualityLabel: '⭐⭐⭐⭐ 4/5',
+      quality: 4.2,
+      qualityLabel: '⭐⭐⭐⭐ 4.2/5',
       maxRPM: 30,
       maxRPD: 14400,
-      description: 'Estremamente scattante per testi standard.'
+      description: 'Versione ultra-rapida di riserva.'
+    },
+    'gemini-1.5-flash': {
+      id: 'gemini-1.5-flash',
+      name: 'Gemini 1.5 Flash',
+      provider: 'gemini',
+      quality: 4.8,
+      qualityLabel: '⭐⭐⭐⭐⭐ 4.8/5',
+      maxRPM: 15,
+      maxRPD: 1500,
+      description: 'Google AI Studio (richiede abilitazione progetto).'
     }
   };
 
@@ -65,7 +45,7 @@ const AIService = (() => {
     groq: []
   };
 
-  let activeModel = localStorage.getItem('docushift_active_model') || 'gemini-1.5-flash';
+  let activeModel = localStorage.getItem('docushift_active_model') || 'llama-3.3-70b-versatile';
   let autoFallbackEnabled = localStorage.getItem('docushift_auto_fallback') !== 'false';
 
   // Inizializzazione automatizzata: Magic Link (#key=... o #gemini_key=...)
@@ -143,7 +123,7 @@ const AIService = (() => {
   }
 
   function getActiveModel() {
-    return MODELS[activeModel] || MODELS['gemini-1.5-flash'];
+    return MODELS[activeModel] || MODELS['llama-3.3-70b-versatile'];
   }
 
   function setActiveModel(modelId) {
@@ -193,12 +173,12 @@ const AIService = (() => {
     };
   }
 
-  // Generatore di Magic Link
-  function generateMagicLink(provider = 'gemini') {
+  // Generatore di Magic Link (default: Groq)
+  function generateMagicLink(provider = 'groq') {
     const keys = getKeys();
-    const key = provider === 'gemini' ? keys.gemini : keys.groq;
+    const key = provider === 'groq' ? keys.groq : keys.gemini;
     if (!key) return null;
-    const param = provider === 'gemini' ? 'gemini_key' : 'groq_key';
+    const param = provider === 'groq' ? 'groq_key' : 'gemini_key';
     const baseUrl = window.location.origin + window.location.pathname;
     return `${baseUrl}#${param}=${encodeURIComponent(key)}`;
   }
@@ -341,6 +321,25 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
           const data = await resp.json();
           return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Rilevamento automatico';
         }
+      } else {
+        recordRequest('groq');
+        const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`
+          },
+          body: JSON.stringify({
+            model: current.id,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0,
+            max_tokens: 15
+          })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          return data.choices?.[0]?.message?.content?.trim() || 'Rilevamento automatico';
+        }
       }
     } catch (e) {
       console.warn('Errore auto-detect lingua:', e);
@@ -354,11 +353,9 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
 
     let currentModelId = activeModel;
     const modelOrder = [
-      'gemini-1.5-flash',
-      'gemini-2.0-flash',
-      'gemini-2.5-flash',
       'llama-3.3-70b-versatile',
-      'llama-3.1-8b-instant'
+      'llama-3.1-8b-instant',
+      'gemini-1.5-flash'
     ];
 
     // Seleziona la lista di fallback partendo dal modello attuale
@@ -417,12 +414,14 @@ Il testo tradotto andrà inserito in riquadri grafici PDF a dimensione fissa.
 È FONDAMENTALE che la traduzione in ${targetLang} sia CONCISA e NON superi la lunghezza dell'originale se non strettamente necessario, per evitare sovrapposizioni visive con immagini o bordi.${glossaryInstruction}
 
 Riceverai un array JSON di oggetti con "id" e "text".
-DEVI restituire ESCLUSIVAMENTE un array JSON valido con lo stesso identico numero di elementi e gli stessi "id", con il campo "translated" contenente la traduzione.
+DEVI restituire ESCLUSIVAMENTE un oggetto JSON valido contenente la chiave "translations" con la lista degli oggetti tradotti.
 Esempio output:
-[
-  {"id": 1, "translated": "Testo tradotto..."},
-  {"id": 2, "translated": "Altro testo..."}
-]`;
+{
+  "translations": [
+    {"id": 1, "translated": "Testo tradotto..."},
+    {"id": 2, "translated": "Altro testo..."}
+  ]
+}`;
 
     const payload = items.map(it => ({ id: it.id, text: it.text }));
 
