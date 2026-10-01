@@ -20,7 +20,7 @@ const PDFEngine = (() => {
   // Configura il worker di PDF.js (locale ad alte prestazioni con fallback CDN)
   if (typeof pdfjsLib !== 'undefined') {
     try {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js?v=3.6';
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js?v=3.7';
     } catch (e) {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
@@ -51,7 +51,18 @@ const PDFEngine = (() => {
 
   // Estrae pagine, dimensioni e blocchi di testo con coordinate
   async function parsePDF(pdfArrayBuffer) {
-    const loadingTask = pdfjsLib.getDocument({ data: pdfArrayBuffer });
+    // Clona sempre il buffer prima di passarlo a PDF.js: i Web Worker infatti
+    // scollegano (detach) la memoria dell'ArrayBuffer trasferito rendendola inutilizzabile
+    let bufferCopy;
+    if (pdfArrayBuffer instanceof Uint8Array) {
+      bufferCopy = pdfArrayBuffer.slice();
+    } else if (pdfArrayBuffer && pdfArrayBuffer.slice) {
+      bufferCopy = new Uint8Array(pdfArrayBuffer.slice(0));
+    } else {
+      bufferCopy = new Uint8Array(pdfArrayBuffer);
+    }
+
+    const loadingTask = pdfjsLib.getDocument({ data: bufferCopy });
     const pdfDoc = await loadingTask.promise;
     const numPages = pdfDoc.numPages;
     const pagesData = [];
@@ -186,7 +197,7 @@ const PDFEngine = (() => {
     if (existing) return existing;
 
     const sourceUrls = [
-      'pdf-lib.min.js?v=3.6',
+      'pdf-lib.min.js?v=3.7',
       'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',
       'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js',
       'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js'
@@ -227,7 +238,7 @@ const PDFEngine = (() => {
     if (existing) return existing;
 
     const sourceUrls = [
-      'fontkit.umd.min.js?v=3.6',
+      'fontkit.umd.min.js?v=3.7',
       'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js',
       'https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js'
     ];
@@ -259,8 +270,18 @@ const PDFEngine = (() => {
     const pdfLibInstance = await ensurePDFLibLoaded();
     const { PDFDocument, rgb, StandardFonts } = pdfLibInstance;
 
+    // Assicura che l'ArrayBuffer sia integro, valido e mai scollegato (non-detached)
+    let safeBytes;
+    if (originalPdfBytes instanceof Uint8Array) {
+      safeBytes = originalPdfBytes.slice();
+    } else if (originalPdfBytes && originalPdfBytes.slice) {
+      safeBytes = new Uint8Array(originalPdfBytes.slice(0));
+    } else {
+      safeBytes = new Uint8Array(originalPdfBytes);
+    }
+
     // Carica il PDF originale per mantenere vettori, immagini e layer
-    const pdfDoc = await PDFDocument.load(originalPdfBytes);
+    const pdfDoc = await PDFDocument.load(safeBytes);
 
     // Registra fontkit per supportare TrueType scaricati da Google Fonts
     const fkInstance = await ensureFontkitLoaded();
@@ -361,8 +382,18 @@ const PDFEngine = (() => {
 
   // Renderizza una pagina specifica su un elemento <canvas> HTML per l'anteprima
   async function renderPageToCanvas(pdfData, pageNum, canvasEl, targetScale = 1.3) {
-    if (!canvasEl) return;
-    const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+    if (!canvasEl || !pdfData) return;
+    // Clona sempre i dati prima di inviarli al worker di PDF.js per non detachare l'ArrayBuffer
+    let safeData;
+    if (pdfData instanceof Uint8Array) {
+      safeData = pdfData.slice();
+    } else if (pdfData && pdfData.slice) {
+      safeData = new Uint8Array(pdfData.slice(0));
+    } else {
+      safeData = new Uint8Array(pdfData);
+    }
+
+    const loadingTask = pdfjsLib.getDocument({ data: safeData });
     const pdfDoc = await loadingTask.promise;
     const page = await pdfDoc.getPage(pageNum);
 

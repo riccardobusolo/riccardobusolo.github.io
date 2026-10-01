@@ -5,7 +5,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('[DocuShift v3.6] Initialized - PDFLib ready:', typeof window.PDFLib !== 'undefined', 'fontkit ready:', typeof window.fontkit !== 'undefined');
+  console.log('[DocuShift v3.7] Initialized - PDFLib ready:', typeof window.PDFLib !== 'undefined', 'fontkit ready:', typeof window.fontkit !== 'undefined');
 
   // Theme Toggle
   const btnThemeToggle = document.getElementById('btn-theme-toggle');
@@ -219,7 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       originalPdfBytes = await file.arrayBuffer();
-      parsedPdfData = await PDFEngine.parsePDF(originalPdfBytes);
+      // Passa una copia clonata per non rischiare di scollegare (detach) originalPdfBytes
+      parsedPdfData = await PDFEngine.parsePDF(originalPdfBytes.slice(0));
       totalPages = parsedPdfData.numPages;
       fileInfoMeta.textContent = `${sizeKB} KB • ${totalPages} ${totalPages === 1 ? 'pagina' : 'pagine'}`;
       btnTranslate.disabled = false;
@@ -355,8 +356,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const minFontScale = parseInt(rangeFontScale.value, 10) / 100;
 
       updateProgress(92, '4. Compilazione del nuovo file PDF', `Inserimento testi tradotti e composizione vettoriale (${totalPages} pagine)...`, 4);
+      
+      // Assicura un buffer fresco e mai scollegato (non-detached) rileggendolo direttamente dal file caricato
+      let compileBytes = null;
+      if (currentFile) {
+        try {
+          compileBytes = await currentFile.arrayBuffer();
+        } catch (readErr) {
+          console.warn('[DocuShift] Rilettura file non riuscita:', readErr);
+        }
+      }
+      if (!compileBytes || compileBytes.byteLength === 0) {
+        compileBytes = (originalPdfBytes && originalPdfBytes.byteLength > 0) ? originalPdfBytes.slice(0) : null;
+      }
+      if (!compileBytes) {
+        throw new Error('Buffer del documento originale non disponibile o scollegato. Ricarica il file PDF.');
+      }
+
       translatedPdfBytes = await PDFEngine.buildTranslatedPDF(
-        originalPdfBytes,
+        compileBytes,
         parsedPdfData.pages,
         translationsMap,
         { minFontScale }
@@ -429,14 +447,21 @@ document.addEventListener('DOMContentLoaded', () => {
     btnNextPage.disabled = (currentPage >= totalPages);
 
     try {
-      if (originalPdfBytes) {
-        await PDFEngine.renderPageToCanvas(originalPdfBytes, currentPage, canvasOriginal, currentZoom);
+      let origToRender = null;
+      if (currentFile) {
+        try { origToRender = await currentFile.arrayBuffer(); } catch (e) {}
       }
-      if (translatedPdfBytes) {
-        await PDFEngine.renderPageToCanvas(translatedPdfBytes, currentPage, canvasTranslated, currentZoom);
+      if (!origToRender && originalPdfBytes && originalPdfBytes.byteLength > 0) {
+        origToRender = originalPdfBytes.slice(0);
+      }
+      if (origToRender) {
+        await PDFEngine.renderPageToCanvas(origToRender, currentPage, canvasOriginal, currentZoom);
+      }
+      if (translatedPdfBytes && translatedPdfBytes.byteLength > 0) {
+        await PDFEngine.renderPageToCanvas(translatedPdfBytes.slice(0), currentPage, canvasTranslated, currentZoom);
       }
     } catch (e) {
-      console.warn(e);
+      console.warn('[DocuShift Viewer] Errore rendering anteprima:', e);
     }
   }
 
