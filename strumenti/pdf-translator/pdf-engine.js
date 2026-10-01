@@ -17,9 +17,13 @@ const PDFEngine = (() => {
 
   let cachedFontBuffers = {};
 
-  // Configura il worker di PDF.js
+  // Configura il worker di PDF.js (locale ad alte prestazioni con fallback CDN)
   if (typeof pdfjsLib !== 'undefined') {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    try {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js?v=3.6';
+    } catch (e) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
   }
 
   // Scarica il font in un buffer temporaneo in RAM
@@ -169,69 +173,85 @@ const PDFEngine = (() => {
     return groups;
   }
 
-  // Assicura il caricamento dinamico e resiliente di PDFLib con fallback tra CDN
+  // Assicura il caricamento dinamico e ultra-resiliente di PDFLib (locale con fallback CDN)
   async function ensurePDFLibLoaded() {
-    if (typeof window !== 'undefined' && window.PDFLib) {
-      return window.PDFLib;
-    }
+    const getLib = () => {
+      if (typeof window !== 'undefined' && window.PDFLib) return window.PDFLib;
+      if (typeof PDFLib !== 'undefined') return PDFLib;
+      if (typeof globalThis !== 'undefined' && globalThis.PDFLib) return globalThis.PDFLib;
+      return null;
+    };
 
-    const cdnUrls = [
+    const existing = getLib();
+    if (existing) return existing;
+
+    const sourceUrls = [
+      'pdf-lib.min.js?v=3.6',
       'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',
       'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js',
       'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js'
     ];
 
-    for (const url of cdnUrls) {
+    for (const url of sourceUrls) {
       try {
         await new Promise((resolve, reject) => {
           const s = document.createElement('script');
           s.src = url;
-          s.crossOrigin = 'anonymous';
+          if (url.startsWith('http')) {
+            s.crossOrigin = 'anonymous';
+          }
           s.onload = () => resolve();
-          s.onerror = () => reject(new Error(`Failed to load ${url}`));
+          s.onerror = (e) => reject(e || new Error(`Failed to load ${url}`));
           document.head.appendChild(s);
         });
-        if (typeof window !== 'undefined' && window.PDFLib) {
-          return window.PDFLib;
-        }
+        const lib = getLib();
+        if (lib) return lib;
       } catch (err) {
-        console.warn(`[DocuShift PDFEngine] Fallback CDN per PDFLib da ${url}:`, err);
+        console.warn(`[DocuShift PDFEngine] Fallback per PDFLib da ${url}:`, err);
       }
     }
 
     throw new Error('Impossibile caricare la libreria di compilazione PDF (PDFLib). Verifica la connessione a Internet o eventuali blocchi estensioni.');
   }
 
-  // Assicura il caricamento resiliente di fontkit con fallback tra CDN
+  // Assicura il caricamento resiliente di fontkit (locale con fallback CDN)
   async function ensureFontkitLoaded() {
-    if (typeof window !== 'undefined' && window.fontkit) {
-      return window.fontkit;
-    }
+    const getFk = () => {
+      if (typeof window !== 'undefined' && window.fontkit) return window.fontkit;
+      if (typeof fontkit !== 'undefined') return fontkit;
+      if (typeof globalThis !== 'undefined' && globalThis.fontkit) return globalThis.fontkit;
+      return null;
+    };
 
-    const cdnUrls = [
+    const existing = getFk();
+    if (existing) return existing;
+
+    const sourceUrls = [
+      'fontkit.umd.min.js?v=3.6',
       'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js',
       'https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js'
     ];
 
-    for (const url of cdnUrls) {
+    for (const url of sourceUrls) {
       try {
         await new Promise((resolve, reject) => {
           const s = document.createElement('script');
           s.src = url;
-          s.crossOrigin = 'anonymous';
+          if (url.startsWith('http')) {
+            s.crossOrigin = 'anonymous';
+          }
           s.onload = () => resolve();
-          s.onerror = () => reject(new Error(`Failed to load ${url}`));
+          s.onerror = (e) => reject(e || new Error(`Failed to load ${url}`));
           document.head.appendChild(s);
         });
-        if (typeof window !== 'undefined' && window.fontkit) {
-          return window.fontkit;
-        }
+        const fk = getFk();
+        if (fk) return fk;
       } catch (err) {
-        console.warn(`[DocuShift PDFEngine] Fallback CDN per fontkit da ${url}:`, err);
+        console.warn(`[DocuShift PDFEngine] Fallback per fontkit da ${url}:`, err);
       }
     }
 
-    return (typeof window !== 'undefined' && window.fontkit) ? window.fontkit : null;
+    return getFk();
   }
 
   // Costruisce il nuovo documento PDF tradotto preservando immagini e grafica originale

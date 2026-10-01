@@ -5,6 +5,8 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('[DocuShift v3.6] Initialized - PDFLib ready:', typeof window.PDFLib !== 'undefined', 'fontkit ready:', typeof window.fontkit !== 'undefined');
+
   // Theme Toggle
   const btnThemeToggle = document.getElementById('btn-theme-toggle');
   let currentTheme = localStorage.getItem('docushift_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
