@@ -69,14 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnClipboardDetect = document.getElementById('btn-clipboard-detect');
   const btnCopyMagicLink = document.getElementById('btn-copy-magic-link');
   const inputGeminiKey = document.getElementById('input-gemini-key');
-  const inputGroqKey = document.getElementById('input-groq-key');
   const btnTestGemini = document.getElementById('btn-test-gemini');
-  const btnTestGroq = document.getElementById('btn-test-groq');
-  const selectModel = document.getElementById('select-model');
   const modelStatusQuality = document.getElementById('model-status-quality');
   const quotaCountdownText = document.getElementById('quota-countdown-text');
   const quotaBarFill = document.getElementById('quota-bar-fill');
-  const checkAutoFallback = document.getElementById('check-auto-fallback');
 
   const btnAddGlossaryRow = document.getElementById('btn-add-glossary-row');
   const btnExportCsv = document.getElementById('btn-export-csv');
@@ -108,10 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGlossary();
   startQuotaMonitoring();
 
-  // Controllo startup: se non ci sono API, mostra popup centrale dopo 600ms
+  // Controllo startup: se non c'è API key, mostra popup centrale dopo 600ms
   setTimeout(() => {
-    const keys = AIService.getKeys();
-    if (!keys.gemini && !keys.groq) {
+    const key = AIService.getKey();
+    if (!key) {
       openApiPopup();
     }
   }, 600);
@@ -148,13 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnPopupSave.addEventListener('click', async () => {
     const key = popupGeminiKey.value.trim();
     if (key) {
-      if (key.startsWith('AIzaSy')) {
-        AIService.setKeys(key, undefined);
-        AIService.setActiveModel('gemini-1.5-flash');
-      } else {
-        AIService.setKeys(undefined, key);
-        AIService.setActiveModel('llama-3.3-70b-versatile');
-      }
+      AIService.setKey(key);
       loadSettings();
       btnPopupSave.disabled = true;
       btnPopupSave.textContent = 'Verifica...';
@@ -163,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnPopupSave.textContent = 'Salva';
       if (res.ok) {
         closeApiPopup();
-        showToast(`Connesso con successo: ${res.model}`, 'success');
+        showToast(`Connesso a ${res.model}`, 'success');
       } else {
         showToast(`Verifica: ${res.error}`, 'error', 7000);
       }
@@ -242,8 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Se non ci sono API, ricorda di inserirle
-      const keys = AIService.getKeys();
-      if (!keys.gemini && !keys.groq) {
+      if (!AIService.getKey()) {
         openApiPopup();
       }
     } catch (err) {
@@ -273,8 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnTranslate.addEventListener('click', async () => {
     if (!originalPdfBytes || !parsedPdfData) return;
 
-    const keys = AIService.getKeys();
-    if (!keys.gemini && !keys.groq) {
+    if (!AIService.getKey()) {
       openApiPopup();
       return;
     }
@@ -305,9 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const percent = 35 + Math.round((batchIndex / totalBatches) * 35);
         updateProgress(percent, `Traduzione (${batchIndex}/${totalBatches})...`, 2);
 
-        const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules, (fallbackModel) => {
-          showToast(`Fallback su ${fallbackModel.name}`, 'info');
-        });
+        const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules);
 
         translatedBatch.forEach(item => {
           if (item && item.id) {
@@ -462,9 +448,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnCopyMagicLink.addEventListener('click', async () => {
-    const link = AIService.generateMagicLink('groq') || AIService.generateMagicLink('gemini');
+    const link = AIService.generateMagicLink();
     if (!link) {
-      showToast('Inserisci prima una chiave API', 'error');
+      showToast('Inserisci prima la tua API Key Gemini', 'error');
       return;
     }
     try {
@@ -476,24 +462,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   inputGeminiKey.addEventListener('change', () => {
-    AIService.setKeys(inputGeminiKey.value, undefined);
-    showToast('Salvato', 'info');
-  });
-
-  inputGroqKey.addEventListener('change', () => {
-    AIService.setKeys(undefined, inputGroqKey.value);
-    showToast('Salvato', 'info');
+    AIService.setKey(inputGeminiKey.value);
+    showToast('API Key salvata', 'info');
   });
 
   btnTestGemini.addEventListener('click', async () => {
     btnTestGemini.textContent = '...';
-    const key = inputGeminiKey.value.trim() || AIService.getKeys().gemini;
-    if (key) AIService.setKeys(key, undefined);
+    const key = inputGeminiKey.value.trim() || AIService.getKey();
+    if (key) AIService.setKey(key);
     
-    const selectedModelId = selectModel.value;
-    const testModelId = selectedModelId.startsWith('gemini') ? selectedModelId : 'gemini-1.5-flash';
-    
-    const res = await AIService.testConnection(testModelId);
+    const res = await AIService.testConnection();
     btnTestGemini.textContent = 'Verifica';
     if (res.ok) {
       showToast(`Connesso a ${res.model}`, 'success');
@@ -502,49 +480,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  btnTestGroq.addEventListener('click', async () => {
-    btnTestGroq.textContent = '...';
-    const key = inputGroqKey.value.trim() || AIService.getKeys().groq;
-    if (key) AIService.setKeys(undefined, key);
-    
-    const selectedModelId = selectModel.value;
-    const testModelId = selectedModelId.startsWith('llama') ? selectedModelId : 'llama-3.3-70b-versatile';
-
-    const res = await AIService.testConnection(testModelId);
-    btnTestGroq.textContent = 'Verifica';
-    if (res.ok) {
-      showToast(`Connesso a ${res.model}`, 'success');
-    } else {
-      showToast(`Errore: ${res.error}`, 'error', 7000);
-    }
-  });
-
-  selectModel.addEventListener('change', () => {
-    AIService.setActiveModel(selectModel.value);
-    updateModelStatusCard();
-    const model = AIService.getActiveModel();
-    showToast(`Modello attivo: ${model.name}`, 'info');
-  });
-
-  checkAutoFallback.addEventListener('change', () => {
-    AIService.setAutoFallback(checkAutoFallback.checked);
-  });
-
   rangeFontScale.addEventListener('input', () => {
     fontScaleVal.textContent = `${rangeFontScale.value}%`;
     localStorage.setItem('docushift_min_font_scale', rangeFontScale.value);
   });
 
   function loadSettings() {
-    const keys = AIService.getKeys();
-    inputGeminiKey.value = keys.gemini;
-    inputGroqKey.value = keys.groq;
-    popupGeminiKey.value = keys.groq || keys.gemini;
-
-    const currentModel = AIService.getActiveModel();
-    selectModel.value = currentModel.id;
-
-    checkAutoFallback.checked = AIService.getAutoFallback();
+    const key = AIService.getKey();
+    if (inputGeminiKey) inputGeminiKey.value = key;
+    if (popupGeminiKey) popupGeminiKey.value = key;
 
     const savedFontScale = localStorage.getItem('docushift_min_font_scale') || '70';
     rangeFontScale.value = savedFontScale;
