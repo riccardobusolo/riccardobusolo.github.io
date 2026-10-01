@@ -5,3 +5,10 @@
 # exceeds GitHub's 100MB limit) and personal character backups. Kept local only.
 # NB: the previous pattern moon/risorse/*.pdf did NOT match PDFs in subfolders.
 moon/risorse/
+
+# Local API Keys and environment files
+*.local.js
+config.local.js
+keys.json
+.env*
+
