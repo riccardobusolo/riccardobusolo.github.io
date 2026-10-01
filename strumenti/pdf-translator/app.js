@@ -285,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    AIService.resetWorkingModel();
     const targetLang = targetLangSelect.value;
     btnTranslate.disabled = true;
     if (progressErrorBox) progressErrorBox.style.display = 'none';
@@ -311,25 +312,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const batch = allBlocks.slice(i, i + batchSize);
         const batchIndex = Math.floor(i / batchSize) + 1;
         const percent = 25 + Math.round((batchIndex / totalBatches) * 55);
+        const currentModelName = AIService.getActiveModel().name;
 
         updateProgress(
           percent,
-          `2. Traduzione con Gemini 3.8 Flash`,
+          `2. Traduzione con ${currentModelName}`,
           `Traduzione blocco ${batchIndex} di ${totalBatches} (${batch.length} frasi verso ${targetLang})...`,
           2
         );
 
-        // Notifica in tempo reale se Google Gemini risponde con 503 (picco di traffico) e riprova
-        const onRetry = (attempt, maxRetries, delay) => {
-          updateProgress(
-            percent,
-            `Attesa risposta server Google...`,
-            `Picco momentaneo di traffico AI (503). Nuovo tentativo automatico ${attempt}/${maxRetries} tra ${(delay / 1000).toFixed(1)}s...`,
-            2
-          );
+        // Notifica in tempo reale se Google Gemini risponde con 503 (picco di traffico) o fallback
+        const onStatus = (info) => {
+          if (info.status === 'switching') {
+            updateProgress(
+              percent,
+              `Ottimizzazione automatica...`,
+              info.message,
+              2
+            );
+          } else if (info.status === 'retry') {
+            updateProgress(
+              percent,
+              `Attesa risposta server Google...`,
+              info.message,
+              2
+            );
+          }
         };
 
-        const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules, onRetry);
+        const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules, onStatus);
 
         translatedBatch.forEach(item => {
           if (item && item.id) {

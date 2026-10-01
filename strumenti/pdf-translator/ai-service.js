@@ -6,8 +6,12 @@
  */
 
 const AIService = (() => {
-  const MODEL_ID = 'gemini-3.8-flash';
-  const MODEL_NAME = 'Gemini 3.8 Flash';
+  const CANDIDATE_MODELS = [
+    { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash' },
+    { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' }
+  ];
+  let currentWorkingModelIndex = 0;
   const MAX_RPM = 15;
 
   // Cronologia chiamate per calcolo rate limit scorrevole
@@ -71,12 +75,17 @@ const AIService = (() => {
   }
 
   function getActiveModel() {
+    const current = CANDIDATE_MODELS[currentWorkingModelIndex] || CANDIDATE_MODELS[0];
     return {
-      id: MODEL_ID,
-      name: MODEL_NAME,
+      id: current.id,
+      name: current.name,
       provider: 'gemini',
       qualityLabel: '⭐⭐⭐⭐⭐ 5/5'
     };
+  }
+
+  function resetWorkingModel() {
+    currentWorkingModelIndex = 0;
   }
 
   function recordRequest() {
@@ -150,52 +159,98 @@ const AIService = (() => {
     }
   }
 
-  // Chiamata con retry automatico ed exponential backoff per gestire picchi di traffico (503 / 429)
-  async function fetchGeminiWithRetry(url, options, maxRetries = 3, onRetry = null) {
-    let attempt = 0;
-    let delay = 1500;
+  // Chiamata API resiliente: prova Gemini 3.8 Flash e se Google restituisce 503 (High Demand),
+  // passa automaticamente a Gemini 2.5 Flash / 2.0 Flash usando la stessa identica API Key
+  async function callGeminiApi(payload, onStatus = null) {
+    const key = getKey();
+    if (!key) {
+      throw new Error('Nessuna API Key configurata. Inserisci prima la tua chiave Gemini nelle Impostazioni.');
+    }
 
-    while (true) {
-      attempt++;
-      try {
-        const resp = await fetch(url, options);
+    recordRequest();
+    let lastError = null;
 
-        if ((resp.status === 503 || resp.status === 429) && attempt <= maxRetries) {
-          if (onRetry) onRetry(attempt, maxRetries, delay, resp.status);
-          console.warn(`[DocuShift AI] Gemini temporaneamente occupato (HTTP ${resp.status}). Tentativo ${attempt}/${maxRetries} tra ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-          delay *= 2;
-          continue;
-        }
+    for (let mIdx = currentWorkingModelIndex; mIdx < CANDIDATE_MODELS.length; mIdx++) {
+      const model = CANDIDATE_MODELS[mIdx];
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent?key=${key}`;
+      const maxAttempts = (mIdx === 0 ? 2 : 2);
+      let delay = 1200;
 
-        const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) {
-          const errorMsg = data.error?.message || `Errore Google API (${resp.status})`;
-          if (attempt <= maxRetries && (errorMsg.includes('high demand') || errorMsg.includes('Resource has been exhausted') || errorMsg.includes('overloaded'))) {
-            if (onRetry) onRetry(attempt, maxRetries, delay, 503);
-            console.warn(`[DocuShift AI] Gemini picco di traffico: ${errorMsg}. Tentativo ${attempt}/${maxRetries} tra ${delay}ms...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
-            delay *= 2;
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          const resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          // Se 503 (High demand) o 429
+          if (resp.status === 503 || resp.status === 429) {
+            const isLastAttempt = (attempt === maxAttempts);
+            const hasNextModel = (mIdx + 1 < CANDIDATE_MODELS.length);
+
+            if (isLastAttempt && hasNextModel) {
+              const nextModel = CANDIDATE_MODELS[mIdx + 1];
+              console.warn(`[DocuShift AI] ${model.name} saturo (503). Switch automatico su ${nextModel.name}...`);
+              if (onStatus) {
+                onStatus({
+                  status: 'switching',
+                  message: `Picco su ${model.name} (503). Risolvo passando a ${nextModel.name}...`
+                });
+              }
+              currentWorkingModelIndex = mIdx + 1;
+              break;
+            }
+
+            if (onStatus) {
+              onStatus({
+                status: 'retry',
+                message: `Server Google occupati (503). Tentativo ${attempt}/${maxAttempts} tra ${(delay / 1000).toFixed(1)}s...`
+              });
+            }
+            await new Promise(r => setTimeout(r, delay));
+            delay *= 1.8;
             continue;
           }
-          throw new Error(errorMsg);
-        }
 
-        return data;
-      } catch (err) {
-        if (attempt <= maxRetries && (err.message?.includes('high demand') || err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError'))) {
-          if (onRetry) onRetry(attempt, maxRetries, delay, 0);
-          console.warn(`[DocuShift AI] Errore temporaneo: ${err.message}. Tentativo ${attempt}/${maxRetries} tra ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-          delay *= 2;
-          continue;
+          const data = await resp.json().catch(() => ({}));
+          if (!resp.ok) {
+            const errMsg = data.error?.message || `Errore Google API (${resp.status})`;
+            if (errMsg.includes('high demand') || errMsg.includes('overloaded') || errMsg.includes('Resource has been exhausted')) {
+              if (mIdx + 1 < CANDIDATE_MODELS.length) {
+                const nextModel = CANDIDATE_MODELS[mIdx + 1];
+                if (onStatus) {
+                  onStatus({
+                    status: 'switching',
+                    message: `Carico elevato su ${model.name}. Passaggio a ${nextModel.name}...`
+                  });
+                }
+                currentWorkingModelIndex = mIdx + 1;
+                break;
+              }
+            }
+            throw new Error(errMsg);
+          }
+
+          return data;
+
+        } catch (fetchErr) {
+          lastError = fetchErr;
+          if (fetchErr.message?.includes('API key') || fetchErr.message?.includes('PERMISSION_DENIED') || fetchErr.message?.includes('INVALID_ARGUMENT')) {
+            throw fetchErr;
+          }
+          if (attempt < maxAttempts) {
+            await new Promise(r => setTimeout(r, delay));
+            delay *= 1.8;
+          }
         }
-        throw err;
       }
     }
+
+    throw lastError || new Error('Server Gemini temporaneamente saturi. Riprova tra pochi istanti.');
   }
 
-  // Test di connessione per Gemini 3.8 Flash
+  // Test di connessione per la chiave Gemini
   async function testConnection(customKey = null) {
     const key = customKey || getKey();
     if (!key) {
@@ -213,7 +268,7 @@ const AIService = (() => {
         throw new Error(data.error?.message || `API Key non valida o non autorizzata (${resp.status})`);
       }
 
-      return { ok: true, model: MODEL_NAME };
+      return { ok: true, model: getActiveModel().name };
     } catch (e) {
       return { ok: false, error: e.message };
     }
@@ -223,7 +278,7 @@ const AIService = (() => {
   async function translateGlossaryTerm(term, sourceLang = 'auto') {
     const key = getKey();
     if (!key) {
-      throw new Error('Inserisci prima la tua API Key Gemini 3.8 Flash.');
+      throw new Error('Inserisci prima la tua API Key Gemini.');
     }
 
     const prompt = `Traduci il termine "${term}" (lingua sorgente: ${sourceLang}) in italiano (it), inglese (en), spagnolo (es), francese (fr), tedesco (de).
@@ -236,18 +291,12 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
   "de": "Übersetzung"
 }`;
 
-    recordRequest();
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${key}`;
-    const data = await fetchGeminiWithRetry(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.1
-        }
-      })
+    const data = await callGeminiApi({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.1
+      }
     });
 
     const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -264,15 +313,9 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
 "${sampleText.slice(0, 500).replace(/"/g, "'")}"`;
 
     try {
-      recordRequest();
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${key}`;
-      const data = await fetchGeminiWithRetry(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0 }
-        })
+      const data = await callGeminiApi({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0 }
       });
 
       return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Rilevamento automatico';
@@ -283,11 +326,11 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
   }
 
   // Traduzione batch di blocchi PDF
-  async function translateBatch(items, targetLang, glossaryRules = [], onRetry = null) {
+  async function translateBatch(items, targetLang, glossaryRules = [], onStatus = null) {
     if (!items || items.length === 0) return [];
     const key = getKey();
     if (!key) {
-      throw new Error('Nessuna API Key configurata. Inserisci la tua chiave Gemini 3.8 Flash nelle Impostazioni.');
+      throw new Error('Nessuna API Key configurata. Inserisci la tua chiave Gemini nelle Impostazioni.');
     }
 
     let glossaryInstruction = '';
@@ -318,21 +361,16 @@ Esempio output valido:
 
     const payload = items.map(it => ({ id: it.id, text: it.text }));
 
-    recordRequest();
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${key}`;
-    try {
-      const data = await fetchGeminiWithRetry(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: `${systemPrompt}\n\nTraduci i seguenti blocchi:\n${JSON.stringify(payload)}` }] }],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.15
-          }
-        })
-      }, 3, onRetry);
+    const body = {
+      contents: [{ parts: [{ text: `${systemPrompt}\n\nTraduci i seguenti blocchi:\n${JSON.stringify(payload)}` }] }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.15
+      }
+    };
 
+    try {
+      const data = await callGeminiApi(body, onStatus);
       const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!rawText) throw new Error('Nessuna traduzione ricevuta da Gemini');
       const parsed = parseSafeJSON(rawText);
@@ -340,11 +378,9 @@ Esempio output valido:
       return parsed.translations || parsed.items || Object.values(parsed);
     } catch (batchErr) {
       console.error('[DocuShift AI] Errore blocco traduzione:', batchErr);
-      // Se l'errore è dovuto ad API Key non valida o permessi, rilancia l'errore
       if (batchErr.message.includes('API key') || batchErr.message.includes('Resource has been exhausted') || batchErr.message.includes('PERMISSION_DENIED')) {
         throw batchErr;
       }
-      // Altrimenti fallback per non interrompere il documento di 24 pagine
       console.warn('[DocuShift AI] Fallback: mantengo testi originali per questo blocco.');
       return items.map(it => ({ id: it.id, translated: it.text }));
     }
@@ -358,6 +394,7 @@ Esempio output valido:
     getKeys,
     setKeys,
     getActiveModel,
+    resetWorkingModel,
     getQuotaStatus,
     generateMagicLink,
     testConnection,
