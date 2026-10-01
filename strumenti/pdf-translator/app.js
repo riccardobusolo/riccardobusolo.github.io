@@ -34,8 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Elementi Progress Card
   const progressCard = document.getElementById('progress-card');
   const progressTitle = document.getElementById('progress-title');
+  const progressSubtitle = document.getElementById('progress-subtitle');
   const progressPercent = document.getElementById('progress-percent');
   const progressBarFill = document.getElementById('progress-bar-fill');
+  const progressErrorBox = document.getElementById('progress-error-box');
+  const progressErrorText = document.getElementById('progress-error-text');
+  const btnDismissProgressError = document.getElementById('btn-dismiss-progress-error');
   const step1 = document.getElementById('step-1');
   const step2 = document.getElementById('step-2');
   const step3 = document.getElementById('step-3');
@@ -218,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fileInfoMeta.textContent = `${sizeKB} KB • ${totalPages} ${totalPages === 1 ? 'pagina' : 'pagine'}`;
       btnTranslate.disabled = false;
 
-      // Auto-detect lingua
+      // Auto-detect lingua con auto-switch intelligente del target
       const sampleText = parsedPdfData.pages
         .flatMap(p => p.blocks)
         .slice(0, 6)
@@ -228,6 +232,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (sampleText.trim().length > 0) {
         AIService.detectLanguage(sampleText).then(lang => {
           detectedLangText.textContent = lang;
+          // Se la lingua rilevata è Italiano e la destinazione è ancora su Italiano, imposta Inglese
+          if (lang.toLowerCase().includes('ita') && targetLangSelect.value === 'Italiano') {
+            targetLangSelect.value = 'Inglese';
+          } else if (lang.toLowerCase().includes('ing') && targetLangSelect.value === 'Inglese') {
+            targetLangSelect.value = 'Italiano';
+          }
         });
       }
 
@@ -237,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (err) {
       console.error(err);
-      showToast('Errore lettura PDF: ' + err.message, 'error');
+      showToast('Errore lettura PDF: ' + err.message, 'error', 10000);
       resetLoadedFile();
     }
   }
@@ -253,11 +263,19 @@ document.addEventListener('DOMContentLoaded', () => {
     btnTranslate.disabled = true;
     detectedLangText.textContent = 'Auto-detect';
     progressCard.classList.remove('active');
+    if (progressErrorBox) progressErrorBox.style.display = 'none';
     viewerSection.classList.remove('active');
   }
 
+  if (btnDismissProgressError) {
+    btnDismissProgressError.addEventListener('click', () => {
+      progressErrorBox.style.display = 'none';
+      progressCard.classList.remove('active');
+    });
+  }
+
   // =========================================================================
-  // PIPELINE DI TRADUZIONE
+  // PIPELINE DI TRADUZIONE CON STATI ESPLICATIVI E RESILIENZA AGLI ERRORI
   // =========================================================================
   btnTranslate.addEventListener('click', async () => {
     if (!originalPdfBytes || !parsedPdfData) return;
@@ -269,18 +287,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const targetLang = targetLangSelect.value;
     btnTranslate.disabled = true;
+    if (progressErrorBox) progressErrorBox.style.display = 'none';
+    progressBarFill.style.background = 'var(--accent)';
     progressCard.classList.add('active');
     viewerSection.classList.remove('active');
 
-    updateProgress(15, 'Lettura coordinate...', 1);
+    updateProgress(10, '1. Analisi del documento PDF', `Estrazione testo, coordinate e font per ${totalPages} pagine...`, 1);
 
     try {
       const allBlocks = parsedPdfData.pages.flatMap(p => p.blocks);
       if (allBlocks.length === 0) {
-        throw new Error('Nessun testo estraibile rilevato nel documento.');
+        throw new Error('Nessun testo estraibile rilevato nel documento. Se il PDF è una scansione o un\'immagine, è necessario un file con testo vettoriale selezionabile.');
       }
 
-      updateProgress(35, `Traduzione verso ${targetLang}...`, 2);
+      updateProgress(22, 'Preparazione traduzione', `Rilevati ${allBlocks.length} elementi di testo complessivi distribuiti su ${totalPages} pagine.`, 1);
 
       const glossaryRules = GlossaryManager.getRulesForTarget(targetLang);
       const translationsMap = {};
@@ -290,10 +310,26 @@ document.addEventListener('DOMContentLoaded', () => {
       for (let i = 0; i < allBlocks.length; i += batchSize) {
         const batch = allBlocks.slice(i, i + batchSize);
         const batchIndex = Math.floor(i / batchSize) + 1;
-        const percent = 35 + Math.round((batchIndex / totalBatches) * 35);
-        updateProgress(percent, `Traduzione (${batchIndex}/${totalBatches})...`, 2);
+        const percent = 25 + Math.round((batchIndex / totalBatches) * 55);
 
-        const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules);
+        updateProgress(
+          percent,
+          `2. Traduzione con Gemini 3.8 Flash`,
+          `Traduzione blocco ${batchIndex} di ${totalBatches} (${batch.length} frasi verso ${targetLang})...`,
+          2
+        );
+
+        // Notifica in tempo reale se Google Gemini risponde con 503 (picco di traffico) e riprova
+        const onRetry = (attempt, maxRetries, delay) => {
+          updateProgress(
+            percent,
+            `Attesa risposta server Google...`,
+            `Picco momentaneo di traffico AI (503). Nuovo tentativo automatico ${attempt}/${maxRetries} tra ${(delay / 1000).toFixed(1)}s...`,
+            2
+          );
+        };
+
+        const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules, onRetry);
 
         translatedBatch.forEach(item => {
           if (item && item.id) {
@@ -302,10 +338,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      updateProgress(80, 'Auto-scaling layout e font...', 3);
+      updateProgress(82, '3. Adattamento grafico del layout', 'Calcolo ingombri e ridimensionamento proporzionale font per preservare grafica e immagini...', 3);
       const minFontScale = parseInt(rangeFontScale.value, 10) / 100;
 
-      updateProgress(92, 'Compilazione PDF...', 4);
+      updateProgress(92, '4. Compilazione del nuovo file PDF', `Inserimento testi tradotti e composizione vettoriale (${totalPages} pagine)...`, 4);
       translatedPdfBytes = await PDFEngine.buildTranslatedPDF(
         originalPdfBytes,
         parsedPdfData.pages,
@@ -313,8 +349,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { minFontScale }
       );
 
-      updateProgress(100, 'Completato', 4);
-      setTimeout(() => progressCard.classList.remove('active'), 1200);
+      updateProgress(100, 'Traduzione completata con successo!', `Tutte le ${totalPages} pagine sono state tradotte. Visualizza l'anteprima o scarica il file.`, 4);
+      setTimeout(() => progressCard.classList.remove('active'), 2500);
 
       // Download link
       const blob = new Blob([translatedPdfBytes], { type: 'application/pdf' });
@@ -328,21 +364,36 @@ document.addEventListener('DOMContentLoaded', () => {
       viewerSection.classList.add('active');
       await renderViewerPages();
       viewerSection.scrollIntoView({ behavior: 'smooth' });
-      showToast('Traduzione completata', 'success');
+      showToast('Traduzione completata con successo!', 'success', 4000);
 
     } catch (err) {
       console.error(err);
-      showToast(err.message, 'error');
-      progressCard.classList.remove('active');
+      progressTitle.textContent = 'Processo interrotto';
+      if (progressSubtitle) {
+        progressSubtitle.textContent = 'Si è verificato un errore durante la traduzione del documento.';
+      }
+      progressBarFill.style.background = 'var(--status-red)';
+      if (progressErrorText) {
+        progressErrorText.textContent = err.message || 'Errore imprevisto durante la traduzione.';
+      }
+      if (progressErrorBox) {
+        progressErrorBox.style.display = 'flex';
+      }
+
+      // Mostra l'errore chiaramente a schermo: rimosso a mano o automaticamente dopo 10 secondi
+      showToast(err.message || 'Errore durante la traduzione', 'error', 10000);
     } finally {
       btnTranslate.disabled = false;
     }
   });
 
-  function updateProgress(percent, titleText, activeStepNum) {
+  function updateProgress(percent, titleText, subtitleText, activeStepNum) {
     progressPercent.textContent = `${percent}%`;
     progressBarFill.style.width = `${percent}%`;
     progressTitle.textContent = titleText;
+    if (progressSubtitle && subtitleText) {
+      progressSubtitle.textContent = subtitleText;
+    }
 
     const steps = [step1, step2, step3, step4];
     steps.forEach((step, idx) => {
@@ -559,28 +610,51 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =========================================================================
-  // NOTIFICHE TOAST MINIMALI
+  // NOTIFICHE TOAST MINIMALI (Errori rimossi a mano o dopo 10 secondi)
   // =========================================================================
-  function showToast(message, type = 'info', duration = 3000) {
+  function showToast(message, type = 'info', duration = null) {
+    // Di default: 10 secondi (10000ms) per gli errori, 3.5s per altri messaggi
+    const effectiveDuration = duration !== null ? duration : (type === 'error' ? 10000 : 3500);
+
     const toast = document.createElement('div');
     toast.className = `toast toast--${type}`;
 
-    let icon = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent);"></span>`;
+    let icon = `<span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); flex-shrink:0;"></span>`;
     if (type === 'success') {
-      icon = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--status-green);"></span>`;
+      icon = `<span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--status-green); flex-shrink:0;"></span>`;
     } else if (type === 'error') {
-      icon = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--status-red);"></span>`;
+      icon = `<span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--status-red); flex-shrink:0;"></span>`;
     }
 
-    toast.innerHTML = `${icon}<span>${escapeHtml(message)}</span>`;
+    const content = document.createElement('div');
+    content.className = 'toast__content';
+    content.innerHTML = `${icon}<span>${escapeHtml(message)}</span>`;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'toast__close';
+    closeBtn.title = 'Chiudi avviso';
+    closeBtn.setAttribute('aria-label', 'Chiudi avviso');
+    closeBtn.innerHTML = '&times;';
+
+    toast.appendChild(content);
+    toast.appendChild(closeBtn);
     toastContainer.appendChild(toast);
 
-    setTimeout(() => {
+    let dismissTimer = null;
+
+    const dismiss = () => {
+      if (dismissTimer) clearTimeout(dismissTimer);
       toast.style.opacity = '0';
-      toast.style.transform = 'translateY(8px)';
+      toast.style.transform = 'translateY(8px) scale(0.96)';
       toast.style.transition = 'all 0.25s ease';
       setTimeout(() => toast.remove(), 250);
-    }, duration);
+    };
+
+    closeBtn.addEventListener('click', dismiss);
+
+    if (effectiveDuration > 0) {
+      dismissTimer = setTimeout(dismiss, effectiveDuration);
+    }
   }
 
   function escapeHtml(text) {

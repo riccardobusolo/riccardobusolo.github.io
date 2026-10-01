@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=3.1">
+  <link rel="stylesheet" href="style.css?v=3.2">
 </head>
 <body>
 
@@ -129,7 +129,10 @@
     <!-- Progress Card (Dynamic Island Minimal) -->
     <section class="progress-card" id="progress-card">
       <div class="progress-header">
-        <div class="progress-title" id="progress-title">Elaborazione...</div>
+        <div class="progress-header-info">
+          <div class="progress-title" id="progress-title">Elaborazione in corso...</div>
+          <div class="progress-subtitle" id="progress-subtitle">Preparazione e verifica del documento...</div>
+        </div>
         <div class="progress-percent" id="progress-percent">0%</div>
       </div>
       <div class="progress-bar-bg">
@@ -140,6 +143,10 @@
         <div class="progress-step" id="step-2">2. Traduzione</div>
         <div class="progress-step" id="step-3">3. Layout</div>
         <div class="progress-step" id="step-4">4. Compilazione</div>
+      </div>
+      <div class="progress-error-box" id="progress-error-box" style="display: none;">
+        <span class="progress-error-text" id="progress-error-text"></span>
+        <button class="progress-error-dismiss" id="btn-dismiss-progress-error" title="Chiudi avviso">&times;</button>
       </div>
     </section>
 
@@ -320,9 +327,9 @@
   <script src="config.local.js" onerror="this.remove()"></script>
 
   <!-- Script dell'applicazione -->
-  <script src="ai-service.js?v=3.1"></script>
-  <script src="glossary.js?v=3.1"></script>
-  <script src="pdf-engine.js?v=3.1"></script>
-  <script src="app.js?v=3.1"></script>
+  <script src="ai-service.js?v=3.2"></script>
+  <script src="glossary.js?v=3.2"></script>
+  <script src="pdf-engine.js?v=3.2"></script>
+  <script src="app.js?v=3.2"></script>
 </body>
 </html>

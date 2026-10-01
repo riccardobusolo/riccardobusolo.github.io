@@ -118,8 +118,40 @@ const AIService = (() => {
     return `${baseUrl}#key=${encodeURIComponent(key)}`;
   }
 
+  // Parser JSON sicuro che rimuove blocchi markdown ```json o testo di contorno
+  function parseSafeJSON(str) {
+    if (!str) return null;
+    let cleaned = str.trim();
+    if (cleaned.startsWith('```json')) {
+      cleaned = cleaned.replace(/^```json\s*/i, '').replace(/\s*```$/, '').trim();
+    } else if (cleaned.startsWith('```')) {
+      cleaned = cleaned.replace(/^```\s*/, '').replace(/\s*```$/, '').trim();
+    }
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {
+      const firstBrace = cleaned.indexOf('{');
+      const firstBracket = cleaned.indexOf('[');
+      let start = -1;
+      let end = -1;
+      if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+        start = firstBrace;
+        end = cleaned.lastIndexOf('}');
+      } else if (firstBracket !== -1) {
+        start = firstBracket;
+        end = cleaned.lastIndexOf(']');
+      }
+      if (start !== -1 && end > start) {
+        try {
+          return JSON.parse(cleaned.substring(start, end + 1));
+        } catch (e2) {}
+      }
+      throw new Error(`Risposta AI non in formato JSON valido: ${e.message}`);
+    }
+  }
+
   // Chiamata con retry automatico ed exponential backoff per gestire picchi di traffico (503 / 429)
-  async function fetchGeminiWithRetry(url, options, maxRetries = 3) {
+  async function fetchGeminiWithRetry(url, options, maxRetries = 3, onRetry = null) {
     let attempt = 0;
     let delay = 1500;
 
@@ -129,6 +161,7 @@ const AIService = (() => {
         const resp = await fetch(url, options);
 
         if ((resp.status === 503 || resp.status === 429) && attempt <= maxRetries) {
+          if (onRetry) onRetry(attempt, maxRetries, delay, resp.status);
           console.warn(`[DocuShift AI] Gemini temporaneamente occupato (HTTP ${resp.status}). Tentativo ${attempt}/${maxRetries} tra ${delay}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
           delay *= 2;
@@ -139,6 +172,7 @@ const AIService = (() => {
         if (!resp.ok) {
           const errorMsg = data.error?.message || `Errore Google API (${resp.status})`;
           if (attempt <= maxRetries && (errorMsg.includes('high demand') || errorMsg.includes('Resource has been exhausted') || errorMsg.includes('overloaded'))) {
+            if (onRetry) onRetry(attempt, maxRetries, delay, 503);
             console.warn(`[DocuShift AI] Gemini picco di traffico: ${errorMsg}. Tentativo ${attempt}/${maxRetries} tra ${delay}ms...`);
             await new Promise(resolve => setTimeout(resolve, delay));
             delay *= 2;
@@ -150,6 +184,7 @@ const AIService = (() => {
         return data;
       } catch (err) {
         if (attempt <= maxRetries && (err.message?.includes('high demand') || err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError'))) {
+          if (onRetry) onRetry(attempt, maxRetries, delay, 0);
           console.warn(`[DocuShift AI] Errore temporaneo: ${err.message}. Tentativo ${attempt}/${maxRetries} tra ${delay}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
           delay *= 2;
@@ -217,7 +252,7 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
 
     const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!rawText) throw new Error('Nessuna risposta ricevuta da Gemini');
-    return JSON.parse(rawText);
+    return parseSafeJSON(rawText);
   }
 
   // Rilevamento automatico lingua
@@ -248,7 +283,7 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
   }
 
   // Traduzione batch di blocchi PDF
-  async function translateBatch(items, targetLang, glossaryRules = []) {
+  async function translateBatch(items, targetLang, glossaryRules = [], onRetry = null) {
     if (!items || items.length === 0) return [];
     const key = getKey();
     if (!key) {
@@ -268,8 +303,11 @@ VINCOLO CRUCIALE DI DESIGN (PRESERVAZIONE DEL LAYOUT):
 Il testo tradotto andrà inserito in riquadri grafici PDF a dimensione fissa.
 È FONDAMENTALE che la traduzione in ${targetLang} sia CONCISA e NON superi la lunghezza dell'originale se non strettamente necessario, per evitare sovrapposizioni visive con immagini o bordi.${glossaryInstruction}
 
-Riceverai una lista JSON di blocchi con "id" e "text".
-DEVI restituire ESCLUSIVAMENTE un oggetto JSON valido contenente la chiave "translations" con la lista degli oggetti tradotti.
+REGOLE DI RISPOSTA:
+1. DEVI restituire ESCLUSIVAMENTE un oggetto JSON valido contenente la chiave "translations" con la lista degli oggetti tradotti.
+2. IMPORTANTE: Anche se il testo sorgente dovesse essere già in ${targetLang} o se ritieni non necessiti modifiche, restituisci COMUNQUE tutti gli elementi con i loro id e il testo.
+3. NON includere MAI spiegazioni, introduzioni o note discorsive. Solo JSON.
+
 Esempio output valido:
 {
   "translations": [
@@ -282,23 +320,34 @@ Esempio output valido:
 
     recordRequest();
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${key}`;
-    const data = await fetchGeminiWithRetry(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: `${systemPrompt}\n\nTraduci i seguenti blocchi:\n${JSON.stringify(payload)}` }] }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.15
-        }
-      })
-    });
+    try {
+      const data = await fetchGeminiWithRetry(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: `${systemPrompt}\n\nTraduci i seguenti blocchi:\n${JSON.stringify(payload)}` }] }],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.15
+          }
+        })
+      }, 3, onRetry);
 
-    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawText) throw new Error('Nessuna traduzione ricevuta da Gemini');
-    const parsed = JSON.parse(rawText);
-    if (Array.isArray(parsed)) return parsed;
-    return parsed.translations || parsed.items || Object.values(parsed);
+      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawText) throw new Error('Nessuna traduzione ricevuta da Gemini');
+      const parsed = parseSafeJSON(rawText);
+      if (Array.isArray(parsed)) return parsed;
+      return parsed.translations || parsed.items || Object.values(parsed);
+    } catch (batchErr) {
+      console.error('[DocuShift AI] Errore blocco traduzione:', batchErr);
+      // Se l'errore è dovuto ad API Key non valida o permessi, rilancia l'errore
+      if (batchErr.message.includes('API key') || batchErr.message.includes('Resource has been exhausted') || batchErr.message.includes('PERMISSION_DENIED')) {
+        throw batchErr;
+      }
+      // Altrimenti fallback per non interrompere il documento di 24 pagine
+      console.warn('[DocuShift AI] Fallback: mantengo testi originali per questo blocco.');
+      return items.map(it => ({ id: it.id, translated: it.text }));
+    }
   }
 
   return {
