@@ -5,7 +5,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('[DocuShift v3.7] Initialized - PDFLib ready:', typeof window.PDFLib !== 'undefined', 'fontkit ready:', typeof window.fontkit !== 'undefined');
+  console.log('[DocuShift v3.8] Initialized - PDFLib ready:', typeof window.PDFLib !== 'undefined', 'fontkit ready:', typeof window.fontkit !== 'undefined');
 
   // Theme Toggle
   const btnThemeToggle = document.getElementById('btn-theme-toggle');

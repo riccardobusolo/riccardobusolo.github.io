@@ -7,7 +7,7 @@
  */
 
 const PDFEngine = (() => {
-  // CDN font TrueType per supporto completo caratteri accentati Unicode
+  // CDN font TrueType predefiniti per fallback ad alta compatibilità
   const FONT_URLS = {
     sans: 'https://cdn.jsdelivr.net/fontsource/fonts/outfit@latest/latin-400-normal.ttf',
     sansBold: 'https://cdn.jsdelivr.net/fontsource/fonts/outfit@latest/latin-700-normal.ttf',
@@ -15,37 +15,144 @@ const PDFEngine = (() => {
     mono: 'https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.ttf'
   };
 
+  // Mappa delle famiglie commerciali agli equivalenti metrici open-source Google Fonts
+  const FONT_FAMILY_MAP = {
+    'calibri': 'carlito',
+    'arial': 'arimo',
+    'helvetica': 'inter',
+    'times': 'tinos',
+    'times new roman': 'tinos',
+    'courier': 'cousine',
+    'courier new': 'cousine',
+    'verdana': 'open-sans',
+    'tahoma': 'noto-sans',
+    'segoe': 'inter',
+    'segoe ui': 'inter',
+    'myriad': 'pt-sans',
+    'myriad pro': 'pt-sans',
+    'din': 'fira-sans',
+    'din pro': 'fira-sans',
+    'futura': 'montserrat'
+  };
+
   let cachedFontBuffers = {};
+  const embeddedDynamicFonts = new Map();
 
   // Configura il worker di PDF.js (locale ad alte prestazioni con fallback CDN)
   if (typeof pdfjsLib !== 'undefined') {
     try {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js?v=3.7';
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js?v=3.8';
     } catch (e) {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
   }
 
-  // Scarica il font in un buffer temporaneo in RAM
-  async function fetchFontBuffer(fontType = 'sans') {
-    const url = FONT_URLS[fontType] || FONT_URLS.sans;
-    if (cachedFontBuffers[fontType]) {
-      return cachedFontBuffers[fontType];
+  // Scarica dinamicamente il font richiesto dal PDF tramite Google Fonts / Fontsource CDN
+  async function fetchFontBuffer(fontFamily = 'sans', isBold = false) {
+    const raw = (fontFamily || '').toLowerCase().trim();
+    const cleanFamily = raw
+      .replace(/^([a-z]{6}\+)/i, '')
+      .replace(/mt$|ps$|pro$|lt$|-regular$|-bold$|-italic$/i, '')
+      .trim();
+
+    const mappedFamily = FONT_FAMILY_MAP[cleanFamily] || cleanFamily || 'outfit';
+    const slug = mappedFamily.replace(/[\s_]+/g, '-').toLowerCase();
+    const weight = isBold ? '700' : '400';
+    const cacheKey = `${slug}_${weight}`;
+
+    if (cachedFontBuffers[cacheKey]) {
+      return cachedFontBuffers[cacheKey];
     }
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Impossibile scaricare il font da Google Fonts CDN (${response.status})`);
+
+    // 1. Prova a scaricare il font esatto dalla CDN fontsource
+    const candidateUrls = [
+      `https://cdn.jsdelivr.net/fontsource/fonts/${slug}@latest/latin-${weight}-normal.ttf`,
+      `https://cdn.jsdelivr.net/fontsource/fonts/${slug}@latest/latin-400-normal.ttf`
+    ];
+
+    for (const url of candidateUrls) {
+      try {
+        const resp = await fetch(url);
+        if (resp.ok) {
+          const buf = await resp.arrayBuffer();
+          if (buf && buf.byteLength > 1000) {
+            cachedFontBuffers[cacheKey] = buf;
+            return buf;
+          }
+        }
+      } catch (e) {}
     }
-    const buffer = await response.arrayBuffer();
-    cachedFontBuffers[fontType] = buffer;
-    return buffer;
+
+    // 2. Fallback al font predefinito integrato (Outfit o Lora o Mono)
+    let fallbackKey = isBold ? 'sansBold' : 'sans';
+    if (raw.includes('serif') || raw.includes('times')) fallbackKey = 'serif';
+    if (raw.includes('mono') || raw.includes('courier')) fallbackKey = 'mono';
+
+    const fallbackUrl = FONT_URLS[fallbackKey] || FONT_URLS.sans;
+    if (cachedFontBuffers[fallbackKey]) {
+      return cachedFontBuffers[fallbackKey];
+    }
+    const fallbackResp = await fetch(fallbackUrl);
+    const fallbackBuf = await fallbackResp.arrayBuffer();
+    cachedFontBuffers[fallbackKey] = fallbackBuf;
+    return fallbackBuf;
   }
 
   // Rilascia la memoria dei font temporanei
   function clearFontMemory() {
     cachedFontBuffers = {};
+    embeddedDynamicFonts.clear();
     if (window.gc) {
       try { window.gc(); } catch (e) {}
+    }
+  }
+
+  // Rileva in modo intelligente il colore del testo e dello sfondo tramite campionamento canvas
+  function detectBlockColor(x, y, width, height, ctx, pageHeight, sampleScale = 0.75) {
+    if (!ctx) return { isDarkBg: false, color: { r: 0.12, g: 0.12, b: 0.15 } };
+    try {
+      const cx = Math.max(0, Math.round(x * sampleScale));
+      const cy = Math.max(0, Math.round((pageHeight - y - height) * sampleScale));
+      const cw = Math.max(2, Math.round(Math.max(width, 20) * sampleScale));
+      const ch = Math.max(2, Math.round(height * sampleScale));
+
+      const imgData = ctx.getImageData(cx, cy, cw, ch);
+      const data = imgData.data;
+      if (!data || data.length === 0) return { isDarkBg: false, color: { r: 0.12, g: 0.12, b: 0.15 } };
+
+      let totalR = 0, totalG = 0, totalB = 0, count = 0;
+      const step = Math.max(1, Math.floor(data.length / (4 * 40)));
+
+      for (let p = 0; p < data.length; p += step * 4) {
+        const r = data[p] / 255;
+        const g = data[p + 1] / 255;
+        const b = data[p + 2] / 255;
+        totalR += r;
+        totalG += g;
+        totalB += b;
+        count++;
+      }
+
+      const avgR = count > 0 ? (totalR / count) : 1;
+      const avgG = count > 0 ? (totalG / count) : 1;
+      const avgB = count > 0 ? (totalB / count) : 1;
+      const avgLum = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
+
+      // Se lo sfondo è scuro (blu scuro, nero, grigio scuro - lum < 0.45):
+      // il testo deve risaltare in bianco nitido!
+      if (avgLum < 0.45) {
+        return {
+          isDarkBg: true,
+          color: { r: 0.98, g: 0.98, b: 0.98 } // Bianco Puro
+        };
+      } else {
+        return {
+          isDarkBg: false,
+          color: { r: 0.12, g: 0.12, b: 0.15 } // Scuro Grafite
+        };
+      }
+    } catch (e) {
+      return { isDarkBg: false, color: { r: 0.12, g: 0.12, b: 0.15 } };
     }
   }
 
@@ -72,16 +179,39 @@ const PDFEngine = (() => {
       const viewport = page.getViewport({ scale: 1.0 });
       const textContent = await page.getTextContent({ normalizeWhitespace: true });
 
+      // Renderizza un canvas off-screen veloce (scale 0.75) per campionare il colore dello sfondo di ogni blocco
+      let sampleCtx = null;
+      try {
+        const sampleScale = 0.75;
+        const sampleViewport = page.getViewport({ scale: sampleScale });
+        const sampleCanvas = document.createElement('canvas');
+        sampleCanvas.width = Math.round(sampleViewport.width);
+        sampleCanvas.height = Math.round(sampleViewport.height);
+        sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
+        await page.render({ canvasContext: sampleCtx, viewport: sampleViewport }).promise;
+      } catch (cvErr) {
+        console.warn('[DocuShift] Campionamento cromatico canvas non disponibile:', cvErr);
+      }
+
       const rawItems = textContent.items.map((item, idx) => {
         // [scaleX, skewY, skewX, scaleY, tx, ty]
         const tx = item.transform[4];
         const ty = item.transform[5];
         const fontSize = Math.hypot(item.transform[0], item.transform[1]) || 12;
         const fontName = (item.fontName || '').toLowerCase();
+        
+        // Estrae il nome pulito della famiglia di font
+        const styleInfo = textContent.styles && textContent.styles[item.fontName];
+        const rawFamily = (styleInfo && styleInfo.fontFamily) || item.fontName || 'sans';
+        const cleanFamily = rawFamily.replace(/^([a-z]{6}\+)/i, '').replace(/mt$|ps$|pro$|lt$/i, '').trim();
+
         const isBold = fontName.includes('bold') || fontName.includes('black') || fontName.includes('heavy');
         const isItalic = fontName.includes('italic') || fontName.includes('oblique');
         const isSerif = fontName.includes('serif') || fontName.includes('times') || fontName.includes('roman') || fontName.includes('georgia');
         const isMono = fontName.includes('mono') || fontName.includes('courier') || fontName.includes('code');
+
+        // Campiona la luminosità dello sfondo sotto il testo per impostare il colore con contrasto perfetto
+        const colorInfo = detectBlockColor(tx, ty, item.width, item.height || fontSize, sampleCtx, viewport.height, 0.75);
 
         return {
           id: `p${pageNum}_b${idx + 1}`,
@@ -96,6 +226,9 @@ const PDFEngine = (() => {
           isItalic,
           isSerif,
           isMono,
+          fontFamily: cleanFamily,
+          color: colorInfo.color,
+          isDarkBg: colorInfo.isDarkBg,
           hasEOL: item.hasEOL
         };
       });
@@ -142,6 +275,9 @@ const PDFEngine = (() => {
           isBold: item.isBold,
           isSerif: item.isSerif,
           isMono: item.isMono,
+          fontFamily: item.fontFamily,
+          color: item.color,
+          isDarkBg: item.isDarkBg,
           originalItems: [item]
         };
         continue;
@@ -172,6 +308,9 @@ const PDFEngine = (() => {
           isBold: item.isBold,
           isSerif: item.isSerif,
           isMono: item.isMono,
+          fontFamily: item.fontFamily,
+          color: item.color,
+          isDarkBg: item.isDarkBg,
           originalItems: [item]
         };
       }
@@ -197,7 +336,7 @@ const PDFEngine = (() => {
     if (existing) return existing;
 
     const sourceUrls = [
-      'pdf-lib.min.js?v=3.7',
+      'pdf-lib.min.js?v=3.8',
       'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',
       'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js',
       'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js'
@@ -238,7 +377,7 @@ const PDFEngine = (() => {
     if (existing) return existing;
 
     const sourceUrls = [
-      'fontkit.umd.min.js?v=3.7',
+      'fontkit.umd.min.js?v=3.8',
       'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js',
       'https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js'
     ];
@@ -263,6 +402,109 @@ const PDFEngine = (() => {
     }
 
     return getFk();
+  }
+
+  // Rimuove e neutralizza alla radice il testo originale dallo stream vettoriale della pagina
+  // Senza toccare forme, sfondi colorati (giallo, blu), immagini o elementi grafici
+  function stripOriginalTextFromPage(page, pdfDoc) {
+    try {
+      const { PDFName, PDFArray, decodePDFRawStream } = window.PDFLib;
+      const contentsEntry = page.node.Contents();
+      if (!contentsEntry) return;
+
+      const streamRefs = [];
+      if (contentsEntry instanceof PDFArray) {
+        for (let i = 0; i < contentsEntry.size(); i++) {
+          streamRefs.push(contentsEntry.get(i));
+        }
+      } else {
+        streamRefs.push(contentsEntry);
+      }
+
+      const cleanedStreamChunks = [];
+
+      for (const ref of streamRefs) {
+        let rawStream = ref;
+        if (pdfDoc.context.lookup) {
+          const lookedUp = pdfDoc.context.lookup(ref);
+          if (lookedUp) rawStream = lookedUp;
+        }
+
+        let decodedBytes = null;
+        try {
+          if (rawStream.getUnencodedContents) {
+            decodedBytes = rawStream.getUnencodedContents();
+          } else if (rawStream.contents) {
+            const decoded = decodePDFRawStream(rawStream);
+            decodedBytes = decoded.decode ? decoded.decode() : decoded;
+          }
+        } catch (e) {
+          console.warn('[DocuShift PDFEngine] Fallback decodifica stream:', e);
+        }
+
+        if (!decodedBytes || decodedBytes.length === 0) continue;
+
+        // Converti in stringa Latin-1 (preserva esattamente i codici e operatori binari PDF)
+        let streamText = '';
+        const chunkSize = 8192;
+        for (let i = 0; i < decodedBytes.length; i += chunkSize) {
+          const slice = decodedBytes.subarray(i, Math.min(i + chunkSize, decodedBytes.length));
+          streamText += String.fromCharCode.apply(null, slice);
+        }
+
+        // CANCELLAZIONE CHIRURGICA DEL VECCHIO TESTO NEL FLUSSO VETTORIALE:
+        // 1) Imposta Text Rendering Mode a 3 (3 Tr = Neither fill nor stroke text, completamente invisibile)
+        // 2) Svuota gli argomenti di disegno testo per non occupare memoria di rendering
+        let cleaned = streamText.replace(/\bBT\b/g, 'BT 3 Tr ');
+        cleaned = cleaned.replace(/\((?:\\.|[^()\\])*\)\s*Tj/g, '() Tj');
+        cleaned = cleaned.replace(/<[0-9a-fA-F\s]*>\s*Tj/g, '<> Tj');
+        cleaned = cleaned.replace(/\[[\s\S]*?\]\s*TJ/g, '[] TJ');
+        cleaned = cleaned.replace(/\((?:\\.|[^()\\])*\)\s*'/g, "() '");
+
+        cleanedStreamChunks.push(cleaned);
+      }
+
+      if (cleanedStreamChunks.length > 0) {
+        const combinedText = cleanedStreamChunks.join('\n');
+        const newBytes = new Uint8Array(combinedText.length);
+        for (let i = 0; i < combinedText.length; i++) {
+          newBytes[i] = combinedText.charCodeAt(i) & 0xff;
+        }
+
+        const newStream = pdfDoc.context.flateStream(newBytes);
+        const newStreamRef = pdfDoc.context.register(newStream);
+        page.node.set(PDFName.of('Contents'), newStreamRef);
+      }
+    } catch (stripErr) {
+      console.warn('[DocuShift PDFEngine] Errore pulizia testo stream originale:', stripErr);
+    }
+  }
+
+  // Incorpora dinamicamente un font TrueType nel documento PDF con cache in memoria
+  async function getOrEmbedDynamicFont(pdfDoc, fontFamily, isBold) {
+    if (!fontFamily) return null;
+    const cleanFamily = fontFamily
+      .replace(/^([a-z]{6}\+)/i, '')
+      .replace(/mt$|ps$|pro$|lt$|-regular$|-bold$|-italic$/i, '')
+      .trim();
+    const weightKey = isBold ? 'bold' : 'normal';
+    const cacheKey = `${cleanFamily.toLowerCase()}_${weightKey}`;
+
+    if (embeddedDynamicFonts.has(cacheKey)) {
+      return embeddedDynamicFonts.get(cacheKey);
+    }
+
+    try {
+      const buffer = await fetchFontBuffer(cleanFamily, isBold);
+      if (buffer) {
+        const embedded = await pdfDoc.embedFont(buffer);
+        embeddedDynamicFonts.set(cacheKey, embedded);
+        return embedded;
+      }
+    } catch (err) {
+      console.warn(`[DocuShift PDFEngine] Fallback font per ${cleanFamily}:`, err);
+    }
+    return null;
   }
 
   // Costruisce il nuovo documento PDF tradotto preservando immagini e grafica originale
@@ -293,11 +535,11 @@ const PDFEngine = (() => {
       }
     }
 
-    // Scarica font Google Fonts dinamici o usa fallback StandardFonts
+    // Scarica font Google Fonts di base predefiniti
     let embeddedFontRegular, embeddedFontBold;
     try {
-      const sansBuffer = await fetchFontBuffer('sans');
-      const sansBoldBuffer = await fetchFontBuffer('sansBold');
+      const sansBuffer = await fetchFontBuffer('sans', false);
+      const sansBoldBuffer = await fetchFontBuffer('sans', true);
       embeddedFontRegular = await pdfDoc.embedFont(sansBuffer);
       embeddedFontBold = await pdfDoc.embedFont(sansBoldBuffer);
     } catch (fontErr) {
@@ -311,7 +553,11 @@ const PDFEngine = (() => {
     for (let pageIdx = 0; pageIdx < pagesData.length; pageIdx++) {
       const pageData = pagesData[pageIdx];
       const page = pdfPages[pageIdx];
-      const { height: pageHeight } = page.getSize();
+
+      // 1. ELIMINAZIONE DEL TESTO VECCHIO DALLO STREAM DELLA PAGINA:
+      // Rimuove e rende trasparenti tutti i glifi originali preservando al 100%
+      // lo sfondo (giallo, barra blu, loghi, illustrazioni e foto). ZERO TOPPE BIANCHE!
+      stripOriginalTextFromPage(page, pdfDoc);
 
       for (const block of pageData.blocks) {
         const translatedText = translationsMap[block.id] || block.text;
@@ -319,42 +565,38 @@ const PDFEngine = (() => {
         // Se il testo è invariato o vuoto, passa oltre
         if (!translatedText || translatedText.trim().length === 0) continue;
 
-        const font = block.isBold ? embeddedFontBold : embeddedFontRegular;
+        // 2. Selezione dinamica del Font (recupera il font esatto o il fallback)
+        let font = block.isBold ? embeddedFontBold : embeddedFontRegular;
+        if (block.fontFamily) {
+          const dynamicFont = await getOrEmbedDynamicFont(pdfDoc, block.fontFamily, block.isBold);
+          if (dynamicFont) font = dynamicFont;
+        }
+
         const origFontSize = block.fontSize;
         const boxWidth = Math.max(block.width, 20);
-        const boxHeight = Math.max(block.height, origFontSize * 1.1);
 
-        // 1. Algoritmo di Auto-Scaling del testo per evitare sbordature grafiche
+        // 3. Auto-Scaling del testo proporzionale per preservare gli ingombri
         let fontSize = origFontSize;
         let measuredWidth = font.widthOfTextAtSize(translatedText, fontSize);
 
-        // Se il testo tradotto è più lungo della scatola originale, riduci proporzionalmente la dimensione
         if (measuredWidth > boxWidth) {
           const ratio = boxWidth / measuredWidth;
-          // Limita il ridimensionamento al 70% per garantire la leggibilità
           const minFontScale = options.minFontScale || 0.70;
           fontSize = Math.max(origFontSize * minFontScale, origFontSize * ratio);
           measuredWidth = font.widthOfTextAtSize(translatedText, fontSize);
         }
 
-        // 2. Maschera/sbianca il testo originale sottostante (senza toccare le immagini circostanti)
-        // Crea un rettangolo di copertura con leggero padding
-        const padding = 1.2;
-        page.drawRectangle({
-          x: Math.max(0, block.x - padding),
-          y: Math.max(0, block.y - (fontSize * 0.25) - padding),
-          width: boxWidth + (padding * 2),
-          height: boxHeight + (padding * 2),
-          color: rgb(1, 1, 1), // Fondo bianco o neutral overlay
-          opacity: 0.96
-        });
+        // 4. Colore del Testo con contrasto perfetto:
+        // Se lo sfondo è scuro (come la fascia blu), il testo viene disegnato in BIANCO.
+        // Se lo sfondo è chiaro (come il giallo o bianco), il testo viene disegnato in SCURO.
+        const textColor = block.color 
+          ? rgb(block.color.r, block.color.g, block.color.b) 
+          : rgb(0.12, 0.12, 0.15);
 
-        // 3. Riscrivi il testo tradotto nella posizione originale esatta
+        // 5. Riscrivi il testo tradotto direttamente sui vettori nativi (SENZA NESSUNA TOPPA BIANCA)
         try {
-          // Se anche al font minimo sborda di poco, tronca o adatta delicatamente
           let textToWrite = translatedText;
           if (font.widthOfTextAtSize(textToWrite, fontSize) > boxWidth * 1.15) {
-            // Spezza in parole se necessario o adatta
             fontSize = Math.max(7, fontSize * 0.9);
           }
 
@@ -363,7 +605,7 @@ const PDFEngine = (() => {
             y: block.y,
             size: fontSize,
             font: font,
-            color: rgb(0.1, 0.1, 0.12)
+            color: textColor
           });
         } catch (drawErr) {
           console.warn('Errore disegno testo blocco:', block.id, drawErr);
