@@ -1102,10 +1102,12 @@ img {
   object-fit: cover;
 }
 
-/* 1. Hero Visual Card & Floating Badges */
+/* 1. Hero Visual Card (Clean, Unobstructed Image Presentation) */
 .hero-visual-card {
   position: relative;
   width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
   border-radius: 28px;
   padding: 8px;
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.05) 100%);
@@ -1136,67 +1138,47 @@ img {
   display: block;
 }
 
-/* Floating Elements */
-.hero-badge-top {
-  position: absolute;
-  top: 1.25rem;
-  right: 1.25rem;
-  background: rgba(19, 42, 34, 0.92);
-  backdrop-filter: blur(10px);
-  color: #d8f3dc;
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 0.45rem 1rem;
-  border-radius: var(--radius-full);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  border: 1px solid rgba(82, 183, 136, 0.4);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  z-index: 5;
-}
-
-.hero-badge-bottom {
-  position: absolute;
-  bottom: 1.25rem;
-  left: 1.25rem;
-  right: 1.25rem;
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(12px);
-  color: var(--white);
-  padding: 0.85rem 1.25rem;
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
+/* Subtle clean tag under hero image, NOT obscuring the photo */
+.hero-image-caption-bar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-  z-index: 5;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+  font-size: 0.85rem;
+  color: #c4f1d3;
+  font-weight: 600;
+  text-align: center;
 }
 
-.hero-badge-bottom svg {
-  color: var(--primary-500);
-  flex-shrink: 0;
+.hero-image-caption-bar svg {
+  color: var(--accent-500);
 }
 
-/* 2. Facility Showcase Section */
+/* 2. Facility Showcase Section (Fully Centered, Unobstructed Panoramic View) */
 .facility-section {
   background-color: var(--white);
   border-top: 1px solid var(--gray-200);
   border-bottom: 1px solid var(--gray-200);
 }
 
+.facility-showcase-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
 .facility-showcase-card {
   position: relative;
-  border-radius: 28px;
+  width: 100%;
+  margin: 0 auto;
+  border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.15);
   border: 1px solid var(--gray-200);
   aspect-ratio: 16 / 9;
-  min-height: 380px;
-  max-height: 520px;
   background-color: var(--dark-900);
+  display: block;
 }
 
 .facility-showcase-card img {
@@ -1209,71 +1191,51 @@ img {
 }
 
 .facility-showcase-card:hover img {
-  transform: scale(1.03);
+  transform: scale(1.02);
 }
 
-.facility-showcase-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.05) 0%, rgba(15, 23, 42, 0.45) 50%, rgba(15, 23, 42, 0.95) 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 2.75rem 2.5rem;
-  color: var(--white);
+.facility-details-block {
+  margin-top: 2rem;
+  text-align: center;
 }
 
-.facility-overlay-badge {
-  display: inline-block;
-  align-self: flex-start;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  background-color: var(--accent-600);
-  color: var(--white);
-  padding: 0.3rem 0.8rem;
-  border-radius: var(--radius-full);
-  margin-bottom: 0.85rem;
-}
-
-.facility-showcase-title {
+.facility-details-block h3 {
   font-size: 1.85rem;
   font-weight: 800;
-  color: var(--white);
-  line-height: 1.25;
-  margin-bottom: 0.5rem;
+  color: var(--dark-900);
+  margin-bottom: 0.75rem;
 }
 
-.facility-showcase-desc {
+.facility-details-block p {
   font-size: 1.05rem;
-  color: #cbd5e1;
-  max-width: 750px;
-  margin-bottom: 1.5rem;
+  color: var(--dark-600);
+  max-width: 780px;
+  margin: 0 auto 1.5rem auto;
+  line-height: 1.6;
 }
 
-.facility-pills {
+.facility-pills-row {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.75rem;
 }
 
-.facility-pill {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 0.4rem 0.9rem;
+.facility-pill-clean {
+  background: var(--primary-50);
+  border: 1px solid var(--primary-100);
+  padding: 0.5rem 1.1rem;
   border-radius: var(--radius-full);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--primary-900);
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
-.facility-pill svg {
-  color: var(--primary-500);
+.facility-pill-clean svg {
+  color: var(--primary-700);
 }
 
 /* 3. Course Card Image Thumbnail */
@@ -1326,18 +1288,7 @@ img {
     border-radius: 16px;
   }
   .facility-showcase-card {
-    border-radius: 20px;
-    min-height: 420px;
-  }
-  .facility-showcase-overlay {
-    padding: 1.5rem;
-  }
-  .facility-showcase-title {
-    font-size: 1.4rem;
-  }
-  .hero-badge-bottom {
-    font-size: 0.8rem;
-    padding: 0.65rem 1rem;
+    border-radius: 16px;
   }
 }
 

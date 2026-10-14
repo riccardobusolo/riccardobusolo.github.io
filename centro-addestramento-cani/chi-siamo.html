@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chi Siamo & Struttura | Centro Cinofilo Patavino Padova</title>
   <meta name="description" content="Scopri chi siamo, la nostra filosofia cinofila e il team di educatori certificati ENCI e CSEN a Padova. Visita il nostro campo di 5.000 mq.">
-  <link rel="stylesheet" href="./css/style.css?v=20261014-2">
+  <link rel="stylesheet" href="./css/style.css?v=20261014-3">
   <style>
-    .facility-showcase-card { position: relative; border-radius: 28px; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(15,23,42,0.2); aspect-ratio: 16/9; min-height: 400px; max-height: 520px; background: #0f172a; margin-top: 2.5rem; }
+    .facility-showcase-container { width: 100%; max-width: 1100px; margin: 0 auto; }
+    .facility-showcase-card { position: relative; width: 100%; margin: 0 auto; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(15,23,42,0.15); border: 1px solid #e2e8f0; aspect-ratio: 16/9; background: #0f172a; display: block; }
     .facility-showcase-card img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
-    .facility-showcase-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,23,42,0.05) 0%, rgba(15,23,42,0.45) 50%, rgba(15,23,42,0.95) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 2.75rem 2.5rem; color: #fff; }
   </style>
 </head>
 <body>
@@ -234,28 +234,57 @@
         </div>
       </div>
 
-      <!-- Facility Image Showcase Card -->
-      <div class="facility-showcase-card">
-        <img src="./images/dog-center-field.jpg" alt="Campo di addestramento cinofilo a Padova con vista Colli Euganei" width="1200" height="675" loading="lazy">
-        <div class="facility-showcase-overlay">
-          <span class="facility-overlay-badge">La Struttura a Padova Ovest</span>
-          <h2 class="facility-showcase-title">5.000 mq di Parco Cinofilo Attrezzato</h2>
-          <p class="facility-showcase-desc">
-            Alle pendici dei Colli Euganei, a soli 5 minuti dalle uscite tangenziale di Padova Ovest. Campi recintati a norma ENCI, tensostruttura coperta per il maltempo e clubhouse per i proprietari.
+      <!-- Facility Image Showcase Container (Clean & Perfectly Centered) -->
+      <div class="facility-showcase-container" style="margin-top: 3rem;">
+        <div class="facility-showcase-card">
+          <img src="./images/dog-center-field.jpg" alt="Campo di addestramento cinofilo a Padova con vista Colli Euganei" width="1200" height="675" loading="lazy">
+        </div>
+
+        <div class="facility-details-block">
+          <h3>I Nostri Campi all'Aperto &bull; 5.000 mq</h3>
+          <p>
+            Alle pendici dei Colli Euganei, a soli 5 minuti dalle uscite tangenziale di Padova Ovest. Campi recintati a norma ENCI con doppia bussola di sicurezza, erba naturale ben curata e percorsi olfattivi protetti.
           </p>
-          <div class="facility-pills">
-            <span class="facility-pill">
+          <div class="facility-pills-row">
+            <span class="facility-pill-clean">
               <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-              Erba Naturale & Ombreggiatura
+              5.000 mq di Erba Naturale
             </span>
-            <span class="facility-pill">
+            <span class="facility-pill-clean">
               <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-              Recinzione 2m Antiscavo
+              Doppia Bussola Antiscavalco 2m
             </span>
-            <span class="facility-pill">
+            <span class="facility-pill-clean">
               <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-              Campo Coperto
+              Zona Ombra & Punti Acqua Fresca
             </span>
+          </div>
+        </div>
+
+        <!-- Tensostruttura Coperta Showcase -->
+        <div style="margin-top: 3.5rem;">
+          <div class="facility-showcase-card">
+            <img src="./images/dog-indoor-arena.jpg" alt="Tensostruttura coperta per addestramento cinofilo al riparo dalla pioggia a Padova" width="1200" height="675" loading="lazy">
+          </div>
+          <div class="facility-details-block">
+            <h3>Tensostruttura Coperta &bull; Attività Tutto l'Anno</h3>
+            <p>
+              Per garantire continuità didattica anche in caso di forte pioggia, vento o caldo estivo. Fondo ammortizzante ideale per le articolazioni dei cani e illuminazione LED ad alta efficienza per sessioni serali.
+            </p>
+            <div class="facility-pills-row">
+              <span class="facility-pill-clean">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Allenamenti anche con la Pioggia
+              </span>
+              <span class="facility-pill-clean">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Fondo Tecnico Antiscivolo
+              </span>
+              <span class="facility-pill-clean">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Illuminazione per Orari Serali
+              </span>
+            </div>
           </div>
         </div>
       </div>
