@@ -4,13 +4,15 @@
    ========================================================================== */
 
 :root {
-  --primary-900: #132a22;
-  --primary-800: #1b4332;
-  --primary-700: #2d6a4f;
-  --primary-600: #40916c;
-  --primary-500: #52b788;
-  --primary-100: #d8f3dc;
-  --primary-50:  #eefbf2;
+  --primary-950: #082f49;
+  --primary-900: #0c4a6e;
+  --primary-800: #075985;
+  --primary-700: #0284c7;
+  --primary-600: #0ea5e9;
+  --primary-500: #38bdf8;
+  --primary-200: #bae6fd;
+  --primary-100: #e0f2fe;
+  --primary-50:  #f0f9ff;
 
   --accent-700:  #b45309;
   --accent-600:  #d97706;
@@ -149,16 +151,16 @@ ul, ol {
 }
 
 .btn-primary {
-  background-color: var(--primary-800);
+  background-color: var(--primary-700);
   color: var(--white);
-  box-shadow: 0 4px 14px rgba(27, 67, 50, 0.3);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-700);
+  background-color: var(--primary-800);
   color: var(--white);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(27, 67, 50, 0.4);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
 }
 
 .btn-secondary {
@@ -223,14 +225,14 @@ ul, ol {
 .brand-icon {
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, var(--primary-800), var(--primary-600));
+  background: linear-gradient(135deg, var(--primary-700), var(--primary-500));
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--white);
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(27, 67, 50, 0.2);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
 }
 
 .brand-text {
@@ -303,7 +305,7 @@ ul, ol {
 /* Hero Section */
 .hero-section {
   position: relative;
-  background: linear-gradient(135deg, #132a22 0%, #1b4332 50%, #2d6a4f 100%);
+  background: linear-gradient(135deg, #082f49 0%, #0369a1 50%, #0284c7 100%);
   color: var(--white);
   padding: 5.5rem 0 6.5rem 0;
   overflow: hidden;
@@ -316,7 +318,7 @@ ul, ol {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 80% 20%, rgba(82, 183, 136, 0.25) 0%, transparent 60%);
+  background: radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.28) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -343,7 +345,7 @@ ul, ol {
 .hero-content p {
   font-size: 1.2rem;
   line-height: 1.6;
-  color: #e2f3e8;
+  color: #e0f2fe;
   margin-bottom: 2rem;
   max-width: 600px;
 }
@@ -370,7 +372,7 @@ ul, ol {
 
 .stat-item p {
   font-size: 0.85rem;
-  color: #c4e4d0;
+  color: #bae6fd;
   margin-bottom: 0;
 }
 
@@ -404,7 +406,7 @@ ul, ol {
   align-items: flex-start;
   gap: 0.75rem;
   font-size: 0.95rem;
-  color: #f1f8f4;
+  color: #f0f9ff;
 }
 
 .hero-card-list svg {
@@ -832,7 +834,7 @@ ul, ol {
 }
 
 .contact-info-card p {
-  color: #cce7d8;
+  color: #bae6fd;
   margin-bottom: 2rem;
   font-size: 0.95rem;
 }
@@ -864,7 +866,7 @@ ul, ol {
 
 .contact-detail-text h4 {
   font-size: 0.9rem;
-  color: #a3d9b8;
+  color: #7dd3fc;
   font-weight: 600;
   margin-bottom: 0.15rem;
 }
@@ -887,7 +889,7 @@ ul, ol {
 .contact-hours-box p {
   margin-bottom: 0.25rem;
   font-size: 0.85rem;
-  color: #d8f3dc;
+  color: #bae6fd;
 }
 
 /* Contact Form */
@@ -930,7 +932,7 @@ ul, ol {
 
 .form-control:focus {
   border-color: var(--primary-600);
-  box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.2);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.25);
 }
 
 textarea.form-control {
@@ -947,14 +949,14 @@ textarea.form-control {
 }
 
 .form-alert.success {
-  background-color: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
 }
 
 /* CTA Banner */
 .cta-banner {
-  background: linear-gradient(135deg, var(--primary-900), var(--primary-800));
+  background: linear-gradient(135deg, var(--primary-900), var(--primary-700));
   color: var(--white);
   border-radius: var(--radius-lg);
   padding: 3.5rem 3rem;
@@ -971,7 +973,7 @@ textarea.form-control {
 
 .cta-banner p {
   font-size: 1.1rem;
-  color: #d1fae5;
+  color: #e0f2fe;
   max-width: 600px;
   margin: 0 auto 2rem auto;
 }
@@ -1170,7 +1172,7 @@ img {
   gap: 0.6rem;
   margin-top: 0.85rem;
   font-size: 0.85rem;
-  color: #c4f1d3;
+  color: #bae6fd;
   font-weight: 600;
   text-align: center;
 }
@@ -1288,7 +1290,7 @@ img {
   position: absolute;
   top: 1rem;
   left: 1rem;
-  background: rgba(19, 42, 34, 0.9);
+  background: rgba(8, 47, 73, 0.92);
   backdrop-filter: blur(8px);
   color: var(--white);
   font-size: 0.75rem;
@@ -1318,7 +1320,7 @@ img {
 
 /* 4. Joyful & Playful Canine Moments Section */
 .fun-gallery-section {
-  background: linear-gradient(180deg, #f8fafc 0%, #f0fdf4 100%);
+  background: linear-gradient(180deg, #f8fafc 0%, #f0f9ff 100%);
   position: relative;
   overflow: hidden;
   border-top: 1px solid var(--gray-200);
@@ -1337,7 +1339,7 @@ img {
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(82, 183, 136, 0.2);
+  border: 1px solid rgba(14, 165, 233, 0.25);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
   display: flex;
   flex-direction: column;
@@ -1345,7 +1347,7 @@ img {
 
 .fun-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 35px -8px rgba(45, 106, 79, 0.15);
+  box-shadow: 0 20px 35px -8px rgba(2, 132, 199, 0.15);
 }
 
 .fun-card-thumb {
@@ -1410,15 +1412,15 @@ img {
 
 /* Playful FAQ banner with head-tilt dog */
 .faq-playful-banner {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
   border-radius: 24px;
   padding: 1.75rem 2rem;
   display: flex;
   align-items: center;
   gap: 1.75rem;
   margin-bottom: 3rem;
-  box-shadow: 0 10px 25px -5px rgba(22, 101, 52, 0.08);
+  box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.1);
 }
 
 .faq-playful-avatar {
@@ -1427,7 +1429,7 @@ img {
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 8px 20px rgba(45, 106, 79, 0.2);
+  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
   border: 4px solid var(--white);
 }
 
