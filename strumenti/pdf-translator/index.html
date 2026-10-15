@@ -139,7 +139,19 @@
           <div class="progress-title" id="progress-title">Elaborazione in corso...</div>
           <div class="progress-subtitle" id="progress-subtitle">Preparazione e verifica del documento...</div>
         </div>
-        <div class="progress-percent" id="progress-percent">0%</div>
+        <div class="progress-header-right">
+          <div class="progress-actions" id="progress-actions">
+            <button type="button" class="progress-action-btn btn-downgrade-model" id="btn-downgrade-model" style="display: none;" title="Scala al modello Gemini inferiore">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>
+              <span id="btn-downgrade-label">Scala a Gemini 3.7</span>
+            </button>
+            <button type="button" class="progress-action-btn btn-cancel-progress" id="btn-cancel-translate" style="display: none;" title="Annulla traduzione">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <span>Annulla</span>
+            </button>
+          </div>
+          <div class="progress-percent" id="progress-percent">0%</div>
+        </div>
       </div>
       <div class="progress-bar-bg">
         <div class="progress-bar-fill" id="progress-bar-fill"></div>

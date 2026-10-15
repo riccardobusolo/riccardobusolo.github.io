@@ -502,10 +502,11 @@ body::before {
 
 .progress-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .progress-header-info {
@@ -513,6 +514,7 @@ body::before {
   flex-direction: column;
   gap: 3px;
   min-width: 0;
+  flex: 1 1 220px;
 }
 
 .progress-title {
@@ -529,11 +531,68 @@ body::before {
   word-break: break-word;
 }
 
+.progress-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.progress-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-apple);
+  font-size: 0.74rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-glass-subtle);
+  background: var(--bg-pill);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s var(--ease-apple);
+  white-space: nowrap;
+}
+
+.progress-action-btn:hover {
+  background: var(--bg-pill-hover);
+  color: var(--text-primary);
+  border-color: var(--border-glass);
+}
+
+.progress-action-btn.btn-cancel-progress:hover {
+  color: #ff453a;
+  background: rgba(255, 69, 58, 0.12);
+  border-color: rgba(255, 69, 58, 0.35);
+}
+
+.progress-action-btn.btn-downgrade-model {
+  background: rgba(48, 146, 176, 0.12);
+  border-color: rgba(48, 146, 176, 0.32);
+  color: var(--accent);
+}
+
+.progress-action-btn.btn-downgrade-model:hover {
+  background: rgba(48, 146, 176, 0.24);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
 .progress-percent {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--accent);
   flex-shrink: 0;
+  min-width: 32px;
+  text-align: right;
 }
 
 .progress-bar-bg {

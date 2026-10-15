@@ -12,6 +12,11 @@ const AIService = (() => {
     { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash' }
   ];
   let currentWorkingModelIndex = 0;
+  let activeAbortController = null;
+  let pendingRetryTimer = null;
+  let retryResolve = null;
+  let isCancellationRequested = false;
+  let isModelSwitchRequested = false;
   const MAX_RPM = 15;
 
   // Cronologia chiamate per calcolo rate limit scorrevole
@@ -79,13 +84,71 @@ const AIService = (() => {
     return {
       id: current.id,
       name: current.name,
+      index: currentWorkingModelIndex,
       provider: 'gemini',
       qualityLabel: '⭐⭐⭐⭐⭐ 5/5'
     };
   }
 
+  function getNextModel() {
+    if (currentWorkingModelIndex + 1 < CANDIDATE_MODELS.length) {
+      return CANDIDATE_MODELS[currentWorkingModelIndex + 1];
+    }
+    return null;
+  }
+
+  function hasNextModel() {
+    return (currentWorkingModelIndex + 1 < CANDIDATE_MODELS.length);
+  }
+
+  function switchToNextModel() {
+    if (hasNextModel()) {
+      currentWorkingModelIndex++;
+      isModelSwitchRequested = true;
+      const nextM = CANDIDATE_MODELS[currentWorkingModelIndex];
+      console.log(`[DocuShift AI] Scalato manualmente a: ${nextM.name}`);
+
+      if (activeAbortController) {
+        try { activeAbortController.abort(); } catch (_) {}
+        activeAbortController = null;
+      }
+      if (pendingRetryTimer) {
+        clearTimeout(pendingRetryTimer);
+        pendingRetryTimer = null;
+      }
+      if (retryResolve) {
+        const res = retryResolve;
+        retryResolve = null;
+        res({ switched: true, model: nextM });
+      }
+      return nextM;
+    }
+    return null;
+  }
+
+  function cancelCurrentOperation() {
+    isCancellationRequested = true;
+    isModelSwitchRequested = false;
+
+    if (activeAbortController) {
+      try { activeAbortController.abort(); } catch (_) {}
+      activeAbortController = null;
+    }
+    if (pendingRetryTimer) {
+      clearTimeout(pendingRetryTimer);
+      pendingRetryTimer = null;
+    }
+    if (retryResolve) {
+      const res = retryResolve;
+      retryResolve = null;
+      res({ cancelled: true });
+    }
+  }
+
   function resetWorkingModel() {
     currentWorkingModelIndex = 0;
+    isCancellationRequested = false;
+    isModelSwitchRequested = false;
   }
 
   function recordRequest() {
@@ -159,129 +222,215 @@ const AIService = (() => {
     }
   }
 
-  // Chiamata API resiliente: prioritario Gemini 3.8 Flash con retry esponenziale.
-  // In caso di sovraccarico temporaneo dei server Google (503/429), passa in modo trasparente
-  // a Gemini 3.7 Flash o Gemini 3.5 Flash senza interrompere la traduzione.
+  // Chiamata API resiliente: prioritario Gemini 3.8 Flash con retry continuo in caso di 503/429.
+  // Continua a riprovare con Gemini 3.8 Flash finché non ha successo, oppure finché l'utente
+  // non preme esplicitamente il pulsante per scalare al modello inferiore o annulla l'operazione.
   async function callGeminiApi(payload, onStatus = null) {
     const key = getKey();
     if (!key) {
       throw new Error('Nessuna API Key configurata. Inserisci prima la tua chiave Gemini nelle Impostazioni.');
     }
 
+    if (isCancellationRequested) {
+      throw new DOMException('Operazione annullata dall\'utente.', 'AbortError');
+    }
+
     recordRequest();
-    let lastError = null;
+    let attempt = 1;
+    let delay = 1500;
 
-    for (let mIdx = currentWorkingModelIndex; mIdx < CANDIDATE_MODELS.length; mIdx++) {
-      const model = CANDIDATE_MODELS[mIdx];
+    while (true) {
+      if (isCancellationRequested) {
+        throw new DOMException('Operazione annullata dall\'utente.', 'AbortError');
+      }
+
+      const model = CANDIDATE_MODELS[currentWorkingModelIndex] || CANDIDATE_MODELS[0];
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent?key=${key}`;
-      const maxAttempts = (mIdx === 0 ? 3 : 2);
-      let delay = 1500;
 
-      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        try {
-          const resp = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+      activeAbortController = new AbortController();
+      const signal = activeAbortController.signal;
+
+      try {
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal
+        });
+
+        // Se 503 (High demand / Service Unavailable) o 429 (Rate limit)
+        if (resp.status === 503 || resp.status === 429) {
+          const nextModel = getNextModel();
+          if (onStatus) {
+            onStatus({
+              status: 'retry',
+              statusCode: resp.status,
+              modelName: model.name,
+              nextModelName: nextModel?.name,
+              hasNextModel: !!nextModel,
+              attempt,
+              delay,
+              message: `Server Google occupati (${resp.status}) su ${model.name}. Tentativo ${attempt} tra ${(delay / 1000).toFixed(1)}s...`
+            });
+          }
+
+          const sleepResult = await new Promise((resolve) => {
+            retryResolve = resolve;
+            pendingRetryTimer = setTimeout(() => {
+              pendingRetryTimer = null;
+              retryResolve = null;
+              resolve({ timeout: true });
+            }, delay);
           });
 
-          // Se 503 (High demand / Service Unavailable) o 429 (Rate limit)
-          if (resp.status === 503 || resp.status === 429) {
-            const isLastAttempt = (attempt === maxAttempts);
-            const hasNextModel = (mIdx + 1 < CANDIDATE_MODELS.length);
+          if (isCancellationRequested || sleepResult?.cancelled) {
+            throw new DOMException('Operazione annullata dall\'utente.', 'AbortError');
+          }
 
-            if (isLastAttempt && hasNextModel) {
-              const nextModel = CANDIDATE_MODELS[mIdx + 1];
-              console.warn(`[DocuShift AI] ${model.name} saturo (${resp.status}). Switch automatico su ${nextModel.name}...`);
-              if (onStatus) {
-                onStatus({
-                  status: 'switching',
-                  message: `Picco temporaneo su ${model.name}. Switch automatico a ${nextModel.name}...`
-                });
-              }
-              currentWorkingModelIndex = mIdx + 1;
-              break;
-            }
-
-            if (onStatus) {
-              onStatus({
-                status: 'retry',
-                message: `Server Google occupati (${resp.status}). Tentativo ${attempt}/${maxAttempts} tra ${(delay / 1000).toFixed(1)}s...`
-              });
-            }
-            await new Promise(r => setTimeout(r, delay));
-            delay = Math.min(6000, delay * 1.8);
+          if (isModelSwitchRequested || sleepResult?.switched) {
+            isModelSwitchRequested = false;
+            attempt = 1;
+            delay = 1500;
             continue;
           }
 
-          const data = await resp.json().catch(() => ({}));
-          if (!resp.ok) {
-            const errMsg = data.error?.message || `Errore Google API (${resp.status})`;
+          delay = Math.min(5000, Math.round(delay * 1.5));
+          attempt++;
+          continue;
+        }
 
-            // Se il modello è deprecato, non trovato o non supportato (404), passa subito al modello successivo
-            if (resp.status === 404 || errMsg.includes('no longer available') || errMsg.includes('not found') || errMsg.includes('is not supported')) {
-              if (mIdx + 1 < CANDIDATE_MODELS.length) {
-                const nextModel = CANDIDATE_MODELS[mIdx + 1];
-                console.warn(`[DocuShift AI] ${model.name} non disponibile. Passaggio immediato a ${nextModel.name}...`);
-                if (onStatus) {
-                  onStatus({
-                    status: 'switching',
-                    message: `${model.name} non disponibile. Passaggio a ${nextModel.name}...`
-                  });
-                }
-                currentWorkingModelIndex = mIdx + 1;
-                break;
+        const data = await resp.json().catch(() => ({}));
+
+        if (!resp.ok) {
+          const errMsg = data.error?.message || `Errore Google API (${resp.status})`;
+
+          // Se il modello è 404 (non trovato o dismesso da Google), passa al successivo se esiste
+          if (resp.status === 404 || errMsg.includes('no longer available') || errMsg.includes('not found')) {
+            if (hasNextModel()) {
+              const nextM = switchToNextModel();
+              if (onStatus) {
+                onStatus({
+                  status: 'switching',
+                  message: `${model.name} non disponibile. Passaggio a ${nextM.name}...`
+                });
               }
+              attempt = 1;
+              delay = 1500;
+              continue;
             }
-
-            // Se errore di sovraccarico o quota nel corpo del messaggio
-            if (errMsg.includes('high demand') || errMsg.includes('overloaded') || errMsg.includes('Resource has been exhausted')) {
-              if (mIdx + 1 < CANDIDATE_MODELS.length) {
-                const nextModel = CANDIDATE_MODELS[mIdx + 1];
-                if (onStatus) {
-                  onStatus({
-                    status: 'switching',
-                    message: `Carico elevato su ${model.name}. Passaggio a ${nextModel.name}...`
-                  });
-                }
-                currentWorkingModelIndex = mIdx + 1;
-                break;
-              }
-            }
-
-            // Errori critici di autenticazione o chiave
-            if (resp.status === 400 && (errMsg.includes('API key') || errMsg.includes('INVALID_ARGUMENT'))) {
-              throw new Error(`Chiave API Gemini non valida: ${errMsg}`);
-            }
-            if (resp.status === 403 || errMsg.includes('PERMISSION_DENIED')) {
-              throw new Error(`Permessi non autorizzati per questa API Key: ${errMsg}`);
-            }
-
-            throw new Error(errMsg);
           }
 
-          return data;
-
-        } catch (fetchErr) {
-          lastError = fetchErr;
-          if (fetchErr.message?.includes('Chiave API') || fetchErr.message?.includes('PERMISSION_DENIED') || fetchErr.message?.includes('non valida')) {
-            throw fetchErr;
-          }
-          if (attempt < maxAttempts) {
+          // Se errore di sovraccarico o quota nel corpo del messaggio
+          if (errMsg.includes('high demand') || errMsg.includes('overloaded') || errMsg.includes('Resource has been exhausted')) {
+            const nextModel = getNextModel();
             if (onStatus) {
               onStatus({
                 status: 'retry',
-                message: `Tentativo di connessione ${attempt}/${maxAttempts} tra ${(delay / 1000).toFixed(1)}s...`
+                statusCode: 503,
+                modelName: model.name,
+                nextModelName: nextModel?.name,
+                hasNextModel: !!nextModel,
+                attempt,
+                delay,
+                message: `Carico elevato su ${model.name}. Tentativo ${attempt} tra ${(delay / 1000).toFixed(1)}s...`
               });
             }
-            await new Promise(r => setTimeout(r, delay));
-            delay = Math.min(6000, delay * 1.8);
+
+            const sleepResult = await new Promise((resolve) => {
+              retryResolve = resolve;
+              pendingRetryTimer = setTimeout(() => {
+                pendingRetryTimer = null;
+                retryResolve = null;
+                resolve({ timeout: true });
+              }, delay);
+            });
+
+            if (isCancellationRequested || sleepResult?.cancelled) {
+              throw new DOMException('Operazione annullata dall\'utente.', 'AbortError');
+            }
+
+            if (isModelSwitchRequested || sleepResult?.switched) {
+              isModelSwitchRequested = false;
+              attempt = 1;
+              delay = 1500;
+              continue;
+            }
+
+            delay = Math.min(5000, Math.round(delay * 1.5));
+            attempt++;
+            continue;
           }
+
+          // Errori critici di autenticazione o chiave
+          if (resp.status === 400 && (errMsg.includes('API key') || errMsg.includes('INVALID_ARGUMENT'))) {
+            throw new Error(`Chiave API Gemini non valida: ${errMsg}`);
+          }
+          if (resp.status === 403 || errMsg.includes('PERMISSION_DENIED')) {
+            throw new Error(`Permessi non autorizzati per questa API Key: ${errMsg}`);
+          }
+
+          throw new Error(errMsg);
         }
+
+        activeAbortController = null;
+        return data;
+
+      } catch (fetchErr) {
+        activeAbortController = null;
+
+        if (isCancellationRequested || (fetchErr.name === 'AbortError' && !isModelSwitchRequested)) {
+          throw new DOMException('Operazione annullata dall\'utente.', 'AbortError');
+        }
+
+        if (isModelSwitchRequested) {
+          isModelSwitchRequested = false;
+          attempt = 1;
+          delay = 1500;
+          continue;
+        }
+
+        if (fetchErr.message?.includes('Chiave API') || fetchErr.message?.includes('PERMISSION_DENIED') || fetchErr.message?.includes('non valida')) {
+          throw fetchErr;
+        }
+
+        // Riconnessione di rete temporanea
+        const nextModel = getNextModel();
+        if (onStatus) {
+          onStatus({
+            status: 'retry',
+            modelName: model.name,
+            nextModelName: nextModel?.name,
+            hasNextModel: !!nextModel,
+            attempt,
+            delay,
+            message: `Tentativo di connessione a ${model.name} (${attempt}) tra ${(delay / 1000).toFixed(1)}s...`
+          });
+        }
+
+        const sleepResult = await new Promise((resolve) => {
+          retryResolve = resolve;
+          pendingRetryTimer = setTimeout(() => {
+            pendingRetryTimer = null;
+            retryResolve = null;
+            resolve({ timeout: true });
+          }, delay);
+        });
+
+        if (isCancellationRequested || sleepResult?.cancelled) {
+          throw new DOMException('Operazione annullata dall\'utente.', 'AbortError');
+        }
+
+        if (isModelSwitchRequested || sleepResult?.switched) {
+          isModelSwitchRequested = false;
+          attempt = 1;
+          delay = 1500;
+          continue;
+        }
+
+        delay = Math.min(5000, Math.round(delay * 1.5));
+        attempt++;
       }
     }
-
-    throw lastError || new Error('Server Gemini temporaneamente saturi. Riprova tra pochi istanti.');
   }
 
   // Test di connessione per la chiave Gemini
@@ -453,6 +602,9 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido contenente l'array "translatio
       });
 
     } catch (batchErr) {
+      if (batchErr.name === 'AbortError' || batchErr.message?.includes('annullat')) {
+        throw batchErr;
+      }
       console.error('[DocuShift AI] Errore blocco traduzione:', batchErr);
       throw new Error(`Errore durante la traduzione con Gemini (${batchErr.message || 'Server occupato'}). Verifica la tua chiave API o riprova tra pochi secondi.`);
     }
@@ -466,7 +618,11 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido contenente l'array "translatio
     getKeys,
     setKeys,
     getActiveModel,
+    getNextModel,
+    hasNextModel,
+    switchToNextModel,
     resetWorkingModel,
+    cancelCurrentOperation,
     getQuotaStatus,
     generateMagicLink,
     testConnection,

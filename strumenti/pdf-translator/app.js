@@ -47,6 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const step3 = document.getElementById('step-3');
   const step4 = document.getElementById('step-4');
 
+  // Pulsanti Azioni Progress (Annulla e Scala Modello)
+  const btnCancelTranslate = document.getElementById('btn-cancel-translate');
+  const btnDowngradeModel = document.getElementById('btn-downgrade-model');
+  const btnDowngradeLabel = document.getElementById('btn-downgrade-label');
+
   // Elementi Viewer
   const viewerSection = document.getElementById('viewer-section');
   const btnPrevPage = document.getElementById('btn-prev-page');
@@ -99,6 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let totalPages = 1;
   let currentZoom = 1.25;
   let quotaTimerInterval = null;
+  let isTranslating = false;
+  let isTranslationCancelled = false;
 
   // Inizializzazione automatica Magic Link / config locale
   const autoAuthResult = AIService.initAutoAuth();
@@ -277,6 +284,52 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Helper per aggiornare visibilità e testo del pulsante "Scala Modello"
+  function updateDowngradeButton() {
+    if (!btnDowngradeModel || !btnDowngradeLabel) return;
+    if (isTranslating && AIService.hasNextModel()) {
+      const next = AIService.getNextModel();
+      btnDowngradeLabel.textContent = `Scala a ${next.name}`;
+      btnDowngradeModel.style.display = 'inline-flex';
+    } else {
+      btnDowngradeModel.style.display = 'none';
+    }
+  }
+
+  // Listener per pulsante Annulla
+  if (btnCancelTranslate) {
+    btnCancelTranslate.addEventListener('click', () => {
+      if (!isTranslating) return;
+      isTranslationCancelled = true;
+      AIService.cancelCurrentOperation();
+      progressTitle.textContent = 'Traduzione annullata';
+      if (progressSubtitle) {
+        progressSubtitle.textContent = 'Operazione interrotta dall\'utente.';
+      }
+      progressBarFill.style.background = 'var(--text-tertiary)';
+      btnCancelTranslate.style.display = 'none';
+      if (btnDowngradeModel) btnDowngradeModel.style.display = 'none';
+      btnTranslate.disabled = false;
+      showToast('Traduzione annullata dall\'utente.', 'warning', 4000);
+    });
+  }
+
+  // Listener per pulsante Scala Modello (su richiesta esplicita dell'utente)
+  if (btnDowngradeModel) {
+    btnDowngradeModel.addEventListener('click', () => {
+      if (!isTranslating) return;
+      const nextModel = AIService.switchToNextModel();
+      if (nextModel) {
+        showToast(`Passaggio a ${nextModel.name} attivato!`, 'info', 3000);
+        updateDowngradeButton();
+        if (progressSubtitle) {
+          progressSubtitle.textContent = `Richiesto passaggio a ${nextModel.name}. Riconnessione in corso...`;
+        }
+        progressTitle.textContent = `2. Traduzione con ${nextModel.name}`;
+      }
+    });
+  }
+
   // =========================================================================
   // PIPELINE DI TRADUZIONE CON STATI ESPLICATIVI E RESILIENZA AGLI ERRORI
   // =========================================================================
@@ -288,6 +341,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    isTranslating = true;
+    isTranslationCancelled = false;
     AIService.resetWorkingModel();
     const targetLang = targetLangSelect.value;
     const detected = (detectedLangText.textContent || '').trim().toLowerCase();
@@ -300,9 +355,14 @@ document.addEventListener('DOMContentLoaded', () => {
     progressCard.classList.add('active');
     viewerSection.classList.remove('active');
 
+    // Mostra pulsanti Annulla e Scala Modello
+    if (btnCancelTranslate) btnCancelTranslate.style.display = 'inline-flex';
+    updateDowngradeButton();
+
     updateProgress(10, '1. Analisi del documento PDF', `Estrazione testo, coordinate e font per ${totalPages} pagine...`, 1);
 
     try {
+      if (isTranslationCancelled) return;
       const allBlocks = parsedPdfData.pages.flatMap(p => p.blocks);
       if (allBlocks.length === 0) {
         throw new Error('Nessun testo estraibile rilevato nel documento. Se il PDF è una scansione o un\'immagine, è necessario un file con testo vettoriale selezionabile.');
@@ -316,11 +376,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const totalBatches = Math.ceil(allBlocks.length / batchSize);
 
       for (let i = 0; i < allBlocks.length; i += batchSize) {
+        if (isTranslationCancelled) return;
         const batch = allBlocks.slice(i, i + batchSize);
         const batchIndex = Math.floor(i / batchSize) + 1;
         const percent = 25 + Math.round((batchIndex / totalBatches) * 55);
         const currentModelName = AIService.getActiveModel().name;
 
+        updateDowngradeButton();
         updateProgress(
           percent,
           `2. Traduzione con ${currentModelName}`,
@@ -328,19 +390,22 @@ document.addEventListener('DOMContentLoaded', () => {
           2
         );
 
-        // Notifica in tempo reale se Google Gemini risponde con 503 (picco di traffico) o fallback
+        // Notifica in tempo reale se Google Gemini risponde con 503 (picco di traffico) o fallback manuale
         const onStatus = (info) => {
+          if (isTranslationCancelled) return;
+          updateDowngradeButton();
+          const activeModelName = AIService.getActiveModel().name;
           if (info.status === 'switching') {
             updateProgress(
               percent,
-              `Ottimizzazione automatica...`,
+              `Passaggio a ${activeModelName}...`,
               info.message,
               2
             );
           } else if (info.status === 'retry') {
             updateProgress(
               percent,
-              `Attesa risposta server Google...`,
+              `2. Traduzione con ${info.modelName || activeModelName}`,
               info.message,
               2
             );
@@ -348,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules, onStatus);
+        if (isTranslationCancelled) return;
 
         translatedBatch.forEach((item, idx) => {
           if (item) {
@@ -357,9 +423,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
+      if (isTranslationCancelled) return;
       updateProgress(82, '3. Adattamento grafico del layout', 'Calcolo ingombri e ridimensionamento proporzionale font per preservare grafica e immagini...', 3);
       const minFontScale = parseInt(rangeFontScale.value, 10) / 100;
 
+      if (isTranslationCancelled) return;
       updateProgress(92, '4. Compilazione del nuovo file PDF', `Inserimento testi tradotti e composizione vettoriale (${totalPages} pagine)...`, 4);
       
       // Assicura un buffer fresco e mai scollegato (non-detached) rileggendolo direttamente dal file caricato
@@ -378,6 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error('Buffer del documento originale non disponibile o scollegato. Ricarica il file PDF.');
       }
 
+      if (isTranslationCancelled) return;
       translatedPdfBytes = await PDFEngine.buildTranslatedPDF(
         compileBytes,
         parsedPdfData.pages,
@@ -385,8 +454,11 @@ document.addEventListener('DOMContentLoaded', () => {
         { minFontScale }
       );
 
+      if (isTranslationCancelled) return;
       updateProgress(100, 'Traduzione completata con successo!', `Tutte le ${totalPages} pagine sono state tradotte. Visualizza l'anteprima o scarica il file.`, 4);
-      setTimeout(() => progressCard.classList.remove('active'), 2500);
+      setTimeout(() => {
+        if (!isTranslating) progressCard.classList.remove('active');
+      }, 2500);
 
       // Download link
       const blob = new Blob([translatedPdfBytes], { type: 'application/pdf' });
@@ -403,6 +475,15 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('Traduzione completata con successo!', 'success', 4000);
 
     } catch (err) {
+      if (isTranslationCancelled || err.name === 'AbortError' || err.message?.includes('annullat')) {
+        progressTitle.textContent = 'Traduzione annullata';
+        if (progressSubtitle) {
+          progressSubtitle.textContent = 'Operazione interrotta dall\'utente.';
+        }
+        progressBarFill.style.background = 'var(--text-tertiary)';
+        return;
+      }
+
       console.error(err);
       progressTitle.textContent = 'Processo interrotto';
       if (progressSubtitle) {
@@ -419,7 +500,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Mostra l'errore chiaramente a schermo: rimosso a mano o automaticamente dopo 10 secondi
       showToast(err.message || 'Errore durante la traduzione', 'error', 10000);
     } finally {
+      isTranslating = false;
       btnTranslate.disabled = false;
+      if (btnCancelTranslate) btnCancelTranslate.style.display = 'none';
+      if (btnDowngradeModel) btnDowngradeModel.style.display = 'none';
     }
   });
 
