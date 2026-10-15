@@ -339,50 +339,88 @@ Restituisci ESCLUSIVAMENTE un oggetto JSON valido in questo formato:
         glossaryRules.map(r => `- "${r.source}" DEVE essere tradotto come "${r.target}"`).join('\n');
     }
 
-    const systemPrompt = `Sei un traduttore professionale di documenti e manuali tecnici.
-Il tuo compito è tradurre una lista di segmenti di testo mantenendo fedelmente significato, tono e contesto del documento.
+    const systemPrompt = `Sei un traduttore professionale di manuali tecnici industriali e documentazione ingegneristica.
+Il tuo compito è tradurre la lista di segmenti forniti verso la lingua di destinazione: "${targetLang}".
 
-VINCOLO CRUCIALE DI DESIGN (PRESERVAZIONE DEL LAYOUT):
-Il testo tradotto andrà inserito in riquadri grafici PDF a dimensione fissa.
-È FONDAMENTALE che la traduzione in ${targetLang} sia CONCISA e NON superi la lunghezza dell'originale se non strettamente necessario, per evitare sovrapposizioni visive con immagini o bordi.${glossaryInstruction}
+VINCOLO ASSOLUTO DI LINGUA TARGET:
+1. DEVI tradurre OGNI elemento in "${targetLang}". Non lasciare testi nella lingua di partenza.
+2. Ad esempio, per traduzione in Inglese (English):
+   - "ALIMENTATORE VENTURI" -> "VENTURI FEEDER"
+   - "MANUALE D'ISTRUZIONI" -> "INSTRUCTION MANUAL"
+   - "INDICE" -> "TABLE OF CONTENTS"
+   - "Regole di sicurezza" -> "Safety Rules"
+   - "Simboli grafici" -> "Graphic Symbols"
+   - "Maneggiamento" -> "Handling"
+   - "Installazione" -> "Installation"
+   - "Operazione" -> "Operation"
+   - "Pannello di controllo" -> "Control Panel"
+   - "Manutenzione" -> "Maintenance"
+   - "Parti di ricambio" -> "Spare Parts"
+   - "PERICOLO" -> "DANGER"
+   - "ALLARME" -> "WARNING"
+   - "ATTENZIONE" -> "CAUTION"
+   - "Superficie calda!" -> "Hot surface!"
+   - "Pericolo di shocks elettrici!" -> "Danger of electric shock!"
 
-REGOLE DI RISPOSTA:
-1. DEVI restituire ESCLUSIVAMENTE un oggetto JSON valido contenente la chiave "translations" con la lista degli oggetti tradotti.
-2. IMPORTANTE: Anche se il testo sorgente dovesse essere già in ${targetLang} o se ritieni non necessiti modifiche, restituisci COMUNQUE tutti gli elementi con i loro id e il testo.
-3. NON includere MAI spiegazioni, introduzioni o note discorsive. Solo JSON.
+CORREZIONE AUTOMATICA ERRORI DI ESTRAZIONE E LIGATURE:
+Nel testo possono comparire lettere artefatte dovute all'estrazione PDF (es. 'y' al posto di 'fi', come 'deumidiycazione' = 'deumidificazione', 'grayci' = 'grafici', 'zusso' = 'flusso', 'zuidi' = 'fluidi', 'inyammabile' = 'infiammabile', 'polveri yni' = 'polveri fini', 'Superycie' = 'Superficie', 'certiychi' = 'certifichi', o spazi anomali come 'grafi ci' = 'grafici').
+Traduci SEMPRE il significato reale corretto.${glossaryInstruction}
 
-Esempio output valido:
+VINCOLO DI LAYOUT:
+Le traduzioni andranno inserite in riquadri grafici PDF a dimensione prefissata.
+Mantieni le traduzioni concise ed efficaci per evitare sbordature.
+
+REGOLE DI FORMATO:
+Restituisci ESCLUSIVAMENTE un oggetto JSON valido contenente l'array "translations" di oggetti con "id" e "translated":
 {
   "translations": [
-    {"id": 1, "translated": "Testo tradotto..."},
-    {"id": 2, "translated": "Altro testo..."}
+    {"id": "p1_b1", "translated": "Translated text in ${targetLang}..."}
   ]
 }`;
 
     const payload = items.map(it => ({ id: it.id, text: it.text }));
 
     const body = {
-      contents: [{ parts: [{ text: `${systemPrompt}\n\nTraduci i seguenti blocchi:\n${JSON.stringify(payload)}` }] }],
+      contents: [{ parts: [{ text: `${systemPrompt}\n\nTraduci i seguenti blocchi in ${targetLang}:\n${JSON.stringify(payload)}` }] }],
       generationConfig: {
         responseMimeType: 'application/json',
-        temperature: 0.15
+        temperature: 0.1
       }
     };
 
     try {
       const data = await callGeminiApi(body, onStatus);
       const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!rawText) throw new Error('Nessuna traduzione ricevuta da Gemini');
+      if (!rawText) throw new Error('Nessuna risposta ricevuta da Gemini');
       const parsed = parseSafeJSON(rawText);
-      if (Array.isArray(parsed)) return parsed;
-      return parsed.translations || parsed.items || Object.values(parsed);
+
+      let list = [];
+      if (Array.isArray(parsed)) {
+        list = parsed;
+      } else if (parsed && parsed.translations && Array.isArray(parsed.translations)) {
+        list = parsed.translations;
+      } else if (parsed && parsed.items && Array.isArray(parsed.items)) {
+        list = parsed.items;
+      } else if (parsed && typeof parsed === 'object') {
+        list = Object.values(parsed);
+      }
+
+      // Mappatura iper-resiliente sia per ID che per INDICE posizionale:
+      return items.map((origItem, idx) => {
+        const byId = list.find(it => it && String(it.id) === String(origItem.id));
+        const byIndex = list[idx];
+        const resText = (byId && (byId.translated || byId.text)) || 
+                        (byIndex && (byIndex.translated || byIndex.text)) || 
+                        origItem.text;
+        return {
+          id: origItem.id,
+          translated: resText
+        };
+      });
+
     } catch (batchErr) {
       console.error('[DocuShift AI] Errore blocco traduzione:', batchErr);
-      if (batchErr.message.includes('API key') || batchErr.message.includes('Resource has been exhausted') || batchErr.message.includes('PERMISSION_DENIED')) {
-        throw batchErr;
-      }
-      console.warn('[DocuShift AI] Fallback: mantengo testi originali per questo blocco.');
-      return items.map(it => ({ id: it.id, translated: it.text }));
+      throw new Error(`Errore durante la traduzione con Gemini (${batchErr.message || 'Server occupato'}). Verifica la tua chiave API o riprova tra pochi secondi.`);
     }
   }
 

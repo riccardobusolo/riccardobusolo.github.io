@@ -5,7 +5,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('[DocuShift v3.8] Initialized - PDFLib ready:', typeof window.PDFLib !== 'undefined', 'fontkit ready:', typeof window.fontkit !== 'undefined');
+  console.log('[DocuShift v3.9] Initialized - PDFLib ready:', typeof window.PDFLib !== 'undefined', 'fontkit ready:', typeof window.fontkit !== 'undefined');
 
   // Theme Toggle
   const btnThemeToggle = document.getElementById('btn-theme-toggle');
@@ -290,6 +290,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     AIService.resetWorkingModel();
     const targetLang = targetLangSelect.value;
+    const detected = (detectedLangText.textContent || '').trim().toLowerCase();
+    if (detected && !detected.includes('auto') && detected.includes(targetLang.toLowerCase())) {
+      showToast(`Nota: La lingua rilevata (${detectedLangText.textContent}) coincide con la destinazione (${targetLang}). Verifica di aver impostato la lingua corretta.`, 'warning', 6000);
+    }
     btnTranslate.disabled = true;
     if (progressErrorBox) progressErrorBox.style.display = 'none';
     progressBarFill.style.background = 'var(--accent)';
@@ -345,9 +349,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules, onStatus);
 
-        translatedBatch.forEach(item => {
-          if (item && item.id) {
-            translationsMap[item.id] = item.translated;
+        translatedBatch.forEach((item, idx) => {
+          if (item) {
+            if (item.id) translationsMap[item.id] = item.translated;
+            if (batch[idx] && batch[idx].id) translationsMap[batch[idx].id] = item.translated;
           }
         });
       }
