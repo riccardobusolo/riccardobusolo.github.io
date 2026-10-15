@@ -8,8 +8,8 @@
 const AIService = (() => {
   const CANDIDATE_MODELS = [
     { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash' },
-    { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
-    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' }
+    { id: 'gemini-3.7-flash', name: 'Gemini 3.7 Flash' },
+    { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash' }
   ];
   let currentWorkingModelIndex = 0;
   const MAX_RPM = 15;
@@ -159,8 +159,9 @@ const AIService = (() => {
     }
   }
 
-  // Chiamata API resiliente: prova Gemini 3.8 Flash e se Google restituisce 503 (High Demand),
-  // passa automaticamente a Gemini 2.5 Flash / 2.0 Flash usando la stessa identica API Key
+  // Chiamata API resiliente: prioritario Gemini 3.8 Flash con retry esponenziale.
+  // In caso di sovraccarico temporaneo dei server Google (503/429), passa in modo trasparente
+  // a Gemini 3.7 Flash o Gemini 3.5 Flash senza interrompere la traduzione.
   async function callGeminiApi(payload, onStatus = null) {
     const key = getKey();
     if (!key) {
@@ -173,8 +174,8 @@ const AIService = (() => {
     for (let mIdx = currentWorkingModelIndex; mIdx < CANDIDATE_MODELS.length; mIdx++) {
       const model = CANDIDATE_MODELS[mIdx];
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent?key=${key}`;
-      const maxAttempts = (mIdx === 0 ? 2 : 2);
-      let delay = 1200;
+      const maxAttempts = (mIdx === 0 ? 3 : 2);
+      let delay = 1500;
 
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         try {
@@ -184,18 +185,18 @@ const AIService = (() => {
             body: JSON.stringify(payload)
           });
 
-          // Se 503 (High demand) o 429
+          // Se 503 (High demand / Service Unavailable) o 429 (Rate limit)
           if (resp.status === 503 || resp.status === 429) {
             const isLastAttempt = (attempt === maxAttempts);
             const hasNextModel = (mIdx + 1 < CANDIDATE_MODELS.length);
 
             if (isLastAttempt && hasNextModel) {
               const nextModel = CANDIDATE_MODELS[mIdx + 1];
-              console.warn(`[DocuShift AI] ${model.name} saturo (503). Switch automatico su ${nextModel.name}...`);
+              console.warn(`[DocuShift AI] ${model.name} saturo (${resp.status}). Switch automatico su ${nextModel.name}...`);
               if (onStatus) {
                 onStatus({
                   status: 'switching',
-                  message: `Picco su ${model.name} (503). Risolvo passando a ${nextModel.name}...`
+                  message: `Picco temporaneo su ${model.name}. Switch automatico a ${nextModel.name}...`
                 });
               }
               currentWorkingModelIndex = mIdx + 1;
@@ -205,17 +206,35 @@ const AIService = (() => {
             if (onStatus) {
               onStatus({
                 status: 'retry',
-                message: `Server Google occupati (503). Tentativo ${attempt}/${maxAttempts} tra ${(delay / 1000).toFixed(1)}s...`
+                message: `Server Google occupati (${resp.status}). Tentativo ${attempt}/${maxAttempts} tra ${(delay / 1000).toFixed(1)}s...`
               });
             }
             await new Promise(r => setTimeout(r, delay));
-            delay *= 1.8;
+            delay = Math.min(6000, delay * 1.8);
             continue;
           }
 
           const data = await resp.json().catch(() => ({}));
           if (!resp.ok) {
             const errMsg = data.error?.message || `Errore Google API (${resp.status})`;
+
+            // Se il modello è deprecato, non trovato o non supportato (404), passa subito al modello successivo
+            if (resp.status === 404 || errMsg.includes('no longer available') || errMsg.includes('not found') || errMsg.includes('is not supported')) {
+              if (mIdx + 1 < CANDIDATE_MODELS.length) {
+                const nextModel = CANDIDATE_MODELS[mIdx + 1];
+                console.warn(`[DocuShift AI] ${model.name} non disponibile. Passaggio immediato a ${nextModel.name}...`);
+                if (onStatus) {
+                  onStatus({
+                    status: 'switching',
+                    message: `${model.name} non disponibile. Passaggio a ${nextModel.name}...`
+                  });
+                }
+                currentWorkingModelIndex = mIdx + 1;
+                break;
+              }
+            }
+
+            // Se errore di sovraccarico o quota nel corpo del messaggio
             if (errMsg.includes('high demand') || errMsg.includes('overloaded') || errMsg.includes('Resource has been exhausted')) {
               if (mIdx + 1 < CANDIDATE_MODELS.length) {
                 const nextModel = CANDIDATE_MODELS[mIdx + 1];
@@ -229,6 +248,15 @@ const AIService = (() => {
                 break;
               }
             }
+
+            // Errori critici di autenticazione o chiave
+            if (resp.status === 400 && (errMsg.includes('API key') || errMsg.includes('INVALID_ARGUMENT'))) {
+              throw new Error(`Chiave API Gemini non valida: ${errMsg}`);
+            }
+            if (resp.status === 403 || errMsg.includes('PERMISSION_DENIED')) {
+              throw new Error(`Permessi non autorizzati per questa API Key: ${errMsg}`);
+            }
+
             throw new Error(errMsg);
           }
 
@@ -236,12 +264,18 @@ const AIService = (() => {
 
         } catch (fetchErr) {
           lastError = fetchErr;
-          if (fetchErr.message?.includes('API key') || fetchErr.message?.includes('PERMISSION_DENIED') || fetchErr.message?.includes('INVALID_ARGUMENT')) {
+          if (fetchErr.message?.includes('Chiave API') || fetchErr.message?.includes('PERMISSION_DENIED') || fetchErr.message?.includes('non valida')) {
             throw fetchErr;
           }
           if (attempt < maxAttempts) {
+            if (onStatus) {
+              onStatus({
+                status: 'retry',
+                message: `Tentativo di connessione ${attempt}/${maxAttempts} tra ${(delay / 1000).toFixed(1)}s...`
+              });
+            }
             await new Promise(r => setTimeout(r, delay));
-            delay *= 1.8;
+            delay = Math.min(6000, delay * 1.8);
           }
         }
       }
