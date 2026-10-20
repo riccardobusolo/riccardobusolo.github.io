@@ -71,8 +71,9 @@
     });
     canvas.setAttribute('aria-label', `Rete neurale 4, 6, 5, 3. Campione ${sample}. Output: classe ${'ABC'[winner]}, probabilità ${(output[winner] * 100).toFixed(1)}%.`);
   }
-  // True 3D coordinates: four separated neuron planes, orthographic camera,
-  // yaw/pitch rotation and depth-sorted primitives on a transparent canvas.
+  // True 3D coordinates: four separated neuron planes, fixed perspective camera,
+  // trackball rotation and depth-sorted primitives on a transparent canvas.
+  const cameraDistance = 24;
   const geometry = counts.map((n, l) => Array.from({length:n}, (_, i) => {
     const angle = i / n * Math.PI * 2 + Math.PI / 4;
     const radius = [1.45, 2.05, 1.8, 1.25][l];
@@ -128,13 +129,14 @@
     ctx.clearRect(0, 0, width, height);
     const mobile = width < 700;
     const areaHeight = height - (mobile ? 220 : 160);
-    // Fixed viewport scale and orthographic projection: rotating never changes zoom.
-    // A 15-unit bounding sphere fits all orientations, including vertical ones.
+    // Viewport scale and camera stay fixed while rotating. Only physical depth
+    // changes apparent size; the framing does not fit itself to each orientation.
     const scale = Math.min((width - (mobile ? 40 : 130)) / 15, areaHeight / 15);
     const centerY = 48 + areaHeight / 2;
     const project = p => {
       const q = rotate(p);
-      return {x:width / 2 + q.x * scale, y:centerY + q.y * scale, z:q.z, s:1};
+      const perspective = cameraDistance / (cameraDistance + q.z);
+      return {x:width / 2 + q.x * scale * perspective, y:centerY + q.y * scale * perspective, z:q.z, s:perspective};
     };
     points = geometry.map(layer => layer.map(project));
     const primitives = [];
