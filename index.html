@@ -79,6 +79,8 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
   <style>
+    /* Dark theme for OpenStreetMap tiles */
+    .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88)}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     :root{--bg:#08080e;--bg-card:#151518;--bg-card-hover:#1c1c20;--border:rgba(180,180,190,.08);--border-hover:rgba(180,180,190,.2);--text:#e6e6ea;--text-dim:#9a9a9e;--text-muted:#7a7a8e;--cyan:#00e0d0;--cyan-glow:rgba(0,224,208,.3);--cyan-subtle:rgba(0,224,208,.06);--blue:#4facfe;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
     html{scroll-behavior:smooth}
@@ -1026,24 +1028,14 @@
       attributionControl: false
     });
 
-    // Dark tile layer (CARTO) with automatic fallback to OpenStreetMap
-    const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // Tile layer: OpenStreetMap (free), styled dark via CSS filter
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18
-    });
-    const osmFallback = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18
-    });
-    cartoDark.on('tileerror', function() {
-      if (map.hasLayer(cartoDark)) {
-        map.removeLayer(cartoDark);
-        osmFallback.addTo(map);
-      }
-    });
-    cartoDark.addTo(map);
+    }).addTo(map);
 
     // Attribution in bottom-right (compact)
     L.control.attribution({ position: 'bottomright', prefix: false })
-      .addAttribution('&copy; <a href="https://www.openstreetmap.org/copyright" style="color:#7a7a8e">OSM</a> &copy; <a href="https://carto.com/" style="color:#7a7a8e">CARTO</a>')
+      .addAttribution('&copy; <a href="https://www.openstreetmap.org/copyright" style="color:#7a7a8e">OpenStreetMap</a>')
       .addTo(map);
 
     // Coverage circle
