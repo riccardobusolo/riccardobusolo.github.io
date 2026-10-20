@@ -126,12 +126,6 @@
     .nn-wrap{position:relative;width:100%;height:clamp(280px,42vh,600px);overflow:hidden;cursor:grab;z-index:0}
     .nn-wrap:active{cursor:grabbing}
     .nn-wrap canvas{display:block;width:100%;height:100%}
-    .nn-fade-top,.nn-fade-bot{position:absolute;left:0;right:0;pointer-events:none;z-index:2}
-    .nn-fade-top{top:0;height:120px;background:linear-gradient(to bottom,var(--bg) 0%,rgba(8,8,14,.7) 40%,transparent 100%)}
-    .nn-fade-bot{bottom:0;height:120px;background:linear-gradient(to top,var(--bg) 0%,rgba(8,8,14,.7) 40%,transparent 100%)}
-    .nn-fade-left,.nn-fade-right{position:absolute;top:0;bottom:0;width:15%;pointer-events:none;z-index:2}
-    .nn-fade-left{left:0;background:linear-gradient(to right,var(--bg) 0%,rgba(8,8,14,.5) 40%,transparent 100%)}
-    .nn-fade-right{right:0;background:linear-gradient(to left,var(--bg) 0%,rgba(8,8,14,.5) 40%,transparent 100%)}
     .section{padding:100px 0}
     .section__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:12px}
     .section__title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;letter-spacing:-.03em;margin-bottom:48px}
@@ -344,10 +338,6 @@
   </div>
 
   <div class="nn-wrap" id="nn-wrap">
-    <div class="nn-fade-top"></div>
-    <div class="nn-fade-bot"></div>
-    <div class="nn-fade-left"></div>
-    <div class="nn-fade-right"></div>
     <canvas id="nn-canvas"></canvas>
   </div>
 
@@ -523,75 +513,64 @@
     const wrap=document.getElementById('nn-wrap'),nnCanvas=document.getElementById('nn-canvas');
     if(!wrap||!nnCanvas) return;
 
-    /* ═══ Spiking neural network: stochastic firing, synaptic pulse propagation ═══ */
+    /* === Feedforward deep network: dense architecture, stochastic spiking === */
 
-    // ── Graph: layered network with organic jitter + long-range skip connections ──
-    const LAYERS=[4,6,8,10,12,14,14,12,10,8,6,4];
-    const LZS=5.5, NXY=1.75, CK=4, NR=0.15;
-    const tZ=(LAYERS.length-1)*LZS;
+    // Architecture: clean tapered layers, neurons packed in discs (sunflower spiral)
+    const COUNTS=[10,14,18,22,26,30,26,22,18,14,10,6];
+    const LZS=3.3, NR=0.17, GOLD=2.399963;
+    const tZ=(COUNTS.length-1)*LZS;
     const pos=[], lG=[]; let nC=0;
-    LAYERS.forEach((n,li)=>{
-      const z=-tZ/2+li*LZS, cols=Math.ceil(Math.sqrt(n*1.7)), rows=Math.ceil(n/cols);
-      const ox=-(cols-1)*NXY/2, oy=-(rows-1)*NXY/2, g=[];
+    COUNTS.forEach((n,li)=>{
+      const z=-tZ/2+li*LZS, R=Math.sqrt(n)*0.92, g=[];
       for(let i=0;i<n;i++){
-        const jx=(Math.random()-.5)*NXY*.55, jy=(Math.random()-.5)*NXY*.55;
-        const x=ox+(i%cols)*NXY+jx, y=oy+Math.floor(i/cols)*NXY+jy;
-        pos.push(x,y,z); g.push({x,y,z,idx:nC++,d:li/(LAYERS.length-1)});
+        const r=R*Math.sqrt((i+.5)/n), a=i*GOLD;
+        pos.push(r*Math.cos(a), r*Math.sin(a), z);
+        g.push({idx:nC++, d:li/(COUNTS.length-1)});
       }
       lG.push(g);
     });
 
-    // ── Edges: k-nearest to next layer + a few long-range skip links ──
+    // Dense feedforward connectivity (layer i -> i+1), few long-range shortcuts
     const eV=[], adj=Array.from({length:nC},()=>[]);
     function addEdge(a,b){
       eV.push(pos[a*3],pos[a*3+1],pos[a*3+2],pos[b*3],pos[b*3+1],pos[b*3+2]);
       adj[a].push({to:b,len:Math.hypot(pos[b*3]-pos[a*3],pos[b*3+1]-pos[a*3+1],pos[b*3+2]-pos[a*3+2])});
     }
-    for(let li=0;li<lG.length-1;li++){
-      const from=lG[li], to=lG[li+1];
-      from.forEach(fn=>{
-        const scored=to.map(tn=>({tn,d:(tn.x-fn.x)**2+(tn.y-fn.y)**2+(Math.random()-.5)*3}));
-        scored.sort((a,b)=>a.d-b.d);
-        const k=Math.min(CK,scored.length);
-        for(let j=0;j<k;j++) addEdge(fn.idx,scored[j].tn.idx);
-      });
-    }
-    for(let li=0;li<lG.length-2;li++){
-      lG[li].forEach(fn=>{
-        if(Math.random()<.22){
-          const to=lG[li+2][Math.floor(Math.random()*lG[li+2].length)];
-          addEdge(fn.idx,to.idx);
-        }
-      });
-    }
+    for(let li=0;li<lG.length-1;li++)
+      for(const fn of lG[li])
+        for(const tn of lG[li+1]) addEdge(fn.idx,tn.idx);
+    for(let li=0;li<lG.length-3;li++)
+      for(const fn of lG[li])
+        if(Math.random()<.15) addEdge(fn.idx,lG[li+3][Math.floor(Math.random()*lG[li+3].length)].idx);
 
-    // ── Spiking simulation state ──
-    const SPEED=9, THR=0.55, LEAK=2.2, REFR=0.28, SPONT=0.10, GLOW_DECAY=2.6;
+    // Spiking dynamics: leaky integrate-and-fire, forward-biased spontaneity
+    const SPEED=10, THR=0.5, LEAK=2.5, REFR=0.35, GLOW_DECAY=2.4;
     const pot=new Float32Array(nC), refr=new Float32Array(nC), glow=new Float32Array(nC);
-    const pending=[]; // synaptic events in flight: {t, j, w}
+    const pending=[];
     let simT=0;
 
-    // ── Three.js scene ──
+    // Renderer: fully transparent canvas
     const ren=new THREE.WebGLRenderer({canvas:nnCanvas,antialias:true,powerPreference:"high-performance",alpha:true});
     ren.setClearColor(0x000000,0);
+    ren.setPixelRatio(Math.min(devicePixelRatio,2));
     const sc=new THREE.Scene();
-    sc.fog=new THREE.FogExp2(0x08080e,0.011);
-    const cam=new THREE.PerspectiveCamera(50,1,0.1,600);
-    function nnSz(){const r=wrap.getBoundingClientRect();ren.setSize(r.width,r.height);ren.setPixelRatio(Math.min(devicePixelRatio,2));cam.aspect=r.width/r.height;cam.updateProjectionMatrix();}
-    // Neurons: instanced spheres with per-instance glow (set by the spiking sim)
+    const cam=new THREE.PerspectiveCamera(46,1,0.1,400);
+    function nnSz(){const r=wrap.getBoundingClientRect();ren.setSize(r.width,r.height);cam.aspect=r.width/r.height;cam.updateProjectionMatrix();}
+
+    // Neurons: instanced spheres, glow driven by the spiking sim
     const nVS=`attribute float aGlow;attribute float aDepth;varying float vG;varying float vD;varying float vZ;
       void main(){vG=aGlow;vD=aDepth;vec4 mv=modelViewMatrix*instanceMatrix*vec4(position,1.0);vZ=-mv.z;gl_Position=projectionMatrix*mv;}`;
     const nFS=`varying float vG;varying float vD;varying float vZ;
       void main(){
-        vec3 cyan=vec3(0.0,0.878,0.816),blue=vec3(0.31,0.675,0.996);
-        vec3 base=mix(cyan,blue,vD);
-        float near=smoothstep(95.0,22.0,vZ);
-        float g=min(vG,1.4);
-        vec3 col=base*(0.04+g*1.1)+vec3(1.0)*g*g*0.28;
-        float alpha=(0.09+min(g,1.2)*0.85)*near;
+        vec3 cyan=vec3(0.0,0.878,0.816),azure=vec3(0.19,0.573,0.69),blue=vec3(0.31,0.675,0.996);
+        vec3 base=vD<.5?mix(cyan,azure,vD*2.):mix(azure,blue,(vD-.5)*2.);
+        float near=smoothstep(120.0,28.0,vZ);
+        float g=min(vG,1.6);
+        vec3 col=base*(0.05+g*1.2)+vec3(1.0)*g*g*0.30;
+        float alpha=(0.10+min(g,1.3)*0.9)*near;
         gl_FragColor=vec4(col,alpha);
       }`;
-    const sG=new THREE.SphereGeometry(NR,10,8);
+    const sG=new THREE.SphereGeometry(NR,12,10);
     sG.setAttribute('aGlow',new THREE.InstancedBufferAttribute(glow,1));
     const depthArr=new Float32Array(nC);
     for(const g of lG) for(const n of g) depthArr[n.idx]=n.d;
@@ -601,13 +580,13 @@
     for(let i=0;i<nC;i++){dm.position.set(pos[i*3],pos[i*3+1],pos[i*3+2]);dm.updateMatrix();nM.setMatrixAt(i,dm.matrix);}
     nM.instanceMatrix.needsUpdate=true;sc.add(nM);
 
-    // Synapses: faint static lines
+    // Synapses: hairline web
     const cG=new THREE.BufferGeometry();
     cG.setAttribute('position',new THREE.Float32BufferAttribute(eV,3));
-    sc.add(new THREE.LineSegments(cG,new THREE.LineBasicMaterial({color:0x1a4a55,transparent:true,opacity:0.42,blending:THREE.AdditiveBlending,depthWrite:false})));
+    sc.add(new THREE.LineSegments(cG,new THREE.LineBasicMaterial({color:0x0e3742,transparent:true,opacity:0.30,blending:THREE.AdditiveBlending,depthWrite:false})));
 
-    // Pulses: pool of travelling action potentials rendered as GPU point sprites
-    const POOL=900;
+    // Action potentials: GPU point sprites travelling along edges
+    const POOL=1400;
     const pFrom=new Float32Array(POOL*3), pTo=new Float32Array(POOL*3), pMeta=new Float32Array(POOL*3);
     pMeta.fill(-1e3);
     const pG=new THREE.BufferGeometry();
@@ -622,7 +601,7 @@
         float e=p*p*(3.0-2.0*p);
         vec4 mv=modelViewMatrix*vec4(mix(aFrom,aTo,e),1.0);
         vB=sin(3.14159*p);
-        gl_PointSize=(4.0+4.0*aMeta.z)*(150.0/max(1.0,-mv.z));
+        gl_PointSize=(3.2+3.2*aMeta.z)*(140.0/max(1.0,-mv.z));
         gl_Position=projectionMatrix*mv;
       }`;
     const pFS=`varying float vB;varying float vS;
@@ -630,8 +609,8 @@
         float d=length(gl_PointCoord-0.5);
         float a=smoothstep(0.5,0.0,d); a*=a;
         vec3 col=mix(vec3(0.0,0.878,0.816),vec3(0.31,0.675,0.996),vS);
-        col=mix(col,vec3(1.0),vB*0.4);
-        gl_FragColor=vec4(col*(0.5+1.8*vB),a*vB);
+        col=mix(col,vec3(1.0),vB*0.45);
+        gl_FragColor=vec4(col*(0.45+1.9*vB),a*vB);
       }`;
     const pMat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0}},vertexShader:pVS,fragmentShader:pFS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
     sc.add(new THREE.Points(pG,pMat));
@@ -640,22 +619,22 @@
       const i=pCur; pCur=(pCur+1)%POOL;
       pFrom[i*3]=pos[a*3];pFrom[i*3+1]=pos[a*3+1];pFrom[i*3+2]=pos[a*3+2];
       pTo[i*3]=pos[b*3];pTo[i*3+1]=pos[b*3+1];pTo[i*3+2]=pos[b*3+2];
-      pMeta[i*3]=simT;pMeta[i*3+1]=Math.max(.12,Math.hypot(pos[b*3]-pos[a*3],pos[b*3+1]-pos[a*3+1],pos[b*3+2]-pos[a*3+2])/SPEED);pMeta[i*3+2]=Math.random();
+      pMeta[i*3]=simT;pMeta[i*3+1]=Math.max(.1,Math.hypot(pos[b*3]-pos[a*3],pos[b*3+1]-pos[a*3+1],pos[b*3+2]-pos[a*3+2])/SPEED);pMeta[i*3+2]=Math.random();
       pG.attributes.aFrom.needsUpdate=true;pG.attributes.aTo.needsUpdate=true;pG.attributes.aMeta.needsUpdate=true;
     }
 
-    // ── Firing: neuron spikes and propagates pulses along its synapses ──
+    // Firing: flash + propagate along all outgoing synapses
     function fire(i){
-      glow[i]=1.4;
+      glow[i]=depthArr[i]>=0.999?1.8:1.35;
       const out=adj[i];
       for(let k=0;k<out.length;k++){
-        pending.push({t:simT+out[k].len/SPEED+Math.random()*.05,j:out[k].to,w:0.34+Math.random()*.22});
+        pending.push({t:simT+out[k].len/SPEED+Math.random()*.04,j:out[k].to,w:0.30+Math.random()*.18});
         spawnPulse(i,out[k].to);
       }
     }
 
-    // ── Camera orbit + drag ──
-    let isDrag=false,pX=0,pY=0,oT=.5,oP=.3,oD=42,tT=oT,tP=oP,tD=oD,autoR=true,autoTm=0;const DAMP=.06;
+    // Camera: slow cinematic orbit + drag
+    let isDrag=false,pX=0,pY=0,oT=.55,oP=.32,oD=36,tT=oT,tP=oP,tD=oD,autoR=true,autoTm=0;const DAMP=.06;
     nnCanvas.addEventListener('pointerdown',e=>{isDrag=true;pX=e.clientX;pY=e.clientY;nnCanvas.setPointerCapture(e.pointerId);autoR=false;autoTm=0;});
     nnCanvas.addEventListener('pointermove',e=>{if(!isDrag)return;tT-=(e.clientX-pX)*.004;tP+=(e.clientY-pY)*.004;tP=Math.max(-1.3,Math.min(1.3,tP));pX=e.clientX;pY=e.clientY;});
     nnCanvas.addEventListener('pointerup',()=>{isDrag=false;});
@@ -669,12 +648,16 @@
       lastTs=ts;
       simT+=dt;
 
-      // Spontaneous spikes (Poisson-like) + glow decay
-      for(let i=0;i<nC;i++){
-        glow[i]*=Math.max(0,1-GLOW_DECAY*dt);
-        if(simT>refr[i]&&Math.random()<SPONT*dt)fire(i);
+      // Spontaneous excitation, stronger at the input layer (forward flow)
+      for(let li=0;li<lG.length;li++){
+        const rate=.30*Math.pow(.72,li);
+        for(const n of lG[li]){
+          const i=n.idx;
+          glow[i]*=Math.max(0,1-GLOW_DECAY*dt);
+          if(simT>refr[i]&&Math.random()<rate*dt)fire(i);
+        }
       }
-      // Synaptic arrivals: potential integration, threshold, refractory
+      // Synaptic arrivals
       for(let k=pending.length-1;k>=0;k--){
         const p=pending[k];
         if(p.t<=simT){
@@ -686,7 +669,6 @@
           }
         }
       }
-      // Leak
       const lk=Math.max(0,1-LEAK*dt);
       for(let i=0;i<nC;i++)pot[i]*=lk;
 
@@ -694,17 +676,18 @@
       pMat.uniforms.uTime.value=simT;
 
       if(!isDrag&&!autoR){autoTm+=dt;if(autoTm>3)autoR=true;}
-      if(autoR)tT-=.0015*dt*60;
+      if(autoR)tT-=.0012*dt*60;
       oT+=(tT-oT)*Math.min(1,DAMP*dt*60);
       oP+=(tP-oP)*Math.min(1,DAMP*dt*60);
       oD+=(tD-oD)*Math.min(1,DAMP*dt*60);
-      cam.position.set(Math.sin(oT)*Math.cos(oP)*oD,Math.sin(oP)*oD*.6+2,Math.cos(oT)*Math.cos(oP)*oD);
+      cam.position.set(Math.sin(oT)*Math.cos(oP)*oD,Math.sin(oP)*oD*.55+2,Math.cos(oT)*Math.cos(oP)*oD);
       cam.lookAt(0,0,0);
       ren.render(sc,cam);
     }
     nnSz();window.addEventListener('resize',nnSz);nnLoop();
   })();
   </script>
+
 
   <!-- Service cards: proximity border glow (canvas) + bounce + modal -->
   <script>
