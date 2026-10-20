@@ -522,42 +522,177 @@
     "use strict";
     const wrap=document.getElementById('nn-wrap'),nnCanvas=document.getElementById('nn-canvas');
     if(!wrap||!nnCanvas) return;
-    const LAYERS=[[5,5],[7,7],[8,8],[10,10],[12,12],[14,14],[16,16],[16,16],[16,16],[14,14],[12,12],[10,10],[8,8],[6,6],[4,4]];
-    const LZS=5,NXY=1.1,CK=5,WS=0.12,NR=0.16;
-    const ren=new THREE.WebGLRenderer({canvas:nnCanvas,antialias:true,powerPreference:"high-performance",alpha:false});
-    function nnSz(){const r=wrap.getBoundingClientRect();ren.setSize(r.width,r.height);ren.setPixelRatio(Math.min(devicePixelRatio,2));cam.aspect=r.width/r.height;cam.updateProjectionMatrix();}
-    ren.setClearColor(0x08080e);
-    const sc=new THREE.Scene();sc.fog=new THREE.FogExp2(0x08080e,0.012);
+
+    /* ═══ Spiking neural network: stochastic firing, synaptic pulse propagation ═══ */
+
+    // ── Graph: layered network with organic jitter + long-range skip connections ──
+    const LAYERS=[4,6,8,10,12,14,14,12,10,8,6,4];
+    const LZS=6.5, NXY=1.5, CK=4, NR=0.15;
+    const tZ=(LAYERS.length-1)*LZS;
+    const pos=[], lG=[]; let nC=0;
+    LAYERS.forEach((n,li)=>{
+      const z=-tZ/2+li*LZS, cols=Math.ceil(Math.sqrt(n*1.7)), rows=Math.ceil(n/cols);
+      const ox=-(cols-1)*NXY/2, oy=-(rows-1)*NXY/2, g=[];
+      for(let i=0;i<n;i++){
+        const jx=(Math.random()-.5)*NXY*.55, jy=(Math.random()-.5)*NXY*.55;
+        const x=ox+(i%cols)*NXY+jx, y=oy+Math.floor(i/cols)*NXY+jy;
+        pos.push(x,y,z); g.push({x,y,z,idx:nC++,d:li/(LAYERS.length-1)});
+      }
+      lG.push(g);
+    });
+
+    // ── Edges: k-nearest to next layer + a few long-range skip links ──
+    const eV=[], adj=Array.from({length:nC},()=>[]);
+    function addEdge(a,b){
+      eV.push(pos[a*3],pos[a*3+1],pos[a*3+2],pos[b*3],pos[b*3+1],pos[b*3+2]);
+      adj[a].push({to:b,len:Math.hypot(pos[b*3]-pos[a*3],pos[b*3+1]-pos[a*3+1],pos[b*3+2]-pos[a*3+2])});
+    }
+    for(let li=0;li<lG.length-1;li++){
+      const from=lG[li], to=lG[li+1];
+      from.forEach(fn=>{
+        const scored=to.map(tn=>({tn,d:(tn.x-fn.x)**2+(tn.y-fn.y)**2+(Math.random()-.5)*3}));
+        scored.sort((a,b)=>a.d-b.d);
+        const k=Math.min(CK,scored.length);
+        for(let j=0;j<k;j++) addEdge(fn.idx,scored[j].tn.idx);
+      });
+    }
+    for(let li=0;li<lG.length-2;li++){
+      lG[li].forEach(fn=>{
+        if(Math.random()<.22){
+          const to=lG[li+2][Math.floor(Math.random()*lG[li+2].length)];
+          addEdge(fn.idx,to.idx);
+        }
+      });
+    }
+
+    // ── Spiking simulation state ──
+    const SPEED=9, THR=0.55, LEAK=2.2, REFR=0.28, SPONT=0.10, GLOW_DECAY=2.6;
+    const pot=new Float32Array(nC), refr=new Float32Array(nC), glow=new Float32Array(nC);
+    const pending=[]; // synaptic events in flight: {t, j, w}
+    let simT=0;
+
+    // ── Three.js scene ──
+    const ren=new THREE.WebGLRenderer({canvas:nnCanvas,antialias:true,powerPreference:"high-performance",alpha:true});
+    ren.setClearColor(0x000000,0);
+    const sc=new THREE.Scene();
+    sc.fog=new THREE.FogExp2(0x08080e,0.011);
     const cam=new THREE.PerspectiveCamera(50,1,0.1,600);
-    const tZ=(LAYERS.length-1)*LZS,nP=[],nD=[],lG=[];let nC=0;
-    LAYERS.forEach(([c,r],li)=>{const z=-tZ/2+li*LZS,ox=-(c-1)*NXY/2,oy=-(r-1)*NXY/2;const g=[];for(let rr=0;rr<r;rr++)for(let cc=0;cc<c;cc++){const x=ox+cc*NXY,y=oy+rr*NXY;nP.push(x,y,z);nD.push(li/(LAYERS.length-1));g.push({x,y,z,idx:nC++});}lG.push(g);});
-    const nVS=`attribute float aDepth;varying float vD;varying vec3 vN;varying float vFogD;void main(){vD=aDepth;vec4 wp=instanceMatrix*vec4(position,1.0);vN=normalize(mat3(modelViewMatrix)*mat3(instanceMatrix)*normal);vec4 mv=modelViewMatrix*wp;vFogD=length(mv.xyz);gl_Position=projectionMatrix*mv;}`;
-    const nFS=`uniform float uWave;uniform vec3 uFogColor;uniform float uFogDensity;varying float vD,vFogD;varying vec3 vN;vec3 lc(float d){vec3 a=vec3(.498,.467,.867);vec3 b=vec3(.114,.62,.459);vec3 c=vec3(.847,.353,.188);return d<.5?mix(a,b,d*2.):mix(b,c,(d-.5)*2.);}void main(){float pulse=0.;for(int i=0;i<3;i++){float w=fract(uWave+float(i)*.333);float d=vD-w;if(d>.5)d-=1.;if(d<-.5)d+=1.;float g=exp(-d*d*110.);float trail=d<0.?exp(d*5.)*.25:0.;pulse=max(pulse,g+trail);}pulse=clamp(pulse,0.,1.);vec3 base=lc(vD);float diff=dot(vN,normalize(vec3(.4,.8,.5)))*.4+.6;vec3 lit=base*diff;vec3 bright=mix(lit,vec3(1.),.35);vec3 col=mix(lit*.06,bright,pulse);float alpha=.15+pulse*.85;float fogF=1.-exp(-uFogDensity*uFogDensity*vFogD*vFogD);col=mix(col,uFogColor,fogF);alpha*=1.-fogF*.7;gl_FragColor=vec4(col,alpha);}`;
-    const nMat=new THREE.ShaderMaterial({uniforms:{uWave:{value:0},uFogColor:{value:new THREE.Color(0x08080e)},uFogDensity:{value:.012}},vertexShader:nVS,fragmentShader:nFS,transparent:true,depthWrite:false});
-    const sG=new THREE.SphereGeometry(NR,10,8);sG.setAttribute('aDepth',new THREE.InstancedBufferAttribute(new Float32Array(nD),1));
+    function nnSz(){const r=wrap.getBoundingClientRect();ren.setSize(r.width,r.height);ren.setPixelRatio(Math.min(devicePixelRatio,2));cam.aspect=r.width/r.height;cam.updateProjectionMatrix();}
+    // Neurons: instanced spheres with per-instance glow (set by the spiking sim)
+    const nVS=`attribute float aGlow;attribute float aDepth;varying float vG;varying float vD;varying float vZ;
+      void main(){vG=aGlow;vD=aDepth;vec4 mv=modelViewMatrix*instanceMatrix*vec4(position,1.0);vZ=-mv.z;gl_Position=projectionMatrix*mv;}`;
+    const nFS=`varying float vG;varying float vD;varying float vZ;
+      void main(){
+        vec3 cyan=vec3(0.0,0.878,0.816),blue=vec3(0.31,0.675,0.996);
+        vec3 base=mix(cyan,blue,vD);
+        float near=smoothstep(95.0,22.0,vZ);
+        float g=min(vG,1.4);
+        vec3 col=base*(0.04+g*1.1)+vec3(1.0)*g*g*0.28;
+        float alpha=(0.09+min(g,1.2)*0.85)*near;
+        gl_FragColor=vec4(col,alpha);
+      }`;
+    const sG=new THREE.SphereGeometry(NR,10,8);
+    sG.setAttribute('aGlow',new THREE.InstancedBufferAttribute(glow,1));
+    const depthArr=new Float32Array(nC);
+    for(const g of lG) for(const n of g) depthArr[n.idx]=n.d;
+    sG.setAttribute('aDepth',new THREE.InstancedBufferAttribute(depthArr,1));
+    const nMat=new THREE.ShaderMaterial({vertexShader:nVS,fragmentShader:nFS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
     const nM=new THREE.InstancedMesh(sG,nMat,nC);const dm=new THREE.Object3D();
-    for(let i=0;i<nC;i++){dm.position.set(nP[i*3],nP[i*3+1],nP[i*3+2]);dm.updateMatrix();nM.setMatrixAt(i,dm.matrix);}nM.instanceMatrix.needsUpdate=true;sc.add(nM);
-    const cV=[],cDD=[];
-    for(let li=0;li<lG.length-1;li++){const from=lG[li],to=lG[li+1],dF=li/(LAYERS.length-1),dT=(li+1)/(LAYERS.length-1);from.forEach(fn=>{const scored=to.map(tn=>({tn,d:(tn.x-fn.x)**2+(tn.y-fn.y)**2}));scored.sort((a,b)=>a.d-b.d);const k=Math.min(CK,scored.length);for(let j=0;j<k;j++){const tn=scored[j].tn;cV.push(fn.x,fn.y,fn.z,tn.x,tn.y,tn.z);cDD.push(dF,dT);}});}
-    const cVS=`attribute float aDepth;varying float vD;varying float vFogD;void main(){vD=aDepth;vec4 mv=modelViewMatrix*vec4(position,1.0);vFogD=length(mv.xyz);gl_Position=projectionMatrix*mv;}`;
-    const cFS=`uniform float uWave;uniform vec3 uFogColor;uniform float uFogDensity;varying float vD,vFogD;vec3 lc(float d){vec3 a=vec3(.498,.467,.867);vec3 b=vec3(.114,.62,.459);vec3 c=vec3(.847,.353,.188);return d<.5?mix(a,b,d*2.):mix(b,c,(d-.5)*2.);}void main(){float pulse=0.;for(int i=0;i<3;i++){float w=fract(uWave+float(i)*.333);float d=vD-w;if(d>.5)d-=1.;if(d<-.5)d+=1.;float g=exp(-d*d*90.);float trail=d<0.?exp(d*4.5)*.2:0.;pulse=max(pulse,g+trail);}pulse=clamp(pulse,0.,1.);vec3 base=lc(vD);vec3 col=mix(base*.015,base*.9,pulse);float alpha=.018+pulse*.38;float fogF=1.-exp(-uFogDensity*uFogDensity*vFogD*vFogD);col=mix(col,uFogColor,fogF);alpha*=1.-fogF*.6;gl_FragColor=vec4(col,alpha);}`;
-    const cG=new THREE.BufferGeometry();cG.setAttribute('position',new THREE.Float32BufferAttribute(cV,3));cG.setAttribute('aDepth',new THREE.Float32BufferAttribute(cDD,1));
-    const cMat=new THREE.ShaderMaterial({uniforms:{uWave:{value:0},uFogColor:{value:new THREE.Color(0x08080e)},uFogDensity:{value:.012}},vertexShader:cVS,fragmentShader:cFS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
-    sc.add(new THREE.LineSegments(cG,cMat));
-    let isDrag=false,pX=0,pY=0,oT=.35,oP=.25,oD=52,tT=oT,tP=oP,tD=oD,autoR=true,autoTm=0;const DAMP=.06;
+    for(let i=0;i<nC;i++){dm.position.set(pos[i*3],pos[i*3+1],pos[i*3+2]);dm.updateMatrix();nM.setMatrixAt(i,dm.matrix);}
+    nM.instanceMatrix.needsUpdate=true;sc.add(nM);
+
+    // Synapses: faint static lines
+    const cG=new THREE.BufferGeometry();
+    cG.setAttribute('position',new THREE.Float32BufferAttribute(eV,3));
+    sc.add(new THREE.LineSegments(cG,new THREE.LineBasicMaterial({color:0x1a4a55,transparent:true,opacity:0.42,blending:THREE.AdditiveBlending,depthWrite:false})));
+
+    // Pulses: pool of travelling action potentials rendered as GPU point sprites
+    const POOL=900;
+    const pFrom=new Float32Array(POOL*3), pTo=new Float32Array(POOL*3), pMeta=new Float32Array(POOL*3);
+    pMeta.fill(-1e3);
+    const pG=new THREE.BufferGeometry();
+    pG.setAttribute('position',new THREE.Float32BufferAttribute(new Float32Array(POOL*3),3));
+    pG.setAttribute('aFrom',new THREE.BufferAttribute(pFrom,3));
+    pG.setAttribute('aTo',new THREE.BufferAttribute(pTo,3));
+    pG.setAttribute('aMeta',new THREE.BufferAttribute(pMeta,3));
+    const pVS=`attribute vec3 aFrom;attribute vec3 aTo;attribute vec3 aMeta;uniform float uTime;varying float vB;varying float vS;
+      void main(){
+        float p=(uTime-aMeta.x)/aMeta.y; vS=aMeta.z;
+        if(p<0.0||p>1.0){gl_Position=vec4(2.0,2.0,2.0,1.0);gl_PointSize=0.0;vB=0.0;return;}
+        float e=p*p*(3.0-2.0*p);
+        vec4 mv=modelViewMatrix*vec4(mix(aFrom,aTo,e),1.0);
+        vB=sin(3.14159*p);
+        gl_PointSize=(4.0+4.0*aMeta.z)*(150.0/max(1.0,-mv.z));
+        gl_Position=projectionMatrix*mv;
+      }`;
+    const pFS=`varying float vB;varying float vS;
+      void main(){
+        float d=length(gl_PointCoord-0.5);
+        float a=smoothstep(0.5,0.0,d); a*=a;
+        vec3 col=mix(vec3(0.0,0.878,0.816),vec3(0.31,0.675,0.996),vS);
+        col=mix(col,vec3(1.0),vB*0.4);
+        gl_FragColor=vec4(col*(0.5+1.8*vB),a*vB);
+      }`;
+    const pMat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0}},vertexShader:pVS,fragmentShader:pFS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+    sc.add(new THREE.Points(pG,pMat));
+    let pCur=0;
+    function spawnPulse(a,b){
+      const i=pCur; pCur=(pCur+1)%POOL;
+      pFrom[i*3]=pos[a*3];pFrom[i*3+1]=pos[a*3+1];pFrom[i*3+2]=pos[a*3+2];
+      pTo[i*3]=pos[b*3];pTo[i*3+1]=pos[b*3+1];pTo[i*3+2]=pos[b*3+2];
+      pMeta[i*3]=simT;pMeta[i*3+1]=Math.max(.12,Math.hypot(pos[b*3]-pos[a*3],pos[b*3+1]-pos[a*3+1],pos[b*3+2]-pos[a*3+2])/SPEED);pMeta[i*3+2]=Math.random();
+      pG.attributes.aFrom.needsUpdate=true;pG.attributes.aTo.needsUpdate=true;pG.attributes.aMeta.needsUpdate=true;
+    }
+
+    // ── Firing: neuron spikes and propagates pulses along its synapses ──
+    function fire(i){
+      glow[i]=1.4;
+      const out=adj[i];
+      for(let k=0;k<out.length;k++){
+        pending.push({t:simT+out[k].len/SPEED+Math.random()*.05,j:out[k].to,w:0.34+Math.random()*.22});
+        spawnPulse(i,out[k].to);
+      }
+    }
+
+    // ── Camera orbit + drag ──
+    let isDrag=false,pX=0,pY=0,oT=.4,oP=.18,oD=54,tT=oT,tP=oP,tD=oD,autoR=true,autoTm=0;const DAMP=.06;
     nnCanvas.addEventListener('pointerdown',e=>{isDrag=true;pX=e.clientX;pY=e.clientY;nnCanvas.setPointerCapture(e.pointerId);autoR=false;autoTm=0;});
     nnCanvas.addEventListener('pointermove',e=>{if(!isDrag)return;tT-=(e.clientX-pX)*.004;tP+=(e.clientY-pY)*.004;tP=Math.max(-1.3,Math.min(1.3,tP));pX=e.clientX;pY=e.clientY;});
     nnCanvas.addEventListener('pointerup',()=>{isDrag=false;});
-    let time=0;
-    function fract(x){return x-Math.floor(x);}
+
     let lastTs=0;
     let nnVis=false;const nnObs=new IntersectionObserver(en=>{nnVis=en[0].isIntersecting;},{threshold:.05});nnObs.observe(wrap);
     function nnLoop(ts=0){
       requestAnimationFrame(nnLoop);
       if(!nnVis)return;
-      const dt=Math.min((ts-lastTs)/1000,.1);
+      const dt=Math.min((ts-lastTs)/1000,.1)||.016;
       lastTs=ts;
-      time+=WS*dt;
+      simT+=dt;
+
+      // Spontaneous spikes (Poisson-like) + glow decay
+      for(let i=0;i<nC;i++){
+        glow[i]*=Math.max(0,1-GLOW_DECAY*dt);
+        if(simT>refr[i]&&Math.random()<SPONT*dt)fire(i);
+      }
+      // Synaptic arrivals: potential integration, threshold, refractory
+      for(let k=pending.length-1;k>=0;k--){
+        const p=pending[k];
+        if(p.t<=simT){
+          pending[k]=pending[pending.length-1];pending.pop();
+          const j=p.j;
+          if(simT>refr[j]){
+            pot[j]+=p.w;
+            if(pot[j]>=THR){pot[j]=0;refr[j]=simT+REFR;fire(j);}
+          }
+        }
+      }
+      // Leak
+      const lk=Math.max(0,1-LEAK*dt);
+      for(let i=0;i<nC;i++)pot[i]*=lk;
+
+      sG.attributes.aGlow.needsUpdate=true;
+      pMat.uniforms.uTime.value=simT;
+
       if(!isDrag&&!autoR){autoTm+=dt;if(autoTm>3)autoR=true;}
       if(autoR)tT-=.0015*dt*60;
       oT+=(tT-oT)*Math.min(1,DAMP*dt*60);
@@ -565,9 +700,6 @@
       oD+=(tD-oD)*Math.min(1,DAMP*dt*60);
       cam.position.set(Math.sin(oT)*Math.cos(oP)*oD,Math.sin(oP)*oD*.6+2,Math.cos(oT)*Math.cos(oP)*oD);
       cam.lookAt(0,0,0);
-      const w=fract(time);
-      nMat.uniforms.uWave.value=w;
-      cMat.uniforms.uWave.value=w;
       ren.render(sc,cam);
     }
     nnSz();window.addEventListener('resize',nnSz);nnLoop();
