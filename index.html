@@ -123,9 +123,6 @@
     .btn--primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--cyan-glow)}
     .btn--ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border-hover)}
     .btn--ghost:hover{color:var(--cyan);border-color:var(--cyan);background:var(--cyan-subtle)}
-    .nn-wrap{position:relative;width:100%;height:clamp(280px,42vh,600px);overflow:hidden;cursor:grab;z-index:0}
-    .nn-wrap:active{cursor:grabbing}
-    .nn-wrap canvas{display:block;width:100%;height:100%}
     .section{padding:100px 0}
     .section__label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:12px}
     .section__title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;letter-spacing:-.03em;margin-bottom:48px}
@@ -256,7 +253,6 @@
     @media(max-width:900px){.tri-panel{width:min(22vw,250px)}}
     @media(max-width:700px){
       .tri-panel{display:none}
-      .nn-wrap{display:none}
       .main{padding:0 20px}
       .nav{padding:14px 20px}
       .nav__links{gap:16px}
@@ -298,6 +294,7 @@
       .contact-form input,.contact-form textarea,.contact-form select{font-size:16px}
     }
   </style>
+  <link rel="stylesheet" href="/neural-network.css">
 </head>
 <body>
   <!-- Aurora background: soft drifting lights -->
@@ -337,9 +334,19 @@
     </section>
   </div>
 
-  <div class="nn-wrap" id="nn-wrap">
-    <canvas id="nn-canvas"></canvas>
-  </div>
+  <section class="nn-wrap" id="nn-wrap" aria-label="Dimostrazione di una rete neurale">
+    <div class="nn-head">
+      <div><div class="nn-eyebrow">NEURAL SYSTEMS / LIVE INFERENCE</div><h2 class="nn-title">Il segnale diventa decisione.</h2></div>
+      <div class="nn-controls"><span class="nn-live">SYSTEM ONLINE</span><button class="nn-pause" type="button" aria-pressed="false" aria-label="Metti in pausa o riprendi la rete neurale">Pausa</button></div>
+    </div>
+    <div class="nn-stage"><canvas id="nn-canvas" role="img" aria-label="Rete neurale con quattro input, due strati nascosti e tre output">Rete neurale: 4 input → 6 neuroni → 5 neuroni → 3 classi di output.</canvas></div>
+    <div class="nn-telemetry">
+      <div><div class="nn-metric-label"><span>01 / VETTORE IN INGRESSO</span><span>RANDOM</span></div><div class="nn-vector">Inizializzazione…</div><div class="nn-detail">4 valori casuali · intervallo [−1, +1]</div></div>
+      <div><div class="nn-metric-label"><span>02 / PROBABILITÀ</span><span>SOFTMAX</span></div><div class="nn-output"><span>A</span><i><b></b></i><em>—</em></div><div class="nn-output"><span>B</span><i><b></b></i><em>—</em></div><div class="nn-output"><span>C</span><i><b></b></i><em>—</em></div></div>
+      <div><div class="nn-metric-label"><span>03 / CLASSIFICAZIONE</span></div><div class="nn-result">Analisi…</div><div class="nn-detail">MLP addestrata su dati sintetici<br>69 connessioni · 14 bias · inferenza locale</div></div>
+    </div>
+    <div class="nn-foot"><span class="nn-status">ACQUISIZIONE INPUT</span><span>#<span class="nn-sequence">00001</span> / NEXT <span class="nn-countdown">2.0 s</span></span><div class="nn-progress"></div></div>
+  </section>
 
   <div class="main">
 
@@ -505,189 +512,8 @@
     </div>
   </div>
 
-  <!-- Three.js + Neural Network — DELTA TIME FIX -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script>
-  (function(){
-    "use strict";
-    const wrap=document.getElementById('nn-wrap'),nnCanvas=document.getElementById('nn-canvas');
-    if(!wrap||!nnCanvas) return;
-
-    /* === Feedforward deep network: dense architecture, stochastic spiking === */
-
-    // Architecture: clean tapered layers, neurons packed in discs (sunflower spiral)
-    const COUNTS=[10,14,18,22,26,30,26,22,18,14,10,6];
-    const LZS=2.8, NR=0.19, GOLD=2.399963;
-    const tZ=(COUNTS.length-1)*LZS;
-    const pos=[], lG=[]; let nC=0;
-    COUNTS.forEach((n,li)=>{
-      const z=-tZ/2+li*LZS, R=Math.sqrt(n)*0.92, g=[];
-      for(let i=0;i<n;i++){
-        const r=R*Math.sqrt((i+.5)/n), a=i*GOLD;
-        pos.push(r*Math.cos(a), r*Math.sin(a), z);
-        g.push({idx:nC++, d:li/(COUNTS.length-1)});
-      }
-      lG.push(g);
-    });
-
-    // Dense feedforward connectivity (layer i -> i+1), few long-range shortcuts
-    const eV=[], adj=Array.from({length:nC},()=>[]);
-    function addEdge(a,b){
-      eV.push(pos[a*3],pos[a*3+1],pos[a*3+2],pos[b*3],pos[b*3+1],pos[b*3+2]);
-      adj[a].push({to:b,len:Math.hypot(pos[b*3]-pos[a*3],pos[b*3+1]-pos[a*3+1],pos[b*3+2]-pos[a*3+2])});
-    }
-    for(let li=0;li<lG.length-1;li++)
-      for(const fn of lG[li])
-        for(const tn of lG[li+1]) addEdge(fn.idx,tn.idx);
-    for(let li=0;li<lG.length-3;li++)
-      for(const fn of lG[li])
-        if(Math.random()<.15) addEdge(fn.idx,lG[li+3][Math.floor(Math.random()*lG[li+3].length)].idx);
-
-    // Spiking dynamics: leaky integrate-and-fire, forward-biased spontaneity
-    const SPEED=10, THR=0.5, LEAK=2.5, REFR=0.35, GLOW_DECAY=2.4;
-    const pot=new Float32Array(nC), refr=new Float32Array(nC), glow=new Float32Array(nC);
-    const pending=[];
-    let simT=0;
-
-    // Renderer: fully transparent canvas
-    const ren=new THREE.WebGLRenderer({canvas:nnCanvas,antialias:true,powerPreference:"high-performance",alpha:true});
-    ren.setClearColor(0x000000,0);
-    ren.setPixelRatio(Math.min(devicePixelRatio,2));
-    const sc=new THREE.Scene();
-    const cam=new THREE.PerspectiveCamera(46,1,0.1,400);
-    function nnSz(){const r=wrap.getBoundingClientRect();ren.setSize(r.width,r.height);cam.aspect=r.width/r.height;cam.updateProjectionMatrix();}
-
-    // Neurons: instanced spheres, glow driven by the spiking sim
-    const nVS=`attribute float aGlow;attribute float aDepth;varying float vG;varying float vD;varying float vZ;
-      void main(){vG=aGlow;vD=aDepth;vec4 mv=modelViewMatrix*instanceMatrix*vec4(position,1.0);vZ=-mv.z;gl_Position=projectionMatrix*mv;}`;
-    const nFS=`varying float vG;varying float vD;varying float vZ;
-      void main(){
-        vec3 cyan=vec3(0.0,0.878,0.816),azure=vec3(0.19,0.573,0.69),blue=vec3(0.31,0.675,0.996);
-        vec3 base=vD<.5?mix(cyan,azure,vD*2.):mix(azure,blue,(vD-.5)*2.);
-        float near=smoothstep(120.0,28.0,vZ);
-        float g=min(vG,1.6);
-        vec3 col=base*(0.05+g*1.2)+vec3(1.0)*g*g*0.30;
-        float alpha=(0.10+min(g,1.3)*0.9)*near;
-        gl_FragColor=vec4(col,alpha);
-      }`;
-    const sG=new THREE.SphereGeometry(NR,12,10);
-    sG.setAttribute('aGlow',new THREE.InstancedBufferAttribute(glow,1));
-    const depthArr=new Float32Array(nC);
-    for(const g of lG) for(const n of g) depthArr[n.idx]=n.d;
-    sG.setAttribute('aDepth',new THREE.InstancedBufferAttribute(depthArr,1));
-    const nMat=new THREE.ShaderMaterial({vertexShader:nVS,fragmentShader:nFS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
-    const nM=new THREE.InstancedMesh(sG,nMat,nC);const dm=new THREE.Object3D();
-    for(let i=0;i<nC;i++){dm.position.set(pos[i*3],pos[i*3+1],pos[i*3+2]);dm.updateMatrix();nM.setMatrixAt(i,dm.matrix);}
-    nM.instanceMatrix.needsUpdate=true;sc.add(nM);
-
-    // Synapses: hairline web
-    const cG=new THREE.BufferGeometry();
-    cG.setAttribute('position',new THREE.Float32BufferAttribute(eV,3));
-    sc.add(new THREE.LineSegments(cG,new THREE.LineBasicMaterial({color:0x0e3742,transparent:true,opacity:0.34,blending:THREE.AdditiveBlending,depthWrite:false})));
-
-    // Action potentials: GPU point sprites travelling along edges
-    const POOL=1400;
-    const pFrom=new Float32Array(POOL*3), pTo=new Float32Array(POOL*3), pMeta=new Float32Array(POOL*3);
-    pMeta.fill(-1e3);
-    const pG=new THREE.BufferGeometry();
-    pG.setAttribute('position',new THREE.Float32BufferAttribute(new Float32Array(POOL*3),3));
-    pG.setAttribute('aFrom',new THREE.BufferAttribute(pFrom,3));
-    pG.setAttribute('aTo',new THREE.BufferAttribute(pTo,3));
-    pG.setAttribute('aMeta',new THREE.BufferAttribute(pMeta,3));
-    const pVS=`attribute vec3 aFrom;attribute vec3 aTo;attribute vec3 aMeta;uniform float uTime;varying float vB;varying float vS;
-      void main(){
-        float p=(uTime-aMeta.x)/aMeta.y; vS=aMeta.z;
-        if(p<0.0||p>1.0){gl_Position=vec4(2.0,2.0,2.0,1.0);gl_PointSize=0.0;vB=0.0;return;}
-        float e=p*p*(3.0-2.0*p);
-        vec4 mv=modelViewMatrix*vec4(mix(aFrom,aTo,e),1.0);
-        vB=sin(3.14159*p);
-        gl_PointSize=(3.2+3.2*aMeta.z)*(140.0/max(1.0,-mv.z));
-        gl_Position=projectionMatrix*mv;
-      }`;
-    const pFS=`varying float vB;varying float vS;
-      void main(){
-        float d=length(gl_PointCoord-0.5);
-        float a=smoothstep(0.5,0.0,d); a*=a;
-        vec3 col=mix(vec3(0.0,0.878,0.816),vec3(0.31,0.675,0.996),vS);
-        col=mix(col,vec3(1.0),vB*0.45);
-        gl_FragColor=vec4(col*(0.45+1.9*vB),a*vB);
-      }`;
-    const pMat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0}},vertexShader:pVS,fragmentShader:pFS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
-    sc.add(new THREE.Points(pG,pMat));
-    let pCur=0;
-    function spawnPulse(a,b){
-      const i=pCur; pCur=(pCur+1)%POOL;
-      pFrom[i*3]=pos[a*3];pFrom[i*3+1]=pos[a*3+1];pFrom[i*3+2]=pos[a*3+2];
-      pTo[i*3]=pos[b*3];pTo[i*3+1]=pos[b*3+1];pTo[i*3+2]=pos[b*3+2];
-      pMeta[i*3]=simT;pMeta[i*3+1]=Math.max(.1,Math.hypot(pos[b*3]-pos[a*3],pos[b*3+1]-pos[a*3+1],pos[b*3+2]-pos[a*3+2])/SPEED);pMeta[i*3+2]=Math.random();
-      pG.attributes.aFrom.needsUpdate=true;pG.attributes.aTo.needsUpdate=true;pG.attributes.aMeta.needsUpdate=true;
-    }
-
-    // Firing: flash + propagate along all outgoing synapses
-    function fire(i){
-      glow[i]=depthArr[i]>=0.999?1.8:1.35;
-      const out=adj[i];
-      for(let k=0;k<out.length;k++){
-        pending.push({t:simT+out[k].len/SPEED+Math.random()*.04,j:out[k].to,w:0.30+Math.random()*.18});
-        spawnPulse(i,out[k].to);
-      }
-    }
-
-    // Camera: slow cinematic orbit + drag
-    let isDrag=false,pX=0,pY=0,oT=1.45,oP=.26,oD=38,tT=oT,tP=oP,tD=oD,autoR=true,autoTm=0;const DAMP=.06;
-    nnCanvas.addEventListener('pointerdown',e=>{isDrag=true;pX=e.clientX;pY=e.clientY;nnCanvas.setPointerCapture(e.pointerId);autoR=false;autoTm=0;});
-    nnCanvas.addEventListener('pointermove',e=>{if(!isDrag)return;tT-=(e.clientX-pX)*.004;tP+=(e.clientY-pY)*.004;tP=Math.max(-1.3,Math.min(1.3,tP));pX=e.clientX;pY=e.clientY;});
-    nnCanvas.addEventListener('pointerup',()=>{isDrag=false;});
-
-    let lastTs=0;
-    let nnVis=false;const nnObs=new IntersectionObserver(en=>{nnVis=en[0].isIntersecting;},{threshold:.05});nnObs.observe(wrap);
-    function nnLoop(ts=0){
-      requestAnimationFrame(nnLoop);
-      if(!nnVis)return;
-      const dt=Math.min((ts-lastTs)/1000,.1)||.016;
-      lastTs=ts;
-      simT+=dt;
-
-      // Spontaneous excitation, stronger at the input layer (forward flow)
-      for(let li=0;li<lG.length;li++){
-        const rate=.30*Math.pow(.72,li);
-        for(const n of lG[li]){
-          const i=n.idx;
-          glow[i]*=Math.max(0,1-GLOW_DECAY*dt);
-          if(simT>refr[i]&&Math.random()<rate*dt)fire(i);
-        }
-      }
-      // Synaptic arrivals
-      for(let k=pending.length-1;k>=0;k--){
-        const p=pending[k];
-        if(p.t<=simT){
-          pending[k]=pending[pending.length-1];pending.pop();
-          const j=p.j;
-          if(simT>refr[j]){
-            pot[j]+=p.w;
-            if(pot[j]>=THR){pot[j]=0;refr[j]=simT+REFR;fire(j);}
-          }
-        }
-      }
-      const lk=Math.max(0,1-LEAK*dt);
-      for(let i=0;i<nC;i++)pot[i]*=lk;
-
-      sG.attributes.aGlow.needsUpdate=true;
-      pMat.uniforms.uTime.value=simT;
-
-      if(!isDrag&&!autoR){autoTm+=dt;if(autoTm>3)autoR=true;}
-      if(autoR)tT=1.45+Math.sin(simT*.12)*.38;
-      oT+=(tT-oT)*Math.min(1,DAMP*dt*60);
-      oP+=(tP-oP)*Math.min(1,DAMP*dt*60);
-      oD+=(tD-oD)*Math.min(1,DAMP*dt*60);
-      cam.position.set(Math.sin(oT)*Math.cos(oP)*oD,Math.sin(oP)*oD*.55+2,Math.cos(oT)*Math.cos(oP)*oD);
-      cam.lookAt(0,0,0);
-      ren.render(sc,cam);
-    }
-    nnSz();window.addEventListener('resize',nnSz);nnLoop();
-  })();
-  </script>
-
+  <!-- Local neural classifier and synchronized signal visualization -->
+  <script src="/neural-network.js" defer></script>
 
   <!-- Service cards: proximity border glow (canvas) + bounce + modal -->
   <script>

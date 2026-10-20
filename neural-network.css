@@ -1,0 +1,37 @@
+.nn-wrap{position:relative;z-index:10;width:calc(100% - 40px);max-width:1000px;height:auto;margin:12px auto 0;overflow:hidden;border:1px solid #1c3943;border-radius:12px;background:radial-gradient(ellipse at 48% 45%,#0d222c 0%,#090f18 65%);cursor:default;box-shadow:0 24px 90px #0005,inset 0 1px #89ebff0a;font-family:var(--mono)}
+.nn-wrap:active{cursor:default}
+.nn-wrap::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,#0000000c 4px);border-radius:inherit}
+.nn-head,.nn-foot{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px}
+.nn-head{border-bottom:1px solid #82dfff14}
+.nn-eyebrow{font-size:9px;letter-spacing:.19em;color:#718c9c}
+.nn-title{font-size:14px;font-weight:500;letter-spacing:.1em;color:#e1f5ff;margin-top:3px}
+.nn-live{display:flex;align-items:center;gap:8px;color:#59e5ce;font-size:9px;letter-spacing:.12em}
+.nn-live::before{content:'';width:5px;height:5px;border-radius:50%;background:#59e5ce;box-shadow:0 0 12px #59e5ce}
+.nn-pause{border:1px solid #365160;background:#0b1722;color:#aac7d7;border-radius:4px;padding:6px 9px;font:9px var(--mono);cursor:pointer}
+.nn-pause:hover,.nn-pause:focus-visible{border-color:#59e5ce;color:#59e5ce}
+.nn-controls{display:flex;gap:16px;align-items:center}
+.nn-stage{position:relative;height:300px}
+.nn-wrap canvas{display:block;width:100%;height:100%}
+.nn-telemetry{display:grid;grid-template-columns:1.1fr 1.1fr 1fr;gap:24px;padding:0 24px 20px}
+.nn-metric-label{display:flex;justify-content:space-between;font-size:9px;color:#7996a7;letter-spacing:.08em;margin-bottom:9px}
+.nn-vector{font-size:12px;color:#7de8e0;letter-spacing:.04em}
+.nn-output{display:flex;gap:10px;align-items:center;font-size:10px;color:#9fb8c8;margin-top:5px}
+.nn-output span{width:10px}
+.nn-output i{height:3px;flex:1;background:#1c2d3b;overflow:hidden}
+.nn-output b{display:block;height:100%;width:0;background:#7eafff;box-shadow:0 0 9px #7eafff;transition:width .3s}
+.nn-output em{width:38px;text-align:right;font-style:normal;font-variant-numeric:tabular-nums}
+.nn-result{font-size:19px;color:#c3d9ff;line-height:1.3}
+.nn-detail{font-size:9px;color:#6f8b9c;margin-top:7px;line-height:1.7}
+.nn-foot{padding:12px 24px;border-top:1px solid #82dfff14;font-size:9px;color:#8da6b6;letter-spacing:.05em}
+.nn-progress{position:absolute;left:0;bottom:0;height:2px;width:100%;transform-origin:left;background:linear-gradient(90deg,#4ce5cb,#7eafff);box-shadow:0 0 10px #53d8e4}
+.nn-status{color:#65ddca}
+@media(max-width:700px){
+  .nn-wrap{display:block;width:calc(100% - 40px)}
+  .nn-head,.nn-foot{padding:14px}
+  .nn-title{font-size:11px}.nn-eyebrow{font-size:8px}.nn-live{display:none}
+  .nn-stage{height:260px}
+  .nn-telemetry{grid-template-columns:1fr 1fr;padding:0 14px 16px;gap:16px}
+  .nn-telemetry>div:first-child{grid-column:1/-1}
+  .nn-vector{font-size:11px}.nn-foot{font-size:8px;gap:8px}
+}
+@media(prefers-reduced-motion:reduce){.nn-output b{transition:none}}
