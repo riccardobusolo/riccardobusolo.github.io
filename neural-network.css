@@ -1,4 +1,4 @@
-.nn-wrap{position:relative;z-index:10;width:100%;max-width:1240px;margin:0 auto;height:490px;font-family:var(--mono);isolation:isolate}
+.nn-wrap{position:relative;z-index:10;width:100%;max-width:1240px;margin:0 auto;height:clamp(490px,52vw,620px);font-family:var(--mono);isolation:isolate}
 .nn-stage{position:absolute;inset:0}
 .nn-wrap canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:pan-y;outline-offset:-8px}
 .nn-wrap canvas:active{cursor:grabbing}

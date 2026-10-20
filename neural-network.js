@@ -71,21 +71,41 @@
     });
     canvas.setAttribute('aria-label', `Rete neurale 4, 6, 5, 3. Campione ${sample}. Output: classe ${'ABC'[winner]}, probabilità ${(output[winner] * 100).toFixed(1)}%.`);
   }
-  // True 3D coordinates: four separated neuron planes, perspective camera,
+  // True 3D coordinates: four separated neuron planes, orthographic camera,
   // yaw/pitch rotation and depth-sorted primitives on a transparent canvas.
   const geometry = counts.map((n, l) => Array.from({length:n}, (_, i) => {
     const angle = i / n * Math.PI * 2 + Math.PI / 4;
     const radius = [1.45, 2.05, 1.8, 1.25][l];
     return {x:(l - 1.5) * 4.4, y:Math.cos(angle) * radius, z:Math.sin(angle) * radius, l, i};
   }));
-  let yaw = .38, pitch = -.16, drift = 0, dragging = false, pointer = null;
-  let pointerX = 0, pointerY = 0;
+  let drift = 0, dragging = false, pointer = null, trackStart = null;
+  function multiply(a,b) {
+    return [
+      a[3]*b[0]+a[0]*b[3]+a[1]*b[2]-a[2]*b[1],
+      a[3]*b[1]-a[0]*b[2]+a[1]*b[3]+a[2]*b[0],
+      a[3]*b[2]+a[0]*b[1]-a[1]*b[0]+a[2]*b[3],
+      a[3]*b[3]-a[0]*b[0]-a[1]*b[1]-a[2]*b[2]
+    ];
+  }
+  const axis = (x,y,z,a) => [x*Math.sin(a/2),y*Math.sin(a/2),z*Math.sin(a/2),Math.cos(a/2)];
+  const initialOrientation = () => multiply(axis(1,0,0,-.16),axis(0,1,0,.38));
+  let orientation = initialOrientation();
+  function turn(q) {
+    const next = multiply(q,orientation), length = Math.hypot(...next);
+    orientation = next.map(v=>v/length);
+  }
   function rotate(p) {
-    const a = yaw + (motion.matches ? 0 : Math.sin(drift * .24) * .12);
-    const b = pitch + (motion.matches ? 0 : Math.sin(drift * .17) * .045);
-    const x = p.x * Math.cos(a) + p.z * Math.sin(a);
-    const z = -p.x * Math.sin(a) + p.z * Math.cos(a);
-    return {x, y:p.y * Math.cos(b) - z * Math.sin(b), z:p.y * Math.sin(b) + z * Math.cos(b)};
+    const q = motion.matches ? orientation : multiply(axis(0,1,0,Math.sin(drift*.24)*.12),orientation);
+    const v = multiply(multiply(q,[p.x,p.y,p.z,0]),[-q[0],-q[1],-q[2],q[3]]);
+    return {x:v[0],y:v[1],z:v[2]};
+  }
+  function trackball(e) {
+    const rect = canvas.getBoundingClientRect(), radius = Math.min(rect.width,rect.height)*.45;
+    const x = (e.clientX-rect.left-rect.width/2)/radius;
+    const y = (e.clientY-rect.top-(48+(rect.height-(rect.width<700?220:160))/2))/radius;
+    const d = Math.hypot(x,y);
+    // The front of the virtual sphere faces the camera (negative Z).
+    return d <= 1 ? [x,y,-Math.sqrt(1-d*d)] : [x/d,y/d,0];
   }
   function resize() {
     const rect = canvas.getBoundingClientRect();
@@ -106,32 +126,18 @@
   function draw() {
     if (!activations || !width) return;
     ctx.clearRect(0, 0, width, height);
-    const rotated = geometry.flat().map(rotate);
-    const xs = rotated.map(p => p.x * 22 / (22 + p.z));
-    const ys = rotated.map(p => p.y * 22 / (22 + p.z));
-    const spanX = Math.max(...xs) - Math.min(...xs);
-    const spanY = Math.max(...ys) - Math.min(...ys);
     const mobile = width < 700;
     const areaHeight = height - (mobile ? 220 : 160);
-    const scale = Math.min((width - (mobile ? 40 : 130)) / (spanX + 2.6), areaHeight / (spanY + 1.9), 80);
+    // Fixed viewport scale and orthographic projection: rotating never changes zoom.
+    // A 15-unit bounding sphere fits all orientations, including vertical ones.
+    const scale = Math.min((width - (mobile ? 40 : 130)) / 15, areaHeight / 15);
     const centerY = 48 + areaHeight / 2;
     const project = p => {
-      const q = rotate(p), perspective = 22 / (22 + q.z);
-      return {x:width / 2 + q.x * perspective * scale, y:centerY + q.y * perspective * scale, z:q.z, s:perspective};
+      const q = rotate(p);
+      return {x:width / 2 + q.x * scale, y:centerY + q.y * scale, z:q.z, s:1};
     };
     points = geometry.map(layer => layer.map(project));
     const primitives = [];
-    // Fine circular guides live in the same 3D planes as their neurons.
-    geometry.forEach((layer, l) => {
-      const radius = [1.45, 2.05, 1.8, 1.25][l] + .38;
-      for (let k = 0; k < 64; k++) {
-        if (k % 16 > 12) continue;
-        const a = k / 64 * Math.PI * 2, b = (k + 1) / 64 * Math.PI * 2;
-        const p = project({x:layer[0].x,y:Math.cos(a)*radius,z:Math.sin(a)*radius});
-        const q = project({x:layer[0].x,y:Math.cos(b)*radius,z:Math.sin(b)*radius});
-        primitives.push({z:(p.z+q.z)/2, paint:() => line(p,q,'rgba('+colors[l]+',.13)',.6)});
-      }
-    });
     weights.forEach((matrix,l) => matrix.forEach((row,j) => row.forEach((weight,i) => {
       const a = points[l][i], b = points[l+1][j];
       const strength = Math.min(1,Math.abs(weight*activations[l][i]));
@@ -165,14 +171,11 @@
         const halo = ctx.createRadialGradient(p.x,p.y,r*.3,p.x,p.y,r*4.5);
         halo.addColorStop(0,'rgba('+colors[l]+','+(.15+intensity*.27+flash*.15)+')');halo.addColorStop(1,'rgba('+colors[l]+',0)');
         ctx.fillStyle=halo;ctx.fillRect(p.x-r*4.5,p.y-r*4.5,r*9,r*9);
-        const sphere = ctx.createRadialGradient(p.x-r*.32,p.y-r*.38,r*.05,p.x,p.y,r);
-        sphere.addColorStop(0,active?'#e2ffff':'#81b4c5');
-        sphere.addColorStop(.25,'rgba('+colors[l]+','+(.5+intensity*.5)+')');
-        sphere.addColorStop(1,'#081724');
-        ctx.fillStyle=sphere;ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();
+        // Compact signal nodes: a single luminous core, without orbital rings.
+        ctx.fillStyle='#0a1720';ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();
         ctx.strokeStyle='rgba('+colors[l]+','+(.35+intensity*.55)+')';ctx.lineWidth=.7;ctx.stroke();
-        ctx.strokeStyle='rgba('+colors[l]+','+(.15+flash*.45)+')';
-        ctx.beginPath();ctx.ellipse(p.x,p.y,r*1.75,r*.65,-.5,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle='rgba('+colors[l]+','+(.4+intensity*.6)+')';
+        ctx.beginPath();ctx.arc(p.x,p.y,r*.38,0,Math.PI*2);ctx.fill();
         if (width > 700) text(active?value.toFixed(2):'···',p.x+r*2.3,p.y+3,'rgba('+colors[l]+',.65)',8,'left');
       }});
     }));
@@ -185,14 +188,17 @@
   }
   canvas.addEventListener('pointerdown',e => {
     if (e.button !== 0 || pointer !== null) return;
-    dragging=true;pointer=e.pointerId;pointerX=e.clientX;pointerY=e.clientY;
+    dragging=true;pointer=e.pointerId;trackStart=trackball(e);
     canvas.setPointerCapture(e.pointerId);
   });
   canvas.addEventListener('pointermove',e => {
     if (!dragging || e.pointerId !== pointer) return;
-    yaw+=(e.clientX-pointerX)*.007;
-    pitch=Math.max(-1.3,Math.min(1.3,pitch+(e.clientY-pointerY)*.007));
-    pointerX=e.clientX;pointerY=e.clientY;draw();
+    const next = trackball(e), a = trackStart, b = next;
+    const cross = [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+    const q = [...cross,1+a.reduce((sum,v,i)=>sum+v*b[i],0)];
+    const length = Math.hypot(...q);
+    if (length > 1e-6) turn(q.map(v=>v/length));
+    trackStart=next;draw();
   });
   const release = e => {
     if (e.pointerId !== pointer) return;
@@ -205,10 +211,10 @@
   canvas.addEventListener('keydown',e => {
     if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home'].includes(e.key)) return;
     e.preventDefault();
-    if(e.key==='Home'){yaw=.38;pitch=-.16;drift=0;}
-    else if(e.key==='ArrowLeft')yaw-=.12;
-    else if(e.key==='ArrowRight')yaw+=.12;
-    else pitch=Math.max(-1.3,Math.min(1.3,pitch+(e.key==='ArrowDown'?.12:-.12)));
+    if(e.key==='Home'){orientation=initialOrientation();drift=0;}
+    else if(e.key==='ArrowLeft')turn(axis(0,1,0,.12));
+    else if(e.key==='ArrowRight')turn(axis(0,1,0,-.12));
+    else turn(axis(1,0,0,e.key==='ArrowDown'?.12:-.12));
     draw();
   });
   function render() {
