@@ -294,7 +294,7 @@
       .contact-form input,.contact-form textarea,.contact-form select{font-size:16px}
     }
   </style>
-  <link rel="stylesheet" href="/neural-network.css">
+  <link rel="stylesheet" href="/neural-network.css?v=3d-2">
 </head>
 <body>
   <!-- Aurora background: soft drifting lights -->
@@ -336,16 +336,16 @@
 
   <section class="nn-wrap" id="nn-wrap" aria-label="Dimostrazione di una rete neurale">
     <div class="nn-head">
-      <div><div class="nn-eyebrow">NEURAL SYSTEMS / LIVE INFERENCE</div><h2 class="nn-title">Il segnale diventa decisione.</h2></div>
+      <div><div class="nn-eyebrow">NEURAL SYSTEMS / LIVE INFERENCE</div></div>
       <div class="nn-controls"><span class="nn-live">SYSTEM ONLINE</span><button class="nn-pause" type="button" aria-pressed="false" aria-label="Metti in pausa o riprendi la rete neurale">Pausa</button></div>
     </div>
-    <div class="nn-stage"><canvas id="nn-canvas" role="img" aria-label="Rete neurale con quattro input, due strati nascosti e tre output">Rete neurale: 4 input → 6 neuroni → 5 neuroni → 3 classi di output.</canvas></div>
+    <div class="nn-stage"><canvas id="nn-canvas" tabindex="0" aria-describedby="nn-hint" role="img" aria-label="Rete neurale con quattro input, due strati nascosti e tre output">Rete neurale: 4 input → 6 neuroni → 5 neuroni → 3 classi di output.</canvas></div>
     <div class="nn-telemetry">
       <div><div class="nn-metric-label"><span>01 / VETTORE IN INGRESSO</span><span>RANDOM</span></div><div class="nn-vector">Inizializzazione…</div><div class="nn-detail">4 valori casuali · intervallo [−1, +1]</div></div>
       <div><div class="nn-metric-label"><span>02 / PROBABILITÀ</span><span>SOFTMAX</span></div><div class="nn-output"><span>A</span><i><b></b></i><em>—</em></div><div class="nn-output"><span>B</span><i><b></b></i><em>—</em></div><div class="nn-output"><span>C</span><i><b></b></i><em>—</em></div></div>
       <div><div class="nn-metric-label"><span>03 / CLASSIFICAZIONE</span></div><div class="nn-result">Analisi…</div><div class="nn-detail">MLP addestrata su dati sintetici<br>69 connessioni · 14 bias · inferenza locale</div></div>
     </div>
-    <div class="nn-foot"><span class="nn-status">ACQUISIZIONE INPUT</span><span>#<span class="nn-sequence">00001</span> / NEXT <span class="nn-countdown">2.0 s</span></span><div class="nn-progress"></div></div>
+    <div class="nn-foot"><span class="nn-status">ACQUISIZIONE INPUT</span><span class="nn-hint" id="nn-hint">TRASCINA PER RUOTARE · TASTI FRECCIA / HOME</span><span>#<span class="nn-sequence">00001</span> / NEXT <span class="nn-countdown">2.0 s</span></span><div class="nn-progress"></div></div>
   </section>
 
   <div class="main">
@@ -513,7 +513,7 @@
   </div>
 
   <!-- Local neural classifier and synchronized signal visualization -->
-  <script src="/neural-network.js" defer></script>
+  <script src="/neural-network.js?v=3d-2" defer></script>
 
   <!-- Service cards: proximity border glow (canvas) + bounce + modal -->
   <script>
