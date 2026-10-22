@@ -6,14 +6,14 @@
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   const $ = selector => wrap.querySelector(selector);
-  const counts = [4, 6, 5, 3];
+  const counts = [4, 9, 9, 4];
   const colors = ['77,229,202', '71,207,226', '107,166,255', '155,174,255'];
   const period = 2000;
-  // A real 4 → 6 → 5 → 3 MLP: tanh hidden layers, softmax output.
-  // Learn three synthetic signal families with SGD + cross entropy.
+  // A real 4 → 9 → 9 → 4 MLP: tanh hidden layers, softmax output.
+  // Learn four synthetic signal families with SGD + cross entropy.
   let seed = 7531;
   const rng = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
-  const centers = [[.8, -.7, .6, -.5], [-.6, .8, -.5, .7], [.5, .5, -.8, -.7]];
+  const centers = [[.8, -.7, .6, -.5], [-.6, .8, -.5, .7], [.5, .5, -.8, -.7], [-.7, -.6, .7, .6]];
   const weights = counts.slice(1).map((n, l) =>
     Array.from({length:n}, () => Array.from({length:counts[l]}, () => (rng() * 2 - 1) * .5)));
   const biases = counts.slice(1).map(n => Array(n).fill(0));
@@ -31,7 +31,7 @@
     return a;
   }
   for (let step = 0; step < 1800; step++) {
-    const label = Math.floor(rng() * 3);
+    const label = Math.floor(rng() * centers.length);
     const input = centers[label].map(v => v + (rng() - .5) * 1.2);
     const a = forward(input);
     let delta = a[3].map((v, j) => v - Number(j === label));
@@ -64,20 +64,20 @@
     published = true;
     const output = activations[3];
     const winner = output.indexOf(Math.max(...output));
-    $('.nn-result').textContent = `Classe ${'ABC'[winner]} / ${(output[winner] * 100).toFixed(1)}%`;
+    $('.nn-result').textContent = `Classe ${'ABCD'[winner]} / ${(output[winner] * 100).toFixed(1)}%`;
     bars.forEach((row, i) => {
       row.querySelector('b').style.width = `${output[i] * 100}%`;
       row.querySelector('em').textContent = `${(output[i] * 100).toFixed(1)}%`;
     });
-    canvas.setAttribute('aria-label', `Rete neurale 4, 6, 5, 3. Campione ${sample}. Output: classe ${'ABC'[winner]}, probabilità ${(output[winner] * 100).toFixed(1)}%.`);
+    canvas.setAttribute('aria-label', `Rete neurale ${counts.join(", ")}. Campione ${sample}. Output: classe ${'ABCD'[winner]}, probabilità ${(output[winner] * 100).toFixed(1)}%.`);
   }
   // True 3D coordinates: four separated neuron planes, fixed perspective camera,
   // constrained orbit rotation and depth-sorted primitives on a transparent canvas.
   const cameraDistance = 24;
   const geometry = counts.map((n, l) => Array.from({length:n}, (_, i) => {
-    const angle = i / n * Math.PI * 2 + Math.PI / 4;
-    const radius = [1.45, 2.05, 1.8, 1.25][l];
-    return {x:(l - 1.5) * 4.4, y:Math.cos(angle) * radius, z:Math.sin(angle) * radius, l, i};
+    const side = Math.sqrt(n), spacing = 1.8;
+    const row = Math.floor(i / side), column = i % side;
+    return {x:(l - 1.5) * 4.4, y:(row - (side - 1)/2) * spacing, z:(column - (side - 1)/2) * spacing, l, i};
   }));
   // Horizontal mouse movement controls unrestricted yaw; vertical movement
   // controls pitch within a 90-degree total range. No roll is introduced.
@@ -172,8 +172,8 @@
     primitives.sort((a,b)=>b.z-a.z).forEach(p=>p.paint());
     // Labels track each layer in space, instead of enclosing the model in a card.
     geometry.forEach((layer,l) => {
-      const anchor = project({x:layer[0].x,y:-[1.45,2.05,1.8,1.25][l]-.75,z:0});
-      text(['INPUT / 04','HIDDEN / 06','HIDDEN / 05','OUTPUT / 03'][l],anchor.x,anchor.y,'rgba('+colors[l]+',.65)',mobile?6:8);
+      const anchor = project({x:layer[0].x,y:-(Math.sqrt(counts[l])-1)*.9-.75,z:0});
+      text(['INPUT','HIDDEN','HIDDEN','OUTPUT'][l]+' / '+String(counts[l]).padStart(2,'0'),anchor.x,anchor.y,'rgba('+colors[l]+',.65)',mobile?6:8);
     });
   }
   canvas.addEventListener('pointerdown',e => {
