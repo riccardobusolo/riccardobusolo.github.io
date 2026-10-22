@@ -131,7 +131,8 @@
     .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;padding:20px 40px;transition:background .4s,backdrop-filter .4s}
     .nav--scrolled{background:rgba(10,10,14,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
     .nav__inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:900px}
-    .nav__logo{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none;transition:scale .3s var(--ease)}
+    .nav__logo{position:relative;font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none;transition:scale .3s var(--ease)}
+    .nav__logo .site-version{position:absolute;left:0;top:-11px;white-space:nowrap;font:400 7px var(--mono);letter-spacing:.06em;line-height:1;color:rgba(154,170,184,.28);pointer-events:none}
     .nav__logo:hover{scale:1.08}
     .nav__logo:active{scale:.94;transition-duration:.1s}
     .nav__logo span{color:var(--cyan)}
@@ -164,8 +165,8 @@
     .service-card:hover{transform:translateY(-3px);border-color:var(--border-hover);background:var(--bg-card-hover)}
     .service-card:active{transform:translateY(-3px) scale(.96);transition-duration:.1s}
     /* proximity border glow – canvas overlay */
-    .service-card__glow-canvas{position:absolute;pointer-events:none;border-radius:14px;z-index:0;left:-6px;top:-6px}
-    /* tutti gli elementi interni sopra il canvas */
+    .service-card__glow-canvas{position:absolute;pointer-events:none;border-radius:14px;z-index:3;left:-6px;top:-6px}
+    /* Content below the transparent border-glow overlay. */
     .service-card > *:not(.service-card__glow-canvas){position:relative;z-index:1}
     .service-card__glow{display:none}
     .service-card__media{aspect-ratio:16/10;flex-shrink:0;overflow:hidden;border-bottom:1px solid rgba(135,184,204,.12);background:radial-gradient(ellipse at 25% 25%,rgba(0,224,208,.13),transparent 65%),linear-gradient(135deg,#14272e,#11151e);display:flex;align-items:flex-end;padding:18px}
@@ -186,7 +187,8 @@
 
 
     /* Training-provider banner */
-    .training-banner{display:grid;grid-template-columns:200px minmax(0,1fr);margin-top:24px;border:1px solid rgba(0,224,208,.18);border-radius:12px;overflow:hidden;background:linear-gradient(110deg,rgba(0,224,208,.055),rgba(79,172,254,.025)),var(--bg-card)}
+    .training-banner{position:relative;display:grid;grid-template-columns:200px minmax(0,1fr);margin-top:24px;border:1px solid rgba(0,224,208,.18);border-radius:12px;overflow:hidden;background:linear-gradient(110deg,rgba(0,224,208,.055),rgba(79,172,254,.025)),var(--bg-card)}
+    .training-banner > *:not(.service-card__glow-canvas){position:relative;z-index:1}
     .training-banner__media{position:relative;display:flex;align-items:center;justify-content:center;min-height:240px;background:radial-gradient(ellipse at center,rgba(0,224,208,.1),transparent 70%),repeating-linear-gradient(0deg,transparent,transparent 29px,rgba(79,172,254,.045) 30px),repeating-linear-gradient(90deg,transparent,transparent 29px,rgba(79,172,254,.045) 30px);border-right:1px solid rgba(0,224,208,.1);overflow:hidden}
     .training-banner__media svg{width:76px;height:76px;stroke:var(--cyan);fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
     .training-banner__media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -368,6 +370,7 @@
 
   <nav class="nav" id="nav"><div class="nav__inner">
     <a href="#hero" class="nav__logo" style="display:flex;align-items:center">
+      <span class="site-version" aria-label="Versione del sito 2026.10.22.1">v2026.10.22.1</span>
       <svg height="32" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
         <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
         <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
@@ -692,11 +695,13 @@
     const BORDER_R = 12;
 
     const cards = document.querySelectorAll('.service-card[data-service]');
+    const glowCards = document.querySelectorAll('.service-card[data-service], .training-banner');
     const cardStates = [];
 
-    cards.forEach((card, idx) => {
+    glowCards.forEach(card => {
       const cvs = document.createElement('canvas');
       cvs.className = 'service-card__glow-canvas';
+      cvs.setAttribute('aria-hidden', 'true');
       card.insertBefore(cvs, card.firstChild);
       const ctx = cvs.getContext('2d');
       cardStates.push({ card, cvs, ctx, alpha: 0, targetAlpha: 0, mx: -9999, my: -9999 });
