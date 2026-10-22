@@ -339,11 +339,11 @@
       <div><div class="nn-eyebrow">NEURAL SYSTEMS / LIVE INFERENCE</div></div>
       <div class="nn-controls"><span class="nn-live">SYSTEM ONLINE</span><button class="nn-pause" type="button" aria-pressed="false" aria-label="Metti in pausa o riprendi la rete neurale">Pausa</button></div>
     </div>
-    <div class="nn-stage"><canvas id="nn-canvas" tabindex="0" aria-describedby="nn-hint" role="img" aria-label="Rete neurale con 25 input, tre strati nascosti da 16, 16 e 9 neuroni e quattro output">Rete neurale: 25 input → 16 neuroni → 16 neuroni → 9 neuroni → 4 classi di output.</canvas></div>
+    <div class="nn-stage"><canvas id="nn-canvas" tabindex="0" aria-describedby="nn-hint" role="img" aria-label="Rete neurale con 16 input, tre strati nascosti da 16, 16 e 9 neuroni e quattro output">Rete neurale: 16 input → 16 neuroni → 16 neuroni → 9 neuroni → 4 classi di output.</canvas></div>
     <div class="nn-telemetry">
-      <div><div class="nn-metric-label"><span>01 / VETTORE IN INGRESSO</span><span>RANDOM</span></div><div class="nn-vector">Inizializzazione…</div><div class="nn-detail">25 valori casuali · intervallo [−1, +1]</div></div>
+      <div><div class="nn-metric-label"><span>01 / VETTORE IN INGRESSO</span><span>RANDOM</span></div><div class="nn-vector">Inizializzazione…</div><div class="nn-detail">16 valori casuali · intervallo [−1, +1]</div></div>
       <div><div class="nn-metric-label"><span>02 / PROBABILITÀ</span><span>SOFTMAX</span></div><div class="nn-output"><span>A</span><i><b></b></i><em>—</em></div><div class="nn-output"><span>B</span><i><b></b></i><em>—</em></div><div class="nn-output"><span>C</span><i><b></b></i><em>—</em></div><div class="nn-output"><span>D</span><i><b></b></i><em>—</em></div></div>
-      <div><div class="nn-metric-label"><span>03 / CLASSIFICAZIONE</span></div><div class="nn-result">Analisi…</div><div class="nn-detail">MLP addestrata su dati sintetici<br>836 connessioni · 45 bias · inferenza locale</div></div>
+      <div><div class="nn-metric-label"><span>03 / CLASSIFICAZIONE</span></div><div class="nn-result">Analisi…</div><div class="nn-detail">MLP addestrata su dati sintetici<br>692 connessioni · 45 bias · inferenza locale</div></div>
     </div>
     <div class="nn-foot"><span class="nn-status">ACQUISIZIONE INPUT</span><span class="nn-hint" id="nn-hint">TRASCINA PER RUOTARE · TASTI FRECCIA / HOME</span><span>#<span class="nn-sequence">00001</span> / NEXT <span class="nn-countdown">2.0 s</span></span><div class="nn-progress"></div></div>
   </section>
@@ -513,7 +513,7 @@
   </div>
 
   <!-- Local neural classifier and synchronized signal visualization -->
-  <script src="/neural-network.js?v=3d-7" defer></script>
+  <script src="/neural-network.js?v=3d-8" defer></script>
 
   <!-- Service cards: proximity border glow (canvas) + bounce + modal -->
   <script>

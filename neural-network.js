@@ -6,12 +6,12 @@
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   const $ = selector => wrap.querySelector(selector);
-  const counts = [25, 16, 16, 9, 4];
+  const counts = [16, 16, 16, 9, 4];
   const colors = ['77,229,202', '71,207,226', '83,184,245', '107,166,255', '155,174,255'];
   const period = 2000;
   const signalStart = 180, outputTime = 1320;
   const layerDuration = (outputTime - signalStart) / (counts.length - 1);
-  // A real 25 → 16 → 16 → 9 → 4 MLP: tanh hidden layers, softmax output.
+  // A real 16 → 16 → 16 → 9 → 4 MLP: tanh hidden layers, softmax output.
   // Learn four synthetic signal families with SGD + cross entropy.
   let seed = 7531;
   const rng = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
@@ -77,6 +77,7 @@
   // True 3D coordinates: five separated neuron planes, fixed perspective camera,
   // constrained orbit rotation and depth-sorted primitives on a transparent canvas.
   const cameraDistance = 24;
+  const zoom = 1.4, neuronGlow = .5;
   const geometry = counts.map((n, l) => Array.from({length:n}, (_, i) => {
     const side = Math.sqrt(n), spacing = 1.3;
     const row = Math.floor(i / side), column = i % side;
@@ -122,7 +123,7 @@
     const areaHeight = height - (mobile ? 220 : 160);
     // Viewport scale and camera stay fixed while rotating. Only physical depth
     // changes apparent size; the framing does not fit itself to each orientation.
-    const scale = Math.min((width - (mobile ? 40 : 130)) / 16, areaHeight / 16);
+    const scale = zoom * Math.min((width - (mobile ? 40 : 130)) / 16, areaHeight / 16);
     const centerY = 48 + areaHeight / 2;
     const project = p => {
       const q = rotate(p);
@@ -150,7 +151,7 @@
           trail.addColorStop(1,'rgba('+color+','+(.3+strength*.7)+')');
           ctx.shadowColor='rgb('+color+')';ctx.shadowBlur=8;
           line(tail,head,trail,1+strength);
-          ctx.fillStyle='#dfffff';ctx.beginPath();ctx.arc(head.x,head.y,(1+strength)*head.s,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+          ctx.fillStyle='#dfffff';ctx.beginPath();ctx.arc(head.x,head.y,(1+strength)*head.s*zoom,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
         }});
       }
     })));
@@ -159,10 +160,10 @@
       const active = motion.matches || elapsed >= arrival;
       const value = activations[l][i], intensity = active ? Math.abs(value) : .06;
       const flash = active && !motion.matches ? Math.max(0,1-(elapsed-arrival)/420) : 0;
-      const r = (mobile ? 5 : 7.5)*p.s;
+      const r = (mobile ? 5 : 7.5)*p.s*zoom;
       primitives.push({z:p.z,paint:() => {
         const halo = ctx.createRadialGradient(p.x,p.y,r*.3,p.x,p.y,r*4.5);
-        halo.addColorStop(0,'rgba('+colors[l]+','+(.15+intensity*.27+flash*.15)+')');halo.addColorStop(1,'rgba('+colors[l]+',0)');
+        halo.addColorStop(0,'rgba('+colors[l]+','+((.15+intensity*.27+flash*.15)*neuronGlow)+')');halo.addColorStop(1,'rgba('+colors[l]+',0)');
         ctx.fillStyle=halo;ctx.fillRect(p.x-r*4.5,p.y-r*4.5,r*9,r*9);
         // Compact signal nodes: a single luminous core, without orbital rings.
         ctx.fillStyle='#0a1720';ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();
