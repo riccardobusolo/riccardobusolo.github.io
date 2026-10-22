@@ -132,7 +132,7 @@
     .nav--scrolled{background:rgba(10,10,14,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
     .nav__inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:900px}
     .nav__logo{position:relative;font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none;transition:scale .3s var(--ease)}
-    .nav__logo .site-version{position:absolute;left:0;top:-11px;white-space:nowrap;font:400 7px var(--mono);letter-spacing:.06em;line-height:1;color:rgba(154,170,184,.28);pointer-events:none}
+    .nav > .site-version{position:absolute;right:12px;bottom:5px;white-space:nowrap;font:400 7px var(--mono);letter-spacing:.06em;line-height:1;color:rgba(154,170,184,.28);pointer-events:none}
     .nav__logo:hover{scale:1.08}
     .nav__logo:active{scale:.94;transition-duration:.1s}
     .nav__logo span{color:var(--cyan)}
@@ -370,7 +370,6 @@
 
   <nav class="nav" id="nav"><div class="nav__inner">
     <a href="#hero" class="nav__logo" style="display:flex;align-items:center">
-      <span class="site-version" aria-label="Versione del sito 2026.10.22.1">v2026.10.22.1</span>
       <svg height="32" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg">
         <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
         <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
@@ -379,7 +378,9 @@
       </svg>
     </a>
     <ul class="nav__links"><li><a href="#servizi">Servizi</a></li><li><a href="#progetti">Progetti</a></li><li><a href="#risorse">Risorse</a></li><li><a href="#contatti">Contatti</a></li></ul>
-  </div></nav>
+  </div>
+<span class="site-version" aria-label="Versione del sito 2026.10.22.1">v2026.10.22.1</span>
+  </nav>
 
   <div class="main">
     <section class="hero" id="hero">
