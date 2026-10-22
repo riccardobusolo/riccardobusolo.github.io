@@ -72,41 +72,29 @@
     canvas.setAttribute('aria-label', `Rete neurale 4, 6, 5, 3. Campione ${sample}. Output: classe ${'ABC'[winner]}, probabilità ${(output[winner] * 100).toFixed(1)}%.`);
   }
   // True 3D coordinates: four separated neuron planes, fixed perspective camera,
-  // trackball rotation and depth-sorted primitives on a transparent canvas.
+  // constrained orbit rotation and depth-sorted primitives on a transparent canvas.
   const cameraDistance = 24;
   const geometry = counts.map((n, l) => Array.from({length:n}, (_, i) => {
     const angle = i / n * Math.PI * 2 + Math.PI / 4;
     const radius = [1.45, 2.05, 1.8, 1.25][l];
     return {x:(l - 1.5) * 4.4, y:Math.cos(angle) * radius, z:Math.sin(angle) * radius, l, i};
   }));
-  let drift = 0, dragging = false, pointer = null, trackStart = null;
-  function multiply(a,b) {
-    return [
-      a[3]*b[0]+a[0]*b[3]+a[1]*b[2]-a[2]*b[1],
-      a[3]*b[1]-a[0]*b[2]+a[1]*b[3]+a[2]*b[0],
-      a[3]*b[2]+a[0]*b[1]-a[1]*b[0]+a[2]*b[3],
-      a[3]*b[3]-a[0]*b[0]-a[1]*b[1]-a[2]*b[2]
-    ];
-  }
-  const axis = (x,y,z,a) => [x*Math.sin(a/2),y*Math.sin(a/2),z*Math.sin(a/2),Math.cos(a/2)];
-  const initialOrientation = () => multiply(axis(1,0,0,-.16),axis(0,1,0,.38));
-  let orientation = initialOrientation();
-  function turn(q) {
-    const next = multiply(q,orientation), length = Math.hypot(...next);
-    orientation = next.map(v=>v/length);
+  // Horizontal mouse movement controls unrestricted yaw; vertical movement
+  // controls pitch within a 90-degree total range. No roll is introduced.
+  const maxPitch = Math.PI / 4, autoSpeed = .12;
+  let yaw = .38, pitch = 0, dragging = false, pointer = null;
+  let pointerX = 0, pointerY = 0;
+  const clampPitch = angle => Math.max(-maxPitch, Math.min(maxPitch, angle));
+  function advanceRotation(dt) {
+    if (dragging || paused || motion.matches) return;
+    yaw = (yaw - autoSpeed * dt) % (Math.PI * 2);
+    pitch *= Math.exp(-4 * dt);
+    if (Math.abs(pitch) < .0001) pitch = 0;
   }
   function rotate(p) {
-    const q = motion.matches ? orientation : multiply(axis(0,1,0,Math.sin(drift*.24)*.12),orientation);
-    const v = multiply(multiply(q,[p.x,p.y,p.z,0]),[-q[0],-q[1],-q[2],q[3]]);
-    return {x:v[0],y:v[1],z:v[2]};
-  }
-  function trackball(e) {
-    const rect = canvas.getBoundingClientRect(), radius = Math.min(rect.width,rect.height)*.45;
-    const x = (e.clientX-rect.left-rect.width/2)/radius;
-    const y = (e.clientY-rect.top-(48+(rect.height-(rect.width<700?220:160))/2))/radius;
-    const d = Math.hypot(x,y);
-    // The front of the virtual sphere faces the camera (negative Z).
-    return d <= 1 ? [x,y,-Math.sqrt(1-d*d)] : [x/d,y/d,0];
+    const x = p.x * Math.cos(yaw) + p.z * Math.sin(yaw);
+    const z = -p.x * Math.sin(yaw) + p.z * Math.cos(yaw);
+    return {x, y:p.y * Math.cos(pitch) - z * Math.sin(pitch), z:p.y * Math.sin(pitch) + z * Math.cos(pitch)};
   }
   function resize() {
     const rect = canvas.getBoundingClientRect();
@@ -190,21 +178,19 @@
   }
   canvas.addEventListener('pointerdown',e => {
     if (e.button !== 0 || pointer !== null) return;
-    dragging=true;pointer=e.pointerId;trackStart=trackball(e);
+    dragging=true;pointer=e.pointerId;pointerX=e.clientX;pointerY=e.clientY;
     canvas.setPointerCapture(e.pointerId);
   });
   canvas.addEventListener('pointermove',e => {
     if (!dragging || e.pointerId !== pointer) return;
-    const next = trackball(e), a = trackStart, b = next;
-    const cross = [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
-    const q = [...cross,1+a.reduce((sum,v,i)=>sum+v*b[i],0)];
-    const length = Math.hypot(...q);
-    if (length > 1e-6) turn(q.map(v=>v/length));
-    trackStart=next;draw();
+    yaw = (yaw - (e.clientX-pointerX)*.007) % (Math.PI*2);
+    pitch = clampPitch(pitch + (e.clientY-pointerY)*.007);
+    pointerX=e.clientX;pointerY=e.clientY;draw();
   });
   const release = e => {
     if (e.pointerId !== pointer) return;
     dragging=false;pointer=null;
+    if (motion.matches) { pitch=0;draw(); }
     if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId);
   };
   canvas.addEventListener('pointerup',release);
@@ -213,10 +199,10 @@
   canvas.addEventListener('keydown',e => {
     if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home'].includes(e.key)) return;
     e.preventDefault();
-    if(e.key==='Home'){orientation=initialOrientation();drift=0;}
-    else if(e.key==='ArrowLeft')turn(axis(0,1,0,.12));
-    else if(e.key==='ArrowRight')turn(axis(0,1,0,-.12));
-    else turn(axis(1,0,0,e.key==='ArrowDown'?.12:-.12));
+    if(e.key==='Home'){yaw=.38;pitch=0;}
+    else if(e.key==='ArrowLeft')yaw=(yaw+.12)%(Math.PI*2);
+    else if(e.key==='ArrowRight')yaw=(yaw-.12)%(Math.PI*2);
+    else pitch=clampPitch(pitch+(e.key==='ArrowDown'?.12:-.12));
     draw();
   });
   function render() {
@@ -232,7 +218,7 @@
     if (last !== null) {
       const dt = now - last;
       elapsed += dt;
-      if (!dragging && !motion.matches) drift += Math.min(dt, 100) / 1000;
+      advanceRotation(Math.min(dt, 100) / 1000);
     }
     last = now;
     if (elapsed >= period) { elapsed %= period; nextSample(); }
