@@ -6,14 +6,16 @@
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   const $ = selector => wrap.querySelector(selector);
-  const counts = [4, 9, 9, 4];
-  const colors = ['77,229,202', '71,207,226', '107,166,255', '155,174,255'];
+  const counts = [25, 16, 16, 9, 4];
+  const colors = ['77,229,202', '71,207,226', '83,184,245', '107,166,255', '155,174,255'];
   const period = 2000;
-  // A real 4 → 9 → 9 → 4 MLP: tanh hidden layers, softmax output.
+  const signalStart = 180, outputTime = 1320;
+  const layerDuration = (outputTime - signalStart) / (counts.length - 1);
+  // A real 25 → 16 → 16 → 9 → 4 MLP: tanh hidden layers, softmax output.
   // Learn four synthetic signal families with SGD + cross entropy.
   let seed = 7531;
   const rng = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
-  const centers = [[.8, -.7, .6, -.5], [-.6, .8, -.5, .7], [.5, .5, -.8, -.7], [-.7, -.6, .7, .6]];
+  const centers = Array.from({length:counts.at(-1)}, () => Array.from({length:counts[0]}, () => rng() * 1.6 - .8));
   const weights = counts.slice(1).map((n, l) =>
     Array.from({length:n}, () => Array.from({length:counts[l]}, () => (rng() * 2 - 1) * .5)));
   const biases = counts.slice(1).map(n => Array(n).fill(0));
@@ -34,8 +36,8 @@
     const label = Math.floor(rng() * centers.length);
     const input = centers[label].map(v => v + (rng() - .5) * 1.2);
     const a = forward(input);
-    let delta = a[3].map((v, j) => v - Number(j === label));
-    for (let l = 2; l >= 0; l--) {
+    let delta = a.at(-1).map((v, j) => v - Number(j === label));
+    for (let l = weights.length - 1; l >= 0; l--) {
       const prev = a[l].map((v, i) =>
         weights[l].reduce((sum, row, j) => sum + row[i] * delta[j], 0) * (1 - v * v));
       weights[l].forEach((row, j) => {
@@ -51,10 +53,11 @@
   const bars = [...wrap.querySelectorAll('.nn-output')];
   function nextSample() {
     // Uniform random probes, including ambiguous points between training clusters.
-    activations = forward(Array.from({length:4}, () => Math.random() * 2 - 1));
+    activations = forward(Array.from({length:counts[0]}, () => Math.random() * 2 - 1));
     sample++;
     published = false;
-    $('.nn-vector').textContent = '[ ' + activations[0].map(v => (v >= 0 ? '+' : '') + v.toFixed(2)).join('  ') + ' ]';
+    $('.nn-vector').textContent = '[ ' + activations[0].slice(0, 4).map(v => (v >= 0 ? '+' : '') + v.toFixed(2)).join('  ') + ' … ]';
+    $('.nn-vector').title = activations[0].map(v => v.toFixed(2)).join(', ');
     $('.nn-sequence').textContent = String(sample).padStart(5, '0');
     $('.nn-result').textContent = 'Analisi…';
     bars.forEach(row => { row.querySelector('b').style.width = '0%'; row.querySelector('em').textContent = '—'; });
@@ -62,7 +65,7 @@
   function publish() {
     if (published) return;
     published = true;
-    const output = activations[3];
+    const output = activations.at(-1);
     const winner = output.indexOf(Math.max(...output));
     $('.nn-result').textContent = `Classe ${'ABCD'[winner]} / ${(output[winner] * 100).toFixed(1)}%`;
     bars.forEach((row, i) => {
@@ -71,13 +74,13 @@
     });
     canvas.setAttribute('aria-label', `Rete neurale ${counts.join(", ")}. Campione ${sample}. Output: classe ${'ABCD'[winner]}, probabilità ${(output[winner] * 100).toFixed(1)}%.`);
   }
-  // True 3D coordinates: four separated neuron planes, fixed perspective camera,
+  // True 3D coordinates: five separated neuron planes, fixed perspective camera,
   // constrained orbit rotation and depth-sorted primitives on a transparent canvas.
   const cameraDistance = 24;
   const geometry = counts.map((n, l) => Array.from({length:n}, (_, i) => {
-    const side = Math.sqrt(n), spacing = 1.8;
+    const side = Math.sqrt(n), spacing = 1.3;
     const row = Math.floor(i / side), column = i % side;
-    return {x:(l - 1.5) * 4.4, y:(row - (side - 1)/2) * spacing, z:(column - (side - 1)/2) * spacing, l, i};
+    return {x:(l - (counts.length - 1)/2) * 3.1, y:(row - (side - 1)/2) * spacing, z:(column - (side - 1)/2) * spacing, l, i};
   }));
   // Horizontal mouse movement controls unrestricted yaw; vertical movement
   // controls pitch within a 90-degree total range. No roll is introduced.
@@ -119,7 +122,7 @@
     const areaHeight = height - (mobile ? 220 : 160);
     // Viewport scale and camera stay fixed while rotating. Only physical depth
     // changes apparent size; the framing does not fit itself to each orientation.
-    const scale = Math.min((width - (mobile ? 40 : 130)) / 15, areaHeight / 15);
+    const scale = Math.min((width - (mobile ? 40 : 130)) / 16, areaHeight / 16);
     const centerY = 48 + areaHeight / 2;
     const project = p => {
       const q = rotate(p);
@@ -132,7 +135,7 @@
       const a = points[l][i], b = points[l+1][j];
       const strength = Math.min(1,Math.abs(weight*activations[l][i]));
       const color = weight >= 0 ? colors[l] : '133,147,226';
-      const progress = (elapsed - 180 - l * 380) / 380;
+      const progress = (elapsed - signalStart - l * layerDuration) / layerDuration;
       primitives.push({z:(a.z+b.z)/2,paint:() => {
         line(a,b,'rgba('+color+','+(.075+strength*.16)+')',.65);
       }});
@@ -152,7 +155,7 @@
       }
     })));
     points.forEach((layer,l) => layer.forEach((p,i) => {
-      const arrival = l === 0 ? 0 : 180+l*380;
+      const arrival = l === 0 ? 0 : signalStart+l*layerDuration;
       const active = motion.matches || elapsed >= arrival;
       const value = activations[l][i], intensity = active ? Math.abs(value) : .06;
       const flash = active && !motion.matches ? Math.max(0,1-(elapsed-arrival)/420) : 0;
@@ -172,8 +175,8 @@
     primitives.sort((a,b)=>b.z-a.z).forEach(p=>p.paint());
     // Labels track each layer in space, instead of enclosing the model in a card.
     geometry.forEach((layer,l) => {
-      const anchor = project({x:layer[0].x,y:-(Math.sqrt(counts[l])-1)*.9-.75,z:0});
-      text(['INPUT','HIDDEN','HIDDEN','OUTPUT'][l]+' / '+String(counts[l]).padStart(2,'0'),anchor.x,anchor.y,'rgba('+colors[l]+',.65)',mobile?6:8);
+      const anchor = project({x:layer[0].x,y:-(Math.sqrt(counts[l])-1)*.65-.75,z:0});
+      text((l === 0 ? 'INPUT' : l === counts.length - 1 ? 'OUTPUT' : 'HIDDEN')+' / '+String(counts[l]).padStart(2,'0'),anchor.x,anchor.y,'rgba('+colors[l]+',.65)',mobile?6:8);
     });
   }
   canvas.addEventListener('pointerdown',e => {
@@ -206,11 +209,12 @@
     draw();
   });
   function render() {
-    const stage = motion.matches ? 4 : elapsed < 180 ? 0 : elapsed < 560 ? 1 : elapsed < 940 ? 2 : elapsed < 1320 ? 3 : 4;
-    $('.nn-status').textContent = paused ? 'IN PAUSA' : ['ACQUISIZIONE INPUT', 'PROPAGAZIONE / 01', 'PROPAGAZIONE / 02', 'CALCOLO SOFTMAX', 'OUTPUT DISPONIBILE'][stage];
+    const stages = ['ACQUISIZIONE INPUT', 'PROPAGAZIONE / 01', 'PROPAGAZIONE / 02', 'PROPAGAZIONE / 03', 'CALCOLO SOFTMAX', 'OUTPUT DISPONIBILE'];
+    const stage = motion.matches ? counts.length : elapsed < signalStart ? 0 : Math.min(counts.length, 1 + Math.floor((elapsed - signalStart) / layerDuration));
+    $('.nn-status').textContent = paused ? 'IN PAUSA' : stages[stage];
     $('.nn-countdown').textContent = ((period - elapsed) / 1000).toFixed(1) + ' s';
     $('.nn-progress').style.transform = `scaleX(${elapsed / period})`;
-    if (elapsed >= 1320 || motion.matches) publish();
+    if (elapsed >= outputTime || motion.matches) publish();
     draw();
   }
   function tick(now) {
