@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict');
+const example=require('./demo.js');
+assert.deepEqual(example.compare(1200,7,'price').rows.map(o=>o.total),[1160,1180,1140]);
+assert.equal(example.compare(1200,7,'price').winner.name,'Gamma');
+assert.equal(example.compare(1200,7,'speed').winner.name,'Beta');
+assert.equal(example.compare(1150,7,'speed').winner.name,'Gamma');
+assert.equal(example.compare(900,10,'price').winner,null);
+assert.equal(example.compare(1200,3,'price').winner,null);
+assert.equal(example.compare(1140,7,'price').winner.name,'Gamma');
+assert.equal(example.compare(1139,7,'price').winner,null);
+assert.equal(example.compare(1200,5,'price').winner.name,'Beta');
+assert.equal(example.compare(1200,4,'price').winner,null);
+console.log('OK: totali, priorità, limiti inclusivi, offerte escluse e nessuna offerta valida.');
