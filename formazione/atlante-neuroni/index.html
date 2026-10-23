@@ -8,9 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="models.js" defer></script><script src="app.js" defer></script>
+  <link rel="stylesheet" href="/project-navigation.css">
 </head>
-<body>
-  <header class="topbar"><a href="/progetti.html#formazione">← Formazione</a><a class="brand" href="/">RICCARDO BUSOLO <span>/ LAB</span></a></header>
+<body data-project="atlante-neuroni" data-project-category="formazione">
+  <a class="project-return" href="/progetti.html#formazione" aria-label="Torna a Formazione" title="Torna a Formazione"><img src="/img/logo.svg" width="42" height="42" alt=""></a>
+  <header class="topbar"><a class="brand" href="/">RICCARDO BUSOLO <span>/ LAB</span></a></header>
   <main>
     <section class="intro"><div><p class="eyebrow">GUARDA, UN PASSAGGIO ALLA VOLTA</p><h1>Come funziona un neurone?</h1></div><p>Riceve dei numeri, li combina e restituisce un risultato.<br>Segui il percorso: a ogni giro arrivano valori diversi.</p></section>
     <nav id="models" class="model-nav" aria-label="Scegli il neurone da osservare"></nav>

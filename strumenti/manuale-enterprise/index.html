@@ -29,7 +29,7 @@
   --win-accent-hover: #005aa3;
   --win-accent-light: #e0eef9;
   --win-accent-border: #b3d7f2;
-  
+
   --text-primary: #1c1c1c;
   --text-secondary: #5c5c5c;
   --text-tertiary: #8a8a8a;
@@ -45,7 +45,7 @@
   --font-main: 'Segoe UI Variable', 'Segoe UI', 'Manrope', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
   --font-editor: 'Calibri', 'Segoe UI', Arial, sans-serif;
-  
+
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -1219,11 +1219,13 @@ input::placeholder {
   }
 }
 </style>
+  <link rel="stylesheet" href="/project-navigation.css">
 </head>
-<body>
+<body data-project="manuale-enterprise" data-project-category="strumenti">
+  <a class="project-return" href="/progetti.html#strumenti" aria-label="Torna a Strumenti" title="Torna a Strumenti"><img src="/img/logo.svg" width="42" height="42" alt=""></a>
 
 <div class="app-window">
-  
+
   <!-- System Titlebar -->
   <header class="system-titlebar">
     <div class="titlebar-left">
@@ -1232,15 +1234,7 @@ input::placeholder {
         <span>Home</span>
       </button>
 
-      <a href="/progetti.html#strumenti" class="site-back-link" title="Torna al portfolio">
-        <svg height="15" viewBox="0 0 252.1 251.05" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle">
-          <path fill="#2a2a32" d="M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
-          <path fill="#2a2a32" d="M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
-          <path fill="#2a2a32" d="M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z"/>
-          <path fill="#3092b0" d="M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z"/>
-        </svg>
-        <span>Portfolio</span>
-      </a>
+
 
       <div id="brandLogoTrigger" class="app-brand-badge">
         <div class="app-brand-icon">W</div>
@@ -1279,7 +1273,7 @@ input::placeholder {
        VIEW 1: EXPLORER & SHELL
   ═══════════════════════════════════════════════ -->
   <main id="explorerView">
-    
+
     <!-- Left Navigation Sidebar -->
     <aside class="explorer-sidebar">
       <div class="sidebar-heading">Libreria</div>
@@ -1310,7 +1304,7 @@ input::placeholder {
 
     <!-- Main Explorer Section -->
     <div class="explorer-main">
-      
+
       <!-- Command Bar -->
       <div id="explorerCommandBar" class="explorer-commandbar">
         <div class="commandbar-left">
@@ -1503,7 +1497,7 @@ input::placeholder {
        VIEW 2: WORD-STYLE DOCUMENT EDITOR
   ═══════════════════════════════════════════════ -->
   <section id="editorView">
-    
+
     <!-- Word Ribbon -->
     <div class="word-ribbon">
       <div class="ribbon-tabs-bar">
@@ -1632,7 +1626,7 @@ input::placeholder {
 
     <!-- Workspace: Module Sidebar + Document Viewport -->
     <div class="editor-workspace">
-      
+
       <!-- Module Navigator -->
       <aside class="module-nav-pane">
         <div class="module-nav-header">
@@ -1719,7 +1713,7 @@ input::placeholder {
     </div>
 
     <div class="modal-body" style="padding:0">
-      
+
       <!-- Option 1: Blank Page -->
       <div id="paneChoiceBlank" style="padding:32px;display:flex;flex-direction:column;gap:14px;max-width:480px;margin:0 auto">
         <div class="form-field">
@@ -2980,7 +2974,7 @@ input::placeholder {
   function openCreateLibraryModuleModal() {
     modalCreateLibraryModule.classList.add('open');
     newLibModuleTitleInput.value = '';
-    
+
     newLibModuleFolderSelect.innerHTML = '<option value="">(Nessuna cartella - Principale)</option>';
     vfs.moduleFolders.forEach(f => {
       const opt = document.createElement('option');
@@ -3559,7 +3553,7 @@ input::placeholder {
     activeDoc.modules.forEach((mod, idx) => {
       const card = document.createElement('div');
       card.className = 'module-item-card' + (idx === 0 ? ' active' : '');
-      
+
       const toolsHtml = isReadOnly ? '' : `
         <div class="module-card-tools">
           <button class="win-btn btn-save-mod-lib" style="padding:2px 4px" title="Salva questo modulo nei Miei Moduli">💾</button>
@@ -3650,7 +3644,7 @@ input::placeholder {
     modalNewVersion.classList.add('open');
     const curr = manual.currentVersion || 'v1.0';
     verCurrentLabelInput.value = curr;
-    
+
     // Auto increment patch or minor
     const match = curr.match(/^v?(\d+)\.(\d+)$/);
     if (match) {
@@ -3728,7 +3722,7 @@ input::placeholder {
     if (!currentManual || !activeHistoryVersion) return;
     if (confirm(`Ripristinare la versione ${activeHistoryVersion.versionLabel} come versione attiva del manuale? La versione attuale verrà archiviata.`)) {
       if (!currentManual.versions) currentManual.versions = [];
-      
+
       currentManual.versions.unshift({
         versionLabel: currentManual.currentVersion || 'v1.0',
         createdAt: currentManual.updatedAt || new Date().toISOString(),

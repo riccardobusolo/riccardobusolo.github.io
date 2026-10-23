@@ -15,8 +15,10 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css?v=3.9">
+  <link rel="stylesheet" href="/project-navigation.css">
 </head>
-<body>
+<body data-project="pdf-translator" data-project-category="strumenti">
+  <a class="project-return" href="/progetti.html#strumenti" aria-label="Torna a Strumenti" title="Torna a Strumenti"><img src="/img/logo.svg" width="42" height="42" alt=""></a>
 
   <!-- Versione Software discreta in alto a destra -->
   <div class="software-version" title="DocuShift v3.9" aria-hidden="true">v3.9</div>
@@ -48,7 +50,7 @@
       <!-- Destra: Versione e Ritorno a progetti -->
       <div class="header__right">
         <span class="header__version" title="Versione del software">v3.9</span>
-        <a href="/progetti.html" class="icon-btn" title="Torna a Progetti" aria-label="Torna a Progetti">
+        <a href="/progetti.html#strumenti" class="icon-btn" title="Torna a Strumenti" aria-label="Torna a Strumenti">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </a>
       </div>
@@ -57,7 +59,7 @@
 
   <!-- Main Content -->
   <main class="main">
-    
+
     <!-- Hero Ultra-Minimal -->
     <section class="hero">
       <h1 class="hero__title">Traduci PDF</h1>
@@ -66,7 +68,7 @@
 
     <!-- Upload & Controls Card -->
     <section class="upload-card">
-      
+
       <!-- Drag & Drop Zone Minimal -->
       <div class="dropzone" id="dropzone">
         <input type="file" id="file-input" accept="application/pdf" style="display: none;">
@@ -262,10 +264,10 @@
       </div>
 
       <div class="modal-body">
-        
+
         <!-- TAB 1: API KEY (GEMINI 3.8 FLASH) -->
         <div class="tab-pane active" id="tab-models">
-          
+
           <div class="settings-group">
             <div class="form-group">
               <div class="form-header-line">

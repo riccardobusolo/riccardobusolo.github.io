@@ -117,8 +117,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
   .topbar{padding:12px}
 }
 </style>
+  <link rel="stylesheet" href="/project-navigation.css">
 </head>
-<body>
+<body data-project="earth-tracker" data-project-category="strumenti">
+  <a class="project-return" href="/progetti.html#strumenti" aria-label="Torna a Strumenti" title="Torna a Strumenti"><img src="/img/logo.svg" width="42" height="42" alt=""></a>
 
 <div class="loader" id="loader">
   <div class="loader__ring"></div>
@@ -129,10 +131,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 
 <header class="topbar">
   <div class="topbar__left">
-    <a href="/progetti.html#strumenti" class="brand" title="Torna ai progetti">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-      <span class="brand__txt">Progetti</span>
-    </a>
+
   </div>
   <div class="topbar__right">
     <div class="title">Earth Tracker</div>

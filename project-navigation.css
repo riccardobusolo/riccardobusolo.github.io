@@ -1,0 +1,40 @@
+/* Shared category navigation: identical artwork, size and viewport position. */
+.project-return {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 150;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform .2s ease;
+}
+.project-return img { display: block; width: 42px; height: 42px; }
+.project-return:hover { transform: scale(1.06); }
+.project-return:focus-visible { outline: 2px solid #3092b0; outline-offset: 5px; }
+[data-project-category="articoli"] .nav { min-height: 84px; padding-left: 92px; box-sizing: border-box; }
+[data-project-category="articoli"] .nav__inner { justify-content: flex-end; }
+[data-project="atlante-neuroni"] .topbar { height: 84px; padding-left: 92px; justify-content: flex-end; }
+[data-project="trainable-deep-network"] #hud-top { padding-left: 92px; padding-top: 20px; }
+[data-project="manuale-enterprise"] .system-titlebar { height: 84px; padding-left: 92px; }
+[data-project="pdf-translator"] .header { padding-left: 92px; }
+@media (max-width: 600px) {
+  .project-return { top: 16px; left: 16px; }
+  [data-project-category="articoli"] .nav { padding-left: 80px; padding-right: 12px; min-height: 76px; }
+  [data-project-category="articoli"] .nav__links { gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+  [data-project="atlante-neuroni"] .topbar { height: 76px; padding-left: 80px; }
+  [data-project="manuale-enterprise"] .system-titlebar { padding-left: 80px; }
+  [data-project="pdf-translator"] .header { padding-left: 80px; }
+  [data-project="trainable-deep-network"] #hud-top { padding-left: 80px; }
+  [data-project="mark-i-perceptron"] .page,
+  [data-project="neuropong"] .page { padding-top: 80px; }
+  [data-project="pixelforge"] header { padding-top: 80px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-return { transition: none; }
+}
