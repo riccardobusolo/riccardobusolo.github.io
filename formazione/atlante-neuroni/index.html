@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atlante dei neuroni — Laboratorio interattivo | Riccardo Busolo</title>
+  <meta name="description" content="Esplora sei modelli di neurone: McCulloch–Pitts, perceptron, ADALINE, sigmoide, ReLU e integrate-and-fire. Simulazioni animate, esperimenti e storia dell’AI.">
+  <link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="models.js" defer></script><script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a href="/progetti.html#formazione" class="back">← <span>Formazione</span></a><a class="brand" href="/">RICCARDO BUSOLO<span> / LAB</span></a><span class="edition">ATLANTE INTERATTIVO · 01</span></header>
+  <main>
+    <section class="hero"><div><p class="eyebrow">DENTRO L’INTELLIGENZA ARTIFICIALE</p><h1>Piccole unità.<br><em>Grandi idee.</em></h1><p class="intro">Prima delle reti, c’è un neurone. Entra nel suo mondo:<br class="desktop"> modifica un segnale, segui il calcolo, osserva la risposta.</p></div><div class="hero-note"><span class="hero-number">06</span><p>modelli da esplorare<br>un secolo di intuizioni</p><a href="#laboratorio">Entra nel laboratorio ↘</a></div></section>
+    <nav id="models" class="model-nav" aria-label="Scegli un modello di neurone"></nav>
+    <section class="lab" id="laboratorio" aria-labelledby="model-title">
+      <div class="lab-header"><div><p class="eyebrow" id="model-meta"></p><h2 id="model-title"></h2></div><div class="transport"><span id="run-state" class="live">IN ESECUZIONE</span><button id="pause" type="button">Ⅱ Pausa</button><button id="step" type="button" title="Avanza di 20 millisecondi simulati">Un passo →</button><button id="reset" type="button" aria-label="Ripristina il modello">↺ Reset</button></div></div>
+      <div class="workspace"><div class="visual-panel"><div class="panel-caption"><span>ANATOMIA DEL CALCOLO</span><span id="clock">t = 0 ms</span></div>
+        <svg id="neuron" viewBox="0 0 760 320" role="img" aria-labelledby="diagram-title diagram-desc"><title id="diagram-title">Flusso del segnale nel neurone</title><desc id="diagram-desc">Gli ingressi attraversano le connessioni, vengono combinati e trasformati in un’uscita. I valori sono riportati anche sotto il diagramma.</desc><defs><radialGradient id="aura"><stop stop-color="#71e6cc" stop-opacity=".16"/><stop offset="1" stop-color="#71e6cc" stop-opacity="0"/></radialGradient><pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".7" fill="#688b83" opacity=".24"/></pattern></defs><rect width="760" height="320" fill="url(#dots)"/><circle cx="410" cy="160" r="145" fill="url(#aura)"/>
+          <g class="wires"><path d="M110 70 C245 70 245 160 350 160"/><path d="M110 160 H350"/><path d="M110 250 C245 250 245 160 350 160"/><path d="M470 160 H660"/></g>
+          <g id="particles"></g><g class="input-nodes"><circle cx="100" cy="70" r="25"/><circle cx="100" cy="160" r="25"/><circle cx="100" cy="250" r="25"/></g><g class="svg-label" text-anchor="middle"><text x="100" y="75">x₁</text><text x="100" y="165">x₂</text><text id="third-label" x="100" y="255">i</text></g>
+          <g class="svg-small"><text id="wire0" x="178" y="67"></text><text id="wire1" x="178" y="149"></text><text id="wire2" x="178" y="263"></text></g>
+          <circle id="core-ring" cx="410" cy="160" r="66"/><circle class="core" cx="410" cy="160" r="54"/><text id="core-symbol" class="core-symbol" x="410" y="164" text-anchor="middle">Σ</text><text id="core-caption" class="svg-small" x="410" y="190" text-anchor="middle">SOGLIA</text><text id="sum-label" class="svg-small" x="410" y="255" text-anchor="middle"></text>
+          <circle class="output-node" cx="670" cy="160" r="33"/><text id="diagram-output" x="670" y="166" text-anchor="middle">0</text><text class="svg-small" x="670" y="218" text-anchor="middle">USCITA y</text><text class="svg-small" x="100" y="305" text-anchor="middle">INGRESSI</text>
+        </svg>
+        <div class="readouts"><div><span id="sum-title">Somma degli ingressi</span><strong id="sum-value">0</strong></div><div><span id="rule-title">Soglia</span><strong id="rule-value">2</strong></div><div><span id="output-title">Uscita</span><strong id="output-value">0</strong></div></div>
+        <div class="scope-heading"><span id="scope-title">USCITA NEL TEMPO</span><span id="scope-scale"></span></div><svg id="scope" viewBox="0 0 700 120" role="img" aria-label="Grafico temporale degli ultimi 4 secondi simulati"></svg>
+      </div><aside class="controls"><p class="eyebrow">IL TUO ESPERIMENTO</p><p id="experiment" class="experiment"></p><div id="inputs"></div><div id="special-controls"></div><p class="control-note" id="control-note"></p></aside></div>
+      <div class="calculation"><span>IL CALCOLO, ORA</span><code id="formula"></code></div>
+    </section>
+    <section class="explanation"><article><p class="eyebrow">L’IDEA CHE CAMBIA TUTTO</p><h3 id="idea-title"></h3><p id="idea"></p><a id="source" target="_blank" rel="noopener">Leggi la fonte ↗</a></article><article><p class="eyebrow">COSA STAI OSSERVANDO</p><h3 id="observe-title"></h3><p id="observe"></p><div class="insight" id="insight"></div></article></section>
+    <section class="guide"><p class="eyebrow">UNA MAPPA, NON UNA SCALA EVOLUTIVA</p><h3>Sei modi diversi di trasformare un segnale.</h3><p>Un neurone logico decide. Un’unità lineare misura. Una funzione di attivazione trasforma. Un neurone a impulsi conserva uno stato nel tempo. Queste idee convivono: le più recenti non cancellano le precedenti.</p><p class="small">Simulazioni didattiche di singole unità, non ricostruzioni hardware o modelli biologici completi. Le particelle illustrano il flusso del calcolo, non la velocità fisica dei segnali. Le date della sigmoide e della ReLU indicano lavori di riferimento, non l’invenzione delle funzioni. Il tempo biologico del modello a impulsi è rallentato 20 volte.</p></section>
+  </main><footer><a href="/progetti.html#formazione">← Esplora gli altri laboratori</a><span>IDEATO PER CAPIRE, NON SOLO PER GUARDARE.</span></footer>
+  <noscript><p>Attiva JavaScript per utilizzare le simulazioni interattive.</p></noscript>
+</body></html>
