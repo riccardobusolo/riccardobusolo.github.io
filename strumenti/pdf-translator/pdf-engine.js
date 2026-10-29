@@ -28,7 +28,7 @@ window.PDFEngine = (() => {
     for(const e of edits.reverse())source=source.slice(0,e.start)+e.replace+source.slice(e.end);
     return source;
   }
-  function removeText(doc){
+  async function removeText(doc,signal,onPage=()=>{}){
     const {PDFName:N,PDFDict,PDFArray,PDFRawStream,PDFRef}=PDFLib;
     const visited=new Set();
     const contents=s=>s.getUnencodedContents?s.getUnencodedContents():PDFLib.decodePDFRawStream(s).decode();
@@ -43,7 +43,9 @@ window.PDFEngine = (() => {
         if(ref instanceof PDFRef)doc.context.assign(ref,replacement);else objects.set(name,doc.context.register(replacement));
       }
     }
+    let pageIndex=0;
     for(const page of doc.getPages()){
+      signal?.throwIfAborted();onPage(++pageIndex,doc.getPageCount(),'validate');await new Promise(resolve=>setTimeout(resolve,0));signal?.throwIfAborted();
       if(page.node.Annots()?.size())throw Error('PDF con annotazioni o campi modulo: formato non supportato in questa beta.');
       resources(page.node.Resources());const entry=page.node.Contents();if(!entry)continue;
       const streams=entry instanceof PDFArray?entry.asArray():[entry];
@@ -55,7 +57,7 @@ window.PDFEngine = (() => {
     const doc=await PDFLib.PDFDocument.load(bytes.slice());
     if(doc.getPageCount()>100)throw Error('Limite beta: massimo 100 pagine.');
     // Validate all content streams before sending text to the provider.
-    removeText(doc);
+    await removeText(doc,signal,progress);
     const reader=await pdfjsLib.getDocument({data:bytes.slice(),isEvalSupported:false}).promise;
     const pages=[];try{
       for(let n=1;n<=reader.numPages;n++){
@@ -90,15 +92,16 @@ window.PDFEngine = (() => {
           else blocks.push(block);
         }
         if(!blocks.length)throw Error(`Pagina ${n}: nessun testo selezionabile. Le scansioni non sono supportate.`);
-        pages.push(blocks);progress(n,reader.numPages);
+        pages.push(blocks);progress(n,reader.numPages,'extract');await new Promise(resolve=>setTimeout(resolve,0));
       }
     }finally{await reader.destroy();}
     return pages;
   }
-  async function build(bytes,pages,translated,signal){
-    const doc=await PDFLib.PDFDocument.load(bytes.slice());removeText(doc);
+  async function build(bytes,pages,translated,signal,onProgress=()=>{}){
+    const doc=await PDFLib.PDFDocument.load(bytes.slice());await removeText(doc,signal);
     const fonts=new Map();let index=0,shrunk=0;
     for(let p=0;p<pages.length;p++){
+      await new Promise(resolve=>setTimeout(resolve,0));
       signal.throwIfAborted();const page=doc.getPage(p);
       for(const b of pages[p]){
         const text=translated[index++];
@@ -111,6 +114,7 @@ window.PDFEngine = (() => {
         if(size<b.size*.8)shrunk++;
         page.drawText(text,{x:b.x,y:b.y,size,font,color:PDFLib.rgb(...b.color)});
       }
+      onProgress(p+1,pages.length);
     }
     // Copy only the reachable page graph into a fresh document: obsolete text streams
     // and original metadata must not remain embedded as unreferenced objects.

@@ -34,5 +34,5 @@ vm.runInThisContext(fs.readFileSync(__dirname+'/ai-service.js','utf8'));
   assert.deepEqual(await AI.translate(['Hello'],'Italiano','test-key','models/gemini-test-flash',found,signal,()=>{}),['Ciao']);
   global.fetch=async()=>({ok:true,json:async()=>({candidates:[{finishReason:'STOP',content:{parts:[{text:'[]'}]}}]})});
   await assert.rejects(AI.translate(['Hello'],'Italiano','test-key',found[0],[],signal,()=>{}),/non riescono/);
-  fs.writeFileSync(__dirname+'/test-fixture.pdf',bytes);console.log('PASS: lexer, original text removal (page + form), graphics/images, colors, PDF export, Gemini discovery, quota fallback, malformed response.');
+  if(!fs.existsSync(__dirname+'/test-fixture.pdf'))fs.writeFileSync(__dirname+'/test-fixture.pdf',bytes);console.log('PASS: lexer, original text removal (page + form), graphics/images, colors, PDF export, Gemini discovery, quota fallback, malformed response.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

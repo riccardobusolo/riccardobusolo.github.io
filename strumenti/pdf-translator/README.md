@@ -22,6 +22,10 @@ L'elaborazione di file grandi può usare molta RAM. Annullamento cooperativo fra
 
 `node strumenti/pdf-translator/pdf-translator.test.cjs`
 
+`node strumenti/pdf-translator/progress.test.cjs`
+
+Il pannello di elaborazione mostra fase, pagine/testi completati, percentuale per fasi, tempo trascorso e registro dei tentativi. Durante una richiesta AI la percentuale resta ferma finché non arriva un risultato validato, mentre spinner e timer continuano. Ogni tentativo API ha un timeout di 45 secondi; i ripieghi sui modelli verificati sono visibili nel registro. Errori e annullamenti restano visibili nel pannello. Il test di progressione simula una richiesta pendente, successo, errore di quota e annullamento.
+
 I test usano un PDF sintetico con immagini, grafica, testo e Form XObject. Verificano rimozione del testo originale, estrazione del nuovo testo e diagnostica Gemini con risposte simulate. Il test reale richiede una chiave dell'utente.
 
 Le tre librerie PDF sono distribuzioni di terze parti mantenute dal repository precedente (PDF.js Apache-2.0, pdf-lib MIT). Tutto il codice applicativo è stato riscritto.
