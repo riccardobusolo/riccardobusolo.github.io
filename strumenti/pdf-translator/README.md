@@ -1,4 +1,4 @@
-# DocuShift 4
+# DocuShift 4.0.1
 
 Strumento statico per PDF con testo selezionabile. Non richiede backend o build.
 
@@ -18,7 +18,9 @@ Strumento statico per PDF con testo selezionabile. Non richiede backend o build.
 - `app.js`: una sola operazione attiva, chiusura delle anteprime, revoca dei Blob URL, blocco dei controlli durante le operazioni, annullamento e recupero del rilevamento lingua.
 - `glossary.js`: corrispondenza esplicita nomi lingua/ISO; validazione dei dati e rigenerazione degli ID importati.
 
-Le chiavi restano nella sessione della scheda, salvo selezione esplicita di **Ricorda**. Non sono inserite in URL, link condivisibili o file del repository. I vecchi magic link vengono ancora consumati per compatibilità; non vengono più generati. Il file locale `config.local.js` non viene caricato.
+Le nuove chiavi restano nella sessione della scheda. Le chiavi già memorizzate nel browser restano compatibili. Non sono inserite in URL, link condivisibili o file del repository. I vecchi magic link vengono ancora consumati per compatibilità; non vengono più generati. Il file locale `config.local.js` non viene caricato.
+
+La UI mantiene il layout compatto originale: popup con campo chiave e impostazioni a tre schede. La scelta OpenAI/Gemini è integrata nella riga della chiave, senza nuovi pannelli o campi modello visibili. Le risorse CSS/JS hanno URL versionati per evitare l'abbinamento di vecchi controller in cache a nuovi elementi HTML. Nessuna verifica automatica all'avvio blocca la modifica di una vecchia chiave; la verifica manuale può essere annullata anche dalla finestra delle impostazioni.
 
 ## Font e limiti
 
@@ -35,6 +37,8 @@ Eseguire dalla radice del repository:
 ```sh
 node --test strumenti/pdf-translator/pdf-translator.test.cjs
 ```
+
+Con Playwright disponibile, `node --test strumenti/pdf-translator/settings.browser.test.cjs` verifica inserimento chiave dal popup e dalle impostazioni, cambio provider senza perdita delle bozze, recupero dopo errore e annullamento, vecchie chiavi salvate, URL della cache e larghezza del campo su mobile. `DOCUSHIFT_BROWSER` può indicare il browser da usare; il test viene saltato se Playwright non è disponibile.
 
 La suite usa API simulate, senza chiavi reali e senza spese. Verifica payload OpenAI, selezione Gemini, risposte incomplete/riordinate/duplicate, errori permanenti, annullamento, glossario, lexer PDF, Form XObject e fitting. Il test di compilazione reale usa un TTF locale tramite `DOCUSHIFT_TEST_FONT` (su Windows usa Arial se disponibile); sugli altri sistemi quel test viene saltato se non si indica un font.
 

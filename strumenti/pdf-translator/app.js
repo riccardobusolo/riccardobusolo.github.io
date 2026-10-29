@@ -2,7 +2,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
   let file = null, bytes = null, parsed = null, language = null, connected = false;
-  let operation = null, downloadUrl = null, previews = [], currentPage = 1, zoom = 1.25, rendering = false;
+  let operation = null, downloadUrl = null, previews = [], currentPage = 1, zoom = 1.25, rendering = false, isConnecting = false;
+  const apiDrafts = new Map();
   const providerNames = { openai: 'OpenAI', gemini: 'Gemini' };
   AIService.initAutoAuth();
   function toast(message, error = false) {
@@ -22,6 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
     $('btn-connect').disabled = busy;
     $('btn-retry-language').disabled = busy;
     for (const id of ['popup-provider', 'popup-model', 'popup-api-key', 'popup-remember', 'btn-popup-save', 'btn-popup-clipboard', 'settings-provider', 'settings-model', 'input-api-key', 'settings-remember', 'btn-test-gemini', 'btn-clipboard-detect', 'btn-add-glossary-row', 'btn-import-json', 'range-font-scale']) $(id).disabled = busy;
+    $('btn-popup-save').disabled = busy && !isConnecting;
+    $('btn-test-gemini').disabled = busy && !isConnecting;
+    $('btn-popup-save').textContent = isConnecting ? 'Annulla' : 'Connetti';
+    $('btn-test-gemini').textContent = isConnecting ? 'Annulla' : 'Verifica';
     $('excel-table-container').inert = busy;
     $('btn-cancel-translate').style.display = busy ? 'inline-flex' : 'none';
   }
@@ -46,26 +51,33 @@ document.addEventListener('DOMContentLoaded', () => {
   $('btn-dismiss-progress-error').onclick = () => $('progress-error-box').style.display = 'none';
 
   function fillApiForms() {
-    const p = AIService.getProvider(), key = AIService.getKey(), model = AIService.getModel();
+    const p = AIService.getProvider();
+    const { key, model, remember } = apiDrafts.get(p) || { key: AIService.getKey(), model: AIService.getModel(), remember: !!localStorage.getItem(`docushift_${p}_key`) };
     for (const prefix of ['popup', 'settings']) {
       $(`${prefix}-provider`).value = p; $(`${prefix}-model`).value = model;
-      $(`${prefix}-remember`).checked = !!localStorage.getItem(`docushift_${p}_key`);
+      $(`${prefix}-remember`).checked = remember;
       $(`${prefix}-key-link`).href = p === 'openai' ? 'https://platform.openai.com/api-keys' : 'https://aistudio.google.com/app/apikey';
     }
     $('popup-api-key').value = key; $('input-api-key').value = key;
     $('popup-model').placeholder = p === 'gemini' ? 'Automatico dai modelli disponibili' : 'gpt-6-luna';
+    $('popup-api-key').placeholder = p === 'gemini' ? 'AIzaSy…' : 'sk-…';
+    $('input-api-key').placeholder = $('popup-api-key').placeholder;
     $('model-status-quality').textContent = `${providerNames[p]} · ${model || 'modello automatico'}`;
   }
-  function openPopup() { fillApiForms(); $('api-setup-popup').classList.add('active'); $('popup-api-key').focus(); }
-  function closePopup() { $('api-setup-popup').classList.remove('active'); $('btn-connect').focus(); }
+  function openPopup() { $('settings-modal').classList.remove('active'); fillApiForms(); $('api-setup-popup').classList.add('active'); $('popup-api-key').focus(); }
+  function closeModal(id) {
+    if (isConnecting) operation?.abort();
+    $(id).classList.remove('active'); $('btn-open-settings').focus();
+  }
+  function closePopup() { closeModal('api-setup-popup'); }
   $('btn-connect').onclick = openPopup; $('btn-close-popup').onclick = closePopup;
-  $('btn-open-settings').onclick = () => { fillApiForms(); $('settings-modal').classList.add('active'); $('btn-close-settings').focus(); };
-  $('btn-close-settings').onclick = () => { $('settings-modal').classList.remove('active'); $('btn-open-settings').focus(); };
-  for (const id of ['settings-modal', 'api-setup-popup']) $(id).addEventListener('click', e => { if (e.target === $(id)) $(id).classList.remove('active'); });
+  $('btn-open-settings').onclick = () => { $('api-setup-popup').classList.remove('active'); fillApiForms(); $('settings-modal').classList.add('active'); $('input-api-key').focus(); };
+  $('btn-close-settings').onclick = () => closeModal('settings-modal');
+  for (const id of ['settings-modal', 'api-setup-popup']) $(id).addEventListener('click', e => { if (e.target === $(id)) closeModal(id); });
   document.addEventListener('keydown', e => {
     const modal = ['api-setup-popup', 'settings-modal'].map($).find(el => el.classList.contains('active'));
     if (!modal) return;
-    if (e.key === 'Escape') { modal.classList.remove('active'); $('btn-connect').focus(); }
+    if (e.key === 'Escape') closeModal(modal.id);
     if (e.key === 'Tab') {
       const focusable = [...modal.querySelectorAll('button, input, select, a[href], [tabindex="0"]')].filter(el => !el.disabled && el.getClientRects().length);
       const first = focusable[0], last = focusable.at(-1);
@@ -78,12 +90,14 @@ document.addEventListener('DOMContentLoaded', () => {
     fillApiForms(); updateControls(); status('Connetti la chiave del provider selezionato.');
   };
   async function connect(prefix) {
+    if (isConnecting) { operation?.abort(); return; }
     if (operation) return;
     const key = $(prefix === 'popup' ? 'popup-api-key' : 'input-api-key').value.trim();
     if (!key) return toast('Inserisci la tua API key.', true);
     AIService.setKey(key, $(`${prefix}-remember`).checked); AIService.setModel($(`${prefix}-model`).value);
     connected = false; language = null;
-    await run(async signal => {
+    isConnecting = true;
+    try { await run(async signal => {
       progress(0, 'Verifica connessione', 'Invio di una breve richiesta al modello…');
       const result = await AIService.testConnection({ signal });
       if (!result.ok) { status('Connessione non riuscita. Controlla le impostazioni API.'); throw new Error(result.error); }
@@ -92,14 +106,19 @@ document.addEventListener('DOMContentLoaded', () => {
       $('api-setup-popup').classList.remove('active'); $('settings-modal').classList.remove('active');
       $('progress-card').classList.remove('active'); fillApiForms();
       if (parsed) await detect(signal);
-    });
+    }); } finally { isConnecting = false; updateControls(); }
   }
   $('btn-popup-save').onclick = () => connect('popup'); $('btn-test-gemini').onclick = () => connect('settings');
   $('popup-api-key').onkeydown = e => { if (e.key === 'Enter') connect('popup'); };
   for (const [id, target] of [['btn-popup-clipboard', 'popup-api-key'], ['btn-clipboard-detect', 'input-api-key']]) $(id).onclick = async () => {
-    try { $(target).value = (await navigator.clipboard.readText()).trim(); } catch (_) { toast('Incolla la chiave direttamente nel campo.', true); }
+    try { $(target).value = (await navigator.clipboard.readText()).trim(); $(target).dispatchEvent(new Event('input', { bubbles: true })); } catch (_) { toast('Incolla la chiave direttamente nel campo.', true); }
   };
   for (const id of ['popup-api-key', 'input-api-key', 'popup-model', 'settings-model']) $(id).addEventListener('input', () => {
+    const prefix = id.startsWith('popup-') ? 'popup' : 'settings';
+    apiDrafts.set(AIService.getProvider(), {
+      key: $(prefix === 'popup' ? 'popup-api-key' : 'input-api-key').value,
+      model: $(`${prefix}-model`).value, remember: $(`${prefix}-remember`).checked
+    });
     connected = false; language = null; updateControls(); status('Impostazioni modificate: premi Connetti o Verifica.');
   });
 
@@ -227,5 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
   $('btn-theme-toggle').onclick = () => { theme = theme === 'dark' ? 'light' : 'dark'; applyTheme(); }; applyTheme();
   setInterval(() => { $('quota-countdown-text').textContent = `${AIService.getQuotaStatus().used} richieste locali / ultimo minuto`; }, 1000);
   fillApiForms(); renderGlossary(); updateControls();
-  if (AIService.getKey()) connect('popup'); else openPopup();
+  // Never lock credential fields with an automatic verification of an old key.
+  if (!AIService.getKey()) openPopup();
 });
