@@ -1,803 +1,309 @@
-/**
- * pdf-engine.js — DocuShift AI v3.9
- * Motore di elaborazione PDF: estrazione coordinate con PDF.js,
- * correzione automatica di ligatures e codifiche font,
- * download dinamico di Google Fonts (Inter / TrueType) con fontkit,
- * supporto completo per stili Bold, Italic e Bold-Italic,
- * rilevamento cromatico ad alto contrasto (bianco su sfondi scuri),
- * cancellazione chirurgica non distruttiva del vecchio testo (zero toppe bianche),
- * algoritmo di auto-scaling del testo e rendering anteprima side-by-side.
- */
-
+/* DocuShift 4: vector-preserving PDF editing, font metadata lookup and measured fitting. */
 const PDFEngine = (() => {
-  // CDN font TrueType predefiniti per fallback ad alta compatibilità (Inter / Lora / JetBrains Mono)
-  const FONT_URLS = {
-    sans: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf',
-    sansBold: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.ttf',
-    sansItalic: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-italic.ttf',
-    sansBoldItalic: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-italic.ttf',
-    serif: 'https://cdn.jsdelivr.net/fontsource/fonts/lora@latest/latin-400-normal.ttf',
-    serifBold: 'https://cdn.jsdelivr.net/fontsource/fonts/lora@latest/latin-700-normal.ttf',
-    mono: 'https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.ttf',
-    monoBold: 'https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-700-normal.ttf'
-  };
+  if (typeof pdfjsLib !== 'undefined') pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js?v=4.0';
+  const check = signal => { if (signal?.aborted) throw new DOMException('Operazione annullata.', 'AbortError'); };
+  const normalize = s => String(s || '').normalize('NFC').replace(/[ﬀﬁﬂﬃﬄﬅﬆ]/g, c => ({ 'ﬀ': 'ff', 'ﬁ': 'fi', 'ﬂ': 'fl', 'ﬃ': 'ffi', 'ﬄ': 'ffl', 'ﬅ': 'st', 'ﬆ': 'st' }[c]));
+  const bytesToString = bytes => { let s = ''; for (let i = 0; i < bytes.length; i += 8192) s += String.fromCharCode(...bytes.subarray(i, i + 8192)); return s; };
+  const stringToBytes = text => Uint8Array.from(text, c => c.charCodeAt(0));
 
-  // Mappa delle famiglie commerciali agli equivalenti metrici open-source Google Fonts
-  const FONT_FAMILY_MAP = {
-    'calibri': 'carlito',
-    'arial': 'arimo',
-    'helvetica': 'inter',
-    'swiss721': 'inter',
-    'swiss': 'inter',
-    'times': 'tinos',
-    'times new roman': 'tinos',
-    'courier': 'cousine',
-    'courier new': 'cousine',
-    'verdana': 'open-sans',
-    'tahoma': 'noto-sans',
-    'segoe': 'inter',
-    'segoe ui': 'inter',
-    'myriad': 'pt-sans',
-    'myriad pro': 'pt-sans',
-    'din': 'fira-sans',
-    'din pro': 'fira-sans',
-    'futura': 'montserrat'
-  };
-
-  let cachedFontBuffers = {};
-  const embeddedDynamicFonts = new Map();
-
-  // Configura il worker di PDF.js (locale ad alte prestazioni con fallback CDN)
-  if (typeof pdfjsLib !== 'undefined') {
-    try {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js?v=3.9';
-    } catch (e) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  // PDF lexical scanner: strings, arrays, dictionaries and comments are atomic.
+  // Never search BT/ET inside strings or binary images with regular expressions.
+  function tokens(source) {
+    let i = 0; const result = [], ws = c => /[\x00\t\n\f\r ]/.test(c), delim = c => !c || ws(c) || '()<>[]{}/%'.includes(c);
+    function skip() { while (i < source.length) { if (ws(source[i])) i++; else if (source[i] === '%') { while (i < source.length && !/[\r\n]/.test(source[i])) i++; } else break; } }
+    function read() {
+      skip(); const start = i; if (i >= source.length) return null;
+      const c = source[i++]; let type = 'value';
+      if (c === '(') {
+        let depth = 1;
+        while (i < source.length && depth) { const ch = source[i++]; if (ch === '\\') { if (source[i] === '\r' && source[i + 1] === '\n') i++; i++; } else if (ch === '(') depth++; else if (ch === ')') depth--; }
+        if (depth) throw new Error('Stringa PDF non terminata.');
+      } else if (c === '[' || (c === '<' && source[i] === '<')) {
+        const end = c === '[' ? ']' : '>>'; if (end === '>>') i++;
+        while (true) { skip(); if (source.startsWith(end, i)) { i += end.length; break; } if (!read()) throw new Error('Array o dizionario PDF non terminato.'); }
+      } else if (c === '<') { while (i < source.length && source[i] !== '>') i++; if (i >= source.length) throw new Error('Stringa esadecimale PDF non terminata.'); i++; }
+      else if (c === '/') { while (i < source.length && !delim(source[i])) i++; }
+      else {
+        while (i < source.length && !delim(source[i])) i++;
+        if (i === start + 1 && ']>)}'.includes(c)) throw new Error('Sintassi stream PDF non supportata.');
+        const value = source.slice(start, i);
+        if (!/^[+-]?(?:\d*\.\d+|\d+\.?\d*)$/.test(value) && !['true', 'false', 'null'].includes(value)) type = 'operator';
+      }
+      return { start, end: i, value: source.slice(start, i), type };
     }
+    let token; while ((token = read())) {
+      // Ambiguous binary inline images must not be rewritten by a text lexer.
+      if (token.type === 'operator' && token.value === 'BI') throw new Error('Questo PDF contiene immagini inline: la modifica sicura di questo formato non è supportata. Il file originale resta integro.');
+      result.push(token);
+    }
+    return result;
+  }
+  function removeTextOperators(source) {
+    const list = tokens(source), changes = []; let args = [];
+    for (const t of list) {
+      if (t.type !== 'operator') { args.push(t); continue; }
+      if (t.value === 'Tr' && Number(args.at(-1)?.value) >= 4) throw new Error('Il PDF usa testo come maschera grafica: impossibile sostituirlo mantenendo invariata la grafica.');
+      const count = { Tj: 1, TJ: 1, "'": 1, '"': 3 }[t.value];
+      if (count) {
+        if (args.length !== count) throw new Error('Operatore di testo PDF non valido.');
+        const replacement = t.value === "'" ? ' T* ' : t.value === '"' ? ` ${args[0].value} Tw ${args[1].value} Tc T* ` : ' ';
+        changes.push({ start: args[0].start, end: t.end, replacement });
+      }
+      args = [];
+    }
+    for (const change of changes.reverse()) source = source.slice(0, change.start) + change.replacement + source.slice(change.end);
+    return source;
+  }
+  function decodedStream(stream) {
+    return stream.getUnencodedContents ? stream.getUnencodedContents() : PDFLib.decodePDFRawStream(stream).decode();
+  }
+  function removePageText(doc, page, seen = new Set()) {
+    const { PDFName, PDFArray, PDFDict, PDFRawStream } = PDFLib;
+    function rewrite(stream) {
+      if (seen.has(stream)) return stream; seen.add(stream);
+      const original = bytesToString(decodedStream(stream)), modified = removeTextOperators(original);
+      if (original === modified) return stream;
+      const dict = {};
+      for (const [key, value] of stream.dict.entries()) if (!['/Length', '/Filter', '/DecodeParms'].includes(key.toString())) dict[key.decodeText()] = value;
+      return doc.context.flateStream(stringToBytes(modified), dict);
+    }
+    function forms(resources, visited = new Set()) {
+      if (!resources || visited.has(resources)) return; visited.add(resources);
+      const objects = resources.lookupMaybe(PDFName.of('XObject'), PDFDict); if (!objects) return;
+      for (const [name, ref] of objects.entries()) {
+        const stream = doc.context.lookup(ref);
+        if (!(stream instanceof PDFRawStream) || stream.dict.get(PDFName.of('Subtype'))?.toString() !== '/Form') continue;
+        const ownResources = stream.dict.lookupMaybe(PDFName.of('Resources'), PDFDict);
+        forms(ownResources, visited);
+        const modified = rewrite(stream);
+        if (modified !== stream) { if (ref instanceof PDFLib.PDFRef) doc.context.assign(ref, modified); else objects.set(name, doc.context.register(modified)); }
+      }
+    }
+    forms(page.node.Resources());
+    const contents = page.node.Contents(); if (!contents) return;
+    const refs = contents instanceof PDFArray ? contents.asArray() : [contents];
+    // Text objects can span multiple /Contents streams. Parse their concatenation.
+    const source = refs.map(ref => bytesToString(decodedStream(doc.context.lookup(ref)))).join('\n');
+    page.node.set(PDFName.of('Contents'), doc.context.register(doc.context.flateStream(stringToBytes(removeTextOperators(source)))));
   }
 
-  // Pulizia e normalizzazione delle ligatures e artefatti di codifica nei PDF tecnici
-  function cleanLigaturesAndEncoding(str) {
-    if (!str) return '';
-    let s = str
-      .replace(/\uFB00/g, 'ff')
-      .replace(/\uFB01/g, 'fi')
-      .replace(/\uFB02/g, 'fl')
-      .replace(/\uFB03/g, 'ffi')
-      .replace(/\uFB04/g, 'ffl')
-      .replace(/\uFB05/g, 'ft')
-      .replace(/\uFB06/g, 'st');
-
-    // Risolve la corruzione da subset font dove 'fi' è stato codificato come 'y' o 'ffi' come 'fy'
-    s = s.replace(/\b([a-zàèéìòù]*)y([a-zàèéìòù]+)\b/gi, (match, pre, post) => {
-      const lowerPre = pre.toLowerCase();
-      const lowerPost = post.toLowerCase();
-      if (
-        lowerPre === 'gra' || lowerPre === 'deumidi' || lowerPre === 'super' ||
-        lowerPre === 'certi' || lowerPre === 'modi' || lowerPre === 'quali' ||
-        lowerPre === 'speci' || lowerPre === 'veri' || lowerPre === 'in' ||
-        lowerPre === 'ri' || lowerPre === 'e' || lowerPre === 'u' || lowerPre === ''
-      ) {
-        if (lowerPre === 'u' || lowerPre === 'e') return pre + 'ffi' + post;
-        if (lowerPre === '' && (lowerPost === 'ni' || lowerPost === 'no' || lowerPost === 'le' || lowerPost === 'li')) {
-          return (pre.toUpperCase() === pre && pre.length > 0 ? 'Fi' : 'fi') + post;
-        }
-        return pre + 'fi' + post;
+  function colorsFromOperators(opList) {
+    const OPS = pdfjsLib.OPS, records = []; let fill = [0, 0, 0], opacity = 1, mode = 0, stack = [];
+    for (let i = 0; i < opList.fnArray.length; i++) {
+      const op = opList.fnArray[i], args = opList.argsArray[i];
+      if (op === OPS.save || op === OPS.paintFormXObjectBegin) stack.push({ fill: [...fill], opacity, mode });
+      if (op === OPS.restore || op === OPS.paintFormXObjectEnd) { const previous = stack.pop() || { fill: [0, 0, 0], opacity: 1, mode: 0 }; ({ fill, opacity, mode } = previous); }
+      if (op === OPS.setFillRGBColor) fill = Array.from(args).map(n => n / 255);
+      if (op === OPS.setTextRenderingMode) mode = args[0];
+      if (op === OPS.setGState) for (const [name, value] of args[0] || []) if (name === 'ca') opacity = value;
+      if ([OPS.showText, OPS.showSpacedText, OPS.nextLineShowText].includes(op)) {
+        const text = (args?.[0] || []).filter(g => typeof g === 'object').map(g => g.unicode || '').join('');
+        if (text.trim() && mode !== 0) throw new Error('Il PDF usa testo invisibile, contornato o come maschera: la sostituzione fedele di questo formato non è ancora supportata.');
+        for (const char of normalize(text).replace(/\s/g, '')) records.push({ char, color: [...fill], opacity });
       }
-      return match;
+    }
+    return records;
+  }
+  async function parsePDF(data, { signal, onSample, onProgress } = {}) {
+    // Check stream syntax before sending any document text to a paid API.
+    const structure = await PDFLib.PDFDocument.load(new Uint8Array(data.slice(0)));
+    const inspectedForms = new Set();
+    for (const page of structure.getPages()) { check(signal); removePageText(structure, page, inspectedForms); }
+    const loading = pdfjsLib.getDocument({ data: new Uint8Array(data.slice(0)), fontExtraProperties: true, isEvalSupported: false });
+    const cancel = () => loading.destroy(); signal?.addEventListener('abort', cancel, { once: true });
+    let doc;
+    try {
+      doc = await loading.promise; const pages = []; let sampled = false;
+      for (let n = 1; n <= doc.numPages; n++) {
+        check(signal); const page = await doc.getPage(n);
+        const content = await page.getTextContent(), ops = await page.getOperatorList(), colors = colorsFromOperators(ops);
+        let colorCursor = 0;
+        const blocks = [];
+        for (let idx = 0; idx < content.items.length; idx++) {
+          const item = content.items[idx]; if (!item.str?.trim()) continue;
+          const style = content.styles[item.fontName] || {};
+          if (style.vertical || item.dir === 'ttb') throw new Error('La scrittura verticale non è ancora supportata.');
+          let fontInfo; try { fontInfo = page.commonObjs.get(item.fontName); } catch (_) {}
+          if (fontInfo?.isType3Font) throw new Error('Questo PDF contiene font Type 3 disegnati come grafica: sostituzione fedele non supportata.');
+          const fontFamily = fontInfo?.name || style.fontFamily || 'sans-serif';
+          const [a, b, c, d, x, y] = item.transform, fontSize = Math.hypot(c, d) || Math.hypot(a, b);
+          if (!fontSize || Math.abs(a * d - b * c) < 1e-8) throw new Error('Matrice di testo PDF non valida.');
+          const text = normalize(item.str), key = text.replace(/\s/g, '');
+          let color = colors[colorCursor]?.color || [0, 0, 0], opacity = colors[colorCursor]?.opacity ?? 1;
+          // TextContent may insert spaces; match actual glyph characters, never pixel backgrounds.
+          const start = colors.slice(colorCursor, colorCursor + key.length + 30).findIndex((v, i, arr) => arr.slice(i, i + key.length).map(r => r.char).join('') === key);
+          if (start >= 0) { color = colors[colorCursor + start].color; opacity = colors[colorCursor + start].opacity; colorCursor += start + key.length; }
+          const block = { id: `p${n}_b${idx}`, text, x, y, width: item.width, fontSize, matrix: [a / fontSize, b / fontSize, c / fontSize, d / fontSize],
+            fontFamily, isBold: !!fontInfo?.bold || /bold|black|heavy/i.test(fontFamily), isItalic: !!fontInfo?.italic || /italic|oblique/i.test(fontFamily), color,
+            ascent: style.ascent || 0.8, descent: style.descent || -0.2, fontId: item.fontName, opacity };
+          const prev = blocks.at(-1), gap = prev ? x - prev.x - prev.width : 0;
+          if (prev && prev.opacity === opacity && Math.abs(b) < 0.01 && Math.abs(c) < 0.01 && prev.matrix.every((v, i) => Math.abs(v - block.matrix[i]) < 0.001) && prev.fontId === block.fontId && Math.abs(prev.y - y) < fontSize * 0.15 && Math.abs(prev.fontSize - fontSize) < 0.1 && gap >= -0.1 && gap < fontSize * 0.65 && prev.color.every((v, i) => v === color[i])) {
+            prev.text += (gap > fontSize * 0.1 && !prev.text.endsWith(' ') ? ' ' : '') + text; prev.width = x + item.width - prev.x;
+          } else blocks.push(block);
+        }
+        if (!sampled && blocks.length) { sampled = true; onSample?.(blocks.map(b => b.text).join(' ').slice(0, 3500)); }
+        pages.push({ pageNum: n, blocks, width: page.view[2] - page.view[0], height: page.view[3] - page.view[1] });
+        onProgress?.(n, doc.numPages); page.cleanup();
+      }
+      return { numPages: doc.numPages, pages };
+    } finally { signal?.removeEventListener('abort', cancel); await (doc ? doc.destroy() : loading.destroy()); }
+  }
+
+  const aliases = { arial: 'arimo', helvetica: 'arimo', 'helvetica neue': 'arimo', calibri: 'carlito', times: 'tinos', 'times new roman': 'tinos', courier: 'cousine', 'courier new': 'cousine', verdana: 'open-sans', tahoma: 'noto-sans', 'segoe ui': 'noto-sans', segoe: 'noto-sans', myriad: 'source-sans-3', 'myriad pro': 'source-sans-3', din: 'fira-sans', futura: 'jost', 'sans-serif': 'noto-sans', sans: 'noto-sans', serif: 'noto-serif', monospace: 'noto-sans-mono' };
+  function fontFamilyName(name) {
+    const clean = name.replace(/^[A-Z]{6}\+/i, '').replace(/[-, ]?(bolditalic|boldoblique|semibold|regular|italic|oblique|bold|roman|medium|light)(mt|ps)?$/i, '').replace(/PSMT$|MT$|PS$/i, '').replace(/([a-z])([A-Z])/g, '$1 $2').trim().toLowerCase();
+    return clean;
+  }
+  function fontSlug(name) {
+    const clean = fontFamilyName(name);
+    return aliases[clean] || clean.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+  function rangeContains(range, cp) {
+    return String(range || '').split(',').some(part => {
+      const value = part.trim().replace(/^U\+/i, ''), [a, b] = value.split('-');
+      if (a.includes('?')) return cp >= parseInt(a.replace(/\?/g, '0'), 16) && cp <= parseInt(a.replace(/\?/g, 'F'), 16);
+      return cp >= parseInt(a, 16) && cp <= parseInt(b || a, 16);
     });
-
-    s = s.replace(/\bzusso\b/gi, 'flusso')
-         .replace(/\bzuidi\b/gi, 'fluidi')
-         .replace(/\bzuido\b/gi, 'fluido');
-
-    // Rimuovi spazi anomali tipici di estrazioni frammentate
-    s = s.replace(/\b([a-zàèéìòù]+)\s+ci\b/gi, (m, w) => {
-      if (w.toLowerCase() === 'grafi' || w.toLowerCase() === 'artifi' || w.toLowerCase() === 'edifi') return w + 'ci';
-      return m;
-    });
-    s = s.replace(/\bquali\s+cato\b/gi, 'qualificato')
-         .replace(/\bpart\s+e\b/gi, 'parte')
-         .replace(/\bcom\s+pleta\b/gi, 'completa')
-         .replace(/\bini\s+ziare\b/gi, 'iniziare')
-         .replace(/\bdispo\s+sto\b/gi, 'disposto')
-         .replace(/\bi\s+l\s+livello\b/gi, 'il livello')
-         .replace(/\br\s+le\s+protezioni\b/gi, 'e le protezioni')
-         .replace(/\bafyssi\b/gi, 'affissi')
-         .replace(/\bysici\b/gi, 'fisici')
-         .replace(/\briyuti\b/gi, 'rifiuti')
-         .replace(/\befyciente\b/gi, 'efficiente');
-
-    return s;
   }
-
-  // Sanitizza il testo per prevenire crash dovuti a caratteri speciali non supportati dal font
-  function sanitizeTextForFont(text, font) {
-    if (!text) return '';
-    let safe = text
-      .replace(/[\u2018\u2019]/g, "'")
-      .replace(/[\u201C\u201D]/g, '"')
-      .replace(/[\u2013\u2014]/g, '-')
-      .replace(/[\u2026]/g, '...')
-      .replace(/[\u27A2\u27A1\u25BA\u02C3]/g, '>')
-      .replace(/[\u2022]/g, '*');
-
-    try {
-      if (font && font.encodeText) {
-        font.encodeText(safe);
+  function createFontResolver(doc, signal, warnings, onStatus) {
+    const metadata = new Map(), fonts = new Map();
+    async function get(url, json = false) {
+      check(signal); const ctrl = new AbortController(), stop = () => ctrl.abort(); signal?.addEventListener('abort', stop, { once: true });
+      const timer = setTimeout(stop, 20000);
+      try { const resp = await fetch(url, { signal: ctrl.signal, cache: 'no-store' }); if (!resp.ok) return null; return await (json ? resp.json() : resp.arrayBuffer()); }
+      catch (e) { check(signal); return null; }
+      finally { clearTimeout(timer); signal?.removeEventListener('abort', stop); }
+    }
+    async function meta(slug) {
+      if (!metadata.has(slug)) metadata.set(slug, get(`https://api.fontsource.org/v1/fonts/${encodeURIComponent(slug)}`, true));
+      return metadata.get(slug);
+    }
+    async function load(slug, bold, italic, needed) {
+      const m = await meta(slug); if (!m?.variants) return [];
+      const weights = (m.weights || []).map(Number).sort((a, b) => Math.abs(a - (bold ? 700 : 400)) - Math.abs(b - (bold ? 700 : 400)));
+      const weight = weights[0], style = m.styles?.includes(italic ? 'italic' : 'normal') ? (italic ? 'italic' : 'normal') : m.styles?.[0];
+      const variants = m.variants[String(weight)]?.[style] || {}, selected = new Set();
+      for (const char of needed) {
+        const cp = char.codePointAt(0);
+        const subset = Object.keys(variants).find(s => rangeContains(m.unicodeRange?.[s], cp)) || (cp < 256 ? m.defSubset || 'latin' : null);
+        if (subset && variants[subset]) selected.add(subset);
       }
-      return safe;
-    } catch (e) {
-      return safe.replace(/[^\x20-\x7E\xA0-\xFF]/g, ' ');
-    }
-  }
-
-  // Scarica dinamicamente il font richiesto dal PDF tramite Google Fonts / Fontsource CDN
-  async function fetchFontBuffer(fontFamily = 'sans', isBold = false, isItalic = false) {
-    const raw = (fontFamily || '').toLowerCase().trim();
-    const cleanFamily = raw
-      .replace(/^([a-z]{6}\+)/i, '')
-      .replace(/mt$|ps$|pro$|lt$|-regular$|-bold$|-italic$|-bolditalic$/i, '')
-      .trim();
-
-    const mappedFamily = FONT_FAMILY_MAP[cleanFamily] || cleanFamily || 'inter';
-    const slug = mappedFamily.replace(/[\s_]+/g, '-').toLowerCase();
-    const weight = isBold ? '700' : '400';
-    const style = isItalic ? 'italic' : 'normal';
-    const cacheKey = `${slug}_${weight}_${style}`;
-
-    if (cachedFontBuffers[cacheKey]) {
-      return cachedFontBuffers[cacheKey];
-    }
-
-    // 1. Prova a scaricare il font esatto dalla CDN fontsource
-    const candidateUrls = [
-      `https://cdn.jsdelivr.net/fontsource/fonts/${slug}@latest/latin-${weight}-${style}.ttf`,
-      `https://cdn.jsdelivr.net/fontsource/fonts/${slug}@latest/latin-${weight}-normal.ttf`,
-      `https://cdn.jsdelivr.net/fontsource/fonts/${slug}@latest/latin-400-normal.ttf`
-    ];
-
-    for (const url of candidateUrls) {
-      try {
-        const resp = await fetch(url);
-        if (resp.ok) {
-          const buf = await resp.arrayBuffer();
-          if (buf && buf.byteLength > 1000) {
-            cachedFontBuffers[cacheKey] = buf;
-            return buf;
-          }
-        }
-      } catch (e) {}
-    }
-
-    // 2. Fallback intelligente: distringue rigorosamente Sans da Serif e Mono
-    const isSerif = (raw.includes('serif') && !raw.includes('sans')) || raw.includes('times') || raw.includes('georgia') || raw.includes('tinos');
-    const isMono = raw.includes('mono') || raw.includes('courier') || raw.includes('cousine') || raw.includes('code');
-
-    let fallbackKey = 'sans';
-    if (isMono) {
-      fallbackKey = isBold ? 'monoBold' : 'mono';
-    } else if (isSerif) {
-      fallbackKey = isBold ? 'serifBold' : 'serif';
-    } else {
-      if (isBold && isItalic) fallbackKey = 'sansBoldItalic';
-      else if (isBold) fallbackKey = 'sansBold';
-      else if (isItalic) fallbackKey = 'sansItalic';
-      else fallbackKey = 'sans';
-    }
-
-    if (cachedFontBuffers[fallbackKey]) {
-      return cachedFontBuffers[fallbackKey];
-    }
-
-    const fallbackUrl = FONT_URLS[fallbackKey] || FONT_URLS.sans;
-    try {
-      const fallbackResp = await fetch(fallbackUrl);
-      if (fallbackResp.ok) {
-        const fallbackBuf = await fallbackResp.arrayBuffer();
-        if (fallbackBuf && fallbackBuf.byteLength > 1000) {
-          cachedFontBuffers[fallbackKey] = fallbackBuf;
-          return fallbackBuf;
-        }
-      }
-    } catch (e) {}
-
-    return null;
-  }
-
-  // Rilascia la memoria dei font temporanei
-  function clearFontMemory() {
-    cachedFontBuffers = {};
-    embeddedDynamicFonts.clear();
-    if (window.gc) {
-      try { window.gc(); } catch (e) {}
-    }
-  }
-
-  // Rileva in modo intelligente il colore dello sfondo e del testo tramite luminosità mediana
-  function detectBlockColor(x, y, width, height, ctx, pageHeight, sampleScale = 0.75) {
-    if (!ctx) return { isDarkBg: false, color: { r: 0.10, g: 0.10, b: 0.12 } };
-    try {
-      const cx = Math.max(0, Math.round(x * sampleScale));
-      const topY = Math.max(0, Math.round((pageHeight - y - height) * sampleScale));
-      const bottomY = Math.min(ctx.canvas.height - 1, Math.round((pageHeight - y) * sampleScale));
-      const cw = Math.max(4, Math.round(Math.max(width, 24) * sampleScale));
-      const ch = Math.max(2, bottomY - topY);
-
-      const imgData = ctx.getImageData(cx, topY, Math.min(cw, ctx.canvas.width - cx), Math.min(ch, ctx.canvas.height - topY));
-      const data = imgData.data;
-      if (!data || data.length === 0) return { isDarkBg: false, color: { r: 0.10, g: 0.10, b: 0.12 } };
-
-      // Campiona pixel e calcola la luminosità mediana dello sfondo:
-      // i pixel del testo occupano solo una piccola frazione (< 20%) dell'area del riquadro,
-      // quindi la luminosità mediana (40°-50° percentile) corrisponde rigorosamente allo sfondo!
-      const lums = [];
-      const step = Math.max(1, Math.floor(data.length / (4 * 60)));
-      for (let p = 0; p < data.length; p += step * 4) {
-        const r = data[p] / 255;
-        const g = data[p + 1] / 255;
-        const b = data[p + 2] / 255;
-        lums.push(0.299 * r + 0.587 * g + 0.114 * b);
-      }
-
-      lums.sort((a, b) => a - b);
-      const bgLum = lums[Math.floor(lums.length * 0.40)] || 1.0;
-
-      // Se lo sfondo è scuro (blu banner, nero, grigio scuro - lum < 0.48):
-      // il testo deve risaltare in BIANCO PURO!
-      if (bgLum < 0.48) {
-        return {
-          isDarkBg: true,
-          color: { r: 1.0, g: 1.0, b: 1.0 } // Bianco Puro brillante
-        };
-      } else {
-        return {
-          isDarkBg: false,
-          color: { r: 0.10, g: 0.10, b: 0.12 } // Scuro Grafite
-        };
-      }
-    } catch (e) {
-      return { isDarkBg: false, color: { r: 0.10, g: 0.10, b: 0.12 } };
-    }
-  }
-
-  // Estrae pagine, dimensioni e blocchi di testo con coordinate
-  async function parsePDF(pdfArrayBuffer) {
-    let bufferCopy;
-    if (pdfArrayBuffer instanceof Uint8Array) {
-      bufferCopy = pdfArrayBuffer.slice();
-    } else if (pdfArrayBuffer && pdfArrayBuffer.slice) {
-      bufferCopy = new Uint8Array(pdfArrayBuffer.slice(0));
-    } else {
-      bufferCopy = new Uint8Array(pdfArrayBuffer);
-    }
-
-    const loadingTask = pdfjsLib.getDocument({ data: bufferCopy });
-    const pdfDoc = await loadingTask.promise;
-    const numPages = pdfDoc.numPages;
-    const pagesData = [];
-
-    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-      const page = await pdfDoc.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 1.0 });
-      const textContent = await page.getTextContent({ normalizeWhitespace: true });
-
-      // Renderizza un canvas off-screen veloce (scale 0.75) per campionare il colore dello sfondo di ogni blocco
-      let sampleCtx = null;
-      try {
-        const sampleScale = 0.75;
-        const sampleViewport = page.getViewport({ scale: sampleScale });
-        const sampleCanvas = document.createElement('canvas');
-        sampleCanvas.width = Math.round(sampleViewport.width);
-        sampleCanvas.height = Math.round(sampleViewport.height);
-        sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
-        await page.render({ canvasContext: sampleCtx, viewport: sampleViewport }).promise;
-      } catch (cvErr) {
-        console.warn('[DocuShift] Campionamento cromatico canvas non disponibile:', cvErr);
-      }
-
-      const rawItems = textContent.items.map((item, idx) => {
-        const tx = item.transform[4];
-        const ty = item.transform[5];
-        const fontSize = Math.hypot(item.transform[0], item.transform[1]) || 12;
-        const fontName = (item.fontName || '').toLowerCase();
-        
-        const styleInfo = textContent.styles && textContent.styles[item.fontName];
-        const rawFamily = (styleInfo && styleInfo.fontFamily) || item.fontName || 'sans';
-        const cleanFamily = rawFamily.replace(/^([a-z]{6}\+)/i, '').replace(/mt$|ps$|pro$|lt$/i, '').trim();
-
-        const isBold = fontName.includes('bold') || fontName.includes('black') || fontName.includes('heavy') || (styleInfo && styleInfo.fontFamily && /bold|black/i.test(styleInfo.fontFamily));
-        const isItalic = fontName.includes('italic') || fontName.includes('oblique') || (styleInfo && styleInfo.fontFamily && /italic|oblique/i.test(styleInfo.fontFamily));
-        const isSerif = (rawFamily.includes('serif') && !rawFamily.includes('sans')) || rawFamily.includes('times') || rawFamily.includes('roman') || rawFamily.includes('georgia');
-        const isMono = rawFamily.includes('mono') || rawFamily.includes('courier') || rawFamily.includes('code');
-
-        // Campiona la luminosità dello sfondo sotto il testo per impostare il colore con contrasto perfetto
-        const colorInfo = detectBlockColor(tx, ty, item.width, item.height || fontSize, sampleCtx, viewport.height, 0.75);
-
-        // Pulizia ligatures e caratteri corrotti
-        const cleanedStr = cleanLigaturesAndEncoding(item.str);
-
-        return {
-          id: `p${pageNum}_b${idx + 1}`,
-          page: pageNum,
-          str: cleanedStr,
-          x: tx,
-          y: ty,
-          width: item.width,
-          height: item.height || fontSize,
-          fontSize: fontSize,
-          isBold: !!isBold,
-          isItalic: !!isItalic,
-          isSerif: !!isSerif,
-          isMono: !!isMono,
-          fontFamily: cleanFamily,
-          color: colorInfo.color,
-          isDarkBg: colorInfo.isDarkBg,
-          hasEOL: item.hasEOL
-        };
-      });
-
-      // Filtra blocchi vuoti o con soli spazi
-      const filteredItems = rawItems.filter(it => it.str && it.str.trim().length > 0);
-
-      // Raggruppa frammenti adiacenti sulla stessa riga per preservare senso e traduzione coerente
-      const groupedBlocks = groupAdjacentTextItems(filteredItems);
-
-      pagesData.push({
-        pageNum,
-        width: viewport.width,
-        height: viewport.height,
-        blocks: groupedBlocks
-      });
-    }
-
-    return {
-      numPages,
-      pages: pagesData
-    };
-  }
-
-  // Raggruppa elementi di testo continui sulla stessa riga (stessa Y o quasi)
-  function groupAdjacentTextItems(items) {
-    if (items.length === 0) return [];
-    const groups = [];
-    let currentGroup = null;
-
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-
-      if (!currentGroup) {
-        currentGroup = {
-          id: item.id,
-          page: item.page,
-          text: item.str,
-          x: item.x,
-          y: item.y,
-          width: item.width,
-          height: item.height,
-          fontSize: item.fontSize,
-          isBold: item.isBold,
-          isItalic: item.isItalic,
-          isSerif: item.isSerif,
-          isMono: item.isMono,
-          fontFamily: item.fontFamily,
-          color: item.color,
-          isDarkBg: item.isDarkBg,
-          originalItems: [item]
-        };
-        continue;
-      }
-
-      const sameLine = Math.abs(item.y - currentGroup.y) < (currentGroup.fontSize * 0.4);
-      const isNearby = item.x >= currentGroup.x && (item.x - (currentGroup.x + currentGroup.width)) < (currentGroup.fontSize * 1.5);
-      const sameStyle = (
-        item.isBold === currentGroup.isBold && 
-        item.isItalic === currentGroup.isItalic && 
-        item.isDarkBg === currentGroup.isDarkBg
-      );
-
-      if (sameLine && isNearby && sameStyle) {
-        const space = (currentGroup.text.endsWith(' ') || item.str.startsWith(' ')) ? '' : ' ';
-        currentGroup.text += space + item.str;
-        currentGroup.width = (item.x + item.width) - currentGroup.x;
-        currentGroup.height = Math.max(currentGroup.height, item.height);
-        currentGroup.originalItems.push(item);
-      } else {
-        groups.push(currentGroup);
-        currentGroup = {
-          id: item.id,
-          page: item.page,
-          text: item.str,
-          x: item.x,
-          y: item.y,
-          width: item.width,
-          height: item.height,
-          fontSize: item.fontSize,
-          isBold: item.isBold,
-          isItalic: item.isItalic,
-          isSerif: item.isSerif,
-          isMono: item.isMono,
-          fontFamily: item.fontFamily,
-          color: item.color,
-          isDarkBg: item.isDarkBg,
-          originalItems: [item]
-        };
-      }
-    }
-
-    if (currentGroup) {
-      groups.push(currentGroup);
-    }
-
-    return groups;
-  }
-
-  // Assicura il caricamento dinamico e ultra-resiliente di PDFLib (locale con fallback CDN)
-  async function ensurePDFLibLoaded() {
-    const getLib = () => {
-      if (typeof window !== 'undefined' && window.PDFLib) return window.PDFLib;
-      if (typeof PDFLib !== 'undefined') return PDFLib;
-      if (typeof globalThis !== 'undefined' && globalThis.PDFLib) return globalThis.PDFLib;
-      return null;
-    };
-
-    const existing = getLib();
-    if (existing) return existing;
-
-    const sourceUrls = [
-      'pdf-lib.min.js?v=3.9',
-      'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',
-      'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js'
-    ];
-
-    for (const url of sourceUrls) {
-      try {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = url;
-          if (url.startsWith('http')) {
-            s.crossOrigin = 'anonymous';
-          }
-          s.onload = () => resolve();
-          s.onerror = (e) => reject(e || new Error(`Failed to load ${url}`));
-          document.head.appendChild(s);
-        });
-        const lib = getLib();
-        if (lib) return lib;
-      } catch (err) {
-        console.warn(`[DocuShift PDFEngine] Fallback per PDFLib da ${url}:`, err);
-      }
-    }
-
-    throw new Error('Impossibile caricare la libreria di compilazione PDF (PDFLib). Verifica la connessione a Internet o eventuali blocchi estensioni.');
-  }
-
-  // Assicura il caricamento resiliente di fontkit (locale con fallback CDN)
-  async function ensureFontkitLoaded() {
-    const getFk = () => {
-      if (typeof window !== 'undefined' && window.fontkit) return window.fontkit;
-      if (typeof fontkit !== 'undefined') return fontkit;
-      if (typeof globalThis !== 'undefined' && globalThis.fontkit) return globalThis.fontkit;
-      return null;
-    };
-
-    const existing = getFk();
-    if (existing) return existing;
-
-    const sourceUrls = [
-      'fontkit.umd.min.js?v=3.9',
-      'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js',
-      'https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js'
-    ];
-
-    for (const url of sourceUrls) {
-      try {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = url;
-          if (url.startsWith('http')) {
-            s.crossOrigin = 'anonymous';
-          }
-          s.onload = () => resolve();
-          s.onerror = (e) => reject(e || new Error(`Failed to load ${url}`));
-          document.head.appendChild(s);
-        });
-        const fk = getFk();
-        if (fk) return fk;
-      } catch (err) {
-        console.warn(`[DocuShift PDFEngine] Fallback per fontkit da ${url}:`, err);
-      }
-    }
-
-    return getFk();
-  }
-
-  // Rimuove e neutralizza alla radice il testo originale dallo stream vettoriale della pagina
-  // Senza toccare forme, sfondi colorati (giallo, blu), immagini, tabelle o elementi grafici
-  function stripOriginalTextFromPage(page, pdfDoc) {
-    try {
-      const { PDFName, PDFArray, decodePDFRawStream } = window.PDFLib;
-      const contentsEntry = page.node.Contents();
-      if (!contentsEntry) return;
-
-      const streamRefs = [];
-      if (contentsEntry instanceof PDFArray) {
-        for (let i = 0; i < contentsEntry.size(); i++) {
-          streamRefs.push(contentsEntry.get(i));
-        }
-      } else {
-        streamRefs.push(contentsEntry);
-      }
-
-      for (let sIdx = 0; sIdx < streamRefs.length; sIdx++) {
-        const ref = streamRefs[sIdx];
-        let rawStream = ref;
-        if (pdfDoc.context.lookup) {
-          const lookedUp = pdfDoc.context.lookup(ref);
-          if (lookedUp) rawStream = lookedUp;
-        }
-
-        let decodedBytes = null;
-        try {
-          if (rawStream.getUnencodedContents) {
-            decodedBytes = rawStream.getUnencodedContents();
-          } else if (rawStream.contents) {
-            const decoded = decodePDFRawStream(rawStream);
-            decodedBytes = decoded.decode ? decoded.decode() : decoded;
-          }
-        } catch (e) {
-          console.warn('[DocuShift PDFEngine] Fallback decodifica stream:', e);
-        }
-
-        if (!decodedBytes || decodedBytes.length === 0) continue;
-
-        let streamText = '';
-        const chunkSize = 8192;
-        for (let i = 0; i < decodedBytes.length; i += chunkSize) {
-          const slice = decodedBytes.subarray(i, Math.min(i + chunkSize, decodedBytes.length));
-          streamText += String.fromCharCode.apply(null, slice);
-        }
-
-        // Se lo stream non contiene comandi di testo BT...ET, non toccarlo assolutamente!
-        if (!/\bBT\b/.test(streamText)) continue;
-
-        // CANCELLAZIONE CHIRURGICA E NON DISTRUTTIVA DEL VECCHIO TESTO:
-        // In PDF ISO 32000-1 sez. 9.2.2, TUTTO il testo risiede esclusivamente tra 'BT' ed 'ET'.
-        // Nessun operatore di tracciamento vettoriale (re, f, s, S, Do, m, l, c) compare mai tra BT ed ET.
-        // Sostituendo 'BT ... ET' con 'BT 3 Tr ET' (Text Rendering Mode 3 = né riempimento né tratto, invisibile):
-        // 1. Eliminiamo completamente e in sicurezza la visualizzazione del vecchio testo
-        // 2. NON tocchiamo alcuna forma, colore di sfondo (giallo, blu), tabella, bordo o immagine!
-        // 3. Modifichiamo ciascuno stream in-place preservando la gerarchia della pagina!
-        const cleanedText = streamText.replace(/\bBT\b[\s\S]*?\bET\b/g, 'BT 3 Tr ET');
-
-        const newBytes = new Uint8Array(cleanedText.length);
-        for (let i = 0; i < cleanedText.length; i++) {
-          newBytes[i] = cleanedText.charCodeAt(i) & 0xff;
-        }
-
-        const newStream = pdfDoc.context.flateStream(newBytes);
-        const newStreamRef = pdfDoc.context.register(newStream);
-
-        if (contentsEntry instanceof PDFArray) {
-          contentsEntry.set(sIdx, newStreamRef);
-        } else {
-          page.node.set(PDFName.of('Contents'), newStreamRef);
-        }
-      }
-    } catch (stripErr) {
-      console.warn('[DocuShift PDFEngine] Errore pulizia testo stream originale:', stripErr);
-    }
-  }
-
-  // Incorpora dinamicamente un font TrueType nel documento PDF con cache in memoria
-  async function getOrEmbedDynamicFont(pdfDoc, fontFamily, isBold, isItalic) {
-    if (!fontFamily) return null;
-    const cleanFamily = fontFamily
-      .replace(/^([a-z]{6}\+)/i, '')
-      .replace(/mt$|ps$|pro$|lt$|-regular$|-bold$|-italic$|-bolditalic$/i, '')
-      .trim();
-    const weightKey = isBold ? 'bold' : 'normal';
-    const styleKey = isItalic ? 'italic' : 'normal';
-    const cacheKey = `${cleanFamily.toLowerCase()}_${weightKey}_${styleKey}`;
-
-    if (embeddedDynamicFonts.has(cacheKey)) {
-      return embeddedDynamicFonts.get(cacheKey);
-    }
-
-    try {
-      const buffer = await fetchFontBuffer(cleanFamily, isBold, isItalic);
-      if (buffer) {
-        const embedded = await pdfDoc.embedFont(buffer);
-        embeddedDynamicFonts.set(cacheKey, embedded);
-        return embedded;
-      }
-    } catch (err) {
-      console.warn(`[DocuShift PDFEngine] Fallback font per ${cleanFamily}:`, err);
-    }
-    return null;
-  }
-
-  // Costruisce il nuovo documento PDF tradotto preservando immagini e grafica originale
-  async function buildTranslatedPDF(originalPdfBytes, pagesData, translationsMap, options = {}) {
-    const pdfLibInstance = await ensurePDFLibLoaded();
-    const { PDFDocument, rgb, StandardFonts } = pdfLibInstance;
-
-    let safeBytes;
-    if (originalPdfBytes instanceof Uint8Array) {
-      safeBytes = originalPdfBytes.slice();
-    } else if (originalPdfBytes && originalPdfBytes.slice) {
-      safeBytes = new Uint8Array(originalPdfBytes.slice(0));
-    } else {
-      safeBytes = new Uint8Array(originalPdfBytes);
-    }
-
-    // Carica il PDF originale per mantenere vettori, immagini e layer
-    const pdfDoc = await PDFDocument.load(safeBytes);
-
-    // Registra fontkit per supportare TrueType scaricati da Google Fonts
-    const fkInstance = await ensureFontkitLoaded();
-    if (fkInstance) {
-      try {
-        pdfDoc.registerFontkit(fkInstance);
-      } catch (e) {
-        console.warn('[DocuShift PDFEngine] Registrazione fontkit non riuscita:', e);
-      }
-    }
-
-    // Embed all 4 font variants for Sans
-    let fontSansRegular, fontSansBold, fontSansItalic, fontSansBoldItalic;
-    try {
-      const [bufR, bufB, bufI, bufBI] = await Promise.all([
-        fetchFontBuffer('sans', false, false),
-        fetchFontBuffer('sans', true, false),
-        fetchFontBuffer('sans', false, true),
-        fetchFontBuffer('sans', true, true)
-      ]);
-      if (bufR) fontSansRegular = await pdfDoc.embedFont(bufR);
-      if (bufB) fontSansBold = await pdfDoc.embedFont(bufB);
-      if (bufI) fontSansItalic = await pdfDoc.embedFont(bufI);
-      if (bufBI) fontSansBoldItalic = await pdfDoc.embedFont(bufBI);
-    } catch (fontErr) {
-      console.warn('[DocuShift PDFEngine] Fallback a StandardFonts Helvetica:', fontErr);
-    }
-
-    // Standard fallback fonts if dynamic download fails or is blocked
-    const stdRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const stdBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    const stdItalic = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
-    const stdBoldItalic = await pdfDoc.embedFont(StandardFonts.HelveticaBoldOblique);
-
-    const baseRegular = fontSansRegular || stdRegular;
-    const baseBold = fontSansBold || stdBold;
-    const baseItalic = fontSansItalic || stdItalic;
-    const baseBoldItalic = fontSansBoldItalic || stdBoldItalic;
-
-    function getBaseFont(isBold, isItalic) {
-      if (isBold && isItalic) return baseBoldItalic;
-      if (isBold) return baseBold;
-      if (isItalic) return baseItalic;
-      return baseRegular;
-    }
-
-    const pdfPages = pdfDoc.getPages();
-
-    for (let pageIdx = 0; pageIdx < pagesData.length; pageIdx++) {
-      const pageData = pagesData[pageIdx];
-      const page = pdfPages[pageIdx];
-      if (!page) continue;
-
-      // 1. ELIMINAZIONE DEL TESTO VECCHIO DALLO STREAM DELLA PAGINA:
-      // Neutralizza e rende trasparenti tutti i glifi originali preservando al 100%
-      // lo sfondo (giallo, barra blu, loghi, illustrazioni, tabelle e grafiche).
-      // ZERO TOPPE BIANCHE!
-      stripOriginalTextFromPage(page, pdfDoc);
-
-      for (const block of pageData.blocks) {
-        const translatedText = translationsMap[block.id] || block.text;
-
-        // Se il testo è vuoto, passa oltre
-        if (!translatedText || translatedText.trim().length === 0) continue;
-
-        // 2. Selezione dinamica del Font (recupera il font esatto con bold e italic corretti)
-        let font = getBaseFont(block.isBold, block.isItalic);
-        if (block.fontFamily) {
-          const dynamicFont = await getOrEmbedDynamicFont(pdfDoc, block.fontFamily, block.isBold, block.isItalic);
-          if (dynamicFont) font = dynamicFont;
-        }
-
-        const origFontSize = block.fontSize;
-        const boxWidth = Math.max(block.width, 20);
-
-        // 3. Sanitizzazione caratteri per prevenire crash di codifica
-        let textToWrite = sanitizeTextForFont(translatedText, font);
-
-        // 4. Auto-Scaling del testo proporzionale per preservare gli ingombri
-        let fontSize = origFontSize;
-        let measuredWidth = 0;
-        try {
-          measuredWidth = font.widthOfTextAtSize(textToWrite, fontSize);
-        } catch (mErr) {
-          measuredWidth = textToWrite.length * (fontSize * 0.55);
-        }
-
-        if (measuredWidth > boxWidth) {
-          const ratio = boxWidth / measuredWidth;
-          const minFontScale = options.minFontScale || 0.70;
-          fontSize = Math.max(origFontSize * minFontScale, origFontSize * ratio);
+      const loaded = [];
+      for (const subset of selected) {
+        const key = `${slug}/${weight}/${style}/${subset}`;
+        if (!fonts.has(key)) fonts.set(key, (async () => {
+          const url = variants[subset]?.url?.ttf;
+          // Do not allow metadata to turn font downloads into arbitrary external requests.
+          if (!url || !/^https:\/\/cdn\.jsdelivr\.net\/fontsource\/fonts\//.test(url)) return null;
+          onStatus?.(`Font: ${m.family} (${subset})`);
+          const buffer = await get(url); if (!buffer) return null;
           try {
-            measuredWidth = font.widthOfTextAtSize(textToWrite, fontSize);
-          } catch (e) {}
-        }
-
-        if (measuredWidth > boxWidth * 1.1) {
-          fontSize = Math.max(7, fontSize * 0.92);
-        }
-
-        // 5. Colore del Testo con contrasto perfetto:
-        // Se lo sfondo è scuro (come la fascia blu), il testo viene disegnato in BIANCO.
-        // Se lo sfondo è chiaro (come il giallo o bianco), il testo viene disegnato in SCURO.
-        const textColor = block.color 
-          ? rgb(block.color.r, block.color.g, block.color.b) 
-          : (block.isDarkBg ? rgb(1.0, 1.0, 1.0) : rgb(0.10, 0.10, 0.12));
-
-        // 6. Riscrivi il testo tradotto direttamente sui vettori nativi (SENZA NESSUNA TOPPA BIANCA)
-        try {
-          page.drawText(textToWrite, {
-            x: block.x,
-            y: block.y,
-            size: fontSize,
-            font: font,
-            color: textColor
-          });
-        } catch (drawErr) {
-          console.warn('Errore disegno testo blocco:', block.id, drawErr);
-        }
+            const source = window.fontkit.create(new Uint8Array(buffer));
+            const font = await doc.embedFont(buffer, { subset: true });
+            return { font, source, chars: new Set(font.getCharacterSet()) };
+          } catch (_) { return null; }
+        })());
+        const font = await fonts.get(key); if (font) loaded.push(font);
       }
+      return loaded;
     }
-
-    // Salva il PDF risultante
-    const translatedPdfBytes = await pdfDoc.save();
-
-    // Pulizia memoria font temporanei
-    clearFontMemory();
-
-    return translatedPdfBytes;
-  }
-
-  // Renderizza una pagina specifica su un elemento <canvas> HTML per l'anteprima
-  async function renderPageToCanvas(pdfData, pageNum, canvasEl, targetScale = 1.3) {
-    if (!canvasEl || !pdfData) return;
-    let safeData;
-    if (pdfData instanceof Uint8Array) {
-      safeData = pdfData.slice();
-    } else if (pdfData && pdfData.slice) {
-      safeData = new Uint8Array(pdfData.slice(0));
-    } else {
-      safeData = new Uint8Array(pdfData);
-    }
-
-    const loadingTask = pdfjsLib.getDocument({ data: safeData });
-    const pdfDoc = await loadingTask.promise;
-    const page = await pdfDoc.getPage(pageNum);
-
-    const viewport = page.getViewport({ scale: targetScale });
-    canvasEl.width = viewport.width;
-    canvasEl.height = viewport.height;
-
-    const ctx = canvasEl.getContext('2d');
-    const renderContext = {
-      canvasContext: ctx,
-      viewport: viewport
+    return async function resolve(block, text) {
+      const characters = [...new Set(Array.from(text))]; let available = [];
+      const original = fontSlug(block.fontFamily);
+      if (original !== fontFamilyName(block.fontFamily).replace(/[^a-z0-9]+/g, '-')) warnings.add(`Font «${block.fontFamily}»: cercato l’equivalente gratuito «${original}».`);
+      const candidates = [...new Set([original, /times|serif|roman/i.test(block.fontFamily) && !/sans/i.test(block.fontFamily) ? 'noto-serif' : /courier|mono/i.test(block.fontFamily) ? 'noto-sans-mono' : 'noto-sans', /[\u3040-\u30ff]/u.test(text) ? 'noto-sans-jp' : 'noto-sans-sc'])];
+      for (const slug of candidates) {
+        const missing = characters.filter(c => !available.some(f => f.chars.has(c.codePointAt(0)))); if (!missing.length) break;
+        const found = await load(slug, block.isBold, block.isItalic, missing); available.push(...found);
+        if (slug !== original && found.length) warnings.add(`Font «${block.fontFamily}»: usato un equivalente gratuito per i caratteri non disponibili.`);
+      }
+      const runs = [];
+      for (const char of text) {
+        const chosen = available.find(f => f.chars.has(char.codePointAt(0)));
+        if (!chosen) throw new Error(`Nessun font gratuito disponibile per il carattere «${char}» (U+${char.codePointAt(0).toString(16).toUpperCase()}). Il PDF non è stato esportato per evitare perdita di testo.`);
+        if (runs.at(-1)?.font === chosen.font) runs.at(-1).text += char; else runs.push({ font: chosen.font, source: chosen.source, text: char });
+      }
+      return runs;
     };
-
-    await page.render(renderContext).promise;
   }
-
-  return {
-    parsePDF,
-    buildTranslatedPDF,
-    renderPageToCanvas,
-    clearFontMemory
-  };
+  function fitText(block, runs) {
+    const scaleX = Math.hypot(block.matrix[0], block.matrix[1]);
+    const advance = runs.reduce((sum, run) => sum + run.font.widthOfTextAtSize(run.text, 1), 0);
+    let cursor = 0, left = 0, right = advance;
+    for (const run of runs) {
+      if (run.source) {
+        const layout = run.source.layout(run.text), units = run.source.unitsPerEm;
+        let glyphX = cursor;
+        layout.glyphs.forEach((glyph, i) => {
+          const position = layout.positions[i];
+          left = Math.min(left, glyphX + (glyph.bbox.minX + position.xOffset) / units);
+          right = Math.max(right, glyphX + (glyph.bbox.maxX + position.xOffset) / units);
+          glyphX += position.xAdvance / units;
+        });
+      }
+      cursor += run.font.widthOfTextAtSize(run.text, 1);
+    }
+    const measured = right - left;
+    const widthLimit = block.width / scaleX;
+    let fontSize = Math.min(block.fontSize, widthLimit / Math.max(measured, 1e-9));
+    // Keep actual font ascent/descent inside the original text line's vertical extent.
+    const extents = runs.map(run => {
+      if (!run.source) return { upper: run.font.heightAtSize(1, { descender: false }), lower: 0 };
+      const layout = run.source.layout(run.text), units = run.source.unitsPerEm;
+      return {
+        upper: Math.max(0, ...layout.glyphs.map((g, i) => (g.bbox.maxY + layout.positions[i].yOffset) / units)),
+        lower: Math.max(0, ...layout.glyphs.map((g, i) => -(g.bbox.minY + layout.positions[i].yOffset) / units))
+      };
+    });
+    const upper = extents.map(e => e.upper), lower = extents.map(e => e.lower);
+    fontSize = Math.min(fontSize, block.fontSize * Math.max(0.1, block.ascent) / Math.max(...upper, 0.1), block.fontSize * Math.max(0.1, -block.descent) / Math.max(...lower, 0.1));
+    fontSize *= 0.995;
+    return { fontSize, width: measured * fontSize, offset: -left * fontSize };
+  }
+  async function buildTranslatedPDF(bytes, pages, translations, { signal, minFontScale = 0.7, onStatus } = {}) {
+    check(signal);
+    const doc = await PDFLib.PDFDocument.load(new Uint8Array(bytes.slice(0)));
+    if (!window.fontkit) throw new Error('Libreria fontkit non disponibile. Ricarica la pagina.');
+    doc.registerFontkit(window.fontkit);
+    const warnings = new Set(), resolve = createFontResolver(doc, signal, warnings, onStatus), plans = [];
+    // Validate every segment/font before touching original content streams.
+    for (const page of pages) {
+      const plan = [];
+      for (const block of page.blocks) {
+        check(signal); const raw = translations[block.id];
+        if (typeof raw !== 'string' || !raw.trim()) throw new Error(`Traduzione assente per ${block.id}.`);
+        const text = raw.replace(/\s+/gu, ' ').trim(), runs = await resolve(block, text), fit = fitText(block, runs);
+        if (fit.fontSize < block.fontSize * minFontScale) warnings.add('Alcuni testi sono stati ridotti oltre la soglia di leggibilità impostata per mantenerli nel riquadro originale.');
+        plan.push({ block, runs, ...fit });
+      }
+      plans.push(plan);
+    }
+    const visited = new Set();
+    for (let i = 0; i < pages.length; i++) {
+      check(signal); const page = doc.getPage(i); onStatus?.(`Composizione pagina ${i + 1}/${pages.length}`);
+      if (!plans[i].length) continue;
+      removePageText(doc, page, visited);
+      for (const { block, runs, fontSize, offset } of plans[i]) {
+        page.pushOperators(PDFLib.pushGraphicsState(), PDFLib.concatTransformationMatrix(...block.matrix, block.x, block.y));
+        let x = offset;
+        for (const run of runs) { page.drawText(run.text, { x, y: 0, size: fontSize, font: run.font, color: PDFLib.rgb(...block.color), opacity: block.opacity ?? 1 }); x += run.font.widthOfTextAtSize(run.text, fontSize); }
+        page.pushOperators(PDFLib.popGraphicsState());
+      }
+      // Yield for the cancel button during long document builds.
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+    check(signal); const output = await doc.save(); check(signal);
+    return { bytes: output, warnings: [...warnings] };
+  }
+  async function openPreview(bytes) {
+    return pdfjsLib.getDocument({ data: new Uint8Array(bytes.slice(0)), isEvalSupported: false }).promise;
+  }
+  async function renderPageToCanvas(doc, pageNum, canvas, scale = 1.25) {
+    const page = await doc.getPage(pageNum), viewport = page.getViewport({ scale });
+    canvas.width = viewport.width; canvas.height = viewport.height;
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+  }
+  return { parsePDF, buildTranslatedPDF, openPreview, renderPageToCanvas,
+    // Exposed pure helpers are also used by the regression suite.
+    removeTextOperators, removePageText, fitText, fontSlug, rangeContains };
 })();

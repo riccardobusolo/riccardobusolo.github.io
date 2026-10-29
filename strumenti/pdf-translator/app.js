@@ -1,793 +1,231 @@
-/**
- * app.js — DocuShift AI
- * Controller minimale: Dark/Light Mode, Popup Setup API, Drag & Drop,
- * Traduzione e Anteprima Side-by-Side.
- */
-
+/* DocuShift 4: one cancellable operation at a time, no shared request controllers. */
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('[DocuShift v3.9] Initialized - PDFLib ready:', typeof window.PDFLib !== 'undefined', 'fontkit ready:', typeof window.fontkit !== 'undefined');
-
-  // Theme Toggle
-  const btnThemeToggle = document.getElementById('btn-theme-toggle');
-  let currentTheme = localStorage.getItem('docushift_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-  applyTheme(currentTheme);
-
-  function applyTheme(theme) {
-    currentTheme = theme;
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('docushift_theme', theme);
+  const $ = id => document.getElementById(id);
+  let file = null, bytes = null, parsed = null, language = null, connected = false;
+  let operation = null, downloadUrl = null, previews = [], currentPage = 1, zoom = 1.25, rendering = false;
+  const providerNames = { openai: 'OpenAI', gemini: 'Gemini' };
+  AIService.initAutoAuth();
+  function toast(message, error = false) {
+    const item = document.createElement('div'); item.className = `toast toast--${error ? 'error' : 'success'}`;
+    const text = document.createElement('span'); text.textContent = message;
+    const close = document.createElement('button'); close.className = 'toast__close'; close.textContent = '×'; close.setAttribute('aria-label', 'Chiudi avviso'); close.onclick = () => item.remove();
+    item.append(text, close); $('toast-container').append(item); setTimeout(() => item.remove(), error ? 12000 : 5000);
   }
-
-  btnThemeToggle.addEventListener('click', () => {
-    applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-  });
-
-  // Elementi Principali
-  const dropzone = document.getElementById('dropzone');
-  const fileInput = document.getElementById('file-input');
-  const fileInfo = document.getElementById('file-info');
-  const fileInfoName = document.getElementById('file-info-name');
-  const fileInfoMeta = document.getElementById('file-info-meta');
-  const btnRemoveFile = document.getElementById('btn-remove-file');
-  const detectedLangText = document.getElementById('detected-lang-text');
-  const targetLangSelect = document.getElementById('target-lang-select');
-  const btnTranslate = document.getElementById('btn-translate');
-
-  // Elementi Progress Card
-  const progressCard = document.getElementById('progress-card');
-  const progressTitle = document.getElementById('progress-title');
-  const progressSubtitle = document.getElementById('progress-subtitle');
-  const progressPercent = document.getElementById('progress-percent');
-  const progressBarFill = document.getElementById('progress-bar-fill');
-  const progressErrorBox = document.getElementById('progress-error-box');
-  const progressErrorText = document.getElementById('progress-error-text');
-  const btnDismissProgressError = document.getElementById('btn-dismiss-progress-error');
-  const step1 = document.getElementById('step-1');
-  const step2 = document.getElementById('step-2');
-  const step3 = document.getElementById('step-3');
-  const step4 = document.getElementById('step-4');
-
-  // Pulsanti Azioni Progress (Annulla e Scala Modello)
-  const btnCancelTranslate = document.getElementById('btn-cancel-translate');
-  const btnDowngradeModel = document.getElementById('btn-downgrade-model');
-  const btnDowngradeLabel = document.getElementById('btn-downgrade-label');
-
-  // Elementi Viewer
-  const viewerSection = document.getElementById('viewer-section');
-  const btnPrevPage = document.getElementById('btn-prev-page');
-  const btnNextPage = document.getElementById('btn-next-page');
-  const viewerPageIndicator = document.getElementById('viewer-page-indicator');
-  const btnZoomIn = document.getElementById('btn-zoom-in');
-  const btnZoomOut = document.getElementById('btn-zoom-out');
-  const btnDownloadPdf = document.getElementById('btn-download-pdf');
-  const canvasOriginal = document.getElementById('canvas-original');
-  const canvasTranslated = document.getElementById('canvas-translated');
-
-  // Elementi Popup Centro Schermata API
-  const apiSetupPopup = document.getElementById('api-setup-popup');
-  const popupGeminiKey = document.getElementById('popup-gemini-key');
-  const btnPopupClipboard = document.getElementById('btn-popup-clipboard');
-  const btnPopupSave = document.getElementById('btn-popup-save');
-  const btnClosePopup = document.getElementById('btn-close-popup');
-
-  // Elementi Modale Impostazioni
-  const btnOpenSettings = document.getElementById('btn-open-settings');
-  const btnCloseSettings = document.getElementById('btn-close-settings');
-  const settingsModal = document.getElementById('settings-modal');
-  const modalTabs = document.querySelectorAll('.modal-tab');
-  const tabPanes = document.querySelectorAll('.tab-pane');
-
-  const btnClipboardDetect = document.getElementById('btn-clipboard-detect');
-  const btnCopyMagicLink = document.getElementById('btn-copy-magic-link');
-  const inputGeminiKey = document.getElementById('input-gemini-key');
-  const btnTestGemini = document.getElementById('btn-test-gemini');
-  const modelStatusQuality = document.getElementById('model-status-quality');
-  const quotaCountdownText = document.getElementById('quota-countdown-text');
-  const quotaBarFill = document.getElementById('quota-bar-fill');
-
-  const btnAddGlossaryRow = document.getElementById('btn-add-glossary-row');
-  const btnExportCsv = document.getElementById('btn-export-csv');
-  const btnImportJson = document.getElementById('btn-import-json');
-  const glossaryFileInput = document.getElementById('glossary-file-input');
-  const excelTableContainer = document.getElementById('excel-table-container');
-
-  const rangeFontScale = document.getElementById('range-font-scale');
-  const fontScaleVal = document.getElementById('font-scale-val');
-  const toastContainer = document.getElementById('toast-container');
-
-  // Stato dell'applicazione
-  let currentFile = null;
-  let originalPdfBytes = null;
-  let parsedPdfData = null;
-  let translatedPdfBytes = null;
-  let currentPage = 1;
-  let totalPages = 1;
-  let currentZoom = 1.25;
-  let quotaTimerInterval = null;
-  let isTranslating = false;
-  let isTranslationCancelled = false;
-
-  // Inizializzazione automatica Magic Link / config locale
-  const autoAuthResult = AIService.initAutoAuth();
-  if (autoAuthResult.success) {
-    showToast(autoAuthResult.message, 'success');
+  function status(text) { $('connection-status').textContent = text; }
+  function updateControls() {
+    const busy = !!operation;
+    $('file-input').disabled = !connected || busy;
+    $('dropzone').setAttribute('aria-disabled', String(!connected || busy));
+    $('btn-remove-file').disabled = busy;
+    $('btn-translate').disabled = busy || !connected || !parsed || !language;
+    $('target-lang-select').disabled = busy;
+    $('btn-connect').disabled = busy;
+    $('btn-retry-language').disabled = busy;
+    for (const id of ['popup-provider', 'popup-model', 'popup-api-key', 'popup-remember', 'btn-popup-save', 'btn-popup-clipboard', 'settings-provider', 'settings-model', 'input-api-key', 'settings-remember', 'btn-test-gemini', 'btn-clipboard-detect', 'btn-add-glossary-row', 'btn-import-json', 'range-font-scale']) $(id).disabled = busy;
+    $('excel-table-container').inert = busy;
+    $('btn-cancel-translate').style.display = busy ? 'inline-flex' : 'none';
   }
-
-  loadSettings();
-  renderGlossary();
-  startQuotaMonitoring();
-
-  // Controllo startup: se non c'è API key, mostra popup centrale dopo 600ms
-  setTimeout(() => {
-    const key = AIService.getKey();
-    if (!key) {
-      openApiPopup();
-    }
-  }, 600);
-
-  // =========================================================================
-  // GESTIONE POPUP CENTRALE API
-  // =========================================================================
-  function openApiPopup() {
-    apiSetupPopup.classList.add('active');
-    setTimeout(() => popupGeminiKey.focus(), 150);
+  function progress(percent, title, subtitle, step = 1) {
+    $('progress-card').classList.add('active'); $('progress-percent').textContent = `${percent}%`;
+    $('progress-bar-fill').style.width = `${percent}%`; $('progress-title').textContent = title; $('progress-subtitle').textContent = subtitle;
+    for (let n = 1; n <= 4; n++) { $(`step-${n}`).classList.toggle('current', n === step); $(`step-${n}`).classList.toggle('done', n < step); }
   }
-
-  function closeApiPopup() {
-    apiSetupPopup.classList.remove('active');
+  async function run(task) {
+    if (operation) return;
+    const ctrl = new AbortController(); operation = ctrl; updateControls();
+    $('progress-error-box').style.display = 'none';
+    try { await task(ctrl.signal); }
+    catch (err) {
+      const cancelled = ctrl.signal.aborted || err.name === 'AbortError';
+      ctrl.abort(); // Stop any language request still running alongside PDF parsing.
+      if (cancelled) progress(0, 'Operazione annullata', 'Puoi riprovare o scegliere un altro documento.');
+      else { $('progress-title').textContent = 'Operazione interrotta'; $('progress-error-text').textContent = err.message; $('progress-error-box').style.display = 'flex'; toast(err.message, true); }
+    } finally { if (operation === ctrl) operation = null; updateControls(); }
   }
+  $('btn-cancel-translate').onclick = () => { operation?.abort(); $('progress-subtitle').textContent = 'Annullamento in corso…'; };
+  $('btn-dismiss-progress-error').onclick = () => $('progress-error-box').style.display = 'none';
 
-  btnClosePopup.addEventListener('click', closeApiPopup);
-  apiSetupPopup.addEventListener('click', (e) => {
-    if (e.target === apiSetupPopup) closeApiPopup();
-  });
-
-  btnPopupClipboard.addEventListener('click', async () => {
-    try {
-      const res = await AIService.detectKeyFromClipboard();
-      popupGeminiKey.value = res.key;
-      loadSettings();
-      closeApiPopup();
-      showToast('Chiave salvata', 'success');
-    } catch (e) {
-      showToast(e.message, 'error');
+  function fillApiForms() {
+    const p = AIService.getProvider(), key = AIService.getKey(), model = AIService.getModel();
+    for (const prefix of ['popup', 'settings']) {
+      $(`${prefix}-provider`).value = p; $(`${prefix}-model`).value = model;
+      $(`${prefix}-remember`).checked = !!localStorage.getItem(`docushift_${p}_key`);
+      $(`${prefix}-key-link`).href = p === 'openai' ? 'https://platform.openai.com/api-keys' : 'https://aistudio.google.com/app/apikey';
     }
-  });
-
-  btnPopupSave.addEventListener('click', async () => {
-    const key = popupGeminiKey.value.trim();
-    if (key) {
-      AIService.setKey(key);
-      loadSettings();
-      btnPopupSave.disabled = true;
-      btnPopupSave.textContent = 'Verifica...';
-      const res = await AIService.testConnection();
-      btnPopupSave.disabled = false;
-      btnPopupSave.textContent = 'Salva';
-      if (res.ok) {
-        closeApiPopup();
-        showToast(`Connesso a ${res.model}`, 'success');
-      } else {
-        showToast(`Verifica: ${res.error}`, 'error', 7000);
-      }
-    } else {
-      showToast('Inserisci prima la tua chiave API', 'error');
-    }
-  });
-
-  popupGeminiKey.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      btnPopupSave.click();
-    }
-  });
-
-  // =========================================================================
-  // GESTIONE DRAG & DROP E FILE
-  // =========================================================================
-  dropzone.addEventListener('click', () => fileInput.click());
-
-  dropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropzone.classList.add('dragover');
-  });
-
-  dropzone.addEventListener('dragleave', () => {
-    dropzone.classList.remove('dragover');
-  });
-
-  dropzone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('dragover');
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileSelected(e.dataTransfer.files[0]);
-    }
-  });
-
-  fileInput.addEventListener('change', (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleFileSelected(e.target.files[0]);
-    }
-  });
-
-  btnRemoveFile.addEventListener('click', resetLoadedFile);
-
-  async function handleFileSelected(file) {
-    if (!file || file.type !== 'application/pdf') {
-      showToast('Seleziona un file PDF.', 'error');
-      return;
-    }
-
-    currentFile = file;
-    fileInfoName.textContent = file.name;
-    const sizeKB = Math.round(file.size / 1024);
-    fileInfoMeta.textContent = `${sizeKB} KB`;
-    fileInfo.classList.add('active');
-    dropzone.style.display = 'none';
-
-    try {
-      originalPdfBytes = await file.arrayBuffer();
-      // Passa una copia clonata per non rischiare di scollegare (detach) originalPdfBytes
-      parsedPdfData = await PDFEngine.parsePDF(originalPdfBytes.slice(0));
-      totalPages = parsedPdfData.numPages;
-      fileInfoMeta.textContent = `${sizeKB} KB • ${totalPages} ${totalPages === 1 ? 'pagina' : 'pagine'}`;
-      btnTranslate.disabled = false;
-
-      // Auto-detect lingua con auto-switch intelligente del target
-      const sampleText = parsedPdfData.pages
-        .flatMap(p => p.blocks)
-        .slice(0, 6)
-        .map(b => b.text)
-        .join(' ');
-
-      if (sampleText.trim().length > 0) {
-        AIService.detectLanguage(sampleText).then(lang => {
-          detectedLangText.textContent = lang;
-          // Se la lingua rilevata è Italiano e la destinazione è ancora su Italiano, imposta Inglese
-          if (lang.toLowerCase().includes('ita') && targetLangSelect.value === 'Italiano') {
-            targetLangSelect.value = 'Inglese';
-          } else if (lang.toLowerCase().includes('ing') && targetLangSelect.value === 'Inglese') {
-            targetLangSelect.value = 'Italiano';
-          }
-        });
-      }
-
-      // Se non ci sono API, ricorda di inserirle
-      if (!AIService.getKey()) {
-        openApiPopup();
-      }
-    } catch (err) {
-      console.error(err);
-      showToast('Errore lettura PDF: ' + err.message, 'error', 10000);
-      resetLoadedFile();
-    }
+    $('popup-api-key').value = key; $('input-api-key').value = key;
+    $('popup-model').placeholder = p === 'gemini' ? 'Automatico dai modelli disponibili' : 'gpt-6-luna';
+    $('model-status-quality').textContent = `${providerNames[p]} · ${model || 'modello automatico'}`;
   }
-
-  function resetLoadedFile() {
-    currentFile = null;
-    originalPdfBytes = null;
-    parsedPdfData = null;
-    translatedPdfBytes = null;
-    fileInput.value = '';
-    fileInfo.classList.remove('active');
-    dropzone.style.display = 'block';
-    btnTranslate.disabled = true;
-    detectedLangText.textContent = 'Auto-detect';
-    progressCard.classList.remove('active');
-    if (progressErrorBox) progressErrorBox.style.display = 'none';
-    viewerSection.classList.remove('active');
-  }
-
-  if (btnDismissProgressError) {
-    btnDismissProgressError.addEventListener('click', () => {
-      progressErrorBox.style.display = 'none';
-      progressCard.classList.remove('active');
+  function openPopup() { fillApiForms(); $('api-setup-popup').classList.add('active'); $('popup-api-key').focus(); }
+  function closePopup() { $('api-setup-popup').classList.remove('active'); $('btn-connect').focus(); }
+  $('btn-connect').onclick = openPopup; $('btn-close-popup').onclick = closePopup;
+  $('btn-open-settings').onclick = () => { fillApiForms(); $('settings-modal').classList.add('active'); $('btn-close-settings').focus(); };
+  $('btn-close-settings').onclick = () => { $('settings-modal').classList.remove('active'); $('btn-open-settings').focus(); };
+  for (const id of ['settings-modal', 'api-setup-popup']) $(id).addEventListener('click', e => { if (e.target === $(id)) $(id).classList.remove('active'); });
+  document.addEventListener('keydown', e => {
+    const modal = ['api-setup-popup', 'settings-modal'].map($).find(el => el.classList.contains('active'));
+    if (!modal) return;
+    if (e.key === 'Escape') { modal.classList.remove('active'); $('btn-connect').focus(); }
+    if (e.key === 'Tab') {
+      const focusable = [...modal.querySelectorAll('button, input, select, a[href], [tabindex="0"]')].filter(el => !el.disabled && el.getClientRects().length);
+      const first = focusable[0], last = focusable.at(-1);
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+    }
+  });
+  for (const prefix of ['popup', 'settings']) $(`${prefix}-provider`).onchange = e => {
+    if (operation) return; AIService.setProvider(e.target.value); connected = false; language = null;
+    fillApiForms(); updateControls(); status('Connetti la chiave del provider selezionato.');
+  };
+  async function connect(prefix) {
+    if (operation) return;
+    const key = $(prefix === 'popup' ? 'popup-api-key' : 'input-api-key').value.trim();
+    if (!key) return toast('Inserisci la tua API key.', true);
+    AIService.setKey(key, $(`${prefix}-remember`).checked); AIService.setModel($(`${prefix}-model`).value);
+    connected = false; language = null;
+    await run(async signal => {
+      progress(0, 'Verifica connessione', 'Invio di una breve richiesta al modello…');
+      const result = await AIService.testConnection({ signal });
+      if (!result.ok) { status('Connessione non riuscita. Controlla le impostazioni API.'); throw new Error(result.error); }
+      connected = true; $('model-status-quality').textContent = result.model;
+      status(`Connesso a ${result.model}. Carica il PDF per rilevare la lingua.`);
+      $('api-setup-popup').classList.remove('active'); $('settings-modal').classList.remove('active');
+      $('progress-card').classList.remove('active'); fillApiForms();
+      if (parsed) await detect(signal);
     });
   }
+  $('btn-popup-save').onclick = () => connect('popup'); $('btn-test-gemini').onclick = () => connect('settings');
+  $('popup-api-key').onkeydown = e => { if (e.key === 'Enter') connect('popup'); };
+  for (const [id, target] of [['btn-popup-clipboard', 'popup-api-key'], ['btn-clipboard-detect', 'input-api-key']]) $(id).onclick = async () => {
+    try { $(target).value = (await navigator.clipboard.readText()).trim(); } catch (_) { toast('Incolla la chiave direttamente nel campo.', true); }
+  };
+  for (const id of ['popup-api-key', 'input-api-key', 'popup-model', 'settings-model']) $(id).addEventListener('input', () => {
+    connected = false; language = null; updateControls(); status('Impostazioni modificate: premi Connetti o Verifica.');
+  });
 
-  // Helper per aggiornare visibilità e testo del pulsante "Scala Modello"
-  function updateDowngradeButton() {
-    if (!btnDowngradeModel || !btnDowngradeLabel) return;
-    if (isTranslating && AIService.hasNextModel()) {
-      const next = AIService.getNextModel();
-      btnDowngradeLabel.textContent = `Scala a ${next.name}`;
-      btnDowngradeModel.style.display = 'inline-flex';
-    } else {
-      btnDowngradeModel.style.display = 'none';
-    }
+  async function discardResult() {
+    $('viewer-section').classList.remove('active'); $('result-warnings').hidden = true;
+    if (downloadUrl) URL.revokeObjectURL(downloadUrl); downloadUrl = null; $('btn-download-pdf').removeAttribute('href');
+    await Promise.all(previews.map(p => p.destroy())); previews = [];
   }
-
-  // Listener per pulsante Annulla
-  if (btnCancelTranslate) {
-    btnCancelTranslate.addEventListener('click', () => {
-      if (!isTranslating) return;
-      isTranslationCancelled = true;
-      AIService.cancelCurrentOperation();
-      progressTitle.textContent = 'Traduzione annullata';
-      if (progressSubtitle) {
-        progressSubtitle.textContent = 'Operazione interrotta dall\'utente.';
-      }
-      progressBarFill.style.background = 'var(--text-tertiary)';
-      btnCancelTranslate.style.display = 'none';
-      if (btnDowngradeModel) btnDowngradeModel.style.display = 'none';
-      btnTranslate.disabled = false;
-      showToast('Traduzione annullata dall\'utente.', 'warning', 4000);
-    });
+  async function reset() {
+    if (operation || rendering) return;
+    await discardResult(); file = bytes = parsed = language = null;
+    $('file-input').value = ''; $('file-info').classList.remove('active'); $('dropzone').style.display = '';
+    $('detected-lang-text').textContent = 'Auto-detect'; $('btn-retry-language').hidden = true; $('progress-card').classList.remove('active'); updateControls();
   }
-
-  // Listener per pulsante Scala Modello (su richiesta esplicita dell'utente)
-  if (btnDowngradeModel) {
-    btnDowngradeModel.addEventListener('click', () => {
-      if (!isTranslating) return;
-      const nextModel = AIService.switchToNextModel();
-      if (nextModel) {
-        showToast(`Passaggio a ${nextModel.name} attivato!`, 'info', 3000);
-        updateDowngradeButton();
-        if (progressSubtitle) {
-          progressSubtitle.textContent = `Richiesto passaggio a ${nextModel.name}. Riconnessione in corso...`;
-        }
-        progressTitle.textContent = `2. Traduzione con ${nextModel.name}`;
-      }
-    });
-  }
-
-  // =========================================================================
-  // PIPELINE DI TRADUZIONE CON STATI ESPLICATIVI E RESILIENZA AGLI ERRORI
-  // =========================================================================
-  btnTranslate.addEventListener('click', async () => {
-    if (!originalPdfBytes || !parsedPdfData) return;
-
-    if (!AIService.getKey()) {
-      openApiPopup();
-      return;
-    }
-
-    isTranslating = true;
-    isTranslationCancelled = false;
-    AIService.resetWorkingModel();
-    const targetLang = targetLangSelect.value;
-    const detected = (detectedLangText.textContent || '').trim().toLowerCase();
-    if (detected && !detected.includes('auto') && detected.includes(targetLang.toLowerCase())) {
-      showToast(`Nota: La lingua rilevata (${detectedLangText.textContent}) coincide con la destinazione (${targetLang}). Verifica di aver impostato la lingua corretta.`, 'warning', 6000);
-    }
-    btnTranslate.disabled = true;
-    if (progressErrorBox) progressErrorBox.style.display = 'none';
-    progressBarFill.style.background = 'var(--accent)';
-    progressCard.classList.add('active');
-    viewerSection.classList.remove('active');
-
-    // Mostra pulsanti Annulla e Scala Modello
-    if (btnCancelTranslate) btnCancelTranslate.style.display = 'inline-flex';
-    updateDowngradeButton();
-
-    updateProgress(10, '1. Analisi del documento PDF', `Estrazione testo, coordinate e font per ${totalPages} pagine...`, 1);
-
+  async function detect(signal, sample) {
+    language = null; $('detected-lang-text').textContent = 'Rilevamento…'; $('btn-retry-language').hidden = true;
     try {
-      if (isTranslationCancelled) return;
-      const allBlocks = parsedPdfData.pages.flatMap(p => p.blocks);
-      if (allBlocks.length === 0) {
-        throw new Error('Nessun testo estraibile rilevato nel documento. Se il PDF è una scansione o un\'immagine, è necessario un file con testo vettoriale selezionabile.');
-      }
-
-      updateProgress(22, 'Preparazione traduzione', `Rilevati ${allBlocks.length} elementi di testo complessivi distribuiti su ${totalPages} pagine.`, 1);
-
-      const glossaryRules = GlossaryManager.getRulesForTarget(targetLang);
-      const translationsMap = {};
-      const batchSize = 18;
-      const totalBatches = Math.ceil(allBlocks.length / batchSize);
-
-      for (let i = 0; i < allBlocks.length; i += batchSize) {
-        if (isTranslationCancelled) return;
-        const batch = allBlocks.slice(i, i + batchSize);
-        const batchIndex = Math.floor(i / batchSize) + 1;
-        const percent = 25 + Math.round((batchIndex / totalBatches) * 55);
-        const currentModelName = AIService.getActiveModel().name;
-
-        updateDowngradeButton();
-        updateProgress(
-          percent,
-          `2. Traduzione con ${currentModelName}`,
-          `Traduzione blocco ${batchIndex} di ${totalBatches} (${batch.length} frasi verso ${targetLang})...`,
-          2
-        );
-
-        // Notifica in tempo reale se Google Gemini risponde con 503 (picco di traffico) o fallback manuale
-        const onStatus = (info) => {
-          if (isTranslationCancelled) return;
-          updateDowngradeButton();
-          const activeModelName = AIService.getActiveModel().name;
-          if (info.status === 'switching') {
-            updateProgress(
-              percent,
-              `Passaggio a ${activeModelName}...`,
-              info.message,
-              2
-            );
-          } else if (info.status === 'retry') {
-            updateProgress(
-              percent,
-              `2. Traduzione con ${info.modelName || activeModelName}`,
-              info.message,
-              2
-            );
-          }
-        };
-
-        const translatedBatch = await AIService.translateBatch(batch, targetLang, glossaryRules, onStatus);
-        if (isTranslationCancelled) return;
-
-        translatedBatch.forEach((item, idx) => {
-          if (item) {
-            if (item.id) translationsMap[item.id] = item.translated;
-            if (batch[idx] && batch[idx].id) translationsMap[batch[idx].id] = item.translated;
-          }
-        });
-      }
-
-      if (isTranslationCancelled) return;
-      updateProgress(82, '3. Adattamento grafico del layout', 'Calcolo ingombri e ridimensionamento proporzionale font per preservare grafica e immagini...', 3);
-      const minFontScale = parseInt(rangeFontScale.value, 10) / 100;
-
-      if (isTranslationCancelled) return;
-      updateProgress(92, '4. Compilazione del nuovo file PDF', `Inserimento testi tradotti e composizione vettoriale (${totalPages} pagine)...`, 4);
-      
-      // Assicura un buffer fresco e mai scollegato (non-detached) rileggendolo direttamente dal file caricato
-      let compileBytes = null;
-      if (currentFile) {
-        try {
-          compileBytes = await currentFile.arrayBuffer();
-        } catch (readErr) {
-          console.warn('[DocuShift] Rilettura file non riuscita:', readErr);
-        }
-      }
-      if (!compileBytes || compileBytes.byteLength === 0) {
-        compileBytes = (originalPdfBytes && originalPdfBytes.byteLength > 0) ? originalPdfBytes.slice(0) : null;
-      }
-      if (!compileBytes) {
-        throw new Error('Buffer del documento originale non disponibile o scollegato. Ricarica il file PDF.');
-      }
-
-      if (isTranslationCancelled) return;
-      translatedPdfBytes = await PDFEngine.buildTranslatedPDF(
-        compileBytes,
-        parsedPdfData.pages,
-        translationsMap,
-        { minFontScale }
-      );
-
-      if (isTranslationCancelled) return;
-      updateProgress(100, 'Traduzione completata con successo!', `Tutte le ${totalPages} pagine sono state tradotte. Visualizza l'anteprima o scarica il file.`, 4);
-      setTimeout(() => {
-        if (!isTranslating) progressCard.classList.remove('active');
-      }, 2500);
-
-      // Download link
-      const blob = new Blob([translatedPdfBytes], { type: 'application/pdf' });
-      const downloadUrl = URL.createObjectURL(blob);
-      btnDownloadPdf.href = downloadUrl;
-      const baseName = currentFile.name.replace(/\.[^/.]+$/, '');
-      btnDownloadPdf.download = `${baseName}_${targetLang.toLowerCase()}.pdf`;
-
-      // Viewer
-      currentPage = 1;
-      viewerSection.classList.add('active');
-      await renderViewerPages();
-      viewerSection.scrollIntoView({ behavior: 'smooth' });
-      showToast('Traduzione completata con successo!', 'success', 4000);
-
-    } catch (err) {
-      if (isTranslationCancelled || err.name === 'AbortError' || err.message?.includes('annullat')) {
-        progressTitle.textContent = 'Traduzione annullata';
-        if (progressSubtitle) {
-          progressSubtitle.textContent = 'Operazione interrotta dall\'utente.';
-        }
-        progressBarFill.style.background = 'var(--text-tertiary)';
-        return;
-      }
-
-      console.error(err);
-      progressTitle.textContent = 'Processo interrotto';
-      if (progressSubtitle) {
-        progressSubtitle.textContent = 'Si è verificato un errore durante la traduzione del documento.';
-      }
-      progressBarFill.style.background = 'var(--status-red)';
-      if (progressErrorText) {
-        progressErrorText.textContent = err.message || 'Errore imprevisto durante la traduzione.';
-      }
-      if (progressErrorBox) {
-        progressErrorBox.style.display = 'flex';
-      }
-
-      // Mostra l'errore chiaramente a schermo: rimosso a mano o automaticamente dopo 10 secondi
-      showToast(err.message || 'Errore durante la traduzione', 'error', 10000);
-    } finally {
-      isTranslating = false;
-      btnTranslate.disabled = false;
-      if (btnCancelTranslate) btnCancelTranslate.style.display = 'none';
-      if (btnDowngradeModel) btnDowngradeModel.style.display = 'none';
-    }
-  });
-
-  function updateProgress(percent, titleText, subtitleText, activeStepNum) {
-    progressPercent.textContent = `${percent}%`;
-    progressBarFill.style.width = `${percent}%`;
-    progressTitle.textContent = titleText;
-    if (progressSubtitle && subtitleText) {
-      progressSubtitle.textContent = subtitleText;
-    }
-
-    const steps = [step1, step2, step3, step4];
-    steps.forEach((step, idx) => {
-      const num = idx + 1;
-      step.classList.remove('current', 'done');
-      if (num < activeStepNum) {
-        step.classList.add('done');
-      } else if (num === activeStepNum) {
-        step.classList.add('current');
-      }
-    });
+      language = await AIService.detectLanguage(sample || parsed.pages.flatMap(p => p.blocks).map(b => b.text).join(' ').slice(0, 3500), { signal });
+      if (signal.aborted) throw new DOMException('Annullato', 'AbortError');
+      $('detected-lang-text').textContent = language.name;
+      status(`Lingua rilevata: ${language.name}. Scegli la lingua di destinazione e premi Traduci.`);
+    } catch (err) { $('detected-lang-text').textContent = 'Lingua non rilevata'; $('btn-retry-language').hidden = false; throw err; }
   }
-
-  // =========================================================================
-  // GESTIONE ANTEPRIMA (VIEWER)
-  // =========================================================================
-  async function renderViewerPages() {
-    viewerPageIndicator.textContent = `${currentPage} / ${totalPages}`;
-    btnPrevPage.disabled = (currentPage <= 1);
-    btnNextPage.disabled = (currentPage >= totalPages);
-
-    try {
-      let origToRender = null;
-      if (currentFile) {
-        try { origToRender = await currentFile.arrayBuffer(); } catch (e) {}
-      }
-      if (!origToRender && originalPdfBytes && originalPdfBytes.byteLength > 0) {
-        origToRender = originalPdfBytes.slice(0);
-      }
-      if (origToRender) {
-        await PDFEngine.renderPageToCanvas(origToRender, currentPage, canvasOriginal, currentZoom);
-      }
-      if (translatedPdfBytes && translatedPdfBytes.byteLength > 0) {
-        await PDFEngine.renderPageToCanvas(translatedPdfBytes.slice(0), currentPage, canvasTranslated, currentZoom);
-      }
-    } catch (e) {
-      console.warn('[DocuShift Viewer] Errore rendering anteprima:', e);
-    }
-  }
-
-  btnPrevPage.addEventListener('click', async () => {
-    if (currentPage > 1) {
-      currentPage--;
-      await renderViewerPages();
-    }
-  });
-
-  btnNextPage.addEventListener('click', async () => {
-    if (currentPage < totalPages) {
-      currentPage++;
-      await renderViewerPages();
-    }
-  });
-
-  btnZoomIn.addEventListener('click', async () => {
-    if (currentZoom < 2.2) {
-      currentZoom += 0.2;
-      await renderViewerPages();
-    }
-  });
-
-  btnZoomOut.addEventListener('click', async () => {
-    if (currentZoom > 0.8) {
-      currentZoom -= 0.2;
-      await renderViewerPages();
-    }
-  });
-
-  // =========================================================================
-  // GESTIONE MODALE IMPOSTAZIONI
-  // =========================================================================
-  btnOpenSettings.addEventListener('click', openModal);
-  btnCloseSettings.addEventListener('click', closeModal);
-  settingsModal.addEventListener('click', (e) => {
-    if (e.target === settingsModal) closeModal();
-  });
-
-  function openModal() {
-    loadSettings();
-    settingsModal.classList.add('active');
-  }
-
-  function closeModal() {
-    settingsModal.classList.remove('active');
-  }
-
-  modalTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      modalTabs.forEach(t => t.classList.remove('active'));
-      tabPanes.forEach(p => p.classList.remove('active'));
-
-      tab.classList.add('active');
-      const targetPane = document.getElementById(tab.dataset.tab);
-      if (targetPane) targetPane.classList.add('active');
-
-      if (tab.dataset.tab === 'tab-glossary') {
-        renderGlossary();
-      }
-    });
-  });
-
-  btnClipboardDetect.addEventListener('click', async () => {
-    try {
-      const res = await AIService.detectKeyFromClipboard();
-      loadSettings();
-      showToast(`Chiave ${res.label} salvata`, 'success');
-    } catch (err) {
-      showToast(err.message, 'error');
-    }
-  });
-
-  btnCopyMagicLink.addEventListener('click', async () => {
-    const link = AIService.generateMagicLink();
-    if (!link) {
-      showToast('Inserisci prima la tua API Key Gemini', 'error');
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(link);
-      showToast('Magic Link copiato negli appunti', 'success');
-    } catch (e) {
-      prompt('Magic Link:', link);
-    }
-  });
-
-  inputGeminiKey.addEventListener('change', () => {
-    AIService.setKey(inputGeminiKey.value);
-    showToast('API Key salvata', 'info');
-  });
-
-  btnTestGemini.addEventListener('click', async () => {
-    btnTestGemini.textContent = '...';
-    const key = inputGeminiKey.value.trim() || AIService.getKey();
-    if (key) AIService.setKey(key);
-    
-    const res = await AIService.testConnection();
-    btnTestGemini.textContent = 'Verifica';
-    if (res.ok) {
-      showToast(`Connesso a ${res.model}`, 'success');
-    } else {
-      showToast(`Errore: ${res.error}`, 'error', 7000);
-    }
-  });
-
-  rangeFontScale.addEventListener('input', () => {
-    fontScaleVal.textContent = `${rangeFontScale.value}%`;
-    localStorage.setItem('docushift_min_font_scale', rangeFontScale.value);
-  });
-
-  function loadSettings() {
-    const key = AIService.getKey();
-    if (inputGeminiKey) inputGeminiKey.value = key;
-    if (popupGeminiKey) popupGeminiKey.value = key;
-
-    const savedFontScale = localStorage.getItem('docushift_min_font_scale') || '70';
-    rangeFontScale.value = savedFontScale;
-    fontScaleVal.textContent = `${savedFontScale}%`;
-
-    updateModelStatusCard();
-  }
-
-  function updateModelStatusCard() {
-    const model = AIService.getActiveModel();
-    modelStatusQuality.textContent = model.qualityLabel;
-    updateQuotaUI();
-  }
-
-  function updateQuotaUI() {
-    const status = AIService.getQuotaStatus();
-    quotaBarFill.style.width = `${status.percentage}%`;
-
-    if (status.secondsUntilReset > 0) {
-      quotaCountdownText.textContent = `Reset tra ${status.secondsUntilReset}s`;
-    } else {
-      quotaCountdownText.textContent = `Pronto`;
-    }
-  }
-
-  function startQuotaMonitoring() {
-    if (quotaTimerInterval) clearInterval(quotaTimerInterval);
-    quotaTimerInterval = setInterval(updateQuotaUI, 1000);
-  }
-
-  // =========================================================================
-  // GESTIONE GLOSSARIO
-  // =========================================================================
-  function renderGlossary() {
-    GlossaryManager.renderTable(excelTableContainer, () => {});
-  }
-
-  btnAddGlossaryRow.addEventListener('click', () => {
-    GlossaryManager.addEntry('', '', '', '', '', '');
-    renderGlossary();
-  });
-
-  btnExportCsv.addEventListener('click', () => {
-    GlossaryManager.exportCSV();
-    showToast('Esportato CSV', 'info');
-  });
-
-  btnImportJson.addEventListener('click', () => {
-    glossaryFileInput.click();
-  });
-
-  glossaryFileInput.addEventListener('change', (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
+  async function loadFile(selected) {
+    if (operation || rendering) return;
+    if (!connected) { openPopup(); return; }
+    if (!selected || (!/\.pdf$/i.test(selected.name) && selected.type !== 'application/pdf')) return toast('Seleziona un file PDF.', true);
+    await reset();
+    await run(async signal => {
+      file = selected; $('file-info-name').textContent = file.name; $('file-info-meta').textContent = 'Lettura PDF…';
+      $('file-info').classList.add('active'); $('dropzone').style.display = 'none';
+      progress(5, 'Lettura del documento', 'Il rilevamento della lingua parte dal primo testo disponibile.');
+      let detectedPromise = null;
       try {
-        if (GlossaryManager.importJSON(event.target.result)) {
-          renderGlossary();
-          showToast('Glossario importato', 'success');
-        }
-      } catch (err) {
-        showToast('File non valido', 'error');
+        bytes = await file.arrayBuffer();
+        parsed = await PDFEngine.parsePDF(bytes, { signal,
+          onSample: sample => { detectedPromise = detect(signal, sample).then(() => null, err => err); },
+          onProgress: (n, total) => progress(5 + Math.round(10 * n / total), 'Lettura del documento', `Pagina ${n}/${total} · ${language?.name || 'rilevamento lingua in corso…'}`)
+        });
+        $('file-info-meta').textContent = `${Math.round(file.size / 1024)} KB · ${parsed.numPages} pagine`;
+        if (!parsed.pages.some(p => p.blocks.length)) throw new Error('Nessun testo selezionabile. Le scansioni richiedono OCR, non disponibile in questo strumento.');
+        const detectionError = detectedPromise ? await detectedPromise : new Error('Nessun testo per rilevare la lingua.');
+        if (detectionError) throw detectionError;
+        $('progress-card').classList.remove('active');
+      } catch (err) { if (!parsed) { bytes = null; language = null; } throw err; }
+    });
+  }
+  $('btn-retry-language').onclick = () => run(async signal => { if (!parsed) return; progress(10, 'Rilevamento lingua', 'Interrogazione del provider selezionato…'); await detect(signal); $('progress-card').classList.remove('active'); });
+  $('dropzone').onclick = () => { if (!connected) openPopup(); else if (!operation) $('file-input').click(); };
+  $('dropzone').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('dropzone').click(); } };
+  $('dropzone').ondragover = e => { e.preventDefault(); if (connected && !operation) $('dropzone').classList.add('dragover'); };
+  $('dropzone').ondragleave = () => $('dropzone').classList.remove('dragover');
+  $('dropzone').ondrop = e => { e.preventDefault(); $('dropzone').classList.remove('dragover'); loadFile(e.dataTransfer.files?.[0]); };
+  $('file-input').onchange = e => loadFile(e.target.files?.[0]); $('btn-remove-file').onclick = reset;
+
+  $('btn-translate').onclick = () => {
+    if (!parsed || !language || !connected || operation || rendering) return;
+    run(async signal => {
+      await discardResult();
+      const target = $('target-lang-select').value;
+      const all = parsed.pages.flatMap(p => p.blocks), batches = []; let batch = [], count = 0;
+      for (const block of all) { if (batch.length && (batch.length >= 18 || count + block.text.length > 9000)) { batches.push(batch); batch = []; count = 0; } batch.push(block); count += block.text.length; }
+      if (batch.length) batches.push(batch);
+      const translations = Object.create(null), rules = GlossaryManager.getRulesForTarget(target);
+      for (let i = 0; i < batches.length; i++) {
+        const subtitle = `Blocco ${i + 1}/${batches.length} · ${language.name} → ${target}`;
+        progress(20 + Math.round(55 * i / batches.length), 'Traduzione dei testi', subtitle, 2);
+        const result = await AIService.translateBatch(batches[i], target, rules, { signal, onStatus: info => { $('progress-subtitle').textContent = `${subtitle} · ${info.message}`; } });
+        result.forEach(item => { translations[item.id] = item.translated; });
       }
-    };
-    reader.readAsText(file);
-    glossaryFileInput.value = '';
+      progress(80, 'Ricerca dei font e adattamento', 'Metadati PDF → Fontsource → font temporanei → calcolo degli ingombri.', 3);
+      const result = await PDFEngine.buildTranslatedPDF(bytes, parsed.pages, translations, { signal, minFontScale: Number($('range-font-scale').value) / 100,
+        onStatus: message => { $('progress-subtitle').textContent = message; } });
+      if (signal.aborted) throw new DOMException('Annullato', 'AbortError');
+      progress(95, 'Preparazione anteprima', 'Apertura del PDF originale e del risultato…', 4);
+      const opened = [];
+      try {
+        opened.push(await PDFEngine.openPreview(bytes)); opened.push(await PDFEngine.openPreview(result.bytes));
+        if (signal.aborted) throw new DOMException('Annullato', 'AbortError');
+        previews = opened; currentPage = 1; zoom = 1.25; await render();
+      } catch (err) { await Promise.all(opened.map(p => p.destroy())); previews = []; throw err; }
+      downloadUrl = URL.createObjectURL(new Blob([result.bytes], { type: 'application/pdf' }));
+      $('btn-download-pdf').href = downloadUrl; $('btn-download-pdf').download = `${file.name.replace(/\.pdf$/i, '')}_${target.toLowerCase()}.pdf`;
+      const warnings = $('result-warnings'); warnings.replaceChildren();
+      if (result.warnings.length) { const title = document.createElement('strong'); title.textContent = 'Controlla questi adattamenti prima di usare il PDF:'; warnings.append(title); for (const warning of result.warnings) { const p = document.createElement('p'); p.textContent = warning; warnings.append(p); } warnings.hidden = false; }
+      $('viewer-section').classList.add('active');
+      progress(100, 'Traduzione completata', result.warnings.length ? 'PDF pronto. Sono presenti avvisi sui font o sulla leggibilità.' : 'PDF pronto per il download e il controllo visivo.', 4);
+      $('viewer-section').scrollIntoView({ behavior: 'smooth' });
+    });
+  };
+  async function render() {
+    if (rendering || previews.length !== 2) return;
+    rendering = true; for (const id of ['btn-prev-page', 'btn-next-page', 'btn-zoom-in', 'btn-zoom-out']) $(id).disabled = true;
+    try { await Promise.all([PDFEngine.renderPageToCanvas(previews[0], currentPage, $('canvas-original'), zoom), PDFEngine.renderPageToCanvas(previews[1], currentPage, $('canvas-translated'), zoom)]); }
+    finally {
+      rendering = false; $('viewer-page-indicator').textContent = `${currentPage} / ${parsed.numPages}`;
+      $('btn-prev-page').disabled = currentPage <= 1; $('btn-next-page').disabled = currentPage >= parsed.numPages;
+      $('btn-zoom-in').disabled = zoom >= 2.2; $('btn-zoom-out').disabled = zoom <= 0.5;
+    }
+  }
+  async function changeView(change) { if (rendering || operation) return; change(); try { await render(); } catch (err) { toast(`Anteprima non disponibile: ${err.message}`, true); } }
+  $('btn-prev-page').onclick = () => changeView(() => { currentPage = Math.max(1, currentPage - 1); });
+  $('btn-next-page').onclick = () => changeView(() => { currentPage = Math.min(parsed.numPages, currentPage + 1); });
+  $('btn-zoom-in').onclick = () => changeView(() => { zoom = Math.min(2.2, zoom + 0.2); });
+  $('btn-zoom-out').onclick = () => changeView(() => { zoom = Math.max(0.5, zoom - 0.2); });
+
+  document.querySelectorAll('.modal-tab').forEach(tab => tab.onclick = () => {
+    document.querySelectorAll('.modal-tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === tab.dataset.tab));
   });
-
-  // =========================================================================
-  // NOTIFICHE TOAST MINIMALI (Errori rimossi a mano o dopo 10 secondi)
-  // =========================================================================
-  function showToast(message, type = 'info', duration = null) {
-    // Di default: 10 secondi (10000ms) per gli errori, 3.5s per altri messaggi
-    const effectiveDuration = duration !== null ? duration : (type === 'error' ? 10000 : 3500);
-
-    const toast = document.createElement('div');
-    toast.className = `toast toast--${type}`;
-
-    let icon = `<span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); flex-shrink:0;"></span>`;
-    if (type === 'success') {
-      icon = `<span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--status-green); flex-shrink:0;"></span>`;
-    } else if (type === 'error') {
-      icon = `<span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--status-red); flex-shrink:0;"></span>`;
-    }
-
-    const content = document.createElement('div');
-    content.className = 'toast__content';
-    content.innerHTML = `${icon}<span>${escapeHtml(message)}</span>`;
-
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'toast__close';
-    closeBtn.title = 'Chiudi avviso';
-    closeBtn.setAttribute('aria-label', 'Chiudi avviso');
-    closeBtn.innerHTML = '&times;';
-
-    toast.appendChild(content);
-    toast.appendChild(closeBtn);
-    toastContainer.appendChild(toast);
-
-    let dismissTimer = null;
-
-    const dismiss = () => {
-      if (dismissTimer) clearTimeout(dismissTimer);
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateY(8px) scale(0.96)';
-      toast.style.transition = 'all 0.25s ease';
-      setTimeout(() => toast.remove(), 250);
-    };
-
-    closeBtn.addEventListener('click', dismiss);
-
-    if (effectiveDuration > 0) {
-      dismissTimer = setTimeout(dismiss, effectiveDuration);
-    }
-  }
-
-  function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
+  function renderGlossary() { GlossaryManager.renderTable($('excel-table-container'), () => {}); }
+  $('btn-add-glossary-row').onclick = () => { GlossaryManager.addEntry(); renderGlossary(); };
+  $('btn-export-csv').onclick = () => GlossaryManager.exportCSV();
+  $('btn-import-json').onclick = () => $('glossary-file-input').click();
+  $('glossary-file-input').onchange = async e => {
+    const selected = e.target.files?.[0]; if (!selected) return;
+    try { if (!GlossaryManager.importJSON(await selected.text())) throw new Error('Seleziona un glossario JSON valido.'); renderGlossary(); toast('Glossario importato.'); }
+    catch (err) { toast(err.message, true); } finally { e.target.value = ''; }
+  };
+  $('range-font-scale').value = localStorage.getItem('docushift_min_font_scale') || '70';
+  function fontScale() { $('font-scale-val').textContent = `${$('range-font-scale').value}%`; localStorage.setItem('docushift_min_font_scale', $('range-font-scale').value); }
+  $('range-font-scale').oninput = fontScale; fontScale();
+  let theme = localStorage.getItem('docushift_theme') || 'dark';
+  function applyTheme() { document.documentElement.dataset.theme = theme; localStorage.setItem('docushift_theme', theme); }
+  $('btn-theme-toggle').onclick = () => { theme = theme === 'dark' ? 'light' : 'dark'; applyTheme(); }; applyTheme();
+  setInterval(() => { $('quota-countdown-text').textContent = `${AIService.getQuotaStatus().used} richieste locali / ultimo minuto`; }, 1000);
+  fillApiForms(); renderGlossary(); updateControls();
+  if (AIService.getKey()) connect('popup'); else openPopup();
 });

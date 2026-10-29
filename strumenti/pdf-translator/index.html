@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DocuShift AI — Traduttore PDF</title>
-  <meta name="description" content="Traduci documenti PDF preservando fedelmente layout, grafica e immagini con modelli AI gratuiti.">
+  <meta name="description" content="Traduci PDF con OpenAI o Gemini, font gratuiti e adattamento automatico del testo.">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.47V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.48,0,14.47,0h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.99,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
@@ -21,7 +21,7 @@
   <a class="project-return" href="/progetti.html#strumenti" aria-label="Torna a Strumenti" title="Torna a Strumenti"><img src="/img/logo.svg" width="42" height="42" alt=""></a>
 
   <!-- Versione Software discreta in alto a destra -->
-  <div class="software-version" title="DocuShift v3.9" aria-hidden="true">v3.9</div>
+  <div class="software-version" title="DocuShift v4.0" aria-hidden="true">v4.0</div>
 
   <!-- Floating Navigation -->
   <header class="header">
@@ -49,7 +49,7 @@
 
       <!-- Destra: Versione e Ritorno a progetti -->
       <div class="header__right">
-        <span class="header__version" title="Versione del software">v3.9</span>
+        <span class="header__version" title="Versione del software">v4.0</span>
         <a href="/progetti.html#strumenti" class="icon-btn" title="Torna a Strumenti" aria-label="Torna a Strumenti">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </a>
@@ -63,15 +63,17 @@
     <!-- Hero Ultra-Minimal -->
     <section class="hero">
       <h1 class="hero__title">Traduci PDF</h1>
-      <p class="hero__desc">Preserva layout, immagini e grafica.</p>
+      <p class="hero__desc">Traduzione AI. Font e adattamento automatici.</p>
+      <p class="connection-status" id="connection-status" role="status">1. Connetti la tua API key per iniziare.</p>
+      <button class="btn-secondary" id="btn-connect">Connetti API</button>
     </section>
 
     <!-- Upload & Controls Card -->
     <section class="upload-card">
 
       <!-- Drag & Drop Zone Minimal -->
-      <div class="dropzone" id="dropzone">
-        <input type="file" id="file-input" accept="application/pdf" style="display: none;">
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Scegli un PDF" aria-disabled="true">
+        <input type="file" id="file-input" accept="application/pdf,.pdf" disabled style="display: none;">
         <div class="dropzone__icon">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><polyline points="9 15 12 12 15 15"/></svg>
         </div>
@@ -88,6 +90,7 @@
           <div>
             <div class="file-info__name" id="file-info-name">documento.pdf</div>
             <div class="file-info__meta" id="file-info-meta">0 KB • 0 Pagine</div>
+            <button class="btn-subtle" id="btn-retry-language" hidden>Riprova rilevamento lingua</button>
           </div>
         </div>
         <button class="file-info__remove" id="btn-remove-file" title="Rimuovi">
@@ -110,7 +113,7 @@
 
           <!-- Selezione Lingua Target -->
           <div class="lang-select-wrap">
-            <select id="target-lang-select">
+            <select id="target-lang-select" aria-label="Lingua di destinazione">
               <option value="Inglese" selected>Inglese</option>
               <option value="Italiano">Italiano</option>
               <option value="Spagnolo">Spagnolo</option>
@@ -135,7 +138,7 @@
     </section>
 
     <!-- Progress Card (Dynamic Island Minimal) -->
-    <section class="progress-card" id="progress-card">
+    <section class="progress-card" id="progress-card" aria-live="polite">
       <div class="progress-header">
         <div class="progress-header-info">
           <div class="progress-title" id="progress-title">Elaborazione in corso...</div>
@@ -143,10 +146,6 @@
         </div>
         <div class="progress-header-right">
           <div class="progress-actions" id="progress-actions">
-            <button type="button" class="progress-action-btn btn-downgrade-model" id="btn-downgrade-model" style="display: none;" title="Scala al modello Gemini inferiore">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>
-              <span id="btn-downgrade-label">Scala a Gemini 3.7</span>
-            </button>
             <button type="button" class="progress-action-btn btn-cancel-progress" id="btn-cancel-translate" style="display: none;" title="Annulla traduzione">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               <span>Annulla</span>
@@ -169,6 +168,8 @@
         <button class="progress-error-dismiss" id="btn-dismiss-progress-error" title="Chiudi avviso">&times;</button>
       </div>
     </section>
+
+    <section id="result-warnings" class="result-warnings" role="status" hidden></section>
 
     <!-- Side-by-Side Viewer Section -->
     <section class="viewer-section" id="viewer-section">
@@ -213,15 +214,19 @@
        Popup Centro Schermata: Setup Chiave API Rapido (se mancante)
        ========================================================================= -->
   <div class="modal-overlay" id="api-setup-popup">
-    <div class="modal-card popup-card">
+    <div class="modal-card popup-card" role="dialog" aria-modal="true" aria-labelledby="api-popup-title">
       <div class="popup-icon">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
-      <h3 class="popup-title">Gemini 3.8 Flash</h3>
-      <p class="popup-desc">Inserisci la tua API Key per tradurre i documenti. Viene salvata esclusivamente nel tuo browser.</p>
+      <h3 class="popup-title" id="api-popup-title">Connetti il traduttore</h3>
+      <p class="popup-desc">Scegli OpenAI (ChatGPT API) o Google Gemini. La chiave resta in questa scheda, salvo tua scelta. Il testo del PDF viene inviato al provider selezionato, già per rilevare la lingua. Le API possono avere costi separati dall’abbonamento ChatGPT.</p>
+      <label class="form-label" for="popup-provider">Provider</label>
+      <select id="popup-provider" class="form-input"><option value="openai">OpenAI — ChatGPT API</option><option value="gemini">Google Gemini</option></select>
+      <label class="form-label" for="popup-model">Modello</label><input id="popup-model" class="form-input" placeholder="gpt-6-luna">
+      <label class="remember-key"><input type="checkbox" id="popup-remember"> Ricorda la chiave su questo browser</label>
 
       <div class="form-group" style="width: 100%; margin-top: 18px;">
-        <input type="password" id="popup-gemini-key" class="form-input" placeholder="Incolla API Key (AIzaSy...)" autocomplete="off">
+        <input type="password" id="popup-api-key" aria-label="API key del provider" class="form-input" placeholder="Incolla API key" autocomplete="off">
       </div>
 
       <div class="popup-actions">
@@ -230,12 +235,13 @@
           <span>Incolla</span>
         </button>
         <button class="btn-translate" id="btn-popup-save" style="padding: 10px 24px;">
-          <span>Salva</span>
+          <span>Connetti e verifica</span>
         </button>
       </div>
 
       <div class="popup-footer">
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Ottieni chiave su Google AI Studio ↗</a>
+        <a id="popup-key-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">Ottieni API key ↗</a>
+        <p>La verifica esegue una breve richiesta al modello.</p>
       </div>
 
       <button class="modal-close popup-close" id="btn-close-popup" title="Chiudi">
@@ -265,17 +271,22 @@
 
       <div class="modal-body">
 
-        <!-- TAB 1: API KEY (GEMINI 3.8 FLASH) -->
+        <!-- TAB 1: PROVIDER E API KEY -->
         <div class="tab-pane active" id="tab-models">
+          <label class="form-label" for="settings-provider">Provider</label>
+          <select id="settings-provider" class="form-input"><option value="openai">OpenAI — ChatGPT API</option><option value="gemini">Google Gemini</option></select>
+          <label class="form-label" for="settings-model">Modello (Gemini: vuoto per selezione automatica)</label>
+          <input id="settings-model" class="form-input">
+          <label class="remember-key"><input type="checkbox" id="settings-remember"> Ricorda la chiave su questo browser</label>
 
           <div class="settings-group">
             <div class="form-group">
               <div class="form-header-line">
-                <label class="form-label" for="input-gemini-key">API Key Gemini 3.8 Flash</label>
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="link-subtle">Google AI Studio ↗</a>
+                <label class="form-label" for="input-api-key">API key</label>
+                <a id="settings-key-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="link-subtle">Ottieni API key ↗</a>
               </div>
               <div class="form-input-wrap">
-                <input type="password" id="input-gemini-key" class="form-input" placeholder="AIzaSy..." autocomplete="off">
+                <input type="password" id="input-api-key" class="form-input" placeholder="API key" autocomplete="off">
                 <button class="btn-secondary" id="btn-clipboard-detect" title="Incolla da appunti">Incolla</button>
                 <button class="btn-secondary" id="btn-test-gemini">Verifica</button>
               </div>
@@ -284,20 +295,13 @@
 
           <div class="settings-group" style="margin-top: 16px;">
             <div class="quota-minimal-line">
-              <span id="model-status-quality" class="quality-badge-subtle">Gemini 3.8 Flash</span>
+              <span id="model-status-quality" class="quality-badge-subtle">OpenAI / Gemini</span>
               <span id="quota-countdown-text" class="quota-countdown">Pronto</span>
             </div>
 
             <div class="quota-bar-bg" style="margin-top: 8px;">
               <div class="quota-bar-fill" id="quota-bar-fill"></div>
             </div>
-          </div>
-
-          <!-- Pulsante Magic Link -->
-          <div style="margin-top: 14px; text-align: center;">
-            <button class="btn-subtle" id="btn-copy-magic-link">
-              <span>Copia Magic Link</span>
-            </button>
           </div>
 
         </div>
@@ -307,11 +311,11 @@
           <div class="excel-toolbar">
             <div class="excel-toolbar__group">
               <button class="btn-secondary" id="btn-add-glossary-row">+ Aggiungi</button>
-              <button class="btn-secondary" id="btn-export-csv">Esporta</button>
+              <button class="btn-secondary" id="btn-export-csv">Esporta CSV</button>
             </div>
             <div class="excel-toolbar__group">
-              <button class="btn-secondary" id="btn-import-json">Importa</button>
-              <input type="file" id="glossary-file-input" accept=".json,.csv" style="display: none;">
+              <button class="btn-secondary" id="btn-import-json">Importa JSON</button>
+              <input type="file" id="glossary-file-input" accept=".json,application/json" style="display: none;">
             </div>
           </div>
 
@@ -323,10 +327,10 @@
           <div class="settings-group">
             <div class="form-group">
               <div class="form-header-line">
-                <label class="form-label" for="range-font-scale">Riduzione Minima Font</label>
+                <label class="form-label" for="range-font-scale">Soglia di avviso leggibilità</label>
                 <span id="font-scale-val" style="color: var(--accent); font-weight: 500;">70%</span>
               </div>
-              <input type="range" id="range-font-scale" min="50" max="95" value="70" style="width: 100%; accent-color: var(--accent);">
+              <p class="popup-desc">I font vengono cercati automaticamente tramite Fontsource e tenuti in memoria solo durante la composizione. Per i font proprietari si usano equivalenti gratuiti, segnalati nel risultato. Il testo viene ridotto automaticamente per rientrare nel riquadro; questa soglia determina quando avvisarti.</p><input type="range" id="range-font-scale" min="50" max="95" value="70" style="width: 100%; accent-color: var(--accent);">
             </div>
           </div>
         </div>
@@ -342,9 +346,6 @@
   <script src="pdf.min.js?v=3.9"></script>
   <script src="pdf-lib.min.js?v=3.9"></script>
   <script src="fontkit.umd.min.js?v=3.9"></script>
-
-  <!-- Script Locale (opzionale per sviluppo) -->
-  <script src="config.local.js" onerror="this.remove()"></script>
 
   <!-- Script dell'applicazione -->
   <script src="ai-service.js?v=3.9"></script>

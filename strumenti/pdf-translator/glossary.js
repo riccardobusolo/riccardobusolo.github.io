@@ -20,7 +20,12 @@ const GlossaryManager = (() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        entries = JSON.parse(stored);
+        const data = JSON.parse(stored);
+        if (!Array.isArray(data)) throw new Error('Glossario non valido');
+        entries = data.map((item, idx) => ({
+          id: `stored-${idx}`,
+          ...Object.fromEntries(['source', 'it', 'en', 'es', 'fr', 'de'].map(k => [k, typeof item?.[k] === 'string' ? item[k] : '']))
+        }));
       } else {
         entries = [...DEFAULT_ENTRIES];
         save();
@@ -45,7 +50,7 @@ const GlossaryManager = (() => {
 
   function addEntry(term = '', it = '', en = '', es = '', fr = '', de = '') {
     const newEntry = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       source: term.trim(),
       it: it.trim(),
       en: en.trim(),
@@ -104,7 +109,9 @@ const GlossaryManager = (() => {
   // Estrae le regole del glossario per la lingua di destinazione corrente
   function getRulesForTarget(targetLangCode) {
     // normalizza codice lingua (it, en, es, fr, de)
-    const code = (targetLangCode || '').toLowerCase().slice(0, 2);
+    const languages = { italiano: 'it', inglese: 'en', spagnolo: 'es', francese: 'fr', tedesco: 'de', portoghese: 'pt', olandese: 'nl', russo: 'ru', cinese: 'zh', giapponese: 'ja' };
+    const value = (targetLangCode || '').toLowerCase();
+    const code = languages[value] || value;
     const rules = [];
 
     entries.forEach(entry => {
@@ -158,13 +165,8 @@ const GlossaryManager = (() => {
       const data = JSON.parse(jsonString);
       if (Array.isArray(data)) {
         entries = data.map((item, idx) => ({
-          id: item.id || (Date.now() + idx).toString(),
-          source: item.source || '',
-          it: item.it || '',
-          en: item.en || '',
-          es: item.es || '',
-          fr: item.fr || '',
-          de: item.de || ''
+          id: `import-${Date.now()}-${idx}`,
+          ...Object.fromEntries(['source', 'it', 'en', 'es', 'fr', 'de'].map(k => [k, typeof item?.[k] === 'string' ? item[k] : '']))
         }));
         save();
         return true;
