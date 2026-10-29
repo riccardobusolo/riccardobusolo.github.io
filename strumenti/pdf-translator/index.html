@@ -14,14 +14,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=4.0.1">
+  <link rel="stylesheet" href="style.css?v=4.0.2">
   <link rel="stylesheet" href="/project-navigation.css">
 </head>
 <body data-project="pdf-translator" data-project-category="strumenti">
   <a class="project-return" href="/progetti.html#strumenti" aria-label="Torna a Strumenti" title="Torna a Strumenti"><img src="/img/logo.svg" width="42" height="42" alt=""></a>
 
   <!-- Versione Software discreta in alto a destra -->
-  <div class="software-version" title="DocuShift v4.0.1" aria-hidden="true">v4.0.1</div>
+  <div class="software-version" title="DocuShift v4.0.2" aria-hidden="true">v4.0.2</div>
 
   <!-- Floating Navigation -->
   <header class="header">
@@ -49,7 +49,7 @@
 
       <!-- Destra: Versione e Ritorno a progetti -->
       <div class="header__right">
-        <span class="header__version" title="Versione del software">v4.0.1</span>
+        <span class="header__version" title="Versione del software">v4.0.2</span>
         <a href="/progetti.html#strumenti" class="icon-btn" title="Torna a Strumenti" aria-label="Torna a Strumenti">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </a>
@@ -264,34 +264,46 @@
 
       <div class="modal-body">
 
-        <!-- TAB 1: API KEY -->
+        <!-- TAB 1: DUE CHIAVI INDIPENDENTI, UN SERVIZIO ATTIVO -->
         <div class="tab-pane active" id="tab-models">
-
+          <div class="form-header-line">
+            <label class="form-label" for="settings-provider">Servizio da usare</label>
+            <select id="settings-provider" class="api-provider-select" aria-label="Servizio da usare"><option value="openai">OpenAI / ChatGPT</option><option value="gemini">Google Gemini</option></select>
+          </div>
+          <input type="hidden" id="settings-model"><input type="checkbox" id="settings-remember" hidden>
           <div class="settings-group">
             <div class="form-group">
               <div class="form-header-line">
-                <label class="form-label" for="input-api-key">API key</label><select id="settings-provider" class="api-provider-select" aria-label="Provider API"><option value="openai">OpenAI / ChatGPT</option><option value="gemini">Google Gemini</option></select>
-                <a id="settings-key-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="link-subtle">Ottieni API key ↗</a>
+                <label class="form-label" for="input-api-key">API key OpenAI / ChatGPT</label>
+                <a id="settings-key-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="link-subtle">Ottieni chiave OpenAI ↗</a>
               </div>
               <div class="form-input-wrap">
-                <input type="hidden" id="settings-model"><input type="checkbox" id="settings-remember" hidden><input type="password" id="input-api-key" class="form-input" placeholder="API key" autocomplete="off">
-                <button class="btn-secondary" id="btn-clipboard-detect" title="Incolla da appunti">Incolla</button>
-                <button class="btn-secondary" id="btn-test-gemini">Verifica</button>
+                <input type="password" id="input-api-key" class="form-input" placeholder="sk-…" autocomplete="off">
+                <button class="btn-secondary" id="btn-clipboard-detect" title="Incolla chiave OpenAI">Incolla</button>
+                <button class="btn-secondary" id="btn-save-openai">Salva</button>
               </div>
+              <div class="form-header-line api-key-status"><span id="api-status-openai" class="form-label" role="status"></span><button class="btn-subtle" id="btn-remove-openai">Rimuovi</button></div>
             </div>
           </div>
-
+          <div class="settings-group" style="margin-top: 12px;">
+            <div class="form-group">
+              <div class="form-header-line">
+                <label class="form-label" for="input-gemini-key">API key Google Gemini</label>
+                <a id="gemini-key-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="link-subtle">Ottieni chiave Gemini ↗</a>
+              </div>
+              <div class="form-input-wrap">
+                <input type="password" id="input-gemini-key" class="form-input" placeholder="AIzaSy…" autocomplete="off">
+                <button class="btn-secondary" id="btn-paste-gemini" title="Incolla chiave Gemini">Incolla</button>
+                <button class="btn-secondary" id="btn-save-gemini">Salva</button>
+              </div>
+              <div class="form-header-line api-key-status"><span id="api-status-gemini" class="form-label" role="status"></span><button class="btn-subtle" id="btn-remove-gemini">Rimuovi</button></div>
+            </div>
+          </div>
           <div class="settings-group" style="margin-top: 16px;">
-            <div class="quota-minimal-line">
-              <span id="model-status-quality" class="quality-badge-subtle">OpenAI / Gemini</span>
-              <span id="quota-countdown-text" class="quota-countdown">Pronto</span>
-            </div>
-
-            <div class="quota-bar-bg" style="margin-top: 8px;">
-              <div class="quota-bar-fill" id="quota-bar-fill"></div>
-            </div>
+            <div class="quota-minimal-line"><span id="model-status-quality" class="quality-badge-subtle">OpenAI / Gemini</span><button class="btn-secondary" id="btn-test-gemini">Verifica</button></div>
+            <div class="quota-minimal-line" style="margin-top: 8px;"><span id="quota-countdown-text" class="quota-countdown">Pronto</span></div>
+            <div class="quota-bar-bg" style="margin-top: 8px;"><div class="quota-bar-fill" id="quota-bar-fill"></div></div>
           </div>
-
         </div>
 
         <!-- TAB 2: GLOSSARIO -->
@@ -331,14 +343,14 @@
   <div class="toast-container" id="toast-container"></div>
 
   <!-- Librerie PDF (Locali ad altissima velocità e indipendenti da CDN esterne) -->
-  <script src="pdf.min.js?v=4.0.1"></script>
-  <script src="pdf-lib.min.js?v=4.0.1"></script>
-  <script src="fontkit.umd.min.js?v=4.0.1"></script>
+  <script src="pdf.min.js?v=4.0.2"></script>
+  <script src="pdf-lib.min.js?v=4.0.2"></script>
+  <script src="fontkit.umd.min.js?v=4.0.2"></script>
 
   <!-- Script dell'applicazione -->
-  <script src="ai-service.js?v=4.0.1"></script>
-  <script src="glossary.js?v=4.0.1"></script>
-  <script src="pdf-engine.js?v=4.0.1"></script>
-  <script src="app.js?v=4.0.1"></script>
+  <script src="ai-service.js?v=4.0.2"></script>
+  <script src="glossary.js?v=4.0.2"></script>
+  <script src="pdf-engine.js?v=4.0.2"></script>
+  <script src="app.js?v=4.0.2"></script>
 </body>
 </html>

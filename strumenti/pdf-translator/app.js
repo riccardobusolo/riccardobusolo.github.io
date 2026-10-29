@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
   let file = null, bytes = null, parsed = null, language = null, connected = false;
   let operation = null, downloadUrl = null, previews = [], currentPage = 1, zoom = 1.25, rendering = false, isConnecting = false;
-  const apiDrafts = new Map();
+  const apiDrafts = new Map(), verifiedConnections = new Map();
   const providerNames = { openai: 'OpenAI', gemini: 'Gemini' };
   AIService.initAutoAuth();
   function toast(message, error = false) {
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('target-lang-select').disabled = busy;
     $('btn-connect').disabled = busy;
     $('btn-retry-language').disabled = busy;
-    for (const id of ['popup-provider', 'popup-model', 'popup-api-key', 'popup-remember', 'btn-popup-save', 'btn-popup-clipboard', 'settings-provider', 'settings-model', 'input-api-key', 'settings-remember', 'btn-test-gemini', 'btn-clipboard-detect', 'btn-add-glossary-row', 'btn-import-json', 'range-font-scale']) $(id).disabled = busy;
+    for (const id of ['popup-provider', 'popup-model', 'popup-api-key', 'popup-remember', 'btn-popup-save', 'btn-popup-clipboard', 'settings-provider', 'settings-model', 'input-api-key', 'settings-remember', 'btn-test-gemini', 'btn-clipboard-detect', 'input-gemini-key', 'btn-paste-gemini', 'btn-save-openai', 'btn-save-gemini', 'btn-remove-openai', 'btn-remove-gemini', 'btn-add-glossary-row', 'btn-import-json', 'range-font-scale']) $(id).disabled = busy;
     $('btn-popup-save').disabled = busy && !isConnecting;
     $('btn-test-gemini').disabled = busy && !isConnecting;
     $('btn-popup-save').textContent = isConnecting ? 'Annulla' : 'Connetti';
@@ -50,19 +50,31 @@ document.addEventListener('DOMContentLoaded', () => {
   $('btn-cancel-translate').onclick = () => { operation?.abort(); $('progress-subtitle').textContent = 'Annullamento in corso…'; };
   $('btn-dismiss-progress-error').onclick = () => $('progress-error-box').style.display = 'none';
 
+  const fieldFor = p => p === 'openai' ? 'input-api-key' : 'input-gemini-key';
+  function draft(p) {
+    return apiDrafts.get(p) || { key: AIService.getKey(p), model: AIService.getModel(p), remember: !!localStorage.getItem(`docushift_${p}_key`) };
+  }
+  function isVerified(p) {
+    const verified = verifiedConnections.get(p);
+    return !!verified && verified.key === AIService.getKey(p) && verified.model === AIService.getModel(p) && draft(p).key.trim() === verified.key;
+  }
   function fillApiForms() {
-    const p = AIService.getProvider();
-    const { key, model, remember } = apiDrafts.get(p) || { key: AIService.getKey(), model: AIService.getModel(), remember: !!localStorage.getItem(`docushift_${p}_key`) };
+    const p = AIService.getProvider(), active = draft(p);
     for (const prefix of ['popup', 'settings']) {
-      $(`${prefix}-provider`).value = p; $(`${prefix}-model`).value = model;
-      $(`${prefix}-remember`).checked = remember;
-      $(`${prefix}-key-link`).href = p === 'openai' ? 'https://platform.openai.com/api-keys' : 'https://aistudio.google.com/app/apikey';
+      $(`${prefix}-provider`).value = p; $(`${prefix}-model`).value = active.model;
+      $(`${prefix}-remember`).checked = active.remember;
     }
-    $('popup-api-key').value = key; $('input-api-key').value = key;
-    $('popup-model').placeholder = p === 'gemini' ? 'Automatico dai modelli disponibili' : 'gpt-6-luna';
+    const popupLink = $('popup-key-link');
+    popupLink.href = p === 'openai' ? 'https://platform.openai.com/api-keys' : 'https://aistudio.google.com/app/apikey';
+    popupLink.textContent = p === 'openai' ? 'Ottieni chiave OpenAI ↗' : 'Ottieni chiave Gemini ↗';
+    $('popup-api-key').value = active.key;
     $('popup-api-key').placeholder = p === 'gemini' ? 'AIzaSy…' : 'sk-…';
-    $('input-api-key').placeholder = $('popup-api-key').placeholder;
-    $('model-status-quality').textContent = `${providerNames[p]} · ${model || 'modello automatico'}`;
+    for (const service of ['openai', 'gemini']) {
+      $(fieldFor(service)).value = draft(service).key;
+      const saved = AIService.getKey(service), modified = draft(service).key.trim() !== saved;
+      $(`api-status-${service}`).textContent = modified ? 'Modifiche da salvare' : !saved ? 'Nessuna chiave salvata' : isVerified(service) ? 'Chiave verificata' : 'Chiave salvata';
+    }
+    $('model-status-quality').textContent = `Servizio: ${providerNames[p]}${connected ? ' · connesso' : ''}`;
   }
   function openPopup() { $('settings-modal').classList.remove('active'); fillApiForms(); $('api-setup-popup').classList.add('active'); $('popup-api-key').focus(); }
   function closeModal(id) {
@@ -71,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function closePopup() { closeModal('api-setup-popup'); }
   $('btn-connect').onclick = openPopup; $('btn-close-popup').onclick = closePopup;
-  $('btn-open-settings').onclick = () => { $('api-setup-popup').classList.remove('active'); fillApiForms(); $('settings-modal').classList.add('active'); $('input-api-key').focus(); };
+  $('btn-open-settings').onclick = () => { $('api-setup-popup').classList.remove('active'); fillApiForms(); $('settings-modal').classList.add('active'); $(fieldFor(AIService.getProvider())).focus(); };
   $('btn-close-settings').onclick = () => closeModal('settings-modal');
   for (const id of ['settings-modal', 'api-setup-popup']) $(id).addEventListener('click', e => { if (e.target === $(id)) closeModal(id); });
   document.addEventListener('keydown', e => {
@@ -86,40 +98,57 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   for (const prefix of ['popup', 'settings']) $(`${prefix}-provider`).onchange = e => {
-    if (operation) return; AIService.setProvider(e.target.value); connected = false; language = null;
-    fillApiForms(); updateControls(); status('Connetti la chiave del provider selezionato.');
+    if (operation) return;
+    AIService.setProvider(e.target.value); connected = isVerified(e.target.value);
+    fillApiForms(); updateControls();
+    status(`Servizio selezionato: ${providerNames[e.target.value]}.${connected ? ' Pronto per la traduzione.' : ' Premi Verifica per connetterlo.'}`);
   };
+  function saveKey(p, inputId = fieldFor(p)) {
+    const current = draft(p), key = $(inputId).value.trim();
+    AIService.setKey(key, current.remember, p);
+    apiDrafts.set(p, { ...current, key });
+    verifiedConnections.delete(p);
+    connected = isVerified(AIService.getProvider());
+    fillApiForms(); updateControls();
+  }
+  for (const p of ['openai', 'gemini']) {
+    $(`btn-save-${p}`).onclick = () => { saveKey(p); toast(`Chiave ${providerNames[p]} salvata separatamente.`); };
+    $(`btn-remove-${p}`).onclick = () => { $(fieldFor(p)).value = ''; saveKey(p); toast(`Chiave ${providerNames[p]} rimossa.`); };
+  }
   async function connect(prefix) {
     if (isConnecting) { operation?.abort(); return; }
     if (operation) return;
-    const key = $(prefix === 'popup' ? 'popup-api-key' : 'input-api-key').value.trim();
-    if (!key) return toast('Inserisci la tua API key.', true);
-    AIService.setKey(key, $(`${prefix}-remember`).checked); AIService.setModel($(`${prefix}-model`).value);
-    connected = false; language = null;
-    isConnecting = true;
+    const p = AIService.getProvider(), inputId = prefix === 'popup' ? 'popup-api-key' : fieldFor(p);
+    if (!$(inputId).value.trim()) return toast(`Inserisci la chiave ${providerNames[p]}.`, true);
+    saveKey(p, inputId);
+    AIService.setModel(draft(p).model, p);
+    connected = false; isConnecting = true;
     try { await run(async signal => {
-      progress(0, 'Verifica connessione', 'Invio di una breve richiesta al modello…');
+      progress(0, 'Verifica connessione', `Verifica di ${providerNames[p]}…`);
       const result = await AIService.testConnection({ signal });
-      if (!result.ok) { status('Connessione non riuscita. Controlla le impostazioni API.'); throw new Error(result.error); }
-      connected = true; $('model-status-quality').textContent = result.model;
+      if (!result.ok) { status(`Connessione ${providerNames[p]} non riuscita.`); throw new Error(result.error); }
+      verifiedConnections.set(p, { key: AIService.getKey(p), model: AIService.getModel(p) });
+      connected = true;
       status(`Connesso a ${result.model}. Carica il PDF per rilevare la lingua.`);
       $('api-setup-popup').classList.remove('active'); $('settings-modal').classList.remove('active');
       $('progress-card').classList.remove('active'); fillApiForms();
-      if (parsed) await detect(signal);
+      if (parsed && !language) await detect(signal);
     }); } finally { isConnecting = false; updateControls(); }
   }
   $('btn-popup-save').onclick = () => connect('popup'); $('btn-test-gemini').onclick = () => connect('settings');
   $('popup-api-key').onkeydown = e => { if (e.key === 'Enter') connect('popup'); };
-  for (const [id, target] of [['btn-popup-clipboard', 'popup-api-key'], ['btn-clipboard-detect', 'input-api-key']]) $(id).onclick = async () => {
+  for (const [id, target] of [['btn-popup-clipboard', 'popup-api-key'], ['btn-clipboard-detect', 'input-api-key'], ['btn-paste-gemini', 'input-gemini-key']]) $(id).onclick = async () => {
     try { $(target).value = (await navigator.clipboard.readText()).trim(); $(target).dispatchEvent(new Event('input', { bubbles: true })); } catch (_) { toast('Incolla la chiave direttamente nel campo.', true); }
   };
-  for (const id of ['popup-api-key', 'input-api-key', 'popup-model', 'settings-model']) $(id).addEventListener('input', () => {
-    const prefix = id.startsWith('popup-') ? 'popup' : 'settings';
-    apiDrafts.set(AIService.getProvider(), {
-      key: $(prefix === 'popup' ? 'popup-api-key' : 'input-api-key').value,
-      model: $(`${prefix}-model`).value, remember: $(`${prefix}-remember`).checked
-    });
-    connected = false; language = null; updateControls(); status('Impostazioni modificate: premi Connetti o Verifica.');
+  for (const id of ['popup-api-key', 'input-api-key', 'input-gemini-key']) $(id).addEventListener('input', () => {
+    const p = id === 'popup-api-key' ? AIService.getProvider() : id === 'input-api-key' ? 'openai' : 'gemini';
+    apiDrafts.set(p, { ...draft(p), key: $(id).value });
+    connected = isVerified(AIService.getProvider());
+    // Sync both entry points without replacing the other provider's draft.
+    if (id === 'popup-api-key') $(fieldFor(p)).value = $(id).value;
+    else if (p === AIService.getProvider()) $('popup-api-key').value = $(id).value;
+    $(`api-status-${p}`).textContent = 'Modifiche da salvare';
+    updateControls();
   });
 
   async function discardResult() {

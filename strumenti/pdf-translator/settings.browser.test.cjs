@@ -9,7 +9,7 @@ try { ({ chromium } = require('playwright')); } catch (_) {}
 const repo = path.resolve(__dirname, '../..');
 const chrome = process.env.DOCUSHIFT_BROWSER || (process.platform === 'win32' ? 'C:/Program Files/Google/Chrome/Application/chrome.exe' : null);
 
-test('original compact settings accept OpenAI keys, preserve drafts and recover after cancellation', { skip: !chromium || (chrome && !fs.existsSync(chrome)) }, async () => {
+test('compact settings keep provider keys and links independent and recover after cancellation', { skip: !chromium || (chrome && !fs.existsSync(chrome)) }, async () => {
   const server = http.createServer((req, res) => {
     const pathname = decodeURIComponent(req.url.split('?')[0]);
     const file = path.resolve(repo, '.' + (pathname.endsWith('/') ? pathname + 'index.html' : pathname));
@@ -29,7 +29,11 @@ test('original compact settings accept OpenAI keys, preserve drafts and recover 
     page.on('pageerror', e => errors.push(e.message));
     page.on('request', req => { if (req.resourceType() === 'script') scripts.push(req.url()); });
     await page.route('https://fonts.googleapis.com/**', route => route.abort());
-    let requests = 0, mode = 'success';
+    let requests = 0, mode = 'success'; const geminiRequests = [];
+    await page.route('https://generativelanguage.googleapis.com/**', async route => {
+      geminiRequests.push({ url: route.request().url(), key: route.request().headers()['x-goog-api-key'] });
+      await route.fulfill({ json: route.request().url().includes(':generateContent') ? { candidates: [{ finishReason: 'STOP', content: { parts: [{ text: '{"ok":true}' }] } }] } : { models: [{ name: 'models/gemini-3.8-flash', supportedGenerationMethods: ['generateContent'] }] } });
+    });
     await page.route('https://api.openai.com/**', async route => {
       requests++;
       if (mode === 'pending') { await new Promise(resolve => setTimeout(resolve, 1200)); }
@@ -45,9 +49,14 @@ test('original compact settings accept OpenAI keys, preserve drafts and recover 
     assert.equal(await page.locator('#popup-model').isVisible(), false);
     assert.equal(await page.locator('#popup-remember').isVisible(), false);
     assert.ok((await page.locator('.popup-card').boundingBox()).height < 500);
-    assert.ok(scripts.filter(s => /app\.js|ai-service\.js|pdf-engine\.js|glossary\.js/.test(s)).every(s => s.endsWith('?v=4.0.1')));
+    assert.ok(scripts.filter(s => /app\.js|ai-service\.js|pdf-engine\.js|glossary\.js/.test(s)).every(s => s.endsWith('?v=4.0.2')));
     assert.equal(await page.locator('.hero__desc').innerText(), 'Preserva layout, immagini e grafica.');
 
+    await page.selectOption('#popup-provider', 'gemini');
+    assert.equal(await page.locator('#popup-key-link').getAttribute('href'), 'https://aistudio.google.com/app/apikey');
+    assert.match(await page.locator('#popup-key-link').innerText(), /Gemini/);
+    await page.selectOption('#popup-provider', 'openai');
+    assert.equal(await page.locator('#popup-key-link').getAttribute('href'), 'https://platform.openai.com/api-keys');
     await page.fill('#popup-api-key', 'sk-popup-draft');
     await page.click('#btn-close-popup');
     await page.click('#btn-open-settings');
@@ -55,10 +64,33 @@ test('original compact settings accept OpenAI keys, preserve drafts and recover 
     assert.equal(await page.locator('.modal-overlay.active').count(), 1);
     await page.fill('#input-api-key', 'sk-settings-draft');
     await page.selectOption('#settings-provider', 'gemini');
-    await page.fill('#input-api-key', 'AIza-gemini-draft');
+    await page.fill('#input-gemini-key', 'AIza-gemini-draft');
+    assert.equal(await page.locator('#settings-key-link').getAttribute('href'), 'https://platform.openai.com/api-keys');
+    assert.equal(await page.locator('#gemini-key-link').getAttribute('href'), 'https://aistudio.google.com/app/apikey');
+    await page.click('#btn-save-gemini');
+    await page.click('#btn-save-openai');
+    assert.equal(await page.locator('#settings-provider').inputValue(), 'gemini');
+    assert.equal(await page.evaluate(() => sessionStorage.getItem('docushift_openai_key')), 'sk-settings-draft');
+    assert.equal(await page.evaluate(() => sessionStorage.getItem('docushift_gemini_key')), 'AIza-gemini-draft');
+    await page.click('#btn-remove-openai');
+    assert.equal(await page.locator('#input-api-key').inputValue(), '');
+    assert.equal(await page.evaluate(() => sessionStorage.getItem('docushift_gemini_key')), 'AIza-gemini-draft');
+    await page.fill('#input-api-key', 'sk-settings-draft');
+    await page.click('#btn-save-openai');
+    const beforeGemini = requests;
+    await page.click('#btn-test-gemini');
+    await page.waitForFunction(() => !document.getElementById('file-input').disabled);
+    assert.equal(requests, beforeGemini, 'Gemini verification must never use OpenAI');
+    assert.ok(geminiRequests.some(r => r.url.includes(':generateContent')));
+    assert.ok(geminiRequests.every(r => r.key === 'AIza-gemini-draft'));
+    await page.click('#btn-open-settings');
+    await page.fill('#input-api-key', 'sk-settings-draft');
+    await page.click('#btn-save-openai');
+    assert.equal(await page.locator('#file-input').isEnabled(), true, 'Saving OpenAI must not disconnect active Gemini');
     await page.selectOption('#settings-provider', 'openai');
     assert.equal(await page.locator('#input-api-key').inputValue(), 'sk-settings-draft');
     assert.equal(await page.locator('#settings-model').isVisible(), false);
+    assert.equal(await page.locator('#input-gemini-key').inputValue(), 'AIza-gemini-draft');
 
     mode = 'error';
     await page.click('#btn-test-gemini');

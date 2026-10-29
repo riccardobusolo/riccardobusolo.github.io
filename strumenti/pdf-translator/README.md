@@ -1,4 +1,4 @@
-# DocuShift 4.0.1
+# DocuShift 4.0.2
 
 Strumento statico per PDF con testo selezionabile. Non richiede backend o build.
 
@@ -20,7 +20,7 @@ Strumento statico per PDF con testo selezionabile. Non richiede backend o build.
 
 Le nuove chiavi restano nella sessione della scheda. Le chiavi già memorizzate nel browser restano compatibili. Non sono inserite in URL, link condivisibili o file del repository. I vecchi magic link vengono ancora consumati per compatibilità; non vengono più generati. Il file locale `config.local.js` non viene caricato.
 
-La UI mantiene il layout compatto originale: popup con campo chiave e impostazioni a tre schede. La scelta OpenAI/Gemini è integrata nella riga della chiave, senza nuovi pannelli o campi modello visibili. Le risorse CSS/JS hanno URL versionati per evitare l'abbinamento di vecchi controller in cache a nuovi elementi HTML. Nessuna verifica automatica all'avvio blocca la modifica di una vecchia chiave; la verifica manuale può essere annullata anche dalla finestra delle impostazioni.
+La UI mantiene il layout compatto originale: popup con campo chiave e impostazioni a tre schede. Nella scheda API le chiavi OpenAI e Gemini hanno campi, link ufficiali, pulsanti Salva e Rimuovi distinti. Salvare una chiave non invia richieste e non modifica l'altra. La scelta **Servizio da usare** determina il provider di rilevamento e traduzione; **Verifica** usa soltanto la chiave del servizio selezionato. Il popup mostra il link ufficiale corrispondente alla scelta. Nessun campo modello aggiuntivo è visibile. Le risorse CSS/JS hanno URL versionati per evitare l'abbinamento di vecchi controller in cache a nuovi elementi HTML. Nessuna verifica automatica all'avvio blocca la modifica di una vecchia chiave; la verifica manuale può essere annullata anche dalla finestra delle impostazioni.
 
 ## Font e limiti
 

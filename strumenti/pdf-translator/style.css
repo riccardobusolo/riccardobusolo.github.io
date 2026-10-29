@@ -1255,4 +1255,5 @@ body::before {
 .result-warnings { padding: 12px 16px; margin: 16px 0; border: 1px solid var(--border-glass); border-radius: var(--radius-md); color: var(--text-secondary); font-size: .8rem; line-height: 1.5; }
 .popup-card { overflow-y: auto; flex-shrink: 0; }
 .popup-card > * { flex-shrink: 0; }
+.api-key-status { margin-top: 8px; margin-bottom: 0; }
 @media (max-width: 420px) { .form-input-wrap { flex-wrap: wrap; } .form-input-wrap .form-input { flex-basis: 100%; } }
