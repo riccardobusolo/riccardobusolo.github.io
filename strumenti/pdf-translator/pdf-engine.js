@@ -46,7 +46,18 @@ window.PDFEngine = (() => {
     let pageIndex=0;
     for(const page of doc.getPages()){
       signal?.throwIfAborted();onPage(++pageIndex,doc.getPageCount(),'validate');await new Promise(resolve=>setTimeout(resolve,0));signal?.throwIfAborted();
-      if(page.node.Annots()?.size())throw Error('PDF con annotazioni o campi modulo: formato non supportato in questa beta.');
+      // Link annotations only define an active area. They do not paint text or alter the
+      // page content stream, so retaining them is safe and preserves table-of-contents
+      // navigation. Other annotation types can carry visible appearances or AcroForm
+      // field values; reject those rather than leaving untranslated text on the page.
+      const annots=page.node.Annots();
+      if(annots){
+        for(const ref of annots.asArray()){
+          const annotation=doc.context.lookup(ref,PDFDict);
+          const subtype=annotation?.get(N.of('Subtype'))?.toString();
+          if(subtype!=='/Link')throw Error(`Pagina ${pageIndex}: annotazione ${subtype||'sconosciuta'} non supportata. Sono supportati i collegamenti PDF; campi modulo, commenti e timbri richiedono un formato separato.`);
+        }
+      }
       resources(page.node.Resources());const entry=page.node.Contents();if(!entry)continue;
       const streams=entry instanceof PDFArray?entry.asArray():[entry];
       const source=streams.map(ref=>decode(contents(doc.context.lookup(ref)))).join('\n');
@@ -79,16 +90,19 @@ window.PDFEngine = (() => {
         for(const item of content.items){
           if(!item.str?.trim())continue;
           const[a,b,c,d,x,y]=item.transform,style=content.styles[item.fontName]||{};
-          if(Math.abs(b)>.01||Math.abs(c)>.01||a<=0||d<=0||style.vertical||item.dir==='rtl')throw Error('Testo ruotato, specchiato o verticale non supportato.');
+          // PDFs often use a horizontal shear for display titles. It is not rotated
+          // text: retain it with pdf-lib's xSkew when redrawing. Rotation, mirrored
+          // writing, vertical writing and RTL text still need a dedicated layout pass.
+          if(Math.abs(b)>.01||a<=0||d<=0||style.vertical||item.dir==='rtl')throw Error('Testo ruotato, specchiato, verticale o RTL non supportato.');
           const text=item.str.normalize('NFC'),chars=text.replace(/\s/g,'');
           let fill=paints[cursor]?.color||[0,0,0];
           for(let j=cursor;j<Math.min(cursor+40,paints.length);j++)if(paints.slice(j,j+chars.length).map(p=>p.ch).join('')===chars){fill=paints[j].color;cursor=j+chars.length;break;}
           let font;try{font=page.commonObjs.get(item.fontName);}catch{}
           if(font?.isType3Font)throw Error('Font Type 3 non supportati.');
           const family=font?.name||style.fontFamily||'';
-          const block={text,x,y,width:item.width,size:d,color:fill,bold:/bold|black|heavy/i.test(family),italic:/italic|oblique/i.test(family),serif:/serif|times|georgia/i.test(family)&&!/sans/i.test(family),mono:/mono|courier/i.test(family)};
+          const block={text,x,y,width:item.width,size:d,xSkew:Math.atan2(c,d)*180/Math.PI,color:fill,bold:/bold|black|heavy/i.test(family),italic:/italic|oblique/i.test(family),serif:/serif|times|georgia/i.test(family)&&!/sans/i.test(family),mono:/mono|courier/i.test(family)};
           const prev=blocks.at(-1),gap=prev?x-prev.x-prev.width:Infinity;
-          if(prev&&Math.abs(prev.y-y)<.5&&Math.abs(prev.size-d)<.2&&gap>=-.1&&gap<d*.7&&prev.bold===block.bold&&prev.italic===block.italic&&prev.color.join()===fill.join()) {prev.text+=(gap>d*.15?' ':'')+text;prev.width=x+item.width-prev.x;}
+          if(prev&&Math.abs(prev.y-y)<.5&&Math.abs(prev.size-d)<.2&&Math.abs(prev.xSkew-block.xSkew)<.01&&gap>=-.1&&gap<d*.7&&prev.bold===block.bold&&prev.italic===block.italic&&prev.color.join()===fill.join()) {prev.text+=(gap>d*.15?' ':'')+text;prev.width=x+item.width-prev.x;}
           else blocks.push(block);
         }
         if(!blocks.length)throw Error(`Pagina ${n}: nessun testo selezionabile. Le scansioni non sono supportate.`);
@@ -112,7 +126,7 @@ window.PDFEngine = (() => {
         let width;try{width=font.widthOfTextAtSize(text,b.size);}catch{throw Error('La traduzione contiene caratteri non disponibili nei font latini della beta. Prova una lingua europea.');}
         const size=Math.min(b.size,b.size*Math.max(b.width,1)/Math.max(width,1));
         if(size<b.size*.8)shrunk++;
-        page.drawText(text,{x:b.x,y:b.y,size,font,color:PDFLib.rgb(...b.color)});
+        page.drawText(text,{x:b.x,y:b.y,size,font,color:PDFLib.rgb(...b.color),xSkew:PDFLib.degrees(b.xSkew||0)});
       }
       onProgress(p+1,pages.length);
     }

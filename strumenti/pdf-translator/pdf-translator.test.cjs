@@ -23,6 +23,16 @@ vm.runInThisContext(fs.readFileSync(__dirname+'/ai-service.js','utf8'));
   assert.match(text,/TRADOTTO/);assert.match(text,/FORM NUOVO/);assert.doesNotMatch(text,/SECRET|ORIGINAL/);
   const ops=await resultPage.getOperatorList();assert.ok(ops.fnArray.includes(pdfjsLib.OPS.paintImageXObject));assert.ok(ops.fnArray.includes(pdfjsLib.OPS.constructPath));await reader.destroy();
   const saved=await PDFLib.PDFDocument.load(built.bytes);for(const[,obj]of saved.context.enumerateIndirectObjects())if(obj instanceof PDFLib.PDFRawStream){let content;try{content=PDFLib.decodePDFRawStream(obj).decode();}catch{continue;}assert.doesNotMatch(Buffer.from(content).toString('latin1'),/SECRET|ORIGINAL/);}
+
+  // A table-of-contents /Link annotation does not paint text and must remain usable.
+  const linked=await PDFLib.PDFDocument.create(),linkedPage=linked.addPage([200,100]);linkedPage.drawText('CLICKABLE ORIGINAL',{x:10,y:50,size:12});
+  const link=linked.context.obj({Type:'Annot',Subtype:'Link',Rect:[10,40,130,62],Border:[0,0,0],A:{S:'URI',URI:PDFLib.PDFString.of('https://example.com')}});linkedPage.node.addAnnot(linked.context.register(link));
+  const linkedBytes=await linked.save(),linkedPages=await PDFEngine.parse(linkedBytes,signal,()=>{}),linkedBuilt=await PDFEngine.build(linkedBytes,linkedPages,['CLICKABLE TRADOTTO'],signal);
+  const linkedOut=await PDFLib.PDFDocument.load(linkedBuilt.bytes);assert.equal(linkedOut.getPage(0).node.Annots().size(),1);const linkedReader=await pdfjsLib.getDocument({data:linkedBuilt.bytes.slice(),isEvalSupported:false}).promise;assert.doesNotMatch((await linkedReader.getPage(1)).getAnnotations?JSON.stringify(await (await linkedReader.getPage(1)).getAnnotations()):'',/ORIGINAL/);await linkedReader.destroy();
+
+  // Sheared display text is common in manuals; keep the same x-axis angle.
+  const sheared=await PDFLib.PDFDocument.create(),shearedPage=sheared.addPage([200,100]);shearedPage.drawText('SHEARED ORIGINAL',{x:10,y:40,size:18});
+  const shearedBytes=await sheared.save(),shearedPages=[[{text:'SHEARED ORIGINAL',x:10,y:40,width:160,size:18,xSkew:18.4,color:[0,0,0],bold:false,italic:false,serif:false,mono:false}]],shearedBuilt=await PDFEngine.build(shearedBytes,shearedPages,['SHEARED TRADOTTO'],signal);const shearedReader=await pdfjsLib.getDocument({data:shearedBuilt.bytes.slice(),isEvalSupported:false}).promise;assert.match((await shearedReader.getPage(1)).getTextContent?JSON.stringify(await (await shearedReader.getPage(1)).getTextContent()):'',/SHEARED TRADOTTO/);await shearedReader.destroy();
   const calls=[];global.fetch=async(url,opts)=>{
     calls.push(url);assert.equal(opts.headers['x-goog-api-key'],'test-key');assert.ok(!url.includes('test-key'));
     if(url.includes('models?'))return{ok:true,json:async()=>({models:[{name:'models/gemini-test-flash',supportedGenerationMethods:['generateContent']},{name:'models/gemini-test-pro',supportedGenerationMethods:['generateContent']}]})};
