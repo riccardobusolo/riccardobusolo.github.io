@@ -31,3 +31,9 @@
 @media(prefers-reduced-motion:reduce) {
   .reel-card,.reel-card img,.reel-card::after { transition:none; transform:none!important; }
 }
+
+.project-reel__viewport { touch-action:pan-y pinch-zoom; }
+.reel-card { cursor:grab; user-select:none; -webkit-user-select:none; }
+.reel-card img { -webkit-user-drag:none; }
+.project-reel__viewport.is-dragging,.project-reel__viewport.is-dragging .reel-card { cursor:grabbing; }
+.project-reel__viewport.is-dragging .reel-card { transform:none; transition:none; }

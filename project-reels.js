@@ -45,12 +45,57 @@
     viewport.addEventListener('pointerleave',() => { hovered = false; });
     viewport.addEventListener('focusin',() => { focused = true; });
     viewport.addEventListener('focusout',e => { focused = viewport.contains(e.relatedTarget); });
-    viewport.addEventListener('pointerdown',() => { touching = true; });
-    window.addEventListener('pointerup',() => { touching = false; resumeAt = performance.now()+1800; });
-    viewport.addEventListener('pointercancel',() => { touching = false; resumeAt = performance.now()+1800; });
+    let drag = null, suppressClickUntil = 0;
+    viewport.addEventListener('dragstart',e => e.preventDefault());
+    viewport.addEventListener('pointerdown',e => {
+      if (!e.isPrimary || e.button !== 0) return;
+      suppressClickUntil = 0;
+      touching = true;
+      drag = { id:e.pointerId, startX:e.clientX, startY:e.clientY, lastX:e.clientX, active:false };
+    });
+    window.addEventListener('pointermove',e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX-drag.startX, dy = e.clientY-drag.startY;
+      if (!drag.active) {
+        if (Math.abs(dx) < 6 || Math.abs(dx) < Math.abs(dy)) return;
+        drag.active = true;
+        viewport.setPointerCapture(e.pointerId);
+        viewport.classList.add('is-dragging');
+        viewport.querySelectorAll('.reel-card').forEach(card => {
+          card.style.removeProperty('--rx'); card.style.removeProperty('--ry');
+        });
+      }
+      e.preventDefault();
+      position = viewport.scrollLeft - (e.clientX-drag.lastX);
+      if (!reduced.matches && period) {
+        position = period + ((position-period) % period + period) % period;
+      }
+      viewport.scrollLeft = position;
+      drag.lastX = e.clientX;
+    }, {passive:false});
+    function endDrag(e) {
+      if (!drag || (e.pointerId !== undefined && e.pointerId !== drag.id)) return;
+      const id = drag.id;
+      if (drag.active) suppressClickUntil = performance.now()+500;
+      drag = null;
+      touching = false;
+      position = viewport.scrollLeft;
+      resumeAt = performance.now()+1800;
+      viewport.classList.remove('is-dragging');
+      if (viewport.hasPointerCapture(id)) viewport.releasePointerCapture(id);
+    }
+    window.addEventListener('pointerup',endDrag);
+    window.addEventListener('pointercancel',endDrag);
+    viewport.addEventListener('lostpointercapture',endDrag);
+    window.addEventListener('blur',endDrag);
+    viewport.addEventListener('click',e => {
+      if (e.detail !== 0 && performance.now() < suppressClickUntil) {
+        e.preventDefault(); e.stopPropagation();
+      }
+    },true);
     viewport.addEventListener('wheel',() => { resumeAt = performance.now()+2400; },{passive:true});
     viewport.addEventListener('pointermove',e => {
-      if (!fine.matches || reduced.matches) return;
+      if (touching || !fine.matches || reduced.matches) return;
       const card = e.target.closest('.reel-card'); if (!card) return;
       const r = card.getBoundingClientRect(), x = (e.clientX-r.left)/r.width, y = (e.clientY-r.top)/r.height;
       card.style.setProperty('--rx',`${(0.5-y)*7}deg`);
