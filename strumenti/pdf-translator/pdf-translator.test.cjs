@@ -1,50 +1,38 @@
-const {test}=require('node:test');
-const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-const root=__dirname,lib=require('./pdf-lib.min.js'),fontkit=require('./fontkit.umd.min.js'),pdfjs=require('./pdf.min.js');
-pdfjs.GlobalWorkerOptions.workerSrc=path.join(root,'pdf.worker.min.js');
-function storage(){const m=new Map();return {getItem:k=>m.get(k)||null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)}}
-function context(extra={}){return vm.createContext({console,Uint8Array,ArrayBuffer,URLSearchParams,DOMException,AbortController,Set,Map,setTimeout,clearTimeout,crypto:require('node:crypto').webcrypto,localStorage:storage(),sessionStorage:storage(),window:{location:{hash:''}},...extra})}
-function load(name,extra={}){const c=context(extra);vm.runInContext(fs.readFileSync(path.join(root,name+'.js'),'utf8')+`;globalThis.subject=${{ 'ai-service':'AIService','pdf-engine':'PDFEngine',glossary:'GlossaryManager'}[name]}`,c);if(name==='pdf-engine')pdfjs.GlobalWorkerOptions.workerSrc=path.join(root,'pdf.worker.min.js');return c}
-function api(fetch){const c=load('ai-service',{fetch});c.subject.setKey('fake-test-key');return c.subject}
-const response=data=>({ok:true,status:200,json:async()=>data});
-const openai=data=>response({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(data)}]}]});
-const engine=()=>load('pdf-engine',{PDFLib:lib,pdfjsLib:pdfjs,window:{fontkit}}).subject;
-async function extract(bytes){const d=await pdfjs.getDocument({data:bytes.slice(),isEvalSupported:false}).promise;try{const texts=[];for(let n=1;n<=d.numPages;n++)texts.push((await(await d.getPage(n)).getTextContent()).items.map(i=>i.str).join(' '));return texts.join('\n')}finally{await d.destroy()}}
-
-test('OpenAI uses Responses structured output and maps reordered IDs',async()=>{
- let body,url;const a=api(async(u,o)=>{url=u;body=JSON.parse(o.body);return openai({translations:[{id:'b',translated:'Due'},{id:'a',translated:'Uno'}]})});
- const out=await a.translateBatch([{id:'a',text:'One'},{id:'b',text:'Two'}],'Italiano');
- assert.equal(url,'https://api.openai.com/v1/responses');assert.equal(body.store,false);assert.equal(body.text.format.type,'json_schema');assert.equal(out[0].translated,'Uno');
-});
-test('missing, duplicate and unknown IDs never produce successful partial documents',async()=>{
- for(const translations of [[{id:'b',translated:'B'}],[{id:'a',translated:'A'},{id:'a',translated:'A'}],[{id:'a',translated:'A'},{id:'x',translated:'X'}]]){
-  const a=api(async()=>openai({translations}));await assert.rejects(a.translateBatch([{id:'a',text:'A'},{id:'b',text:'B'}],'Italiano'),/incompleta|non valida/);
- }
-});
-test('HTTP 400 is terminal and never retried',async()=>{let n=0;const a=api(async()=>{n++;return {ok:false,status:400,json:async()=>({error:{message:'Invalid payload'}})}});await assert.rejects(a.translateBatch([{id:'a',text:'A'}],'Italiano'),/Invalid payload/);assert.equal(n,1)});
-test('insufficient quota is terminal',async()=>{let n=0;const a=api(async()=>{n++;return {ok:false,status:429,json:async()=>({error:{code:'insufficient_quota',message:'Quota exhausted'}})}});await assert.rejects(a.translateBatch([{id:'a',text:'A'}],'Italiano'),/Quota/);assert.equal(n,1)});
-test('cancellation during retry is immediate',async()=>{const ctrl=new AbortController();const a=api(async()=>({ok:false,status:503,headers:{get:()=>null},json:async()=>({})}));await assert.rejects(a.translateBatch([{id:'a',text:'A'}],'Italiano',[],{signal:ctrl.signal,onStatus:()=>ctrl.abort()}),{name:'AbortError'})});
-test('Gemini discovers only callable models and sends key in header',async()=>{const calls=[];const a=api(async(url,o)=>{calls.push({url,o});return url.includes(':generateContent')?response({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"name":"Inglese","code":"en"}'}]}}]}):response({models:[{name:'models/gemini-3.8-flash',supportedGenerationMethods:['generateContent']},{name:'models/not-callable'}]})});a.setProvider('gemini');a.setKey('gemini-fake');const l=await a.detectLanguage('Hello world');assert.equal(l.code,'en');assert.equal(calls.length,2);assert.ok(calls.every(c=>!c.url.includes('gemini-fake')));assert.equal(calls[1].o.headers['x-goog-api-key'],'gemini-fake');assert.ok(calls[1].url.includes('gemini-3.8-flash'))});
-test('keys default to session storage',()=>{const c=load('ai-service',{fetch:async()=>{}});c.subject.setKey('fake');assert.equal(c.localStorage.getItem('docushift_openai_key'),null);assert.equal(c.sessionStorage.getItem('docushift_openai_key'),'fake')});
-test('glossary language names map to ISO and imported IDs cannot inject HTML',()=>{const c=load('glossary'),g=c.subject;g.importJSON(JSON.stringify([{id:'" onclick="evil()',source:'Hello',it:'Ciao',en:'Hi',es:'Hola',fr:'Salut',de:'Hallo'}]));for(const l of ['Italiano','Inglese','Spagnolo','Francese','Tedesco'])assert.equal(g.getRulesForTarget(l).length,1);assert.match(g.getEntries()[0].id,/^import-\d+-0$/);assert.ok(!g.getEntries()[0].id.includes('"'))});
-test('PDF lexer preserves strings, comments and graphics while removing showing operators',()=>{const e=engine();const out=e.removeTextOperators('% ET comment\nq 1 0 0 rg BT /F1 12 Tf (MARK ET (nested) END) Tj [(BT) -20 (ET)] TJ (more) \' 1 2 (word) " ET 0 0 100 100 re f Q');assert.ok(!out.includes('MARK'));assert.ok(!out.includes('(BT)'));assert.ok(out.includes('1 Tw 2 Tc T*'));assert.ok(out.includes('0 0 100 100 re f Q'));assert.ok(out.includes('% ET comment'))});
-test('unsafe text clipping and binary inline images stop before export',()=>{const e=engine();assert.throws(()=>e.removeTextOperators('BT 7 Tr (a) Tj ET'),/maschera/);assert.throws(()=>e.removeTextOperators('BI /W 1 ID xx EI'),/inline/)});
-test('fit algorithm actually fits arbitrarily expanded translations',()=>{const e=engine(),font={widthOfTextAtSize:(t,s)=>t.length*s*.5,heightAtSize:s=>s};const block={matrix:[1,0,0,1],width:30,fontSize:12,ascent:1,descent:-.2};const fit=e.fitText(block,[{font,text:'A very long translated sentence which would overflow the box'}]);assert.ok(font.widthOfTextAtSize('A very long translated sentence which would overflow the box',fit.fontSize)<=30);assert.ok(fit.fontSize<12)});
-test('font names and Unicode coverage are resolved deterministically',()=>{const e=engine();assert.equal(e.fontSlug('ABCDEF+Arial-BoldMT'),'arimo');assert.equal(e.fontSlug('Helvetica'),'arimo');assert.equal(e.rangeContains('U+0400-04FF, U+4E??',0x412),true);assert.equal(e.rangeContains('U+4E??',0x4e12),true)});
-test('Form XObject text is removed recursively; graphics remain vector',async()=>{const d=await lib.PDFDocument.create(),p=d.addPage([400,400]);const form=d.context.flateStream('q 0 0 1 rg 10 10 50 50 re f BT /F1 12 Tf (FORM ORIGINAL) Tj ET Q',{Type:'XObject',Subtype:'Form',BBox:[0,0,100,100],Resources:{}});const ref=d.context.register(form);p.node.set(lib.PDFName.of('Resources'),d.context.obj({XObject:{Fm:ref}}));p.node.set(lib.PDFName.of('Contents'),d.context.register(d.context.flateStream('q /Fm Do Q')));engine().removePageText(d,p);const text=Buffer.from(lib.decodePDFRawStream(d.context.lookup(ref)).decode()).toString();assert.ok(!text.includes('FORM ORIGINAL'));assert.ok(text.includes('10 10 50 50 re f'));});
-const fontPath=process.env.DOCUSHIFT_TEST_FONT||(process.platform==='win32'?'C:/Windows/Fonts/arial.ttf':'');
-test('real PDF parse/build preserves pages, images, colored vectors and rotated placement',{skip:!fontPath||!fs.existsSync(fontPath)},async()=>{
- const fontData=fs.readFileSync(fontPath),d=await lib.PDFDocument.create(),p=d.addPage([400,400]);
- p.drawRectangle({x:0,y:0,width:400,height:400,color:lib.rgb(.1,.2,.35)});
- p.drawText('yellow year m2 ET END',{x:30,y:300,size:18,color:lib.rgb(1,1,1)});
- p.drawText('Rotated',{x:300,y:70,size:14,rotate:lib.degrees(90),color:lib.rgb(1,1,0)});
- const image=await d.embedPng(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR1sAAAAASUVORK5CYII=','base64'));p.drawImage(image,{x:30,y:30,width:40,height:40});
- const original=await d.save(),c=load('pdf-engine',{PDFLib:lib,pdfjsLib:pdfjs,window:{fontkit},fetch:async url=>url.includes('api.fontsource')?response({family:'Arimo',weights:[400],styles:['normal'],unicodeRange:{latin:'U+0000-04FF'},defSubset:'latin',variants:{400:{normal:{latin:{url:{ttf:'https://cdn.jsdelivr.net/fontsource/fonts/arimo@latest/latin-400-normal.ttf'}}}}}}):{ok:true,arrayBuffer:async()=>fontData.buffer.slice(fontData.byteOffset,fontData.byteOffset+fontData.byteLength)}});
- const e=c.subject,parsed=await e.parsePDF(original.buffer.slice(original.byteOffset,original.byteOffset+original.byteLength));assert.ok(parsed.pages[0].blocks.some(b=>b.text.includes('yellow year')));assert.ok(parsed.pages[0].blocks[0].color.every(v=>v===1));
- const map=Object.fromEntries(parsed.pages.flatMap(p=>p.blocks).map(b=>[b.id,b.text.includes('Rotated')?'Ruotato':'Una traduzione notevolmente più lunga del testo iniziale']));
- const out=await e.buildTranslatedPDF(original,parsed.pages,map);const text=await extract(out.bytes);assert.ok(text.includes('Una traduzione'));assert.ok(text.includes('Ruotato'));assert.ok(!text.includes('yellow'));
- const result=await lib.PDFDocument.load(out.bytes);assert.equal(result.getPageCount(),1);assert.equal(result.getPage(0).getWidth(),400);
- const images=doc=>doc.context.enumerateIndirectObjects().filter(([,o])=>o.dict?.get(lib.PDFName.of('Subtype'))?.toString()==='/Image').map(([,o])=>Buffer.from(o.contents).toString('hex')).sort();assert.deepEqual(images(result),images(d));
- const streams=result.getPage(0).node.Contents().asArray().map(r=>Buffer.from(lib.decodePDFRawStream(result.context.lookup(r)).decode()).toString()).join('\n');assert.ok(streams.includes('0.1 0.2 0.35 rg'));assert.ok(streams.includes('300 70 cm'));const rotated=parsed.pages[0].blocks.find(b=>b.text==='Rotated');assert.ok(Math.abs(rotated.matrix[1]-1)<1e-8);assert.ok(Math.abs(rotated.matrix[2]+1)<1e-8);
- if(process.env.DOCUSHIFT_QA_OUTPUT){fs.writeFileSync(path.join(process.env.DOCUSHIFT_QA_OUTPUT,'original.pdf'),original);fs.writeFileSync(path.join(process.env.DOCUSHIFT_QA_OUTPUT,'translated.pdf'),out.bytes)}
-});
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+global.window=global;global.PDFLib=require('./pdf-lib.min.js');global.pdfjsLib=require('./pdf.min.js');
+pdfjsLib.GlobalWorkerOptions.workerSrc=require('node:path').join(__dirname,'pdf.worker.min.js');
+vm.runInThisContext(fs.readFileSync(__dirname+'/pdf-engine.js','utf8'));
+vm.runInThisContext(fs.readFileSync(__dirname+'/ai-service.js','utf8'));
+(async()=>{
+  assert.equal(PDFEngine.strip('BT /F1 12 Tf (A \\(nested\\) Tj) Tj ET'),'BT /F1 12 Tf   ET');
+  assert.equal(PDFEngine.strip('[(a) 12 (b)] TJ 0 0 m 20 20 l S'),'  0 0 m 20 20 l S');
+  assert.throws(()=>PDFEngine.strip('BI /W 1 ID bytes EI'),/inline/);
+  assert.throws(()=>PDFEngine.strip('BT 7 Tr (a) Tj ET'),/maschere/);
+  const doc=await PDFLib.PDFDocument.create(),page=doc.addPage([400,300]);
+  page.drawRectangle({x:0,y:0,width:400,height:300,color:PDFLib.rgb(.1,.2,.3)});
+  page.drawText('ORIGINAL SECRET',{x:30,y:220,size:18,color:PDFLib.rgb(1,1,1)});
+  page.drawLine({start:{x:30,y:200},end:{x:370,y:200},color:PDFLib.rgb(1,0,0),thickness:2});
+  const image=await doc.embedPng(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9b8AAAAASUVORK5CYII=','base64'));page.drawImage(image,{x:40,y:40,width:20,height:20});
+  const source=await PDFLib.PDFDocument.create();source.addPage([100,100]).drawText('FORM SECRET',{x:4,y:50,size:10});
+  const [form]=await doc.embedPdf(await source.save());page.drawPage(form,{x:200,y:20,width:100,height:100});
+  const bytes=await doc.save(),signal=new AbortController().signal;
+  const parsed=await PDFEngine.parse(bytes,signal,()=>{});assert.equal(parsed.flat().length,2);assert.deepEqual(parsed[0][0].color,[1,1,1]);
+  const built=await PDFEngine.build(bytes,parsed,['TRADOTTO','FORM NUOVO'],signal);
+  const reader=await pdfjsLib.getDocument({data:built.bytes.slice(),isEvalSupported:false}).promise;
+  const resultPage=await reader.getPage(1),text=(await resultPage.getTextContent()).items.map(i=>i.str).join(' ');
+  assert.match(text,/TRADOTTO/);assert.match(text,/FORM NUOVO/);assert.doesNotMatch(text,/SECRET|ORIGINAL/);
+  const ops=await resultPage.getOperatorList();assert.ok(ops.fnArray.includes(pdfjsLib.OPS.paintImageXObject));assert.ok(ops.fnArray.includes(pdfjsLib.OPS.constructPath));await reader.destroy();
+  const saved=await PDFLib.PDFDocument.load(built.bytes);for(const[,obj]of saved.context.enumerateIndirectObjects())if(obj instanceof PDFLib.PDFRawStream){let content;try{content=PDFLib.decodePDFRawStream(obj).decode();}catch{continue;}assert.doesNotMatch(Buffer.from(content).toString('latin1'),/SECRET|ORIGINAL/);}
+  const calls=[];global.fetch=async(url,opts)=>{
+    calls.push(url);assert.equal(opts.headers['x-goog-api-key'],'test-key');assert.ok(!url.includes('test-key'));
+    if(url.includes('models?'))return{ok:true,json:async()=>({models:[{name:'models/gemini-test-flash',supportedGenerationMethods:['generateContent']},{name:'models/gemini-test-pro',supportedGenerationMethods:['generateContent']}]})};
+    if(url.includes('flash'))return{ok:false,status:429,json:async()=>({error:{status:'RESOURCE_EXHAUSTED'}})};
+    const prompt=JSON.parse(opts.body).contents[0].parts[0].text;
+    return{ok:true,json:async()=>({candidates:[{finishReason:'STOP',content:{parts:[{text:prompt.includes('Translate')?'["Ciao"]':'OK'}]}}]})};
+  };
+  const found=[],logs=[];assert.equal(await AI.discover('test-key',signal,(...x)=>logs.push(x),m=>found.push(m.name)),1);assert.equal(found[0],'models/gemini-test-pro');assert.ok(logs.some(x=>/429/.test(x[1])));
+  assert.deepEqual(await AI.translate(['Hello'],'Italiano','test-key','models/gemini-test-flash',found,signal,()=>{}),['Ciao']);
+  global.fetch=async()=>({ok:true,json:async()=>({candidates:[{finishReason:'STOP',content:{parts:[{text:'[]'}]}}]})});
+  await assert.rejects(AI.translate(['Hello'],'Italiano','test-key',found[0],[],signal,()=>{}),/non riescono/);
+  fs.writeFileSync(__dirname+'/test-fixture.pdf',bytes);console.log('PASS: lexer, original text removal (page + form), graphics/images, colors, PDF export, Gemini discovery, quota fallback, malformed response.');
+})().catch(e=>{console.error(e);process.exitCode=1;});
