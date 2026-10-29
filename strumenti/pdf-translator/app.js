@@ -3,6 +3,23 @@ pdfjsLib.GlobalWorkerOptions.workerSrc='pdf.worker.min.js';
 const $=id=>document.getElementById(id);
 let source=null,result=null,fileName='',pageNumber=1,busy=false,controller=null,workingModels=[],downloadURL=null,renderVersion=0,renderQueue=Promise.resolve();
 const logs=new Map();
+const providerSessions=new Map();let currentProvider='gemini';
+const providerName=()=>currentProvider==='openai'?'OpenAI':'Gemini';
+const service=()=>currentProvider==='openai'?OpenAIService:AI;
+function providerUI(){
+  const openai=currentProvider==='openai';
+  $('key-label').textContent='API key '+providerName();$('key').placeholder=openai?'sk-… · chiave OpenAI':'Incolla la tua chiave Gemini';
+  $('key-link').href=openai?'https://platform.openai.com/api-keys':'https://aistudio.google.com/apikey';$('key-link').textContent=openai?'Crea una chiave OpenAI ↗':'Ottieni una chiave in Google AI Studio ↗';
+  $('billing-link').hidden=!openai;$('test').textContent=openai?'✦ Testa il modello OpenAI':'✦ Trova un modello funzionante';
+  $('provider-hint').textContent=openai?'API a consumo, separate dall’abbonamento ChatGPT. Il test esegue una sola richiesta sul modello scelto. Nessun cambio automatico di modello o provider.':'Il test prova fino a 6 modelli, privilegiando Flash. L’accesso non garantisce quota gratuita: verifica il piano in AI Studio.';
+}
+function resetModels(){workingModels=[];$('model').replaceChildren();if(currentProvider==='openai')for(const name of OpenAIService.models)$('model').add(new Option(name,name));else $('model').add(new Option('Prima verifica la connessione',''));}
+$('provider').onchange=()=>{
+  providerSessions.set(currentProvider,{key:$('key').value,verified:[...workingModels],options:[...$('model').options].map(o=>[o.text,o.value]),selected:$('model').value});
+  currentProvider=$('provider').value;const saved=providerSessions.get(currentProvider);$('key').value=saved?.key||'';$('key').type='password';$('show-key').setAttribute('aria-label','Mostra chiave');
+  resetModels();if(saved){workingModels=saved.verified;$('model').replaceChildren(...saved.options.map(([text,value])=>new Option(text,value)));$('model').value=saved.selected;}
+  logs.clear();$('diagnostics').replaceChildren();$('test-count').textContent='';providerUI();sync();status(providerName()+' selezionato. '+(workingModels.includes($('model').value)?'Connessione già verificata in questa sessione.':'Inserisci la chiave e verifica il modello.'));
+};
 const activity=document.createElement('section');
 activity.id='activity';activity.hidden=true;activity.setAttribute('aria-label','Stato elaborazione');
 activity.innerHTML='<div class="activity-head"><span class="activity-spinner" aria-hidden="true"></span><div><strong id="activity-title"></strong><p id="activity-detail"></p></div><span id="activity-time">0:00</span></div><ol id="activity-steps"><li>Analisi PDF</li><li>Traduzione AI</li><li>Creazione PDF</li><li>Anteprima</li></ol><div class="activity-meta"><span id="activity-count">Avvio…</span><span id="activity-percent">0%</span></div><p id="activity-heartbeat"></p><details><summary>Attività e tentativi</summary><div id="activity-log" role="log" aria-live="polite"></div></details>';
@@ -35,7 +52,7 @@ function diagnostic(name,message,ok=false){
 }
 function sync(){
   $('translate').disabled=busy||!source||(!$('demo').checked&&(!workingModels.includes($('model').value)||!$('key').value.trim()));
-  for(const id of ['test','file','key','model','language','demo','show-key','sample'])$(id).disabled=busy;
+  for(const id of ['test','file','key','model','language','demo','show-key','sample','provider'])$(id).disabled=busy;
   $('cancel').hidden=!busy;$('translate').hidden=busy;
   $('prev').disabled=busy||!source||pageNumber===1;$('next').disabled=busy||!source||pageNumber>=source.numPages;
 }
@@ -79,16 +96,17 @@ $('sample').onclick=async()=>{
 for(const type of ['dragenter','dragover'])$('drop').addEventListener(type,e=>{e.preventDefault();if(!busy)$('drop').classList.add('drag');});
 for(const type of ['dragleave','drop'])$('drop').addEventListener(type,e=>{e.preventDefault();$('drop').classList.remove('drag');if(type==='drop')load(e.dataTransfer.files[0]);});
 $('show-key').onclick=()=>{const hidden=$('key').type==='password';$('key').type=hidden?'text':'password';$('show-key').setAttribute('aria-label',hidden?'Nascondi chiave':'Mostra chiave');};
-$('key').addEventListener('input',()=>{workingModels=[];$('model').replaceChildren(new Option('Verifica la nuova chiave',''));sync();});
+$('key').addEventListener('input',()=>{const selected=$('model').value;resetModels();if(currentProvider==='openai')$('model').value=selected;sync();});
 $('demo').onchange=sync;$('model').onchange=sync;
 $('prev').onclick=()=>{if(pageNumber>1){pageNumber--;preview();}};
 $('next').onclick=()=>{if(pageNumber<source.numPages){pageNumber++;preview();}};
 $('cancel').onclick=()=>{controller?.abort();status('Annullamento in corso…');};
 $('test').onclick=async()=>{
-  const key=$('key').value.trim();if(!key){status('Inserisci la tua API key Gemini.');$('key').focus();return;}
-  busy=true;controller=new AbortController();sync();startActivity('Verifica dei modelli Gemini',false);logs.clear();$('diagnostics').replaceChildren();$('diagnostics').parentElement.open=true;workingModels=[];$('model').replaceChildren();status('Cerco i modelli accessibili e verifico le risposte…');
+  const key=$('key').value.trim();if(!key){status('Inserisci la tua API key '+providerName()+'.');$('key').focus();return;}
+  const selectedModel=$('model').value;
+  busy=true;controller=new AbortController();sync();startActivity('Verifica connessione '+providerName(),false);logs.clear();$('diagnostics').replaceChildren();$('diagnostics').parentElement.open=true;workingModels=[];if(currentProvider!=='openai')$('model').replaceChildren();status('Verifico la risposta di '+providerName()+'…');
   try{
-    const count=await AI.discover(key,controller.signal,diagnostic,model=>{workingModels.push(model.name);$('model').add(new Option(model.displayName||model.name,model.name));});
+    const count=await service().discover(key,controller.signal,diagnostic,model=>{workingModels.push(model.name);if(currentProvider!=='openai')$('model').add(new Option(model.displayName||model.name,model.name));},selectedModel);
     status(`${count} modelli verificati. Puoi avviare la traduzione.`);
     endActivity('done',`${count} modelli hanno risposto correttamente.`);
   }catch(error){const message=controller.signal.aborted?'Test annullato.':error.message;status(message);if(!controller.signal.aborted)diagnostic('Connessione',error.message);endActivity(controller.signal.aborted?'cancelled':'error',message);}
@@ -111,7 +129,7 @@ $('translate').onclick=async()=>{
         while(offset+batch.length<unique.length&&batch.length<35){const text=unique[offset+batch.length];if(batch.length&&length+text.length>4500)break;batch.push(text);length+=text.length;}
         status(`Traduzione dei testi ${offset+1}–${offset+batch.length} di ${unique.length}…`);
         stage(1,'Traduzione in corso',`Invio dei testi ${offset+1}–${offset+batch.length} di ${unique.length}.`,20+offset/unique.length*60,`${offset} / ${unique.length} testi tradotti`);await paint();
-        const output=await AI.translate(batch,$('language').value,$('key').value.trim(),$('model').value,workingModels,signal,diagnostic,attempt=>{const message=`${attempt.model.replace('models/','')} · tentativo ${attempt.index} / ${attempt.total} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta (massimo 45 s)'}`;$('activity-detail').textContent=message;eventLog(message);});
+        const output=await service().translate(batch,$('language').value,$('key').value.trim(),$('model').value,workingModels,signal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · tentativo ${attempt.index} / ${attempt.total} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta (massimo 45 s)'}`;$('activity-detail').textContent=message;eventLog(message);});
         batch.forEach((text,i)=>cache.set(text,output[i]));offset+=batch.length;setProgress(20+offset/unique.length*60,`${offset} / ${unique.length} testi tradotti`);eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);
       }
     }
@@ -129,4 +147,4 @@ $('translate').onclick=async()=>{
   }catch(error){clearResult();const message=signal.aborted?'Operazione annullata. Puoi riprovare.':error.message;status(message);endActivity(signal.aborted?'cancelled':'error',message);}
   finally{busy=false;controller=null;sync();}
 };
-sync();
+providerUI();sync();

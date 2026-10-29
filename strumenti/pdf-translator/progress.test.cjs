@@ -4,6 +4,7 @@ class Element{
   constructor(){this.children=[];this.style={};this.dataset={};this.attrs={};this.value='';this.textContent='';this.hidden=false;this.classList={toggle(){},add(){},remove(){}};this.parentElement={};}
   setAttribute(k,v){this.attrs[k]=v;}removeAttribute(k){delete this.attrs[k];}
   append(e){this.children.push(e);}replaceChildren(...args){this.children=args;}before(){}scrollIntoView(){}addEventListener(){}focus(){}
+  add(e){this.children.push(e);}get options(){return this.children;}
   get firstChild(){return this.children[0];}
 }
 const elements=new Map(),get=id=>{if(!elements.has(id))elements.set(id,new Element());return elements.get(id);};
@@ -23,5 +24,9 @@ function reset(){resolveAI=rejectAI=null;context.fixture=fakeDoc;vm.runInContext
   resolveAI(['Ciao']);await job;assert.equal(activity.dataset.state,'done');assert.equal(get('activity-percent').textContent,'100%');assert.equal(get('download').hidden,false);assert.equal(activity.attrs['aria-busy'],'false');assert.equal(vm.runInContext('activityTimer',context),null);
   reset();job=get('translate').onclick();await flush();rejectAI(new Error('429 · Quota esaurita'));await job;assert.equal(activity.dataset.state,'error');assert.match(get('activity-detail').textContent,/429/);assert.equal(get('download').hidden,true);assert.equal(get('translate').disabled,false);
   reset();job=get('translate').onclick();await flush();get('cancel').onclick();await job;assert.equal(activity.dataset.state,'cancelled');assert.equal(get('download').hidden,true);assert.equal(vm.runInContext('activityTimer',context),null);
+  context.OpenAIService={models:['gpt-4.1-mini','gpt-4.1-nano','gpt-4o-mini']};get('key').value='gemini-test-key';get('provider').value='openai';get('provider').onchange();assert.equal(get('key').value,'');assert.equal(get('billing-link').hidden,false);assert.equal(get('translate').disabled,true);
+  get('key').value='openai-test-key';get('model').value='gpt-4.1-mini';vm.runInContext('workingModels=["gpt-4.1-mini"]',context);
+  get('provider').value='gemini';get('provider').onchange();assert.equal(get('key').value,'gemini-test-key');assert.equal(get('billing-link').hidden,true);
+  get('provider').value='openai';get('provider').onchange();assert.equal(get('key').value,'openai-test-key');assert.equal(get('model').value,'gpt-4.1-mini');assert.equal(get('translate').disabled,false);
   console.log('PASS: pending AI progress + attempt details, completed PDF, visible API error, cancellation, timer cleanup, retry enabled.');
 })().catch(error=>{vm.runInContext('clearInterval(activityTimer)',context);console.error(error);process.exitCode=1;});

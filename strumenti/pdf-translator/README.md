@@ -1,12 +1,22 @@
 # DocuShift
 
+## OpenAI
+
+Selezionare OpenAI nel menu Provider AI, inserire la propria chiave API Platform, scegliere GPT-4.1 mini, GPT-4.1 nano o GPT-4o mini e premere Testa il modello OpenAI. Ogni test esegue una sola richiesta a consumo sul modello selezionato. Nessun ripiego automatico su altri modelli o provider a pagamento. Il credito API è separato dall'abbonamento ChatGPT. Il link Credito API apre la fatturazione personale; questa app non effettua acquisti e non imposta un limite di spesa di 20 euro.
+
+La connessione usa POST https://api.openai.com/v1/responses con Authorization Bearer, store:false, timeout di 45 secondi e schema JSON rigoroso per le traduzioni. Le chiavi e i modelli verificati vengono mantenuti separatamente per provider, esclusivamente nella memoria della scheda. Il cambio provider non invia richieste. Una chiave modificata richiede una nuova verifica. Nei log non vengono incluse chiavi, testi dei documenti o messaggi grezzi del provider.
+
+`node strumenti/pdf-translator/openai.test.cjs`
+
+I test OpenAI usano risposte HTTP simulate; una verifica reale richiede la chiave del visitatore e credito disponibile.
+
 App statica per GitHub Pages. Aprire tramite HTTP, non file://. Nessun build e nessun backend.
 
-Ogni visitatore inserisce una chiave Gemini personale, mantenuta esclusivamente in memoria. Testi e richieste vengono inviati direttamente a generativelanguage.googleapis.com con header x-goog-api-key. Il PDF non viene caricato a un server. Nessun analytics o storage delle chiavi. Google Fonts viene usato per la sola UI.
+Ogni visitatore inserisce una chiave personale del provider scelto, mantenuta esclusivamente in memoria. Con Gemini i testi vengono inviati a generativelanguage.googleapis.com con header x-goog-api-key; con OpenAI a api.openai.com con Authorization Bearer. Il PDF non viene caricato a un server. Nessun analytics o storage delle chiavi. Google Fonts viene usato per la sola UI.
 
 La diagnostica elenca tramite models.list i modelli Gemini di testo e prova fino a sei modelli con generateContent, privilegiando Flash e Flash Lite stabili. Ogni test esegue una vera richiesta. Una risposta positiva non certifica un piano gratuito: controllare quote e fatturazione in Google AI Studio. I limiti possono essere condivisi fra modelli. La traduzione ripiega esclusivamente sui modelli già verificati e interrompe l'esportazione se un blocco non viene tradotto. Nessuna promessa di disponibilità gratuita illimitata.
 
-Modalità simulata: nessuna chiamata Gemini; sostituisce le righe con [TEST n]. Serve per verificare caricamento, rimozione del testo, rendering ed esportazione.
+Modalità simulata: nessuna chiamata AI; sostituisce le righe con [TEST n]. Serve per verificare caricamento, rimozione del testo, rendering ed esportazione.
 
 ## Motore PDF beta
 
