@@ -351,6 +351,8 @@
     }
   </style>
   <link rel="stylesheet" href="/neural-network.css?v=3d-3">
+  <link rel="stylesheet" href="/project-reels.css">
+  <script src="/project-reels.js" defer></script>
 </head>
 <body>
   <!-- Aurora background: soft drifting lights -->
@@ -461,63 +463,36 @@
 
     <section class="section" id="progetti">
       <div class="reveal"><p class="section__label">02 — Progetti</p><h2 class="section__title">Progetti AI</h2></div>
-      <div class="hex-orbit reveal" id="hex-orbit">
-        <div class="hex-orbit__track"><div class="hex-orbit__sweep"></div><div class="hex-orbit__sweep"></div><div class="hex-orbit__sweep"></div></div>
-        <div class="hex-orbit__ring" id="hex-ring">
-          <a href="progetti.html#formazione" class="hex-card" data-project="formazione">
-            <div class="hex-card__border"></div>
-            <div class="hex-card__shape">
-              <div class="hex-card__inner">
-                <div class="hex-card__img">
-                  <img src="img/formazione-ai-rete-neurale-deep-learning.webp?v=0abae173" alt="Libro digitale luminoso con rete neurale — simbolo della formazione AI">
-                </div>
-                <div class="hex-card__title">Progetti di Formazione</div>
-              </div>
-            </div>
-          </a>
-          <a href="progetti.html#strumenti" class="hex-card" data-project="altri">
-            <div class="hex-card__border"></div>
-            <div class="hex-card__shape">
-              <div class="hex-card__inner">
-                <div class="hex-card__img">
-                  <img src="img/dashboard-ai-monitoraggio-dati-analytics.webp" alt="Dashboard AI per il monitoraggio in tempo reale di dati e analytics">
-                </div>
-                <div class="hex-card__title">Strumenti</div>
-              </div>
-            </div>
-          </a>
-          <a href="progetti.html#articoli" class="hex-card" data-project="blog">
-            <div class="hex-card__border"></div>
-            <div class="hex-card__shape">
-              <div class="hex-card__inner">
-                <div class="hex-card__img">
-                  <img src="img/articoli-ai-approfondimenti-guide.webp?v=4ba6e948" alt="Visualizzazione astratta di dati e connessioni AI per articoli tecnici">
-                </div>
-                <div class="hex-card__title">Articoli</div>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
 
-      <!-- Mobile project links (hidden on desktop) -->
-      <div class="proj-mobile" style="display:none">
-        <a href="progetti.html#formazione" class="proj-mobile__link">
-          <div class="proj-mobile__icon"><svg viewBox="0 0 24 24"><path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5c0 0 2.5 3 6 3s6-3 6-3v-5"/></svg></div>
-          <div class="proj-mobile__text"><div class="proj-mobile__name">Progetti di Formazione</div><div class="proj-mobile__sub">Corsi, workshop e materiali didattici</div></div>
-          <svg class="proj-mobile__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-        </a>
-        <a href="progetti.html#strumenti" class="proj-mobile__link">
-          <div class="proj-mobile__icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg></div>
-          <div class="proj-mobile__text"><div class="proj-mobile__name">Strumenti</div><div class="proj-mobile__sub">Dashboard, automazioni e demo AI</div></div>
-          <svg class="proj-mobile__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-        </a>
-        <a href="progetti.html#articoli" class="proj-mobile__link">
-          <div class="proj-mobile__icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-          <div class="proj-mobile__text"><div class="proj-mobile__name">Articoli</div><div class="proj-mobile__sub">Approfondimenti tecnici e guide AI</div></div>
-          <svg class="proj-mobile__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-        </a>
-      </div>
+      <section class="project-reel" data-direction="right" aria-labelledby="reel-formazione">
+        <header class="project-reel__header"><div><span class="project-reel__index">01 / ESPLORA</span><h3 id="reel-formazione">Formazione</h3></div><div class="project-reel__actions"><button class="project-reel__pause" type="button" aria-label="Pausa carosello Formazione" aria-pressed="false" hidden><span aria-hidden="true">Ⅱ</span></button><a class="project-reel__all" href="/progetti.html#formazione">Tutti i progetti <span aria-hidden="true">↗</span></a></div></header>
+        <div class="project-reel__viewport" aria-label="Progetti: Formazione"><div class="project-reel__track"><div class="project-reel__group">
+          <a class="reel-card" href="/formazione/atlante-neuroni/"><div class="reel-card__image"><img src="/img/atlante-neuroni.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>Come funziona un neurone</h4><span aria-hidden="true">↗</span></div></a>
+          <a class="reel-card" href="/formazione/mark-i-perceptron/"><div class="reel-card__image"><img src="/img/mark-i-perceptron-laboratorio-interattivo.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>Mark I — Il Perceptron</h4><span aria-hidden="true">↗</span></div></a>
+          <a class="reel-card" href="/formazione/neuropong/"><div class="reel-card__image"><img src="/img/neuropong-ai-pong-reinforcement-learning.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>NeuroPong — AI Self-Play</h4><span aria-hidden="true">↗</span></div></a>
+          <a class="reel-card" href="/formazione/llm-radar/"><div class="reel-card__image"><img src="/img/llm-radar-confronto-benchmark-ai.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>LLM Radar — Confronto Benchmark</h4><span aria-hidden="true">↗</span></div></a>
+          <a class="reel-card" href="/formazione/trainable-deep-network/"><div class="reel-card__image"><img src="/img/trainable-deep-network-riconoscimento-cifre.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>Trainable Deep Network</h4><span aria-hidden="true">↗</span></div></a>
+        </div></div></div>
+      </section>
+
+      <section class="project-reel" data-direction="left" aria-labelledby="reel-strumenti">
+        <header class="project-reel__header"><div><span class="project-reel__index">02 / ESPLORA</span><h3 id="reel-strumenti">Strumenti</h3></div><div class="project-reel__actions"><button class="project-reel__pause" type="button" aria-label="Pausa carosello Strumenti" aria-pressed="false" hidden><span aria-hidden="true">Ⅱ</span></button><a class="project-reel__all" href="/progetti.html#strumenti">Tutti gli strumenti <span aria-hidden="true">↗</span></a></div></header>
+        <div class="project-reel__viewport" aria-label="Progetti: Strumenti"><div class="project-reel__track"><div class="project-reel__group">
+          <a class="reel-card" href="/strumenti/pixelforge/"><div class="reel-card__image"><img src="/img/pixelforge-convertitore-immagini-ai.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>PixelForge — Image Converter</h4><span aria-hidden="true">↗</span></div></a>
+          <a class="reel-card" href="/strumenti/manuale-enterprise/"><div class="reel-card__image"><img src="/img/omnimanual-suite-documentale-enterprise.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>OmniManual — Enterprise Suite</h4><span aria-hidden="true">↗</span></div></a>
+          <a class="reel-card" href="/strumenti/pdf-translator/"><div class="reel-card__image"><img src="/img/docushift-ai-traduttore-pdf-layout.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>DocuShift AI — Traduttore PDF</h4><span aria-hidden="true">↗</span></div></a>
+        </div></div></div>
+      </section>
+
+      <section class="project-reel" data-direction="right" aria-labelledby="reel-articoli">
+        <header class="project-reel__header"><div><span class="project-reel__index">03 / ESPLORA</span><h3 id="reel-articoli">Articoli</h3></div><div class="project-reel__actions"><button class="project-reel__pause" type="button" aria-label="Pausa carosello Articoli" aria-pressed="false" hidden><span aria-hidden="true">Ⅱ</span></button><a class="project-reel__all" href="/progetti.html#articoli">Tutti gli articoli <span aria-hidden="true">↗</span></a></div></header>
+        <div class="project-reel__viewport" aria-label="Progetti: Articoli"><div class="project-reel__track"><div class="project-reel__group">
+          <a class="reel-card" href="/articoli/cosa-sono-gli-agenti-ai/"><div class="reel-card__image"><img src="/img/agenti-ai-dalla-chat-all-azione.svg" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>Dalla chat all’azione: gli agenti AI</h4><span aria-hidden="true">↗</span></div></a>
+          <a class="reel-card" href="/articoli/come-ragiona-un-llm/"><div class="reel-card__image"><img src="/img/come-ragiona-un-llm-cover.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>Come Ragiona un LLM</h4><span aria-hidden="true">↗</span></div></a>
+          <a class="reel-card" href="/articoli/dal-perceptron-al-transformer/"><div class="reel-card__image"><img src="/img/dal-perceptron-al-transformer-storia-reti-neurali.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>Dal Perceptron al Transformer</h4><span aria-hidden="true">↗</span></div></a>
+          <a class="reel-card" href="/articoli/allucinazioni-ai/"><div class="reel-card__image"><img src="/img/allucinazioni-ai-come-riconoscerle.webp" alt="" loading="lazy" width="640" height="400"></div><div class="reel-card__caption"><h4>Allucinazioni AI</h4><span aria-hidden="true">↗</span></div></a>
+        </div></div></div>
+      </section>
     </section>
 
     <section class="section" id="risorse">
@@ -844,111 +819,7 @@
   })();
   </script>
 
-  <!-- Hex orbit: JS-driven rotation + proximity glow -->
-  <script>
-  (function(){
-    'use strict';
-    const ring = document.getElementById('hex-ring');
-    const hexCards = document.querySelectorAll('.hex-card');
-    const orbitEl = document.getElementById('hex-orbit');
-    if (!ring || !hexCards.length || !orbitEl) return;
 
-    // Rotation state
-    const FULL_SPEED = 360 / 80; // deg/s (matches original 80s cycle)
-    let angle = 0;
-    let speed = FULL_SPEED;
-    let targetSpeed = FULL_SPEED;
-    let anyHovered = false;
-
-    // Glow state
-    const GLOW_RADIUS = 280;
-    const hexStates = [];
-    let hMx = -9999, hMy = -9999;
-
-    // Card offsets (from CSS translate values)
-    const offsets = [
-      { x: 210, y: 0 },
-      { x: -105, y: -182 },
-      { x: -105, y: 182 }
-    ];
-
-    hexCards.forEach((card, i) => {
-      const border = card.querySelector('.hex-card__border');
-      const shape = card.querySelector('.hex-card__shape');
-      hexStates.push({ card, border, shape, offset: offsets[i], alpha: 0, targetAlpha: 0 });
-
-      card.addEventListener('mouseenter', () => { anyHovered = true; });
-      card.addEventListener('mouseleave', () => { anyHovered = false; });
-    });
-
-    window.addEventListener('mousemove', e => {
-      hMx = e.clientX;
-      hMy = e.clientY;
-    }, { passive: true });
-
-    // Get orbit center in screen coords
-    function getOrbitCenter() {
-      const r = orbitEl.getBoundingClientRect();
-      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    }
-
-    let lastTs = 0;
-    function loop(ts) {
-      const dt = Math.min((ts - lastTs) / 1000, 0.1);
-      lastTs = ts;
-
-      // Smooth speed control
-      targetSpeed = anyHovered ? 0 : FULL_SPEED;
-      const speedLerp = 1 - Math.pow(0.04, dt);
-      speed += (targetSpeed - speed) * speedLerp;
-
-      // Update angle
-      angle += speed * dt;
-      if (angle >= 360) angle -= 360;
-
-      // Apply ring rotation
-      ring.style.transform = 'rotate(' + angle + 'deg)';
-
-      // Counter-rotate shapes and borders
-      const counterAngle = -angle;
-      const orbitCenter = getOrbitCenter();
-      const rad = angle * Math.PI / 180;
-
-      hexStates.forEach(state => {
-        const counterStr = 'rotate(' + counterAngle + 'deg)';
-        state.shape.style.transform = counterStr;
-        state.border.style.transform = counterStr;
-
-        // Compute actual screen center of this card
-        const ox = state.offset.x;
-        const oy = state.offset.y;
-        const cosA = Math.cos(rad);
-        const sinA = Math.sin(rad);
-        const screenX = orbitCenter.x + ox * cosA - oy * sinA;
-        const screenY = orbitCenter.y + ox * sinA + oy * cosA;
-
-        // Proximity glow
-        const dist = Math.hypot(hMx - screenX, hMy - screenY);
-        state.targetAlpha = dist < GLOW_RADIUS
-          ? Math.pow(Math.max(0, 1 - dist / GLOW_RADIUS), 1.2)
-          : 0;
-
-        const glowLerp = 1 - Math.pow(0.1, dt);
-        state.alpha += (state.targetAlpha - state.alpha) * glowLerp;
-        state.border.style.opacity = state.alpha;
-
-        // Mouse position relative to border element (206x232, card 200x226 + inset 3px)
-        const relX = (hMx - screenX) + 103;
-        const relY = (hMy - screenY) + 116;
-        state.border.style.setProperty('--hx', relX + 'px');
-        state.border.style.setProperty('--hy', relY + 'px');
-      });
-
-      requestAnimationFrame(loop);
-    }
-    requestAnimationFrame(loop);
-  })();
-  </script>
 
   <!-- Contact form -->
   <script>
