@@ -6,9 +6,7 @@
     const viewport = reel.querySelector('.project-reel__viewport');
     const track = reel.querySelector('.project-reel__track');
     const original = reel.querySelector('.project-reel__group');
-    const button = reel.querySelector('.project-reel__pause');
-    const label = reel.querySelector('h3').textContent;
-    let period = 0, position = 0, paused = false, hovered = false, focused = false;
+    let period = 0, position = 0, hovered = false, focused = false;
     let touching = false, visible = false, frame = null, last = 0, resumeAt = 0;
     function setup() {
       track.querySelectorAll('[data-copy]').forEach(copy => copy.remove());
@@ -24,14 +22,13 @@
         }
         position = period; viewport.scrollLeft = position;
       } else { position = 0; viewport.scrollLeft = 0; }
-      button.hidden = reduced.matches;
       sync();
     }
     function tick(stamp) {
       frame = null;
       const dt = last ? Math.min((stamp-last)/1000,.05) : 0;
       last = stamp;
-      if (!paused && !hovered && !focused && !touching && stamp > resumeAt && period) {
+      if (!hovered && !focused && !touching && stamp > resumeAt && period) {
         position += (reel.dataset.direction === 'right' ? -1 : 1) * dt * 27;
         if (position < period) position += period;
         if (position >= period * 2) position -= period;
@@ -44,12 +41,6 @@
       frame = null; last = 0;
       if (visible && !document.hidden && !reduced.matches) frame = requestAnimationFrame(tick);
     }
-    button.addEventListener('click', () => {
-      paused = !paused;
-      button.setAttribute('aria-pressed',String(paused));
-      button.setAttribute('aria-label',`${paused ? 'Riprendi' : 'Pausa'} carosello ${label}`);
-      button.firstElementChild.textContent = paused ? '▷' : 'Ⅱ';
-    });
     viewport.addEventListener('pointerenter',e => { if (e.pointerType === 'mouse') hovered = true; });
     viewport.addEventListener('pointerleave',() => { hovered = false; });
     viewport.addEventListener('focusin',() => { focused = true; });
