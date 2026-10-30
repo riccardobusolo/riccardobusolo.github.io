@@ -1,17 +1,54 @@
-/* Native cursor: no overlay, input delay or interference with drag gestures. */
+/* The native pointer remains available until the enhanced cursor is ready. */
 @media (hover: hover) and (pointer: fine) {
   html, body, body :where(*:not(input):not(textarea):not([contenteditable="true"]):not([contenteditable="true"] *)) {
     cursor: url("/img/site-cursor.svg") 22 17, auto !important;
   }
-  input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
-  textarea, [contenteditable="true"], [contenteditable="true"] * {
-    cursor: text !important;
-  }
-  input[type="button"], input[type="submit"], input[type="checkbox"], input[type="radio"], input[type="range"], input[type="color"] {
-    cursor: url("/img/site-cursor.svg") 22 17, pointer !important;
-  }
-  :disabled, [aria-disabled="true"] { cursor: not-allowed !important; }
+  input, textarea, [contenteditable="true"], [contenteditable="true"] * { cursor: auto !important; }
+  html.site-cursor-active, html.site-cursor-active * { cursor: none !important; }
+}
+.site-cursor {
+  position: fixed; top: 0; left: 0; width: 72px; height: 72px;
+  z-index: 2147483647; pointer-events: none; opacity: 0;
+  transition: opacity .16s; contain: layout style;
+}
+.site-cursor.is-visible { opacity: 1; }
+.site-cursor__shape {
+  width: 72px; height: 72px; transform-origin: 22px 17px;
+  animation: cursor-wiggle 18s ease-in-out infinite;
+}
+.site-cursor__shape svg {
+  display: block; width: 72px; height: 72px; overflow: visible;
+  transform-origin: 22px 17px;
+  transition: transform .5s cubic-bezier(.22,1,.36,1);
+}
+.site-cursor__glow {
+  fill: #8bbdff; stroke: #7bafff; stroke-width: 8px;
+  filter: blur(6px); opacity: .8;
+  transition: fill .45s, stroke .45s, opacity .45s;
+}
+.site-cursor__arrow {
+  fill: #080c14; stroke: #f4f7ff; stroke-width: 2.2px;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 2px rgba(255,255,255,.5));
+  transition: fill .45s, stroke .45s;
+}
+.site-cursor.is-interactive .site-cursor__shape svg { transform: scale(1.13); }
+.site-cursor.is-interactive .site-cursor__glow { fill: #65ffe2; stroke: #54e9db; opacity: 1; }
+.site-cursor.is-interactive .site-cursor__arrow { fill: #12302f; stroke: #b3fff0; }
+.site-cursor.is-pressed .site-cursor__shape svg { transform: scale(.94); }
+.site-cursor.is-pressed .site-cursor__shape { animation-play-state: paused; }
+/* Both transforms pivot on the hotspot: the tip never moves away from the mouse. */
+@keyframes cursor-wiggle {
+  0%, 65%, 100% { transform: rotate(0deg); }
+  74% { transform: rotate(-7deg); }
+  84% { transform: rotate(5deg); }
+  93% { transform: rotate(-2deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-cursor__shape { animation: none; }
+  .site-cursor, .site-cursor__shape svg, .site-cursor__glow, .site-cursor__arrow { transition: none; }
 }
 @media (forced-colors: active) {
   html, body, body * { cursor: revert !important; }
+  .site-cursor { display: none; }
 }
