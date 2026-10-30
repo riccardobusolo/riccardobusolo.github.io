@@ -52,3 +52,7 @@
   html, body, body * { cursor: revert !important; }
   .site-cursor { display: none; }
 }
+/* Text selection stays precise: the I-beam neither wiggles nor scales. */
+.site-cursor.is-text .site-cursor__shape { animation: none; }
+.site-cursor.is-text .site-cursor__shape svg { transform: none; }
+.site-cursor.is-text .site-cursor__glow { opacity: .6; }
