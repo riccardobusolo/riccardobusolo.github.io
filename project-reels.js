@@ -43,12 +43,14 @@
     }
     viewport.addEventListener('pointerenter',e => { if (e.pointerType === 'mouse') hovered = true; });
     viewport.addEventListener('pointerleave',() => { hovered = false; });
-    viewport.addEventListener('focusin',() => { focused = true; });
-    viewport.addEventListener('focusout',e => { focused = viewport.contains(e.relatedTarget); });
+    viewport.addEventListener('focusin',e => { focused = e.target.matches(':focus-visible'); });
+    viewport.addEventListener('focusout',e => { focused = !!e.relatedTarget && viewport.contains(e.relatedTarget) && e.relatedTarget.matches(':focus-visible'); });
     let drag = null, suppressClickUntil = 0;
     viewport.addEventListener('dragstart',e => e.preventDefault());
     viewport.addEventListener('pointerdown',e => {
       if (!e.isPrimary || e.button !== 0) return;
+
+      focused = false;
       suppressClickUntil = 0;
       touching = true;
       drag = { id:e.pointerId, startX:e.clientX, startY:e.clientY, lastX:e.clientX, active:false };
@@ -88,6 +90,7 @@
     window.addEventListener('pointercancel',endDrag);
     viewport.addEventListener('lostpointercapture',endDrag);
     window.addEventListener('blur',endDrag);
+    window.addEventListener('dragend',endDrag);
     viewport.addEventListener('click',e => {
       if (e.detail !== 0 && performance.now() < suppressClickUntil) {
         e.preventDefault(); e.stopPropagation();
