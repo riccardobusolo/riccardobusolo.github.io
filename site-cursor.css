@@ -1,0 +1,17 @@
+/* Native cursor: no overlay, input delay or interference with drag gestures. */
+@media (hover: hover) and (pointer: fine) {
+  html, body, body :where(*:not(input):not(textarea):not([contenteditable="true"]):not([contenteditable="true"] *)) {
+    cursor: url("/img/site-cursor.svg") 22 17, auto !important;
+  }
+  input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  textarea, [contenteditable="true"], [contenteditable="true"] * {
+    cursor: text !important;
+  }
+  input[type="button"], input[type="submit"], input[type="checkbox"], input[type="radio"], input[type="range"], input[type="color"] {
+    cursor: url("/img/site-cursor.svg") 22 17, pointer !important;
+  }
+  :disabled, [aria-disabled="true"] { cursor: not-allowed !important; }
+}
+@media (forced-colors: active) {
+  html, body, body * { cursor: revert !important; }
+}
