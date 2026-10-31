@@ -56,3 +56,28 @@
 .site-cursor.is-text .site-cursor__shape { animation: none; }
 .site-cursor.is-text .site-cursor__shape svg { transform: none; }
 .site-cursor.is-text .site-cursor__glow { opacity: .6; }
+
+/* Native control parts are pseudo-elements: the universal selector misses them.
+   Keep vendor selectors separate so unsupported ones cannot invalidate a rule. */
+@media (hover: hover) and (pointer: fine) and (forced-colors: none) {
+  html { --site-control-cursor: url("/img/site-cursor.svg") 22 17, default; }
+  html.site-cursor-active { --site-control-cursor: none; }
+  html body input[type="range"],
+  html body input[type="button"],
+  html body input[type="submit"],
+  html body input[type="checkbox"],
+  html body input[type="radio"],
+  html body input[type="color"],
+  html body input[type="file"],
+  html body select,
+  html body *::before,
+  html body *::after {
+    cursor: var(--site-control-cursor) !important;
+  }
+  html body input[type="range"]::-webkit-slider-thumb { cursor: var(--site-control-cursor) !important; }
+  html body input[type="range"]::-webkit-slider-runnable-track { cursor: var(--site-control-cursor) !important; }
+  html body input[type="range"]::-moz-range-thumb { cursor: var(--site-control-cursor) !important; }
+  html body input[type="range"]::-moz-range-track { cursor: var(--site-control-cursor) !important; }
+  html body input[type="range"]::-moz-range-progress { cursor: var(--site-control-cursor) !important; }
+  html body input::file-selector-button { cursor: var(--site-control-cursor) !important; }
+}
