@@ -73,3 +73,21 @@ footer a:hover{color:var(--mint)}
 @media(max-width:1000px){.orbit{right:0;opacity:.65}.hero p{max-width:400px}.workflow{grid-template-columns:260px minmax(0,1fr)}.workspace{padding:18px}.action-row{flex-wrap:wrap}}
 @media(max-width:740px){header{padding:0 18px 0 80px;height:76px}.brand small{display:none}header .pill{font-size:8px;padding:6px 8px}main{padding:0 20px}.hero{padding:36px 0;min-height:320px}.hero h1{font-size:40px;letter-spacing:-1.5px}.hero p{font-size:15px}.orbit{display:none}.features{flex-wrap:wrap;gap:8px 14px;font-size:9px}.workflow{grid-template-columns:1fr}.section-title{align-items:center;gap:12px}.section-title h2{font-size:19px}.section-title .pill{font-size:8px;white-space:nowrap}.panel{padding:20px}.workspace{padding:16px}.drop{padding:18px 12px}.drop small{font-size:10px}.previews{grid-template-columns:1fr;gap:20px}.canvas-wrap{min-height:220px}footer{align-items:flex-start;flex-direction:column;gap:10px}footer p{margin:0}.brand b{font-size:18px}}
 @media(max-width:380px){header .pill{max-width:112px;text-align:center}.section-title{align-items:flex-start;flex-direction:column}.features{font-size:8px}}
+
+
+/* The introduction lives in the toolbar; the workspace starts immediately below. */
+.compact-header{max-width:none;min-height:100px;height:auto;padding:14px 32px 14px 92px;display:grid;grid-template-columns:160px minmax(0,1fr) 90px auto;gap:24px;align-items:center}
+.compact-header .brand{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.compact-header .brand small{border:0;padding:0;font-size:9px;display:block}
+.header-intro{min-width:0}
+.header-intro h1{font-size:22px;line-height:1.25;letter-spacing:-.6px;margin:0 0 4px}
+.header-intro p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
+.header-intro .features{margin:5px 0 0;gap:16px;font-size:9px}
+.header-art{width:90px;height:68px;position:relative}
+.header-art .orbit{display:block;left:0;right:auto;top:3px;opacity:1;transform:scale(.25);transform-origin:top left}
+.studio{border-top:0;padding-top:16px}
+.section-title{margin-bottom:16px}
+.section-title h2{font-size:18px;margin:0}
+@media(min-width:1600px){.compact-header{grid-template-columns:180px minmax(0,1fr) 90px auto}.header-intro h1{font-size:24px}}
+@media(max-width:1000px){.compact-header{grid-template-columns:130px minmax(0,1fr) 80px;gap:16px;padding-right:24px}.compact-header>.pill{display:none}.header-intro h1{font-size:20px}.header-art{width:80px}}
+@media(max-width:600px){.compact-header{grid-template-columns:minmax(0,1fr) 76px;padding:16px 20px 16px 80px;gap:12px}.compact-header .brand{grid-column:1}.compact-header .brand small{font-size:8px}.header-art{grid-column:2;grid-row:1;width:76px;height:48px}.header-art .orbit{transform:scale(.19)}.header-intro{grid-column:1/-1;margin-left:-60px}.header-intro h1{font-size:20px;letter-spacing:-.5px}.header-intro p{font-size:12px}.header-intro .features{font-size:8px;gap:12px}.studio{padding-top:16px}.section-title{flex-direction:row;align-items:center}.section-title h2{font-size:16px}.section-title .pill{font-size:7px}}
