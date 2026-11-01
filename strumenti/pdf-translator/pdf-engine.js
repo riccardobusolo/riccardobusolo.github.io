@@ -103,7 +103,8 @@ window.PDFEngine = (() => {
     }
     // Neighbours on the same baseline reveal tables, headers and TOC entries.
     for(const L of lines)for(const M of lines){
-      if(M===L||Math.abs(M.y-L.y)>.35*Math.max(L.size,M.size)||MARKER_ONLY.test(M.text))continue;
+      if(M===L||Math.abs(M.y-L.y)>.35*Math.max(L.size,M.size))continue;
+      if(MARKER_ONLY.test(M.text)){if(M.right<=L.x+1)L.marker=true;continue;}
       if(M.right<=L.x+1){L.left=true;L.leftRight=Math.max(L.leftRight??-Infinity,M.right);}
       else if(M.x>=L.right-1)L.rightX=Math.min(L.rightX??Infinity,M.x);
     }
@@ -150,6 +151,8 @@ window.PDFEngine = (() => {
     else if(styles.length===1)unit.text=plain;
     else unit.text=runs.map(r=>{const i=index.get(keyOf(r)),t=r.text;if(i===base||!t.trim())return t;const m=/^(\s*)([\s\S]*?)(\s*)$/.exec(t);return `${m[1]}<s${i}>${m[2]}</s${i}>${m[3]}`;}).join('').replace(/\s+/g,' ').trim();
     unit.translate=hasWords(plain);
+    unit.table=lines.length===1&&(first.left||first.rightX!==undefined);unit.marker=!!first.marker;
+    const gaps=lines.slice(1).map((L,i)=>lines[i].y-L.y).sort((a,b)=>a-b);unit.leading=gaps.length?gaps[gaps.length>>1]:size*1.2;
     // Available width. Paragraphs keep their column; isolated labels may grow a
     // little; table cells must stay inside their original box.
     const single=lines.length===1,center=(first.x+right)/2;
@@ -192,7 +195,41 @@ window.PDFEngine = (() => {
         }
         if(area>total*.2&&changed<Math.max(3,area*.002)){unit.hidden=true;unit.translate=false;}
       });
+      // Free space around each block: graphics (pixels that differ from the block's own
+      // background in the text-free render) and other text blocks are obstacles.
+      const W=b.width,H=b.height,scale=1.5,visible=units.map(u=>!u.hidden);
+      const occupied=new Uint8Array(W*H);rects.forEach((list,u)=>{if(visible[u])for(const[l,t,r,btm]of list)for(let y=t;y<btm;y++)occupied.fill(1,y*W+l,y*W+r);});
+      units.forEach((unit,u)=>{
+        if(unit.hidden||!rects[u].length)return;
+        const own=rects[u],[l0,t0,r0,b0]=own[0],last=own.at(-1);
+        const counts=new Map();for(let y=t0;y<b0;y+=2)for(let x=l0;x<r0;x+=2){const i=(y*W+x)*4,key=(b.data[i]>>4)+','+(b.data[i+1]>>4)+','+(b.data[i+2]>>4);counts.set(key,(counts.get(key)||0)+1);}
+        let bgKey='15,15,15',max=0;for(const[k,v]of counts)if(v>max){max=v;bgKey=k;}const bg=bgKey.split(',').map(v=>v*16+8);
+        const inOwn=(x,y)=>own.some(([l,t,r,btm])=>x>=l&&x<r&&y>=t&&y<btm);
+        const blocked=(x,y)=>{const k=y*W+x,i=k*4;if(occupied[k]&&!inOwn(x,y))return true;return Math.abs(b.data[i]-bg[0])+Math.abs(b.data[i+1]-bg[1])+Math.abs(b.data[i+2]-bg[2])>60;};
+        let x=r0;outer:for(;x<W;x++)for(let y=t0;y<b0;y++)if(blocked(x,y))break outer;
+        unit.spaceRight=Math.max(0,Math.min((x-r0)/scale,page.view[2]-28-unit.right));
+        const right=Math.min(W,Math.ceil(Math.max(r0,(Math.max(unit.right,unit.maxRight||0))*scale)));
+        let y=last[3];outer2:for(;y<H;y++)for(let xx=l0;xx<right;xx++)if(blocked(xx,y))break outer2;
+        unit.spaceBelow=Math.max(0,Math.min((y-last[3])/scale,unit.lines.at(-1).y-.2*unit.size-28));
+      });
     }catch{/* rendering is only a refinement: keep every block if it fails */}
+  }
+
+  // Isolated labels may grow into the free space measured on their right.
+  function widen(units){
+    for(const u of units)if(u.spaceRight!==undefined&&u.lines.length===1&&!u.table&&!u.leader&&u.align==='left')u.maxRight=Math.max(u.right,u.right+u.spaceRight-.6*u.size);
+  }
+  // A flow is a column of consecutive left-aligned blocks with the same body size:
+  // when a translation needs an extra line, the blocks below move down together, and
+  // any reduction is shared so the whole column keeps one size.
+  function assignFlows(units,page){
+    const ok=u=>!u.hidden&&u.translate&&!u.leader&&!u.table&&!u.marker&&u.align==='left';
+    const sorted=units.filter(ok).sort((a,b)=>b.y-a.y),flows=[];
+    for(const u of sorted){
+      const f=flows.find(f=>{const L=f.at(-1),gap=L.lines.at(-1).y-u.y;return Math.abs(L.x-u.x)<=2&&Math.abs(L.size-u.size)<=.35&&gap>.8*u.size&&gap<=4*u.size;});
+      if(f)f.push(u);else flows.push([u]);
+    }
+    flows.forEach((f,i)=>f.forEach(u=>u.flow=`${page}-${i}`));
   }
 
   async function parse(bytes,signal,progress){
@@ -240,6 +277,7 @@ window.PDFEngine = (() => {
         const lines=toLines(blocks),geometry={lines,width:page.view[2],left:Math.min(...lines.map(L=>L.x)),right:Math.max(...lines.map(L=>L.right))};
         const units=group(lines).map(P=>finalize(P,geometry));
         if(stripped)await markHidden(page,stripped,n,units);
+        widen(units);assignFlows(units,n);
         pages.push(units);progress(n,reader.numPages,'extract');await new Promise(resolve=>setTimeout(resolve,0));
       }
     }finally{await reader.destroy();await strippedDoc?.destroy();strippedDoc=strippedSource=null;}
@@ -249,7 +287,7 @@ window.PDFEngine = (() => {
   // ---------------------------------------------------------------------------
   // Composition
   // ---------------------------------------------------------------------------
-  const scriptBase=(()=>{try{return new URL('.',document.currentScript.src).href;}catch{return null;}})();
+  const scriptBase=(()=>{try{return new URL('.',document.currentScript?.src||document.baseURI).href;}catch{return null;}})();
   const STANDARD={arimo:'Helvetica',carlito:'Helvetica',tinos:'Times',caladea:'Times',mono:'Courier'};
   const STANDARD_NAMES={Helvetica:['Helvetica','Helvetica-Bold','Helvetica-Oblique','Helvetica-BoldOblique'],Times:['Times-Roman','Times-Bold','Times-Italic','Times-BoldItalic'],Courier:['Courier','Courier-Bold','Courier-Oblique','Courier-BoldOblique']};
   const fontFiles=new Map();
@@ -300,13 +338,14 @@ window.PDFEngine = (() => {
     return groups;
   }
 
-  async function layout(unit,text,fonts){
+  const STEPS=[[1,1],[1,.975],[1,.95],[1,.925],[1,.9]];for(let scale=.975;scale>=.3-1e-9;scale-=.025)STEPS.push([scale,.9]);
+
+  async function prepare(unit,text,fonts){
     const groups=tokens(text,unit);if(!groups.length)return null;
     for(const g of groups){const pieces=[];for(const p of g.pieces)for(const seg of await fonts.split(unit.styles[p.style],p.text))pieces.push({...seg,style:p.style,unit:fonts.width(seg.font,seg.text)});g.pieces=pieces;}
     const baseStyle=unit.styles[unit.base],spaceFont=(await fonts.split(baseStyle,'n'))[0].font,spaceUnit=fonts.width(spaceFont,' ');
     const number=unit.leader?.number?(await fonts.split(baseStyle,unit.leader.number))[0]:null;
     const dotFont=unit.leader?(await fonts.split(baseStyle,'.'))[0].font:null;
-    const measure=(scale,squeeze)=>{for(const g of groups){g.width=0;for(const p of g.pieces){p.size=unit.styles[p.style].size*scale;p.width=p.unit*p.size*squeeze;g.width+=p.width;}}return spaceUnit*baseStyle.size*scale*squeeze;};
     const slots=unit.lines.map(L=>{
       if(unit.align==='center')return 2*unit.halfWidth;
       if(unit.align==='right')return unit.right-unit.leftLimit;
@@ -314,35 +353,52 @@ window.PDFEngine = (() => {
       if(unit.leader)avail-=(number?fonts.width(number.font,number.text)*baseStyle.size+baseStyle.size*.4:0)+fonts.width(dotFont,'...')*baseStyle.size;
       return avail;
     });
-    // Gentle horizontal condensing first (barely visible), then a smaller size.
-    const steps=[[1,1],[1,.975],[1,.95],[1,.925],[1,.9]];for(let scale=.975;scale>=.3-1e-9;scale-=.025)steps.push([scale,.9]);
-    let best=null;
-    for(const[scale,squeeze]of steps){
-      const space=measure(scale,squeeze),rows=[[]],widths=[0];let ok=true;
-      for(const g of groups){
-        let row=rows.length-1,w=widths[row]+(rows[row].length?space:0)+g.width;
-        if(rows[row].length&&w>slots[row]+.01){if(rows.length===slots.length){ok=false;break;}rows.push([]);widths.push(0);row++;w=g.width;}
-        if(w>slots[row]+.01){ok=false;break;}
-        rows[row].push(g);widths[row]=w;
-      }
-      best={scale,squeeze,rows,widths,space};if(ok)break;
+    return {unit,groups,baseStyle,spaceUnit,number,dotFont,slots,fonts,extraSlot:unit.maxRight-unit.lines.at(-1).x};
+  }
+
+  // Wrap the words at one size; `extra` additional lines may be used below the block.
+  function wrap(prep,scale,squeeze,extra){
+    const {unit,groups,slots}=prep;
+    for(const g of groups){g.width=0;for(const p of g.pieces){p.size=unit.styles[p.style].size*scale;p.width=p.unit*p.size*squeeze;g.width+=p.width;}}
+    const space=prep.spaceUnit*prep.baseStyle.size*scale*squeeze,slot=i=>i<slots.length?slots[i]:prep.extraSlot,limit=slots.length+extra;
+    const rows=[[]],widths=[0];
+    for(const g of groups){
+      let row=rows.length-1,w=widths[row]+(rows[row].length?space:0)+g.width;
+      if(rows[row].length&&w>slot(row)+.01){if(rows.length>=limit)return null;rows.push([]);widths.push(0);row++;w=g.width;}
+      if(w>slot(row)+.01)return null;
+      rows[row].push(g);widths[row]=w;
     }
-    if(best.rows.flat().length<groups.length){ // even the minimum size overflows: keep every word on the available lines
-      const per=Math.ceil(groups.length/slots.length);best.rows=[];best.widths=[];
-      for(let i=0;i<groups.length;i+=per){const row=groups.slice(i,i+per);best.rows.push(row);best.widths.push(row.reduce((s,g)=>s+g.width,0)+best.space*(row.length-1));}
+    return {scale,squeeze,rows,widths,space};
+  }
+
+  // Fit a flow (or a single block): the first step where every block fits, using at
+  // most the free space below the column for extra lines.
+  function fit(preps,free){
+    const grow=free>0;
+    for(const[scale,squeeze]of STEPS){
+      let used=0,plans=[];
+      for(const prep of preps){const plan=wrap(prep,scale,squeeze,grow?Infinity:0);if(!plan){plans=null;break;}used+=Math.max(0,plan.rows.length-prep.slots.length)*prep.unit.leading;plans.push(plan);}
+      if(plans&&used<=free+.01)return plans;
     }
-    return {...best,slots,number,dotFont,baseStyle,fonts};
+    // Even the minimum size overflows: keep every word on the original lines.
+    const[scale,squeeze]=STEPS.at(-1);
+    return preps.map(prep=>{
+      const plan=wrap(prep,scale,squeeze,0);if(plan)return plan;
+      const {groups,slots}=prep,space=prep.spaceUnit*prep.baseStyle.size*scale*squeeze,per=Math.ceil(groups.length/slots.length),rows=[],widths=[];
+      for(let i=0;i<groups.length;i+=per){const row=groups.slice(i,i+per);rows.push(row);widths.push(row.reduce((s,g)=>s+g.width,0)+space*(row.length-1));}
+      return {scale,squeeze,rows,widths,space};
+    });
   }
 
   function draw(page,unit,plan){
     const skew=PDFLib.degrees(unit.xSkew||0);
     if(plan.squeeze<1)page.pushOperators(PDFLib.setCharacterSqueeze(plan.squeeze*100));
     plan.rows.forEach((row,i)=>{
-      const line=unit.lines[i]||unit.lines.at(-1),width=plan.widths[i];
+      const line=plan.positions[i],width=plan.widths[i],slotWidth=i<plan.slots.length?plan.slots[i]:plan.extraSlot;
       let x=line.x;
       if(unit.align==='right')x=unit.right-width;else if(unit.align==='center')x=unit.center-width/2;
-      const justify=unit.justify&&i<plan.rows.length-1&&row.length>1&&plan.slots[i]-width<plan.space*6;
-      const gap=justify?plan.space+(plan.slots[i]-width)/(row.length-1):plan.space;
+      const justify=unit.justify&&i<plan.rows.length-1&&row.length>1&&slotWidth-width<plan.space*6;
+      const gap=justify?plan.space+(slotWidth-width)/(row.length-1):plan.space;
       // Coalesce consecutive pieces with the same font so text stays selectable as words.
       let pending=null;const flush=()=>{if(pending){page.drawText(pending.text,{x:pending.x,y:line.y,size:pending.size,font:pending.font,color:PDFLib.rgb(...pending.color),ySkew:skew});pending=null;}};
       row.forEach((g,j)=>{
@@ -372,9 +428,23 @@ window.PDFEngine = (() => {
     for(let p=0;p<pages.length;p++){
       await new Promise(resolve=>setTimeout(resolve,0));
       signal.throwIfAborted();const page=doc.getPage(p);
+      const groups=new Map();
       for(const unit of pages[p]){
-        const text=translated[index++];if(unit.hidden)continue;const plan=await layout(unit,text??unit.text,fonts);if(!plan)continue;
-        if(plan.scale<.8)shrunk++;draw(page,unit,plan);
+        const text=translated[index++];if(unit.hidden)continue;
+        const prep=await prepare(unit,text??unit.text,fonts);if(!prep)continue;
+        const key=unit.flow??Symbol();if(!groups.has(key))groups.set(key,[]);groups.get(key).push(prep);
+      }
+      for(const preps of groups.values()){
+        preps.sort((a,b)=>b.unit.y-a.unit.y);
+        const last=preps.at(-1).unit,flowable=preps.every(({unit:u})=>!u.table&&!u.leader&&u.align==='left'&&!u.hidden);
+        const plans=fit(preps,flowable?Math.max(0,(last.spaceBelow||0)-.3*last.size):0);
+        let offset=0;
+        preps.forEach((prep,k)=>{
+          const plan={...plans[k],...prep},u=prep.unit,n=u.lines.length,lastLine=u.lines.at(-1);
+          plan.positions=plan.rows.map((_,i)=>i<n?{x:u.lines[i].x,y:u.lines[i].y-offset}:{x:lastLine.x,y:lastLine.y-offset-(i-n+1)*u.leading});
+          offset+=Math.max(0,plan.rows.length-n)*u.leading;
+          if(plan.scale<.8)shrunk++;draw(page,u,plan);
+        });
       }
       onProgress(p+1,pages.length);
     }

@@ -129,8 +129,18 @@ $('translate').onclick=async()=>{
       const batches=[];for(let offset=0;offset<unique.length;){const batch=[];let length=0;while(offset+batch.length<unique.length&&batch.length<40){const text=unique[offset+batch.length];if(batch.length&&length+text.length>3500)break;batch.push(text);length+=text.length;}batches.push({offset,batch});offset+=batch.length;}
       let done=0,next=0;const stop=new AbortController(),batchSignal=AbortSignal.any([signal,stop.signal]);const update=()=>{setProgress(20+done/unique.length*60,`${done} / ${unique.length} testi tradotti`);status(`Traduzione in corso: ${done} di ${unique.length} testi…`);};
       stage(1,'Traduzione in corso',`${unique.length} testi in ${batches.length} richieste a ${providerName()}.`,20,`0 / ${unique.length} testi tradotti`);update();await paint();
+      // A reply with a different number of items (the model merged two fragments)
+      // is retried on two halves, down to single strings.
+      const translateBatch=async(batch,offset,...rest)=>{
+        try{return await service().translate(batch,...rest);}
+        catch(error){
+          if(batchSignal.aborted||batch.length===1||error.status!==422)throw error;
+          const half=Math.ceil(batch.length/2);eventLog(`Risposta incompleta per i testi ${offset+1}–${offset+batch.length}: ritraduco in due parti.`);
+          return [...await translateBatch(batch.slice(0,half),offset,...rest),...await translateBatch(batch.slice(half),offset+half,...rest)];
+        }
+      };
       const worker=async()=>{try{while(next<batches.length){batchSignal.throwIfAborted();const {offset,batch}=batches[next++];
-        const output=await service().translate(batch,$('language').value,$('key').value.trim(),$('model').value,workingModels,batchSignal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · testi ${offset+1}–${offset+batch.length} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta (massimo 45 s)'}`;$('activity-detail').textContent=message;eventLog(message);});
+        const output=await translateBatch(batch,offset,$('language').value,$('key').value.trim(),$('model').value,workingModels,batchSignal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · testi ${offset+1}–${offset+batch.length} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta (massimo 45 s)'}`;$('activity-detail').textContent=message;eventLog(message);});
         batch.forEach((text,i)=>cache.set(text,output[i]));done+=batch.length;update();eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);}}catch(error){stop.abort();throw error;}};
       const workers=Array.from({length:Math.min(currentProvider==='openai'?4:2,batches.length)},worker);
       const outcome=await Promise.allSettled(workers);signal.throwIfAborted();const failed=outcome.find(r=>r.status==='rejected'&&!(r.reason?.name==='AbortError'));if(failed)throw failed.reason;if(outcome.some(r=>r.status==='rejected'))throw Error('Traduzione interrotta.');

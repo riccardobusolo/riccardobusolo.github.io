@@ -56,7 +56,7 @@ window.AI = (() => {
         return output;
       } catch (error) { signal.throwIfAborted(); log(model,error.message); if (![404,429,500,502,503,504,422,0].includes(error.status)) throw error; }
     }
-    throw new Error('I modelli verificati non riescono a tradurre questo blocco. Nessun PDF parziale è stato esportato.');
+    throw new APIError('I modelli verificati non riescono a tradurre questo blocco. Nessun PDF parziale è stato esportato.',422);
   }
   return {discover,translate};
 })();
