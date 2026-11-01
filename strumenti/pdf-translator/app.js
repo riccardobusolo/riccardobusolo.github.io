@@ -120,29 +120,31 @@ $('translate').onclick=async()=>{
     status('Analizzo il testo e verifico la struttura PDF…');
     stage(0,'Analisi del documento','Controllo della struttura e dei testi selezionabili.',0,'Preparazione PDF');await paint();
     const pages=await PDFEngine.parse(source.originalBytes,signal,(n,total,phase)=>{const checking=phase==='validate';stage(0,checking?'Verifica della struttura PDF':'Estrazione dei testi',`Pagina ${n} di ${total}`,checking?n/total*8:8+n/total*12,`${n} / ${total} pagine`);});
-    const texts=pages.flat().map(b=>b.text),unique=[...new Set(texts)],cache=new Map();
-    eventLog(`${texts.length} righe estratte · ${unique.length} testi unici.`);
+    const units=pages.flat(),texts=units.map(u=>u.text),unique=[...new Set(units.filter(u=>u.translate).map(u=>u.text))],cache=new Map();
+    eventLog(`${units.length} blocchi di testo estratti · ${unique.length} da tradurre (paragrafi interi, etichette e celle).`);
     if($('demo').checked){stage(1,'Simulazione senza API','Genero etichette di prova: nessuna traduzione reale.',20,`${unique.length} testi`);await paint();for(let i=0;i<unique.length;i++)cache.set(unique[i],`[TEST ${i+1}]`);status('Simulazione: sostituisco il testo con etichette di prova.');}
     else{
-      for(let offset=0;offset<unique.length;){
-        signal.throwIfAborted();const batch=[];let length=0;
-        while(offset+batch.length<unique.length&&batch.length<35){const text=unique[offset+batch.length];if(batch.length&&length+text.length>4500)break;batch.push(text);length+=text.length;}
-        status(`Traduzione dei testi ${offset+1}–${offset+batch.length} di ${unique.length}…`);
-        stage(1,'Traduzione in corso',`Invio dei testi ${offset+1}–${offset+batch.length} di ${unique.length}.`,20+offset/unique.length*60,`${offset} / ${unique.length} testi tradotti`);await paint();
-        const output=await service().translate(batch,$('language').value,$('key').value.trim(),$('model').value,workingModels,signal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · tentativo ${attempt.index} / ${attempt.total} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta (massimo 45 s)'}`;$('activity-detail').textContent=message;eventLog(message);});
-        batch.forEach((text,i)=>cache.set(text,output[i]));offset+=batch.length;setProgress(20+offset/unique.length*60,`${offset} / ${unique.length} testi tradotti`);eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);
-      }
+      // Batches keep neighbouring blocks together (context for the model) and run
+      // a few at a time; any failed batch stops the export, nothing partial is saved.
+      const batches=[];for(let offset=0;offset<unique.length;){const batch=[];let length=0;while(offset+batch.length<unique.length&&batch.length<40){const text=unique[offset+batch.length];if(batch.length&&length+text.length>3500)break;batch.push(text);length+=text.length;}batches.push({offset,batch});offset+=batch.length;}
+      let done=0,next=0;const stop=new AbortController(),batchSignal=AbortSignal.any([signal,stop.signal]);const update=()=>{setProgress(20+done/unique.length*60,`${done} / ${unique.length} testi tradotti`);status(`Traduzione in corso: ${done} di ${unique.length} testi…`);};
+      stage(1,'Traduzione in corso',`${unique.length} testi in ${batches.length} richieste a ${providerName()}.`,20,`0 / ${unique.length} testi tradotti`);update();await paint();
+      const worker=async()=>{try{while(next<batches.length){batchSignal.throwIfAborted();const {offset,batch}=batches[next++];
+        const output=await service().translate(batch,$('language').value,$('key').value.trim(),$('model').value,workingModels,batchSignal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · testi ${offset+1}–${offset+batch.length} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta (massimo 45 s)'}`;$('activity-detail').textContent=message;eventLog(message);});
+        batch.forEach((text,i)=>cache.set(text,output[i]));done+=batch.length;update();eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);}}catch(error){stop.abort();throw error;}};
+      const workers=Array.from({length:Math.min(currentProvider==='openai'?4:2,batches.length)},worker);
+      const outcome=await Promise.allSettled(workers);signal.throwIfAborted();const failed=outcome.find(r=>r.status==='rejected'&&!(r.reason?.name==='AbortError'));if(failed)throw failed.reason;if(outcome.some(r=>r.status==='rejected'))throw Error('Traduzione interrotta.');
     }
     signal.throwIfAborted();status('Rimuovo il testo originale e compongo il PDF…');$('progress').value=85;
     stage(2,'Creazione del PDF tradotto','Rimozione dei testi originali e inserimento delle traduzioni.',80,'Preparazione pagine');await paint();
-    const built=await PDFEngine.build(source.originalBytes,pages,texts.map(t=>cache.get(t)),signal,(n,total)=>{stage(2,'Creazione del PDF tradotto',`Composizione della pagina ${n} di ${total}.`,80+n/total*14,`${n} / ${total} pagine ricomposte`);});
+    const built=await PDFEngine.build(source.originalBytes,pages,texts.map((t,i)=>units[i].translate?cache.get(t):t),signal,(n,total)=>{stage(2,'Creazione del PDF tradotto',`Composizione della pagina ${n} di ${total}.`,80+n/total*14,`${n} / ${total} pagine ricomposte`);});
     signal.throwIfAborted();
     stage(3,'Preparazione dell’anteprima','Apro il PDF esportato e preparo il download.',95,'Verifica risultato');await paint();
     result=await pdfjsLib.getDocument({data:built.bytes.slice(),isEvalSupported:false}).promise;
     signal.throwIfAborted();
     downloadURL=URL.createObjectURL(new Blob([built.bytes],{type:'application/pdf'}));$('download').href=downloadURL;$('download').download=fileName.replace(/\.pdf$/i,'')+($('demo').checked?'-test':'-'+$('language').value)+'.pdf';$('download').hidden=false;
     await preview();signal.throwIfAborted();
-    status(($('demo').checked?'Simulazione completata. Il PDF contiene etichette di prova.':'Traduzione completata. Il PDF è pronto.')+(built.shrunk?` ${built.shrunk} righe ridotte oltre il 20% per rispettare gli spazi.`:''));
+    status(($('demo').checked?'Simulazione completata. Il PDF contiene etichette di prova.':'Traduzione completata. Il PDF è pronto.')+(built.shrunk?` ${built.shrunk} blocchi con carattere ridotto oltre il 20% per rispettare gli spazi.`:''));
     endActivity('done',$('status').textContent);
   }catch(error){clearResult();const message=signal.aborted?'Operazione annullata. Puoi riprovare.':error.message;status(message);endActivity(signal.aborted?'cancelled':'error',message);}
   finally{busy=false;controller=null;sync();}

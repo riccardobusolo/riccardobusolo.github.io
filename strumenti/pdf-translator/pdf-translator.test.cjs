@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-global.window=global;global.PDFLib=require('./pdf-lib.min.js');global.pdfjsLib=require('./pdf.min.js');
+global.window=global;vm.runInThisContext(fs.readFileSync(__dirname+'/prompt.js','utf8'));global.PDFLib=require('./pdf-lib.min.js');global.pdfjsLib=require('./pdf.min.js');
 pdfjsLib.GlobalWorkerOptions.workerSrc=require('node:path').join(__dirname,'pdf.worker.min.js');
 vm.runInThisContext(fs.readFileSync(__dirname+'/pdf-engine.js','utf8'));
 vm.runInThisContext(fs.readFileSync(__dirname+'/ai-service.js','utf8'));
@@ -32,7 +32,7 @@ vm.runInThisContext(fs.readFileSync(__dirname+'/ai-service.js','utf8'));
 
   // Sheared display text is common in manuals; keep the same x-axis angle.
   const sheared=await PDFLib.PDFDocument.create(),shearedPage=sheared.addPage([200,100]);shearedPage.drawText('SHEARED ORIGINAL',{x:10,y:40,size:18});
-  const shearedBytes=await sheared.save(),shearedPages=[[{text:'SHEARED ORIGINAL',x:10,y:40,width:160,size:18,xSkew:18.4,color:[0,0,0],bold:false,italic:false,serif:false,mono:false}]],shearedBuilt=await PDFEngine.build(shearedBytes,shearedPages,['SHEARED TRADOTTO'],signal);const shearedReader=await pdfjsLib.getDocument({data:shearedBuilt.bytes.slice(),isEvalSupported:false}).promise;assert.match((await shearedReader.getPage(1)).getTextContent?JSON.stringify(await (await shearedReader.getPage(1)).getTextContent()):'',/SHEARED TRADOTTO/);await shearedReader.destroy();
+  const shearedBytes=await sheared.save(),shearedPages=[[{text:'SHEARED ORIGINAL',translate:true,lines:[{x:10,y:40}],x:10,y:40,right:170,maxRight:170,width:160,size:18,xSkew:18.4,color:[0,0,0],styles:[{size:18,bold:false,italic:false,family:'arimo',color:[0,0,0]}],base:0,align:'left',justify:false,leader:null}]],shearedBuilt=await PDFEngine.build(shearedBytes,shearedPages,['SHEARED TRADOTTO'],signal);const shearedReader=await pdfjsLib.getDocument({data:shearedBuilt.bytes.slice(),isEvalSupported:false}).promise;assert.match((await shearedReader.getPage(1)).getTextContent?JSON.stringify(await (await shearedReader.getPage(1)).getTextContent()):'',/SHEARED TRADOTTO/);await shearedReader.destroy();
   const calls=[];global.fetch=async(url,opts)=>{
     calls.push(url);assert.equal(opts.headers['x-goog-api-key'],'test-key');assert.ok(!url.includes('test-key'));
     if(url.includes('models?'))return{ok:true,json:async()=>({models:[{name:'models/gemini-test-flash',supportedGenerationMethods:['generateContent']},{name:'models/gemini-test-pro',supportedGenerationMethods:['generateContent']}]})};

@@ -12,3 +12,4 @@ config.local.js
 keys.json
 .env*
 
+.local-backup/

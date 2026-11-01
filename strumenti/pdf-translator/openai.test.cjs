@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-global.window=global;vm.runInThisContext(fs.readFileSync(__dirname+'/openai-service.js','utf8'));
+global.window=global;vm.runInThisContext(fs.readFileSync(__dirname+'/prompt.js','utf8'));vm.runInThisContext(fs.readFileSync(__dirname+'/openai-service.js','utf8'));
 const signal=new AbortController().signal,calls=[];
 function mock(data,status=200){global.fetch=async(url,options)=>{calls.push({url,options});assert.equal(url,'https://api.openai.com/v1/responses');assert.equal(options.headers.Authorization,'Bearer fake-test-key');const body=JSON.parse(options.body);assert.equal(body.store,false);assert.ok(!options.body.includes('fake-test-key'));return{ok:status===200,status,json:async()=>data};};}
 const response=text=>({status:'completed',output:[{type:'reasoning',summary:[]},{type:'message',content:[{type:'output_text',text}]}]});

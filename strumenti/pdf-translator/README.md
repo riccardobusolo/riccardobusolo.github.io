@@ -2,7 +2,7 @@
 
 ## OpenAI
 
-Selezionare OpenAI nel menu Provider AI, inserire la propria chiave API Platform, scegliere GPT-4.1 mini, GPT-4.1 nano o GPT-4o mini e premere Testa il modello OpenAI. Ogni test esegue una sola richiesta a consumo sul modello selezionato. Nessun ripiego automatico su altri modelli o provider a pagamento. Il credito API è separato dall'abbonamento ChatGPT. Il link Credito API apre la fatturazione personale; questa app non effettua acquisti e non imposta un limite di spesa di 20 euro.
+Selezionare OpenAI nel menu Provider AI, inserire la propria chiave API Platform, scegliere GPT-4.1 mini, GPT-4.1 nano, GPT-4o mini, GPT-5 mini o GPT-5 nano (ragionamento minimo) e premere Testa il modello OpenAI. Ogni test esegue una sola richiesta a consumo sul modello selezionato. Nessun ripiego automatico su altri modelli o provider a pagamento. Il credito API è separato dall'abbonamento ChatGPT. Il link Credito API apre la fatturazione personale; questa app non effettua acquisti e non imposta un limite di spesa di 20 euro.
 
 La connessione usa POST https://api.openai.com/v1/responses con Authorization Bearer, store:false, timeout di 45 secondi e schema JSON rigoroso per le traduzioni. Le chiavi e i modelli verificati vengono mantenuti separatamente per provider, esclusivamente nella memoria della scheda. Il cambio provider non invia richieste. Una chiave modificata richiede una nuova verifica. Nei log non vengono incluse chiavi, testi dei documenti o messaggi grezzi del provider.
 
@@ -22,9 +22,13 @@ Modalità simulata: nessuna chiamata AI; sostituisce le righe con [TEST n]. Serv
 
 PDF.js legge testo e coordinate; pdf-lib modifica i content stream tramite un lexer che rimuove gli operatori di stampa del testo, anche nei Form XObject. La grafica resta vettoriale. Il risultato viene copiato in un documento nuovo per non conservare stream originali non referenziati. Nessun rettangolo bianco sovrapposto e nessuna rasterizzazione della pagina.
 
-La ricomposizione usa font PDF standard latini equivalenti (Helvetica, Times, Courier, varianti grassetto/corsivo), non i font originali incorporati. Le righe tradotte vengono ridotte per rientrare nella larghezza originale e viene mantenuta l'inclinazione orizzontale usata da alcuni titoli grafici. Non viene garantita identità tipografica, conservazione di struttura semantica/tag di accessibilità, metadati o segnalibri. I link vengono conservati; traduzione per riga, contesto limitato. Colori a livello di riga, non singolo carattere.
+Le righe vengono raggruppate in paragrafi (stesso allineamento, interlinea e stile; le righe piene continuano nella successiva, gli elenchi numerati e puntati iniziano un nuovo blocco), così il modello traduce frasi intere. Il testo tradotto viene poi ridistribuito sulle stesse righe e posizioni originali, con giustificazione se l'originale era giustificato. Celle di tabella, intestazioni allineate a destra, testi centrati e voci di indice con puntini di guida (i puntini e il numero di pagina vengono ricostruiti) sono riconosciuti. Gli stili misti nello stesso paragrafo (grassetto, corsivo, colore) vengono inviati al modello come tag `<sN>` e ripristinati.
 
-Limiti: 25 MB, 100 pagine, almeno una riga di testo per pagina; nessun OCR. I collegamenti PDF (`/Link`), compresi quelli di un sommario, vengono mantenuti. Non supportati: password, campi modulo, commenti, timbri e altre annotazioni con aspetto visivo, rotazioni, origini pagina personalizzate, testo verticale/RTL, font Type 3, inline images, testo come maschera/contorno/invisibile e alcuni effetti di trasparenza. I caratteri fuori WinAnsi producono un errore esplicito. La beta non traduce testi incorporati nelle immagini. Nessuna verifica automatica completa della fedeltà di qualunque PDF.
+Se la traduzione è più lunga, il testo viene prima condensato leggermente in orizzontale (fino al 90%) e poi ridotto di corpo. Il testo che nell'originale non è visibile (coperto da immagini, ritagliato o nello stesso colore dello sfondo) viene individuato confrontando il rendering della pagina con e senza testo, e non viene ridisegnato né tradotto.
+
+Font: per i font originali più comuni vengono incorporati font metricamente compatibili, open source (SIL OFL), caricati solo se servono: Calibri → Carlito, Arial/Helvetica → Arimo, Times → Tinos, Cambria → Caladea, nei sottoinsiemi latin e latin-ext (cartella `fonts/`). I caratteri mancanti ricadono sui font PDF standard. fontkit (MIT) serve per l'incorporamento.
+
+Limiti: 25 MB, 100 pagine, almeno una riga di testo per pagina; nessun OCR. I collegamenti PDF (`/Link`), compresi quelli di un sommario, vengono mantenuti. Non supportati: password, campi modulo, commenti, timbri e altre annotazioni con aspetto visivo, rotazioni, origini pagina personalizzate, testo verticale/RTL, font Type 3, inline images, testo come maschera/contorno/invisibile e alcuni effetti di trasparenza. La beta non traduce testi incorporati nelle immagini. Nessuna verifica automatica completa della fedeltà di qualunque PDF.
 
 L'elaborazione di file grandi può usare molta RAM. Annullamento cooperativo fra le fasi PDF e immediato sulle richieste di rete. Le trasformazioni sincrone del PDF possono ritardare la risposta del pulsante Annulla.
 
@@ -37,5 +41,7 @@ L'elaborazione di file grandi può usare molta RAM. Annullamento cooperativo fra
 Il pannello di elaborazione mostra fase, pagine/testi completati, percentuale per fasi, tempo trascorso e registro dei tentativi. Durante una richiesta AI la percentuale resta ferma finché non arriva un risultato validato, mentre spinner e timer continuano. Ogni tentativo API ha un timeout di 45 secondi; i ripieghi sui modelli verificati sono visibili nel registro. Errori e annullamenti restano visibili nel pannello. Il test di progressione simula una richiesta pendente, successo, errore di quota e annullamento.
 
 I test usano un PDF sintetico con immagini, grafica, testo e Form XObject. Verificano rimozione del testo originale, estrazione del nuovo testo e diagnostica Gemini con risposte simulate. Il test reale richiede una chiave dell'utente.
+
+Le richieste vengono inviate in blocchi di testi vicini (contesto per la terminologia), fino a 4 in parallelo con OpenAI e 2 con Gemini; se un blocco fallisce non viene esportato alcun PDF parziale. Le istruzioni di traduzione sono condivise in `prompt.js`.
 
 Le tre librerie PDF sono distribuzioni di terze parti mantenute dal repository precedente (PDF.js Apache-2.0, pdf-lib MIT). Tutto il codice applicativo è stato riscritto.
