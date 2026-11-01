@@ -18,6 +18,14 @@ La diagnostica elenca tramite models.list i modelli Gemini di testo e prova fino
 
 Modalità simulata: nessuna chiamata AI; sostituisce le righe con [TEST n]. Serve per verificare caricamento, rimozione del testo, rendering ed esportazione.
 
+## Glossario e revisione
+
+Con un provider configurato, prima della traduzione una richiesta crea il glossario del documento: nomi di prodotto e componenti, termini ricorrenti, titoli presenti anche nell'indice, intestazioni e parole di sicurezza secondo la convenzione della lingua di destinazione (per l'italiano PERICOLO, AVVERTENZA, ATTENZIONE, AVVISO). Il glossario viene allegato a ogni blocco di traduzione. Marchi, codici e slogan restano invariati; se il documento usa già un termine nella lingua di destinazione, viene riutilizzato.
+
+Con "Revisione finale automatica" (attiva per default) il modello rilegge originale e traduzione dell'intero documento (in parti da circa 45.000 caratteri) e restituisce solo le correzioni: errori di senso, omissioni, incoerenze di terminologia (indice/titoli, intestazioni), parole di sicurezza, testo non tradotto, testo in altre lingue tradotto per errore, numeri o codici alterati. Le correzioni con id inesistente o con tag di stile diversi dall'originale vengono scartate; ogni correzione applicata compare nel registro. Glossario e revisione sono facoltativi: se una delle due richieste fallisce, la traduzione prosegue senza.
+
+`node strumenti/pdf-translator/quality.test.cjs`
+
 ## Motore PDF beta
 
 PDF.js legge testo e coordinate; pdf-lib modifica i content stream tramite un lexer che rimuove gli operatori di stampa del testo, anche nei Form XObject. La grafica resta vettoriale. Il risultato viene copiato in un documento nuovo per non conservare stream originali non referenziati. Nessun rettangolo bianco sovrapposto e nessuna rasterizzazione della pagina.

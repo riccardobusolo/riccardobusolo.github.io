@@ -52,7 +52,7 @@ function diagnostic(name,message,ok=false){
 }
 function sync(){
   $('translate').disabled=busy||!source||(!$('demo').checked&&(!workingModels.includes($('model').value)||!$('key').value.trim()));
-  for(const id of ['test','file','key','model','language','demo','show-key','sample','provider'])$(id).disabled=busy;
+  for(const id of ['test','file','key','model','language','demo','review','show-key','sample','provider'])$(id).disabled=busy;
   $('cancel').hidden=!busy;$('translate').hidden=busy;
   $('prev').disabled=busy||!source||pageNumber===1;$('next').disabled=busy||!source||pageNumber>=source.numPages;
 }
@@ -114,7 +114,7 @@ $('test').onclick=async()=>{
 };
 $('translate').onclick=async()=>{
   if(busy||!source)return;
-  busy=true;controller=new AbortController();const signal=controller.signal;sync();startActivity('Avvio della traduzione');
+  busy=true;controller=new AbortController();const signal=controller.signal;sync();startActivity('Avvio della traduzione');let reviewNote='';
   try{
     await paint();await renderQueue;signal.throwIfAborted();clearResult();
     status('Analizzo il testo e verifico la struttura PDF…');
@@ -126,13 +126,24 @@ $('translate').onclick=async()=>{
     else{
       // Batches keep neighbouring blocks together (context for the model) and run
       // a few at a time; any failed batch stops the export, nothing partial is saved.
+      const svc=service(),key=$('key').value.trim(),model=$('model').value,language=$('language').value,quality=typeof svc.ask==='function';
+      // 1. Glossary: one request fixes the recurring terms for every batch.
+      let glossary=[];
+      if(quality){
+        stage(1,'Glossario del documento','Individuo i termini ricorrenti, i titoli e le parole di sicurezza da tradurre sempre allo stesso modo.',20,'Terminologia');status('Preparo il glossario del documento…');await paint();
+        try{
+          const data=await svc.ask(window.glossaryPrompt(language,unique),window.TRANSLATION_SCHEMAS.glossary,key,model,workingModels,signal,diagnostic);
+          const seen=new Set();glossary=(data.terms||[]).filter(t=>typeof t?.source==='string'&&typeof t?.target==='string'&&t.source.trim()&&t.target.trim()&&!seen.has(t.source.toLowerCase())&&seen.add(t.source.toLowerCase())).slice(0,80).map(t=>({source:t.source.trim(),target:t.target.trim()}));
+          eventLog(`Glossario: ${glossary.length} termini fissati.`);for(const t of glossary.slice(0,25))eventLog(`Glossario · ${t.source} → ${t.target}`);
+        }catch(error){signal.throwIfAborted();eventLog('Glossario non disponibile ('+error.message+'): proseguo senza.');}
+      }
       const batches=[];for(let offset=0;offset<unique.length;){const batch=[];let length=0;while(offset+batch.length<unique.length&&batch.length<40){const text=unique[offset+batch.length];if(batch.length&&length+text.length>3500)break;batch.push(text);length+=text.length;}batches.push({offset,batch});offset+=batch.length;}
-      let done=0,next=0;const stop=new AbortController(),batchSignal=AbortSignal.any([signal,stop.signal]);const update=()=>{setProgress(20+done/unique.length*60,`${done} / ${unique.length} testi tradotti`);status(`Traduzione in corso: ${done} di ${unique.length} testi…`);};
-      stage(1,'Traduzione in corso',`${unique.length} testi in ${batches.length} richieste a ${providerName()}.`,20,`0 / ${unique.length} testi tradotti`);update();await paint();
+      let done=0,next=0;const stop=new AbortController(),batchSignal=AbortSignal.any([signal,stop.signal]);const update=()=>{setProgress((quality?24:20)+done/unique.length*(quality?($('review').checked?48:56):60),`${done} / ${unique.length} testi tradotti`);status(`Traduzione in corso: ${done} di ${unique.length} testi…`);};
+      stage(1,'Traduzione in corso',`${unique.length} testi in ${batches.length} richieste a ${providerName()}.`,quality?24:20,`0 / ${unique.length} testi tradotti`);update();await paint();
       // A reply with a different number of items (the model merged two fragments)
       // is retried on two halves, down to single strings.
       const translateBatch=async(batch,offset,...rest)=>{
-        try{return await service().translate(batch,...rest);}
+        try{return await svc.translate(batch,...rest,glossary);}
         catch(error){
           if(batchSignal.aborted||batch.length===1||error.status!==422)throw error;
           const half=Math.ceil(batch.length/2);eventLog(`Risposta incompleta per i testi ${offset+1}–${offset+batch.length}: ritraduco in due parti.`);
@@ -144,6 +155,30 @@ $('translate').onclick=async()=>{
         batch.forEach((text,i)=>cache.set(text,output[i]));done+=batch.length;update();eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);}}catch(error){stop.abort();throw error;}};
       const workers=Array.from({length:Math.min(currentProvider==='openai'?4:2,batches.length)},worker);
       const outcome=await Promise.allSettled(workers);signal.throwIfAborted();const failed=outcome.find(r=>r.status==='rejected'&&!(r.reason?.name==='AbortError'));if(failed)throw failed.reason;if(outcome.some(r=>r.status==='rejected'))throw Error('Traduzione interrotta.');
+      // 2. Final review: the model rereads source and translation of the whole
+      // document and returns only the items to fix. Best effort: on error the
+      // translation is kept as it is.
+      if(quality&&$('review').checked){
+        stage(1,'Revisione della traduzione','Rileggo originale e traduzione: errori di senso, terminologia, parole di sicurezza, lingue da lasciare invariate.',72,'Revisione');status('Revisione finale della traduzione…');await paint();
+        const tags=t=>(t.match(/<\/?s\d+>/g)||[]).sort().join();
+        const items=unique.map((source,id)=>({id,source,translation:cache.get(source)})),chunks=[];
+        for(let i=0;i<items.length;){const chunk=[];let length=0;while(i<items.length){const it=items[i],size=it.source.length+it.translation.length+20;if(chunk.length&&length+size>45000)break;chunk.push(it);length+=size;i++;}chunks.push(chunk);}
+        let fixed=0;
+        for(const [n,chunk] of chunks.entries()){
+          signal.throwIfAborted();if(chunks.length>1)$('activity-detail').textContent=`Revisione: parte ${n+1} di ${chunks.length}.`;
+          try{
+            const data=await svc.ask(window.reviewPrompt(language,glossary,chunk),window.TRANSLATION_SCHEMAS.review,key,model,workingModels,signal,diagnostic);
+            for(const c of data.corrections||[]){
+              const item=items[c?.id];if(!item||!chunk.includes(item)||typeof c.translation!=='string'||!c.translation.trim()||c.translation===item.translation)continue;
+              if(tags(c.translation)!==tags(item.source))continue;
+              cache.set(item.source,c.translation);fixed++;
+              if(fixed<=60)eventLog(`Revisione · «${item.translation.slice(0,60)}» → «${c.translation.slice(0,60)}»`);
+            }
+          }catch(error){signal.throwIfAborted();eventLog('Revisione non completata ('+error.message+'): mantengo la traduzione.');}
+          setProgress(72+(n+1)/chunks.length*8,`Revisione ${n+1} / ${chunks.length}`);
+        }
+        reviewNote=fixed?` Revisione: ${fixed} correzioni applicate (dettagli nel registro).`:' Revisione: nessuna correzione necessaria.';eventLog(reviewNote.trim());
+      }
     }
     signal.throwIfAborted();status('Rimuovo il testo originale e compongo il PDF…');$('progress').value=85;
     stage(2,'Creazione del PDF tradotto','Rimozione dei testi originali e inserimento delle traduzioni.',80,'Preparazione pagine');await paint();
@@ -154,7 +189,7 @@ $('translate').onclick=async()=>{
     signal.throwIfAborted();
     downloadURL=URL.createObjectURL(new Blob([built.bytes],{type:'application/pdf'}));$('download').href=downloadURL;$('download').download=fileName.replace(/\.pdf$/i,'')+($('demo').checked?'-test':'-'+$('language').value)+'.pdf';$('download').hidden=false;
     await preview();signal.throwIfAborted();
-    status(($('demo').checked?'Simulazione completata. Il PDF contiene etichette di prova.':'Traduzione completata. Il PDF è pronto.')+(built.shrunk?` ${built.shrunk} blocchi con carattere ridotto oltre il 20% per rispettare gli spazi.`:''));
+    status(($('demo').checked?'Simulazione completata. Il PDF contiene etichette di prova.':'Traduzione completata. Il PDF è pronto.'+reviewNote)+(built.shrunk?` ${built.shrunk} blocchi con carattere ridotto oltre il 20% per rispettare gli spazi.`:''));
     endActivity('done',$('status').textContent);
   }catch(error){clearResult();const message=signal.aborted?'Operazione annullata. Puoi riprovare.':error.message;status(message);endActivity(signal.aborted?'cancelled':'error',message);}
   finally{busy=false;controller=null;sync();}

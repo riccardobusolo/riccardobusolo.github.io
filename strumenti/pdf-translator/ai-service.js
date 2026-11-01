@@ -42,8 +42,8 @@ window.AI = (() => {
     if (!successes) throw new Error('Nessun modello ha risposto. Consulta la diagnostica; puoi comunque usare la modalità simulata.');
     return successes;
   }
-  async function translate(texts, language, key, selected, alternatives, signal, log, onAttempt = () => {}) {
-    const prompt = window.translationPrompt(language,texts,'Return ONLY a JSON array of strings with exactly the same length');
+  async function translate(texts, language, key, selected, alternatives, signal, log, onAttempt = () => {}, glossary = []) {
+    const prompt = window.translationPrompt(language,texts,'Return ONLY a JSON array of strings with exactly the same length',glossary);
     const candidates=[selected,...alternatives.filter(m=>m!==selected)];
     for (const [index,model] of candidates.entries()) {
       signal.throwIfAborted();
@@ -58,5 +58,15 @@ window.AI = (() => {
     }
     throw new APIError('I modelli verificati non riescono a tradurre questo blocco. Nessun PDF parziale è stato esportato.',422);
   }
-  return {discover,translate};
+  // Generic structured request (glossary, review) with the same model fallback.
+  async function ask(prompt, format, key, selected, alternatives, signal, log) {
+    const keys=Object.keys(format.schema.properties);
+    for (const model of [selected,...alternatives.filter(m=>m!==selected)]) {
+      signal.throwIfAborted();
+      try { const raw=await generate(key,model,prompt+' Return ONLY a JSON object with the key "'+keys[0]+'".',signal,true); const data=JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g,'')); if(!data||!Array.isArray(data[keys[0]]))throw new APIError('JSON non valido dal modello.',422); return data; }
+      catch (error) { signal.throwIfAborted(); log(model,error.message); if (![404,429,500,502,503,504,422,0].includes(error.status) && !(error instanceof SyntaxError)) throw error; }
+    }
+    throw new APIError('Nessun modello verificato ha completato la richiesta.',422);
+  }
+  return {discover,translate,ask};
 })();

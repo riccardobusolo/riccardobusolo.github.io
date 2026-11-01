@@ -2,16 +2,17 @@
 window.OpenAIService=(()=>{
   const models=['gpt-4.1-mini','gpt-4.1-nano','gpt-4o-mini','gpt-5-mini','gpt-5-nano'];
   class APIError extends Error{constructor(message,status){super(message);this.status=status;}}
-  async function response(key,model,input,signal,json=false){
+  const TRANSLATIONS={name:'translated_texts',schema:{type:'object',properties:{translations:{type:'array',items:{type:'string'}}},required:['translations'],additionalProperties:false}};
+  async function response(key,model,input,signal,json=false,seconds=45){
     if(!models.includes(model))throw Error('Seleziona uno dei modelli OpenAI disponibili.');
-    const timeout=AbortSignal.timeout(45000),combined=signal?AbortSignal.any([signal,timeout]):timeout;
+    const timeout=AbortSignal.timeout(seconds*1000),combined=signal?AbortSignal.any([signal,timeout]):timeout;
     const reasoning=/^gpt-5/.test(model);
     const body={model,input,store:false,max_output_tokens:json?16000:reasoning?2000:32};
     if(reasoning)body.reasoning={effort:'minimal'};
-    if(json)body.text={format:{type:'json_schema',name:'translated_texts',strict:true,schema:{type:'object',properties:{translations:{type:'array',items:{type:'string'}}},required:['translations'],additionalProperties:false}}};
+    if(json){const format=json===true?TRANSLATIONS:json;body.text={format:{type:'json_schema',name:format.name,strict:true,schema:format.schema}};}
     let res,data;
     try{res=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(body),signal:combined,referrerPolicy:'no-referrer'});data=await res.json();}
-    catch(error){signal?.throwIfAborted();throw new APIError(timeout.aborted?'Tempo di risposta OpenAI scaduto (45 s).':'Errore di rete/CORS nella connessione a OpenAI.',0);}
+    catch(error){signal?.throwIfAborted();throw new APIError(timeout.aborted?`Tempo di risposta OpenAI scaduto (${seconds} s).`:'Errore di rete/CORS nella connessione a OpenAI.',0);}
     if(!res.ok){
       const code=data.error?.code;
       const labels={400:'Richiesta non valida per questo modello',401:'Chiave OpenAI non valida',403:'Chiave senza permessi per il modello o per Responses API',404:'Modello non disponibile per il progetto',429:['insufficient_quota','credit_balance_exhausted','billing_hard_limit_reached'].includes(code)?'Credito API esaurito o fatturazione non attiva: controlla Billing OpenAI':'Limite di frequenza OpenAI: attendi e riprova',500:'Errore interno OpenAI',503:'Servizio OpenAI temporaneamente non disponibile'};
@@ -29,9 +30,9 @@ window.OpenAIService=(()=>{
     try{await response(key,model,'Reply only with OK.',signal);log(model,'Disponibile · risposta OpenAI ricevuta',true);found({name:model,displayName:model});return 1;}
     catch(error){signal.throwIfAborted();log(model,error.message);throw error;}
   }
-  async function translate(texts,language,key,model,alternatives,signal,log,onAttempt=()=>{}){
+  async function translate(texts,language,key,model,alternatives,signal,log,onAttempt=()=>{},glossary=[]){
     signal.throwIfAborted();onAttempt({model,index:1,total:1,state:'waiting'});
-    const prompt=window.translationPrompt(language,texts,'Return an object with a translations array of strings in exactly the same order and length');
+    const prompt=window.translationPrompt(language,texts,'Return an object with a translations array of strings in exactly the same order and length',glossary);
     try{
       const raw=await response(key,model,prompt,signal,true);let result;
       try{result=JSON.parse(raw).translations;}catch{throw new APIError('JSON non valido restituito da OpenAI.',422);}
@@ -39,5 +40,11 @@ window.OpenAIService=(()=>{
       onAttempt({model,index:1,total:1,state:'response'});return result;
     }catch(error){signal.throwIfAborted();log(model,error.message);throw error;}
   }
-  return{models,discover,translate};
+  // Generic structured request (glossary, review): longer time limit, parsed JSON.
+  async function ask(prompt,format,key,model,alternatives,signal,log){
+    signal.throwIfAborted();
+    try{const raw=await response(key,model,prompt,signal,format,120);try{return JSON.parse(raw);}catch{throw new APIError('JSON non valido restituito da OpenAI.',422);}}
+    catch(error){signal.throwIfAborted();log(model,error.message);throw error;}
+  }
+  return{models,discover,translate,ask};
 })();
