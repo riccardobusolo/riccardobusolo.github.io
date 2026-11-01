@@ -1,16 +1,26 @@
 'use strict';
 window.OpenAIService=(()=>{
-  const models=['gpt-5-mini','gpt-4.1-mini','gpt-4.1-nano','gpt-4o-mini','gpt-5-nano'];
+  // Curated models. Prices in USD per 1M tokens (standard tier) from the official OpenAI
+  // price list of 1 November 2026; gpt-5-mini is no longer listed there (last known price).
+  // effort: lowest reasoning effort each model accepts (translation needs little reasoning).
+  const catalog=[
+    {id:'gpt-6.1-sol',label:'GPT-6.1 Sol',note:'consigliato',input:2,cached:.1,output:10,effort:'low'},
+    {id:'gpt-6.1-terra',label:'GPT-6.1 Terra',note:'equilibrato',input:1,cached:.05,output:5,effort:'none'},
+    {id:'gpt-6-astra',label:'GPT-6 Astra',note:'massima qualità',input:10,cached:1,output:50,effort:'low'},
+    {id:'gpt-5-mini',label:'GPT-5 mini',note:'economico',input:.25,cached:.025,output:2,effort:'minimal',legacyPrice:true}
+  ];
+  const models=catalog.map(m=>m.id),info=id=>catalog.find(m=>m.id===id);
+  // Every response reports its token usage here (cost of the current document).
+  let meter=null;const setMeter=fn=>{meter=fn;};
   class APIError extends Error{constructor(message,status){super(message);this.status=status;}}
   // Each item also reports the language of its source text (ISO 639-1), so the app can keep
   // passages written in a language other than the document's main one unchanged.
   const TRANSLATIONS={name:'translated_texts',schema:{type:'object',properties:{translations:{type:'array',items:{type:'object',properties:{source_language:{type:'string'},text:{type:'string'}},required:['source_language','text'],additionalProperties:false}}},required:['translations'],additionalProperties:false}};
-  async function response(key,model,input,signal,json=false,seconds=45){
+  async function response(key,model,input,signal,json=false,seconds=120){
     if(!models.includes(model))throw Error('Seleziona uno dei modelli OpenAI disponibili.');
     const timeout=AbortSignal.timeout(seconds*1000),combined=signal?AbortSignal.any([signal,timeout]):timeout;
-    const reasoning=/^gpt-5/.test(model);
-    const body={model,input,store:false,max_output_tokens:json?16000:reasoning?2000:32};
-    if(reasoning)body.reasoning={effort:'minimal'};
+    const effort=info(model).effort;
+    const body={model,input,store:false,max_output_tokens:json?32000:2000,reasoning:{effort}};
     if(json){const format=json===true?TRANSLATIONS:json;body.text={format:{type:'json_schema',name:format.name,strict:true,schema:format.schema}};}
     let res,data;
     try{res=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(body),signal:combined,referrerPolicy:'no-referrer'});data=await res.json();}
@@ -20,6 +30,7 @@ window.OpenAIService=(()=>{
       const labels={400:'Richiesta non valida per questo modello',401:'Chiave OpenAI non valida',403:'Chiave senza permessi per il modello o per Responses API',404:'Modello non disponibile per il progetto',429:['insufficient_quota','credit_balance_exhausted','billing_hard_limit_reached'].includes(code)?'Credito API esaurito o fatturazione non attiva: controlla Billing OpenAI':'Limite di frequenza OpenAI: attendi e riprova',500:'Errore interno OpenAI',503:'Servizio OpenAI temporaneamente non disponibile'};
       throw new APIError(`${res.status} · ${labels[res.status]||'Richiesta OpenAI fallita'}`,res.status);
     }
+    if(data.usage)meter?.(model,data.usage);
     if(data.status!=='completed')throw new APIError('Risposta OpenAI incompleta o interrotta. Nessun PDF parziale è stato esportato.',422);
     const parts=(data.output||[]).filter(item=>item.type==='message').flatMap(item=>item.content||[]);
     if(parts.some(part=>part.type==='refusal'))throw new APIError('OpenAI ha rifiutato la traduzione di questo contenuto.',422);
@@ -27,7 +38,19 @@ window.OpenAIService=(()=>{
     if(!text.trim())throw new APIError('OpenAI ha restituito una risposta vuota.',422);
     return text;
   }
-  async function discover(key,signal,log,found,model='gpt-4.1-mini'){
+  // Free check (no tokens): validates the key and lists the curated models it can use.
+  async function listModels(key,signal){
+    let res,data;
+    try{res=await fetch('https://api.openai.com/v1/models',{headers:{Authorization:'Bearer '+key},signal,referrerPolicy:'no-referrer'});data=await res.json().catch(()=>({}));}
+    catch(error){signal?.throwIfAborted();throw new APIError('Errore di rete/CORS nella connessione a OpenAI.',0);}
+    if(!res.ok)throw new APIError(res.status===401?'Chiave OpenAI non valida o revocata.':`${res.status} · Verifica della chiave non riuscita`,res.status);
+    const ids=new Set((data.data||[]).map(m=>m.id));return {available:models.filter(id=>ids.has(id)),total:ids.size};
+  }
+  // Rough cost from the measured usage of a complete run (glossary + translation + review):
+  // about 2.85 input and 0.76 output tokens per source character; reasoning adds output.
+  function estimate(model,chars){const m=info(model);if(!m)return null;const extra={none:1,minimal:1.1,low:1.4}[m.effort]||1.4;return (chars*2.85*m.input+chars*.76*extra*m.output)/1e6;}
+  function cost(model,usage){const m=info(model);if(!m)return null;const cached=usage.cached||0;return ((usage.input-cached)*m.input+cached*m.cached+usage.output*m.output)/1e6;}
+  async function discover(key,signal,log,found,model=models[0]){
     signal.throwIfAborted();log(model,'Test OpenAI in corso · una sola richiesta a consumo');
     try{await response(key,model,'Reply only with OK.',signal);log(model,'Disponibile · risposta OpenAI ricevuta',true);found({name:model,displayName:model});return 1;}
     catch(error){signal.throwIfAborted();log(model,error.message);throw error;}
@@ -48,5 +71,5 @@ window.OpenAIService=(()=>{
     try{const raw=await response(key,model,prompt,signal,format,120);try{return JSON.parse(raw);}catch{throw new APIError('JSON non valido restituito da OpenAI.',422);}}
     catch(error){signal.throwIfAborted();log(model,error.message);throw error;}
   }
-  return{models,discover,translate,ask};
+  return{models,catalog,info,discover,listModels,estimate,cost,setMeter,translate,ask};
 })();

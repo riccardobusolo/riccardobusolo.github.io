@@ -3,22 +3,73 @@ pdfjsLib.GlobalWorkerOptions.workerSrc='pdf.worker.min.js';
 const $=id=>document.getElementById(id);
 let source=null,result=null,fileName='',pageNumber=1,busy=false,controller=null,workingModels=[],downloadURL=null,renderVersion=0,renderQueue=Promise.resolve();
 const logs=new Map();
-const providerSessions=new Map();let currentProvider='gemini';
+const providerSessions=new Map();let currentProvider='openai';
 const providerName=()=>currentProvider==='openai'?'OpenAI':'Gemini';
 const service=()=>currentProvider==='openai'?OpenAIService:AI;
 function providerUI(){
   const openai=currentProvider==='openai';
-  $('key-label').textContent='API key '+providerName();$('key').placeholder=openai?'sk-… · chiave OpenAI':'Incolla la tua chiave Gemini';
-  $('key-link').href=openai?'https://platform.openai.com/api-keys':'https://aistudio.google.com/apikey';$('key-link').textContent=openai?'Crea una chiave OpenAI ↗':'Ottieni una chiave in Google AI Studio ↗';
-  $('billing-link').hidden=!openai;$('test').textContent=openai?'✦ Testa il modello OpenAI':'✦ Trova un modello funzionante';
-  $('provider-hint').textContent=openai?'API a consumo, separate dall’abbonamento ChatGPT. Il test esegue una sola richiesta sul modello scelto. Nessun cambio automatico di modello o provider.':'Il test prova fino a 6 modelli, privilegiando Flash. L’accesso non garantisce quota gratuita: verifica il piano in AI Studio.';
+  for(const b of document.querySelectorAll('[data-provider]'))b.setAttribute('aria-pressed',String(b.dataset.provider===currentProvider));
+  $('key-label').textContent='API key '+providerName();$('key').placeholder=openai?'sk-… · chiave OpenAI':'Chiave Gemini (AI Studio)';
+  $('key-link').href=openai?'https://platform.openai.com/api-keys':'https://aistudio.google.com/apikey';
+  $('billing-link').hidden=!openai;$('test').hidden=openai;$('test').textContent='✦ Trova un modello funzionante';
+  $('provider-hint').textContent=openai?'La chiave viene verificata gratuitamente (elenco modelli, nessun token). I costi stimati usano il listino OpenAI di novembre 2026 e il consumo misurato su un manuale reale.':'Il test prova fino a 6 modelli Gemini, privilegiando Flash, con una breve richiesta ciascuno. L’accesso non garantisce quota gratuita: verifica il piano in AI Studio.';
+  $('remember').checked=!!storedKey(currentProvider);
 }
-function resetModels(){workingModels=[];$('model').replaceChildren();if(currentProvider==='openai')for(const name of OpenAIService.models)$('model').add(new Option(name,name));else $('model').add(new Option('Prima verifica la connessione',''));}
+// Optional: the key can be kept in this browser only (localStorage), never elsewhere.
+const keyStore='docushift.key.';
+function storedKey(provider){try{return localStorage.getItem(keyStore+provider)||'';}catch{return '';}}
+function storeKey(provider,key){try{if(key)localStorage.setItem(keyStore+provider,key);else localStorage.removeItem(keyStore+provider);}catch{}}
+const money=v=>v==null?'—':v<.01?'< $0,01':'$'+v.toFixed(v<1?3:2).replace('.',',');
+const docChars=()=>source?.chars||null;
+function keyStatus(text,state=''){$('key-status').textContent=text;$('key-status').dataset.state=state;$('key-status').title=text;}
+// OpenAI models are shown as a small table: price for 10 pages and for the loaded PDF.
+function updateEstimate(){
+  const list=$('model-list'),openai=currentProvider==='openai';
+  if(list){list.hidden=!openai;$('model').hidden=openai;}
+  if(!openai){$('estimate').textContent='Costo secondo il piano Gemini: i token usati vengono mostrati a fine traduzione.';return;}
+  const chars=docChars(),selected=$('model').value;
+  if(list&&list.replaceChildren){
+    list.classList.toggle('no-doc',!chars);
+    const head=document.createElement('div');head.className='models-head';head.innerHTML='<span></span><span>Modello</span><span>10 pag.</span><span class="doc">Il tuo PDF</span>';
+    const rows=[...$('model').options].map(o=>{const m=OpenAIService.info(o.value);const b=document.createElement('button');b.type='button';b.className='model';b.setAttribute('role','radio');b.setAttribute('aria-checked',String(o.value===selected));b.dataset.off=o.disabled?'1':'0';b.disabled=o.disabled||busy;
+      b.innerHTML=`<span class="radio"></span><span class="name">${m.label}<small>${o.disabled?'non disponibile sul tuo account':m.note}</small></span><span class="price">${money(OpenAIService.estimate(m.id,10000))}</span><span class="price doc">${chars?money(OpenAIService.estimate(m.id,chars)):''}</span>`;
+      b.title=`${m.label}: $${m.input} input · $${m.output} output per milione di token${m.legacyPrice?' (prezzo storico, da verificare)':''}`;
+      b.onclick=()=>{if(busy)return;$('model').value=o.value;$('model').onchange();};return b;});
+    list.replaceChildren(head,...rows);
+  }
+  const m=OpenAIService.info(selected);
+  $('estimate').textContent=m?'Stime con glossario e revisione, ~1.000 caratteri per pagina · listino OpenAI 1/11/2026.':'';
+}
+function resetModels(available=null){
+  const selected=$('model').value;workingModels=[];$('model').replaceChildren();
+  if(currentProvider==='openai'){
+    for(const m of OpenAIService.catalog){const ok=!available||available.includes(m.id);const o=new Option(`${m.label} · ${m.note}${ok?'':' · non disponibile'}`,m.id);o.disabled=!ok;$('model').add(o);}
+    if(available){workingModels=[...available];}
+    const pick=[selected,...(available||OpenAIService.models)].find(id=>id&&OpenAIService.models.includes(id)&&(!available||available.includes(id)));if(pick)$('model').value=pick;
+  }else $('model').add(new Option('Prima verifica la connessione',''));
+  updateEstimate();
+}
+// OpenAI: the key is checked as soon as it is pasted (or remembered) with a free request.
+let verifyTimer=null,verifyRun=0;
+async function verifyKey(){
+  clearTimeout(verifyTimer);const key=$('key').value.trim(),run=++verifyRun;
+  if(currentProvider!=='openai')return;
+  resetModels();if(!key){keyStatus('');sync();return;}
+  keyStatus('Verifica…','busy');
+  try{const {available,total}=await OpenAIService.listModels(key);if(run!==verifyRun)return;
+    resetModels(available);diagnostic('OpenAI',`Chiave valida · ${total} modelli sul tuo account · ${available.length}/${OpenAIService.models.length} supportati da DocuShift`,true);
+    keyStatus(available.length?'✓ Chiave verificata':'Nessun modello compatibile',available.length?'ok':'error');
+    if($('remember').checked)storeKey('openai',key);
+    if(!busy)status(source?'Pronto: scegli il modello e avvia la traduzione.':'Chiave verificata. Carica un documento.');
+  }catch(error){if(run!==verifyRun)return;keyStatus(error.message,'error');diagnostic('OpenAI',error.message);}
+  sync();
+}
+
 $('provider').onchange=()=>{
   providerSessions.set(currentProvider,{key:$('key').value,verified:[...workingModels],options:[...$('model').options].map(o=>[o.text,o.value]),selected:$('model').value});
-  currentProvider=$('provider').value;const saved=providerSessions.get(currentProvider);$('key').value=saved?.key||'';$('key').type='password';$('show-key').setAttribute('aria-label','Mostra chiave');
+  currentProvider=$('provider').value;const saved=providerSessions.get(currentProvider);$('key').value=saved?.key||storedKey(currentProvider);keyStatus('');$('key').type='password';$('show-key').setAttribute('aria-label','Mostra chiave');
   resetModels();if(saved){workingModels=saved.verified;$('model').replaceChildren(...saved.options.map(([text,value])=>new Option(text,value)));$('model').value=saved.selected;}
-  logs.clear();$('diagnostics').replaceChildren();$('test-count').textContent='';providerUI();sync();status(providerName()+' selezionato. '+(workingModels.includes($('model').value)?'Connessione già verificata in questa sessione.':'Inserisci la chiave e verifica il modello.'));
+  logs.clear();$('diagnostics').replaceChildren();$('test-count').textContent='';providerUI();updateEstimate();sync();if(currentProvider==='openai'&&$('key').value.trim()&&!saved?.verified?.length)verifyKey();status(providerName()+' selezionato. '+(workingModels.includes($('model').value)?'Connessione già verificata.':currentProvider==='openai'?'Incolla la chiave: viene verificata subito, senza costi.':'Inserisci la chiave e trova un modello funzionante.'));
 };
 const activity=document.createElement('section');
 activity.id='activity';activity.hidden=true;activity.setAttribute('aria-label','Stato elaborazione');
@@ -27,7 +78,7 @@ $('progress').before(activity);
 let activityTimer=null,activityStarted=0,lastActivity=0,activityStep=-1;
 const paint=()=>new Promise(resolve=>setTimeout(resolve,0));
 function eventLog(text){const row=document.createElement('p');row.textContent=new Date().toLocaleTimeString('it-IT')+' · '+text;$('activity-log').append(row);while($('activity-log').children.length>60)$('activity-log').firstChild.remove();lastActivity=Date.now();}
-function tick(){const elapsed=Math.floor((Date.now()-activityStarted)/1000),waiting=Math.floor((Date.now()-lastActivity)/1000);$('activity-time').textContent=Math.floor(elapsed/60)+':'+String(elapsed%60).padStart(2,'0');$('activity-heartbeat').textContent=waiting>=10?`Nessun nuovo risultato da ${waiting} s. ${activityStep===1?'Il provider sta elaborando: ogni tentativo ha un limite di 45 s.':'Elaborazione del documento in corso.'}`:'In lavorazione · puoi annullare in qualsiasi momento.';}
+function tick(){const elapsed=Math.floor((Date.now()-activityStarted)/1000),waiting=Math.floor((Date.now()-lastActivity)/1000);$('activity-time').textContent=Math.floor(elapsed/60)+':'+String(elapsed%60).padStart(2,'0');$('activity-heartbeat').textContent=waiting>=10?`Nessun nuovo risultato da ${waiting} s. ${activityStep===1?'Il provider sta elaborando: ogni richiesta ha un limite di 2 minuti.':'Elaborazione del documento in corso.'}`:'In lavorazione · puoi annullare in qualsiasi momento.';}
 function startActivity(title,steps=true){
   clearInterval(activityTimer);activityStarted=lastActivity=Date.now();activityStep=-1;activity.hidden=false;activity.dataset.state='running';activity.setAttribute('aria-busy','true');$('activity-log').replaceChildren();$('activity-steps').hidden=!steps;$('activity-title').textContent=title;$('activity-detail').textContent='Avvio dell’operazione…';$('activity-count').textContent='Preparazione';setProgress(0);tick();activityTimer=setInterval(tick,1000);eventLog(title);
   activity.scrollIntoView({block:'nearest',behavior:'auto'});
@@ -52,7 +103,10 @@ function diagnostic(name,message,ok=false){
 }
 function sync(){
   $('translate').disabled=busy||!source||(!$('demo').checked&&(!workingModels.includes($('model').value)||!$('key').value.trim()));
-  for(const id of ['test','file','key','model','language','demo','review','show-key','sample','provider'])$(id).disabled=busy;
+  for(const id of ['test','file','key','model','language','demo','review','show-key','sample','provider','remember'])$(id).disabled=busy;
+  for(const b of document.querySelectorAll('[data-provider]'))b.disabled=busy;
+  document.body.classList?.toggle('has-file',!!source);
+  for(const b of $('model-list')?.children||[])if(b.dataset?.off)b.disabled=busy||b.dataset.off==='1';
   $('cancel').hidden=!busy;$('translate').hidden=busy;
   $('prev').disabled=busy||!source||pageNumber===1;$('next').disabled=busy||!source||pageNumber>=source.numPages;
 }
@@ -83,8 +137,10 @@ async function load(file){
     if(doc.numPages>100){await doc.destroy();throw Error('Limite beta: massimo 100 pagine.');}
     source=doc;source.originalBytes=bytes;fileName=file.name;pageNumber=1;
     $('file-name').textContent=file.name;$('file-info').textContent=`${doc.numPages} pagine · ${(file.size/1024/1024).toFixed(2)} MB · clicca per sostituire`;
+    // Characters of selectable text: basis of the cost estimate for this document.
+    let chars=0;for(let n=1;n<=doc.numPages;n++){const c=await (await doc.getPage(n)).getTextContent();for(const it of c.items)chars+=(it.str||'').trim().length;}source.chars=chars;updateEstimate();
     signal.throwIfAborted();status('Documento caricato. Scegli la lingua e avvia la traduzione.');await preview();endActivity('done','PDF caricato: '+doc.numPages+' pagine. Pronto per la traduzione.');
-  }catch(error){await source?.destroy();source=null;$('original').style.display='none';$('empty').hidden=false;const message=signal.aborted?'Caricamento annullato.':error.name==='PasswordException'?'PDF protetto da password non supportato.':error.message;status(message);endActivity(signal.aborted?'cancelled':'error',message);$('file-name').textContent='Scegli un altro documento';$('file-info').textContent='Il file non è stato caricato.';}
+  }catch(error){await source?.destroy();source=null;$('original').style.display='none';$('empty').hidden=false;const message=signal.aborted?'Caricamento annullato.':error.name==='PasswordException'?'PDF protetto da password non supportato.':error.message;status(message);endActivity(signal.aborted?'cancelled':'error',message);$('file-name').textContent='Scegli un altro documento';$('file-info').textContent='Il file non è stato caricato.';updateEstimate();}
   finally{busy=false;controller=null;$('file').value='';sync();}
 }
 $('file').addEventListener('change',e=>load(e.target.files[0]));
@@ -93,11 +149,16 @@ $('sample').onclick=async()=>{
   try{const response=await fetch('test-fixture.pdf');if(!response.ok)throw Error('Esempio non disponibile.');const blob=await response.blob();if(busy)return;$('demo').checked=true;await load(new File([blob],'docushift-esempio.pdf',{type:'application/pdf'}));}
   catch(error){status(error.message);}
 };
-for(const type of ['dragenter','dragover'])$('drop').addEventListener(type,e=>{e.preventDefault();if(!busy)$('drop').classList.add('drag');});
-for(const type of ['dragleave','drop'])$('drop').addEventListener(type,e=>{e.preventDefault();$('drop').classList.remove('drag');if(type==='drop')load(e.dataTransfer.files[0]);});
+// The whole workspace accepts a dropped PDF.
+const dropZone=$('work')||$('drop');
+for(const type of ['dragenter','dragover'])dropZone.addEventListener(type,e=>{e.preventDefault();if(!busy)dropZone.classList.add('drag');});
+for(const type of ['dragleave','drop'])dropZone.addEventListener(type,e=>{e.preventDefault();if(type==='dragleave'&&dropZone.contains?.(e.relatedTarget))return;dropZone.classList.remove('drag');if(type==='drop')load(e.dataTransfer.files[0]);});
+$('empty').onclick=()=>{if(!busy)$('file').click();};
 $('show-key').onclick=()=>{const hidden=$('key').type==='password';$('key').type=hidden?'text':'password';$('show-key').setAttribute('aria-label',hidden?'Nascondi chiave':'Mostra chiave');};
-$('key').addEventListener('input',()=>{const selected=$('model').value;resetModels();if(currentProvider==='openai')$('model').value=selected;sync();});
-$('demo').onchange=sync;$('model').onchange=sync;
+$('key').addEventListener('input',()=>{if(currentProvider==='openai'){keyStatus('');clearTimeout(verifyTimer);verifyTimer=setTimeout(verifyKey,450);workingModels=[];}else resetModels();if($('remember').checked)storeKey(currentProvider,$('key').value.trim());sync();});
+$('remember').onchange=()=>{storeKey(currentProvider,$('remember').checked?$('key').value.trim():'');};
+for(const b of document.querySelectorAll('[data-provider]'))b.onclick=()=>{if(busy||b.dataset.provider===currentProvider)return;$('provider').value=b.dataset.provider;$('provider').onchange();};
+$('demo').onchange=sync;$('model').onchange=()=>{updateEstimate();sync();};
 $('prev').onclick=()=>{if(pageNumber>1){pageNumber--;preview();}};
 $('next').onclick=()=>{if(pageNumber<source.numPages){pageNumber++;preview();}};
 $('cancel').onclick=()=>{controller?.abort();status('Annullamento in corso…');};
@@ -114,7 +175,9 @@ $('test').onclick=async()=>{
 };
 $('translate').onclick=async()=>{
   if(busy||!source)return;
-  busy=true;controller=new AbortController();const signal=controller.signal;sync();startActivity('Avvio della traduzione');let reviewNote='';
+  busy=true;controller=new AbortController();const signal=controller.signal;sync();startActivity('Avvio della traduzione');let reviewNote='',costNote='';$('cost').hidden=true;
+  const usage={input:0,cached:0,output:0},usedModel=$('model').value,meter=(model,u)=>{usage.input+=u.input_tokens??u.promptTokenCount??0;usage.cached+=u.input_tokens_details?.cached_tokens??u.cachedContentTokenCount??0;usage.output+=u.output_tokens??((u.candidatesTokenCount||0)+(u.thoughtsTokenCount||0));};
+  globalThis.OpenAIService?.setMeter?.(meter);globalThis.AI?.setMeter?.(meter);
   try{
     await paint();await renderQueue;signal.throwIfAborted();clearResult();
     status('Analizzo il testo e verifico la struttura PDF…');
@@ -152,7 +215,7 @@ $('translate').onclick=async()=>{
         }
       };
       const worker=async()=>{try{while(next<batches.length){batchSignal.throwIfAborted();const {offset,batch}=batches[next++];
-        const output=await translateBatch(batch,offset,$('language').value,$('key').value.trim(),$('model').value,workingModels,batchSignal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · testi ${offset+1}–${offset+batch.length} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta (massimo 45 s)'}`;$('activity-detail').textContent=message;eventLog(message);});
+        const output=await translateBatch(batch,offset,$('language').value,$('key').value.trim(),$('model').value,workingModels,batchSignal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · testi ${offset+1}–${offset+batch.length} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta'}`;$('activity-detail').textContent=message;eventLog(message);});
         batch.forEach((text,i)=>{cache.set(text,output[i]);if(output.languages?.[i])sourceLanguage.set(text,output.languages[i]);});done+=batch.length;update();eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);}}catch(error){stop.abort();throw error;}};
       const workers=Array.from({length:Math.min(currentProvider==='openai'?4:2,batches.length)},worker);
       const outcome=await Promise.allSettled(workers);signal.throwIfAborted();const failed=outcome.find(r=>r.status==='rejected'&&!(r.reason?.name==='AbortError'));if(failed)throw failed.reason;if(outcome.some(r=>r.status==='rejected'))throw Error('Traduzione interrotta.');
@@ -209,11 +272,14 @@ $('translate').onclick=async()=>{
     stage(3,'Preparazione dell’anteprima','Apro il PDF esportato e preparo il download.',95,'Verifica risultato');await paint();
     result=await pdfjsLib.getDocument({data:built.bytes.slice(),isEvalSupported:false}).promise;
     signal.throwIfAborted();
+    // Real cost of this document, from the token usage reported by the provider.
+    if(!$('demo').checked&&usage.input+usage.output){const k=n=>n>=1000?(n/1000).toFixed(1).replace('.',',')+'k':String(n);const c=currentProvider==='openai'?OpenAIService.cost(usedModel,usage):null;
+      $('cost').textContent=(c!=null?'Costo '+money(c)+' · ':'')+`${k(usage.input)} + ${k(usage.output)} token`;$('cost').title=`Token in ingresso ${usage.input} (in cache ${usage.cached}) · in uscita ${usage.output}${c!=null?' · '+OpenAIService.info(usedModel).label+' a listino':''}`;$('cost').hidden=false;costNote=c!=null?` Costo stimato da listino: ${money(c)}.`:` Token usati: ${usage.input+usage.output}.`;eventLog('Consumo: '+$('cost').title);}
     downloadURL=URL.createObjectURL(new Blob([built.bytes],{type:'application/pdf'}));$('download').href=downloadURL;$('download').download=fileName.replace(/\.pdf$/i,'')+($('demo').checked?'-test':'-'+$('language').value)+'.pdf';$('download').hidden=false;
     await preview();signal.throwIfAborted();
-    status(($('demo').checked?'Simulazione completata. Il PDF contiene etichette di prova.':'Traduzione completata. Il PDF è pronto.'+reviewNote)+(built.shrunk?` ${built.shrunk} blocchi con carattere ridotto oltre il 20% per rispettare gli spazi.`:''));
+    status(($('demo').checked?'Simulazione completata. Il PDF contiene etichette di prova.':'Traduzione completata. Il PDF è pronto.'+reviewNote+costNote)+(built.shrunk?` ${built.shrunk} blocchi con carattere ridotto oltre il 20% per rispettare gli spazi.`:''));
     endActivity('done',$('status').textContent);
   }catch(error){clearResult();const message=signal.aborted?'Operazione annullata. Puoi riprovare.':error.message;status(message);endActivity(signal.aborted?'cancelled':'error',message);}
-  finally{busy=false;controller=null;sync();}
+  finally{globalThis.OpenAIService?.setMeter?.(null);globalThis.AI?.setMeter?.(null);busy=false;controller=null;sync();}
 };
-providerUI();sync();
+$('provider').value=currentProvider;$('key').value=storedKey(currentProvider);providerUI();resetModels();sync();if($('key').value.trim())verifyKey();

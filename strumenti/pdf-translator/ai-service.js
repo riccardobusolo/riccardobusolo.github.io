@@ -1,5 +1,6 @@
 'use strict';
 window.AI = (() => {
+  let meter = null; const setMeter = fn => { meter = fn; };
   const base = 'https://generativelanguage.googleapis.com/v1beta/';
   class APIError extends Error { constructor(message, status) { super(message); this.status = status; } }
   async function request(path, key, body, signal) {
@@ -24,6 +25,7 @@ window.AI = (() => {
   async function generate(key, model, prompt, signal, json = false) {
     if (!/^models\/[a-zA-Z0-9._-]+$/.test(model)) throw new Error('Nome modello non valido.');
     const data = await request(model+':generateContent', key, {contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.1,maxOutputTokens:8192,...(json?{responseMimeType:'application/json'}:{})}}, signal);
+    if (data.usageMetadata) meter?.(model, data.usageMetadata);
     const candidate = data.candidates?.[0];
     if (!candidate || !['STOP',undefined].includes(candidate.finishReason)) throw new APIError('Risposta bloccata, incompleta o troncata: '+(candidate?.finishReason || data.promptFeedback?.blockReason || 'nessun candidato'), 422);
     const text = candidate.content?.parts?.filter(p=>!p.thought).map(p=>p.text||'').join('');
@@ -68,5 +70,5 @@ window.AI = (() => {
     }
     throw new APIError('Nessun modello verificato ha completato la richiesta.',422);
   }
-  return {discover,translate,ask};
+  return {discover,translate,ask,setMeter};
 })();

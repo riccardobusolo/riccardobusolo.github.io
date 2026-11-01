@@ -1,9 +1,70 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Traduci PDF con la tua chiave Gemini o OpenAI. Elaborazione del documento nel browser e anteprima affiancata."><title>DocuShift — Il tuo documento, un’altra lingua.</title><link rel="stylesheet" href="style.css?v=20261031-compact-header"><script defer src="pdf.min.js"></script><script defer src="pdf-lib.min.js"></script><script defer src="fontkit.min.js"></script><script defer src="prompt.js?v=20261101-review4"></script><script defer src="ai-service.js?v=20261101-review1"></script><script defer src="pdf-engine.js?v=20261101-flow3"></script><script defer src="openai-service.js?v=20261101-models1"></script><script defer src="app.js?v=20261101-models1"></script>  <link rel="stylesheet" href="/site-cursor.css?v=20261031-controls">
-  <script src="/site-cursor.js?v=20261030-text" defer></script>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Traduci PDF con la tua chiave OpenAI o Gemini conservando impaginazione e grafica. Elaborazione nel browser e anteprima affiancata."><title>DocuShift — Il tuo documento, un’altra lingua.</title><link rel="stylesheet" href="style.css?v=20261101-ui3"><script defer src="pdf.min.js"></script><script defer src="pdf-lib.min.js"></script><script defer src="fontkit.min.js"></script><script defer src="prompt.js?v=20261101-review4"></script><script defer src="ai-service.js?v=20261101-ui2"></script><script defer src="pdf-engine.js?v=20261101-flow3"></script><script defer src="openai-service.js?v=20261101-ui2"></script><script defer src="app.js?v=20261101-ui3"></script>
+<link rel="stylesheet" href="/site-cursor.css?v=20261031-controls">
+<script src="/site-cursor.js?v=20261030-text" defer></script>
 <link rel="stylesheet" href="/project-navigation.css">
 </head>
-<body data-project="pdf-translator" data-project-category="strumenti"><a class="project-return" href="/progetti.html#strumenti" aria-label="Torna a Strumenti" title="Torna a Strumenti"><img src="/img/logo.svg" width="42" height="42" alt=""></a><header class="compact-header"><div class="brand"><b>DocuShift</b><small>di Riccardo Busolo</small></div><div class="header-intro"><h1>Stesso documento. <span>Un’altra lingua.</span></h1><p>Traduci i testi del tuo PDF conservando la grafica, con la tua API key.</p><div class="features"><span>Anteprima affiancata</span><span>Download diretto</span></div></div><div class="header-art" aria-hidden="true"><div class="orbit" aria-hidden="true"><div class="paper back">Aa<span>ORIGINALE</span><i></i><i></i><i></i><em></em><i></i></div><div class="paper front">Àa<span>TRADUZIONE</span><i></i><i></i><i></i><em></em><i></i><b>✦</b></div></div></div><span class="pill">● Elaborazione nel browser</span></header>
-<main><section class="studio"><div class="section-title"><h2>Il tuo spazio di traduzione</h2><span class="pill">BETA · PDF con testo</span></div><div class="workflow"><aside><section class="panel"><h3><span class="number">01</span> Collega l’intelligenza</h3><label for="provider">Provider AI</label><select id="provider"><option value="gemini">Google Gemini</option><option value="openai">OpenAI · ChatGPT API</option></select><label id="key-label" for="key">API key Gemini</label><div class="key-row"><input id="key" type="password" placeholder="Incolla la tua chiave" autocomplete="off" spellcheck="false"><button id="show-key" class="icon" aria-label="Mostra chiave">◉</button></div><p class="hint">La chiave resta in memoria fino alla chiusura o ricarica della pagina.</p><a id="key-link" class="text-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Ottieni una chiave in Google AI Studio ↗</a><a id="billing-link" class="text-link billing-link" href="https://platform.openai.com/settings/organization/billing/overview" target="_blank" rel="noopener noreferrer" hidden>Credito API e fatturazione OpenAI ↗</a><button id="test" class="secondary">✦ Trova un modello funzionante</button><label for="model">Modello</label><select id="model"><option value="">Prima verifica la connessione</option></select><details><summary>Diagnostica connessione <span id="test-count"></span></summary><div id="diagnostics" role="log" aria-live="polite">Nessun test eseguito.</div></details><p id="provider-hint" class="hint">Il test prova fino a 6 modelli, privilegiando Flash. L’accesso non garantisce quota gratuita: verifica il piano in AI Studio. Nessun passaggio automatico a servizi a pagamento.</p></section>
-<section class="panel"><h3><span class="number">02</span> Scegli la destinazione</h3><label for="language">Traduci in</label><select id="language"><option>Italiano</option><option>English</option><option>Français</option><option>Deutsch</option><option>Español</option><option>Português</option></select><label class="check"><input type="checkbox" id="demo"> Modalità simulata · nessuna chiamata AI</label><p class="hint">La simulazione sostituisce i testi con etichette di prova per verificare il motore PDF. Non traduce.</p><label class="check"><input type="checkbox" id="review" checked> Revisione finale automatica</label><p class="hint">Prima della traduzione viene creato un glossario dei termini ricorrenti; alla fine il modello rilegge originale e traduzione e corregge errori di senso, incoerenze (indice/titoli, intestazioni), parole di sicurezza e testi in altre lingue. Circa due richieste in più.</p></section></aside>
-<div class="workspace"><label class="drop" id="drop" for="file"><input id="file" type="file" accept="application/pdf,.pdf"><div class="upload-icon">↑</div><h3 id="file-name">Il prossimo viaggio inizia qui.</h3><p id="file-info">Trascina un PDF o <u>scegli un file</u></p><small>PDF con testo selezionabile · massimo 25 MB / 100 pagine</small></label><button id="sample" class="secondary sample">Prova un PDF di esempio →</button><div class="action-row"><div><span class="eyebrow">PRONTO QUANDO LO SEI TU</span><p id="status" role="status" aria-live="polite">Carica un documento per iniziare.</p></div><button id="translate" class="primary" disabled>Traduci documento →</button><button id="cancel" class="secondary" hidden>Annulla</button></div><progress id="progress" max="100" value="0" aria-label="Avanzamento traduzione"></progress><div id="notice" class="notice">Le immagini e la grafica vengono conservate. I testi vengono ricomposti: font equivalenti e riduzioni di dimensione possono essere necessari. Scansioni e testi nelle immagini non vengono tradotti.</div><div class="preview-bar"><h3>Anteprima documento</h3><div><button id="prev" class="icon" disabled aria-label="Pagina precedente">←</button><span id="page-label">— / —</span><button id="next" class="icon" disabled aria-label="Pagina successiva">→</button></div></div><div class="previews"><figure><figcaption><span class="dot"></span> ORIGINALE</figcaption><div class="canvas-wrap"><canvas id="original"></canvas><p id="empty">Il tuo documento apparirà qui.</p></div></figure><figure><figcaption><span class="dot green"></span> TRADOTTO <a id="download" hidden>Scarica PDF ↓</a></figcaption><div class="canvas-wrap"><canvas id="translated"></canvas><p id="empty-result">Una nuova lingua, la stessa prospettiva.</p></div></figure></div></div></div></section><footer><span>DocuShift · Riccardo Busolo</span><p>Il PDF viene elaborato localmente; i testi estratti vengono inviati al provider scelto (Google o OpenAI) durante la traduzione. Le condizioni del provider si applicano ai dati inviati.</p><a href="../../progetti.html#strumenti">← Torna agli strumenti</a></footer></main></body></html>
+<body data-project="pdf-translator" data-project-category="strumenti">
+<a class="project-return" href="/progetti.html#strumenti" aria-label="Torna a Strumenti" title="Torna a Strumenti"><img src="/img/logo.svg" width="42" height="42" alt=""></a>
+
+<header class="bar">
+  <div class="brand"><b>DocuShift</b><span>Stesso documento. <em>Un’altra lingua.</em></span></div>
+  <div class="bar-meta">
+    <span class="chip"><i class="led"></i>Elaborazione nel browser</span>
+    <span class="chip">Beta · PDF con testo</span>
+    <details class="how"><summary class="chip">Come funziona</summary>
+      <div class="how-panel">
+        <ol><li><b>Collega l’AI.</b> Incolla la chiave OpenAI (o Gemini): viene verificata subito, senza costi.</li><li><b>Carica il PDF.</b> Trascinalo nell’area di lavoro: resta nel tuo browser.</li><li><b>Traduci.</b> Glossario, traduzione per frasi intere e revisione finale; poi scarichi il PDF.</li></ol>
+        <p id="notice">Immagini e grafica restano intatte. I testi vengono ricomposti nelle stesse posizioni con font equivalenti; se la traduzione è più lunga il testo va a capo nello spazio libero o viene leggermente ridotto. Al provider scelto vengono inviati solo i testi estratti. Scansioni e testi dentro le immagini non vengono tradotti. Limiti: 25 MB, 100 pagine.</p>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main class="app">
+  <aside class="side">
+    <section class="card">
+      <div class="card-head"><h2><span class="step">1</span>Intelligenza artificiale</h2><a id="key-link" class="mini" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">Crea chiave ↗</a></div>
+      <div class="seg" role="group" aria-label="Provider AI"><button type="button" data-provider="openai" aria-pressed="true">OpenAI</button><button type="button" data-provider="gemini" aria-pressed="false">Gemini</button></div>
+      <select id="provider" hidden><option value="openai">OpenAI</option><option value="gemini">Google Gemini</option></select>
+      <label id="key-label" for="key">API key OpenAI</label>
+      <div class="key-row"><input id="key" type="password" placeholder="sk-… · chiave OpenAI" autocomplete="off" spellcheck="false"><button id="show-key" type="button" class="icon" aria-label="Mostra chiave">◉</button></div>
+      <div class="key-foot"><label class="check" title="La chiave viene salvata solo in questo browser (localStorage). Senza spunta resta in memoria fino alla chiusura della pagina."><input type="checkbox" id="remember">Ricorda su questo dispositivo</label><span id="key-status" class="key-status" role="status"></span></div>
+      <label for="model" id="model-label">Modello</label>
+      <div id="model-list" class="models" role="radiogroup" aria-labelledby="model-label"></div>
+      <select id="model"></select>
+      <p id="estimate" class="estimate"></p>
+      <button id="test" type="button" class="secondary" hidden>✦ Trova un modello funzionante</button>
+      <details class="diag"><summary>Dettagli connessione <span id="test-count"></span></summary><div id="diagnostics" role="log" aria-live="polite">Nessun test eseguito.</div><p id="provider-hint" class="hint"></p><a id="billing-link" class="mini" href="https://platform.openai.com/settings/organization/billing/overview" target="_blank" rel="noopener noreferrer">Credito API e fatturazione ↗</a></details>
+    </section>
+    <section class="card">
+      <div class="card-head"><h2><span class="step">2</span>Traduzione</h2></div>
+      <label for="language">Lingua di destinazione</label>
+      <select id="language"><option>Italiano</option><option>English</option><option>Français</option><option>Deutsch</option><option>Español</option><option>Português</option></select>
+      <label class="toggle"><input type="checkbox" id="review" checked><span>Glossario e revisione finale</span><i class="tip" tabindex="0" data-tip="Prima di tradurre crea un glossario dei termini ricorrenti; alla fine rilegge originale e traduzione e corregge errori di senso, terminologia e parole di sicurezza. Circa il 40% di token in più.">?</i></label>
+      <label class="toggle"><input type="checkbox" id="demo"><span>Simulazione senza AI</span><i class="tip" tabindex="0" data-tip="Sostituisce i testi con etichette di prova per verificare l’impaginazione. Nessuna chiamata AI, nessun costo.">?</i></label>
+    </section>
+    <div class="go">
+      <button id="translate" type="button" class="primary" disabled><span class="step">3</span>Traduci documento →</button>
+      <button id="cancel" type="button" class="secondary" hidden>Annulla</button>
+      <p id="status" role="status" aria-live="polite">Carica un documento per iniziare.</p>
+    </div>
+  </aside>
+
+  <section class="work" id="work">
+    <div class="toolbar">
+      <label class="drop" id="drop" for="file"><input id="file" type="file" accept="application/pdf,.pdf"><span class="upload-icon">↑</span><span class="drop-text"><strong id="file-name">Carica un PDF</strong><small id="file-info">Trascinalo qui o clicca · max 25 MB / 100 pagine</small></span></label>
+      <button id="sample" type="button" class="link">PDF di esempio</button>
+      <div class="pager"><button id="prev" type="button" class="icon" disabled aria-label="Pagina precedente">←</button><span id="page-label">— / —</span><button id="next" type="button" class="icon" disabled aria-label="Pagina successiva">→</button></div>
+      <a id="download" class="primary download" hidden>Scarica PDF ↓</a>
+    </div>
+    <progress id="progress" max="100" value="0" aria-label="Avanzamento traduzione"></progress>
+    <div class="previews">
+      <figure><figcaption><span class="dot"></span>Originale</figcaption><div class="canvas-wrap"><canvas id="original"></canvas><button id="empty" type="button" class="empty"><span class="big-icon">↑</span><b>Trascina qui il tuo PDF</b><span>oppure clicca per sceglierlo</span></button></div></figure>
+      <figure><figcaption><span class="dot green"></span>Tradotto<span id="cost" class="cost" hidden></span></figcaption><div class="canvas-wrap"><canvas id="translated"></canvas><p id="empty-result" class="empty passive"><span class="big-icon">Àa</span><b>Una nuova lingua, la stessa prospettiva.</b><span>La traduzione apparirà qui, pagina per pagina.</span></p></div></figure>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><span>DocuShift · Riccardo Busolo</span><span>Il PDF resta nel tuo browser · ai provider vanno solo i testi estratti</span><a href="../../progetti.html#strumenti">← Torna agli strumenti</a></footer>
+</body></html>
