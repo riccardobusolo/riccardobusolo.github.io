@@ -4,10 +4,12 @@ window.OpenAIService=(()=>{
   // price list of 1 November 2026; gpt-5-mini is no longer listed there (last known price).
   // effort: lowest reasoning effort each model accepts (translation needs little reasoning).
   const catalog=[
-    {id:'gpt-6.1-sol',label:'GPT-6.1 Sol',note:'consigliato',input:2,cached:.1,output:10,effort:'low'},
-    {id:'gpt-6.1-terra',label:'GPT-6.1 Terra',note:'equilibrato',input:1,cached:.05,output:5,effort:'none'},
-    {id:'gpt-6-astra',label:'GPT-6 Astra',note:'massima qualità',input:10,cached:1,output:50,effort:'low'},
-    {id:'gpt-5-mini',label:'GPT-5 mini',note:'economico',input:.25,cached:.025,output:2,effort:'minimal',legacyPrice:true}
+    // tokensIn/tokensOut: tokens per source character measured on a complete run of the
+    // 18-page test manual (glossary + translation + review, reasoning included).
+    {id:'gpt-6.1-sol',label:'GPT-6.1 Sol',note:'consigliato',input:2,cached:.1,output:10,effort:'low',tokensIn:1.4,tokensOut:.42},
+    {id:'gpt-6.1-terra',label:'GPT-6.1 Terra',note:'equilibrato',input:1,cached:.05,output:5,effort:'none',tokensIn:1.58,tokensOut:.43},
+    {id:'gpt-6-astra',label:'GPT-6 Astra',note:'massima qualità',input:10,cached:1,output:50,effort:'low',tokensIn:1.45,tokensOut:.42},
+    {id:'gpt-5-mini',label:'GPT-5 mini',note:'economico',input:.25,cached:.025,output:2,effort:'minimal',tokensIn:2.25,tokensOut:.59,legacyPrice:true}
   ];
   const models=catalog.map(m=>m.id),info=id=>catalog.find(m=>m.id===id);
   // Every response reports its token usage here (cost of the current document).
@@ -46,9 +48,9 @@ window.OpenAIService=(()=>{
     if(!res.ok)throw new APIError(res.status===401?'Chiave OpenAI non valida o revocata.':`${res.status} · Verifica della chiave non riuscita`,res.status);
     const ids=new Set((data.data||[]).map(m=>m.id));return {available:models.filter(id=>ids.has(id)),total:ids.size};
   }
-  // Rough cost from the measured usage of a complete run (glossary + translation + review):
-  // about 2.85 input and 0.76 output tokens per source character; reasoning adds output.
-  function estimate(model,chars){const m=info(model);if(!m)return null;const extra={none:1,minimal:1.1,low:1.4}[m.effort]||1.4;return (chars*2.85*m.input+chars*.76*extra*m.output)/1e6;}
+  // Rough cost from the measured usage per source character of each model.
+  const CHARS_PER_PAGE=1200;
+  function estimate(model,chars){const m=info(model);if(!m)return null;return chars*(m.tokensIn*m.input+m.tokensOut*m.output)/1e6;}
   function cost(model,usage){const m=info(model);if(!m)return null;const cached=usage.cached||0;return ((usage.input-cached)*m.input+cached*m.cached+usage.output*m.output)/1e6;}
   async function discover(key,signal,log,found,model=models[0]){
     signal.throwIfAborted();log(model,'Test OpenAI in corso · una sola richiesta a consumo');
@@ -71,5 +73,5 @@ window.OpenAIService=(()=>{
     try{const raw=await response(key,model,prompt,signal,format,120);try{return JSON.parse(raw);}catch{throw new APIError('JSON non valido restituito da OpenAI.',422);}}
     catch(error){signal.throwIfAborted();log(model,error.message);throw error;}
   }
-  return{models,catalog,info,discover,listModels,estimate,cost,setMeter,translate,ask};
+  return{models,catalog,info,CHARS_PER_PAGE,discover,listModels,estimate,cost,setMeter,translate,ask};
 })();

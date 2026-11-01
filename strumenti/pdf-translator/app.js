@@ -32,13 +32,13 @@ function updateEstimate(){
     list.classList.toggle('no-doc',!chars);
     const head=document.createElement('div');head.className='models-head';head.innerHTML='<span></span><span>Modello</span><span>10 pag.</span><span class="doc">Il tuo PDF</span>';
     const rows=[...$('model').options].map(o=>{const m=OpenAIService.info(o.value);const b=document.createElement('button');b.type='button';b.className='model';b.setAttribute('role','radio');b.setAttribute('aria-checked',String(o.value===selected));b.dataset.off=o.disabled?'1':'0';b.disabled=o.disabled||busy;
-      b.innerHTML=`<span class="radio"></span><span class="name">${m.label}<small>${o.disabled?'non disponibile sul tuo account':m.note}</small></span><span class="price">${money(OpenAIService.estimate(m.id,10000))}</span><span class="price doc">${chars?money(OpenAIService.estimate(m.id,chars)):''}</span>`;
+      b.innerHTML=`<span class="radio"></span><span class="name">${m.label}<small>${o.disabled?'non disponibile sul tuo account':m.note}</small></span><span class="price">${money(OpenAIService.estimate(m.id,10*OpenAIService.CHARS_PER_PAGE))}</span><span class="price doc">${chars?money(OpenAIService.estimate(m.id,chars)):''}</span>`;
       b.title=`${m.label}: $${m.input} input · $${m.output} output per milione di token${m.legacyPrice?' (prezzo storico, da verificare)':''}`;
       b.onclick=()=>{if(busy)return;$('model').value=o.value;$('model').onchange();};return b;});
     list.replaceChildren(head,...rows);
   }
   const m=OpenAIService.info(selected);
-  $('estimate').textContent=m?'Stime con glossario e revisione, ~1.000 caratteri per pagina · listino OpenAI 1/11/2026.':'';
+  $('estimate').textContent=m?'Stime da consumi misurati con glossario e revisione, ~1.200 caratteri per pagina · listino OpenAI 1/11/2026.':'';
 }
 function resetModels(available=null){
   const selected=$('model').value;workingModels=[];$('model').replaceChildren();
