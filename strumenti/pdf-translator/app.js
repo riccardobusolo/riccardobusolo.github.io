@@ -137,6 +137,7 @@ $('translate').onclick=async()=>{
           eventLog(`Glossario: ${glossary.length} termini fissati.`);for(const t of glossary.slice(0,25))eventLog(`Glossario · ${t.source} → ${t.target}`);
         }catch(error){signal.throwIfAborted();eventLog('Glossario non disponibile ('+error.message+'): proseguo senza.');}
       }
+      const sourceLanguage=new Map(),foreign=new Set();
       const batches=[];for(let offset=0;offset<unique.length;){const batch=[];let length=0;while(offset+batch.length<unique.length&&batch.length<40){const text=unique[offset+batch.length];if(batch.length&&length+text.length>3500)break;batch.push(text);length+=text.length;}batches.push({offset,batch});offset+=batch.length;}
       let done=0,next=0;const stop=new AbortController(),batchSignal=AbortSignal.any([signal,stop.signal]);const update=()=>{setProgress((quality?24:20)+done/unique.length*(quality?($('review').checked?48:56):60),`${done} / ${unique.length} testi tradotti`);status(`Traduzione in corso: ${done} di ${unique.length} testi…`);};
       stage(1,'Traduzione in corso',`${unique.length} testi in ${batches.length} richieste a ${providerName()}.`,quality?24:20,`0 / ${unique.length} testi tradotti`);update();await paint();
@@ -147,36 +148,44 @@ $('translate').onclick=async()=>{
         catch(error){
           if(batchSignal.aborted||batch.length===1||error.status!==422)throw error;
           const half=Math.ceil(batch.length/2);eventLog(`Risposta incompleta per i testi ${offset+1}–${offset+batch.length}: ritraduco in due parti.`);
-          return [...await translateBatch(batch.slice(0,half),offset,...rest),...await translateBatch(batch.slice(half),offset+half,...rest)];
+          const a=await translateBatch(batch.slice(0,half),offset,...rest),b=await translateBatch(batch.slice(half),offset+half,...rest),out=[...a,...b];out.languages=[...(a.languages||a.map(()=>'')),...(b.languages||b.map(()=>''))];return out;
         }
       };
       const worker=async()=>{try{while(next<batches.length){batchSignal.throwIfAborted();const {offset,batch}=batches[next++];
         const output=await translateBatch(batch,offset,$('language').value,$('key').value.trim(),$('model').value,workingModels,batchSignal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · testi ${offset+1}–${offset+batch.length} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta (massimo 45 s)'}`;$('activity-detail').textContent=message;eventLog(message);});
-        batch.forEach((text,i)=>cache.set(text,output[i]));done+=batch.length;update();eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);}}catch(error){stop.abort();throw error;}};
+        batch.forEach((text,i)=>{cache.set(text,output[i]);if(output.languages?.[i])sourceLanguage.set(text,output.languages[i]);});done+=batch.length;update();eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);}}catch(error){stop.abort();throw error;}};
       const workers=Array.from({length:Math.min(currentProvider==='openai'?4:2,batches.length)},worker);
       const outcome=await Promise.allSettled(workers);signal.throwIfAborted();const failed=outcome.find(r=>r.status==='rejected'&&!(r.reason?.name==='AbortError'));if(failed)throw failed.reason;if(outcome.some(r=>r.status==='rejected'))throw Error('Traduzione interrotta.');
+      // Passages in a language other than the document's main one (for example a
+      // declaration repeated in several languages) keep their original text.
+      if(sourceLanguage.size){
+        const weight=new Map();for(const[text,lang]of sourceLanguage)weight.set(lang,(weight.get(lang)||0)+text.length);
+        const main=[...weight].sort((a,b)=>b[1]-a[1])[0][0],kept=new Map();
+        for(const[text,lang]of sourceLanguage)if(lang!==main&&text.replace(/<\/?s\d+>/g,'').trim().length>=12&&/\p{L}{3}/u.test(text)){cache.set(text,text);foreign.add(text);kept.set(lang,(kept.get(lang)||0)+1);}
+        if(kept.size)eventLog(`Lingua principale: ${main}. Lasciati in lingua originale ${[...kept.values()].reduce((a,b)=>a+b,0)} testi (${[...kept].map(([l,n])=>l+' '+n).join(', ')}).`);
+      }
       // 2. Final review: the model rereads source and translation of the whole
       // document and returns only the items to fix. Best effort: on error the
       // translation is kept as it is.
       if(quality&&$('review').checked){
         stage(1,'Revisione della traduzione','Rileggo originale e traduzione: errori di senso, terminologia, parole di sicurezza, lingue da lasciare invariate.',72,'Revisione');status('Revisione finale della traduzione…');await paint();
         const tags=t=>(t.match(/<\/?s\d+>/g)||[]).sort().join();
-        const items=unique.map((source,id)=>({id,source,translation:cache.get(source)})),chunks=[];
-        for(let i=0;i<items.length;){const chunk=[];let length=0;while(i<items.length){const it=items[i],size=it.source.length+it.translation.length+20;if(chunk.length&&length+size>45000)break;chunk.push(it);length+=size;i++;}chunks.push(chunk);}
-        let fixed=0;
-        for(const [n,chunk] of chunks.entries()){
-          signal.throwIfAborted();if(chunks.length>1)$('activity-detail').textContent=`Revisione: parte ${n+1} di ${chunks.length}.`;
+        const items=unique.map((source,id)=>({id,source,translation:cache.get(source)})).filter(it=>!foreign.has(it.source)),byId=new Map(items.map(it=>[it.id,it])),chunks=[];
+        for(let i=0;i<items.length;){const chunk=[];let length=0;while(i<items.length){const it=items[i],size=it.source.length+it.translation.length+20;if(chunk.length&&(length+size>12000||chunk.length>=80))break;chunk.push(it);length+=size;i++;}chunks.push(chunk);}
+        let fixed=0,reviewed=0,next=0;
+        const reviewWorker=async()=>{while(next<chunks.length){const chunk=chunks[next++];signal.throwIfAborted();
           try{
             const data=await svc.ask(window.reviewPrompt(language,glossary,chunk),window.TRANSLATION_SCHEMAS.review,key,model,workingModels,signal,diagnostic);
             for(const c of data.corrections||[]){
-              const item=items[c?.id];if(!item||!chunk.includes(item)||typeof c.translation!=='string'||!c.translation.trim()||c.translation===item.translation)continue;
+              const item=byId.get(c?.id);if(!item||!chunk.includes(item)||typeof c.translation!=='string'||!c.translation.trim()||c.translation===cache.get(item.source))continue;
               if(tags(c.translation)!==tags(item.source))continue;
-              cache.set(item.source,c.translation);fixed++;
-              if(fixed<=60)eventLog(`Revisione · «${item.translation.slice(0,60)}» → «${c.translation.slice(0,60)}»`);
+              const before=cache.get(item.source);cache.set(item.source,c.translation);fixed++;
+              if(fixed<=60)eventLog(`Revisione · «${before.slice(0,60)}» → «${c.translation.slice(0,60)}»`);
             }
-          }catch(error){signal.throwIfAborted();eventLog('Revisione non completata ('+error.message+'): mantengo la traduzione.');}
-          setProgress(72+(n+1)/chunks.length*8,`Revisione ${n+1} / ${chunks.length}`);
-        }
+          }catch(error){signal.throwIfAborted();eventLog('Revisione parziale non completata ('+error.message+'): mantengo la traduzione.');}
+          reviewed++;setProgress(72+reviewed/chunks.length*8,`Revisione ${reviewed} / ${chunks.length}`);$('activity-detail').textContent=`Revisione: ${reviewed} di ${chunks.length} parti.`;
+        }};
+        await Promise.all(Array.from({length:Math.min(currentProvider==='openai'?4:2,chunks.length)},reviewWorker));signal.throwIfAborted();
         reviewNote=fixed?` Revisione: ${fixed} correzioni applicate (dettagli nel registro).`:' Revisione: nessuna correzione necessaria.';eventLog(reviewNote.trim());
       }
     }

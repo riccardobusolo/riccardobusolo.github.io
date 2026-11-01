@@ -8,6 +8,7 @@ const response=text=>({status:'completed',output:[{type:'reasoning',summary:[]},
   assert.equal(await OpenAIService.discover('fake-test-key',signal,()=>{},m=>found=m,'gpt-4.1-mini'),1);assert.equal(calls.length,1);assert.equal(found.name,'gpt-4.1-mini');assert.equal(JSON.parse(calls[0].options.body).max_output_tokens,32);
   mock(response('{"translations":["Ciao"]}'));const attempts=[];
   assert.deepEqual(await OpenAIService.translate(['Hello'],'Italiano','fake-test-key','gpt-4.1-mini',['gpt-4.1-nano'],signal,()=>{},a=>attempts.push(a)),['Ciao']);
+  mock(response('{"translations":[{"source_language":"sv","text":"Ciao"}]}'));const withLanguage=await OpenAIService.translate(['Hej'],'Italiano','fake-test-key','gpt-4.1-mini',[],signal,()=>{});assert.deepEqual(withLanguage,['Ciao']);assert.deepEqual(withLanguage.languages,['sv']);
   const body=JSON.parse(calls.at(-1).options.body);assert.equal(body.text.format.type,'json_schema');assert.equal(body.text.format.strict,true);assert.deepEqual(attempts.map(a=>a.state),['waiting','response']);
   mock({error:{code:'insufficient_quota',message:'fake-test-key'}},429);const before=calls.length;
   await assert.rejects(OpenAIService.translate(['Hello'],'Italiano','fake-test-key','gpt-4.1-mini',['gpt-4.1-nano'],signal,()=>{}),/Credito API esaurito/);assert.equal(calls.length,before+1);

@@ -22,7 +22,9 @@ Modalità simulata: nessuna chiamata AI; sostituisce le righe con [TEST n]. Serv
 
 Con un provider configurato, prima della traduzione una richiesta crea il glossario del documento: nomi di prodotto e componenti, termini ricorrenti, titoli presenti anche nell'indice, intestazioni e parole di sicurezza secondo la convenzione della lingua di destinazione (per l'italiano PERICOLO, AVVERTENZA, ATTENZIONE, AVVISO). Il glossario viene allegato a ogni blocco di traduzione. Marchi, codici e slogan restano invariati; se il documento usa già un termine nella lingua di destinazione, viene riutilizzato.
 
-Con "Revisione finale automatica" (attiva per default) il modello rilegge originale e traduzione dell'intero documento (in parti da circa 45.000 caratteri) e restituisce solo le correzioni: errori di senso, omissioni, incoerenze di terminologia (indice/titoli, intestazioni), parole di sicurezza, testo non tradotto, testo in altre lingue tradotto per errore, numeri o codici alterati. Le correzioni con id inesistente o con tag di stile diversi dall'originale vengono scartate; ogni correzione applicata compare nel registro. Glossario e revisione sono facoltativi: se una delle due richieste fallisce, la traduzione prosegue senza.
+Con OpenAI ogni testo tradotto riporta anche la lingua dell'originale: i passaggi in una lingua diversa da quella principale del documento (per esempio una dichiarazione ripetuta in più lingue) restano invariati, senza dipendere dal giudizio del modello.
+
+Con "Revisione finale automatica" (attiva per default) il modello rilegge originale e traduzione in parti da circa 80 testi, fino a 4 in parallelo, e restituisce solo le correzioni: errori di senso, omissioni, incoerenze di terminologia (indice/titoli, intestazioni), parole di sicurezza, testo non tradotto, testo in altre lingue tradotto per errore, numeri o codici alterati. Le correzioni con id inesistente o con tag di stile diversi dall'originale vengono scartate; ogni correzione applicata compare nel registro. Glossario e revisione sono facoltativi: se una delle due richieste fallisce, la traduzione prosegue senza.
 
 `node strumenti/pdf-translator/quality.test.cjs`
 
