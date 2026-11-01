@@ -2,7 +2,7 @@
 
 ## OpenAI
 
-Selezionare OpenAI nel menu Provider AI, inserire la propria chiave API Platform, scegliere GPT-4.1 mini, GPT-4.1 nano, GPT-4o mini, GPT-5 mini o GPT-5 nano (ragionamento minimo) e premere Testa il modello OpenAI. Ogni test esegue una sola richiesta a consumo sul modello selezionato. Nessun ripiego automatico su altri modelli o provider a pagamento. Il credito API è separato dall'abbonamento ChatGPT. Il link Credito API apre la fatturazione personale; questa app non effettua acquisti e non imposta un limite di spesa di 20 euro.
+Selezionare OpenAI nel menu Provider AI, inserire la propria chiave API Platform, scegliere GPT-5 mini (predefinito), GPT-4.1 mini, GPT-4.1 nano, GPT-4o mini o GPT-5 nano (ragionamento minimo). Nel confronto sul manuale di prova GPT-5 nano lasciava intere pagine non tradotte; GPT-5 mini è risultato il più completo e premere Testa il modello OpenAI. Ogni test esegue una sola richiesta a consumo sul modello selezionato. Nessun ripiego automatico su altri modelli o provider a pagamento. Il credito API è separato dall'abbonamento ChatGPT. Il link Credito API apre la fatturazione personale; questa app non effettua acquisti e non imposta un limite di spesa di 20 euro.
 
 La connessione usa POST https://api.openai.com/v1/responses con Authorization Bearer, store:false, timeout di 45 secondi e schema JSON rigoroso per le traduzioni. Le chiavi e i modelli verificati vengono mantenuti separatamente per provider, esclusivamente nella memoria della scheda. Il cambio provider non invia richieste. Una chiave modificata richiede una nuova verifica. Nei log non vengono incluse chiavi, testi dei documenti o messaggi grezzi del provider.
 

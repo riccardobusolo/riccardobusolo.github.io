@@ -194,6 +194,14 @@ $('translate').onclick=async()=>{
         reviewNote=fixed?` Revisione: ${fixed} correzioni applicate (dettagli nel registro).`:' Revisione: nessuna correzione necessaria.';eventLog(reviewNote.trim());
       }
     }
+    // Glossary terms often come from all-caps headings or the table of contents:
+    // running text whose source has no all-caps words must not gain any.
+    if(!$('demo').checked){let recased=0;
+      for(const text of unique){const tr=cache.get(text);if(!tr||tr===text)continue;
+        if(/\b\p{Lu}{4,}\b/u.test(text.replace(/<\/?s\d+>/g,''))||!/\p{Ll}/u.test(text))continue;
+        const fixed=tr.replace(/(^|[.!?:]\s+|\s|[(“"«'])(\p{Lu}{4,})(?=\b)/gu,(m,before,word)=>text.includes(word)?m:before+(/^$|[.!?:]\s+$/.test(before)?word[0]+word.slice(1).toLowerCase():word.toLowerCase()));
+        if(fixed!==tr){cache.set(text,fixed);recased++;}}
+      if(recased)eventLog(`Maiuscole: uniformate ${recased} traduzioni al testo originale.`);}
     signal.throwIfAborted();status('Rimuovo il testo originale e compongo il PDF…');$('progress').value=85;
     stage(2,'Creazione del PDF tradotto','Rimozione dei testi originali e inserimento delle traduzioni.',80,'Preparazione pagine');await paint();
     const built=await PDFEngine.build(source.originalBytes,pages,texts.map((t,i)=>units[i].translate?cache.get(t):t),signal,(n,total)=>{stage(2,'Creazione del PDF tradotto',`Composizione della pagina ${n} di ${total}.`,80+n/total*14,`${n} / ${total} pagine ricomposte`);});

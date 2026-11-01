@@ -1,6 +1,6 @@
 'use strict';
 window.OpenAIService=(()=>{
-  const models=['gpt-4.1-mini','gpt-4.1-nano','gpt-4o-mini','gpt-5-mini','gpt-5-nano'];
+  const models=['gpt-5-mini','gpt-4.1-mini','gpt-4.1-nano','gpt-4o-mini','gpt-5-nano'];
   class APIError extends Error{constructor(message,status){super(message);this.status=status;}}
   // Each item also reports the language of its source text (ISO 639-1), so the app can keep
   // passages written in a language other than the document's main one unchanged.
