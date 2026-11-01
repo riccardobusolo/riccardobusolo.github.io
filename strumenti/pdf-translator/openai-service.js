@@ -8,7 +8,8 @@ window.OpenAIService=(()=>{
     // 18-page test manual (glossary + translation + review, reasoning included).
     {id:'gpt-6.1-sol',label:'GPT-6.1 Sol',note:'consigliato',input:2,cached:.1,output:10,effort:'low',tokensIn:1.4,tokensOut:.42},
     {id:'gpt-6.1-terra',label:'GPT-6.1 Terra',note:'equilibrato',input:1,cached:.05,output:5,effort:'none',tokensIn:1.58,tokensOut:.43},
-    {id:'gpt-6-astra',label:'GPT-6 Astra',note:'massima qualità',input:10,cached:1,output:50,effort:'low',tokensIn:1.45,tokensOut:.42},
+    // Astra: about 17% above the measured usage, matching the amount billed by OpenAI.
+    {id:'gpt-6-astra',label:'GPT-6 Astra',note:'massima qualità · costoso',input:10,cached:1,output:50,effort:'low',tokensIn:1.7,tokensOut:.49},
     {id:'gpt-5-mini',label:'GPT-5 mini',note:'economico',input:.25,cached:.025,output:2,effort:'minimal',tokensIn:2.25,tokensOut:.59,legacyPrice:true}
   ];
   const models=catalog.map(m=>m.id),info=id=>catalog.find(m=>m.id===id);
