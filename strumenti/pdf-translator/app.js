@@ -19,7 +19,16 @@ function providerUI(){
 const keyStore='docushift.key.';
 function storedKey(provider){try{return localStorage.getItem(keyStore+provider)||'';}catch{return '';}}
 function storeKey(provider,key){try{if(key)localStorage.setItem(keyStore+provider,key);else localStorage.removeItem(keyStore+provider);}catch{}}
-const money=v=>v==null?'—':v<.01?'< $0,01':'$'+v.toFixed(v<1?3:2).replace('.',',');
+// Costs are priced in USD by OpenAI and shown in euro, rounded to the cent. The ECB rate
+// is refreshed on every opening (Frankfurter API) and cached; 0.895 is the 30 Oct 2026 rate.
+let usdToEur=.895,rateDate='30/10/2026';
+try{const cached=JSON.parse(localStorage.getItem('docushift.usdeur')||'null');if(cached?.rate){usdToEur=cached.rate;rateDate=cached.date;}}catch{}
+const money=usd=>{if(usd==null)return '—';const eur=Math.round(usd*usdToEur*100)/100;return eur<.01?'< 0,01 €':'≈ '+eur.toFixed(2).replace('.',',')+' €';};
+async function refreshRate(){
+  try{const r=await fetch('https://api.frankfurter.dev/v1/latest?from=USD&to=EUR',{referrerPolicy:'no-referrer'});const d=await r.json();const rate=d?.rates?.EUR;
+    if(rate>.5&&rate<2){usdToEur=rate;rateDate=String(d.date||'').split('-').reverse().join('/');try{localStorage.setItem('docushift.usdeur',JSON.stringify({rate,date:rateDate}));}catch{}updateEstimate();}}
+  catch{}
+}
 const docChars=()=>source?.chars||null;
 function keyStatus(text,state=''){$('key-status').textContent=text;$('key-status').dataset.state=state;$('key-status').title=text;}
 // OpenAI models are shown as a small table: price for 10 pages and for the loaded PDF.
@@ -33,12 +42,12 @@ function updateEstimate(){
     const head=document.createElement('div');head.className='models-head';head.innerHTML='<span></span><span>Modello</span><span>10 pag.</span><span class="doc">Il tuo PDF</span>';
     const rows=[...$('model').options].map(o=>{const m=OpenAIService.info(o.value);const b=document.createElement('button');b.type='button';b.className='model';b.setAttribute('role','radio');b.setAttribute('aria-checked',String(o.value===selected));b.dataset.off=o.disabled?'1':'0';b.disabled=o.disabled||busy;
       b.innerHTML=`<span class="radio"></span><span class="name">${m.label}<small>${o.disabled?'non disponibile sul tuo account':m.note}</small></span><span class="price">${money(OpenAIService.estimate(m.id,10*OpenAIService.CHARS_PER_PAGE))}</span><span class="price doc">${chars?money(OpenAIService.estimate(m.id,chars)):''}</span>`;
-      b.title=`${m.label}: $${m.input} input · $${m.output} output per milione di token${m.legacyPrice?' (prezzo storico, da verificare)':''}`;
+      b.title=`${m.label}: $${m.input} input · $${m.output} output per milione di token (≈ ${(m.input*usdToEur).toFixed(2).replace('.',',')} € / ${(m.output*usdToEur).toFixed(2).replace('.',',')} €)${m.legacyPrice?' · prezzo storico, da verificare':''}`;
       b.onclick=()=>{if(busy)return;$('model').value=o.value;$('model').onchange();};return b;});
     list.replaceChildren(head,...rows);
   }
   const m=OpenAIService.info(selected);
-  $('estimate').textContent=m?'Stime da consumi misurati con glossario e revisione, ~1.200 caratteri per pagina · listino OpenAI 1/11/2026.':'';
+  $('estimate').textContent=m?`Stime da consumi misurati con glossario e revisione, ~1.200 caratteri per pagina · listino OpenAI 1/11/2026 · cambio BCE ${rateDate}: 1 $ = ${usdToEur.toFixed(3).replace('.',',')} €.`:'';
 }
 function resetModels(available=null){
   const selected=$('model').value;workingModels=[];$('model').replaceChildren();
@@ -274,7 +283,7 @@ $('translate').onclick=async()=>{
     signal.throwIfAborted();
     // Real cost of this document, from the token usage reported by the provider.
     if(!$('demo').checked&&usage.input+usage.output){const k=n=>n>=1000?(n/1000).toFixed(1).replace('.',',')+'k':String(n);const c=currentProvider==='openai'?OpenAIService.cost(usedModel,usage):null;
-      $('cost').textContent=(c!=null?'Costo '+money(c)+' · ':'')+`${k(usage.input)} + ${k(usage.output)} token`;$('cost').title=`Token in ingresso ${usage.input} (in cache ${usage.cached}) · in uscita ${usage.output}${c!=null?' · '+OpenAIService.info(usedModel).label+' a listino':''}`;$('cost').hidden=false;costNote=c!=null?` Costo stimato da listino: ${money(c)} (l’addebito esatto è nel pannello OpenAI).`:` Token usati: ${usage.input+usage.output}.`;eventLog('Consumo: '+$('cost').title);}
+      $('cost').textContent=(c!=null?'Costo '+money(c)+' · ':'')+`${k(usage.input)} + ${k(usage.output)} token`;$('cost').title=`Token in ingresso ${usage.input} (in cache ${usage.cached}) · in uscita ${usage.output}${c!=null?` · ${OpenAIService.info(usedModel).label} a listino: $${c.toFixed(4)} · cambio ${usdToEur.toFixed(3)}`:''}`;$('cost').hidden=false;costNote=c!=null?` Costo da listino: ${money(c)} (l’addebito esatto, in dollari, è nel pannello OpenAI).`:` Token usati: ${usage.input+usage.output}.`;eventLog('Consumo: '+$('cost').title);}
     downloadURL=URL.createObjectURL(new Blob([built.bytes],{type:'application/pdf'}));$('download').href=downloadURL;$('download').download=fileName.replace(/\.pdf$/i,'')+($('demo').checked?'-test':'-'+$('language').value)+'.pdf';$('download').hidden=false;
     await preview();signal.throwIfAborted();
     status(($('demo').checked?'Simulazione completata. Il PDF contiene etichette di prova.':'Traduzione completata. Il PDF è pronto.'+reviewNote+costNote)+(built.shrunk?` ${built.shrunk} blocchi con carattere ridotto oltre il 20% per rispettare gli spazi.`:''));
@@ -282,4 +291,4 @@ $('translate').onclick=async()=>{
   }catch(error){clearResult();const message=signal.aborted?'Operazione annullata. Puoi riprovare.':error.message;status(message);endActivity(signal.aborted?'cancelled':'error',message);}
   finally{globalThis.OpenAIService?.setMeter?.(null);globalThis.AI?.setMeter?.(null);busy=false;controller=null;sync();}
 };
-$('provider').value=currentProvider;$('key').value=storedKey(currentProvider);providerUI();resetModels();sync();if($('key').value.trim())verifyKey();
+$('provider').value=currentProvider;$('key').value=storedKey(currentProvider);providerUI();resetModels();sync();if($('key').value.trim())verifyKey();refreshRate();
