@@ -161,7 +161,11 @@ $('translate').onclick=async()=>{
       if(sourceLanguage.size){
         const weight=new Map();for(const[text,lang]of sourceLanguage)weight.set(lang,(weight.get(lang)||0)+text.length);
         const main=[...weight].sort((a,b)=>b[1]-a[1])[0][0],kept=new Map();
-        for(const[text,lang]of sourceLanguage)if(lang!==main&&text.replace(/<\/?s\d+>/g,'').trim().length>=12&&/\p{L}{3}/u.test(text)){cache.set(text,text);foreign.add(text);kept.set(lang,(kept.get(lang)||0)+1);}
+        const langAt=i=>sourceLanguage.get(unique[i]);
+        unique.forEach((text,i)=>{const lang=langAt(i);if(!lang||lang===main||!/\p{L}{3}/u.test(text))return;
+          // Short fragments count as foreign only next to other fragments in the same language.
+          if(text.replace(/<\/?s\d+>/g,'').trim().length<12&&langAt(i-1)!==lang&&langAt(i+1)!==lang)return;
+          cache.set(text,text);foreign.add(text);kept.set(lang,(kept.get(lang)||0)+1);});
         if(kept.size)eventLog(`Lingua principale: ${main}. Lasciati in lingua originale ${[...kept.values()].reduce((a,b)=>a+b,0)} testi (${[...kept].map(([l,n])=>l+' '+n).join(', ')}).`);
       }
       // 2. Final review: the model rereads source and translation of the whole
@@ -169,7 +173,7 @@ $('translate').onclick=async()=>{
       // translation is kept as it is.
       if(quality&&$('review').checked){
         stage(1,'Revisione della traduzione','Rileggo originale e traduzione: errori di senso, terminologia, parole di sicurezza, lingue da lasciare invariate.',72,'Revisione');status('Revisione finale della traduzione…');await paint();
-        const tags=t=>(t.match(/<\/?s\d+>/g)||[]).sort().join();
+        const tags=t=>(t.match(/<\/?s\d+>/g)||[]).sort().join(),digits=t=>(t.match(/\d+/g)||[]).sort().join();
         const items=unique.map((source,id)=>({id,source,translation:cache.get(source)})).filter(it=>!foreign.has(it.source)),byId=new Map(items.map(it=>[it.id,it])),chunks=[];
         for(let i=0;i<items.length;){const chunk=[];let length=0;while(i<items.length){const it=items[i],size=it.source.length+it.translation.length+20;if(chunk.length&&(length+size>12000||chunk.length>=80))break;chunk.push(it);length+=size;i++;}chunks.push(chunk);}
         let fixed=0,reviewed=0,next=0;
@@ -178,7 +182,8 @@ $('translate').onclick=async()=>{
             const data=await svc.ask(window.reviewPrompt(language,glossary,chunk),window.TRANSLATION_SCHEMAS.review,key,model,workingModels,signal,diagnostic);
             for(const c of data.corrections||[]){
               const item=byId.get(c?.id);if(!item||!chunk.includes(item)||typeof c.translation!=='string'||!c.translation.trim()||c.translation===cache.get(item.source))continue;
-              if(tags(c.translation)!==tags(item.source))continue;
+              // Never accept a correction that alters numbers, codes or style tags of the source.
+              if(tags(c.translation)!==tags(item.source)||digits(c.translation)!==digits(item.source))continue;
               const before=cache.get(item.source);cache.set(item.source,c.translation);fixed++;
               if(fixed<=60)eventLog(`Revisione · «${before.slice(0,60)}» → «${c.translation.slice(0,60)}»`);
             }
