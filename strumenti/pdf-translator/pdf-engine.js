@@ -158,7 +158,7 @@ window.PDFEngine = (() => {
     const single=lines.length===1,center=(first.x+right)/2;
     if(unit.leader)unit.maxRight=right;
     else if(!single)unit.maxRight=right,unit.justify=lines.slice(0,-1).every(L=>L.right>=right-Math.max(1.5,.3*size));
-    else if(first.left&&right>=page.right-6&&first.x>page.left+(page.right-page.left)*.3){unit.align='right';unit.maxRight=right;unit.leftLimit=Math.min(first.x,first.leftRight+1.5*size);}
+    else if(first.left&&right>=page.right-Math.max(6,1.2*size)&&first.x>page.left+(page.right-page.left)*.3){unit.align='right';unit.maxRight=right;unit.leftLimit=Math.min(first.x,first.leftRight+1.5*size);}
     else{
       const w=right-first.x,peers=page.lines.filter(L=>L!==first&&Math.abs(L.y-first.y)<=12*size&&Math.abs(L.y-first.y)>.35*size);
       const table=first.left||first.rightX!==undefined;
