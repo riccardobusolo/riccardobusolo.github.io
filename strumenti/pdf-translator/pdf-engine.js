@@ -252,7 +252,7 @@ window.PDFEngine = (() => {
 
   async function parse(bytes,signal,progress){
     const doc=await PDFLib.PDFDocument.load(bytes.slice());
-    if(doc.getPageCount()>100)throw Error('Limite beta: massimo 100 pagine.');
+    if(doc.getPageCount()>200)throw Error('Limite beta: massimo 200 pagine.');
     // Validate all content streams before sending text to the provider.
     await removeText(doc,signal,progress);
     const stripped=typeof document!=='undefined'?await doc.save():null;

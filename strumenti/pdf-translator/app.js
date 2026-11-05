@@ -141,14 +141,14 @@ function preview(){
 }
 async function load(file){
   if(busy||!file)return;
-  if(file.size>25*1024*1024){status('Il file supera il limite di 25 MB.');return;}
+  if(file.size>50*1024*1024){status('Il file supera il limite di 50 MB.');return;}
   busy=true;controller=new AbortController();const signal=controller.signal;sync();startActivity('Caricamento del PDF',false);++renderVersion;
   try{
     await paint();await renderQueue;clearResult();await source?.destroy();source=null;$('original').style.display='none';$('empty').hidden=false;$('progress').value=0;
     signal.throwIfAborted();
     const bytes=new Uint8Array(await file.arrayBuffer());if(new TextDecoder().decode(bytes.slice(0,5))!=='%PDF-')throw Error('Seleziona un file PDF valido.');
     const doc=await pdfjsLib.getDocument({data:bytes.slice(),isEvalSupported:false}).promise;
-    if(doc.numPages>100){await doc.destroy();throw Error('Limite beta: massimo 100 pagine.');}
+    if(doc.numPages>200){await doc.destroy();throw Error('Limite beta: massimo 200 pagine.');}
     source=doc;source.originalBytes=bytes;fileName=file.name;pageNumber=1;
     $('file-name').textContent=file.name;$('file-info').textContent=`${doc.numPages} pagine · ${(file.size/1024/1024).toFixed(2)} MB · clicca per sostituire`;
     // Characters of selectable text: basis of the cost estimate for this document.

@@ -48,7 +48,7 @@ Se la traduzione è più lunga, il motore misura lo spazio davvero libero sulla 
 
 Font: per i font originali più comuni vengono incorporati font metricamente compatibili, open source (SIL OFL), caricati solo se servono: Calibri → Carlito, Arial/Helvetica → Arimo, Times → Tinos, Cambria → Caladea, nei sottoinsiemi latin e latin-ext (cartella `fonts/`). I caratteri mancanti ricadono sui font PDF standard. fontkit (MIT) serve per l'incorporamento.
 
-Limiti: 25 MB, 100 pagine, almeno una riga di testo per pagina; nessun OCR. I collegamenti PDF (`/Link`), compresi quelli di un sommario, vengono mantenuti. Non supportati: password, campi modulo, commenti, timbri e altre annotazioni con aspetto visivo, rotazioni, origini pagina personalizzate, testo verticale/RTL, font Type 3, inline images, testo come maschera/contorno/invisibile e alcuni effetti di trasparenza. La beta non traduce testi incorporati nelle immagini. Nessuna verifica automatica completa della fedeltà di qualunque PDF.
+Limiti: 50 MB, 200 pagine, almeno una riga di testo per pagina; nessun OCR. I collegamenti PDF (`/Link`), compresi quelli di un sommario, vengono mantenuti. Non supportati: password, campi modulo, commenti, timbri e altre annotazioni con aspetto visivo, rotazioni, origini pagina personalizzate, testo verticale/RTL, font Type 3, inline images, testo come maschera/contorno/invisibile e alcuni effetti di trasparenza. La beta non traduce testi incorporati nelle immagini. Nessuna verifica automatica completa della fedeltà di qualunque PDF.
 
 L'elaborazione di file grandi può usare molta RAM. Annullamento cooperativo fra le fasi PDF e immediato sulle richieste di rete. Le trasformazioni sincrone del PDF possono ritardare la risposta del pulsante Annulla.
 

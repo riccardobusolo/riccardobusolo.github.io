@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Traduci PDF con la tua chiave OpenAI o Gemini conservando impaginazione e grafica. Elaborazione nel browser e anteprima affiancata."><title>DocuShift — Il tuo documento, un’altra lingua.</title><link rel="stylesheet" href="style.css?v=20261105-notes1"><script defer src="pdf.min.js"></script><script defer src="pdf-lib.min.js"></script><script defer src="fontkit.min.js"></script><script defer src="prompt.js?v=20261105-context1"></script><script defer src="ai-service.js?v=20261101-ui2"></script><script defer src="pdf-engine.js?v=20261105-greek1"></script><script defer src="openai-service.js?v=20261105-context1"></script><script defer src="app.js?v=20261105-context1"></script>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Traduci PDF con la tua chiave OpenAI o Gemini conservando impaginazione e grafica. Elaborazione nel browser e anteprima affiancata."><title>DocuShift — Il tuo documento, un’altra lingua.</title><link rel="stylesheet" href="style.css?v=20261105-notes1"><script defer src="pdf.min.js"></script><script defer src="pdf-lib.min.js"></script><script defer src="fontkit.min.js"></script><script defer src="prompt.js?v=20261105-context1"></script><script defer src="ai-service.js?v=20261101-ui2"></script><script defer src="pdf-engine.js?v=20261105-limits1"></script><script defer src="openai-service.js?v=20261105-context1"></script><script defer src="app.js?v=20261105-limits1"></script>
 <link rel="stylesheet" href="/site-cursor.css?v=20261031-controls">
 <script src="/site-cursor.js?v=20261030-text" defer></script>
 <link rel="stylesheet" href="/project-navigation.css">
@@ -15,7 +15,7 @@
     <details class="how"><summary class="chip">Come funziona</summary>
       <div class="how-panel">
         <ol><li><b>Collega l’AI.</b> Incolla la chiave OpenAI (o Gemini): viene verificata subito, senza costi.</li><li><b>Carica il PDF.</b> Trascinalo nell’area di lavoro: resta nel tuo browser.</li><li><b>Traduci.</b> Glossario, traduzione per frasi intere e revisione finale; poi scarichi il PDF.</li></ol>
-        <p id="notice">Immagini e grafica restano intatte. I testi vengono ricomposti nelle stesse posizioni con font equivalenti; se la traduzione è più lunga il testo va a capo nello spazio libero o viene leggermente ridotto. Al provider scelto vengono inviati solo i testi estratti. Scansioni e testi dentro le immagini non vengono tradotti. Limiti: 25 MB, 100 pagine.</p>
+        <p id="notice">Immagini e grafica restano intatte. I testi vengono ricomposti nelle stesse posizioni con font equivalenti; se la traduzione è più lunga il testo va a capo nello spazio libero o viene leggermente ridotto. Al provider scelto vengono inviati solo i testi estratti. Scansioni e testi dentro le immagini non vengono tradotti. Limiti: 50 MB, 200 pagine.</p>
       </div>
     </details>
   </div>
@@ -54,7 +54,7 @@
 
   <section class="work" id="work">
     <div class="toolbar">
-      <label class="drop" id="drop" for="file"><input id="file" type="file" accept="application/pdf,.pdf"><span class="upload-icon">↑</span><span class="drop-text"><strong id="file-name">Carica un PDF</strong><small id="file-info">Trascinalo qui o clicca · max 25 MB / 100 pagine</small></span></label>
+      <label class="drop" id="drop" for="file"><input id="file" type="file" accept="application/pdf,.pdf"><span class="upload-icon">↑</span><span class="drop-text"><strong id="file-name">Carica un PDF</strong><small id="file-info">Trascinalo qui o clicca · max 50 MB / 200 pagine</small></span></label>
       <button id="sample" type="button" class="link">PDF di esempio</button>
       <div class="pager"><button id="prev" type="button" class="icon" disabled aria-label="Pagina precedente">←</button><span id="page-label">— / —</span><button id="next" type="button" class="icon" disabled aria-label="Pagina successiva">→</button></div>
       <a id="download" class="primary download" hidden>Scarica PDF ↓</a>
