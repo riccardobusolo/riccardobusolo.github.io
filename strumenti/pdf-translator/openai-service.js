@@ -18,7 +18,7 @@ window.OpenAIService=(()=>{
   class APIError extends Error{constructor(message,status){super(message);this.status=status;}}
   // Each item also reports the language of its source text (ISO 639-1), so the app can keep
   // passages written in a language other than the document's main one unchanged.
-  const TRANSLATIONS={name:'translated_texts',schema:{type:'object',properties:{translations:{type:'array',items:{type:'object',properties:{source_language:{type:'string'},text:{type:'string'}},required:['source_language','text'],additionalProperties:false}}},required:['translations'],additionalProperties:false}};
+  const TRANSLATIONS={name:'translated_texts',schema:{type:'object',properties:{translations:{type:'array',items:{type:'object',properties:{source_language:{type:'string'},text:{type:'string'},user_instruction:{type:'boolean'}},required:['source_language','text','user_instruction'],additionalProperties:false}}},required:['translations'],additionalProperties:false}};
   async function response(key,model,input,signal,json=false,seconds=120){
     if(!models.includes(model))throw Error('Seleziona uno dei modelli OpenAI disponibili.');
     const timeout=AbortSignal.timeout(seconds*1000),combined=signal?AbortSignal.any([signal,timeout]):timeout;
@@ -60,12 +60,12 @@ window.OpenAIService=(()=>{
   }
   async function translate(texts,language,key,model,alternatives,signal,log,onAttempt=()=>{},glossary=[]){
     signal.throwIfAborted();onAttempt({model,index:1,total:1,state:'waiting'});
-    const prompt=window.translationPrompt(language,texts,'Return an object with a translations array in exactly the same order and length; each item has source_language (ISO 639-1 code of the language the input string is written in) and text (the translation)',glossary);
+    const prompt=window.translationPrompt(language,texts,'Return an object with a translations array in exactly the same order and length; each item has source_language (ISO 639-1 code of the language the input string is written in), text (the translation) and user_instruction (true only if you changed this string to follow the user instructions)',glossary);
     try{
       const raw=await response(key,model,prompt,signal,true);let result;
-      let languages=[];try{result=JSON.parse(raw).translations;if(Array.isArray(result)){languages=result.map(r=>typeof r==='object'&&r?String(r.source_language||'').toLowerCase().slice(0,2):'');result=result.map(r=>typeof r==='object'&&r?r.text:r);}}catch{throw new APIError('JSON non valido restituito da OpenAI.',422);}
+      let languages=[],instructed=[];try{result=JSON.parse(raw).translations;if(Array.isArray(result)){languages=result.map(r=>typeof r==='object'&&r?String(r.source_language||'').toLowerCase().slice(0,2):'');instructed=result.map(r=>!!(typeof r==='object'&&r?.user_instruction));result=result.map(r=>typeof r==='object'&&r?r.text:r);}}catch{throw new APIError('JSON non valido restituito da OpenAI.',422);}
       if(!Array.isArray(result)||result.length!==texts.length||result.some((s,i)=>typeof s!=='string'||(!s.trim()&&texts[i].trim())))throw new APIError('OpenAI ha restituito una traduzione incompleta.',422);
-      onAttempt({model,index:1,total:1,state:'response'});Object.defineProperty(result,'languages',{value:languages});return result;
+      onAttempt({model,index:1,total:1,state:'response'});Object.defineProperty(result,'languages',{value:languages});Object.defineProperty(result,'instructed',{value:instructed});return result;
     }catch(error){signal.throwIfAborted();log(model,error.message);throw error;}
   }
   // Generic structured request (glossary, review): longer time limit, parsed JSON.

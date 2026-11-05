@@ -199,8 +199,16 @@ $('translate').onclick=async()=>{
     const pages=await PDFEngine.parse(source.originalBytes,signal,(n,total,phase)=>{const checking=phase==='validate';stage(0,checking?'Verifica della struttura PDF':'Estrazione dei testi',`Pagina ${n} di ${total}`,checking?n/total*8:8+n/total*12,`${n} / ${total} pagine`);});
     window.setTranslationNotes($('notes').value);if($('notes').value.trim())eventLog('Indicazioni per l’AI: '+$('notes').value.trim().slice(0,200));
     if(pages.overlaps.length)eventLog(`Omessi ${pages.overlaps.length} frammenti stampati sopra altro testo nell’originale: ${pages.overlaps.join(" · ")}`);
-    const units=pages.flat(),texts=units.map(u=>u.text),unique=[...new Set(units.filter(u=>u.translate).map(u=>u.text))],cache=new Map();
+    const units=pages.flat(),texts=units.map(u=>u.text),unique=[...new Set(units.filter(u=>u.translate).map(u=>u.text))],cache=new Map(),instructed=new Set();
     eventLog(`${units.length} blocchi di testo estratti · ${unique.length} da tradurre (paragrafi interi, etichette e celle).`);
+    // Page and role of each text: the model needs them to apply instructions such as
+    // "change the title of the first page" or to recognise a multilingual page.
+    const context=new Map();
+    pages.forEach((page,p)=>{const visible=page.filter(u=>!u.hidden&&u.translate);if(!visible.length)return;
+      const weight=new Map();for(const u of visible)weight.set(u.size,(weight.get(u.size)||0)+u.text.length);
+      const body=[...weight].sort((a,b)=>b[1]-a[1])[0][0],top=Math.max(...visible.map(u=>u.size));
+      for(const u of visible){if(context.has(u.text))continue;const c={page:p+1};if(u.size===top&&top>=1.3*body)c.role='page title';else if(u.size>=1.15*body)c.role='heading';context.set(u.text,c);}});
+    window.setTranslationContext(context);
     {
       // Batches keep neighbouring blocks together (context for the model) and run
       // a few at a time; any failed batch stops the export, nothing partial is saved.
@@ -226,12 +234,12 @@ $('translate').onclick=async()=>{
         catch(error){
           if(batchSignal.aborted||batch.length===1||error.status!==422)throw error;
           const half=Math.ceil(batch.length/2);eventLog(`Risposta incompleta per i testi ${offset+1}–${offset+batch.length}: ritraduco in due parti.`);
-          const a=await translateBatch(batch.slice(0,half),offset,...rest),b=await translateBatch(batch.slice(half),offset+half,...rest),out=[...a,...b];out.languages=[...(a.languages||a.map(()=>'')),...(b.languages||b.map(()=>''))];return out;
+          const a=await translateBatch(batch.slice(0,half),offset,...rest),b=await translateBatch(batch.slice(half),offset+half,...rest),out=[...a,...b];out.languages=[...(a.languages||a.map(()=>'')),...(b.languages||b.map(()=>''))];out.instructed=[...(a.instructed||a.map(()=>false)),...(b.instructed||b.map(()=>false))];return out;
         }
       };
       const worker=async()=>{try{while(next<batches.length){batchSignal.throwIfAborted();const {offset,batch}=batches[next++];
         const output=await translateBatch(batch,offset,$('language').value,$('key').value.trim(),$('model').value,workingModels,batchSignal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · testi ${offset+1}–${offset+batch.length} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta'}`;$('activity-detail').textContent=message;eventLog(message);});
-        batch.forEach((text,i)=>{cache.set(text,output[i]);if(output.languages?.[i])sourceLanguage.set(text,output.languages[i]);});done+=batch.length;update();eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);}}catch(error){stop.abort();throw error;}};
+        batch.forEach((text,i)=>{cache.set(text,output[i]);if(output.languages?.[i])sourceLanguage.set(text,output.languages[i]);if(output.instructed?.[i]&&output[i]!==text)instructed.add(text);});done+=batch.length;update();eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);}}catch(error){stop.abort();throw error;}};
       const workers=Array.from({length:Math.min(currentProvider==='openai'?4:2,batches.length)},worker);
       const outcome=await Promise.allSettled(workers);signal.throwIfAborted();const failed=outcome.find(r=>r.status==='rejected'&&!(r.reason?.name==='AbortError'));if(failed)throw failed.reason;if(outcome.some(r=>r.status==='rejected'))throw Error('Traduzione interrotta.');
       // Passages in a language other than the document's main one (for example a
@@ -240,19 +248,21 @@ $('translate').onclick=async()=>{
         const weight=new Map();for(const[text,lang]of sourceLanguage)weight.set(lang,(weight.get(lang)||0)+text.length);
         const main=[...weight].sort((a,b)=>b[1]-a[1])[0][0],kept=new Map();
         const langAt=i=>sourceLanguage.get(unique[i]);
-        unique.forEach((text,i)=>{const lang=langAt(i);if(!lang||lang===main||!/\p{L}{3}/u.test(text))return;
+        // Texts changed on the user's instructions are kept as the model returned them.
+        unique.forEach((text,i)=>{const lang=langAt(i);if(!lang||lang===main||instructed.has(text)||!/\p{L}{3}/u.test(text))return;
           // Short fragments count as foreign only next to other fragments in the same language.
           if(text.replace(/<\/?s\d+>/g,'').trim().length<12&&langAt(i-1)!==lang&&langAt(i+1)!==lang)return;
           cache.set(text,text);foreign.add(text);kept.set(lang,(kept.get(lang)||0)+1);});
         if(kept.size)eventLog(`Lingua principale: ${main}. Lasciati in lingua originale ${[...kept.values()].reduce((a,b)=>a+b,0)} testi (${[...kept].map(([l,n])=>l+' '+n).join(', ')}).`);
       }
+      if(instructed.size)eventLog(`Indicazioni applicate a ${instructed.size} testi: `+[...instructed].slice(0,8).map(t=>`«${t.slice(0,40)}» → «${cache.get(t).slice(0,40)}»`).join(' · '));
       // 2. Final review: the model rereads source and translation of the whole
       // document and returns only the items to fix. Best effort: on error the
       // translation is kept as it is.
       if(quality&&$('review').checked){
         stage(1,'Revisione della traduzione','Rileggo originale e traduzione: errori di senso, terminologia, parole di sicurezza, lingue da lasciare invariate.',72,'Revisione');status('Revisione finale della traduzione…');await paint();
         const tags=t=>(t.match(/<\/?s\d+>/g)||[]).sort().join(),digits=t=>(t.match(/\d+/g)||[]).sort().join();
-        const items=unique.map((source,id)=>({id,source,translation:cache.get(source)})).filter(it=>!foreign.has(it.source)),byId=new Map(items.map(it=>[it.id,it])),chunks=[];
+        const items=unique.map((source,id)=>({id,source,translation:cache.get(source)})).filter(it=>!foreign.has(it.source)&&!instructed.has(it.source)).map(it=>({...it,...context.get(it.source)})),byId=new Map(items.map(it=>[it.id,it])),chunks=[];
         for(let i=0;i<items.length;){const chunk=[];let length=0;while(i<items.length){const it=items[i],size=it.source.length+it.translation.length+20;if(chunk.length&&(length+size>12000||chunk.length>=80))break;chunk.push(it);length+=size;i++;}chunks.push(chunk);}
         let fixed=0,reviewed=0,next=0;
         const reviewWorker=async()=>{while(next<chunks.length){const chunk=chunks[next++];signal.throwIfAborted();
@@ -275,7 +285,7 @@ $('translate').onclick=async()=>{
     // Glossary terms often come from all-caps headings or the table of contents:
     // running text whose source has no all-caps words must not gain any.
     {let recased=0;
-      for(const text of unique){const tr=cache.get(text);if(!tr||tr===text)continue;
+      for(const text of unique){const tr=cache.get(text);if(!tr||tr===text||instructed.has(text))continue;
         if(/\b\p{Lu}{4,}\b/u.test(text.replace(/<\/?s\d+>/g,''))||!/\p{Ll}/u.test(text))continue;
         const fixed=tr.replace(/(^|[.!?:]\s+|\s|[(“"«'])(\p{Lu}{4,})(?=\b)/gu,(m,before,word)=>text.includes(word)?m:before+(/^$|[.!?:]\s+$/.test(before)?word[0]+word.slice(1).toLowerCase():word.toLowerCase()));
         if(fixed!==tr){cache.set(text,fixed);recased++;}}

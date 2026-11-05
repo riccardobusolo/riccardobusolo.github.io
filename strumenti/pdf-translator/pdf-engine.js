@@ -319,7 +319,9 @@ window.PDFEngine = (() => {
     function standard(style){const name=STANDARD_NAMES[STANDARD[style.family]||'Helvetica'][(style.bold?1:0)+(style.italic?2:0)];if(!cache.has(name))cache.set(name,doc.embedFont(name));return cache.get(name);}
     function custom(style,subset){
       if(!canEmbed||style.family==='mono')return null;
-      const file=`${style.family}-${subset}-${style.bold?700:400}-${style.italic?'italic':'normal'}.woff`;
+      // Caladea has no Greek subset: Tinos is the closest serif with the same metrics class.
+      const family=subset==='greek'&&style.family==='caladea'?'tinos':style.family;
+      const file=`${family}-${subset}-${style.bold?700:400}-${style.italic?'italic':'normal'}.woff`;
       if(!cache.has(file))cache.set(file,fontBytes(file).then(b=>b?doc.embedFont(b,{subset:true}):null).catch(()=>null));
       return cache.get(file);
     }
@@ -327,11 +329,13 @@ window.PDFEngine = (() => {
     // Width at size 1, cached: custom font measurement runs a full shaping pass.
     const width=(font,text)=>{let m=widths.get(font);if(!m)widths.set(font,m=new Map());let w=m.get(text);if(w===undefined){w=font.widthOfTextAtSize(text,1);m.set(text,w);}return w;};
     // Split a word into segments, each drawn with the first font that has its glyphs:
-    // metric-compatible font (latin, then latin-ext subset), then a standard PDF font.
+    // metric-compatible font (latin, then latin-ext subset), then a standard PDF font;
+    // the Greek subset (Δ, Ω, µ… common in technical manuals) is loaded only when needed.
     async function split(style,text){
       const fonts=[await custom(style,'latin'),await custom(style,'latin-ext'),await standard(style)].filter(Boolean),out=[];
       for(let ch of text){
         let font=fonts.find(f=>covers(f,ch));
+        if(!font){const greek=await custom(style,'greek');if(greek&&covers(greek,ch))font=greek;}
         if(!font){const plain=ch.normalize('NFD').replace(/\p{M}/gu,'');ch=plain&&covers(fonts.at(-1),plain)?plain:'?';font=fonts.at(-1);}
         const last=out.at(-1);if(last&&last.font===font)last.text+=ch;else out.push({text:ch,font});
       }
