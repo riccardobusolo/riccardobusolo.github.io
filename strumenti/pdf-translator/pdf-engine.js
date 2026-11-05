@@ -158,7 +158,9 @@ window.PDFEngine = (() => {
     const single=lines.length===1,center=(first.x+right)/2;
     if(unit.leader)unit.maxRight=right;
     else if(!single)unit.maxRight=right,unit.justify=lines.slice(0,-1).every(L=>L.right>=right-Math.max(1.5,.3*size));
-    else if(first.left&&right>=page.right-Math.max(6,1.2*size)&&first.x>page.left+(page.right-page.left)*.3){unit.align='right';unit.maxRight=right;unit.leftLimit=Math.min(first.x,first.leftRight+1.5*size);}
+    // A cell reaching the right margin is right-aligned only if no nearby line shares
+    // its left edge: a left-aligned column that happens to be long stays left-aligned.
+    else if(first.left&&right>=page.right-Math.max(6,1.2*size)&&first.x>page.left+(page.right-page.left)*.3&&!page.lines.some(L=>L!==first&&Math.abs(L.x-first.x)<1.5&&Math.abs(L.y-first.y)<=6*size)){unit.align='right';unit.maxRight=right;unit.leftLimit=Math.min(first.x,first.leftRight+1.5*size);}
     else{
       const w=right-first.x,peers=page.lines.filter(L=>L!==first&&Math.abs(L.y-first.y)<=12*size&&Math.abs(L.y-first.y)>.35*size);
       const table=first.left||first.rightX!==undefined;
@@ -215,9 +217,17 @@ window.PDFEngine = (() => {
     }catch{/* rendering is only a refinement: keep every block if it fails */}
   }
 
-  // Isolated labels may grow into the free space measured on their right.
+  // Isolated labels may grow into the free space measured on their right; every other
+  // block is capped by it, so text never crosses a box border, a table rule or another
+  // block: when it does not fit, the font is reduced instead.
   function widen(units){
-    for(const u of units)if(u.spaceRight!==undefined&&u.lines.length===1&&!u.table&&!u.leader&&u.align==='left')u.maxRight=Math.max(u.right,u.right+u.spaceRight-.6*u.size);
+    for(const u of units){
+      if(u.spaceRight===undefined)continue;
+      const limit=Math.max(u.right,u.right+u.spaceRight-.6*u.size);
+      if(u.lines.length===1&&!u.table&&!u.leader&&u.align==='left')u.maxRight=limit;
+      else if(u.maxRight>limit)u.maxRight=limit;
+      if(u.halfWidth!==undefined)u.halfWidth=Math.min(u.halfWidth,Math.max((u.right-u.x)/2,limit-u.center));
+    }
   }
   // A flow is a column of consecutive left-aligned blocks with the same body size:
   // when a translation needs an extra line, the blocks below move down together, and
