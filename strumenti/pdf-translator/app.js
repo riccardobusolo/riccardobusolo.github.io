@@ -136,14 +136,14 @@ function diagnostic(name,message,ok=false){
 }
 function sync(){
   $('translate').disabled=busy||!source||!workingModels.includes($('model').value)||!$('key').value.trim();
-  for(const id of ['test','file','key','model','language','notes','review','show-key','sample','provider','remember'])$(id).disabled=busy;
+  for(const id of ['test','file','key','model','language','notes','review','show-key','provider','remember'])$(id).disabled=busy;
   for(const b of document.querySelectorAll('[data-provider]'))b.disabled=busy;
   document.body.classList?.toggle('has-file',!!source);
   for(const b of $('model-list')?.children||[])if(b.dataset?.off)b.disabled=busy||b.dataset.off==='1';
   $('cancel').hidden=!busy;$('translate').hidden=busy;
   // Refinement is offered once a translation exists, with a verified model for corrections.
   $('refine').hidden=!job;$('fix').disabled=busy;$('fix-run').disabled=busy||!job||!workingModels.includes($('model').value)||!$('key').value.trim();
-  $('open-viewer').hidden=!source;$('open-editor').hidden=!job;
+  $('open-viewer').hidden=!source;$('open-editor').hidden=!job;$('edit-only').disabled=busy||!source;
   if(job){for(const area of $('edit-list').querySelectorAll('.edit-text'))area.contentEditable=busy?'false':'plaintext-only';editCount();}
   if(viewer.open)viewerControls();
   $('prev').disabled=busy||!source||pageNumber===1;$('next').disabled=busy||!source||pageNumber>=source.numPages;
@@ -182,11 +182,12 @@ async function load(file){
   finally{busy=false;controller=null;$('file').value='';sync();}
 }
 $('file').addEventListener('change',e=>load(e.target.files[0]));
-$('sample').onclick=async()=>{
-  if(busy)return;
-  try{const response=await fetch('test-fixture.pdf');if(!response.ok)throw Error('Esempio non disponibile.');const blob=await response.blob();if(busy)return;await load(new File([blob],'docushift-esempio.pdf',{type:'application/pdf'}));}
-  catch(error){status(error.message);}
-};
+// Full screen for the whole tool (the browser's own Esc leaves it).
+if(document.fullscreenEnabled){
+  $('fullscreen').hidden=false;
+  $('fullscreen').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>status('Il browser non ha concesso lo schermo intero.'));
+  document.addEventListener('fullscreenchange',()=>{$('fullscreen').textContent=document.fullscreenElement?'⛶ Esci da schermo intero':'⛶ Schermo intero';});
+}
 // The whole workspace accepts a dropped PDF.
 const dropZone=$('work')||$('drop');
 for(const type of ['dragenter','dragover'])dropZone.addEventListener(type,e=>{e.preventDefault();if(!busy)dropZone.classList.add('drag');});
@@ -211,6 +212,37 @@ $('test').onclick=async()=>{
   }catch(error){const message=controller.signal.aborted?'Test annullato.':error.message;status(message);if(!controller.signal.aborted)diagnostic('Connessione',error.message);endActivity(controller.signal.aborted?'cancelled':'error',message);}
   finally{busy=false;controller=null;sync();}
 };
+// Page and role of each text: the model needs them to apply instructions such as
+// "change the title of the first page" or to recognise a multilingual page.
+function textContext(pages){
+  const context=new Map();
+  pages.forEach((page,p)=>{const visible=page.filter(u=>!u.hidden&&u.translate);if(!visible.length)return;
+    const weight=new Map();for(const u of visible)weight.set(u.size,(weight.get(u.size)||0)+u.text.length);
+    const body=[...weight].sort((a,b)=>b[1]-a[1])[0][0],top=Math.max(...visible.map(u=>u.size));
+    for(const u of visible){if(context.has(u.text))continue;const c={page:p+1};if(u.size===top&&top>=1.3*body)c.role='page title';else if(u.size>=1.15*body)c.role='heading';context.set(u.text,c);}});
+  return context;
+}
+// A PDF that is already translated can go straight to the editor: no AI, no key.
+// The result starts as the uploaded file itself; the first applied edit recomposes it.
+$('edit-only').onclick=async()=>{
+  if(busy||!source)return;
+  busy=true;controller=new AbortController();const signal=controller.signal;sync();startActivity('Preparazione della modifica',false);
+  try{
+    await paint();await renderQueue;signal.throwIfAborted();clearResult();
+    status('Leggo i testi del PDF…');
+    const pages=await PDFEngine.parse(source.originalBytes,signal,(n,total,phase)=>{stage(0,phase==='validate'?'Verifica della struttura PDF':'Lettura dei testi',`Pagina ${n} di ${total}`,phase==='validate'?n/total*40:40+n/total*50,`${n} / ${total} pagine`);});
+    const units=pages.flat();
+    const run={pages,units,texts:units.map(u=>u.text),unique:[...new Set(units.filter(u=>u.translate).map(u=>u.text))],cache:new Map(),context:textContext(pages),glossary:[],instructed:new Set(),language:$('language').value,provider:currentProvider,model:$('model').value,usage:{input:0,cached:0,output:0},editOnly:true};
+    const doc=await pdfjsLib.getDocument({data:source.originalBytes.slice(),isEvalSupported:false}).promise;
+    if(signal.aborted){await doc.destroy();signal.throwIfAborted();}
+    result=doc;job=run;downloadURL=URL.createObjectURL(new Blob([source.originalBytes],{type:'application/pdf'}));$('download').href=downloadURL;$('download').download=editedName();$('download').hidden=false;
+    await preview();
+    status(`Pronto per la modifica: ${run.unique.length} testi. Alla prima modifica applicata tutto il testo del PDF viene ricomposto con font equivalenti.`);endActivity('done',$('status').textContent);
+    openViewer(true);
+  }catch(error){clearResult();const message=signal.aborted?'Operazione annullata.':error.message;status(message);endActivity(signal.aborted?'cancelled':'error',message);}
+  finally{busy=false;controller=null;sync();}
+};
+const editedName=()=>fileName.replace(/\.pdf$/i,'')+'-modificato.pdf';
 $('translate').onclick=async()=>{
   if(busy||!source)return;
   busy=true;controller=new AbortController();const signal=controller.signal;sync();startActivity('Avvio della traduzione');let reviewNote='',costNote='';$('cost').hidden=true;
@@ -225,14 +257,7 @@ $('translate').onclick=async()=>{
     if(pages.overlaps.length)eventLog(`Omessi ${pages.overlaps.length} frammenti stampati sopra altro testo nell’originale: ${pages.overlaps.join(" · ")}`);
     const units=pages.flat(),texts=units.map(u=>u.text),unique=[...new Set(units.filter(u=>u.translate).map(u=>u.text))],cache=new Map(),instructed=new Set();
     eventLog(`${units.length} blocchi di testo estratti · ${unique.length} da tradurre (paragrafi interi, etichette e celle).`);
-    // Page and role of each text: the model needs them to apply instructions such as
-    // "change the title of the first page" or to recognise a multilingual page.
-    const context=new Map();
-    pages.forEach((page,p)=>{const visible=page.filter(u=>!u.hidden&&u.translate);if(!visible.length)return;
-      const weight=new Map();for(const u of visible)weight.set(u.size,(weight.get(u.size)||0)+u.text.length);
-      const body=[...weight].sort((a,b)=>b[1]-a[1])[0][0],top=Math.max(...visible.map(u=>u.size));
-      for(const u of visible){if(context.has(u.text))continue;const c={page:p+1};if(u.size===top&&top>=1.3*body)c.role='page title';else if(u.size>=1.15*body)c.role='heading';context.set(u.text,c);}});
-    window.setTranslationContext(context);
+    const context=textContext(pages);window.setTranslationContext(context);
     let glossary=[];
     {
       // Batches keep neighbouring blocks together (context for the model) and run
@@ -338,7 +363,7 @@ async function compose(run,signal){
   const doc=await pdfjsLib.getDocument({data:built.bytes.slice(),isEvalSupported:false}).promise;
   if(signal.aborted){await doc.destroy();signal.throwIfAborted();}
   result?.destroy();result=doc;if(downloadURL)URL.revokeObjectURL(downloadURL);
-  downloadURL=URL.createObjectURL(new Blob([built.bytes],{type:'application/pdf'}));$('download').href=downloadURL;$('download').download=fileName.replace(/\.pdf$/i,'')+'-'+run.language+'.pdf';$('download').hidden=false;
+  downloadURL=URL.createObjectURL(new Blob([built.bytes],{type:'application/pdf'}));$('download').href=downloadURL;$('download').download=run.editOnly?editedName():fileName.replace(/\.pdf$/i,'')+'-'+run.language+'.pdf';$('download').hidden=false;
   await preview();return built;
 }
 // Real cost of the work so far, from the token usage reported by the provider.

@@ -26,7 +26,7 @@ Le righe stampate una sopra l’altra già nell’originale (parole residue di u
 
 ## Interfaccia
 
-Tutto sta in una schermata senza scorrere (da 1366×768 in su): a sinistra provider, chiave, tabella dei modelli con i costi, lingua e opzioni; a destra il documento con anteprima originale/tradotto a tutta altezza, avanzamento compatto e download. Il PDF si può trascinare su tutta l'area di lavoro. Cliccando un’anteprima si apre il visore a schermo intero: originale e traduzione affiancati in un’unica area che scorre insieme, adattati alla larghezza, con zoom (75–300%), pagine con frecce o tastiera (← →, + −, Esc) e la scelta fra pagine affiancate, solo originale o solo tradotto. In modifica, sotto i 1700 px di larghezza, viene mostrata di default solo la pagina tradotta. Spiegazioni e limiti sono nel pannello "Come funziona" e nei suggerimenti "?". Sotto i 980 px di larghezza il layout si impila.
+Tutto sta in una schermata senza scorrere (da 1366×768 in su): a sinistra provider, chiave, tabella dei modelli con i costi, lingua e opzioni; a destra il documento con anteprima originale/tradotto a tutta altezza, avanzamento compatto e download. Il PDF si può trascinare su tutta l'area di lavoro. Il pulsante «⛶ Schermo intero» nella barra in alto porta tutto lo strumento a schermo intero (Esc per uscire). Cliccando un’anteprima si apre il visore a schermo intero: originale e traduzione affiancati in un’unica area che scorre insieme, adattati alla larghezza, con zoom (75–300%), pagine con frecce o tastiera (← →, + −, Esc) e la scelta fra pagine affiancate, solo originale o solo tradotto. In modifica, sotto i 1700 px di larghezza, viene mostrata di default solo la pagina tradotta. Spiegazioni e limiti sono nel pannello "Come funziona" e nei suggerimenti "?". Sotto i 980 px di larghezza il layout si impila.
 
 ## Lingue
 
@@ -38,6 +38,8 @@ L'ultima traduzione resta in memoria, così il PDF si può ricomporre senza ritr
 
 - **Correzione per l'AI** (scheda "Rifinisci"): una richiesta in linguaggio naturale, per esempio «traduci "allarme" con "alarm" ovunque». Il modello rilegge originale, traduzione attuale, pagina e ruolo di ogni testo e restituisce solo i testi da cambiare; se una parte fallisce non viene applicato nulla e il PDF precedente resta valido. Costa circa quanto una revisione e il costo si somma a quello mostrato.
 - **Modifica i testi** (pulsante sopra l’anteprima tradotta): si apre il visore a schermo intero con l’elenco dei testi della pagina, originale accanto alla traduzione modificabile. Passando su un testo la sua posizione si evidenzia sulle pagine (sulla traduzione nel punto in cui è stata davvero disegnata); cliccando la pagina si apre il testo corrispondente. Le parole in un altro stile (grassetto, colore) appaiono evidenziate invece che come tag. Le modifiche restano in bozza anche cambiando pagina e si applicano tutte insieme; un testo ripetuto (intestazioni, piè di pagina) cambia ovunque. Nessuna chiamata AI.
+
+**Solo modifica** («✎ Modifica senza tradurre», sotto Traduci): per un PDF già tradotto. Il PDF caricato diventa subito il risultato e si apre l'editor, senza chiave AI né costi; la lingua scelta indica quella del documento, utile se si usa anche la correzione AI. Alla prima modifica applicata tutto il testo del PDF viene ricomposto con i font equivalenti; il file scaricato si chiama «…-modificato.pdf».
 
 I testi corretti o modificati non vengono più toccati dai controlli automatici (lingua dell'originale, maiuscole).
 
