@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Traduci PDF con la tua chiave OpenAI o Gemini conservando impaginazione e grafica. Elaborazione nel browser e anteprima affiancata."><title>DocuShift — Il tuo documento, un’altra lingua.</title><link rel="stylesheet" href="style.css?v=20261105-editonly1"><script defer src="pdf.min.js"></script><script defer src="pdf-lib.min.js"></script><script defer src="fontkit.min.js"></script><script defer src="prompt.js?v=20261105-refine1"></script><script defer src="ai-service.js?v=20261101-ui2"></script><script defer src="pdf-engine.js?v=20261105-viewer4"></script><script defer src="openai-service.js?v=20261105-context1"></script><script defer src="app.js?v=20261105-editonly1"></script>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Traduci PDF con la tua chiave OpenAI o Gemini conservando impaginazione e grafica. Elaborazione nel browser e anteprima affiancata."><title>DocuShift — Il tuo documento, un’altra lingua.</title><link rel="stylesheet" href="style.css?v=20261105-fs3"><script defer src="pdf.min.js"></script><script defer src="pdf-lib.min.js"></script><script defer src="fontkit.min.js"></script><script defer src="prompt.js?v=20261105-refine1"></script><script defer src="ai-service.js?v=20261101-ui2"></script><script defer src="pdf-engine.js?v=20261105-viewer4"></script><script defer src="openai-service.js?v=20261105-context1"></script><script defer src="app.js?v=20261105-fs2"></script>
 <link rel="stylesheet" href="/site-cursor.css?v=20261031-controls">
 <script src="/site-cursor.js?v=20261030-text" defer></script>
 <link rel="stylesheet" href="/project-navigation.css">
@@ -82,7 +82,7 @@
     <div class="viewer-group seg-mini" role="group" aria-label="Pagine mostrate"><button type="button" data-layout="both" aria-pressed="true">Affiancate</button><button type="button" data-layout="original" aria-pressed="false">Originale</button><button type="button" data-layout="translated" aria-pressed="false">Tradotto</button></div>
     <div class="viewer-group" role="group" aria-label="Zoom"><button id="v-zoom-out" type="button" class="icon" aria-label="Riduci">−</button><button id="v-zoom" type="button" class="v-zoom" title="Adatta alla larghezza">Adatta</button><button id="v-zoom-in" type="button" class="icon" aria-label="Ingrandisci">+</button></div>
     <button id="v-edit" type="button" class="v-edit" aria-pressed="false" hidden>✎ Modifica testi</button>
-    <button id="v-close" type="button" class="icon v-close" aria-label="Chiudi (Esc)" title="Chiudi (Esc)">✕</button>
+    <div class="viewer-group v-end"><button id="v-fullscreen" type="button" class="icon v-full" hidden aria-label="Schermo intero" title="Schermo intero">⛶</button><button id="v-close" type="button" class="icon" aria-label="Chiudi (Esc)" title="Chiudi (Esc)">✕</button></div>
   </div>
   <div class="viewer-body">
     <div id="v-pages" class="v-pages" tabindex="-1">

@@ -222,7 +222,9 @@ body.viewer-open{overflow:hidden}
 .seg-mini button[aria-pressed=true]{background:#00e0d01c;color:var(--mint)}
 .v-edit{height:32px;padding:0 14px;border:1px solid #00e0d066;border-radius:9px;background:#00e0d012;color:var(--mint);font-weight:500;cursor:pointer}
 .v-edit[aria-pressed=true]{background:var(--mint);color:#04211f}
-.v-close{margin-left:auto}
+.v-end{margin-left:auto}
+.v-full{font-size:15px}
+.v-full[aria-pressed=true]{border-color:#00e0d088;color:var(--mint)}
 .viewer-body{flex:1;min-height:0;display:flex}
 .v-pages{flex:1;min-width:0;overflow:auto;display:flex;gap:16px;justify-content:flex-start;align-items:flex-start;padding:14px;outline:none;scrollbar-width:thin}
 .v-sheet{flex:none;margin:0}

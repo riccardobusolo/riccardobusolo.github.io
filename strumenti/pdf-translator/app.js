@@ -183,10 +183,12 @@ async function load(file){
 }
 $('file').addEventListener('change',e=>load(e.target.files[0]));
 // Full screen for the whole tool (the browser's own Esc leaves it).
+// The same toggle sits in the header and in the viewer's bar.
 if(document.fullscreenEnabled){
-  $('fullscreen').hidden=false;
-  $('fullscreen').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>status('Il browser non ha concesso lo schermo intero.'));
-  document.addEventListener('fullscreenchange',()=>{$('fullscreen').textContent=document.fullscreenElement?'⛶ Esci da schermo intero':'⛶ Schermo intero';});
+  const toggle=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>status('Il browser non ha concesso lo schermo intero.'));
+  $('fullscreen').hidden=$('v-fullscreen').hidden=false;$('fullscreen').onclick=$('v-fullscreen').onclick=toggle;
+  document.addEventListener('fullscreenchange',()=>{const on=!!document.fullscreenElement,label=on?'Esci da schermo intero':'Schermo intero';
+    $('fullscreen').textContent='⛶ '+label;$('v-fullscreen').title=label;$('v-fullscreen').setAttribute('aria-label',label);$('v-fullscreen').setAttribute('aria-pressed',String(on));});
 }
 // The whole workspace accepts a dropped PDF.
 const dropZone=$('work')||$('drop');
