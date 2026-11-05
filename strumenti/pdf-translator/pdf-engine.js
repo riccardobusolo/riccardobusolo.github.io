@@ -533,7 +533,7 @@ window.PDFEngine = (() => {
       signal.throwIfAborted();const page=doc.getPage(p);
       const groups=new Map();
       for(const unit of pages[p]){
-        const text=translated[index++];if(unit.hidden)continue;
+        const text=translated[index++];delete unit.drawn;if(unit.hidden)continue;
         const prep=await prepare(unit,text??unit.text,fonts);if(!prep)continue;prep.same=(text??unit.text)===unit.text;
         const key=unit.flow??Symbol();if(!groups.has(key))groups.set(key,[]);groups.get(key).push(prep);
       }
@@ -547,6 +547,9 @@ window.PDFEngine = (() => {
           plan.positions=plan.rows.map((_,i)=>i<n?{x:u.lines[i].x,y:u.lines[i].y-offset}:{x:lastLine.x,y:lastLine.y-offset-(i-n+1)*u.leading});
           offset+=Math.max(0,plan.rows.length-n)*u.leading;
           if(plan.scale<.8)shrunk++;draw(page,u,plan);
+          // Where each line was actually drawn (after reflow and shifts), for the editor.
+          const size=u.size*plan.scale;
+          u.drawn=plan.rows.map((_,i)=>{const w=plan.widths[i],p=plan.positions[i];return {x:u.align==='right'?u.right-w:u.align==='center'?u.center-w/2:p.x,y:p.y,width:w,size};});
         });
       }
       onProgress(p+1,pages.length);

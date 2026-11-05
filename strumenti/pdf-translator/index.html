@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Traduci PDF con la tua chiave OpenAI o Gemini conservando impaginazione e grafica. Elaborazione nel browser e anteprima affiancata."><title>DocuShift — Il tuo documento, un’altra lingua.</title><link rel="stylesheet" href="style.css?v=20261105-refine1"><script defer src="pdf.min.js"></script><script defer src="pdf-lib.min.js"></script><script defer src="fontkit.min.js"></script><script defer src="prompt.js?v=20261105-refine1"></script><script defer src="ai-service.js?v=20261101-ui2"></script><script defer src="pdf-engine.js?v=20261105-refine1"></script><script defer src="openai-service.js?v=20261105-context1"></script><script defer src="app.js?v=20261105-refine1"></script>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Traduci PDF con la tua chiave OpenAI o Gemini conservando impaginazione e grafica. Elaborazione nel browser e anteprima affiancata."><title>DocuShift — Il tuo documento, un’altra lingua.</title><link rel="stylesheet" href="style.css?v=20261105-viewer4"><script defer src="pdf.min.js"></script><script defer src="pdf-lib.min.js"></script><script defer src="fontkit.min.js"></script><script defer src="prompt.js?v=20261105-refine1"></script><script defer src="ai-service.js?v=20261101-ui2"></script><script defer src="pdf-engine.js?v=20261105-viewer4"></script><script defer src="openai-service.js?v=20261105-context1"></script><script defer src="app.js?v=20261105-viewer4"></script>
 <link rel="stylesheet" href="/site-cursor.css?v=20261031-controls">
 <script src="/site-cursor.js?v=20261030-text" defer></script>
 <link rel="stylesheet" href="/project-navigation.css">
@@ -68,17 +68,37 @@
     </div>
     <progress id="progress" max="100" value="0" aria-label="Avanzamento traduzione"></progress>
     <div class="previews">
-      <figure><figcaption><span class="dot"></span>Originale</figcaption><div class="canvas-wrap"><canvas id="original"></canvas><button id="empty" type="button" class="empty"><span class="big-icon">↑</span><b>Trascina qui il tuo PDF</b><span>oppure clicca per sceglierlo</span></button></div></figure>
-      <figure><figcaption><span class="dot green"></span>Tradotto<span id="cost" class="cost" hidden></span></figcaption><div class="canvas-wrap"><canvas id="translated"></canvas><p id="empty-result" class="empty passive"><span class="big-icon">Àa</span><b>Una nuova lingua, la stessa prospettiva.</b><span>La traduzione apparirà qui, pagina per pagina.</span></p></div></figure>
+      <figure><figcaption><span class="dot"></span>Originale<button id="open-viewer" type="button" class="cap-btn" hidden title="Apri originale e traduzione affiancati a schermo intero">⤢ Ingrandisci e confronta</button></figcaption><div class="canvas-wrap"><canvas id="original" title="Clicca per ingrandire"></canvas><button id="empty" type="button" class="empty"><span class="big-icon">↑</span><b>Trascina qui il tuo PDF</b><span>oppure clicca per sceglierlo</span></button></div></figure>
+      <figure><figcaption><span class="dot green"></span>Tradotto<button id="open-editor" type="button" class="cap-btn strong" hidden title="Correggi a mano i testi tradotti, pagina per pagina">✎ Modifica testi<span id="draft-count" class="badge" hidden></span></button><span id="cost" class="cost" hidden></span></figcaption><div class="canvas-wrap"><canvas id="translated" title="Clicca per ingrandire"></canvas><p id="empty-result" class="empty passive"><span class="big-icon">Àa</span><b>Una nuova lingua, la stessa prospettiva.</b><span>La traduzione apparirà qui, pagina per pagina.</span></p></div></figure>
     </div>
-    <section id="editor" class="editor" hidden aria-labelledby="editor-title">
-      <div class="editor-head"><h2 id="editor-title">Modifica i testi</h2><span id="edit-page" class="edit-page"></span>
-        <div class="editor-actions"><button id="edit-reset" type="button" class="link" disabled>Annulla bozze</button><button id="edit-apply" type="button" class="primary" disabled>Applica modifiche</button></div></div>
-      <p class="hint">Testi della pagina mostrata nell’anteprima: sopra l’originale, sotto la traduzione. Le modifiche restano in bozza anche se cambi pagina; un testo ripetuto (intestazioni, piè di pagina) cambia ovunque. I segni &lt;s1&gt;…&lt;/s1&gt; marcano parole in grassetto o in un altro colore: lasciali attorno alle parole corrispondenti.</p>
-      <div id="edit-list" class="edit-list"></div>
-    </section>
   </section>
 </main>
+
+<!-- Full-screen comparison: original and translation side by side in one scroll area,
+     with the text editor as a side panel. -->
+<div id="viewer" class="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="viewer-title">
+  <div class="viewer-bar">
+    <b id="viewer-title" class="viewer-title">Confronto</b>
+    <div class="viewer-group" role="group" aria-label="Pagina"><button id="v-prev" type="button" class="icon" aria-label="Pagina precedente">←</button><span id="v-page" class="v-page">— / —</span><button id="v-next" type="button" class="icon" aria-label="Pagina successiva">→</button></div>
+    <div class="viewer-group seg-mini" role="group" aria-label="Pagine mostrate"><button type="button" data-layout="both" aria-pressed="true">Affiancate</button><button type="button" data-layout="original" aria-pressed="false">Originale</button><button type="button" data-layout="translated" aria-pressed="false">Tradotto</button></div>
+    <div class="viewer-group" role="group" aria-label="Zoom"><button id="v-zoom-out" type="button" class="icon" aria-label="Riduci">−</button><button id="v-zoom" type="button" class="v-zoom" title="Adatta alla larghezza">Adatta</button><button id="v-zoom-in" type="button" class="icon" aria-label="Ingrandisci">+</button></div>
+    <button id="v-edit" type="button" class="v-edit" aria-pressed="false" hidden>✎ Modifica testi</button>
+    <button id="v-close" type="button" class="icon v-close" aria-label="Chiudi (Esc)" title="Chiudi (Esc)">✕</button>
+  </div>
+  <div class="viewer-body">
+    <div id="v-pages" class="v-pages" tabindex="-1">
+      <figure class="v-sheet" data-side="original"><figcaption><span class="dot"></span>Originale</figcaption><div class="v-canvas"><canvas id="v-original"></canvas><div class="v-marks" aria-hidden="true"></div></div></figure>
+      <figure class="v-sheet" data-side="translated"><figcaption><span class="dot green"></span>Tradotto</figcaption><div class="v-canvas"><canvas id="v-translated"></canvas><div class="v-marks" aria-hidden="true"></div></div></figure>
+    </div>
+    <aside id="editor" class="editor" hidden aria-labelledby="editor-title">
+      <div class="editor-head"><h2 id="editor-title">Modifica i testi</h2><span id="edit-page" class="edit-page"></span></div>
+      <p class="hint">Correggi nei riquadri della traduzione. Passa su un testo per vederlo sulla pagina, o clicca la pagina per trovarlo. Le parti <span class="styled">evidenziate</span> sono in grassetto o colorate nel PDF. Le bozze restano se cambi pagina.</p>
+      <div class="edit-cols" aria-hidden="true"><span>Originale</span><span>Traduzione · modificabile</span></div>
+      <div id="edit-list" class="edit-list"></div>
+      <div class="editor-actions"><button id="edit-reset" type="button" class="link" disabled>Annulla bozze</button><button id="edit-apply" type="button" class="primary" disabled>Applica modifiche</button></div>
+    </aside>
+  </div>
+</div>
 
 <footer class="foot"><span>DocuShift · Riccardo Busolo</span><span>Il PDF resta nel tuo browser · ai provider vanno solo i testi estratti</span><a href="../../progetti.html#strumenti">← Torna agli strumenti</a></footer>
 </body></html>

@@ -193,19 +193,63 @@ button.empty:hover{background:#00e0d008}
 @media (max-width:1280px){#activity-steps{display:none}}
 @media (max-width:980px){body{display:block}.bar{flex-wrap:wrap;padding-left:80px}.brand span{display:none}.app{grid-template-columns:1fr;padding:12px}.side{overflow:visible}.work{min-height:80vh}.previews{grid-template-columns:1fr;grid-auto-rows:minmax(60vh,1fr)}#activity{grid-template-columns:1fr}#activity-steps{display:none}.how-panel{width:min(380px,90vw)}}
 @media (max-width:600px){.bar-meta .chip:not(summary){display:none}.toolbar{flex-wrap:wrap}.drop{flex-basis:100%}.foot{flex-direction:column;align-items:flex-start}}
-/* Post-translation editor: texts of the previewed page, below the previews. */
-.editor{flex:none;display:flex;flex-direction:column;max-height:42vh;min-height:0;border-top:1px solid var(--border);padding-top:10px}
-.editor-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#refine .secondary{margin-top:8px}
+/* Buttons in the preview captions; the previews open the full-screen viewer. */
+.cap-btn{margin-left:8px;display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 9px;border:1px solid var(--border);border-radius:20px;background:var(--panel-2);color:var(--ink);font:500 11px 'Outfit',sans-serif;letter-spacing:0;text-transform:none;cursor:pointer;white-space:nowrap}
+.cap-btn:hover{border-color:#00e0d066;color:var(--mint)}
+.cap-btn.strong{border-color:#00e0d055;color:var(--mint);background:#00e0d012}
+.badge{min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--mint);color:#04211f;font:600 10px/16px 'JetBrains Mono',monospace;text-align:center}
+.canvas-wrap canvas{cursor:zoom-in}
+body.viewer-open{overflow:hidden}
+
+/* Full-screen viewer: one scroll area holds both pages, so they scroll together. */
+.viewer{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;background:#07070bf2;backdrop-filter:blur(6px)}
+.viewer[hidden]{display:none}
+.viewer-bar{flex:none;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid var(--border);background:var(--panel)}
+.viewer-title{font-size:13px;font-weight:600;margin-right:4px}
+.viewer-group{display:flex;align-items:center;gap:6px}
+.viewer-bar .icon{width:32px;height:32px}
+.v-page{min-width:64px;text-align:center;font:11px 'JetBrains Mono',monospace;color:var(--muted)}
+.v-zoom{min-width:64px;height:32px;border:1px solid var(--border);border-radius:9px;background:var(--panel-2);color:var(--ink);font:11px 'JetBrains Mono',monospace;cursor:pointer}
+.seg-mini{padding:2px;border:1px solid var(--border);border-radius:9px;background:var(--panel-2);gap:2px}
+.seg-mini button{height:28px;padding:0 10px;border:0;border-radius:7px;background:none;color:var(--muted);font-size:12px;cursor:pointer}
+.seg-mini button[aria-pressed=true]{background:#00e0d01c;color:var(--mint)}
+.v-edit{height:32px;padding:0 14px;border:1px solid #00e0d066;border-radius:9px;background:#00e0d012;color:var(--mint);font-weight:500;cursor:pointer}
+.v-edit[aria-pressed=true]{background:var(--mint);color:#04211f}
+.v-close{margin-left:auto}
+.viewer-body{flex:1;min-height:0;display:flex}
+.v-pages{flex:1;min-width:0;overflow:auto;display:flex;gap:16px;justify-content:flex-start;align-items:flex-start;padding:14px;outline:none;scrollbar-width:thin}
+.v-sheet{flex:none;margin:0}
+/* Centred with auto-margin pseudo-elements, not justify-content: a zoomed page wider than the area must still scroll back to its left edge. */
+.v-pages::before,.v-pages::after{content:"";margin:auto}
+.v-sheet[hidden]{display:none}
+.v-sheet figcaption{height:20px}
+.v-canvas{position:relative;line-height:0;box-shadow:0 10px 30px #0009}
+.v-canvas canvas{display:block;background:#fff}
+.v-marks{position:absolute;inset:0;pointer-events:none}
+.v-mark{position:absolute;border:2px solid #00c4b6;background:#00e0d02e;border-radius:3px;box-shadow:0 0 0 3px #00e0d022}
+.v-mark.soft{border-color:#00c4b655;background:#00e0d012;box-shadow:none}
+.editing .v-canvas{cursor:pointer}
+
+/* Text editor: side panel of the viewer. */
+.editor{flex:none;width:min(520px,42vw);display:flex;flex-direction:column;min-height:0;border-left:1px solid var(--border);background:var(--panel);padding:12px 12px 10px}
+.editor[hidden]{display:none}
+.editor-head{display:flex;align-items:center;gap:10px}
 .editor-head h2{margin:0;font-size:13px;font-weight:600}
 .edit-page{font:10.5px 'JetBrains Mono',monospace;color:var(--muted)}
-.editor-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
-.editor-actions .primary{height:32px;padding:0 14px;font-size:12px;border-radius:9px}
 .editor .hint{margin:6px 0 8px}
-.edit-list{overflow:auto;min-height:0;display:grid;gap:8px;padding-right:4px;scrollbar-width:thin}
-.edit-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:10px;align-items:start;padding:7px 8px;border:1px solid var(--line);border-radius:9px}
-.edit-row.changed{border-color:#00e0d066;background:#00e0d00a}
+.edit-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:10px;padding:0 9px 4px;font:9px 'JetBrains Mono',monospace;letter-spacing:.8px;text-transform:uppercase;color:#77778a}
+.edit-list{flex:1;overflow:auto;min-height:0;display:grid;align-content:start;gap:6px;padding-right:4px;scrollbar-width:thin}
+.edit-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:10px;align-items:start;padding:7px 8px;border:1px solid var(--line);border-radius:9px;scroll-margin:8px}
+.edit-row:hover,.edit-row.active{border-color:#00e0d044;background:#00e0d008}
+.edit-row.changed{border-color:#00e0d088;background:#00e0d00f}
 .edit-source{margin:0;padding-top:6px;font-size:11.5px;color:var(--muted);line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
-.edit-row textarea{min-height:32px;max-height:220px}
+.edit-text{min-height:32px;max-height:240px;overflow:auto;padding:6px 10px;border:1px solid var(--border);border-radius:9px;background:var(--panel-2);font-size:12.5px;line-height:1.5;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere;outline:none;cursor:text;transition:border-color .15s}
+.edit-text:focus{border-color:#00e0d088;box-shadow:0 0 0 3px #00e0d014}
+.edit-text[contenteditable=false]{opacity:.55;cursor:default}
+.styled{background:#ffd5401f;border-bottom:1px dashed #ffd540aa;border-radius:3px;padding:0 1px}
 .edit-empty{margin:0;font-size:12px;color:var(--muted)}
-#refine .secondary{margin-top:8px}
-@media (max-width:700px){.edit-row{grid-template-columns:1fr}.editor{max-height:none}}
+.editor-actions{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:10px;padding-top:10px;border-top:1px solid var(--border);margin-top:8px}
+.editor-actions .primary{height:36px;padding:0 16px;font-size:13px;border-radius:9px}
+@media (max-width:900px){.viewer-body{flex-direction:column}.editor{width:auto;height:48%;border-left:0;border-top:1px solid var(--border)}.v-pages{padding:10px}.viewer-title{display:none}}
+@media (max-width:600px){.edit-row,.edit-cols{grid-template-columns:1fr}.edit-cols{display:none}.seg-mini button{padding:0 7px}}

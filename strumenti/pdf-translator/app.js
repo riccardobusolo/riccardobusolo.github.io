@@ -143,10 +143,12 @@ function sync(){
   $('cancel').hidden=!busy;$('translate').hidden=busy;
   // Refinement is offered once a translation exists, with a verified model for corrections.
   $('refine').hidden=!job;$('fix').disabled=busy;$('fix-run').disabled=busy||!job||!workingModels.includes($('model').value)||!$('key').value.trim();
-  if(job&&!$('editor').hidden){for(const area of $('edit-list').querySelectorAll('textarea'))area.disabled=busy;editCount();}
+  $('open-viewer').hidden=!source;$('open-editor').hidden=!job;
+  if(job){for(const area of $('edit-list').querySelectorAll('.edit-text'))area.contentEditable=busy?'false':'plaintext-only';editCount();}
+  if(viewer.open)viewerControls();
   $('prev').disabled=busy||!source||pageNumber===1;$('next').disabled=busy||!source||pageNumber>=source.numPages;
 }
-function clearResult(){job=null;drafts.clear();$('refine').hidden=true;$('editor').hidden=true;$('cost').hidden=true;result?.destroy();result=null;if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=null;$('download').hidden=true;$('translated').style.display='none';$('empty-result').hidden=false;}
+function clearResult(){job=null;drafts.clear();viewer.editing=false;$('refine').hidden=true;$('open-editor').hidden=true;$('cost').hidden=true;result?.destroy();result=null;if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=null;$('download').hidden=true;$('translated').style.display='none';$('empty-result').hidden=false;}
 function preview(){
   const version=++renderVersion,n=pageNumber,original=source,output=result;
   renderQueue=renderQueue.catch(()=>{}).then(async()=>{
@@ -159,7 +161,7 @@ function preview(){
       if(version!==renderVersion)return;canvas.style.display='block';$(empty).hidden=true;
     }
   }).catch(()=>status('Anteprima non disponibile. Ricarica il documento.'));
-  if(job)renderEditor();sync();return renderQueue;
+  if(job)renderEditor();if(viewer.open)renderViewer();sync();return renderQueue;
 }
 async function load(file){
   if(busy||!file)return;
@@ -301,7 +303,7 @@ $('translate').onclick=async()=>{
           reviewed++;setProgress(72+reviewed/chunks.length*8,`Revisione ${reviewed} / ${chunks.length}`);$('activity-detail').textContent=`Revisione: ${reviewed} di ${chunks.length} parti.`;
         }};
         await Promise.all(Array.from({length:Math.min(currentProvider==='openai'?4:2,chunks.length)},reviewWorker));signal.throwIfAborted();
-        reviewNote=fixed?` Revisione: ${fixed} correzioni applicate (dettagli nel registro).`:' Revisione: nessuna correzione necessaria.';eventLog(reviewNote.trim());
+        reviewNote=fixed?` Revisione: ${fixed} ${fixed===1?'correzione applicata':'correzioni applicate'} (dettagli nel registro).`:' Revisione: nessuna correzione necessaria.';eventLog(reviewNote.trim());
       }
     }
     // Glossary terms often come from all-caps headings or the table of contents:
@@ -376,26 +378,149 @@ $('fix-run').onclick=async()=>{
   finally{globalThis.OpenAIService?.setMeter?.(null);globalThis.AI?.setMeter?.(null);busy=false;controller=null;sync();}
 };
 
-// Manual editing: the texts of the page shown in the preview. A text repeated on
-// several pages (headers, footers) is one entry: editing it changes every copy.
-// Unsaved edits are kept while browsing the pages and applied together.
-const drafts=new Map();
+// Manual editing, in the viewer's side panel: the texts of the page shown. A text
+// repeated on several pages (headers, footers) is one entry: editing it changes every
+// copy. Unsaved edits are kept while browsing the pages and applied together.
+const drafts=new Map(),editorRows=new Map();
 const currentText=s=>job.cache.has(s)?job.cache.get(s):s;
-function editCount(){const n=drafts.size;$('edit-apply').textContent=n?`Applica ${n} ${n===1?'modifica':'modifiche'} e ricomponi`:'Applica modifiche';$('edit-apply').disabled=busy||!n;$('edit-reset').disabled=busy||!n;}
+// Words in another style (bold, italic, colour) travel as <sN>…</sN> tags. The editor
+// shows them as highlighted words instead, and turns them back into tags on save.
+function styled(text,unit){
+  const out=document.createDocumentFragment(),re=/<s(\d+)>([\s\S]*?)<\/s\1>/g;let last=0,m;
+  const plain=t=>{t=t.replace(/<\/?s\d+>/g,'');if(t)out.append(t);};
+  while((m=re.exec(text))){plain(text.slice(last,m.index));const style=unit.styles?.[+m[1]],span=document.createElement('span');
+    span.className='styled';span.dataset.s=m[1];span.textContent=m[2];if(style?.bold)span.style.fontWeight='700';if(style?.italic)span.style.fontStyle='italic';
+    span.title='Parola con uno stile diverso nel PDF ('+[style?.bold&&'grassetto',style?.italic&&'corsivo',style&&style.color.some(v=>v>.15)&&'colore'].filter(Boolean).join(', ')+')';out.append(span);last=re.lastIndex;}
+  plain(text.slice(last));return out;
+}
+function serialize(box){
+  let out='';
+  for(const node of box.childNodes){const s=node.dataset?.s,t=node.textContent;out+=s!==undefined?(t.trim()?`<s${s}>${t}</s${s}>`:t):t;}
+  return out.replace(/ /g,' ').replace(/\s+/g,' ').trim();
+}
+function editCount(){
+  const n=drafts.size;$('edit-apply').textContent=busy&&viewer.open?'Ricompongo il PDF…':n?`Applica ${n} ${n===1?'modifica':'modifiche'} e ricomponi`:'Applica modifiche';$('edit-apply').disabled=busy||!n;$('edit-reset').disabled=busy||!n;
+  $('draft-count').hidden=!n;$('draft-count').textContent=n;
+}
 function renderEditor(){
-  const panel=$('editor');panel.hidden=!job;if(!job){drafts.clear();return;}
+  editorRows.clear();if(!job){drafts.clear();editCount();return;}
   const units=job.pages[pageNumber-1]||[],seen=new Set(),rows=[];
-  for(const u of units){if(u.hidden||!u.text.trim()||seen.has(u.text))continue;seen.add(u.text);
-    const saved=currentText(u.text),row=document.createElement('div');row.className='edit-row';
-    const original=document.createElement('p');original.className='edit-source';original.textContent=u.text.replace(/<\/?s\d+>/g,'');original.title='Testo originale';
-    const area=document.createElement('textarea');area.value=drafts.get(u.text)??saved;area.rows=Math.min(6,Math.max(1,Math.ceil(area.value.length/70)));area.disabled=busy;area.spellcheck=true;area.lang=job.language;area.setAttribute('aria-label','Traduzione di: '+original.textContent.slice(0,80));
-    row.classList.toggle('changed',drafts.has(u.text));
-    area.addEventListener('input',()=>{if(area.value===saved)drafts.delete(u.text);else drafts.set(u.text,area.value);row.classList.toggle('changed',drafts.has(u.text));editCount();});
-    row.append(original,area);rows.push(row);}
+  // Page numbers and other texts without words are not listed.
+  for(const u of units){if(u.hidden||!u.translate||seen.has(u.text))continue;seen.add(u.text);
+    const source=u.text,saved=currentText(source),row=document.createElement('div');row.className='edit-row';
+    const original=document.createElement('p');original.className='edit-source';original.append(styled(source,u));
+    const area=document.createElement('div');area.className='edit-text';area.setAttribute('role','textbox');area.setAttribute('aria-multiline','true');area.spellcheck=true;area.lang=job.language;
+    area.contentEditable=busy?'false':'plaintext-only';if(area.contentEditable!=='plaintext-only'&&!busy)area.contentEditable='true';
+    area.append(styled(drafts.get(source)??saved,u));area.setAttribute('aria-label','Traduzione di: '+original.textContent.slice(0,80));
+    row.classList.toggle('changed',drafts.has(source));
+    area.addEventListener('input',()=>{const value=serialize(area);if(value===saved.replace(/s+/g,' ').trim())drafts.delete(source);else drafts.set(source,value);row.classList.toggle('changed',drafts.has(source));editCount();});
+    // One paragraph per text: Enter does not add lines and pasted text arrives unformatted.
+    area.addEventListener('keydown',event=>{if(event.key==='Enter')event.preventDefault();});
+    area.addEventListener('paste',event=>{event.preventDefault();document.execCommand('insertText',false,(event.clipboardData?.getData('text/plain')||'').replace(/\s+/g,' '));});
+    // Hovering or editing a text highlights where it sits on both pages.
+    row.addEventListener('mouseenter',()=>mark(source,true));row.addEventListener('mouseleave',()=>mark(activeSource));
+    area.addEventListener('focus',()=>{activeSource=source;for(const r of editorRows.values())r.classList.toggle('active',r===row);mark(source,false,true);});
+    row.append(original,area);rows.push(row);editorRows.set(source,row);}
   $('edit-page').textContent=`Pagina ${pageNumber} · ${rows.length} ${rows.length===1?'testo':'testi'}`;
   $('edit-list').replaceChildren(...(rows.length?rows:[Object.assign(document.createElement('p'),{className:'edit-empty',textContent:'Nessun testo modificabile in questa pagina.'})]));
   editCount();
 }
+
+// ---------------------------------------------------------------------------
+// Full-screen viewer: original and translation side by side in one scroll area (so
+// they scroll together), fit to the width, zoomable; the editor is its side panel.
+// ---------------------------------------------------------------------------
+const ZOOMS=[.75,1,1.25,1.5,2,2.5,3];
+const viewer={open:false,layout:'both',chosen:false,zoom:1,editing:false,version:0,geometry:{}};
+// While editing on a laptop-sized screen the translated page alone is shown larger (the
+// list already has the original); a layout picked by hand is kept.
+function editLayout(){if(!viewer.chosen)viewer.layout=viewer.editing&&window.innerWidth<1700?'translated':'both';}
+let activeSource=null,viewerOpener=null,viewerTimer=null;
+// Before a translation exists only the original can be shown.
+function viewerSides(){const sides=(viewer.layout==='both'?['original','translated']:[viewer.layout]).filter(s=>s==='original'||result);return sides.length?sides:['original'];}
+function openViewer(edit=false){
+  if(!source)return;viewerOpener=document.activeElement;viewer.open=true;viewer.editing=edit&&!!job;editLayout();
+  $('viewer').hidden=false;document.body.classList.add('viewer-open');viewerControls();renderViewer();
+  if(viewer.editing){renderEditor();setTimeout(()=>$('edit-list').querySelector('.edit-text')?.focus({preventScroll:true}),50);}else $('v-pages').focus();
+}
+function closeViewer(){viewer.open=false;activeSource=null;$('viewer').hidden=true;document.body.classList.remove('viewer-open');viewerOpener?.focus?.();}
+function viewerControls(){
+  $('editor').hidden=!viewer.editing;$('v-pages').classList.toggle('editing',viewer.editing);
+  $('v-edit').hidden=!job;$('v-edit').setAttribute('aria-pressed',String(viewer.editing));$('v-edit').textContent=viewer.editing?'✓ Fine modifiche':'✎ Modifica testi';
+  for(const b of document.querySelectorAll('[data-layout]'))b.setAttribute('aria-pressed',String(b.dataset.layout===viewer.layout));
+  document.querySelector('[data-layout="translated"]').disabled=!result;
+  $('v-zoom').textContent=viewer.zoom===1?'Adatta':Math.round(viewer.zoom*100)+'%';
+  $('v-zoom-out').disabled=viewer.zoom<=ZOOMS[0];$('v-zoom-in').disabled=viewer.zoom>=ZOOMS.at(-1);
+  $('v-page').textContent=source?`${pageNumber} / ${source.numPages}`:'— / —';
+  $('v-prev').disabled=busy||pageNumber<=1;$('v-next').disabled=busy||!source||pageNumber>=source.numPages;
+}
+// A newer render (page change, zoom, a recomposed PDF replacing `result`) supersedes
+// this one; errors from a document destroyed meanwhile are expected and ignored.
+function renderViewer(){return drawViewer().catch(()=>{});}
+async function drawViewer(){
+  if(!viewer.open||!source)return;const version=++viewer.version,n=pageNumber,sides=viewerSides();viewerControls();
+  for(const sheet of document.querySelectorAll('.v-sheet'))sheet.hidden=!sides.includes(sheet.dataset.side);
+  const box=$('v-pages'),gap=16,avail=Math.max(200,box.clientWidth-28-gap*(sides.length-1)),each=avail/sides.length,dpr=Math.min(2,window.devicePixelRatio||1);
+  for(const side of sides){
+    const doc=side==='original'?source:result,page=await doc.getPage(n);if(version!==viewer.version)return;
+    const base=page.getViewport({scale:1}),scale=each/base.width*viewer.zoom,viewport=page.getViewport({scale:scale*dpr});
+    const canvas=$('v-'+side),off=document.createElement('canvas');off.width=Math.ceil(viewport.width);off.height=Math.ceil(viewport.height);
+    await page.render({canvasContext:off.getContext('2d'),viewport}).promise;if(version!==viewer.version)return;
+    // Rendered off-screen, then swapped in: no blank flash while zooming or paging.
+    canvas.width=off.width;canvas.height=off.height;canvas.getContext('2d').drawImage(off,0,0);canvas.style.width=base.width*scale+'px';canvas.style.height=base.height*scale+'px';
+    viewer.geometry[side]={scale,height:base.height};
+  }
+  mark(activeSource);
+}
+// Lines of a text on one side: the original positions, or where the translation was
+// actually drawn (reflow can add lines and push the following blocks down).
+function boxes(u,side){
+  if(side==='translated'&&u.drawn)return u.drawn.map(d=>({x:d.x,right:d.x+d.width,y:d.y,size:d.size}));
+  return u.lines.map(L=>({x:L.x,right:L.right,y:L.y,size:u.size}));
+}
+// Highlight a text's lines on both pages; `soft` for hover, `reveal` scrolls to it.
+function mark(text,soft=false,reveal=false){
+  for(const box of document.querySelectorAll('.v-marks'))box.replaceChildren();
+  if(!viewer.open||!job||!text)return;let first=null;
+  const units=(job.pages[pageNumber-1]||[]).filter(u=>u.text===text&&!u.hidden);
+  for(const sheet of document.querySelectorAll('.v-sheet')){
+    const g=viewer.geometry[sheet.dataset.side];if(sheet.hidden||!g)continue;const layer=sheet.querySelector('.v-marks');
+    for(const u of units)for(const box of boxes(u,sheet.dataset.side)){
+      const el=document.createElement('div');el.className='v-mark'+(soft?' soft':'');
+      Object.assign(el.style,{left:(box.x-2)*g.scale+'px',top:(g.height-box.y-.85*box.size)*g.scale+'px',width:(box.right-box.x+4)*g.scale+'px',height:1.2*box.size*g.scale+'px'});
+      layer.append(el);first??=el;
+    }
+  }
+  if(reveal)first?.scrollIntoView({block:'nearest',inline:'nearest'});
+}
+// Clicking a page while editing opens the text under the pointer.
+for(const sheet of document.querySelectorAll('.v-sheet'))sheet.querySelector('.v-canvas').addEventListener('click',event=>{
+  if(!viewer.editing||!job)return;const g=viewer.geometry[sheet.dataset.side];if(!g)return;
+  const rect=event.currentTarget.getBoundingClientRect(),x=(event.clientX-rect.left)/g.scale,y=g.height-(event.clientY-rect.top)/g.scale;
+  let best=null,dist=Infinity;
+  for(const u of job.pages[pageNumber-1]||[]){if(u.hidden||!editorRows.has(u.text))continue;
+    for(const b of boxes(u,sheet.dataset.side)){const right=Math.max(b.right,b.x+20),dx=x<b.x?b.x-x:x>right?x-right:0,dy=y<b.y-.3*b.size?b.y-.3*b.size-y:y>b.y+b.size?y-b.y-b.size:0,d=Math.hypot(dx,dy);if(d<dist){dist=d;best=u;}}}
+  if(!best||dist>12)return;const row=editorRows.get(best.text);row.scrollIntoView({block:'center',behavior:'smooth'});row.querySelector('.edit-text').focus({preventScroll:true});
+});
+function viewerPage(delta){if(busy||!source)return;const n=Math.min(source.numPages,Math.max(1,pageNumber+delta));if(n===pageNumber)return;pageNumber=n;activeSource=null;$('v-pages').scrollTo({top:0,left:0});preview();}
+function viewerZoom(value){viewer.zoom=value;renderViewer();}
+$('original').onclick=$('translated').onclick=$('open-viewer').onclick=()=>openViewer(false);
+$('open-editor').onclick=()=>openViewer(true);
+$('v-close').onclick=closeViewer;$('v-prev').onclick=()=>viewerPage(-1);$('v-next').onclick=()=>viewerPage(1);
+$('v-zoom-in').onclick=()=>viewerZoom(ZOOMS.find(z=>z>viewer.zoom)??viewer.zoom);
+$('v-zoom-out').onclick=()=>viewerZoom([...ZOOMS].reverse().find(z=>z<viewer.zoom)??viewer.zoom);
+$('v-zoom').onclick=()=>viewerZoom(1);
+$('v-edit').onclick=()=>{viewer.editing=!viewer.editing;editLayout();if(viewer.editing)renderEditor();else activeSource=null;renderViewer();};
+for(const b of document.querySelectorAll('[data-layout]'))b.onclick=()=>{viewer.layout=b.dataset.layout;viewer.chosen=true;renderViewer();};
+document.addEventListener('keydown',event=>{
+  if(!viewer.open)return;const typing=event.target.isContentEditable||/^(TEXTAREA|INPUT|SELECT)$/.test(event.target.tagName);
+  if(event.key==='Escape'){event.preventDefault();if(typing)event.target.blur();else closeViewer();}
+  else if(!typing&&(event.key==='ArrowRight'||event.key==='PageDown'&&event.ctrlKey))viewerPage(1);
+  else if(!typing&&(event.key==='ArrowLeft'||event.key==='PageUp'&&event.ctrlKey))viewerPage(-1);
+  else if(!typing&&(event.key==='+'||event.key==='='))$('v-zoom-in').click();
+  else if(!typing&&event.key==='-')$('v-zoom-out').click();
+});
+window.addEventListener('resize',()=>{if(!viewer.open)return;clearTimeout(viewerTimer);viewerTimer=setTimeout(renderViewer,150);});
 $('edit-apply').onclick=async()=>{
   if(busy||!job||!drafts.size)return;
   busy=true;controller=new AbortController();const signal=controller.signal,run=job,before=new Map(),edits=[...drafts];sync();startActivity('Applicazione delle modifiche',false);
