@@ -1,6 +1,9 @@
 'use strict';
 // Parse PDF syntax instead of matching text operators inside strings or images.
 window.PDFEngine = (() => {
+  // Let the page repaint between pages. A MessageChannel task, unlike setTimeout(0),
+  // is not throttled to one per second (or per minute) when the tab is in background.
+  const yieldToBrowser=()=>new Promise(resolve=>{if(typeof MessageChannel!=='function')return setTimeout(resolve,0);const channel=new MessageChannel();channel.port1.onmessage=()=>{channel.port1.close();resolve();};channel.port2.postMessage(0);});
   const decode = bytes => { let s=''; for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode(...bytes.subarray(i,i+8192)); return s; };
   const encode = s => Uint8Array.from(s,c=>c.charCodeAt(0));
   function strip(source) {
@@ -45,7 +48,7 @@ window.PDFEngine = (() => {
     }
     let pageIndex=0;
     for(const page of doc.getPages()){
-      signal?.throwIfAborted();onPage(++pageIndex,doc.getPageCount(),'validate');await new Promise(resolve=>setTimeout(resolve,0));signal?.throwIfAborted();
+      signal?.throwIfAborted();onPage(++pageIndex,doc.getPageCount(),'validate');await yieldToBrowser();signal?.throwIfAborted();
       // Link annotations only define an active area. They do not paint text or alter the
       // page content stream, so retaining them is safe and preserves table-of-contents
       // navigation. Other annotation types can carry visible appearances or AcroForm
@@ -89,7 +92,9 @@ window.PDFEngine = (() => {
     const lines=[];
     for(const b of blocks){
       const prev=lines.at(-1),size=Math.max(b.size,prev?.size||0),gap=prev?b.x-prev.right:Infinity;
-      const run={text:b.text,size:b.size,bold:b.bold,italic:b.italic,family:b.family,color:b.color,sizes:[[b.size,b.text.length]]};
+      const run={text:b.text,size:b.size,bold:b.bold,italic:b.italic,family:b.family,color:b.color,sizes:[[b.size,b.text.replace(/[^\p{L}]/gu,'').length]]};
+      // Sizes are weighted by letters only: dot leaders and page numbers in a table of
+      // contents are often larger than the entry and must not decide its size.
       if(prev&&Math.abs(prev.y-b.y)<=.3*size&&Math.abs(prev.xSkew-b.xSkew)<.01&&gap>=-.2*size&&gap<size*.7){
         const last=prev.runs.at(-1);if(gap>size*.15&&!/\s$/.test(last.text))last.text+=' ';
         if(keyOf(last)===keyOf(run)){last.text+=run.text;last.sizes.push(...run.sizes);}else prev.runs.push(run);
@@ -123,12 +128,21 @@ window.PDFEngine = (() => {
     const colRight=A=>Math.max(A.right,...lines.filter(L=>!L.left&&L.rightX===undefined&&Math.abs(L.x-A.x)<=2&&Math.abs(L.size-A.size)<=.35&&Math.abs(L.y-A.y)<=8*A.size).map(L=>L.right));
     function canJoin(P,B){
       const A=P.lines.at(-1);
-      if(A.left||B.left||A.rightX!==undefined||B.rightX!==undefined)return false;
+      // A neighbour on the same baseline usually means a table cell; but a line that
+      // plainly continues a paragraph of 2+ lines (same edge, same leading, sentence
+      // still open) belongs to it even if, say, a display panel sits beside it.
+      if(A.left||B.left||A.rightX!==undefined||B.rightX!==undefined){
+        const prev=P.lines.at(-2),dy=A.y-B.y;
+        if(!prev||/[.!?:;]["”»)]?\s*$/.test(A.text)||Math.abs(dy-(prev.y-A.y))>.25*A.size||A.key!==B.key||Math.abs(A.size-B.size)>.35)return false;
+        if(!(Math.abs(A.x-B.x)<2&&Math.abs(prev.x-A.x)<2)&&!(Math.abs(A.right-B.right)<1.5&&Math.abs(prev.right-A.right)<1.5))return false;
+        return true;
+      }
       const dy=A.y-B.y;if(dy<.8*A.size||dy>1.8*A.size||Math.abs(A.size-B.size)>.35||Math.abs(A.xSkew-B.xSkew)>.01)return false;
       if(A.key!==B.key||LIST_START.test(B.text))return false;
       if(P.lines.length>1&&Math.abs(dy-(P.lines.at(-2).y-A.y))>.35*A.size)return false;
       const lower=/^\p{Ll}/u.test(B.text),open=!/[.!?:;]["”»)]?\s*$/.test(A.text);
-      const dx=Math.abs(A.x-B.x);if(dx>2&&!(lower&&open&&dx<3*A.size))return false;
+      // Lines of a right-aligned paragraph start at different x but share the right edge.
+      const dx=Math.abs(A.x-B.x);if(dx>2&&!(lower&&open&&dx<3*A.size)&&!(open&&Math.abs(A.right-B.right)<1.5&&A.right-A.x>=.6*(B.right-B.x)))return false;
       const right=colRight(A),full=A.right>=right-Math.max(3*A.size,.1*(right-A.x));
       return full||(lower&&open);
     }
@@ -149,9 +163,19 @@ window.PDFEngine = (() => {
     }));
     const styles=[],index=new Map();
     for(const r of runs){const k=keyOf(r);if(!index.has(k)){index.set(k,styles.length);styles.push({size:r.size,bold:r.bold,italic:r.italic,family:r.family,color:r.color,chars:0,sizes:[]});}const s=styles[index.get(k)];s.chars+=r.text.length;s.sizes.push(...r.sizes);}
-    for(const s of styles){s.size=dominant(s.sizes);delete s.sizes;}
-    let base=styles.reduce((best,s,i)=>s.chars>styles[best].chars?i:best,0);
+    // Word-style small caps: capitals at two sizes, the larger one on the first letter
+    // of the text (sentence case) or of every word (title case). The translation is
+    // drawn the same way (see `prepare`).
     const plain=runs.map(r=>r.text).join('').replace(/\s+/g,' ').trim();
+    const words=(plain.match(/\p{L}+/gu)||[]).length;
+    for(const s of styles){
+      const sizes=s.sizes.filter(([,w])=>w>0),distinct=[...new Set(sizes.map(([v])=>Math.round(v*100)/100))].sort((a,b)=>b-a);
+      s.size=dominant(s.sizes);
+      if(distinct.length===2&&!/\p{Ll}/u.test(plain)){const [big,small]=distinct,initials=sizes.filter(([v])=>Math.abs(v-big)<.01).reduce((n,[,w])=>n+w,0);
+        if(big/small>1.1&&big/small<1.6&&initials<=words+2&&initials<sizes.reduce((n,[,w])=>n+w,0)/2){s.size=small;s.caps=big/small;s.capsEach=initials>1&&initials>=.6*words;}}
+      delete s.sizes;
+    }
+    let base=styles.reduce((best,s,i)=>s.chars>styles[best].chars?i:best,0);
     const first=lines[0],right=Math.max(...lines.map(L=>L.right)),size=styles[base].size;
     const unit={lines:lines.map(L=>({x:L.x,y:L.y,right:L.right})),x:first.x,y:first.y,right,width:right-first.x,size,xSkew:first.xSkew,color:styles[base].color,styles,base,align:'left',justify:false,leader:null};
     const leader=lines.length===1&&/^(.*?\S)\s*\.{4,}\s*(\d{0,4})\s*$/.exec(plain);
@@ -164,17 +188,25 @@ window.PDFEngine = (() => {
     // Available width. Paragraphs keep their column; isolated labels may grow a
     // little; table cells must stay inside their original box.
     const single=lines.length===1,center=(first.x+right)/2;
+    // Paragraphs whose lines share the right edge (or the centre) but not the left
+    // edge are right-aligned (or centred): their reflowed lines keep that alignment.
+    const left=Math.min(...lines.map(L=>L.x)),ragged=!single&&lines.some(L=>Math.abs(L.x-first.x)>3);
     if(unit.leader)unit.maxRight=right;
+    else if(ragged&&lines.every(L=>Math.abs(L.right-right)<1.5)){unit.align='right';unit.maxRight=right;unit.leftLimit=left;}
+    else if(ragged&&lines.every(L=>Math.abs((L.x+L.right)/2-(first.x+first.right)/2)<1.5)){unit.align='center';unit.center=(first.x+first.right)/2;unit.halfWidth=(right-left)/2;unit.maxRight=right;}
     else if(!single)unit.maxRight=right,unit.justify=lines.slice(0,-1).every(L=>L.right>=right-Math.max(1.5,.3*size));
-    // A cell reaching the right margin is right-aligned only if no nearby line shares
-    // its left edge: a left-aligned column that happens to be long stays left-aligned.
-    else if(first.left&&right>=page.right-Math.max(6,1.2*size)&&first.x>page.left+(page.right-page.left)*.3&&!page.lines.some(L=>L!==first&&Math.abs(L.x-first.x)<1.5&&Math.abs(L.y-first.y)<=6*size)){unit.align='right';unit.maxRight=right;unit.leftLimit=Math.min(first.x,first.leftRight+1.5*size);}
+    // A line is right-aligned when a nearby line ends at the same right edge but starts
+    // elsewhere (headers, captions), or when it is a cell reaching the right margin with
+    // a label on its left; never when a nearby line shares its left edge (a long
+    // left-aligned cell stays left-aligned).
+    else if(first.x>page.left+(page.right-page.left)*.3&&!page.lines.some(L=>L!==first&&Math.abs(L.x-first.x)<1.5&&Math.abs(L.y-first.y)<=6*size)&&((first.left&&right>=page.right-Math.max(6,1.2*size))||page.lines.some(L=>L!==first&&Math.abs(L.right-right)<1.5&&Math.abs(L.x-first.x)>3&&Math.abs(L.y-first.y)<=3*Math.max(size,L.size)))){
+      unit.align='right';unit.maxRight=right;unit.leftLimit=first.left?Math.min(first.x,first.leftRight+1.5*size):Math.max(page.left,first.x-.3*(right-first.x));}
     else{
       const w=right-first.x,peers=page.lines.filter(L=>L!==first&&Math.abs(L.y-first.y)<=12*size&&Math.abs(L.y-first.y)>.35*size);
       const table=first.left||first.rightX!==undefined;
       const leftGap=first.left?first.x-first.leftRight:.15*w,rightGap=first.rightX!==undefined?first.rightX-right:.15*w;
       const centered=peers.some(L=>Math.abs((L.x+L.right)/2-center)<1.5&&Math.abs(L.x-first.x)>1.5)&&!peers.some(L=>Math.abs(L.x-first.x)<1);
-      if(centered||(!table&&Math.abs(center-page.width/2)<3&&first.x>page.left+40)){unit.align='center';unit.center=center;}
+      if(centered||(!table&&Math.min(Math.abs(center-page.width/2),Math.abs(center-(page.left+page.right)/2))<3&&first.x>page.left+40)){unit.align='center';unit.center=center;}
       // Table cells may only use part of the gap to the neighbouring cell.
       if(first.left)unit.maxRight=right+Math.max(0,.45*rightGap);
       else if(first.rightX!==undefined)unit.maxRight=Math.max(right,first.rightX-1.5*size);
@@ -296,7 +328,7 @@ window.PDFEngine = (() => {
         const units=group(lines).map(P=>finalize(P,geometry));
         if(stripped)await markHidden(page,stripped,n,units);
         widen(units);assignFlows(units,n);
-        pages.push(units);progress(n,reader.numPages,'extract');await new Promise(resolve=>setTimeout(resolve,0));
+        pages.push(units);progress(n,reader.numPages,'extract');await yieldToBrowser();
       }
     }finally{await reader.destroy();await strippedDoc?.destroy();strippedDoc=strippedSource=null;}
     pages.overlaps=overlaps;return pages;
@@ -308,7 +340,28 @@ window.PDFEngine = (() => {
   const scriptBase=(()=>{try{return new URL('.',document.currentScript?.src||document.baseURI).href;}catch{return null;}})();
   const STANDARD={arimo:'Helvetica',carlito:'Helvetica',tinos:'Times',caladea:'Times',mono:'Courier'};
   const STANDARD_NAMES={Helvetica:['Helvetica','Helvetica-Bold','Helvetica-Oblique','Helvetica-BoldOblique'],Times:['Times-Roman','Times-Bold','Times-Italic','Times-BoldItalic'],Courier:['Courier','Courier-Bold','Courier-Oblique','Courier-BoldOblique']};
-  const fontFiles=new Map();
+  const fontFiles=new Map(),EXTRA=['greek','cyrillic','vietnamese'];
+  // Symbol-font characters (Symbol / Wingdings private-use codes included).
+  const SUBSTITUTE={'':'•','':'–','':'—','◦':'°'};
+  const SHAPES={'➢':'arrow','➤':'arrow','►':'arrow','▶':'arrow','▸':'arrow','➔':'arrow','':'arrow','':'arrow','':'arrow',
+    '▪':'square','■':'square','◾':'square','':'square','':'square','●':'dot','⚫':'dot','':'dot','':'dot',
+    '✓':'check','✔':'check','':'check','☐':'box','□':'box','':'box','':'box',
+    '↑':'to-up','↓':'to-down','←':'to-left','→':'to-right'};
+  const SHAPE_WIDTH=.75;
+  function drawShape(page,shape,x,y,size,color,bold){
+    const c=PDFLib.rgb(...color),s=size;
+    if(shape==='arrow')page.drawSvgPath(`M ${.1*s} 0 L ${.66*s} ${.31*s} L ${.1*s} ${.62*s} L ${.24*s} ${.31*s} Z`,{x,y:y+.65*s,color:c,borderWidth:0});
+    else if(shape==='square')page.drawRectangle({x:x+.14*s,y:y+.14*s,width:.42*s,height:.42*s,color:c});
+    else if(shape==='dot')page.drawCircle({x:x+.35*s,y:y+.33*s,size:.21*s,color:c});
+    else if(shape==='box')page.drawRectangle({x:x+.08*s,y:y,width:.56*s,height:.56*s,borderColor:c,borderWidth:.07*s});
+    else if(shape.startsWith('to-')){
+      // Arrow of cap height: shaft plus head, rotated for the four directions.
+      const paths={'to-up':`M ${.37*s} ${.92*s} L ${.37*s} ${.06*s} M ${.1*s} ${.34*s} L ${.37*s} ${.04*s} L ${.64*s} ${.34*s}`,'to-down':`M ${.37*s} 0 L ${.37*s} ${.86*s} M ${.1*s} ${.58*s} L ${.37*s} ${.88*s} L ${.64*s} ${.58*s}`,
+        'to-right':`M ${.02*s} ${.44*s} L ${.7*s} ${.44*s} M ${.44*s} ${.18*s} L ${.72*s} ${.44*s} L ${.44*s} ${.7*s}`,'to-left':`M ${.72*s} ${.44*s} L ${.04*s} ${.44*s} M ${.3*s} ${.18*s} L ${.02*s} ${.44*s} L ${.3*s} ${.7*s}`};
+      page.drawSvgPath(paths[shape],{x,y:y+.78*s,borderColor:c,borderWidth:(bold?.085:.055)*s});
+    }
+    else page.drawSvgPath(`M ${.08*s} ${.32*s} L ${.27*s} ${.52*s} L ${.66*s} ${.02*s}`,{x,y:y+.58*s,borderColor:c,borderWidth:.1*s});
+  }
   async function fontBytes(file){
     if(!scriptBase||typeof fetch!=='function')return null;
     if(!fontFiles.has(file))fontFiles.set(file,fetch(new URL('fonts/'+file,scriptBase)).then(r=>r.ok?r.arrayBuffer():null).catch(()=>null));
@@ -318,9 +371,11 @@ window.PDFEngine = (() => {
     const cache=new Map(),widths=new Map();const canEmbed=typeof window!=='undefined'&&window.fontkit;if(canEmbed)doc.registerFontkit(window.fontkit);
     function standard(style){const name=STANDARD_NAMES[STANDARD[style.family]||'Helvetica'][(style.bold?1:0)+(style.italic?2:0)];if(!cache.has(name))cache.set(name,doc.embedFont(name));return cache.get(name);}
     function custom(style,subset){
-      if(!canEmbed||style.family==='mono')return null;
-      // Caladea has no Greek subset: Tinos is the closest serif with the same metrics class.
-      const family=subset==='greek'&&style.family==='caladea'?'tinos':style.family;
+      // Monospaced text keeps Courier for Latin; accented and non-Latin letters that
+      // Courier lacks (ő, ș, Cyrillic…) use Arimo rather than losing their accents.
+      if(!canEmbed||(style.family==='mono'&&subset==='latin'))return null;
+      // Caladea has no Greek or Cyrillic subset: Tinos is the closest serif.
+      const family=style.family==='mono'?'arimo':EXTRA.includes(subset)&&style.family==='caladea'?'tinos':style.family;
       const file=`${family}-${subset}-${style.bold?700:400}-${style.italic?'italic':'normal'}.woff`;
       if(!cache.has(file))cache.set(file,fontBytes(file).then(b=>b?doc.embedFont(b,{subset:true}):null).catch(()=>null));
       return cache.get(file);
@@ -330,14 +385,21 @@ window.PDFEngine = (() => {
     const width=(font,text)=>{let m=widths.get(font);if(!m)widths.set(font,m=new Map());let w=m.get(text);if(w===undefined){w=font.widthOfTextAtSize(text,1);m.set(text,w);}return w;};
     // Split a word into segments, each drawn with the first font that has its glyphs:
     // metric-compatible font (latin, then latin-ext subset), then a standard PDF font;
-    // the Greek subset (Δ, Ω, µ… common in technical manuals) is loaded only when needed.
+    // the Greek and Cyrillic subsets (Δ, Ω in manuals; Greek, Russian, Bulgarian…
+    // translations) are loaded only when a character needs them.
     async function split(style,text){
-      const fonts=[await custom(style,'latin'),await custom(style,'latin-ext'),await standard(style)].filter(Boolean),out=[];
+      const fonts=(style.family==='mono'?[await standard(style),await custom(style,'latin-ext')]:[await custom(style,'latin'),await custom(style,'latin-ext'),await standard(style)]).filter(Boolean),out=[];
       for(let ch of text){
         let font=fonts.find(f=>covers(f,ch));
-        if(!font){const greek=await custom(style,'greek');if(greek&&covers(greek,ch))font=greek;}
-        if(!font){const plain=ch.normalize('NFD').replace(/\p{M}/gu,'');ch=plain&&covers(fonts.at(-1),plain)?plain:'?';font=fonts.at(-1);}
-        const last=out.at(-1);if(last&&last.font===font)last.text+=ch;else out.push({text:ch,font});
+        for(const subset of EXTRA){if(font)break;const extra=await custom(style,subset);if(extra&&covers(extra,ch))font=extra;}
+        // Arrows in the metric fonts are much smaller than in Arial: draw them as shapes.
+        if(SHAPES[ch]?.startsWith('to-')){out.push({text:ch,font:await standard(style),shape:SHAPES[ch]});continue;}
+        if(!font&&SUBSTITUTE[ch]){const sub=SUBSTITUTE[ch];font=fonts.find(f=>covers(f,sub));if(font)ch=sub;}
+        // Bullets and arrows from symbol fonts (Wingdings ➢, ▪, ✓…) have no glyph in
+        // the text fonts: they are drawn as small vector shapes of the same width.
+        if(!font&&SHAPES[ch]){out.push({text:ch,font:await standard(style),shape:SHAPES[ch]});continue;}
+        if(!font){const last=await standard(style),plain=ch.normalize('NFD').replace(/\p{M}/gu,'');ch=plain&&covers(last,plain)?plain:'?';font=last;}
+        const last=out.at(-1);if(last&&last.font===font&&!last.shape)last.text+=ch;else out.push({text:ch,font});
       }
       return out;
     }
@@ -364,7 +426,16 @@ window.PDFEngine = (() => {
 
   async function prepare(unit,text,fonts){
     const groups=tokens(text,unit);if(!groups.length)return null;
-    for(const g of groups){const pieces=[];for(const p of g.pieces)for(const seg of await fonts.split(unit.styles[p.style],p.text))pieces.push({...seg,style:p.style,unit:fonts.width(seg.font,seg.text)});g.pieces=pieces;}
+    for(const g of groups){
+      const pieces=[];
+      for(const p of g.pieces){
+        const style=unit.styles[p.style],text=style.caps?p.text.toUpperCase():p.text;
+        // Small caps: the initial of the text (or of each word) is drawn larger.
+        const parts=style.caps&&!pieces.length&&(style.capsEach||g===groups[0])?(([ch,...rest])=>[[ch,style.caps],[rest.join(''),1]])([...text]):[[text,1]];
+        for(const[part,factor]of parts)if(part)for(const seg of await fonts.split(style,part))pieces.push({...seg,style:p.style,factor,unit:seg.shape?SHAPE_WIDTH:fonts.width(seg.font,seg.text)});
+      }
+      g.pieces=pieces;
+    }
     const baseStyle=unit.styles[unit.base],spaceFont=(await fonts.split(baseStyle,'n'))[0].font,spaceUnit=fonts.width(spaceFont,' ');
     const number=unit.leader?.number?(await fonts.split(baseStyle,unit.leader.number))[0]:null;
     const dotFont=unit.leader?(await fonts.split(baseStyle,'.'))[0].font:null;
@@ -372,7 +443,8 @@ window.PDFEngine = (() => {
       if(unit.align==='center')return 2*unit.halfWidth;
       if(unit.align==='right')return unit.right-unit.leftLimit;
       let avail=unit.maxRight-L.x;
-      if(unit.leader)avail-=(number?fonts.width(number.font,number.text)*baseStyle.size+baseStyle.size*.4:0)+fonts.width(dotFont,'...')*baseStyle.size;
+      const lead=baseStyle.size*(baseStyle.caps||1);
+      if(unit.leader)avail-=(number?fonts.width(number.font,number.text)*lead+lead*.4:0)+fonts.width(dotFont,'...')*lead;
       return avail;
     });
     return {unit,groups,baseStyle,spaceUnit,number,dotFont,slots,fonts,extraSlot:unit.maxRight-unit.lines.at(-1).x};
@@ -381,7 +453,7 @@ window.PDFEngine = (() => {
   // Wrap the words at one size; `extra` additional lines may be used below the block.
   function wrap(prep,scale,squeeze,extra){
     const {unit,groups,slots}=prep;
-    for(const g of groups){g.width=0;for(const p of g.pieces){p.size=unit.styles[p.style].size*scale;p.width=p.unit*p.size*squeeze;g.width+=p.width;}}
+    for(const g of groups){g.width=0;for(const p of g.pieces){p.size=unit.styles[p.style].size*scale*(p.factor||1);p.width=p.unit*p.size*squeeze;g.width+=p.width;}}
     const space=prep.spaceUnit*prep.baseStyle.size*scale*squeeze,slot=i=>i<slots.length?slots[i]:prep.extraSlot,limit=slots.length+extra;
     const rows=[[]],widths=[0];
     for(const g of groups){
@@ -394,9 +466,14 @@ window.PDFEngine = (() => {
   }
 
   // Fit a flow (or a single block): the first step where every block fits, using at
-  // most the free space below the column for extra lines.
+  // most the free space below the column for extra lines. Single lines (labels,
+  // captions) first try a slightly smaller size: "Fig 1" must not break in two.
   function fit(preps,free){
     const grow=free>0;
+    if(grow&&preps.every(p=>p.unit.lines.length===1&&p.groups.length<=4))for(const[scale,squeeze]of STEPS){
+      if(scale<.85)break;
+      const plans=preps.map(prep=>wrap(prep,scale,squeeze,0));if(plans.every(Boolean))return plans;
+    }
     for(const[scale,squeeze]of STEPS){
       let used=0,plans=[];
       for(const prep of preps){const plan=wrap(prep,scale,squeeze,grow?Infinity:0);if(!plan){plans=null;break;}used+=Math.max(0,plan.rows.length-prep.slots.length)*prep.unit.leading;plans.push(plan);}
@@ -419,14 +496,18 @@ window.PDFEngine = (() => {
       const line=plan.positions[i],width=plan.widths[i],slotWidth=i<plan.slots.length?plan.slots[i]:plan.extraSlot;
       let x=line.x;
       if(unit.align==='right')x=unit.right-width;else if(unit.align==='center')x=unit.center-width/2;
-      const justify=unit.justify&&i<plan.rows.length-1&&row.length>1&&slotWidth-width<plan.space*6;
-      const gap=justify?plan.space+(slotWidth-width)/(row.length-1):plan.space;
+      // An untranslated single line (display texts such as "N E X T  ↑ ↑") keeps its
+      // original width: the spaces are widened back to the original letter spacing.
+      const spaced=plan.same&&unit.align==='left'&&plan.rows.length===1&&unit.lines.length===1&&row.length>1&&unit.right-line.x>width;
+      const justify=spaced||(unit.justify&&i<plan.rows.length-1&&row.length>1&&slotWidth-width<plan.space*6);
+      const gap=spaced?plan.space+(unit.right-line.x-width)/(row.length-1):justify?plan.space+(slotWidth-width)/(row.length-1):plan.space;
       // Coalesce consecutive pieces with the same font so text stays selectable as words.
       let pending=null;const flush=()=>{if(pending){page.drawText(pending.text,{x:pending.x,y:line.y,size:pending.size,font:pending.font,color:PDFLib.rgb(...pending.color),ySkew:skew});pending=null;}};
       row.forEach((g,j)=>{
         if(j>0){if(justify){flush();x+=gap;}else{if(pending)pending.text+=' ';x+=gap;}}
         for(const p of g.pieces){
           const color=unit.styles[p.style].color;
+          if(p.shape){flush();drawShape(page,p.shape,x,line.y,p.size,color,unit.styles[p.style].bold);x+=p.width;continue;}
           if(pending&&pending.font===p.font&&pending.size===p.size&&pending.color.join()===color.join())pending.text+=p.text;
           else{flush();pending={text:p.text,x,size:p.size,font:p.font,color};}
           x+=p.width;
@@ -434,7 +515,7 @@ window.PDFEngine = (() => {
       });
       flush();
       if(unit.leader&&i===0){
-        const size=plan.baseStyle.size,color=PDFLib.rgb(...plan.baseStyle.color);
+        const size=plan.baseStyle.size*(plan.baseStyle.caps||1),color=PDFLib.rgb(...plan.baseStyle.color);
         const numberWidth=plan.number?plan.fonts.width(plan.number.font,plan.number.text)*size*plan.squeeze:0,end=unit.right-numberWidth-size*.2;
         const dot=plan.fonts.width(plan.dotFont,'.')*size*plan.squeeze,count=Math.max(0,Math.floor((end-x-size*.3)/dot));
         if(count)page.drawText('.'.repeat(count),{x:end-count*dot,y:line.y,size,font:plan.dotFont,color,ySkew:skew});
@@ -448,18 +529,18 @@ window.PDFEngine = (() => {
     const doc=await PDFLib.PDFDocument.load(bytes.slice());await removeText(doc,signal);
     const fonts=fontManager(doc);let index=0,shrunk=0;
     for(let p=0;p<pages.length;p++){
-      await new Promise(resolve=>setTimeout(resolve,0));
+      await yieldToBrowser();
       signal.throwIfAborted();const page=doc.getPage(p);
       const groups=new Map();
       for(const unit of pages[p]){
         const text=translated[index++];if(unit.hidden)continue;
-        const prep=await prepare(unit,text??unit.text,fonts);if(!prep)continue;
+        const prep=await prepare(unit,text??unit.text,fonts);if(!prep)continue;prep.same=(text??unit.text)===unit.text;
         const key=unit.flow??Symbol();if(!groups.has(key))groups.set(key,[]);groups.get(key).push(prep);
       }
       for(const preps of groups.values()){
         preps.sort((a,b)=>b.unit.y-a.unit.y);
         const last=preps.at(-1).unit,flowable=preps.every(({unit:u})=>!u.table&&!u.leader&&u.align==='left'&&!u.hidden);
-        const plans=fit(preps,flowable?Math.max(0,(last.spaceBelow||0)-.3*last.size):0);
+        const plans=fit(preps,flowable?Math.max(0,(last.spaceBelow||0)-.45*last.size):0);
         let offset=0;
         preps.forEach((prep,k)=>{
           const plan={...plans[k],...prep},u=prep.unit,n=u.lines.length,lastLine=u.lines.at(-1);

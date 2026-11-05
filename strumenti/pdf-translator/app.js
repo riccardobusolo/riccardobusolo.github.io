@@ -1,8 +1,26 @@
 'use strict';
 pdfjsLib.GlobalWorkerOptions.workerSrc='pdf.worker.min.js';
 const $=id=>document.getElementById(id);
-let source=null,result=null,fileName='',pageNumber=1,busy=false,controller=null,workingModels=[],downloadURL=null,renderVersion=0,renderQueue=Promise.resolve();
+let job=null,source=null,result=null,fileName='',pageNumber=1,busy=false,controller=null,workingModels=[],downloadURL=null,renderVersion=0,renderQueue=Promise.resolve();
 const logs=new Map();
+// Target languages: [code, name sent to the model, label]. Latin, Greek and Cyrillic
+// scripts only: the PDF fonts cover them; right-to-left and CJK scripts need a new layout.
+const LANGUAGES=[
+  ['sq','Albanian','Albanese'],['eu','Basque','Basco'],['bs','Bosnian','Bosniaco'],['bg','Bulgarian','Bulgaro'],['ca','Catalan','Catalano'],
+  ['cs','Czech','Ceco'],['hr','Croatian','Croato'],['da','Danish','Danese'],['et','Estonian','Estone'],['fi','Finnish','Finlandese'],
+  ['fr','French','Francese'],['fr-CA','French (Canada)','Francese (Canada)'],['gl','Galician','Galiziano'],['de','German','Tedesco'],['de-CH','German (Switzerland)','Tedesco (Svizzera)'],
+  ['el','Greek','Greco'],['en-GB','English (United Kingdom)','Inglese (Regno Unito)'],['en-US','English (United States)','Inglese americano (USA)'],['id','Indonesian','Indonesiano'],['ga','Irish','Irlandese'],
+  ['is','Icelandic','Islandese'],['it','Italian','Italiano'],['lv','Latvian','Lettone'],['lt','Lithuanian','Lituano'],['mk','Macedonian','Macedone'],
+  ['ms','Malay','Malese'],['mt','Maltese','Maltese'],['nb','Norwegian (Bokmål)','Norvegese'],['nl','Dutch','Olandese'],['nl-BE','Dutch (Belgium, Flemish)','Olandese (Belgio, fiammingo)'],
+  ['pl','Polish','Polacco'],['pt-PT','Portuguese (Portugal)','Portoghese (Portogallo)'],['pt-BR','Portuguese (Brazil)','Portoghese (Brasile)'],['ro','Romanian','Rumeno'],['ru','Russian','Russo'],
+  ['sr-Latn','Serbian (Latin script)','Serbo (alfabeto latino)'],['sr-Cyrl','Serbian (Cyrillic script)','Serbo (cirillico)'],['sk','Slovak','Slovacco'],['sl','Slovenian','Sloveno'],['es','Spanish (Spain)','Spagnolo (Spagna)'],
+  ['es-419','Spanish (Latin America)','Spagnolo (America Latina)'],['sv','Swedish','Svedese'],['tr','Turkish','Turco'],['uk','Ukrainian','Ucraino'],['hu','Hungarian','Ungherese'],['vi','Vietnamese','Vietnamita']
+].sort((a,b)=>a[2].localeCompare(b[2],'it'));
+const languageName=code=>LANGUAGES.find(l=>l[0]===code)?.[1]||code;
+(()=>{const select=$('language');select.replaceChildren(...LANGUAGES.map(([code,,label])=>new Option(label,code)));
+  let saved='';try{saved=localStorage.getItem('docushift.language')||'';}catch{}
+  select.value=LANGUAGES.some(l=>l[0]===saved)?saved:'en-GB';
+  select.addEventListener('change',()=>{try{localStorage.setItem('docushift.language',select.value);}catch{}});})();
 const providerSessions=new Map();let currentProvider='openai';
 const providerName=()=>currentProvider==='openai'?'OpenAI':'Gemini';
 const service=()=>currentProvider==='openai'?OpenAIService:AI;
@@ -90,7 +108,8 @@ activity.id='activity';activity.hidden=true;activity.setAttribute('aria-label','
 activity.innerHTML='<div class="activity-head"><span class="activity-spinner" aria-hidden="true"></span><div><strong id="activity-title"></strong><p id="activity-detail"></p></div><span id="activity-time">0:00</span></div><ol id="activity-steps"><li>Analisi PDF</li><li>Traduzione AI</li><li>Creazione PDF</li><li>Anteprima</li></ol><div class="activity-meta"><span id="activity-count">Avvio…</span><span id="activity-percent">0%</span></div><p id="activity-heartbeat"></p><details><summary>Attività e tentativi</summary><div id="activity-log" role="log" aria-live="polite"></div></details>';
 $('progress').before(activity);
 let activityTimer=null,activityStarted=0,lastActivity=0,activityStep=-1;
-const paint=()=>new Promise(resolve=>setTimeout(resolve,0));
+// Yield to the browser; MessageChannel is not throttled in background tabs like setTimeout.
+const paint=()=>new Promise(resolve=>{if(typeof MessageChannel!=='function')return setTimeout(resolve,0);const channel=new MessageChannel();channel.port1.onmessage=()=>{channel.port1.close();resolve();};channel.port2.postMessage(0);});
 function eventLog(text){const row=document.createElement('p');row.textContent=new Date().toLocaleTimeString('it-IT')+' · '+text;$('activity-log').append(row);while($('activity-log').children.length>60)$('activity-log').firstChild.remove();lastActivity=Date.now();}
 function tick(){const elapsed=Math.floor((Date.now()-activityStarted)/1000),waiting=Math.floor((Date.now()-lastActivity)/1000);$('activity-time').textContent=Math.floor(elapsed/60)+':'+String(elapsed%60).padStart(2,'0');$('activity-heartbeat').textContent=waiting>=10?`Nessun nuovo risultato da ${waiting} s. ${activityStep===1?'Il provider sta elaborando: ogni richiesta ha un limite di 2 minuti.':'Elaborazione del documento in corso.'}`:'In lavorazione · puoi annullare in qualsiasi momento.';}
 function startActivity(title,steps=true){
@@ -122,9 +141,12 @@ function sync(){
   document.body.classList?.toggle('has-file',!!source);
   for(const b of $('model-list')?.children||[])if(b.dataset?.off)b.disabled=busy||b.dataset.off==='1';
   $('cancel').hidden=!busy;$('translate').hidden=busy;
+  // Refinement is offered once a translation exists, with a verified model for corrections.
+  $('refine').hidden=!job;$('fix').disabled=busy;$('fix-run').disabled=busy||!job||!workingModels.includes($('model').value)||!$('key').value.trim();
+  if(job&&!$('editor').hidden){for(const area of $('edit-list').querySelectorAll('textarea'))area.disabled=busy;editCount();}
   $('prev').disabled=busy||!source||pageNumber===1;$('next').disabled=busy||!source||pageNumber>=source.numPages;
 }
-function clearResult(){result?.destroy();result=null;if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=null;$('download').hidden=true;$('translated').style.display='none';$('empty-result').hidden=false;}
+function clearResult(){job=null;drafts.clear();$('refine').hidden=true;$('editor').hidden=true;$('cost').hidden=true;result?.destroy();result=null;if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=null;$('download').hidden=true;$('translated').style.display='none';$('empty-result').hidden=false;}
 function preview(){
   const version=++renderVersion,n=pageNumber,original=source,output=result;
   renderQueue=renderQueue.catch(()=>{}).then(async()=>{
@@ -137,7 +159,7 @@ function preview(){
       if(version!==renderVersion)return;canvas.style.display='block';$(empty).hidden=true;
     }
   }).catch(()=>status('Anteprima non disponibile. Ricarica il documento.'));
-  sync();return renderQueue;
+  if(job)renderEditor();sync();return renderQueue;
 }
 async function load(file){
   if(busy||!file)return;
@@ -209,12 +231,12 @@ $('translate').onclick=async()=>{
       const body=[...weight].sort((a,b)=>b[1]-a[1])[0][0],top=Math.max(...visible.map(u=>u.size));
       for(const u of visible){if(context.has(u.text))continue;const c={page:p+1};if(u.size===top&&top>=1.3*body)c.role='page title';else if(u.size>=1.15*body)c.role='heading';context.set(u.text,c);}});
     window.setTranslationContext(context);
+    let glossary=[];
     {
       // Batches keep neighbouring blocks together (context for the model) and run
       // a few at a time; any failed batch stops the export, nothing partial is saved.
-      const svc=service(),key=$('key').value.trim(),model=$('model').value,language=$('language').value,quality=typeof svc.ask==='function';
+      const svc=service(),key=$('key').value.trim(),model=$('model').value,language=languageName($('language').value),quality=typeof svc.ask==='function';
       // 1. Glossary: one request fixes the recurring terms for every batch.
-      let glossary=[];
       if(quality){
         stage(1,'Glossario del documento','Individuo i termini ricorrenti, i titoli e le parole di sicurezza da tradurre sempre allo stesso modo.',20,'Terminologia');status('Preparo il glossario del documento…');await paint();
         try{
@@ -238,7 +260,7 @@ $('translate').onclick=async()=>{
         }
       };
       const worker=async()=>{try{while(next<batches.length){batchSignal.throwIfAborted();const {offset,batch}=batches[next++];
-        const output=await translateBatch(batch,offset,$('language').value,$('key').value.trim(),$('model').value,workingModels,batchSignal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · testi ${offset+1}–${offset+batch.length} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta'}`;$('activity-detail').textContent=message;eventLog(message);});
+        const output=await translateBatch(batch,offset,language,$('key').value.trim(),$('model').value,workingModels,batchSignal,diagnostic,attempt=>{const message=`${providerName()} · ${attempt.model.replace('models/','')} · testi ${offset+1}–${offset+batch.length} · ${attempt.state==='response'?'risposta ricevuta':'attesa risposta'}`;$('activity-detail').textContent=message;eventLog(message);});
         batch.forEach((text,i)=>{cache.set(text,output[i]);if(output.languages?.[i])sourceLanguage.set(text,output.languages[i]);if(output.instructed?.[i]&&output[i]!==text)instructed.add(text);});done+=batch.length;update();eventLog(`Ricevuti e verificati ${batch.length} testi tradotti.`);}}catch(error){stop.abort();throw error;}};
       const workers=Array.from({length:Math.min(currentProvider==='openai'?4:2,batches.length)},worker);
       const outcome=await Promise.allSettled(workers);signal.throwIfAborted();const failed=outcome.find(r=>r.status==='rejected'&&!(r.reason?.name==='AbortError'));if(failed)throw failed.reason;if(outcome.some(r=>r.status==='rejected'))throw Error('Traduzione interrotta.');
@@ -290,21 +312,99 @@ $('translate').onclick=async()=>{
         const fixed=tr.replace(/(^|[.!?:]\s+|\s|[(“"«'])(\p{Lu}{4,})(?=\b)/gu,(m,before,word)=>text.includes(word)?m:before+(/^$|[.!?:]\s+$/.test(before)?word[0]+word.slice(1).toLowerCase():word.toLowerCase()));
         if(fixed!==tr){cache.set(text,fixed);recased++;}}
       if(recased)eventLog(`Maiuscole: uniformate ${recased} traduzioni al testo originale.`);}
-    signal.throwIfAborted();status('Rimuovo il testo originale e compongo il PDF…');$('progress').value=85;
-    stage(2,'Creazione del PDF tradotto','Rimozione dei testi originali e inserimento delle traduzioni.',80,'Preparazione pagine');await paint();
-    const built=await PDFEngine.build(source.originalBytes,pages,texts.map((t,i)=>units[i].translate?cache.get(t):t),signal,(n,total)=>{stage(2,'Creazione del PDF tradotto',`Composizione della pagina ${n} di ${total}.`,80+n/total*14,`${n} / ${total} pagine ricomposte`);});
     signal.throwIfAborted();
-    stage(3,'Preparazione dell’anteprima','Apro il PDF esportato e preparo il download.',95,'Verifica risultato');await paint();
-    result=await pdfjsLib.getDocument({data:built.bytes.slice(),isEvalSupported:false}).promise;
-    signal.throwIfAborted();
-    // Real cost of this document, from the token usage reported by the provider.
-    if(usage.input+usage.output){const k=n=>n>=1000?(n/1000).toFixed(1).replace('.',',')+'k':String(n);const c=currentProvider==='openai'?OpenAIService.cost(usedModel,usage):null;
-      $('cost').textContent=(c!=null?'Costo '+money(c)+' · ':'')+`${k(usage.input)} + ${k(usage.output)} token`;$('cost').title=`Token in ingresso ${usage.input} (in cache ${usage.cached}) · in uscita ${usage.output}${c!=null?` · ${OpenAIService.info(usedModel).label} a listino: $${c.toFixed(4)} · cambio ${usdToEur.toFixed(3)}`:''}`;$('cost').hidden=false;costNote=c!=null?` Costo da listino: ${money(c)} (l’addebito esatto, in dollari, è nel pannello OpenAI).`:` Token usati: ${usage.input+usage.output}.`;eventLog('Consumo: '+$('cost').title);}
-    downloadURL=URL.createObjectURL(new Blob([built.bytes],{type:'application/pdf'}));$('download').href=downloadURL;$('download').download=fileName.replace(/\.pdf$/i,'')+'-'+$('language').value+'.pdf';$('download').hidden=false;
-    await preview();signal.throwIfAborted();
-    status('Traduzione completata. Il PDF è pronto.'+reviewNote+costNote+(pages.overlaps.length?` ${pages.overlaps.length} frammenti stampati sopra altro testo nell’originale sono stati omessi.`:'')+(built.shrunk?` ${built.shrunk} blocchi con carattere ridotto oltre il 20% per rispettare gli spazi.`:''));
-    endActivity('done',$('status').textContent);
+    const run={pages,units,texts,unique,cache,context,glossary,instructed,language:$('language').value,provider:currentProvider,model:usedModel,usage};
+    const built=await compose(run,signal);
+    job=run;costNote=costText(usage,usedModel);
+    status('Traduzione completata. Il PDF è pronto.'+reviewNote+costNote+(pages.overlaps.length===1?' 1 frammento stampato sopra altro testo nell’originale è stato omesso.':pages.overlaps.length?` ${pages.overlaps.length} frammenti stampati sopra altro testo nell’originale sono stati omessi.`:'')+(built.shrunk?` ${built.shrunk} blocchi con carattere ridotto oltre il 20% per rispettare gli spazi.`:''));
+    endActivity('done',$('status').textContent);renderEditor();
   }catch(error){clearResult();const message=signal.aborted?'Operazione annullata. Puoi riprovare.':error.message;status(message);endActivity(signal.aborted?'cancelled':'error',message);}
   finally{globalThis.OpenAIService?.setMeter?.(null);globalThis.AI?.setMeter?.(null);busy=false;controller=null;sync();}
 };
+
+// ---------------------------------------------------------------------------
+// After the translation: the last run (`job`) is kept, so the PDF can be recomposed
+// after a correction requested to the AI or after editing the texts by hand.
+// ---------------------------------------------------------------------------
+const finalText=(run,i)=>{const t=run.texts[i];return run.cache.has(t)?run.cache.get(t):t;};
+async function compose(run,signal){
+  status('Rimuovo il testo originale e compongo il PDF…');
+  stage(2,'Creazione del PDF tradotto','Rimozione dei testi originali e inserimento delle traduzioni.',80,'Preparazione pagine');await paint();
+  const built=await PDFEngine.build(source.originalBytes,run.pages,run.texts.map((t,i)=>finalText(run,i)),signal,(n,total)=>{stage(2,'Creazione del PDF tradotto',`Composizione della pagina ${n} di ${total}.`,80+n/total*14,`${n} / ${total} pagine ricomposte`);});
+  signal.throwIfAborted();
+  stage(3,'Preparazione dell’anteprima','Apro il PDF esportato e preparo il download.',95,'Verifica risultato');await paint();
+  const doc=await pdfjsLib.getDocument({data:built.bytes.slice(),isEvalSupported:false}).promise;
+  if(signal.aborted){await doc.destroy();signal.throwIfAborted();}
+  result?.destroy();result=doc;if(downloadURL)URL.revokeObjectURL(downloadURL);
+  downloadURL=URL.createObjectURL(new Blob([built.bytes],{type:'application/pdf'}));$('download').href=downloadURL;$('download').download=fileName.replace(/\.pdf$/i,'')+'-'+run.language+'.pdf';$('download').hidden=false;
+  await preview();return built;
+}
+// Real cost of the work so far, from the token usage reported by the provider.
+function costText(usage,model){
+  if(!(usage.input+usage.output))return '';
+  const k=n=>n>=1000?(n/1000).toFixed(1).replace('.',',')+'k':String(n);const c=currentProvider==='openai'?OpenAIService.cost(model,usage):null;
+  $('cost').textContent=(c!=null?'Costo '+money(c)+' · ':'')+`${k(usage.input)} + ${k(usage.output)} token`;$('cost').title=`Token in ingresso ${usage.input} (in cache ${usage.cached}) · in uscita ${usage.output}${c!=null?` · ${OpenAIService.info(model).label} a listino: $${c.toFixed(4)} · cambio ${usdToEur.toFixed(3)}`:''}`;$('cost').hidden=false;eventLog('Consumo: '+$('cost').title);
+  return c!=null?` Costo da listino: ${money(c)} (l’addebito esatto, in dollari, è nel pannello OpenAI).`:` Token usati: ${usage.input+usage.output}.`;
+}
+
+// Correction requested to the AI: the whole document is sent once more (source,
+// translation, page) and only the items concerned come back.
+$('fix-run').onclick=async()=>{
+  const request=$('fix').value.trim();if(busy||!job)return;if(!request){status('Scrivi la correzione da applicare.');$('fix').focus();return;}
+  busy=true;controller=new AbortController();const signal=controller.signal,run=job;sync();startActivity('Correzione della traduzione');
+  const meter=(model,u)=>{run.usage.input+=u.input_tokens??u.promptTokenCount??0;run.usage.cached+=u.input_tokens_details?.cached_tokens??u.cachedContentTokenCount??0;run.usage.output+=u.output_tokens??((u.candidatesTokenCount||0)+(u.thoughtsTokenCount||0));};
+  globalThis.OpenAIService?.setMeter?.(meter);globalThis.AI?.setMeter?.(meter);
+  try{
+    const svc=service(),key=$('key').value.trim(),model=$('model').value,language=languageName(run.language);
+    if(typeof svc.ask!=='function')throw Error('Il provider scelto non supporta le correzioni.');
+    eventLog('Correzione richiesta: '+request.slice(0,200));
+    stage(1,'Correzione in corso','Invio originale e traduzione: l’AI restituisce solo i testi da cambiare.',10,'Correzione');status('Applico la correzione…');await paint();
+    const items=run.unique.map((source,id)=>({id,source,translation:run.cache.get(source)??source,...run.context.get(source)})),byId=new Map(items.map(it=>[it.id,it])),chunks=[];
+    for(let i=0;i<items.length;){const chunk=[];let length=0;while(i<items.length){const it=items[i],size=it.source.length+it.translation.length+20;if(chunk.length&&(length+size>12000||chunk.length>=80))break;chunk.push(it);length+=size;i++;}chunks.push(chunk);}
+    const changes=new Map();let done=0,next=0;
+    const worker=async()=>{while(next<chunks.length){const chunk=chunks[next++];signal.throwIfAborted();
+      const data=await svc.ask(window.correctionPrompt(language,run.glossary,request,chunk),window.TRANSLATION_SCHEMAS.review,key,model,workingModels,signal,diagnostic);
+      for(const c of data.corrections||[]){const item=byId.get(c?.id);if(item&&chunk.includes(item)&&typeof c.translation==='string'&&c.translation!==item.translation)changes.set(item.source,c.translation);}
+      done++;setProgress(10+done/chunks.length*65,`Parte ${done} / ${chunks.length}`);}};
+    // Unlike the automatic review, a failed part stops the correction: nothing is applied.
+    await Promise.all(Array.from({length:Math.min(currentProvider==='openai'?4:2,chunks.length)},worker));signal.throwIfAborted();
+    if(!changes.size){status('L’AI non ha trovato testi da modificare per questa correzione. Prova a descriverla in modo più preciso.');endActivity('done',$('status').textContent);return;}
+    let n=0;for(const[sourceText,translation]of changes){if(++n<=40)eventLog(`Correzione · «${(run.cache.get(sourceText)??sourceText).slice(0,60)}» → «${translation.slice(0,60)}»`);run.cache.set(sourceText,translation);run.instructed.add(sourceText);}
+    const built=await compose(run,signal);
+    status(`Correzione applicata a ${changes.size} ${changes.size===1?'testo':'testi'}.`+costText(run.usage,run.model)+(built.shrunk?` ${built.shrunk} blocchi con carattere ridotto oltre il 20%.`:''));endActivity('done',$('status').textContent);renderEditor();
+  }catch(error){const message=signal.aborted?'Correzione annullata: il PDF precedente resta valido.':error.message+' Il PDF precedente resta valido.';status(message);endActivity(signal.aborted?'cancelled':'error',message);}
+  finally{globalThis.OpenAIService?.setMeter?.(null);globalThis.AI?.setMeter?.(null);busy=false;controller=null;sync();}
+};
+
+// Manual editing: the texts of the page shown in the preview. A text repeated on
+// several pages (headers, footers) is one entry: editing it changes every copy.
+// Unsaved edits are kept while browsing the pages and applied together.
+const drafts=new Map();
+const currentText=s=>job.cache.has(s)?job.cache.get(s):s;
+function editCount(){const n=drafts.size;$('edit-apply').textContent=n?`Applica ${n} ${n===1?'modifica':'modifiche'} e ricomponi`:'Applica modifiche';$('edit-apply').disabled=busy||!n;$('edit-reset').disabled=busy||!n;}
+function renderEditor(){
+  const panel=$('editor');panel.hidden=!job;if(!job){drafts.clear();return;}
+  const units=job.pages[pageNumber-1]||[],seen=new Set(),rows=[];
+  for(const u of units){if(u.hidden||!u.text.trim()||seen.has(u.text))continue;seen.add(u.text);
+    const saved=currentText(u.text),row=document.createElement('div');row.className='edit-row';
+    const original=document.createElement('p');original.className='edit-source';original.textContent=u.text.replace(/<\/?s\d+>/g,'');original.title='Testo originale';
+    const area=document.createElement('textarea');area.value=drafts.get(u.text)??saved;area.rows=Math.min(6,Math.max(1,Math.ceil(area.value.length/70)));area.disabled=busy;area.spellcheck=true;area.lang=job.language;area.setAttribute('aria-label','Traduzione di: '+original.textContent.slice(0,80));
+    row.classList.toggle('changed',drafts.has(u.text));
+    area.addEventListener('input',()=>{if(area.value===saved)drafts.delete(u.text);else drafts.set(u.text,area.value);row.classList.toggle('changed',drafts.has(u.text));editCount();});
+    row.append(original,area);rows.push(row);}
+  $('edit-page').textContent=`Pagina ${pageNumber} · ${rows.length} ${rows.length===1?'testo':'testi'}`;
+  $('edit-list').replaceChildren(...(rows.length?rows:[Object.assign(document.createElement('p'),{className:'edit-empty',textContent:'Nessun testo modificabile in questa pagina.'})]));
+  editCount();
+}
+$('edit-apply').onclick=async()=>{
+  if(busy||!job||!drafts.size)return;
+  busy=true;controller=new AbortController();const signal=controller.signal,run=job,before=new Map(),edits=[...drafts];sync();startActivity('Applicazione delle modifiche',false);
+  try{
+    for(const[s,value]of edits){before.set(s,run.cache.has(s)?run.cache.get(s):undefined);eventLog(`Modifica · «${currentText(s).slice(0,60)}» → «${value.slice(0,60)}»`);run.cache.set(s,value.replace(/\s+/g,' ').trim());run.instructed.add(s);}
+    const built=await compose(run,signal);drafts.clear();
+    status(`${edits.length} ${edits.length===1?'testo modificato':'testi modificati'}. Il PDF è aggiornato.`+(built.shrunk?` ${built.shrunk} blocchi con carattere ridotto oltre il 20%.`:''));endActivity('done',$('status').textContent);
+  }catch(error){for(const[s,v]of before)if(v===undefined)run.cache.delete(s);else run.cache.set(s,v);const message=signal.aborted?'Modifiche annullate: le bozze restano nell’editor.':error.message;status(message);endActivity(signal.aborted?'cancelled':'error',message);}
+  finally{busy=false;controller=null;sync();renderEditor();}
+};
+$('edit-reset').onclick=()=>{drafts.clear();renderEditor();};
 $('provider').value=currentProvider;$('key').value=storedKey(currentProvider);providerUI();resetModels();sync();if($('key').value.trim())verifyKey();refreshRate();

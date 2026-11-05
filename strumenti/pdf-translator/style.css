@@ -193,3 +193,19 @@ button.empty:hover{background:#00e0d008}
 @media (max-width:1280px){#activity-steps{display:none}}
 @media (max-width:980px){body{display:block}.bar{flex-wrap:wrap;padding-left:80px}.brand span{display:none}.app{grid-template-columns:1fr;padding:12px}.side{overflow:visible}.work{min-height:80vh}.previews{grid-template-columns:1fr;grid-auto-rows:minmax(60vh,1fr)}#activity{grid-template-columns:1fr}#activity-steps{display:none}.how-panel{width:min(380px,90vw)}}
 @media (max-width:600px){.bar-meta .chip:not(summary){display:none}.toolbar{flex-wrap:wrap}.drop{flex-basis:100%}.foot{flex-direction:column;align-items:flex-start}}
+/* Post-translation editor: texts of the previewed page, below the previews. */
+.editor{flex:none;display:flex;flex-direction:column;max-height:42vh;min-height:0;border-top:1px solid var(--border);padding-top:10px}
+.editor-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.editor-head h2{margin:0;font-size:13px;font-weight:600}
+.edit-page{font:10.5px 'JetBrains Mono',monospace;color:var(--muted)}
+.editor-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.editor-actions .primary{height:32px;padding:0 14px;font-size:12px;border-radius:9px}
+.editor .hint{margin:6px 0 8px}
+.edit-list{overflow:auto;min-height:0;display:grid;gap:8px;padding-right:4px;scrollbar-width:thin}
+.edit-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:10px;align-items:start;padding:7px 8px;border:1px solid var(--line);border-radius:9px}
+.edit-row.changed{border-color:#00e0d066;background:#00e0d00a}
+.edit-source{margin:0;padding-top:6px;font-size:11.5px;color:var(--muted);line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.edit-row textarea{min-height:32px;max-height:220px}
+.edit-empty{margin:0;font-size:12px;color:var(--muted)}
+#refine .secondary{margin-top:8px}
+@media (max-width:700px){.edit-row{grid-template-columns:1fr}.editor{max-height:none}}

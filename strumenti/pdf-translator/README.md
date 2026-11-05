@@ -28,6 +28,19 @@ Le righe stampate una sopra l’altra già nell’originale (parole residue di u
 
 Tutto sta in una schermata senza scorrere (da 1366×768 in su): a sinistra provider, chiave, tabella dei modelli con i costi, lingua e opzioni; a destra il documento con anteprima originale/tradotto a tutta altezza, avanzamento compatto e download. Il PDF si può trascinare su tutta l'area di lavoro. Spiegazioni e limiti sono nel pannello "Come funziona" e nei suggerimenti "?". Sotto i 980 px di larghezza il layout si impila.
 
+## Lingue
+
+46 lingue e varianti di destinazione in alfabeto latino, greco e cirillico, fra cui inglese britannico e americano, olandese e fiammingo, danese, lettone, ungherese, slovacco, portoghese europeo e brasiliano, spagnolo di Spagna e dell'America Latina, serbo latino e cirillico, vietnamita. Al modello va il nome inglese esatto della variante, con ortografia, lessico e separatore decimale della variante (1,5 → 1.5 in inglese). Le parole di sicurezza hanno una convenzione fissa per italiano, inglese, francese, tedesco, spagnolo, portoghese, olandese e danese; per le altre lingue si segue ISO 3864 / ANSI Z535. L'ultima lingua scelta viene ricordata nel browser. Arabo, ebraico e lingue CJK non sono offerti: richiedono scrittura da destra a sinistra o font molto grandi.
+
+## Dopo la traduzione: correzione e modifica
+
+L'ultima traduzione resta in memoria, così il PDF si può ricomporre senza ritradurre:
+
+- **Correzione per l'AI** (scheda "Rifinisci"): una richiesta in linguaggio naturale, per esempio «traduci "allarme" con "alarm" ovunque». Il modello rilegge originale, traduzione attuale, pagina e ruolo di ogni testo e restituisce solo i testi da cambiare; se una parte fallisce non viene applicato nulla e il PDF precedente resta valido. Costa circa quanto una revisione e il costo si somma a quello mostrato.
+- **Modifica i testi** (sotto le anteprime): i testi della pagina in anteprima, originale accanto alla traduzione. Le modifiche restano in bozza anche cambiando pagina e si applicano tutte insieme; un testo ripetuto (intestazioni, piè di pagina) cambia ovunque. Nessuna chiamata AI.
+
+I testi corretti o modificati non vengono più toccati dai controlli automatici (lingua dell'originale, maiuscole).
+
 ## Glossario e revisione
 
 Con un provider configurato, prima della traduzione una richiesta crea il glossario del documento: nomi di prodotto e componenti, termini ricorrenti, titoli presenti anche nell'indice, intestazioni e parole di sicurezza secondo la convenzione della lingua di destinazione (per l'italiano PERICOLO, AVVERTENZA, ATTENZIONE, AVVISO). Il glossario viene allegato a ogni blocco di traduzione. Marchi, codici e slogan restano invariati; se il documento usa già un termine nella lingua di destinazione, viene riutilizzato.
@@ -46,11 +59,13 @@ Le righe vengono raggruppate in paragrafi (stesso allineamento, interlinea e sti
 
 Se la traduzione è più lunga, il motore misura lo spazio davvero libero sulla pagina (rendering senza testo: grafica, riquadri e altri blocchi sono ostacoli): le etichette isolate si allargano a destra e i paragrafi possono usare righe in più. I blocchi consecutivi della stessa colonna formano un flusso: le righe aggiunte spostano in basso i blocchi successivi, fin dove c'è spazio libero, e un'eventuale riduzione è identica per tutta la colonna, così il corpo del testo resta uniforme. Solo dopo, il testo viene condensato leggermente in orizzontale (fino al 90%) e infine ridotto di corpo. Se una risposta del modello ha un numero di testi diverso da quello inviato, il blocco viene ritradotto in due metà. Il testo che nell'originale non è visibile (coperto da immagini, ritagliato o nello stesso colore dello sfondo) viene individuato confrontando il rendering della pagina con e senza testo, e non viene ridisegnato né tradotto.
 
-Font: per i font originali più comuni vengono incorporati font metricamente compatibili, open source (SIL OFL), caricati solo se servono: Calibri → Carlito, Arial/Helvetica → Arimo, Times → Tinos, Cambria → Caladea, nei sottoinsiemi latin e latin-ext (cartella `fonts/`). I caratteri mancanti ricadono sui font PDF standard. fontkit (MIT) serve per l'incorporamento.
+Font: per i font originali più comuni vengono incorporati font metricamente compatibili, open source (SIL OFL), caricati solo se servono: Calibri → Carlito, Arial/Helvetica → Arimo, Times → Tinos, Cambria → Caladea, nei sottoinsiemi latin e latin-ext, più greek, cyrillic e vietnamese caricati solo per i caratteri che li richiedono (cartella `fonts/`; Caladea usa quelli di Tinos, il testo monospaziato usa Arimo per le lettere che Courier non ha). Il maiuscoletto di Word (iniziale grande, resto in maiuscolo piccolo) viene riprodotto. Simboli dei font Symbol/Wingdings senza glifo (➢, ▪, ●, ✓, ☐) e le frecce ↑ ↓ ← → sono disegnati come piccole forme vettoriali. I testi non tradotti su una riga (display, codici) mantengono la spaziatura originale. I caratteri ancora mancanti ricadono sui font PDF standard. fontkit (MIT) serve per l'incorporamento.
+
+Allineamento: un paragrafo con le righe che finiscono allo stesso bordo destro (o centrate) ma iniziano in punti diversi resta allineato a destra (o centrato); le righe singole allineate a destra si riconoscono da una riga vicina con lo stesso bordo destro (intestazioni). Le etichette brevi (fino a 4 parole) vengono rimpicciolite fino all'85% prima di andare a capo.
 
 Limiti: 50 MB, 200 pagine, almeno una riga di testo per pagina; nessun OCR. I collegamenti PDF (`/Link`), compresi quelli di un sommario, vengono mantenuti. Non supportati: password, campi modulo, commenti, timbri e altre annotazioni con aspetto visivo, rotazioni, origini pagina personalizzate, testo verticale/RTL, font Type 3, inline images, testo come maschera/contorno/invisibile e alcuni effetti di trasparenza. La beta non traduce testi incorporati nelle immagini. Nessuna verifica automatica completa della fedeltà di qualunque PDF.
 
-L'elaborazione di file grandi può usare molta RAM. Annullamento cooperativo fra le fasi PDF e immediato sulle richieste di rete. Le trasformazioni sincrone del PDF possono ritardare la risposta del pulsante Annulla.
+L'elaborazione di file grandi può usare molta RAM. Fra una pagina e l'altra il motore cede il controllo al browser con un `MessageChannel`, che a differenza di `setTimeout` non viene rallentato quando la scheda è in secondo piano. Annullamento cooperativo fra le fasi PDF e immediato sulle richieste di rete. Le trasformazioni sincrone del PDF possono ritardare la risposta del pulsante Annulla.
 
 ## Verifica
 
