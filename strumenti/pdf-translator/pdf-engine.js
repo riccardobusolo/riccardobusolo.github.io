@@ -101,6 +101,14 @@ window.PDFEngine = (() => {
       L.text=L.runs.map(r=>r.text).join('');L.size=dominant(L.runs.flatMap(r=>r.sizes));
       L.key=dominant(L.runs.map(r=>[keyOf(r),r.text.length]));
     }
+    // Two lines printed on top of each other (a leftover word from an edit, or text
+    // drawn twice for a faux-bold effect) are already illegible in the original:
+    // keep only the longer one, so the translation is not drawn over another line.
+    const overlap=(L,M)=>Math.abs(L.y-M.y)<.5*Math.max(L.size,M.size)&&Math.min(L.right,M.right)-Math.max(L.x,M.x)>.3*Math.min(L.right-L.x,M.right-M.x);
+    const dropped=new Set();
+    for(const L of lines)for(const M of lines)if(M!==L&&!dropped.has(L)&&!dropped.has(M)&&overlap(L,M)){const short=L.text.trim().length<M.text.trim().length?L:M;dropped.add(short);}
+    if(dropped.size)lines.splice(0,lines.length,...lines.filter(L=>!dropped.has(L)));
+    lines.dropped=[...dropped].map(L=>L.text.trim());
     // Neighbours on the same baseline reveal tables, headers and TOC entries.
     for(const L of lines)for(const M of lines){
       if(M===L||Math.abs(M.y-L.y)>.35*Math.max(L.size,M.size))continue;
@@ -249,7 +257,7 @@ window.PDFEngine = (() => {
     await removeText(doc,signal,progress);
     const stripped=typeof document!=='undefined'?await doc.save():null;
     const reader=await pdfjsLib.getDocument({data:bytes.slice(),isEvalSupported:false}).promise;
-    const pages=[];try{
+    const pages=[],overlaps=[];try{
       for(let n=1;n<=reader.numPages;n++){
         signal.throwIfAborted();const page=await reader.getPage(n), content=await page.getTextContent();
         if(page.rotate!==0)throw Error('Pagine ruotate non supportate in questa beta.');
@@ -284,14 +292,14 @@ window.PDFEngine = (() => {
           else blocks.push(block);
         }
         if(!blocks.length)throw Error(`Pagina ${n}: nessun testo selezionabile. Le scansioni non sono supportate.`);
-        const lines=toLines(blocks),geometry={lines,width:page.view[2],left:Math.min(...lines.map(L=>L.x)),right:Math.max(...lines.map(L=>L.right))};
+        const lines=toLines(blocks);overlaps.push(...lines.dropped.map(t=>`p. ${n}: «${t}»`));const geometry={lines,width:page.view[2],left:Math.min(...lines.map(L=>L.x)),right:Math.max(...lines.map(L=>L.right))};
         const units=group(lines).map(P=>finalize(P,geometry));
         if(stripped)await markHidden(page,stripped,n,units);
         widen(units);assignFlows(units,n);
         pages.push(units);progress(n,reader.numPages,'extract');await new Promise(resolve=>setTimeout(resolve,0));
       }
     }finally{await reader.destroy();await strippedDoc?.destroy();strippedDoc=strippedSource=null;}
-    return pages;
+    pages.overlaps=overlaps;return pages;
   }
 
   // ---------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Traduci PDF con la tua chiave OpenAI o Gemini conservando impaginazione e grafica. Elaborazione nel browser e anteprima affiancata."><title>DocuShift — Il tuo documento, un’altra lingua.</title><link rel="stylesheet" href="style.css?v=20261101-eur1"><script defer src="pdf.min.js"></script><script defer src="pdf-lib.min.js"></script><script defer src="fontkit.min.js"></script><script defer src="prompt.js?v=20261101-review4"></script><script defer src="ai-service.js?v=20261101-ui2"></script><script defer src="pdf-engine.js?v=20261105-fit1"></script><script defer src="openai-service.js?v=20261101-ui5"></script><script defer src="app.js?v=20261101-eur1"></script>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Traduci PDF con la tua chiave OpenAI o Gemini conservando impaginazione e grafica. Elaborazione nel browser e anteprima affiancata."><title>DocuShift — Il tuo documento, un’altra lingua.</title><link rel="stylesheet" href="style.css?v=20261105-notes1"><script defer src="pdf.min.js"></script><script defer src="pdf-lib.min.js"></script><script defer src="fontkit.min.js"></script><script defer src="prompt.js?v=20261105-notes1"></script><script defer src="ai-service.js?v=20261101-ui2"></script><script defer src="pdf-engine.js?v=20261105-overlap1"></script><script defer src="openai-service.js?v=20261101-ui5"></script><script defer src="app.js?v=20261105-notes1"></script>
 <link rel="stylesheet" href="/site-cursor.css?v=20261031-controls">
 <script src="/site-cursor.js?v=20261030-text" defer></script>
 <link rel="stylesheet" href="/project-navigation.css">
@@ -42,7 +42,8 @@
       <label for="language">Lingua di destinazione</label>
       <select id="language"><option>Italiano</option><option>English</option><option>Français</option><option>Deutsch</option><option>Español</option><option>Português</option></select>
       <label class="toggle"><input type="checkbox" id="review" checked><span>Glossario e revisione finale</span><i class="tip" tabindex="0" data-tip="Prima di tradurre crea un glossario dei termini ricorrenti; alla fine rilegge originale e traduzione e corregge errori di senso, terminologia e parole di sicurezza. Circa il 40% di token in più.">?</i></label>
-      <label class="toggle"><input type="checkbox" id="demo"><span>Simulazione senza AI</span><i class="tip" tabindex="0" data-tip="Sostituisce i testi con etichette di prova per verificare l’impaginazione. Nessuna chiamata AI, nessun costo.">?</i></label>
+      <label for="notes">Indicazioni per l’AI <span class="optional">· facoltative</span></label>
+      <textarea id="notes" rows="3" maxlength="2000" spellcheck="true" placeholder="Es. non tradurre «Drywell» e i nomi dei menu · usa il «lei» · tono più formale"></textarea>
     </section>
     <div class="go">
       <button id="translate" type="button" class="primary" disabled><span class="step">3</span>Traduci documento →</button>

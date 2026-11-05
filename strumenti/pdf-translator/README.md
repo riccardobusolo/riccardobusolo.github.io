@@ -20,7 +20,9 @@ Ogni visitatore inserisce una chiave personale del provider scelto, mantenuta in
 
 La diagnostica elenca tramite models.list i modelli Gemini di testo e prova fino a sei modelli con generateContent, privilegiando Flash e Flash Lite stabili. Ogni test esegue una vera richiesta. Una risposta positiva non certifica un piano gratuito: controllare quote e fatturazione in Google AI Studio. I limiti possono essere condivisi fra modelli. La traduzione ripiega esclusivamente sui modelli già verificati e interrompe l'esportazione se un blocco non viene tradotto. Nessuna promessa di disponibilità gratuita illimitata.
 
-Modalità simulata: nessuna chiamata AI; sostituisce le righe con [TEST n]. Serve per verificare caricamento, rimozione del testo, rendering ed esportazione.
+Indicazioni per l’AI (facoltative): testo libero, ad esempio termini da non tradurre o un cambio di tono, inviato con glossario, traduzione e revisione. Hanno la precedenza sulle regole predefinite di stile e su cosa tradurre, mai sul formato della risposta, sui tag e su numeri e codici. Senza indicazioni l’AI decide da sola cosa lasciare invariato, ma solo con quasi totale certezza: nel dubbio traduce.
+
+Le righe stampate una sopra l’altra già nell’originale (parole residue di una modifica, testo duplicato) mantengono solo la più lunga, così la traduzione non si sovrappone; il numero dei frammenti omessi compare a fine traduzione.
 
 ## Interfaccia
 
