@@ -40,11 +40,44 @@
   // i clic passano alla pagina sotto, tranne quando il puntatore è sopra il
   // controller (così lo si può afferrare e trascinare ovunque sullo schermo).
   const P = new URLSearchParams(location.search);
+  if (P.get("yaw")) window.__gelYaw = parseFloat(P.get("yaw"));
   const POS_X = parseFloat(P.get("x") || "0.7"), POS_Y = parseFloat(P.get("y") || "0.37"), ZOOM = parseFloat(P.get("zoom") || "0.58");
   window.__gelView = (cam) => {
     const W = innerWidth, H = innerHeight;
     cam.zoom = ZOOM * Math.min(1, W / 1100 + 0.25);
     cam.setViewOffset(W, H, -(POS_X - 0.5) * W, (0.5 - POS_Y) * H, W, H);
+  };
+  // Pareti invisibili sui bordi della finestra: nessun punto della gelatina può
+  // uscire dallo schermo (vale anche quando la finestra viene ridimensionata).
+  // Ogni punto si proietta sullo schermo; se esce dal bordo lo riporto dentro
+  // lungo l'asse destra/su della telecamera e lo faccio rimbalzare un poco.
+  const MARGIN = 0.015, BOUNCE = 0.45;
+  // niente pavimento invisibile: il "pavimento" è il bordo inferiore della finestra
+  window.__gelFloor = -1e9;
+  window.__gelWalls = (sim, cam) => {
+    const x = sim.x, v = sim.v, n = sim.P;
+    const P = cam.projectionMatrix.elements, V = cam.matrixWorldInverse.elements, W = cam.matrixWorld.elements;
+    const bx = 1 - MARGIN, by = 1 - MARGIN;
+    const rx = W[0], ry = W[1], rz = W[2], ux = W[4], uy = W[5], uz = W[6];
+    for (let i = 0; i < n; i++) {
+      const k = i * 3, px = x[k], py = x[k + 1], pz = x[k + 2];
+      const vx = V[0] * px + V[4] * py + V[8] * pz + V[12];
+      const vy = V[1] * px + V[5] * py + V[9] * pz + V[13];
+      const vz = V[2] * px + V[6] * py + V[10] * pz + V[14];
+      const w = -vz;
+      if (w <= 0.01) continue;
+      // ndc.x = (P0·vx + P8·vz) / w   ·   ndc.y = (P5·vy + P9·vz) / w
+      const nx = (P[0] * vx + P[8] * vz) / w, ny = (P[5] * vy + P[9] * vz) / w;
+      let dx = 0, dy = 0;
+      if (nx > bx) dx = ((bx * w - P[8] * vz) / P[0]) - vx;
+      else if (nx < -bx) dx = ((-bx * w - P[8] * vz) / P[0]) - vx;
+      if (ny > by) dy = ((by * w - P[9] * vz) / P[5]) - vy;
+      else if (ny < -by) dy = ((-by * w - P[9] * vz) / P[5]) - vy;
+      if (!dx && !dy) continue;
+      x[k] += rx * dx + ux * dy; x[k + 1] += ry * dx + uy * dy; x[k + 2] += rz * dx + uz * dy;
+      if (dx) { const vr = v[k] * rx + v[k + 1] * ry + v[k + 2] * rz; if (vr * dx < 0) { const c = -(1 + BOUNCE) * vr; v[k] += rx * c; v[k + 1] += ry * c; v[k + 2] += rz * c; } }
+      if (dy) { const vu = v[k] * ux + v[k + 1] * uy + v[k + 2] * uz; if (vu * dy < 0) { const c = -(1 + BOUNCE) * vu; v[k] += ux * c; v[k + 1] += uy * c; v[k + 2] += uz * c; } }
+    }
   };
   const frame = window.frameElement;
   const setCatch = (on) => { if (frame) frame.style.pointerEvents = on ? "auto" : "none"; document.body.style.cursor = on ? "grab" : ""; };
