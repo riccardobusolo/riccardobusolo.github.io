@@ -72,8 +72,28 @@
   .cart .label::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(160deg, rgba(255,255,255,.35), rgba(255,255,255,0) 40%); }
   .cart.dragging { cursor: grabbing; box-shadow: 0 0 0 3px #8fdc2a, 0 18px 34px rgba(0, 30, 70, .5); }
   .cart.behind { z-index: 0; }
-  .hint { position: absolute; left: 0; right: 0; top: 95.4%; text-align: center; font-weight: 900; font-size: clamp(10px, 1.9vh, 15px); color: #fff; text-shadow: 0 1px 4px rgba(0, 40, 90, .6); transition: opacity .4s; }
+  /* frecce animate ai lati della cartuccia: "spingila in su, nello slot" */
+  .hint { position: absolute; left: 0; right: 0; top: 81.6%; height: 14%; pointer-events: none; transition: opacity .4s; }
   .hint.gone { opacity: 0; }
+  .arrows { position: absolute; top: 0; bottom: 0; width: 14%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4%; }
+  .arrows.l { left: calc(50% - 22% - 17%); }
+  .arrows.r { left: calc(50% + 22% + 3%); }
+  .arrows i { display: block; width: 100%; aspect-ratio: 1.6; opacity: 0;
+    background: linear-gradient(180deg, #e9ffb8, #8fdc2a 55%, #4fa818); filter: drop-shadow(0 0 3px rgba(255, 255, 255, .95)) drop-shadow(0 3px 6px rgba(20, 80, 10, .45));
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 20'%3E%3Cpath d='M3 17 16 4l13 13' fill='none' stroke='%23000' stroke-width='6.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 20'%3E%3Cpath d='M3 17 16 4l13 13' fill='none' stroke='%23000' stroke-width='6.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    animation: rise-arrow 1.5s ease-in-out infinite; }
+  /* dal basso verso l'alto, una dopo l'altra */
+  .arrows i:nth-child(3) { animation-delay: 0s; }
+  .arrows i:nth-child(2) { animation-delay: .22s; }
+  .arrows i:nth-child(1) { animation-delay: .44s; }
+  @keyframes rise-arrow {
+    0% { opacity: 0; transform: translateY(40%) scale(.8); }
+    30% { opacity: 1; transform: translateY(0) scale(1); }
+    60% { opacity: .9; transform: translateY(-25%) scale(1); }
+    100% { opacity: 0; transform: translateY(-60%) scale(.9); }
+  }
+  .cart.dragging ~ .hint { opacity: .35; }
   /* ---- editor delle posizioni (?edit=1) ---- */
   body.editing { background: linear-gradient(#3fa9f5, #e3f6ff); }
   body.editing .hot { outline: 2px dashed rgba(255, 60, 120, .95); outline-offset: -2px; background: rgba(255, 60, 120, .18); cursor: move; }
@@ -110,7 +130,7 @@
     <div class="slot" id="slot"></div>
   </div>
   <div class="cart" id="cart"><div class="label" id="label"></div></div>
-  <div class="hint" id="hint">Trascina la cartuccia nello slot in basso</div>
+  <div class="hint" id="hint" aria-label="Trascina la cartuccia verso l'alto, nello slot"><div class="arrows l"><i></i><i></i><i></i></div><div class="arrows r"><i></i><i></i><i></i></div></div>
 </div></div>
 <script>
 (() => {
