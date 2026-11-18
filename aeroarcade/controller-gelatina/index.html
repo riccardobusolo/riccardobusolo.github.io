@@ -26,7 +26,6 @@
 } }
 </script>
 <link rel="modulepreload" href="../vendor/three/three.module.min.js">
-<link rel="modulepreload" href="gel-controller.js">
 </head>
 <body>
 <div id="stage"></div>
@@ -64,6 +63,14 @@
     try { parent.postMessage({ aero: "gel-ready" }, location.origin); } catch {}
   }));
 </script>
-<script type="module" src="gel-controller.js"></script>
+<script type="module">
+  // stessa versione dell'indirizzo: dopo ogni aggiornamento del sito il browser
+  // riscarica il controller invece di usare una copia vecchia in memoria
+  const v = new URLSearchParams(location.search).get("v");
+  import(v ? `./gel-controller.js?v=${encodeURIComponent(v)}` : "./gel-controller.js").catch((e) => {
+    console.error("Controller di gelatina non avviato", e);
+    try { parent.postMessage({ aero: "gel-error", message: String(e?.message || e) }, location.origin); } catch {}
+  });
+</script>
 </body>
 </html>
