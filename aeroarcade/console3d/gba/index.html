@@ -24,10 +24,12 @@
   .screen { position: absolute; left: 12.88%; top: 8.65%; width: 73.94%; height: 27.18%; z-index: 1; background: #2b3238; overflow: hidden;
     box-shadow: 0 0 0 1.2cqw #0c0d0f; } /* riempie il bordino tra lo schermo e il foro dell'immagine */
   .screen.off video { opacity: 0; }
+  .k-tag { position: fixed; left: 50%; bottom: 10px; translate: -50% 0; z-index: 20; pointer-events: none; padding: 6px 14px; border-radius: 999px; font: 900 13px "Nunito", system-ui, sans-serif; color: #e9f7ff; background: rgba(4, 27, 43, .72); opacity: 0; transition: opacity .2s; }
+  .k-tag.on { opacity: 1; }
   /* modalità video: morbido (sfumato) e LCD (griglia dei pixel) */
   .screen[data-filter="morbido"] video { image-rendering: auto; filter: blur(.45px); }
   .screen[data-filter="lcd"]::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .4;
-    background: repeating-linear-gradient(0deg, rgba(0,0,0,.6) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,.5) 0 1px, transparent 1px 3px); }
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.6) 0 1px, transparent 1px var(--px, 3px)), repeating-linear-gradient(90deg, rgba(0,0,0,.5) 0 1px, transparent 1px var(--px, 3px)); }
   .screen video { transition: opacity .15s; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; background: #000; image-rendering: pixelated; }
   .screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,0) 40%); }
   .boot { position: absolute; inset: 0; display: grid; place-items: center; color: #b9f0ff; font-weight: 900; font-size: 6cqw; letter-spacing: .5px; text-shadow: 0 0 10px rgba(120, 220, 255, .85); opacity: 0; transition: opacity .6s; }
@@ -303,6 +305,49 @@
     send({ aero: "button", id: b.dataset.id, down: false });
   };
   addEventListener("pointerup", up); addEventListener("pointercancel", up);
+
+  // ---------------- grandezza a pixel interi ----------------
+  // Lo schermo della console mostra il gioco a 240×160 ingrandito di un numero
+  // intero di volte: la console intera si ridimensiona di conseguenza. La
+  // rotellina sceglie l'ingrandimento (da 1:1, la risoluzione reale, al massimo).
+  const NW = 240, NH = 160, SCR_L = 0.1288, SCR_T = 0.0865, SCR_W = 0.7394, SCR_H = 0.2718;
+  // passi della rotellina: 1×, 2×… (pixel perfetti) e in cima "adatta alla finestra"
+  let steps = [1], idx = 0, userIdx = null;
+  const kTag = document.createElement("div"); kTag.className = "k-tag"; document.body.append(kTag);
+  let kTimer = 0;
+  function fit() {
+    if (document.body.classList.contains("editing")) return;
+    const dpr = devicePixelRatio || 1, VW = innerWidth, VH = innerHeight;
+    // ingrandimento massimo che entra nella finestra (anche non intero)
+    const kFit = Math.max(0.5, Math.min((VH * 0.97 * 683 / 1525) * SCR_W * dpr / NW, VW * 0.94 * SCR_W * dpr / NW));
+    steps = [];
+    for (let k = 1; k <= kFit + 1e-6; k++) steps.push(k);
+    if (!steps.length || kFit - steps[steps.length - 1] > 0.08) steps.push(kFit);
+    // all'apertura: il più grande a pixel perfetti
+    const defIdx = Math.max(0, steps.filter((k) => Number.isInteger(k)).length - 1);
+    idx = Math.min(userIdx ?? defIdx, steps.length - 1);
+    const k = steps[idx];
+    const W = (NW * k) / dpr / SCR_W, Hr = W * 1525 / 683, Hc = W * 1225 / 683;
+    const snap = (v) => Math.round(v * dpr) / dpr;
+    rig.style.cssText = `position:absolute;height:${Hr}px;width:${W}px;left:${snap((VW - W) / 2)}px;top:${snap(Math.max(0, (VH - Hr) / 2))}px`;
+    const sw = (NW * k) / dpr, sh = (NH * k) / dpr;
+    screenEl.style.cssText = `left:${snap(SCR_L * W)}px;width:${sw}px;top:${snap(SCR_T * Hc + (SCR_H * Hc - sh) / 2)}px;height:${sh}px;--px:${k / dpr}px`;
+    screenEl.classList.toggle("fit", !Number.isInteger(k));
+  }
+  addEventListener("resize", fit);
+  addEventListener("wheel", (e) => {
+    if (document.body.classList.contains("editing")) return;
+    e.preventDefault();
+    const next = Math.min(steps.length - 1, Math.max(0, idx + (e.deltaY < 0 ? 1 : -1)));
+    if (next === idx) return;
+    userIdx = next;
+    fit();
+    const k = steps[idx];
+    kTag.textContent = !Number.isInteger(k) ? "Adatta alla finestra" : k === 1 ? `Risoluzione reale · ${NW}×${NH}` : `×${k} · ${NW * k}×${NH * k}`;
+    kTag.classList.add("on"); clearTimeout(kTimer); kTimer = setTimeout(() => kTag.classList.remove("on"), 1200);
+    if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); }
+  }, { passive: false });
+  fit();
 
   // ---------------- cartuccia ----------------
   // stati: out | dragging | inserting | inserted | ejecting
