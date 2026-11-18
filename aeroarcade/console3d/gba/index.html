@@ -24,6 +24,17 @@
   .screen { position: absolute; left: 12.88%; top: 8.65%; width: 73.94%; height: 27.18%; z-index: 1; background: #2b3238; overflow: hidden;
     box-shadow: 0 0 0 1.2cqw #0c0d0f; } /* riempie il bordino tra lo schermo e il foro dell'immagine */
   .screen.off video { opacity: 0; }
+  /* retroilluminazione: velo scuro sopra il gioco (sotto il riflesso del vetro) */
+  .screen .backlight { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity .35s ease;
+    background: radial-gradient(120% 140% at 30% 20%, rgba(38, 46, 40, .62), rgba(12, 16, 14, .86)); mix-blend-mode: multiply; }
+  .screen.unlit .backlight { opacity: 1; }
+  .screen.unlit video { filter: saturate(.55) contrast(1.15); }
+  .screen.light-off .backlight { animation: bl-off .55s ease-out both; }
+  .screen.light-on .backlight { animation: bl-on .45s ease-out both; }
+  .screen.light-off video { animation: bl-flick .55s ease-out both; }
+  @keyframes bl-off { 0% { opacity: 0; } 12% { opacity: .55; } 22% { opacity: .2; } 34% { opacity: .75; } 46% { opacity: .5; } 100% { opacity: 1; } }
+  @keyframes bl-on { 0% { opacity: 1; } 18% { opacity: .35; } 30% { opacity: .7; } 55% { opacity: .1; } 100% { opacity: 0; } }
+  @keyframes bl-flick { 0% { filter: brightness(1.35); } 20% { filter: brightness(.8); } 100% { filter: saturate(.55) contrast(1.15); } }
   .k-tag { position: fixed; left: 50%; bottom: 10px; translate: -50% 0; z-index: 20; pointer-events: none; padding: 6px 14px; border-radius: 999px; font: 900 13px "Nunito", system-ui, sans-serif; color: #e9f7ff; background: rgba(4, 27, 43, .72); opacity: 0; transition: opacity .2s; }
   .k-tag.on { opacity: 1; }
   /* modalità video: morbido (sfumato) e LCD (griglia dei pixel) */
@@ -31,7 +42,7 @@
   .screen[data-filter="lcd"]::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .4;
     background: repeating-linear-gradient(0deg, rgba(0,0,0,.6) 0 1px, transparent 1px var(--px, 3px)), repeating-linear-gradient(90deg, rgba(0,0,0,.5) 0 1px, transparent 1px var(--px, 3px)); }
   .screen video { transition: opacity .15s; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; background: #000; image-rendering: pixelated; }
-  .screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,0) 40%); }
+  .screen::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,0) 40%); }
   .boot { position: absolute; inset: 0; display: grid; place-items: center; color: #b9f0ff; font-weight: 900; font-size: 6cqw; letter-spacing: .5px; text-shadow: 0 0 10px rgba(120, 220, 255, .85); opacity: 0; transition: opacity .6s; }
   .boot b { color: #d9ff8c; }
   .boot.on { opacity: 1; animation: pulse 1.6s ease-in-out infinite; }
@@ -169,19 +180,26 @@
   if (cover) $("label").style.backgroundImage = `url("${cover.replace(/"/g, "%22")}")`;
 
   // tasti della tastiera assegnati (dal sito, sezione Tasti); valori di riserva
-  let KEYS = { up: "↑", down: "↓", left: "←", right: "→", a: "X", b: "Z", l: "Q", r: "W", start: "Invio", select: "Shift" };
+  let KEYS = { up: "↑", down: "↓", left: "←", right: "→", a: "X", b: "Z", l: "Q", r: "W", start: "Invio", select: "Shift", light: "☀" };
   try { KEYS = { ...KEYS, ...JSON.parse(P.get("keys") || "{}") }; } catch {}
-  const NAME = { up: "Su", down: "Giù", left: "Sinistra", right: "Destra", a: "A", b: "B", l: "L", r: "R", start: "Start", select: "Select" };
+  const NAME = { up: "Su", down: "Giù", left: "Sinistra", right: "Destra", a: "A", b: "B", l: "L", r: "R", start: "Start", select: "Select", light: "Luce schermo" };
 
   // posizioni dei tasti: centro (x, y) e larghezza (w) in % della console (immagine 683×1225).
   // Si possono ritoccare a mano con ?edit=1 (le modifiche restano su questo browser).
   const DEFAULT_LAYOUT = {
-    up: { x: 23.43, y: 62.86, w: 8.6, kind: "arm" }, down: { x: 23.43, y: 72.41, w: 8.6, kind: "arm" },
-    left: { x: 14.79, y: 67.59, w: 8.6, kind: "arm" }, right: { x: 32.06, y: 67.59, w: 8.6, kind: "arm" },
-    b: { x: 66.91, y: 68.41, w: 11.4, kind: "round" }, a: { x: 81.7, y: 65.88, w: 11.4, kind: "round" },
-    select: { x: 39.39, y: 89.39, w: 9, kind: "small" }, start: { x: 60.32, y: 89.39, w: 9, kind: "small" },
-    l: { x: -6.2, y: 51.6, w: 8.5, kind: "shoulder" }, r: { x: 106.2, y: 51.6, w: 8.5, kind: "shoulder" }
+    up: { x: 26.27, y: 64.05, w: 8.13, kind: "arm" },
+    down: { x: 26.15, y: 72.28, w: 8.6, kind: "arm" },
+    left: { x: 18.57, y: 68.25, w: 7.89, kind: "arm" },
+    right: { x: 33.83, y: 68.18, w: 8.36, kind: "arm" },
+    b: { x: 66.91, y: 68.41, w: 11.4, kind: "round" },
+    a: { x: 81.7, y: 65.88, w: 11.4, kind: "round" },
+    select: { x: 39.63, y: 89.79, w: 8.76, kind: "small" },
+    start: { x: 60.32, y: 89.79, w: 9, kind: "small" },
+    l: { x: -6.2, y: 51.6, w: 8.5, kind: "shoulder" },
+    r: { x: 106.2, y: 51.6, w: 8.5, kind: "shoulder" },
+    light: { x: 49.6, y: 57.6, w: 7.6, kind: "round" }
   };
+
   const LAYOUT_KEY = "aero-console-layout-gba";
   const LAYOUT = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
   try {
@@ -287,6 +305,30 @@
     panel.querySelector("#ed-tips").onclick = (e) => { document.body.classList.toggle("show-tips"); e.target.textContent = document.body.classList.contains("show-tips") ? "Nascondi fumetti" : "Mostra fumetti"; };
   }
 
+  // ---------------- retroilluminazione (il tasto col sole dell'SP) ----------------
+  // spenta: lo schermo diventa quello di un GBA senza luce, scuro e riflettente
+  const LIGHT_KEY = "aero-gba-light";
+  const backlight = document.createElement("div"); backlight.className = "backlight"; screenEl.append(backlight);
+  if (localStorage.getItem(LIGHT_KEY) === "off") screenEl.classList.add("unlit");
+  function toggleLight() {
+    const off = !screenEl.classList.contains("unlit");
+    screenEl.classList.remove("light-off", "light-on"); void screenEl.offsetWidth;
+    screenEl.classList.toggle("unlit", off);
+    screenEl.classList.add(off ? "light-off" : "light-on");
+    try { localStorage.setItem(LIGHT_KEY, off ? "off" : "on"); } catch {}
+    lightClick(off);
+  }
+  function lightClick(off) {
+    try {
+      if (JSON.parse(localStorage.getItem("aero-prefs") || "{}").sound === false) return;
+      const a = (window.__lac ??= new AudioContext()); if (a.state === "suspended") a.resume();
+      const t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+      o.type = "square"; o.frequency.setValueAtTime(off ? 1800 : 2400, t); o.frequency.exponentialRampToValueAtTime(off ? 600 : 900, t + 0.03);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.06, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
+      o.connect(g).connect(a.destination); o.start(t); o.stop(t + 0.05);
+    } catch {}
+  }
+
   // tasti → messaggio alla Home (che li passa al gioco come i tasti della tastiera)
   const held = new Map();
   addEventListener("pointerdown", (e) => {
@@ -296,12 +338,14 @@
     e.preventDefault();
     b.setPointerCapture(e.pointerId);
     held.set(e.pointerId, b); b.classList.add("down");
+    if (b.dataset.id === "light") { toggleLight(); return; }
     send({ aero: "button", id: b.dataset.id, down: true });
   });
   const up = (e) => {
     const b = held.get(e.pointerId);
     if (!b) return;
     held.delete(e.pointerId); b.classList.remove("down");
+    if (b.dataset.id === "light") return;
     send({ aero: "button", id: b.dataset.id, down: false });
   };
   addEventListener("pointerup", up); addEventListener("pointercancel", up);
