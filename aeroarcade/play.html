@@ -8,8 +8,10 @@
     <meta name="theme-color" content="#3fa9f5" />
     <title>Aero Arcade — In gioco</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <!-- Configurazione modificabile senza ricompilare (Supabase, server netplay) -->
-    <script src="./aero-config.js"></script>
+    <!-- Configurazione modificabile senza ricompilare (Supabase, server netplay).
+         Caricata con un parametro sempre diverso, così le modifiche arrivano subito
+         senza dover svuotare la cache del browser. -->
+    <script>document.write('<script src="./aero-config.js?v=' + Date.now() + '"><\/script>');</script>
     <script type="module" crossorigin src="./assets/play-B2ZgNClV.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/netplay-D1DanV20.js">
     <link rel="stylesheet" crossorigin href="./assets/netplay-CbvyZzjk.css">
