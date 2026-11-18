@@ -25,6 +25,9 @@
   .screen { position: absolute; left: 12%; right: 12%; top: 9%; height: 44%; border-radius: 6%; background: #031524; box-shadow: inset 0 0 0 4px rgba(255,255,255,.35), inset 0 6px 18px rgba(0,0,0,.6); overflow: hidden; }
   .wide .screen { left: 26%; right: 26%; top: 10%; height: 62%; }
   .screen .pane { position: absolute; inset: 0; overflow: hidden; }
+  .screen[data-filter="morbido"] video { filter: blur(.45px); }
+  .screen[data-filter="lcd"]::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .4;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.6) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,.5) 0 1px, transparent 1px 3px); }
   .screen video { position: absolute; left: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
   /* DS: due schermi, metà superiore e inferiore dello stesso video */
   .ds .screen { top: 6%; height: 52%; background: transparent; box-shadow: none; overflow: visible; }
@@ -230,6 +233,8 @@
       setTimeout(() => { move(0, 0, 520, 1); }, 380);
       setTimeout(() => { state = "out"; cart.classList.remove("inserted"); send({ aero: "ejected" }); }, 950);
     },
+    insert() { if (state === "out") insertAnim(); },
+    setFilter(f) { document.querySelectorAll(".screen").forEach((el) => (el.dataset.filter = f)); },
     setNight(on) { document.documentElement.dataset.night = on ? "1" : "0"; },
     get state() { return state; }
   };
