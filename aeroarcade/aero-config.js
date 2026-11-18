@@ -18,8 +18,5 @@ window.AERO_CONFIG = {
   SUPABASE_ANON_KEY: "sb_publishable_0VExD9DCjDz_y9KwU1ea_A_wwCZOxGy",
 
   // Email dell'utente condiviso creato in Supabase → Authentication → Users
-  SHARED_EMAIL: "giocatori@aero-arcade.example",
-
-  // Indirizzo del server netplay (Render o Tailscale). Vuoto = quello predefinito.
-  NETPLAY_SERVER_URL: ""
+  SHARED_EMAIL: "giocatori@aero-arcade.example"
 };
