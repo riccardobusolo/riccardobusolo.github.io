@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Controller di gelatina</title>
+<!-- Versione per la Home di Aero Arcade: sfondo trasparente, niente pannelli,
+     three.js servito dal sito (cartella vendor), nessun font o file esterno. -->
+<link rel="preload" href="gel-controller.bin" as="fetch" type="application/octet-stream" crossorigin>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; -webkit-user-select: none; user-select: none; touch-action: none; }
+  #stage { position: fixed; inset: 0; }
+  #stage canvas { display: block; }
+  /* comandi originali: servono al codice, ma nella Home restano nascosti */
+  .hidden-ui { display: none; }
+</style>
+<script>
+  // effetti leggeri (PC deboli): meno pixel e niente antialiasing
+  window.__gelLite = new URLSearchParams(location.search).get("lite") === "1";
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "./vendor/three.module.min.js",
+  "three/addons/": "./vendor/addons/"
+} }
+</script>
+<link rel="modulepreload" href="./vendor/three.module.min.js">
+<link rel="modulepreload" href="gel-controller.js">
+</head>
+<body>
+<div id="stage"></div>
+<div class="hidden-ui" aria-hidden="true">
+  <button id="float"><span>Fluttua</span></button>
+  <div id="swatches"></div>
+  <input id="stiff" type="range" min="0" max="100" value="60">
+  <button id="reset">Ricomincia</button>
+</div>
+<script>
+  // La rotellina scorre la pagina della Home (il controller non usa lo zoom)
+  addEventListener("wheel", (e) => {
+    try { parent.scrollBy({ top: e.deltaY, left: 0 }); } catch {}
+  }, { passive: true });
+  // Avvisa la Home quando il controller è disegnato: così compare in dissolvenza
+  const stage = document.getElementById("stage");
+  const ready = () => requestAnimationFrame(() => requestAnimationFrame(() => {
+    try { parent.postMessage({ aero: "gel-ready" }, location.origin); } catch {}
+  }));
+  new MutationObserver((_, mo) => { if (stage.querySelector("canvas")) { mo.disconnect(); setTimeout(ready, 120); } })
+    .observe(stage, { childList: true });
+</script>
+<script type="module" src="gel-controller.js"></script>
+</body>
+</html>
