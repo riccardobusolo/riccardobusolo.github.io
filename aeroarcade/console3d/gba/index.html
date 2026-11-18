@@ -36,19 +36,18 @@
   .brand b { background: linear-gradient(180deg, #e7ffb0, #8fdc2a); -webkit-background-clip: text; background-clip: text; color: transparent; }
   /* tasti: zone cliccabili sopra l'immagine */
   .hot { position: absolute; z-index: 4; transform: translate(-50%, -50%); border: 0; padding: 0; background: transparent; cursor: pointer; border-radius: 50%; }
-  .hot.arm { width: 8.6%; aspect-ratio: 1; border-radius: 14%; }
-  .hot.round { width: 11.4%; aspect-ratio: 1; }
-  .hot.small { width: 9%; aspect-ratio: 1; }
+  .hot { aspect-ratio: 1; }
+  .hot.arm { border-radius: 14%; }
   .hot::after { content: ""; position: absolute; inset: 6%; border-radius: inherit; background: radial-gradient(circle, rgba(0, 20, 40, .28), rgba(0, 20, 40, .12) 60%, transparent 72%); opacity: 0; transition: opacity .06s; }
   .hot:hover::after { opacity: .35; }
   .hot.down::after { opacity: 1; }
   /* L e R: pulsanti finti ai lati (sull'SP sono sul retro) */
-  .shoulder { position: absolute; z-index: 4; top: 51.6%; width: 8.5%; height: 9%; transform: translate(-50%, -50%); border: 0; padding: 0; cursor: pointer; border-radius: 40% 40% 40% 40% / 30%;
+  .shoulder { position: absolute; z-index: 4; aspect-ratio: 0.53; transform: translate(-50%, -50%); border: 0; padding: 0; cursor: pointer; border-radius: 40% 40% 40% 40% / 30%;
     font-weight: 900; font-size: max(9px, 3.2cqw); color: #4b5560;
     background: linear-gradient(90deg, #8f969c, #e9edf0 45%, #c5cbd0 70%, #7d848a);
     box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .75), 0 6px 12px rgba(0, 30, 60, .35), inset 0 -4px 6px rgba(0, 0, 0, .18); transition: transform .06s, filter .06s; }
-  .shoulder.l { left: -6.2%; border-radius: 55% 20% 20% 55% / 40%; }
-  .shoulder.r { left: 106.2%; border-radius: 20% 55% 55% 20% / 40%; }
+  .shoulder.l { border-radius: 55% 20% 20% 55% / 40%; }
+  .shoulder.r { border-radius: 20% 55% 55% 20% / 40%; }
   .shoulder.down { transform: translate(-50%, -50%) scale(.93); filter: brightness(.9); }
   /* fumetto col tasto della tastiera (compare e scompare con un piccolo rimbalzo) */
   .tip { position: absolute; z-index: 6; left: 50%; bottom: calc(100% + 8px); transform: translate(-50%, 6px) scale(.55); transform-origin: 50% 100%; opacity: 0; pointer-events: none; white-space: nowrap;
@@ -75,6 +74,28 @@
   .cart.behind { z-index: 0; }
   .hint { position: absolute; left: 0; right: 0; top: 95.4%; text-align: center; font-weight: 900; font-size: clamp(10px, 1.9vh, 15px); color: #fff; text-shadow: 0 1px 4px rgba(0, 40, 90, .6); transition: opacity .4s; }
   .hint.gone { opacity: 0; }
+  /* ---- editor delle posizioni (?edit=1) ---- */
+  body.editing { background: linear-gradient(#3fa9f5, #e3f6ff); }
+  body.editing .hot { outline: 2px dashed rgba(255, 60, 120, .95); outline-offset: -2px; background: rgba(255, 60, 120, .18); cursor: move; }
+  body.editing .shoulder { outline: 2px dashed rgba(255, 60, 120, .95); cursor: move; }
+  body.editing .selected { outline: 3px solid #8fdc2a !important; background: rgba(143, 220, 42, .28) !important; }
+  body.editing .hot::after { display: none; }
+  body.editing .tip { display: none; }
+  body.editing.show-tips .tip { display: block; opacity: 1; transform: translate(-50%, 0) scale(1); }
+  body.editing.show-tips .shoulder .tip { transform: translate(0, 50%) scale(1); }
+  .grip { display: none; }
+  body.editing .grip { display: block; position: absolute; right: -6px; bottom: -6px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px #ff3c78; cursor: nwse-resize; }
+  .ed-label { display: none; }
+  body.editing .ed-label { display: block; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); font: 900 10px/1.2 "Nunito", sans-serif; font-style: normal; color: #fff; background: rgba(255, 60, 120, .9); padding: 1px 5px; border-radius: 6px; white-space: nowrap; pointer-events: none; margin-top: 2px; }
+  .editor { position: fixed; left: 12px; top: 12px; z-index: 20; width: 270px; padding: 12px 14px; border-radius: 16px; font: 600 13px/1.4 "Segoe UI", system-ui, sans-serif; color: #0c3954;
+    background: rgba(255, 255, 255, .9); box-shadow: 0 10px 30px rgba(0, 40, 90, .3), 0 0 0 1px #fff; }
+  .editor b { font: 900 16px "Nunito", sans-serif; }
+  .editor p { margin: 6px 0 8px; color: #3d6d86; }
+  .editor .sel { padding: 6px 8px; border-radius: 10px; background: #eaf6ff; font-variant-numeric: tabular-nums; margin-bottom: 8px; }
+  .editor .row { display: flex; gap: 6px; margin-top: 6px; }
+  .editor button { flex: 1; border: 0; padding: 7px 8px; border-radius: 999px; font: 800 12px "Segoe UI", sans-serif; cursor: pointer; color: #0c3954; background: linear-gradient(180deg, #fff, #d8efff); box-shadow: 0 0 0 1px rgba(12, 57, 84, .15); }
+  .editor button.go { background: linear-gradient(180deg, #d4ff7a, #8fdc2a 55%, #4fa818); color: #1c4a05; }
+  .editor .msg { min-height: 1.2em; margin-top: 6px; color: #4fa818; font-weight: 800; }
   :root[data-night="1"] .console img.body { filter: drop-shadow(0 18px 28px rgba(0, 0, 30, .6)) brightness(.82); }
   :root[data-night="1"] .shoulder { filter: brightness(.82); }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -106,12 +127,23 @@
   try { KEYS = { ...KEYS, ...JSON.parse(P.get("keys") || "{}") }; } catch {}
   const NAME = { up: "Su", down: "Giù", left: "Sinistra", right: "Destra", a: "A", b: "B", l: "L", r: "R", start: "Start", select: "Select" };
 
-  // posizioni (centro, in % dell'immagine 683×1225) misurate sulla foto
-  const HOT = [
-    ["up", 23.43, 62.86, "arm"], ["down", 23.43, 72.41, "arm"], ["left", 14.79, 67.59, "arm"], ["right", 32.06, 67.59, "arm"],
-    ["b", 66.91, 68.41, "round"], ["a", 81.70, 65.88, "round"],
-    ["select", 39.39, 89.39, "small"], ["start", 60.32, 89.39, "small"]
-  ];
+  // posizioni dei tasti: centro (x, y) e larghezza (w) in % della console (immagine 683×1225).
+  // Si possono ritoccare a mano con ?edit=1 (le modifiche restano su questo browser).
+  const DEFAULT_LAYOUT = {
+    up: { x: 23.43, y: 62.86, w: 8.6, kind: "arm" }, down: { x: 23.43, y: 72.41, w: 8.6, kind: "arm" },
+    left: { x: 14.79, y: 67.59, w: 8.6, kind: "arm" }, right: { x: 32.06, y: 67.59, w: 8.6, kind: "arm" },
+    b: { x: 66.91, y: 68.41, w: 11.4, kind: "round" }, a: { x: 81.7, y: 65.88, w: 11.4, kind: "round" },
+    select: { x: 39.39, y: 89.39, w: 9, kind: "small" }, start: { x: 60.32, y: 89.39, w: 9, kind: "small" },
+    l: { x: -6.2, y: 51.6, w: 8.5, kind: "shoulder" }, r: { x: 106.2, y: 51.6, w: 8.5, kind: "shoulder" }
+  };
+  const LAYOUT_KEY = "aero-console-layout-gba";
+  const LAYOUT = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+  try {
+    const saved = JSON.parse(localStorage.getItem(LAYOUT_KEY) || "null");
+    if (saved) for (const id in saved) if (LAYOUT[id]) Object.assign(LAYOUT[id], saved[id]);
+  } catch {}
+  const EDIT = P.get("edit") === "1";
+
   const tip = (id, side) => {
     const t = document.createElement("span");
     t.className = "tip" + (side ? " side-" + side : "");
@@ -121,25 +153,98 @@
     return t;
   };
   const buttons = [];
-  for (const [id, x, y, kind] of HOT) {
+  const placeBtn = (b) => {
+    const L = LAYOUT[b.dataset.id];
+    b.style.left = L.x + "%"; b.style.top = L.y + "%"; b.style.width = L.w + "%";
+  };
+  for (const id of Object.keys(LAYOUT)) {
+    const L = LAYOUT[id];
     const b = document.createElement("button");
-    b.type = "button"; b.className = "hot " + kind; b.dataset.id = id;
-    b.style.left = x + "%"; b.style.top = y + "%";
+    b.type = "button"; b.dataset.id = id;
+    if (L.kind === "shoulder") { b.className = "shoulder " + id; b.textContent = id.toUpperCase(); b.append(tip(id, id)); }
+    else { b.className = "hot " + L.kind; b.append(tip(id)); }
     b.setAttribute("aria-label", `${NAME[id]} (${KEYS[id]})`);
-    b.append(tip(id));
+    placeBtn(b);
     consoleEl.append(b); buttons.push(b);
   }
-  for (const id of ["l", "r"]) {
-    const b = document.createElement("button");
-    b.type = "button"; b.className = "shoulder " + id; b.dataset.id = id; b.textContent = id.toUpperCase();
-    b.setAttribute("aria-label", `${NAME[id]} (${KEYS[id]})`);
-    b.append(tip(id, id));
-    consoleEl.append(b); buttons.push(b);
+  if (EDIT) setupEditor();
+
+  // ---------------- editor delle posizioni (?edit=1) ----------------
+  function setupEditor() {
+    document.body.classList.add("editing");
+    let sel = null;
+    const panel = document.createElement("div");
+    panel.className = "editor";
+    panel.innerHTML = `<b>Ritocca i tasti</b>
+      <p>Trascina un tasto per spostarlo, il pallino in basso a destra per ingrandirlo.
+      Frecce = sposta di poco (Maiusc = di più), + e − = dimensione.</p>
+      <div class="sel" id="ed-sel">Nessun tasto selezionato</div>
+      <div class="row"><button id="ed-save" class="go">Salva su questo browser</button><button id="ed-copy">Copia per Claude</button></div>
+      <div class="row"><button id="ed-reset">Ripristina originali</button><button id="ed-tips">Mostra fumetti</button></div>
+      <div class="msg" id="ed-msg"></div>`;
+    document.body.append(panel);
+    const msg = (t) => { const m = panel.querySelector("#ed-msg"); m.textContent = t; clearTimeout(msg._t); msg._t = setTimeout(() => (m.textContent = ""), 3500); };
+    const round = (v) => Math.round(v * 100) / 100;
+    const showSel = () => {
+      panel.querySelector("#ed-sel").textContent = sel ? `${NAME[sel.dataset.id]}: x ${round(LAYOUT[sel.dataset.id].x)}%  y ${round(LAYOUT[sel.dataset.id].y)}%  larghezza ${round(LAYOUT[sel.dataset.id].w)}%` : "Nessun tasto selezionato";
+      buttons.forEach((b) => b.classList.toggle("selected", b === sel));
+    };
+    for (const b of buttons) {
+      const h = document.createElement("i"); h.className = "grip"; b.append(h);
+      const lab = document.createElement("em"); lab.className = "ed-label"; lab.textContent = NAME[b.dataset.id]; b.append(lab);
+    }
+    let op = null;
+    addEventListener("pointerdown", (e) => {
+      const b = e.target.closest("button[data-id]");
+      if (!b) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      sel = b; showSel();
+      const box = consoleEl.getBoundingClientRect(), L = LAYOUT[b.dataset.id];
+      op = { b, resize: !!e.target.closest(".grip"), sx: e.clientX, sy: e.clientY, x: L.x, y: L.y, w: L.w, bw: box.width, bh: box.height };
+      b.setPointerCapture(e.pointerId);
+    }, true);
+    addEventListener("pointermove", (e) => {
+      if (!op) return;
+      const L = LAYOUT[op.b.dataset.id];
+      const dx = ((e.clientX - op.sx) / op.bw) * 100, dy = ((e.clientY - op.sy) / op.bh) * 100;
+      if (op.resize) L.w = Math.max(2, op.w + dx * 2);
+      else { L.x = op.x + dx; L.y = op.y + dy; }
+      placeBtn(op.b); showSel();
+    }, true);
+    addEventListener("pointerup", () => { op = null; }, true);
+    addEventListener("keydown", (e) => {
+      if (!sel) return;
+      const L = LAYOUT[sel.dataset.id], st = e.shiftKey ? 1 : 0.1;
+      if (e.key === "ArrowLeft") L.x -= st; else if (e.key === "ArrowRight") L.x += st;
+      else if (e.key === "ArrowUp") L.y -= st; else if (e.key === "ArrowDown") L.y += st;
+      else if (e.key === "+" || e.key === "=") L.w += st; else if (e.key === "-") L.w = Math.max(2, L.w - st);
+      else if (e.key === "Escape") { sel = null; showSel(); return; }
+      else return;
+      e.preventDefault(); placeBtn(sel); showSel();
+    });
+    const compact = () => {
+      const out = {};
+      for (const id in LAYOUT) out[id] = { x: round(LAYOUT[id].x), y: round(LAYOUT[id].y), w: round(LAYOUT[id].w) };
+      return out;
+    };
+    panel.querySelector("#ed-save").onclick = () => { localStorage.setItem(LAYOUT_KEY, JSON.stringify(compact())); msg("Salvato: la console del sito usa già queste posizioni su questo browser."); };
+    panel.querySelector("#ed-copy").onclick = async () => {
+      const text = "Posizioni tasti GBA: " + JSON.stringify(compact());
+      try { await navigator.clipboard.writeText(text); msg("Copiato! Incollalo a Claude in chat."); }
+      catch { prompt("Copia questo testo e incollalo a Claude:", text); }
+    };
+    panel.querySelector("#ed-reset").onclick = () => {
+      localStorage.removeItem(LAYOUT_KEY);
+      for (const id in DEFAULT_LAYOUT) Object.assign(LAYOUT[id], DEFAULT_LAYOUT[id]);
+      buttons.forEach(placeBtn); showSel(); msg("Posizioni originali ripristinate.");
+    };
+    panel.querySelector("#ed-tips").onclick = (e) => { document.body.classList.toggle("show-tips"); e.target.textContent = document.body.classList.contains("show-tips") ? "Nascondi fumetti" : "Mostra fumetti"; };
   }
 
   // tasti → messaggio alla Home (che li passa al gioco come i tasti della tastiera)
   const held = new Map();
   addEventListener("pointerdown", (e) => {
+    if (EDIT) return;
     const b = e.target.closest("button[data-id]");
     if (!b) return;
     e.preventDefault();
