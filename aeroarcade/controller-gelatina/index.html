@@ -44,7 +44,8 @@
   const POS_X = parseFloat(P.get("x") || "0.7"), POS_Y = parseFloat(P.get("y") || "0.37"), ZOOM = parseFloat(P.get("zoom") || "0.58");
   window.__gelView = (cam) => {
     const W = innerWidth, H = innerHeight;
-    cam.zoom = ZOOM * Math.min(1, W / 1100 + 0.25);
+    // rimpicciolisce su finestre strette o basse, così ci sta sempre con margine
+    cam.zoom = ZOOM * Math.min(1, W / 1100 + 0.25, H / 820 + 0.22);
     cam.setViewOffset(W, H, -(POS_X - 0.5) * W, (0.5 - POS_Y) * H, W, H);
   };
   // La stanza: sei pareti vere attorno al controller. Le quattro laterali
@@ -52,7 +53,7 @@
   // fotogramma dalla telecamera, quindi seguono ogni ridimensionamento); davanti
   // e dietro c'è una profondità fissa. La gelatina ci sbatte contro con i punti
   // della sua superficie: si schiaccia, rimbalza e poi torna a galleggiare.
-  const EDGE = 0.996;           // bordo della finestra in coordinate schermo
+  const EDGE = 0.999;           // bordo della finestra in coordinate schermo
   const FRONT = 1.5, BACK = 2.2; // quanto può avvicinarsi / allontanarsi
   window.__gelBounce = 0.5;      // quanto rimbalza contro le pareti
   window.__gelFriction = 0.22;   // quanto "striscia" lungo le pareti
