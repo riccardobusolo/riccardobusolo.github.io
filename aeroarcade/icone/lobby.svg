@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Lobby">
+<title>Lobby</title>
+<defs>
+  <linearGradient id="aeroFill" x1="8%" y1="0%" x2="93%" y2="100%">
+    <stop offset="0%" stop-color="#e8fffc"/>
+    <stop offset="30%" stop-color="#c6fbf3"/>
+    <stop offset="56%" stop-color="#88f1e3"/>
+    <stop offset="78%" stop-color="#40e8d7"/>
+    <stop offset="100%" stop-color="#00d9e5"/>
+  </linearGradient>
+  <linearGradient id="aeroEdge" x1="0%" y1="0%" x2="90%" y2="100%">
+    <stop offset="0%" stop-color="#0bc4c1"/>
+    <stop offset="47%" stop-color="#05bcb5"/>
+    <stop offset="100%" stop-color="#00a6a4"/>
+  </linearGradient>
+  <linearGradient id="aeroWave" x1="10%" y1="5%" x2="80%" y2="95%">
+    <stop offset="0" stop-color="#ffffff" stop-opacity="0.42"/>
+    <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.22"/>
+    <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="aeroShade" x1="10%" y1="4%" x2="90%" y2="100%">
+    <stop offset="0" stop-color="#3bd9ce" stop-opacity="0"/>
+    <stop offset="1" stop-color="#00b6c4" stop-opacity="0.2"/>
+  </linearGradient>
+  <linearGradient id="glint" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0" stop-color="#ffffff" stop-opacity="0.94"/>
+    <stop offset="100%" stop-color="#ffffff" stop-opacity="0.40"/>
+  </linearGradient>
+  <filter id="glassBlur" x="-35%" y="-35%" width="170%" height="170%">
+    <feGaussianBlur stdDeviation="0.9"/>
+  </filter>
+</defs>
+<defs><clipPath id="torsoR"><path d="M117 182 Q117 151 145 136 Q161 128 180 139 Q201 151 205 182 V185 Q205 191 198 191 H126 Q117 191 117 184 Z"/></clipPath></defs>
+<path d="M117 182 Q117 151 145 136 Q161 128 180 139 Q201 151 205 182 V185 Q205 191 198 191 H126 Q117 191 117 184 Z" fill="url(#aeroFill)" stroke="url(#aeroEdge)" stroke-width="6.3" stroke-linejoin="round"/>
+<g clip-path="url(#torsoR)">
+  <path d="M109 164 Q157 157 197 126 H210 V141 Q168 185 117 180 Z" fill="url(#aeroWave)" opacity=".88"/>
+  <path d="M145 151 L159 143" stroke="url(#glint)" stroke-width="7.1" stroke-linecap="round" fill="none" opacity=".78"/>
+</g><defs><clipPath id="torsoL"><path d="M51 180 Q51 147 80 134 Q100 126 119 139 Q139 152 139 182 V185 Q139 191 132 191 H59 Q51 191 51 184 Z"/></clipPath></defs>
+<path d="M51 180 Q51 147 80 134 Q100 126 119 139 Q139 152 139 182 V185 Q139 191 132 191 H59 Q51 191 51 184 Z" fill="url(#aeroFill)" stroke="url(#aeroEdge)" stroke-width="6.3" stroke-linejoin="round"/>
+<g clip-path="url(#torsoL)">
+  <path d="M43 168 Q100 156 141 126 V140 Q98 183 47 183 Z" fill="url(#aeroWave)" opacity=".88"/>
+  <path d="M77 151 L92 143" stroke="url(#glint)" stroke-width="7.1" stroke-linecap="round" fill="none" opacity=".78"/>
+</g><defs><clipPath id="headR"><path d="M184 100 A27 27 0 1 1 130 100 A27 27 0 1 1 184 100 Z"/></clipPath></defs>
+<path d="M184 100 A27 27 0 1 1 130 100 A27 27 0 1 1 184 100 Z" fill="url(#aeroFill)" stroke="url(#aeroEdge)" stroke-width="6.3" stroke-linejoin="round"/>
+<g clip-path="url(#headR)">
+  <path d="M127 113 Q160 100 193 78 V86 Q179 120 130 125 Z" fill="url(#aeroWave)" opacity=".88"/>
+  <path d="M150 91 L158 84" stroke="url(#glint)" stroke-width="7.1" stroke-linecap="round" fill="none" opacity=".78"/>
+</g><defs><clipPath id="headL"><path d="M126 100 A27 27 0 1 1 72 100 A27 27 0 1 1 126 100 Z"/></clipPath></defs>
+<path d="M126 100 A27 27 0 1 1 72 100 A27 27 0 1 1 126 100 Z" fill="url(#aeroFill)" stroke="url(#aeroEdge)" stroke-width="6.3" stroke-linejoin="round"/>
+<g clip-path="url(#headL)">
+  <path d="M69 113 Q103 101 135 78 V87 Q120 121 72 125 Z" fill="url(#aeroWave)" opacity=".88"/>
+  <path d="M92 91 L100 84" stroke="url(#glint)" stroke-width="7.1" stroke-linecap="round" fill="none" opacity=".78"/>
+</g></svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Home">
+<title>Home</title>
+<defs>
+  <linearGradient id="aeroFill" x1="8%" y1="0%" x2="93%" y2="100%">
+    <stop offset="0%" stop-color="#e8fffc"/>
+    <stop offset="30%" stop-color="#c6fbf3"/>
+    <stop offset="56%" stop-color="#88f1e3"/>
+    <stop offset="78%" stop-color="#40e8d7"/>
+    <stop offset="100%" stop-color="#00d9e5"/>
+  </linearGradient>
+  <linearGradient id="aeroEdge" x1="0%" y1="0%" x2="90%" y2="100%">
+    <stop offset="0%" stop-color="#0bc4c1"/>
+    <stop offset="47%" stop-color="#05bcb5"/>
+    <stop offset="100%" stop-color="#00a6a4"/>
+  </linearGradient>
+  <linearGradient id="aeroWave" x1="10%" y1="5%" x2="80%" y2="95%">
+    <stop offset="0" stop-color="#ffffff" stop-opacity="0.42"/>
+    <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.22"/>
+    <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="aeroShade" x1="10%" y1="4%" x2="90%" y2="100%">
+    <stop offset="0" stop-color="#3bd9ce" stop-opacity="0"/>
+    <stop offset="1" stop-color="#00b6c4" stop-opacity="0.2"/>
+  </linearGradient>
+  <linearGradient id="glint" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0" stop-color="#ffffff" stop-opacity="0.94"/>
+    <stop offset="100%" stop-color="#ffffff" stop-opacity="0.40"/>
+  </linearGradient>
+  <filter id="glassBlur" x="-35%" y="-35%" width="170%" height="170%">
+    <feGaussianBlur stdDeviation="0.9"/>
+  </filter>
+</defs>
+<defs>
+  <clipPath id="houseClip"><path d="M128 53 Q125 50 122 53 L54 113 Q49 118 53 124 Q57 130 64 126 L70 123 L70 180 Q70 191 81 191 H175 Q186 191 186 180 V123 L193 127 Q200 130 204 124 Q207 118 202 113 L134 53 Q131 50 128 53 Z M110 191 V153 Q110 138 125 138 H131 Q146 138 146 153 V191 Z" clip-rule="evenodd"/></clipPath>
+</defs>
+<path d="M128 53 Q125 50 122 53 L54 113 Q49 118 53 124 Q57 130 64 126 L70 123 L70 180 Q70 191 81 191 H175 Q186 191 186 180 V123 L193 127 Q200 130 204 124 Q207 118 202 113 L134 53 Q131 50 128 53 Z M110 191 V153 Q110 138 125 138 H131 Q146 138 146 153 V191 Z" fill="url(#aeroFill)" fill-rule="evenodd"/>
+<g clip-path="url(#houseClip)">
+  <path d="M38 143 C88 113 144 122 211 71 L215 46 H35 Z" fill="url(#aeroWave)"/>
+  <path d="M50 174 C95 150 153 160 204 122 L204 202 H49 Z" fill="#35eada" opacity=".13"/>
+  <path d="M75 113 L118 75" stroke="url(#glint)" stroke-width="10.5" stroke-linecap="round" opacity=".73"/>
+  <path d="M77 125 L85 117" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity=".77"/>
+  <path d="M77 174 V135" stroke="#edfffb" stroke-width="1.7" stroke-linecap="round" opacity=".38"/>
+  <path d="M83 186 H172" stroke="#e4ffff" stroke-width="1.8" stroke-linecap="round" opacity=".43"/>
+</g>
+<path d="M110 191 H81 Q70 191 70 180 V123 L64 126 Q57 130 53 124 Q49 118 54 113 L122 53 Q128 47 134 53 L202 113 Q207 118 204 124 Q200 130 193 127 L186 123 V180 Q186 191 175 191 H146" fill="none" stroke="url(#aeroEdge)" stroke-width="6.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M110 191 V153 Q110 138 125 138 H131 Q146 138 146 153 V191" fill="none" stroke="url(#aeroEdge)" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
