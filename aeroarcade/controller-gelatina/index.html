@@ -47,37 +47,62 @@
     cam.zoom = ZOOM * Math.min(1, W / 1100 + 0.25);
     cam.setViewOffset(W, H, -(POS_X - 0.5) * W, (0.5 - POS_Y) * H, W, H);
   };
-  // Pareti invisibili sui bordi della finestra: nessun punto della gelatina può
-  // uscire dallo schermo (vale anche quando la finestra viene ridimensionata).
-  // Ogni punto si proietta sullo schermo; se esce dal bordo lo riporto dentro
-  // lungo l'asse destra/su della telecamera e lo faccio rimbalzare un poco.
-  const MARGIN = 0.015, BOUNCE = 0.45;
-  // niente pavimento invisibile: il "pavimento" è il bordo inferiore della finestra
-  window.__gelFloor = -1e9;
-  window.__gelWalls = (sim, cam) => {
-    const x = sim.x, v = sim.v, n = sim.P;
-    const P = cam.projectionMatrix.elements, V = cam.matrixWorldInverse.elements, W = cam.matrixWorld.elements;
-    const bx = 1 - MARGIN, by = 1 - MARGIN;
-    const rx = W[0], ry = W[1], rz = W[2], ux = W[4], uy = W[5], uz = W[6];
-    for (let i = 0; i < n; i++) {
-      const k = i * 3, px = x[k], py = x[k + 1], pz = x[k + 2];
-      const vx = V[0] * px + V[4] * py + V[8] * pz + V[12];
-      const vy = V[1] * px + V[5] * py + V[9] * pz + V[13];
-      const vz = V[2] * px + V[6] * py + V[10] * pz + V[14];
-      const w = -vz;
-      if (w <= 0.01) continue;
-      // ndc.x = (P0·vx + P8·vz) / w   ·   ndc.y = (P5·vy + P9·vz) / w
-      const nx = (P[0] * vx + P[8] * vz) / w, ny = (P[5] * vy + P[9] * vz) / w;
-      let dx = 0, dy = 0;
-      if (nx > bx) dx = ((bx * w - P[8] * vz) / P[0]) - vx;
-      else if (nx < -bx) dx = ((-bx * w - P[8] * vz) / P[0]) - vx;
-      if (ny > by) dy = ((by * w - P[9] * vz) / P[5]) - vy;
-      else if (ny < -by) dy = ((-by * w - P[9] * vz) / P[5]) - vy;
-      if (!dx && !dy) continue;
-      x[k] += rx * dx + ux * dy; x[k + 1] += ry * dx + uy * dy; x[k + 2] += rz * dx + uz * dy;
-      if (dx) { const vr = v[k] * rx + v[k + 1] * ry + v[k + 2] * rz; if (vr * dx < 0) { const c = -(1 + BOUNCE) * vr; v[k] += rx * c; v[k + 1] += ry * c; v[k + 2] += rz * c; } }
-      if (dy) { const vu = v[k] * ux + v[k + 1] * uy + v[k + 2] * uz; if (vu * dy < 0) { const c = -(1 + BOUNCE) * vu; v[k] += ux * c; v[k + 1] += uy * c; v[k + 2] += uz * c; } }
+  // La stanza: sei pareti vere attorno al controller. Le quattro laterali
+  // coincidono esattamente con i bordi della finestra (si ricalcolano a ogni
+  // fotogramma dalla telecamera, quindi seguono ogni ridimensionamento); davanti
+  // e dietro c'è una profondità fissa. La gelatina ci sbatte contro con i punti
+  // della sua superficie: si schiaccia, rimbalza e poi torna a galleggiare.
+  const EDGE = 0.996;           // bordo della finestra in coordinate schermo
+  const FRONT = 1.5, BACK = 2.2; // quanto può avvicinarsi / allontanarsi
+  window.__gelBounce = 0.5;      // quanto rimbalza contro le pareti
+  window.__gelFriction = 0.22;   // quanto "striscia" lungo le pareti
+  const planes = new Float64Array(24);
+  window.__gelPlanes = planes;
+  let depth0 = null;
+  // punto dello schermo (x, y in -1..1, z: -1 vicino, 1 lontano) → mondo
+  const unproject = (cam, x, y, z, out) => {
+    const I = cam.projectionMatrixInverse.elements, W = cam.matrixWorld.elements;
+    let vx = I[0] * x + I[4] * y + I[8] * z + I[12], vy = I[1] * x + I[5] * y + I[9] * z + I[13];
+    let vz = I[2] * x + I[6] * y + I[10] * z + I[14];
+    const vw = I[3] * x + I[7] * y + I[11] * z + I[15];
+    vx /= vw; vy /= vw; vz /= vw;
+    out[0] = W[0] * vx + W[4] * vy + W[8] * vz + W[12];
+    out[1] = W[1] * vx + W[5] * vy + W[9] * vz + W[13];
+    out[2] = W[2] * vx + W[6] * vy + W[10] * vz + W[14];
+    return out;
+  };
+  const A = [0, 0, 0], B = [0, 0, 0], C = [0, 0, 0], IN = [0, 0, 0];
+  // piano passante per A, B, C con la normale rivolta verso il punto IN (dentro la stanza)
+  const plane = (k) => {
+    const ux = B[0] - A[0], uy = B[1] - A[1], uz = B[2] - A[2], wx = C[0] - A[0], wy = C[1] - A[1], wz = C[2] - A[2];
+    let nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
+    const l = Math.hypot(nx, ny, nz) || 1; nx /= l; ny /= l; nz /= l;
+    let d = nx * A[0] + ny * A[1] + nz * A[2];
+    if (nx * IN[0] + ny * IN[1] + nz * IN[2] < d) { nx = -nx; ny = -ny; nz = -nz; d = -d; }
+    planes[k * 4] = nx; planes[k * 4 + 1] = ny; planes[k * 4 + 2] = nz; planes[k * 4 + 3] = d;
+  };
+  window.__gelRoom = (cam, sim) => {
+    window.__gelSim = sim; window.__gelCam = cam;
+    cam.updateMatrixWorld();
+    const W = cam.matrixWorld.elements;
+    const ex = W[12], ey = W[13], ez = W[14];
+    const fx = -W[8], fy = -W[9], fz = -W[10]; // direzione in cui guarda la telecamera
+    // profondità di riferimento: dove galleggia il controller (fissata una volta sola)
+    if (depth0 === null) {
+      const c = sim.hover?.pos ?? sim.body?.c;
+      depth0 = c ? (c[0] - ex) * fx + (c[1] - ey) * fy + (c[2] - ez) * fz : 6.5;
     }
+    unproject(cam, 0, 0, 0, IN);
+    const e = EDGE;
+    // sinistra, destra, sotto, sopra: piani che passano per i bordi dello schermo
+    unproject(cam, -e, -e, -1, A); unproject(cam, -e, e, -1, B); unproject(cam, -e, -e, 0.9, C); plane(0);
+    unproject(cam, e, -e, -1, A); unproject(cam, e, e, -1, B); unproject(cam, e, -e, 0.9, C); plane(1);
+    unproject(cam, -e, -e, -1, A); unproject(cam, e, -e, -1, B); unproject(cam, -e, -e, 0.9, C); plane(2);
+    unproject(cam, -e, e, -1, A); unproject(cam, e, e, -1, B); unproject(cam, -e, e, 0.9, C); plane(3);
+    // davanti e dietro: perpendicolari allo sguardo
+    const dn = depth0 - FRONT, df = depth0 + BACK;
+    planes[16] = fx; planes[17] = fy; planes[18] = fz; planes[19] = fx * ex + fy * ey + fz * ez + dn;
+    planes[20] = -fx; planes[21] = -fy; planes[22] = -fz; planes[23] = -(fx * ex + fy * ey + fz * ez + df);
   };
   const frame = window.frameElement;
   const setCatch = (on) => { if (frame) frame.style.pointerEvents = on ? "auto" : "none"; document.body.style.cursor = on ? "grab" : ""; };
