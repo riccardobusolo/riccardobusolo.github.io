@@ -130,4 +130,4 @@ function e(e,t){var n=t,r=e,i=function(e){return r.querySelector(e)},a=i(`.ap-pi
       <input class="ap-file" type="file" accept="audio/*" multiple hidden>
     </div>
   </div>
-</div>`,n=i.content.firstElementChild,document.body.append(n),t=e(n,r)}n.hidden&&(n.hidden=!1,t?.layout())}function i(e=!1){n&&(n.hidden=!0,e&&t?.pause())}export{e as createPlayer,i as hidePlayer,r as showPlayer};
+</div>`,n=i.content.firstElementChild,document.body.append(n),t=e(n,r),window.addEventListener(`aero:music-pause`,()=>t?.pause())}n.hidden&&(n.hidden=!1,t?.layout())}function i(e=!1){n&&(n.hidden=!0,e&&t?.pause())}export{e as createPlayer,i as hidePlayer,r as showPlayer};

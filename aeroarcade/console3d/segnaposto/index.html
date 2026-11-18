@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Console Aero Arcade (segnaposto)</title>
+<!--
+  CONSOLE SEGNAPOSTO (2D) — usata finché non arriva la simulazione 3D della console.
+  Implementa lo stesso protocollo che dovranno seguire le console 3D
+  (vedi docs/CONSOLE-3D.md): è anche l'esempio di riferimento.
+-->
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; font-family: "Nunito", "Segoe UI", system-ui, sans-serif; -webkit-user-select: none; user-select: none; touch-action: none; }
+  :root { --c1: #6fd3ff; --c2: #1f8fe0; --c3: #0b5aa8; --ink: #0c3954; }
+  .scene { position: fixed; inset: 0; display: grid; place-items: center; }
+  .wrap { position: relative; width: min(78vw, 70vh * 0.72); aspect-ratio: 0.72; transition: transform 0.6s cubic-bezier(.2, .9, .3, 1.2); }
+  .wrap.wide { width: min(86vw, 70vh * 1.5); aspect-ratio: 1.5; }
+  /* corpo della console: plastica di gel traslucida */
+  .body { position: absolute; inset: 0; z-index: 1; border-radius: 9% / 6.5%; background: linear-gradient(160deg, var(--c1), var(--c2) 55%, var(--c3)); box-shadow: inset 0 3px 0 rgba(255,255,255,.7), inset 0 -14px 30px rgba(0,30,80,.35), 0 26px 50px rgba(0,40,90,.4); overflow: visible; }
+  .body::before { content: ""; position: absolute; left: 6%; right: 6%; top: 2%; height: 30%; border-radius: 40px 40px 50% 50% / 30px 30px 40% 40%; background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0)); pointer-events: none; }
+  .brand { position: absolute; left: 0; right: 0; top: 57%; text-align: center; font-weight: 900; font-size: clamp(11px, 2.2vmin, 18px); color: rgba(255,255,255,.85); text-shadow: 0 1px 2px rgba(0,30,70,.4); letter-spacing: .5px; }
+  .brand b { color: #d9ff8c; }
+  /* schermo */
+  .screen { position: absolute; left: 12%; right: 12%; top: 9%; height: 44%; border-radius: 6%; background: #031524; box-shadow: inset 0 0 0 4px rgba(255,255,255,.35), inset 0 6px 18px rgba(0,0,0,.6); overflow: hidden; }
+  .wide .screen { left: 26%; right: 26%; top: 10%; height: 62%; }
+  .screen .pane { position: absolute; inset: 0; overflow: hidden; }
+  .screen video { position: absolute; left: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+  /* DS: due schermi, metà superiore e inferiore dello stesso video */
+  .ds .screen { top: 6%; height: 52%; background: transparent; box-shadow: none; overflow: visible; }
+  .ds .pane { height: 47%; border-radius: 5%; background: #031524; box-shadow: inset 0 0 0 4px rgba(255,255,255,.35); }
+  .ds .pane.bottom { top: 53%; }
+  .ds .pane video { height: 200%; object-fit: fill; }
+  .ds .pane.bottom video { top: -100%; }
+  .boot { position: absolute; inset: 0; display: grid; place-items: center; color: #9fe6ff; font-weight: 900; font-size: clamp(14px, 3vmin, 26px); text-shadow: 0 0 12px rgba(120,220,255,.8); opacity: 0; transition: opacity .6s; }
+  .boot.on { opacity: 1; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .55; } }
+  /* slot in alto */
+  .slot { position: absolute; z-index: 2; left: 30%; right: 30%; top: -2.2%; height: 4.4%; border-radius: 6px; background: linear-gradient(180deg, #062b4a, #0b4c80); box-shadow: inset 0 3px 6px rgba(0,0,0,.6), 0 0 0 2px rgba(255,255,255,.6); }
+  .wide .slot { left: 36%; right: 36%; }
+  .slot.hot { box-shadow: inset 0 3px 6px rgba(0,0,0,.6), 0 0 0 3px #8fdc2a, 0 0 22px 6px rgba(143,220,42,.7); }
+  /* tasti */
+  .pad { position: absolute; left: 10%; top: 66%; width: 28%; aspect-ratio: 1; }
+  .wide .pad { left: 6%; top: 38%; width: 15%; }
+  .pad button { position: absolute; width: 34%; height: 34%; }
+  .pad .up { left: 33%; top: 0; } .pad .down { left: 33%; bottom: 0; } .pad .left { left: 0; top: 33%; } .pad .right { right: 0; top: 33%; }
+  .face { position: absolute; right: 9%; top: 66%; width: 30%; aspect-ratio: 1; }
+  .wide .face { right: 5%; top: 36%; width: 16%; }
+  .face button { position: absolute; width: 36%; height: 36%; border-radius: 50%; font-weight: 900; }
+  .face .a { right: 0; top: 18%; } .face .b { left: 14%; top: 48%; } .face .x { right: 26%; top: -12%; } .face .y { left: -6%; top: 14%; }
+  .face.two .a { right: 2%; top: 14%; } .face.two .b { left: 8%; top: 46%; }
+  .meta { position: absolute; left: 34%; right: 34%; bottom: 7%; display: flex; justify-content: space-between; gap: 6%; }
+  .wide .meta { left: 40%; right: 40%; bottom: 8%; }
+  .meta button { flex: 1; height: clamp(12px, 2.4vmin, 20px); border-radius: 999px; font-size: clamp(7px, 1.3vmin, 11px); font-weight: 900; }
+  .shoulder { position: absolute; top: -1.6%; width: 22%; height: 3.6%; }
+  .shoulder.l { left: 4%; } .shoulder.r { right: 4%; }
+  .shoulder button { width: 100%; height: 100%; border-radius: 12px 12px 4px 4px; font-size: clamp(8px, 1.4vmin, 12px); font-weight: 900; }
+  button { border: 0; padding: 0; cursor: pointer; color: rgba(12,57,84,.8); font-family: inherit;
+    background: radial-gradient(circle at 50% 30%, #ffffff, #e6f6ff 45%, #b7def3 100%);
+    box-shadow: 0 0 0 2px rgba(255,255,255,.9), 0 4px 8px rgba(0,40,90,.35), inset 0 -4px 6px rgba(80,150,210,.4); transition: transform .06s, filter .06s; }
+  button.down { transform: translateY(2px) scale(.94); filter: brightness(.92); }
+  .pad button { border-radius: 22%; }
+  /* cartuccia (o disco per la PlayStation) */
+  .cart { position: absolute; width: 22%; aspect-ratio: 0.82; right: -34%; top: 6%; border-radius: 10% 10% 6% 6%; background: linear-gradient(180deg, #e9f3fb, #b8cfe2); box-shadow: 0 0 0 2px rgba(255,255,255,.9), 0 12px 24px rgba(0,40,90,.35); cursor: grab; transition: box-shadow .2s; z-index: 3; }
+  .cart.disc { border-radius: 50%; aspect-ratio: 1; background: radial-gradient(circle, #e8f2ff 0 9%, #6b7f99 9.5% 11%, transparent 11.5%), conic-gradient(from 30deg, #d9e6ff, #ffd9f2, #d9fff2, #fff6c9, #d9e6ff); }
+  .cart .label { position: absolute; left: 9%; right: 9%; top: 14%; bottom: 12%; border-radius: 6%; background: #0d3a5c center / cover no-repeat; box-shadow: inset 0 0 0 1px rgba(0,0,0,.2); }
+  .cart.disc .label { left: 22%; right: 22%; top: 22%; bottom: 22%; border-radius: 50%; -webkit-mask: radial-gradient(circle, transparent 0 24%, #000 25%); mask: radial-gradient(circle, transparent 0 24%, #000 25%); }
+  .cart.dragging { cursor: grabbing; box-shadow: 0 0 0 3px #8fdc2a, 0 18px 34px rgba(0,40,90,.45); transition: none; }
+  .cart.inserted { cursor: grab; }
+  .hint { position: absolute; right: -36%; top: calc(6% + 22% / 0.82 * 0.72 + 4%); width: 26%; text-align: center; font-weight: 800; font-size: clamp(10px, 1.8vmin, 15px); color: #fff; text-shadow: 0 1px 4px rgba(0,40,90,.6); }
+  .hint.gone { opacity: 0; transition: opacity .4s; }
+  :root[data-night="1"] .body { filter: brightness(.78) saturate(.9); }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="scene"><div class="wrap" id="wrap">
+  <div class="body">
+    <div class="slot" id="slot"></div>
+    <div class="screen" id="screen"><div class="boot" id="boot">Aero Arcade</div></div>
+    <div class="brand">Aero <b>Arcade</b></div>
+    <div class="pad" id="pad"></div>
+    <div class="face" id="face"></div>
+    <div class="meta" id="meta"></div>
+  </div>
+  <div class="cart" id="cart"><div class="label" id="label"></div></div>
+  <div class="hint" id="hint">Trascina la cartuccia nello slot</div>
+</div></div>
+<script>
+(() => {
+  const P = new URLSearchParams(location.search);
+  const CONSOLE = P.get("console") || "gba";
+  const send = (m) => { try { parent.postMessage({ ...m, aero: m.aero }, location.origin); } catch {} };
+  const $ = (id) => document.getElementById(id);
+  const wrap = $("wrap"), cart = $("cart"), slot = $("slot"), hint = $("hint"), boot = $("boot"), screenEl = $("screen");
+  document.documentElement.dataset.night = P.get("night") === "1" ? "1" : "0";
+
+  // aspetto per console: colori, forma, tasti
+  const LOOK = {
+    nes:  { c: ["#ffb0b8", "#e8384f", "#9c1d2e"], wide: true,  face: ["b", "a"],            sh: false },
+    snes: { c: ["#d9ccff", "#7d6be0", "#4a3a9c"], wide: true,  face: ["y", "x", "b", "a"],  sh: true },
+    gb:   { c: ["#e2ffb0", "#8fcf3a", "#4e8a17"], wide: false, face: ["b", "a"],            sh: false },
+    gbc:  { c: ["#b6fff0", "#22c7b8", "#0f8f9c"], wide: false, face: ["b", "a"],            sh: false },
+    gba:  { c: ["#c9c2ff", "#5b52e8", "#2f2899"], wide: true,  face: ["b", "a"],            sh: true },
+    nds:  { c: ["#cde6ff", "#4a90e2", "#1d5aa6"], wide: false, face: ["y", "x", "b", "a"],  sh: true, ds: true },
+    psx:  { c: ["#e3e8f5", "#9aa8c8", "#5d6b8f"], wide: true,  face: ["square", "triangle", "cross", "circle"], sh: true, disc: true }
+  }[CONSOLE] || { c: ["#6fd3ff", "#1f8fe0", "#0b5aa8"], wide: true, face: ["b", "a"], sh: true };
+  const r = document.documentElement.style;
+  r.setProperty("--c1", LOOK.c[0]); r.setProperty("--c2", LOOK.c[1]); r.setProperty("--c3", LOOK.c[2]);
+  if (LOOK.wide) wrap.classList.add("wide");
+  if (LOOK.ds) wrap.classList.add("ds");
+  if (LOOK.disc) { cart.classList.add("disc"); hint.textContent = "Trascina il disco nel lettore"; }
+  const cover = P.get("cover");
+  if (cover) $("label").style.backgroundImage = `url("${cover.replace(/"/g, "%22")}")`;
+
+  // tasti → messaggio alla Home (che li passa al gioco come i tasti della tastiera)
+  const LABEL = { a: "A", b: "B", x: "X", y: "Y", cross: "✕", circle: "○", square: "□", triangle: "△", start: "START", select: "SELECT", l: "L", r: "R" };
+  const mk = (id, parentEl, cls) => {
+    const b = document.createElement("button");
+    b.className = cls || id; b.dataset.id = id; b.type = "button"; b.textContent = LABEL[id] || "";
+    b.setAttribute("aria-label", id);
+    parentEl.append(b);
+    return b;
+  };
+  ["up", "down", "left", "right"].forEach((d) => mk(d, $("pad")));
+  const face = $("face");
+  if (LOOK.face.length === 2) face.classList.add("two");
+  const POS = { square: "y", triangle: "x", cross: "b", circle: "a" };
+  LOOK.face.forEach((id) => mk(id, face, POS[id] || id));
+  mk("select", $("meta")); mk("start", $("meta"));
+  if (LOOK.sh) ["l", "r"].forEach((id) => { const s = document.createElement("div"); s.className = "shoulder " + id; wrap.querySelector(".body").append(s); mk(id, s, ""); });
+  const held = new Map();
+  addEventListener("pointerdown", (e) => {
+    const b = e.target.closest("button[data-id]");
+    if (!b) return;
+    e.preventDefault();
+    b.setPointerCapture(e.pointerId);
+    held.set(e.pointerId, b); b.classList.add("down");
+    send({ aero: "button", id: b.dataset.id, down: true });
+  });
+  const up = (e) => {
+    const b = held.get(e.pointerId);
+    if (!b) return;
+    held.delete(e.pointerId); b.classList.remove("down");
+    send({ aero: "button", id: b.dataset.id, down: false });
+  };
+  addEventListener("pointerup", up); addEventListener("pointercancel", up);
+
+  // cartuccia: trascinala nello slot per inserirla, trascinala fuori per espellerla
+  let state = P.get("inserted") === "1" ? "inserted" : "out"; // out | dragging | inserting | inserted | ejecting
+  let drag = null;
+  const rest = () => ({ x: 0, y: 0 });
+  const slotPos = () => {
+    const s = slot.getBoundingClientRect(), c = cart.getBoundingClientRect(), t = cart._t || { x: 0, y: 0 };
+    // centro della cartuccia sullo slot, metà dentro la console
+    return { x: t.x + (s.left + s.width / 2) - (c.left + c.width / 2), y: t.y + (s.top + s.height * 0.5) - (c.top + c.height * 0.38) };
+  };
+  const move = (x, y, ms = 0, scale = 1) => {
+    cart._t = { x, y };
+    cart.style.transition = ms ? `transform ${ms}ms cubic-bezier(.3,.8,.3,1)` : "none";
+    cart.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+  };
+  const nearSlot = () => {
+    const s = slot.getBoundingClientRect(), c = cart.getBoundingClientRect();
+    return Math.abs((c.left + c.width / 2) - (s.left + s.width / 2)) < s.width * 0.9 && c.bottom > s.top - 40 && c.top < s.bottom + 80;
+  };
+  function insertAnim() {
+    state = "inserting"; slot.classList.remove("hot"); hint.classList.add("gone");
+    const p = slotPos();
+    move(p.x, p.y - 30, 260, 0.92);
+    setTimeout(() => { cart.style.zIndex = "0"; move(p.x, p.y, 420, 0.9); }, 280); // scende nello slot, dietro la scocca
+    setTimeout(() => { state = "inserted"; cart.classList.add("inserted"); boot.classList.add("on"); send({ aero: "inserted" }); }, 760);
+  }
+  function placeInserted() {
+    hint.classList.add("gone"); cart.style.zIndex = "0"; cart.classList.add("inserted");
+    requestAnimationFrame(() => { const p = slotPos(); move(p.x, p.y, 0, 0.9); });
+  }
+  if (state === "inserted") placeInserted();
+  cart.addEventListener("pointerdown", (e) => {
+    if (state !== "out" && state !== "inserted") return;
+    e.preventDefault(); cart.setPointerCapture(e.pointerId);
+    const t = cart._t || rest();
+    drag = { sx: e.clientX, sy: e.clientY, x: t.x, y: t.y, from: state };
+    cart.classList.add("dragging");
+    if (state === "out") state = "dragging";
+  });
+  cart.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    if (drag.from === "inserted") { move(drag.x, drag.y + Math.min(0, dy) * 0.9, 0, 0.9); return; } // solo verso l'alto
+    move(drag.x + dx, drag.y + dy);
+    slot.classList.toggle("hot", nearSlot());
+  });
+  const endDrag = (e) => {
+    if (!drag) return;
+    const from = drag.from, dy = e.clientY - drag.sy;
+    drag = null; cart.classList.remove("dragging");
+    if (from === "inserted") {
+      if (dy < -60) send({ aero: "eject-request" }); // la Home salva, poi chiama eject()
+      const p = slotPos(); move(p.x, p.y, 200, 0.9);
+      return;
+    }
+    if (nearSlot()) insertAnim();
+    else { state = "out"; slot.classList.remove("hot"); move(0, 0, 380); }
+  };
+  cart.addEventListener("pointerup", endDrag); cart.addEventListener("pointercancel", endDrag);
+
+  // ---------------- API per la Home (chiamate dirette, stessa origine) ----------------
+  const videos = [];
+  window.aeroConsole = {
+    /** il flusso video del gioco va sullo schermo (DS: metà sopra e metà sotto) */
+    setScreen(stream) {
+      screenEl.querySelectorAll(".pane").forEach((p) => p.remove()); videos.length = 0;
+      if (!stream) { boot.classList.add("on"); return; }
+      boot.classList.remove("on");
+      const panes = LOOK.ds ? ["top", "bottom"] : ["full"];
+      for (const name of panes) {
+        const pane = document.createElement("div"); pane.className = "pane " + name;
+        const v = document.createElement("video"); v.muted = true; v.playsInline = true; v.autoplay = true; v.srcObject = stream;
+        pane.append(v); screenEl.append(pane); videos.push(v); void v.play().catch(() => {});
+      }
+    },
+    /** animazione di espulsione; alla fine avvisa la Home con "ejected" */
+    eject() {
+      if (state === "ejecting") return;
+      state = "ejecting"; this.setScreen(null); boot.classList.remove("on");
+      const t = cart._t || rest();
+      cart.style.zIndex = "3";
+      move(t.x, t.y - 90, 360, 1);
+      setTimeout(() => { move(0, 0, 520, 1); }, 380);
+      setTimeout(() => { state = "out"; cart.classList.remove("inserted"); send({ aero: "ejected" }); }, 950);
+    },
+    setNight(on) { document.documentElement.dataset.night = on ? "1" : "0"; },
+    get state() { return state; }
+  };
+  send({ aero: "console-ready", console: CONSOLE, inserted: state === "inserted" });
+})();
+</script>
+</body>
+</html>

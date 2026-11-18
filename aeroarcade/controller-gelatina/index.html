@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Controller di gelatina</title>
 <!-- Versione per la Home di Aero Arcade: sfondo trasparente, niente pannelli,
-     three.js servito dal sito (cartella vendor), nessun font o file esterno. -->
+     three.js servito dal sito (cartella ../vendor/three, condivisa con le console 3D), nessun font o file esterno. -->
 <link rel="preload" href="gel-controller.bin" as="fetch" type="application/octet-stream" crossorigin>
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; -webkit-user-select: none; user-select: none; touch-action: none; }
@@ -21,11 +21,11 @@
 </script>
 <script type="importmap">
 { "imports": {
-  "three": "./vendor/three.module.min.js",
-  "three/addons/": "./vendor/addons/"
+  "three": "../vendor/three/three.module.min.js",
+  "three/addons/": "../vendor/three/addons/"
 } }
 </script>
-<link rel="modulepreload" href="./vendor/three.module.min.js">
+<link rel="modulepreload" href="../vendor/three/three.module.min.js">
 <link rel="modulepreload" href="gel-controller.js">
 </head>
 <body>
