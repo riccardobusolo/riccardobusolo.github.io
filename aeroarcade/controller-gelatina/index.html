@@ -37,17 +37,32 @@
   <button id="reset">Ricomincia</button>
 </div>
 <script>
-  // La rotellina scorre la pagina della Home (il controller non usa lo zoom)
-  addEventListener("wheel", (e) => {
-    try { parent.scrollBy({ top: e.deltaY, left: 0 }); } catch {}
+  // Il controller vive in un iframe trasparente grande quanto la finestra:
+  // i clic passano alla pagina sotto, tranne quando il puntatore è sopra il
+  // controller (così lo si può afferrare e trascinare ovunque sullo schermo).
+  const P = new URLSearchParams(location.search);
+  const POS_X = parseFloat(P.get("x") || "0.7"), POS_Y = parseFloat(P.get("y") || "0.37"), ZOOM = parseFloat(P.get("zoom") || "0.58");
+  window.__gelView = (cam) => {
+    const W = innerWidth, H = innerHeight;
+    cam.zoom = ZOOM * Math.min(1, W / 1100 + 0.25);
+    cam.setViewOffset(W, H, -(POS_X - 0.5) * W, (0.5 - POS_Y) * H, W, H);
+  };
+  const frame = window.frameElement;
+  const setCatch = (on) => { if (frame) frame.style.pointerEvents = on ? "auto" : "none"; document.body.style.cursor = on ? "grab" : ""; };
+  let dragging = false;
+  addEventListener("pointerdown", () => { dragging = true; document.body.style.cursor = "grabbing"; }, true);
+  addEventListener("pointerup", (e) => { dragging = false; setCatch(!!window.__gelHit?.(e.clientX, e.clientY)); }, true);
+  addEventListener("pointercancel", () => { dragging = false; setCatch(false); }, true);
+  addEventListener("pointermove", (e) => {
+    if (!dragging && e.buttons === 0 && window.__gelHit && !window.__gelHit(e.clientX, e.clientY)) setCatch(false);
   }, { passive: true });
+  addEventListener("pointerleave", () => { if (!dragging) setCatch(false); });
+  // La rotellina scorre la pagina della Home
+  addEventListener("wheel", (e) => { try { parent.scrollBy({ top: e.deltaY, left: 0 }); } catch {} }, { passive: true });
   // Avvisa la Home quando il controller è disegnato: così compare in dissolvenza
-  const stage = document.getElementById("stage");
-  const ready = () => requestAnimationFrame(() => requestAnimationFrame(() => {
+  window.__gelReady = () => requestAnimationFrame(() => requestAnimationFrame(() => {
     try { parent.postMessage({ aero: "gel-ready" }, location.origin); } catch {}
   }));
-  new MutationObserver((_, mo) => { if (stage.querySelector("canvas")) { mo.disconnect(); setTimeout(ready, 120); } })
-    .observe(stage, { childList: true });
 </script>
 <script type="module" src="gel-controller.js"></script>
 </body>
