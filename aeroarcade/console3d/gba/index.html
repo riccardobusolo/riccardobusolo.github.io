@@ -75,24 +75,41 @@
   /* frecce animate ai lati della cartuccia: "spingila in su, nello slot" */
   .hint { position: absolute; left: 0; right: 0; top: 81.6%; height: 14%; pointer-events: none; transition: opacity .4s; }
   .hint.gone { opacity: 0; }
-  .arrows { position: absolute; top: 0; bottom: 0; width: 14%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4%; }
-  .arrows.l { left: calc(50% - 22% - 17%); }
+  /* due binari di vetro ai lati della cartuccia: dentro scorrono verso l'alto
+     delle frecce luminose, come una corrente che porta la cartuccia nello slot */
+  .arrows { position: absolute; top: 2%; bottom: 2%; width: 11%; border-radius: 999px; overflow: hidden;
+    background: linear-gradient(90deg, rgba(255,255,255,.07), rgba(255,255,255,.2) 50%, rgba(255,255,255,.07));
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.28), inset 0 1px 0 rgba(255,255,255,.55), 0 0 14px rgba(140,230,60,.18);
+    -webkit-mask: linear-gradient(transparent, #000 22%, #000 78%, transparent); mask: linear-gradient(transparent, #000 22%, #000 78%, transparent); }
+  .arrows.l { left: calc(50% - 22% - 14%); }
   .arrows.r { left: calc(50% + 22% + 3%); }
-  .arrows i { display: block; width: 100%; aspect-ratio: 1.6; opacity: 0;
-    background: linear-gradient(180deg, #e9ffb8, #8fdc2a 55%, #4fa818); filter: drop-shadow(0 0 3px rgba(255, 255, 255, .95)) drop-shadow(0 3px 6px rgba(20, 80, 10, .45));
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 20'%3E%3Cpath d='M3 17 16 4l13 13' fill='none' stroke='%23000' stroke-width='6.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 20'%3E%3Cpath d='M3 17 16 4l13 13' fill='none' stroke='%23000' stroke-width='6.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-    animation: rise-arrow 1.5s ease-in-out infinite; }
-  /* dal basso verso l'alto, una dopo l'altra */
-  .arrows i:nth-child(3) { animation-delay: 0s; }
-  .arrows i:nth-child(2) { animation-delay: .22s; }
-  .arrows i:nth-child(1) { animation-delay: .44s; }
-  @keyframes rise-arrow {
-    0% { opacity: 0; transform: translateY(40%) scale(.8); }
-    30% { opacity: 1; transform: translateY(0) scale(1); }
-    60% { opacity: .9; transform: translateY(-25%) scale(1); }
-    100% { opacity: 0; transform: translateY(-60%) scale(.9); }
+  /* riflesso del vetro */
+  .arrows::before { content: ""; position: absolute; left: 18%; width: 22%; top: 8%; bottom: 8%; border-radius: 999px; background: linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0)); }
+  /* scia di luce che sale */
+  .arrows::after { content: ""; position: absolute; left: 10%; right: 10%; height: 45%; top: 100%; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(220,255,160,.75), rgba(150,240,60,.25) 60%, rgba(150,240,60,0));
+    animation: lane-glow 1.8s cubic-bezier(.45,0,.25,1) infinite; }
+  .arrows i { position: absolute; left: 50%; top: 100%; width: 80%; aspect-ratio: 1.45; margin-left: -40%; opacity: 0;
+    background: linear-gradient(180deg, #ffffff 0%, #f0ffcf 28%, #a8ec45 62%, #5cb81c 100%);
+    filter: drop-shadow(0 0 4px rgba(170, 255, 80, .9));
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 20'%3E%3Cpath d='M5 16 16 5l11 11' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 20'%3E%3Cpath d='M5 16 16 5l11 11' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    animation: lane-arrow 1.8s cubic-bezier(.45,0,.25,1) infinite; }
+  .arrows i:nth-child(1) { animation-delay: 0s; }
+  .arrows i:nth-child(2) { animation-delay: .6s; }
+  .arrows i:nth-child(3) { animation-delay: 1.2s; }
+  .arrows.r::after, .arrows.r i { animation-name: lane-arrow; }
+  .arrows.r::after { animation-name: lane-glow; }
+  @keyframes lane-arrow {
+    0% { opacity: 0; transform: translateY(0) scale(.7); }
+    14% { opacity: 1; }
+    86% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-560%) scale(1.05); }
   }
+  @keyframes lane-glow { 0% { top: 100%; } 100% { top: -60%; } }
+  /* la cartuccia stessa accenna una spinta verso lo slot, ogni tanto */
+  .cart:not(.dragging):not(.behind) { animation: cart-nudge 3.6s ease-in-out 1.2s infinite; }
+  @keyframes cart-nudge { 0%, 70%, 100% { translate: 0 0; } 78% { translate: 0 -5%; } 86% { translate: 0 1%; } 92% { translate: 0 -1.5%; } }
+  @media (prefers-reduced-motion: reduce) { .arrows::after, .cart { animation: none !important; } .arrows i { animation-duration: 3.6s; } }
   .cart.dragging ~ .hint { opacity: .35; }
   /* ---- editor delle posizioni (?edit=1) ---- */
   body.editing { background: linear-gradient(#3fa9f5, #e3f6ff); }
