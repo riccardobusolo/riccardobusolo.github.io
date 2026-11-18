@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Game Boy Advance SP — Aero Arcade</title>
+<!--
+  CONSOLE GBA (immagine 2D del Game Boy Advance SP).
+  Segue il protocollo di docs/CONSOLE-3D.md: cartuccia da inserire nello slot
+  (in basso, come sull'SP), video del gioco nello schermo, tasti cliccabili.
+  Passando il mouse su un tasto compare il tasto della tastiera che gli corrisponde.
+  L e R sull'SP sono dietro: qui sono due pulsanti ai lati, alla stessa altezza.
+-->
+<style>
+  @font-face { font-family: "Nunito"; font-weight: 900; src: url("nunito-900.woff2") format("woff2"); }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; font-family: "Nunito", "Segoe UI", system-ui, sans-serif; -webkit-user-select: none; user-select: none; touch-action: none; }
+  .scene { position: fixed; inset: 0; display: grid; place-items: center; }
+  /* console + cartuccia sotto: l'altezza decide la dimensione */
+  .rig { position: relative; height: min(96vh, 132vw); aspect-ratio: 683 / 1525; }
+  .console { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 683 / 1225; z-index: 1; container-type: inline-size; }
+  .console img.body { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 2; pointer-events: none; filter: drop-shadow(0 18px 28px rgba(0, 40, 90, 0.35)); }
+  /* schermo: sta DIETRO l'immagine, si vede dal "buco" trasparente */
+  .screen { position: absolute; left: 12.88%; top: 8.65%; width: 73.94%; height: 27.18%; z-index: 1; background: #2b3238; overflow: hidden; }
+  .screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; background: #000; image-rendering: pixelated; }
+  .screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,0) 40%); }
+  .boot { position: absolute; inset: 0; display: grid; place-items: center; color: #b9f0ff; font-weight: 900; font-size: 6cqw; letter-spacing: .5px; text-shadow: 0 0 10px rgba(120, 220, 255, .85); opacity: 0; transition: opacity .6s; }
+  .boot b { color: #d9ff8c; }
+  .boot.on { opacity: 1; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .55; } }
+  /* scritta Aero Arcade al posto del marchio originale */
+  .brand { position: absolute; left: 26.6%; top: 36.0%; width: 47.1%; height: 3.3%; z-index: 3; background: #0b0b0c; border-radius: 3px; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 3.9cqw; letter-spacing: .08em; white-space: nowrap; color: #e9eef2; }
+  .brand > * { line-height: 1; }
+  .brand span { background: linear-gradient(180deg, #ffffff, #b8c3cc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand b { background: linear-gradient(180deg, #e7ffb0, #8fdc2a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  /* tasti: zone cliccabili sopra l'immagine */
+  .hot { position: absolute; z-index: 4; transform: translate(-50%, -50%); border: 0; padding: 0; background: transparent; cursor: pointer; border-radius: 50%; }
+  .hot.arm { width: 8.6%; aspect-ratio: 1; border-radius: 14%; }
+  .hot.round { width: 11.4%; aspect-ratio: 1; }
+  .hot.small { width: 9%; aspect-ratio: 1; }
+  .hot::after { content: ""; position: absolute; inset: 6%; border-radius: inherit; background: radial-gradient(circle, rgba(0, 20, 40, .28), rgba(0, 20, 40, .12) 60%, transparent 72%); opacity: 0; transition: opacity .06s; }
+  .hot:hover::after { opacity: .35; }
+  .hot.down::after { opacity: 1; }
+  /* L e R: pulsanti finti ai lati (sull'SP sono sul retro) */
+  .shoulder { position: absolute; z-index: 4; top: 51.6%; width: 8.5%; height: 9%; transform: translate(-50%, -50%); border: 0; padding: 0; cursor: pointer; border-radius: 40% 40% 40% 40% / 30%;
+    font-weight: 900; font-size: max(9px, 3.2cqw); color: #4b5560;
+    background: linear-gradient(90deg, #8f969c, #e9edf0 45%, #c5cbd0 70%, #7d848a);
+    box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .75), 0 6px 12px rgba(0, 30, 60, .35), inset 0 -4px 6px rgba(0, 0, 0, .18); transition: transform .06s, filter .06s; }
+  .shoulder.l { left: -6.2%; border-radius: 55% 20% 20% 55% / 40%; }
+  .shoulder.r { left: 106.2%; border-radius: 20% 55% 55% 20% / 40%; }
+  .shoulder.down { transform: translate(-50%, -50%) scale(.93); filter: brightness(.9); }
+  /* fumetto col tasto della tastiera (compare e scompare con un piccolo rimbalzo) */
+  .tip { position: absolute; z-index: 6; left: 50%; bottom: calc(100% + 8px); transform: translate(-50%, 6px) scale(.55); transform-origin: 50% 100%; opacity: 0; pointer-events: none; white-space: nowrap;
+    transition: opacity .16s ease, transform .22s cubic-bezier(.3, 1.6, .5, 1); }
+  .tip kbd { display: inline-block; min-width: 1.7em; padding: .22em .55em .28em; border-radius: 8px; font: 900 max(11px, 3.6cqw) "Nunito", sans-serif; color: #0c3954; text-align: center;
+    background: linear-gradient(180deg, #ffffff, #dcefff); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .95), 0 3px 0 #9cc7e6, 0 8px 18px rgba(0, 40, 90, .35); }
+  .tip small { display: block; margin-top: 3px; text-align: center; font: 900 max(8px, 2.2cqw) "Nunito", sans-serif; color: #fff; text-shadow: 0 1px 3px rgba(0, 40, 90, .7); }
+  .tip.side-l { left: auto; right: calc(100% + 8px); bottom: 50%; transform: translate(6px, 50%) scale(.55); transform-origin: 100% 50%; }
+  .tip.side-r { left: calc(100% + 8px); bottom: 50%; transform: translate(-6px, 50%) scale(.55); transform-origin: 0 50%; }
+  .hot:hover .tip, .shoulder:hover .tip, .hot.down .tip, .shoulder.down .tip { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  .shoulder.l:hover .tip, .shoulder.l.down .tip { transform: translate(0, 50%) scale(1); }
+  .shoulder.r:hover .tip, .shoulder.r.down .tip { transform: translate(0, 50%) scale(1); }
+  /* slot in basso (come sull'SP): si illumina quando la cartuccia è vicina */
+  .slot { position: absolute; z-index: 3; left: 26%; width: 48%; top: 99%; height: 1.4%; border-radius: 0 0 6px 6px; pointer-events: none; transition: box-shadow .2s; }
+  .slot.hot-glow { box-shadow: 0 0 0 3px #8fdc2a, 0 0 22px 6px rgba(143, 220, 42, .75); }
+  /* cartuccia GBA con la copertina come etichetta */
+  .cart { position: absolute; z-index: 3; left: 50%; top: 82.6%; width: 44%; aspect-ratio: 57 / 35; margin-left: -22%; cursor: grab; touch-action: none;
+    border-radius: 6% 6% 9% 9% / 10% 10% 14% 14%;
+    background: linear-gradient(180deg, #4a4f56, #2c3036); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .25), 0 12px 24px rgba(0, 30, 70, .4), inset 0 2px 0 rgba(255, 255, 255, .18); }
+  .cart::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10%; border-radius: inherit; background: repeating-linear-gradient(90deg, #3b4047 0 6%, #30343a 6% 8%); }
+  .cart .label { position: absolute; left: 8%; right: 8%; top: 16%; bottom: 12%; border-radius: 4%; background: #0d3a5c center / cover no-repeat; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+  .cart .label::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(160deg, rgba(255,255,255,.35), rgba(255,255,255,0) 40%); }
+  .cart.dragging { cursor: grabbing; box-shadow: 0 0 0 3px #8fdc2a, 0 18px 34px rgba(0, 30, 70, .5); }
+  .cart.behind { z-index: 0; }
+  .hint { position: absolute; left: 0; right: 0; top: 95.4%; text-align: center; font-weight: 900; font-size: clamp(10px, 1.9vh, 15px); color: #fff; text-shadow: 0 1px 4px rgba(0, 40, 90, .6); transition: opacity .4s; }
+  .hint.gone { opacity: 0; }
+  :root[data-night="1"] .console img.body { filter: drop-shadow(0 18px 28px rgba(0, 0, 30, .6)) brightness(.82); }
+  :root[data-night="1"] .shoulder { filter: brightness(.82); }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="scene"><div class="rig" id="rig">
+  <div class="console" id="console">
+    <div class="screen" id="screen"><div class="boot" id="boot">Aero <b>Arcade</b></div></div>
+    <img class="body" src="gba-sp.webp" alt="" draggable="false">
+    <div class="brand"><span>AERO&nbsp;</span><b>ARCADE</b></div>
+    <div class="slot" id="slot"></div>
+  </div>
+  <div class="cart" id="cart"><div class="label" id="label"></div></div>
+  <div class="hint" id="hint">Trascina la cartuccia nello slot in basso</div>
+</div></div>
+<script>
+(() => {
+  const P = new URLSearchParams(location.search);
+  const send = (m) => { try { parent.postMessage(m, location.origin); } catch {} };
+  const $ = (id) => document.getElementById(id);
+  const rig = $("rig"), consoleEl = $("console"), cart = $("cart"), slot = $("slot"), hint = $("hint"), boot = $("boot"), screenEl = $("screen");
+  document.documentElement.dataset.night = P.get("night") === "1" ? "1" : "0";
+  const cover = P.get("cover");
+  if (cover) $("label").style.backgroundImage = `url("${cover.replace(/"/g, "%22")}")`;
+
+  // tasti della tastiera assegnati (dal sito, sezione Tasti); valori di riserva
+  let KEYS = { up: "↑", down: "↓", left: "←", right: "→", a: "X", b: "Z", l: "Q", r: "W", start: "Invio", select: "Shift" };
+  try { KEYS = { ...KEYS, ...JSON.parse(P.get("keys") || "{}") }; } catch {}
+  const NAME = { up: "Su", down: "Giù", left: "Sinistra", right: "Destra", a: "A", b: "B", l: "L", r: "R", start: "Start", select: "Select" };
+
+  // posizioni (centro, in % dell'immagine 683×1225) misurate sulla foto
+  const HOT = [
+    ["up", 23.43, 62.86, "arm"], ["down", 23.43, 72.41, "arm"], ["left", 14.79, 67.59, "arm"], ["right", 32.06, 67.59, "arm"],
+    ["b", 66.91, 68.41, "round"], ["a", 81.70, 65.88, "round"],
+    ["select", 39.39, 89.39, "small"], ["start", 60.32, 89.39, "small"]
+  ];
+  const tip = (id, side) => {
+    const t = document.createElement("span");
+    t.className = "tip" + (side ? " side-" + side : "");
+    const k = document.createElement("kbd"); k.textContent = KEYS[id];
+    const s = document.createElement("small"); s.textContent = NAME[id];
+    t.append(k, s);
+    return t;
+  };
+  const buttons = [];
+  for (const [id, x, y, kind] of HOT) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "hot " + kind; b.dataset.id = id;
+    b.style.left = x + "%"; b.style.top = y + "%";
+    b.setAttribute("aria-label", `${NAME[id]} (${KEYS[id]})`);
+    b.append(tip(id));
+    consoleEl.append(b); buttons.push(b);
+  }
+  for (const id of ["l", "r"]) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "shoulder " + id; b.dataset.id = id; b.textContent = id.toUpperCase();
+    b.setAttribute("aria-label", `${NAME[id]} (${KEYS[id]})`);
+    b.append(tip(id, id));
+    consoleEl.append(b); buttons.push(b);
+  }
+
+  // tasti → messaggio alla Home (che li passa al gioco come i tasti della tastiera)
+  const held = new Map();
+  addEventListener("pointerdown", (e) => {
+    const b = e.target.closest("button[data-id]");
+    if (!b) return;
+    e.preventDefault();
+    b.setPointerCapture(e.pointerId);
+    held.set(e.pointerId, b); b.classList.add("down");
+    send({ aero: "button", id: b.dataset.id, down: true });
+  });
+  const up = (e) => {
+    const b = held.get(e.pointerId);
+    if (!b) return;
+    held.delete(e.pointerId); b.classList.remove("down");
+    send({ aero: "button", id: b.dataset.id, down: false });
+  };
+  addEventListener("pointerup", up); addEventListener("pointercancel", up);
+
+  // ---------------- cartuccia ----------------
+  // stati: out | dragging | inserting | inserted | ejecting
+  let state = P.get("inserted") === "1" ? "inserted" : "out";
+  let drag = null;
+  const move = (x, y, ms = 0) => {
+    cart._t = { x, y };
+    cart.style.transition = ms ? `transform ${ms}ms cubic-bezier(.3,.8,.3,1)` : "none";
+    cart.style.transform = `translate(${x}px, ${y}px)`;
+  };
+  /** spostamento che porta la cartuccia dentro lo slot (resta fuori solo il fondo) */
+  const insertedPos = () => {
+    const s = slot.getBoundingClientRect(), c = cart.getBoundingClientRect(), t = cart._t || { x: 0, y: 0 };
+    return { x: t.x + (s.left + s.width / 2) - (c.left + c.width / 2), y: t.y + s.top - c.top - c.height * 0.72 };
+  };
+  const nearSlot = () => {
+    const s = slot.getBoundingClientRect(), c = cart.getBoundingClientRect();
+    return Math.abs((c.left + c.width / 2) - (s.left + s.width / 2)) < s.width * 0.7 && c.top < s.bottom + c.height * 0.6 && c.bottom > s.top;
+  };
+  function insertAnim() {
+    state = "inserting"; slot.classList.remove("hot-glow"); hint.classList.add("gone");
+    const p = insertedPos();
+    move(p.x, p.y + 26, 220);                                           // si allinea sotto lo slot
+    setTimeout(() => { cart.classList.add("behind"); move(p.x, p.y, 420); }, 240); // entra dietro la scocca
+    setTimeout(() => { state = "inserted"; boot.classList.add("on"); send({ aero: "inserted" }); }, 700);
+  }
+  function placeInserted() {
+    hint.classList.add("gone"); cart.classList.add("behind");
+    requestAnimationFrame(() => { const p = insertedPos(); move(p.x, p.y); });
+  }
+  if (state === "inserted") placeInserted();
+  addEventListener("resize", () => { if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); } });
+
+  cart.addEventListener("pointerdown", (e) => {
+    if (state !== "out" && state !== "inserted") return;
+    e.preventDefault(); cart.setPointerCapture(e.pointerId);
+    const t = cart._t || { x: 0, y: 0 };
+    drag = { sx: e.clientX, sy: e.clientY, x: t.x, y: t.y, from: state };
+    cart.classList.add("dragging");
+    if (state === "out") state = "dragging";
+  });
+  cart.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    if (drag.from === "inserted") { move(drag.x, drag.y + Math.max(0, dy) * 0.9); return; } // si sfila solo verso il basso
+    move(drag.x + dx, drag.y + dy);
+    slot.classList.toggle("hot-glow", nearSlot());
+  });
+  const endDrag = (e) => {
+    if (!drag) return;
+    const from = drag.from, dy = e.clientY - drag.sy;
+    drag = null; cart.classList.remove("dragging");
+    if (from === "inserted") {
+      if (dy > 50) send({ aero: "eject-request" }); // la Home salva, poi chiama eject()
+      const q = insertedPos(); move(q.x, q.y, 200);                   // intanto torna dentro
+      return;
+    }
+    if (nearSlot()) insertAnim();
+    else { state = "out"; slot.classList.remove("hot-glow"); move(0, 0, 380); }
+  };
+  cart.addEventListener("pointerup", endDrag); cart.addEventListener("pointercancel", endDrag);
+
+  // ---------------- API per la Home (stessa origine) ----------------
+  window.aeroConsole = {
+    setScreen(stream) {
+      screenEl.querySelector("video")?.remove();
+      if (!stream) { boot.classList.toggle("on", state === "inserted"); return; }
+      boot.classList.remove("on");
+      const v = document.createElement("video");
+      v.muted = true; v.playsInline = true; v.autoplay = true; v.srcObject = stream;
+      screenEl.prepend(v); void v.play().catch(() => {});
+    },
+    eject() {
+      if (state === "ejecting") return;
+      state = "ejecting"; this.setScreen(null); boot.classList.remove("on");
+      const t = cart._t || { x: 0, y: 0 };
+      move(t.x, t.y + 70, 320);                                         // esce dal basso
+      setTimeout(() => { cart.classList.remove("behind"); move(0, 0, 520); }, 340);
+      setTimeout(() => { state = "out"; hint.classList.remove("gone"); send({ aero: "ejected" }); }, 900);
+    },
+    setNight(on) { document.documentElement.dataset.night = on ? "1" : "0"; },
+    get state() { return state; }
+  };
+  const img = consoleEl.querySelector("img.body");
+  const ready = () => send({ aero: "console-ready", console: "gba", inserted: state === "inserted" });
+  if (img.complete) ready(); else img.addEventListener("load", ready, { once: true });
+})();
+</script>
+</body>
+</html>
