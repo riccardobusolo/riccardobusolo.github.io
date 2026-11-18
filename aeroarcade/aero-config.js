@@ -12,10 +12,10 @@
  */
 window.AERO_CONFIG = {
   // Supabase → pulsante "Connect" → Project URL (es. "https://abcdefghijk.supabase.co")
-  SUPABASE_URL: "",
+  SUPABASE_URL: "https://rmazmtycpvlwniefuncl.supabase.co",
 
   // Supabase → Project Settings → API Keys → chiave "publishable" (sb_publishable_…) o "anon"
-  SUPABASE_ANON_KEY: "",
+  SUPABASE_ANON_KEY: "sb_publishable_0VExD9DCjDz_y9KwU1ea_A_wwCZOxGy",
 
   // Email dell'utente condiviso creato in Supabase → Authentication → Users
   SHARED_EMAIL: "giocatori@aero-arcade.example",
