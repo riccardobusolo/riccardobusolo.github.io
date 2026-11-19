@@ -46,13 +46,16 @@
   <div class="ds"><h2>DS 2 · Defra</h2><canvas id="t1" width="256" height="192"></canvas><canvas id="b1" class="bottom" width="256" height="192"></canvas></div>
 </div>
 <pre id="log"></pre>
-<script src="./duo.js"></script>
+<script>window.DUO_V="1795053353";</script>
+<script src="./duo.js?v=1795053353"></script>
 <script>
 (async () => {
   const $ = (id) => document.getElementById(id);
   const log = (m) => { $("log").textContent += m + "\n"; $("log").scrollTop = 1e9; };
   if (!window.crossOriginIsolated) { $("st").textContent = "Memoria condivisa non disponibile: ricarica la pagina (serve Chrome o Edge)."; log("crossOriginIsolated = false"); return; }
-  const M = await createDuo({ print: log, printErr: log });
+  addEventListener("error", (e) => log("Errore: " + e.message));
+  addEventListener("unhandledrejection", (e) => log("Errore: " + (e.reason?.message || e.reason)));
+  const M = await createDuo({ print: log, printErr: log, locateFile: (f) => f + "?v=" + window.DUO_V });
   const emu = new M.DuoEmulator();
   emu.setNickname(0, "Ricky"); emu.setNickname(1, "Defra");
   $("st").textContent = "Pronto: scegli la ROM.";
@@ -131,7 +134,7 @@
         }
       }
       playAudio();
-      if (now - fpsT > 1000) { $("st").textContent = `In funzione · ${Math.round(frames * 1000 / (now - fpsT))} fps · un fotogramma richiede DS1 ${emu.frameMs(0).toFixed(1)} ms, DS2 ${emu.frameMs(1).toFixed(1)} ms (sotto 16,7 = velocità piena)`; frames = 0; fpsT = now; }
+      if (now - fpsT > 1000) { $("st").textContent = `In funzione · ${Math.round(frames * 1000 / (now - fpsT))} fps · un fotogramma richiede DS1 ${(emu.frameMs ? emu.frameMs(0) : 0).toFixed(1)} ms, DS2 ${(emu.frameMs ? emu.frameMs(1) : 0).toFixed(1)} ms (sotto 16,7 = velocità piena)`; frames = 0; fpsT = now; }
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
