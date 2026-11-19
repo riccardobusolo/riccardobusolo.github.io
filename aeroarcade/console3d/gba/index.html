@@ -431,6 +431,8 @@
   // ---------------- cartuccia ----------------
   // stati: out | dragging | inserting | inserted | ejecting
   let state = P.get("inserted") === "1" ? "inserted" : "out";
+  let intro = null;
+  if (!SPECTATE) { const sc = document.createElement("script"); sc.src = `../intro/intro.js?v=${encodeURIComponent(P.get("v") || "")}`; document.head.append(sc); }
   let drag = null;
   const move = (x, y, ms = 0) => {
     cart._t = { x, y };
@@ -509,7 +511,14 @@
     move(p.x, p.y + ch * 0.72, 140);                                    // si allinea all'imbocco dello slot
     setTimeout(() => { cart.classList.add("behind"); sfx.slide(0.36); move(p.x, p.y, 380); }, 170); // entra dietro la scocca
     setTimeout(() => { sfx.seat(); }, 520);
-    setTimeout(() => { state = "inserted"; boot.classList.add("on"); send({ aero: "inserted" }); }, 600);
+    setTimeout(() => {
+      state = "inserted";
+      // l'intro di accensione, poi il gioco (la console dell'amico non la mostra)
+      if (!SPECTATE && window.AeroIntro) {
+        send({ aero: "intro" });
+        intro = window.AeroIntro.attach(screenEl, () => { intro = null; if (state !== "inserted") return; boot.classList.add("on"); send({ aero: "inserted" }); });
+      } else { boot.classList.add("on"); send({ aero: "inserted" }); }
+    }, 600);
   }
   function placeInserted() {
     hint.classList.add("gone"); cart.classList.add("behind");
@@ -587,6 +596,7 @@
         state = "out"; this.setScreen(null); boot.classList.remove("on"); screenEl.classList.remove("off");
         setTimeout(() => send({ aero: "ejected" }), 250); return;
       }
+      intro?.stop(); intro = null;
       state = "ejecting"; this.setScreen(null); boot.classList.remove("on");
       const t = cart._t || { x: 0, y: 0 };
       sfx.unseat(); setTimeout(() => sfx.slide(0.3), 60);
@@ -597,6 +607,7 @@
     nextSkin() { return applySkin(skinIdx + 1, true); },
     get skin() { return SKINS[skinIdx][1]; },
     insert() { if (state === "out") { computeLane(); insertAnim(); } },
+    skipIntro() { intro?.skip(); },
     setFilter(f) { screenEl.dataset.filter = f; },
     /** per la console dell'amico: skin, luce, copertina e cartuccia dentro/fuori */
     setSkin(id) { const i = SKINS.findIndex(([k]) => k === id); if (i >= 0 && i !== skinIdx) applySkin(i, true); },

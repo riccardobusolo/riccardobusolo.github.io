@@ -152,7 +152,9 @@
   addEventListener("pointerup", up); addEventListener("pointercancel", up);
 
   // cartuccia: trascinala nello slot per inserirla, trascinala fuori per espellerla
-  let state = P.get("inserted") === "1" ? "inserted" : "out"; // out | dragging | inserting | inserted | ejecting
+  let state = P.get("inserted") === "1" ? "inserted" : "out";
+  let intro = null;
+  if (P.get("spectate") !== "1") { const sc = document.createElement("script"); sc.src = `../intro/intro.js?v=${encodeURIComponent(P.get("v") || "")}`; document.head.append(sc); } // out | dragging | inserting | inserted | ejecting
   let drag = null;
   const rest = () => ({ x: 0, y: 0 });
   const slotPos = () => {
@@ -174,7 +176,14 @@
     const p = slotPos();
     move(p.x, p.y - 30, 260, 0.92);
     setTimeout(() => { cart.style.zIndex = "0"; move(p.x, p.y, 420, 0.9); }, 280); // scende nello slot, dietro la scocca
-    setTimeout(() => { state = "inserted"; cart.classList.add("inserted"); boot.classList.add("on"); send({ aero: "inserted" }); }, 760);
+    setTimeout(() => {
+      state = "inserted"; cart.classList.add("inserted");
+      const scr = document.querySelector(".screen");
+      if (!document.body.classList.contains("spectate") && window.AeroIntro && scr) {
+        send({ aero: "intro" });
+        intro = window.AeroIntro.attach(scr, () => { intro = null; if (state !== "inserted") return; boot.classList.add("on"); send({ aero: "inserted" }); });
+      } else { boot.classList.add("on"); send({ aero: "inserted" }); }
+    }, 760);
   }
   function placeInserted() {
     hint.classList.add("gone"); cart.style.zIndex = "0"; cart.classList.add("inserted");
@@ -229,6 +238,7 @@
     /** animazione di espulsione; alla fine avvisa la Home con "ejected" */
     eject() {
       if (state === "ejecting") return;
+      intro?.stop(); intro = null;
       state = "ejecting"; this.setScreen(null); boot.classList.remove("on");
       const t = cart._t || rest();
       cart.style.zIndex = "3";
@@ -237,6 +247,7 @@
       setTimeout(() => { state = "out"; cart.classList.remove("inserted"); send({ aero: "ejected" }); }, 950);
     },
     insert() { if (state === "out") insertAnim(); },
+    skipIntro() { intro?.skip(); },
     setSkin() {}, setLight() {}, setCover() {},
     showInserted(on) { if (on && state === "out") insertAnim(); else if (!on && state === "inserted") { state = "out"; cart.classList.remove("inserted"); move(0, 0, 400, 1); this.setScreen(null); } },
     setFilter(f) { document.querySelectorAll(".screen").forEach((el) => (el.dataset.filter = f)); },
