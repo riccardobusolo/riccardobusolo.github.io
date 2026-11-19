@@ -1,0 +1,33 @@
+Unable to find image 'devkitpro/devkitarm:latest' locally
+latest: Pulling from devkitpro/devkitarm
+74701f26999d: Pulling fs layer
+3c5026e520ae: Pulling fs layer
+ea5d3216df1f: Pulling fs layer
+59e22667830b: Pulling fs layer
+ea5d3216df1f: Download complete
+59e22667830b: Download complete
+956ab3702a6f: Download complete
+59e22667830b: Pull complete
+3c5026e520ae: Download complete
+74701f26999d: Download complete
+74701f26999d: Pull complete
+ea5d3216df1f: Pull complete
+3c5026e520ae: Pull complete
+Digest: sha256:116afba8df8453961de2936ffab20dd441edf4d682856c1ec8b0e53d7ed0bbf5
+Status: Downloaded newer image for devkitpro/devkitarm:latest
+main.c
+linking w.elf
+/opt/devkitpro/devkitARM/arm-none-eabi/bin/ld: ../libs/lib/libdswifi9.a(wifi_arm9.o): in function `arm9_synctoarm7':
+C:\devkitPro\dswifi-master\arm9\release/C:/devkitPro/dswifi-master/arm9/source/wifi_arm9.c:1128:(.text.arm9_synctoarm7+0x6): undefined reference to `fifoSendValue32'
+/opt/devkitpro/devkitARM/arm-none-eabi/bin/ld: ../libs/lib/libdswifi9.a(wifi_arm9.o): in function `Wifi_Init':
+C:\devkitPro\dswifi-master\arm9\release/C:/devkitPro/dswifi-master/arm9/source/wifi_arm9.c:909:(.text.Wifi_Init+0xe): undefined reference to `DC_FlushAll'
+/opt/devkitpro/devkitARM/arm-none-eabi/bin/ld: C:\devkitPro\dswifi-master\arm9\release/C:/devkitPro/dswifi-master/arm9/source/wifi_arm9.c:910:(.text.Wifi_Init+0x14): undefined reference to `memUncached'
+/opt/devkitpro/devkitARM/arm-none-eabi/bin/ld: ../libs/lib/libdswifi9.a(wifi_arm9.o): in function `Wifi_InitDefault':
+C:\devkitPro\dswifi-master\arm9\release/C:/devkitPro/dswifi-master/arm9/source/wifi_arm9.c:1147:(.text.Wifi_InitDefault+0xa): undefined reference to `fifoSetValue32Handler'
+/opt/devkitpro/devkitARM/arm-none-eabi/bin/ld: C:\devkitPro\dswifi-master\arm9\release/C:/devkitPro/dswifi-master/arm9/source/wifi_arm9.c:1154:(.text.Wifi_InitDefault+0x22): undefined reference to `irqEnable'
+/opt/devkitpro/devkitARM/arm-none-eabi/bin/ld: C:\devkitPro\dswifi-master\arm9\release/C:/devkitPro/dswifi-master/arm9/source/wifi_arm9.c:1162:(.text.Wifi_InitDefault+0x3c): undefined reference to `fifoSendAddress'
+/opt/devkitpro/devkitARM/arm-none-eabi/bin/ld: C:\devkitPro\dswifi-master\arm9\release/C:/devkitPro/dswifi-master/arm9/source/wifi_arm9.c:1165:(.text.Wifi_InitDefault+0x50): undefined reference to `swiWaitForVBlank'
+/opt/devkitpro/devkitARM/arm-none-eabi/bin/ld: C:\devkitPro\dswifi-master\arm9\release/C:/devkitPro/dswifi-master/arm9/source/wifi_arm9.c:1177:(.text.Wifi_InitDefault+0x66): undefined reference to `swiWaitForVBlank'
+collect2: error: ld returned 1 exit status
+make[1]: *** [/opt/devkitpro/devkitARM/ds_rules:61: /w/w.elf] Error 1
+make: *** [Makefile:116: build] Error 2
