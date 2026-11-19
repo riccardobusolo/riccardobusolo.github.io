@@ -4,6 +4,7 @@
 #include <thread>
 #include <semaphore>
 #include <mutex>
+#include <condition_variable>
 #include <chrono>
 #include <unistd.h>
 #include <cstdio>
@@ -47,16 +48,26 @@ namespace melonDS::Platform {
   void Thread_Free(Thread* t) { auto* th = (std::thread*)t; if (th->joinable()) th->detach(); delete th; }
   void Thread_Wait(Thread* t) { ((std::thread*)t)->join(); }
 
-  using sem_t2 = std::counting_semaphore<0x7fffffff>;
-  Semaphore* Semaphore_Create() { return (Semaphore*)new sem_t2(0); }
+  // semaforo con mutex + condition variable: si sveglia subito quando arriva un pacchetto
+  // (quello della libreria standard fa polling con attese crescenti e rallenta il collegamento)
+  struct sem_t2 {
+    std::mutex m; std::condition_variable cv; long n = 0;
+    void post(int c) { { std::lock_guard<std::mutex> l(m); n += c; } if (c == 1) cv.notify_one(); else cv.notify_all(); }
+    void wait() { std::unique_lock<std::mutex> l(m); cv.wait(l, [&] { return n > 0; }); n--; }
+    bool tryWait(int ms) {
+      std::unique_lock<std::mutex> l(m);
+      if (ms <= 0) { if (n > 0) { n--; return true; } return false; }
+      if (!cv.wait_for(l, std::chrono::milliseconds(ms), [&] { return n > 0; })) return false;
+      n--; return true;
+    }
+    void reset() { std::lock_guard<std::mutex> l(m); n = 0; }
+  };
+  Semaphore* Semaphore_Create() { return (Semaphore*)new sem_t2(); }
   void Semaphore_Free(Semaphore* s) { delete (sem_t2*)s; }
-  void Semaphore_Reset(Semaphore* s) { while (((sem_t2*)s)->try_acquire()) {} }
-  void Semaphore_Wait(Semaphore* s) { ((sem_t2*)s)->acquire(); }
-  bool Semaphore_TryWait(Semaphore* s, int timeout_ms) {
-    if (timeout_ms <= 0) return ((sem_t2*)s)->try_acquire();
-    return ((sem_t2*)s)->try_acquire_for(std::chrono::milliseconds(timeout_ms));
-  }
-  void Semaphore_Post(Semaphore* s, int count) { ((sem_t2*)s)->release(count); }
+  void Semaphore_Reset(Semaphore* s) { ((sem_t2*)s)->reset(); }
+  void Semaphore_Wait(Semaphore* s) { ((sem_t2*)s)->wait(); }
+  bool Semaphore_TryWait(Semaphore* s, int timeout_ms) { return ((sem_t2*)s)->tryWait(timeout_ms); }
+  void Semaphore_Post(Semaphore* s, int count) { ((sem_t2*)s)->post(count); }
 
   Mutex* Mutex_Create() { return (Mutex*)new std::mutex(); }
   void Mutex_Free(Mutex* m) { delete (std::mutex*)m; }
