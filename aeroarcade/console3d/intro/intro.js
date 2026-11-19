@@ -68,12 +68,13 @@ window.AeroIntro = { preload: loadFont, attach, play(cv, opts = {}) {
   const bokeh = Array.from({ length: 14 }, () => ({ x: rnd(), y: 0.05 + rnd() * 0.5, r: 0.02 + rnd() * 0.06, ph: rnd() * 6.3, hue: rnd() }));
   const clouds = Array.from({ length: 5 }, (_, i) => ({ x: i / 5 + rnd() * 0.08, y: 0.15 + rnd() * 0.18, s: 0.45 + rnd() * 0.4, sp: 0.005 + rnd() * 0.008, v: i % 3, far: i % 2 === 0 }));
   const glints = Array.from({ length: 34 }, () => ({ x: rnd(), y: rnd(), ph: rnd() * 6.3, s: 0.4 + rnd() * 0.8 }));
-  const fish = [{ y: 0.8, sp: 0.07, ph: 0, s: 1, dir: 1, t0: 0.2, hue: 0 }, { y: 0.9, sp: 0.05, ph: 2, s: 0.75, dir: -1, t0: 0.6, hue: 1 }, { y: 0.74, sp: 0.06, ph: 4, s: 0.6, dir: 1, t0: 1.2, hue: 0 }];
+  const fish = [{ y: 0.8, sp: 0.075, ph: 0, s: 1, dir: 1, t0: 0.2, hue: 0 }, { y: 0.88, sp: 0.055, ph: 2, s: 0.8, dir: -1, t0: 0.5, hue: 1 }, { y: 0.75, sp: 0.065, ph: 4, s: 0.6, dir: 1, t0: 1.2, hue: 0 }, { y: 0.93, sp: 0.05, ph: 5.2, s: 0.55, dir: -1, t0: 2.4, hue: 1 }];
   const vines = [0.2, 2.3, 4.2, 5.6].map((lon0, i) => ({ lon0, dir: i % 2 ? -1 : 1, turns: 0.85 + rnd() * 0.35, t0: 3.15 + i * 0.16, w: 0.017 - i * 0.0015,
     leaves: Array.from({ length: 19 }, (_, k) => ({ u: 0.04 + k * 0.05 + rnd() * 0.02, side: k % 2 ? 1 : -1, s: 0.05 + rnd() * 0.02, sway: rnd() * 6.3, v: Math.floor(rnd() * 3) })) }));
   const sparks = Array.from({ length: 18 }, () => ({ a: rnd() * 6.3, d: 0.7 + rnd() * 0.9, t0: 5.0 + rnd() * 2.2, s: 0.012 + rnd() * 0.02 }));
 
   // ---------------- sprite preparate una volta ----------------
+  let shineC = null;
   let cloudSp = [], cloudFar = [], causticSp = null, leafSp = [], bubbleSp = null, logoSprite = null, bloomC = null;
   const lampImg = new Image();
   lampImg.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(LAVA.replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="500" '));
@@ -200,10 +201,10 @@ window.AeroIntro = { preload: loadFont, attach, play(cv, opts = {}) {
 
   function drawSky(t, sy) {
     if (sy <= 0) return;
-    g.save(); g.beginPath(); g.rect(0, 0, CW, sy); g.clip();
+    g.save(); g.beginPath(); g.rect(0, 0, CW, sy + CH * 0.05); g.clip();
     const gr = g.createLinearGradient(0, 0, 0, CH * HORIZON);
     gr.addColorStop(0, "#044caf"); gr.addColorStop(0.4, "#1583e6"); gr.addColorStop(0.75, "#5cbcf6"); gr.addColorStop(0.94, "#b4e8ff"); gr.addColorStop(1, "#dcf6ff");
-    g.fillStyle = gr; g.fillRect(0, 0, CW, sy);
+    g.fillStyle = gr; g.fillRect(0, 0, CW, sy + CH * 0.05);
     const sun = SUN();
     // raggi morbidi (sfocati) che ruotano piano
     g.save(); g.globalCompositeOperation = "lighter"; g.filter = `blur(${CH * 0.008}px)`;
@@ -272,14 +273,26 @@ window.AeroIntro = { preload: loadFont, attach, play(cv, opts = {}) {
     g.restore();
   }
 
+  // profilo delle onde: tre ondulazioni che si sommano, più alte mentre si risale
+  function waveY(x, t, sy) {
+    const settle = clamp((t - 2.6) / 1.5), A = CH * (0.03 - 0.012 * settle);
+    const u = x / CW;
+    return sy + A * (Math.sin(u * 13 + t * 2.1) * 0.55 + Math.sin(u * 29 - t * 3.3) * 0.25 + Math.sin(u * 5.5 + t * 0.8 + 1) * 0.6);
+  }
+  function wavePath(t, sy, bottom) {
+    const p = new Path2D(); p.moveTo(0, bottom);
+    for (let x = 0; x <= CW + 1; x += CW / 120) p.lineTo(x, waveY(x, t, sy));
+    p.lineTo(CW, bottom); p.closePath(); return p;
+  }
+  let wobC = null;
   function drawWater(t, sy) {
-    const top = Math.max(0, sy);
-    if (top >= CH) return;
-    g.save(); g.beginPath(); g.rect(0, top, CW, CH - top); g.clip();
+    if (sy - CH * 0.03 >= CH) return;
+    const top = Math.max(0, sy - CH * 0.03);
+    const clipP = wavePath(t, sy, CH);
+    g.save(); g.clip(clipP);
     const deep = g.createLinearGradient(0, top, 0, CH);
     deep.addColorStop(0, "#4fe0f0"); deep.addColorStop(0.18, "#1ab4d8"); deep.addColorStop(0.55, "#0a78b4"); deep.addColorStop(1, "#03305f");
     g.fillStyle = deep; g.fillRect(0, top, CW, CH - top);
-    // caustiche: due trame che scorrono, più forti vicino alla superficie
     g.globalCompositeOperation = "lighter";
     const tile = CH * 1.1;
     for (const [sp, a, sc] of [[0.03, 0.22, 1], [-0.02, 0.16, 1.37]]) {
@@ -288,7 +301,6 @@ window.AeroIntro = { preload: loadFont, attach, play(cv, opts = {}) {
       for (let y = top - tile * sc + oy; y < top + CH * 0.45; y += tile * sc) for (let x = -tile * sc + ox; x < CW; x += tile * sc) g.drawImage(causticSp, x, y, tile * sc, tile * sc);
     }
     g.globalAlpha = 1;
-    // fasci di luce sfocati
     g.filter = `blur(${CH * 0.012}px)`;
     for (let i = 0; i < 9; i++) {
       const x = CW * (i / 8) + Math.sin(t * 0.7 + i * 1.7) * CW * 0.04, w = CW * (0.02 + (i % 3) * 0.014), len = CH * 1.1;
@@ -296,55 +308,107 @@ window.AeroIntro = { preload: loadFont, attach, play(cv, opts = {}) {
       g.fillStyle = sg; g.beginPath(); g.moveTo(x - w, top); g.lineTo(x + w, top); g.lineTo(x + w * 2.6 + CW * 0.05, top + len); g.lineTo(x - w * 0.4 + CW * 0.05, top + len); g.fill();
     }
     g.filter = "none";
-    // particelle sospese
     for (const m of motes) {
       const x = CW * ((m.x + t * m.sp) % 1), y = top + (CH - top) * ((m.y + Math.sin(t + m.ph) * 0.01) % 1);
       g.fillStyle = `rgba(220,255,255,${0.25 + 0.2 * Math.sin(t * 3 + m.ph)})`; g.beginPath(); g.arc(x, y, m.s * S * 0.6, 0, 6.3); g.fill();
     }
     g.globalCompositeOperation = "source-over";
-    // il profondo scurisce le caustiche
     const fog = g.createLinearGradient(0, top + CH * 0.1, 0, CH); fog.addColorStop(0, "rgba(3,48,95,0)"); fog.addColorStop(1, "rgba(3,40,85,.55)");
     g.fillStyle = fog; g.fillRect(0, top, CW, CH - top);
-    for (const f of fish) drawFish(t, f, top);
+    for (const f of fish) drawFish(t, f, sy);
     g.restore();
-    // superficie: riflesso del cielo, scintille del sole e linea d'argento
-    if (sy > -CH * 0.05 && sy < CH) {
-      const band = CH * 0.05;
-      const sg = g.createLinearGradient(0, sy - band * 0.3, 0, sy + band);
-      sg.addColorStop(0, "rgba(255,255,255,0)"); sg.addColorStop(0.25, "rgba(255,255,255,.95)"); sg.addColorStop(0.45, "rgba(200,250,255,.55)"); sg.addColorStop(1, "rgba(120,220,240,0)");
-      g.fillStyle = sg; g.beginPath(); g.moveTo(0, sy + band);
-      for (let x = 0; x <= CW; x += CW / 90) g.lineTo(x, sy + Math.sin(x / CW * 18 + t * 3) * CH * 0.004 + Math.sin(x / CW * 7 - t * 1.6) * CH * 0.003);
-      g.lineTo(CW, sy + band); g.closePath(); g.fill();
-      // scie di sole sull'acqua
-      if (sy > CH * 0.3) {
-        const sun = SUN(); g.save(); g.globalCompositeOperation = "lighter";
-        const col = g.createLinearGradient(0, sy, 0, sy + CH * 0.18); col.addColorStop(0, "rgba(255,255,230,.55)"); col.addColorStop(1, "rgba(255,255,230,0)");
-        g.fillStyle = col; g.beginPath(); g.moveTo(sun.x - CW * 0.03, sy); g.lineTo(sun.x + CW * 0.03, sy); g.lineTo(sun.x + CW * 0.09, sy + CH * 0.18); g.lineTo(sun.x - CW * 0.09, sy + CH * 0.18); g.fill();
-        for (const s2 of glints) {
-          const a = Math.max(0, Math.sin(t * 6 + s2.ph)); if (a < 0.4) continue;
-          const x = sun.x + (s2.x - 0.5) * CW * 0.22 * (0.4 + s2.y), y = sy + s2.y * CH * 0.16, r = CH * 0.006 * s2.s * a;
-          g.fillStyle = `rgba(255,255,240,${a})`; g.beginPath(); g.moveTo(x - r * 3, y); g.lineTo(x, y - r); g.lineTo(x + r * 3, y); g.lineTo(x, y + r); g.fill();
-        }
-        g.restore();
+    // l'acqua deforma quello che c'è sotto: righe spostate a onda (rifrazione)
+    const y0 = Math.max(0, Math.floor(sy + CH * 0.02)), hh = CH - y0;
+    if (hh > 4) {
+      wobC ??= mk(CW, CH); if (wobC.width !== CW || wobC.height !== CH) { wobC.width = CW; wobC.height = CH; }
+      const wx = wobC.getContext("2d"); wx.clearRect(0, 0, CW, hh); wx.drawImage(buf, 0, y0, CW, hh, 0, 0, CW, hh);
+      const step = Math.max(1, S);
+      for (let y = 0; y < hh; y += step) {
+        const dx = Math.sin(y / CH * 40 + t * 3) * S * 1.4 + Math.sin(y / CH * 13 - t * 1.7) * S * 0.8;
+        g.drawImage(wobC, 0, y, CW, step, dx, y0 + y, CW, step);
       }
     }
+    if (sy > CH) return;
+    // superficie vista di taglio: il cielo riflesso, mosso dalle onde
+    g.save(); g.clip(clipP);
+    const band = CH * 0.045;
+    const refl = g.createLinearGradient(0, sy - band * 0.4, 0, sy + band);
+    refl.addColorStop(0, "rgba(235,252,255,.95)"); refl.addColorStop(0.35, "rgba(170,235,255,.75)"); refl.addColorStop(0.7, "rgba(90,205,235,.35)"); refl.addColorStop(1, "rgba(60,190,230,0)");
+    g.fillStyle = refl; g.fillRect(0, sy - band, CW, band * 2.2);
+    g.restore();
+    // creste: un filo di luce sul profilo dell'onda e qualche schiuma che scorre
+    g.save(); g.lineJoin = "round";
+    const crest = new Path2D(); for (let x = 0; x <= CW + 1; x += CW / 120) { const y = waveY(x, t, sy); x ? crest.lineTo(x, y) : crest.moveTo(x, y); }
+    g.strokeStyle = "rgba(255,255,255,.95)"; g.lineWidth = Math.max(1, CH * 0.006); g.stroke(crest);
+    g.globalCompositeOperation = "lighter"; g.filter = `blur(${CH * 0.006}px)`; g.strokeStyle = "rgba(200,250,255,.6)"; g.lineWidth = CH * 0.014; g.stroke(crest); g.filter = "none";
+    for (let i = 0; i < 18; i++) {
+      const x = ((i / 18 + t * (0.02 + (i % 3) * 0.01)) % 1) * CW, y = waveY(x, t, sy) + CH * (0.008 + (i % 4) * 0.006), w = CW * (0.015 + (i % 5) * 0.006);
+      const a = 0.25 + 0.25 * Math.sin(t * 2 + i);
+      g.strokeStyle = `rgba(255,255,255,${a})`; g.lineWidth = Math.max(0.6, CH * 0.003);
+      g.beginPath(); g.moveTo(x - w, y); g.quadraticCurveTo(x, y - CH * 0.004, x + w, y); g.stroke();
+    }
+    g.restore();
+    // scia di sole e scintille sull'acqua
+    if (sy > CH * 0.3) {
+      const sun = SUN(); g.save(); g.globalCompositeOperation = "lighter";
+      const col = g.createLinearGradient(0, sy, 0, sy + CH * 0.2); col.addColorStop(0, "rgba(255,255,230,.5)"); col.addColorStop(1, "rgba(255,255,230,0)");
+      g.fillStyle = col; g.beginPath(); g.moveTo(sun.x - CW * 0.03, sy); g.lineTo(sun.x + CW * 0.03, sy); g.lineTo(sun.x + CW * 0.09, sy + CH * 0.2); g.lineTo(sun.x - CW * 0.09, sy + CH * 0.2); g.fill();
+      for (const s2 of glints) {
+        const a = Math.max(0, Math.sin(t * 6 + s2.ph)); if (a < 0.4) continue;
+        const x = sun.x + (s2.x - 0.5) * CW * 0.22 * (0.4 + s2.y), y = waveY(sun.x, t, sy) + s2.y * CH * 0.16, r = CH * 0.006 * s2.s * a;
+        g.fillStyle = `rgba(255,255,240,${a})`; g.beginPath(); g.moveTo(x - r * 3, y); g.lineTo(x, y - r); g.lineTo(x + r * 3, y); g.lineTo(x, y + r); g.fill();
+      }
+      g.restore();
+    }
   }
-  function drawFish(t, f, top) {
-    const p = (t - f.t0) * f.sp; if (p < 0) return;
-    const x = f.dir > 0 ? CW * (-0.1 + p * 1.2) : CW * (1.1 - p * 1.2), y = CH * f.y + Math.sin(t * 2 + f.ph) * CH * 0.012;
-    if (y < top + CH * 0.03) return;
-    const s = CH * 0.04 * f.s, sw = Math.sin(t * 9 + f.ph);
-    g.save(); g.translate(x, y); g.scale(f.dir, 1); g.rotate(sw * 0.04);
-    const c = f.hue ? ["#fff1c9", "#ffb347", "#e06a00"] : ["#ffd9a8", "#ff7a2a", "#c43c00"];
-    // pinne trasparenti
-    g.fillStyle = "rgba(255,170,90,.55)";
-    g.beginPath(); g.moveTo(-s * 0.85, 0); g.bezierCurveTo(-s * 1.5, -s * (0.9 + sw * 0.2), -s * 2.1, -s * 0.6, -s * 1.9, 0); g.bezierCurveTo(-s * 2.1, s * 0.6, -s * 1.5, s * (0.9 - sw * 0.2), -s * 0.85, 0); g.fill();
-    g.beginPath(); g.moveTo(-s * 0.2, -s * 0.45); g.quadraticCurveTo(s * 0.1, -s * 1.0, s * 0.45, -s * 0.48); g.fill();
-    const fg = g.createLinearGradient(0, -s * 0.6, 0, s * 0.6); fg.addColorStop(0, c[0]); fg.addColorStop(0.45, c[1]); fg.addColorStop(1, c[2]);
-    g.fillStyle = fg; g.beginPath(); g.ellipse(0, 0, s, s * 0.55, 0, 0, 6.3); g.fill();
-    g.fillStyle = "rgba(255,255,255,.75)"; g.beginPath(); g.ellipse(s * 0.1, -s * 0.28, s * 0.6, s * 0.12, 0, 0, 6.3); g.fill();
-    g.fillStyle = "#fff"; g.beginPath(); g.arc(s * 0.58, -s * 0.1, s * 0.13, 0, 6.3); g.fill();
-    g.fillStyle = "#13202c"; g.beginPath(); g.arc(s * 0.62, -s * 0.1, s * 0.08, 0, 6.3); g.fill();
+  // pesce che nuota davvero: la spina dorsale ondeggia, la coda batte, la rotta cambia piano
+  function drawFish(t, f, sy) {
+    const p = (t - f.t0) * f.sp + Math.sin(t * 0.7 + f.ph) * 0.02; if (p < 0) return;
+    const u0 = f.dir > 0 ? -0.12 + p * 1.25 : 1.12 - p * 1.25;
+    const x = CW * u0, y = CH * (f.y + Math.sin(t * 0.6 + f.ph) * 0.03 + Math.sin(t * 1.7 + f.ph) * 0.006);
+    if (y < sy + CH * 0.05 || x < -CW * 0.2 || x > CW * 1.2) return;
+    const vy = Math.cos(t * 0.6 + f.ph) * 0.6 * 0.03 + Math.cos(t * 1.7 + f.ph) * 1.7 * 0.006;
+    const L = CH * 0.13 * f.s, beat = t * (7 + 2 * Math.sin(t * 0.9 + f.ph)) + f.ph;
+    const N = 14, pts = [];
+    for (let i = 0; i <= N; i++) {
+      const u = i / N, off = Math.sin(beat - u * 3.4) * L * 0.075 * Math.pow(u, 1.4);
+      pts.push({ x: L * 0.5 - u * L, y: off });
+    }
+    const wid = (u) => L * 0.2 * Math.pow(Math.sin(Math.PI * (0.06 + u * 0.88)), 0.75) * (1 - 0.55 * u);
+    g.save(); g.translate(x, y); g.scale(f.dir, 1); g.rotate(Math.atan2(vy * CH, f.sp * CW * 1.25) * f.dir * 0.6);
+    const c = f.hue ? ["#fff3d0", "#ffbb52", "#e47a06"] : ["#ffe0b8", "#ff7d2e", "#c63d00"];
+    // coda a due lobi, segue l'ultimo tratto della spina
+    const tl = pts[N], tp = pts[N - 2], ang = Math.atan2(tl.y - tp.y, tl.x - tp.x), fl = Math.sin(beat - 3.4) * 0.25;
+    g.save(); g.translate(tl.x, tl.y); g.rotate(ang + Math.PI + fl);
+    const tg = g.createLinearGradient(0, 0, -L * 0.4, 0); tg.addColorStop(0, "rgba(255,150,60,.85)"); tg.addColorStop(1, "rgba(255,200,140,.35)");
+    g.fillStyle = tg; g.beginPath(); g.moveTo(0, 0); g.bezierCurveTo(-L * 0.15, -L * 0.1, -L * 0.35, -L * 0.28, -L * 0.42, -L * 0.24);
+    g.quadraticCurveTo(-L * 0.28, 0, -L * 0.42, L * 0.24); g.bezierCurveTo(-L * 0.35, L * 0.28, -L * 0.15, L * 0.1, 0, 0); g.fill();
+    g.restore();
+    // pinna dorsale trasparente
+    const m = pts[5]; g.fillStyle = "rgba(255,190,120,.5)";
+    g.beginPath(); g.moveTo(m.x + L * 0.12, m.y - wid(0.36) * 0.9); g.quadraticCurveTo(m.x - L * 0.02, m.y - wid(0.36) * 2.2, m.x - L * 0.18, m.y - wid(0.5) * 0.9); g.fill();
+    // corpo
+    const body = new Path2D();
+    pts.forEach((q, i) => { const w = wid(i / N); i ? body.lineTo(q.x, q.y - w) : body.moveTo(q.x, q.y - w); });
+    for (let i = N; i >= 0; i--) { const q = pts[i], w = wid(i / N); body.lineTo(q.x, q.y + w); }
+    body.closePath();
+    const bg = g.createLinearGradient(0, -L * 0.2, 0, L * 0.2); bg.addColorStop(0, c[2]); bg.addColorStop(0.35, c[1]); bg.addColorStop(0.75, c[0]); bg.addColorStop(1, "#fff6ea");
+    g.fillStyle = bg; g.fill(body);
+    g.save(); g.clip(body);
+    // squame: riflessi che scorrono con il movimento
+    g.globalCompositeOperation = "lighter";
+    const sh = g.createLinearGradient(-L * 0.5 + Math.sin(beat * 0.3) * L * 0.2, 0, L * 0.5, 0); sh.addColorStop(0, "rgba(255,255,255,0)"); sh.addColorStop(0.5, "rgba(255,240,200,.35)"); sh.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = sh; g.fillRect(-L, -L, L * 2, L * 0.9);
+    g.restore();
+    g.strokeStyle = "rgba(120,30,0,.35)"; g.lineWidth = Math.max(0.5, L * 0.012); g.stroke(body);
+    // pinna pettorale che sbatte
+    const h0 = pts[3], pf = Math.sin(beat * 1.3) * 0.5;
+    g.save(); g.translate(h0.x, h0.y + wid(0.2) * 0.4); g.rotate(0.6 + pf); g.fillStyle = "rgba(255,210,150,.7)";
+    g.beginPath(); g.ellipse(-L * 0.06, 0, L * 0.09, L * 0.035, 0, 0, 6.3); g.fill(); g.restore();
+    // occhio
+    const e = pts[1]; g.fillStyle = "#fff"; g.beginPath(); g.arc(e.x, e.y - L * 0.03, L * 0.045, 0, 6.3); g.fill();
+    g.fillStyle = "#10202c"; g.beginPath(); g.arc(e.x + L * 0.008, e.y - L * 0.03, L * 0.028, 0, 6.3); g.fill();
+    g.fillStyle = "#fff"; g.beginPath(); g.arc(e.x + L * 0.016, e.y - L * 0.04, L * 0.009, 0, 6.3); g.fill();
     g.restore();
   }
 
@@ -515,13 +579,19 @@ window.AeroIntro = { preload: loadFont, attach, play(cv, opts = {}) {
     g.save(); g.translate(cx, cy); g.scale(0.55 + 0.45 * s, 0.55 + 0.45 * s);
     g.drawImage(logoSprite, -w / 2, -h / 2, w, h);
     g.restore(); g.globalAlpha = 1;
-    const p = (t - 5.7) / 0.8;
+    // lucentezza che scorre solo dentro le lettere (non un velo sopra la scena)
+    const p = (t - 5.6) / 1.1;
     if (p > 0 && p < 1) {
-      g.save(); g.globalCompositeOperation = "lighter";
-      const x = cx - w / 2 + w * p;
-      const sg = g.createLinearGradient(x - CW * 0.06, 0, x + CW * 0.06, 0); sg.addColorStop(0, "rgba(255,255,255,0)"); sg.addColorStop(0.5, "rgba(255,255,255,.55)"); sg.addColorStop(1, "rgba(255,255,255,0)");
-      g.fillStyle = sg; g.beginPath(); g.moveTo(x - CW * 0.04, cy - h * 0.45); g.lineTo(x + CW * 0.08, cy - h * 0.45); g.lineTo(x + CW * 0.04, cy + h * 0.45); g.lineTo(x - CW * 0.08, cy + h * 0.45); g.fill();
-      g.restore();
+      shineC ??= mk(w, h); if (shineC.width !== w || shineC.height !== h) { shineC.width = w; shineC.height = h; }
+      const sx = shineC.getContext("2d");
+      sx.globalCompositeOperation = "source-over"; sx.clearRect(0, 0, w, h); sx.drawImage(logoSprite, 0, 0);
+      sx.globalCompositeOperation = "source-in";
+      const bx = -w * 0.3 + w * 1.6 * inout(p);
+      const sg = sx.createLinearGradient(bx - w * 0.12, 0, bx + w * 0.12, h * 0.4);
+      sg.addColorStop(0, "rgba(255,255,255,0)"); sg.addColorStop(0.45, "rgba(255,255,255,.75)"); sg.addColorStop(0.55, "rgba(255,255,255,.75)"); sg.addColorStop(1, "rgba(255,255,255,0)");
+      sx.fillStyle = sg; sx.fillRect(0, 0, w, h);
+      g.save(); g.globalCompositeOperation = "lighter"; g.translate(cx, cy); g.scale(0.55 + 0.45 * s, 0.55 + 0.45 * s);
+      g.drawImage(shineC, -w / 2, -h / 2, w, h); g.restore();
     }
     for (const s2 of sparks) {
       const q = (t - s2.t0) / 0.8; if (q <= 0 || q >= 1) continue;
@@ -562,6 +632,7 @@ window.AeroIntro = { preload: loadFont, attach, play(cv, opts = {}) {
 
   function frame(t) {
     g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = "source-over"; g.filter = "none"; g.shadowColor = "transparent";
+    g.fillStyle = "#0a78b4"; g.fillRect(0, 0, CW, CH);
     const sy = surfaceY(t);
     drawSky(t, sy);
     drawAurora(t);
