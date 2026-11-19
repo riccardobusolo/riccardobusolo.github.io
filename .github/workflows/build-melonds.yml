@@ -1,0 +1,40 @@
+# Compila melonDS per il browser (due DS collegati) e salva il risultato in dist/
+name: Compila melonDS (due DS)
+on:
+  push:
+    branches: [melonds-build]
+    paths-ignore: ["dist/**"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 4.0.0
+          actions-cache-folder: emsdk-cache
+      - name: Configura
+        working-directory: wasmelonDS
+        run: |
+          emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_QT_SDL=OFF -DBUILD_WASM=OFF -DBUILD_DUO=ON -DENABLE_OGLRENDERER=OFF -DENABLE_JIT=OFF \
+            -DENABLE_LTO_RELEASE=OFF -DCMAKE_C_FLAGS="-pthread" -DCMAKE_CXX_FLAGS="-pthread" 2>&1 | tee ../configure.log
+      - name: Compila
+        working-directory: wasmelonDS
+        run: cmake --build build --target duo -j4 2>&1 | tee ../build.log
+      - name: Salva il risultato
+        if: always()
+        run: |
+          mkdir -p dist
+          cp configure.log build.log dist/ 2>/dev/null || true
+          cp wasmelonDS/build/src/frontend/duo/duo.js wasmelonDS/build/src/frontend/duo/duo.wasm dist/ 2>/dev/null || true
+          ls -la wasmelonDS/build/src/frontend/duo/ > dist/files.txt 2>&1 || true
+          echo "${GITHUB_SHA} $(date -u +%FT%TZ) ${{ job.status }}" > dist/STATUS.txt
+          git config user.name "aero-build"
+          git config user.email "aero-build@users.noreply.github.com"
+          git add dist
+          git commit -m "dist: build ${GITHUB_SHA::7} [skip ci]" || echo "niente da salvare"
+          git push
