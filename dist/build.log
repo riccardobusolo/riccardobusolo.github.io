@@ -14,15 +14,15 @@
 [14/70] Building CXX object src/CMakeFiles/core.dir/ARMInterpreter_Branch.cpp.o
 [15/70] Building CXX object src/CMakeFiles/core.dir/ARMInterpreter_ALU.cpp.o
 [16/70] Building CXX object src/CMakeFiles/core.dir/ARMInterpreter_LoadStore.cpp.o
-[17/70] Building CXX object src/CMakeFiles/core.dir/CRC32.cpp.o
-[18/70] Building CXX object src/CMakeFiles/core.dir/CP15.cpp.o
+[17/70] Building CXX object src/CMakeFiles/core.dir/CP15.cpp.o
+[18/70] Building CXX object src/CMakeFiles/core.dir/CRC32.cpp.o
 [19/70] Building CXX object src/CMakeFiles/core.dir/DMA_Timings.cpp.o
 [20/70] Building CXX object src/CMakeFiles/core.dir/DMA.cpp.o
 [21/70] Building CXX object src/CMakeFiles/core.dir/DSi.cpp.o
 [22/70] Building CXX object src/CMakeFiles/core.dir/DSi_AES.cpp.o
 [23/70] Building CXX object src/CMakeFiles/core.dir/DSi_Camera.cpp.o
-[24/70] Building CXX object src/CMakeFiles/core.dir/DSi_I2C.cpp.o
-[25/70] Building CXX object src/CMakeFiles/core.dir/DSi_DSP.cpp.o
+[24/70] Building CXX object src/CMakeFiles/core.dir/DSi_DSP.cpp.o
+[25/70] Building CXX object src/CMakeFiles/core.dir/DSi_I2C.cpp.o
 [26/70] Building CXX object src/CMakeFiles/core.dir/DSi_NDMA.cpp.o
 [27/70] Building CXX object src/CMakeFiles/core.dir/DSi_NAND.cpp.o
 [28/70] Building CXX object src/CMakeFiles/core.dir/DSi_NWifi.cpp.o
@@ -40,8 +40,8 @@
 [40/70] Building CXX object src/CMakeFiles/core.dir/NDSCart.cpp.o
 [41/70] Building CXX object src/CMakeFiles/core.dir/NDS.cpp.o
 [42/70] Building CXX object src/CMakeFiles/core.dir/ROMList.cpp.o
-[43/70] Building CXX object src/CMakeFiles/core.dir/NDSCartR4.cpp.o
-[44/70] Building CXX object src/CMakeFiles/core.dir/FreeBIOS.cpp.o
+[43/70] Building CXX object src/CMakeFiles/core.dir/FreeBIOS.cpp.o
+[44/70] Building CXX object src/CMakeFiles/core.dir/NDSCartR4.cpp.o
 [45/70] Building CXX object src/CMakeFiles/core.dir/Savestate.cpp.o
 [46/70] Building CXX object src/CMakeFiles/core.dir/RTC.cpp.o
 [47/70] Building CXX object src/CMakeFiles/core.dir/SPI_Firmware.cpp.o
@@ -57,41 +57,41 @@
 [57/70] Building C object src/CMakeFiles/core.dir/tiny-AES-c/aes.c.o
 [58/70] Building C object src/CMakeFiles/core.dir/xxhash/xxhash.c.o
 [59/70] Building CXX object src/CMakeFiles/core.dir/debug/GdbStub.cpp.o
-[60/70] Building CXX object src/teakra/src/CMakeFiles/teakra.dir/processor.cpp.o
-[61/70] Building CXX object src/CMakeFiles/core.dir/debug/GdbProto.cpp.o
-[62/70] Building CXX object src/CMakeFiles/core.dir/debug/GdbCmds.cpp.o
-[63/70] Building CXX object src/frontend/duo/CMakeFiles/duo.dir/WasmPlatformUtil.cpp.o
-[64/70] Building CXX object src/frontend/duo/CMakeFiles/duo.dir/DuoPlatform.cpp.o
-[65/70] Building CXX object src/frontend/duo/CMakeFiles/duo.dir/DuoEmulator.cpp.o
+[60/70] Building CXX object src/CMakeFiles/core.dir/debug/GdbProto.cpp.o
+[61/70] Building CXX object src/CMakeFiles/core.dir/debug/GdbCmds.cpp.o
+[62/70] Building CXX object src/teakra/src/CMakeFiles/teakra.dir/processor.cpp.o
+[63/70] Building CXX object src/frontend/duo/CMakeFiles/duo.dir/DuoEmulator.cpp.o
 /home/runner/work/riccardobusolo.github.io/riccardobusolo.github.io/wasmelonDS/src/frontend/duo/DuoEmulator.cpp:59:33: warning: 'codecvt_utf8_utf16<char16_t>' is deprecated [-Wdeprecated-declarations]
    59 |       std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> conv;
       |                                 ^
-/home/runner/work/_temp/8a18bfef-66ef-47ec-9aab-55391687c823/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/codecvt:568:28: note: 'codecvt_utf8_utf16<char16_t>' has been explicitly marked deprecated here
+/home/runner/work/_temp/33bb7b2e-0964-40ae-9ff9-820abb869ef6/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/codecvt:568:28: note: 'codecvt_utf8_utf16<char16_t>' has been explicitly marked deprecated here
   568 | class _LIBCPP_TEMPLATE_VIS _LIBCPP_DEPRECATED_IN_CXX17 codecvt_utf8_utf16 : public __codecvt_utf8_utf16<_Elem> {
       |                            ^
-/home/runner/work/_temp/8a18bfef-66ef-47ec-9aab-55391687c823/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config:723:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+/home/runner/work/_temp/33bb7b2e-0964-40ae-9ff9-820abb869ef6/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config:723:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
   723 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
       |                                         ^
-/home/runner/work/_temp/8a18bfef-66ef-47ec-9aab-55391687c823/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config:688:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+/home/runner/work/_temp/33bb7b2e-0964-40ae-9ff9-820abb869ef6/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config:688:49: note: expanded from macro '_LIBCPP_DEPRECATED'
   688 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
       |                                                 ^
 /home/runner/work/riccardobusolo.github.io/riccardobusolo.github.io/wasmelonDS/src/frontend/duo/DuoEmulator.cpp:59:12: warning: 'wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>' is deprecated [-Wdeprecated-declarations]
    59 |       std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> conv;
       |            ^
-/home/runner/work/_temp/8a18bfef-66ef-47ec-9aab-55391687c823/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/locale:3145:28: note: 'wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>' has been explicitly marked deprecated here
+/home/runner/work/_temp/33bb7b2e-0964-40ae-9ff9-820abb869ef6/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/locale:3145:28: note: 'wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>' has been explicitly marked deprecated here
  3145 | class _LIBCPP_TEMPLATE_VIS _LIBCPP_DEPRECATED_IN_CXX17 wstring_convert {
       |                            ^
-/home/runner/work/_temp/8a18bfef-66ef-47ec-9aab-55391687c823/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config:723:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+/home/runner/work/_temp/33bb7b2e-0964-40ae-9ff9-820abb869ef6/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config:723:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
   723 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
       |                                         ^
-/home/runner/work/_temp/8a18bfef-66ef-47ec-9aab-55391687c823/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config:688:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+/home/runner/work/_temp/33bb7b2e-0964-40ae-9ff9-820abb869ef6/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config:688:49: note: expanded from macro '_LIBCPP_DEPRECATED'
   688 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
       |                                                 ^
 2 warnings generated.
-[66/70] Building CXX object src/teakra/src/CMakeFiles/teakra.dir/disassembler.cpp.o
-[67/70] Linking CXX static library src/teakra/src/libteakra.a
-[68/70] Linking CXX static library src/libcore.a
-[69/70] Building CXX object src/frontend/duo/CMakeFiles/duo.dir/__/__/net/LocalMP.cpp.o
+[64/70] Building CXX object src/frontend/duo/CMakeFiles/duo.dir/WasmPlatformUtil.cpp.o
+[65/70] Building CXX object src/frontend/duo/CMakeFiles/duo.dir/DuoPlatform.cpp.o
+[66/70] Building CXX object src/frontend/duo/CMakeFiles/duo.dir/__/__/net/LocalMP.cpp.o
+[67/70] Building CXX object src/teakra/src/CMakeFiles/teakra.dir/disassembler.cpp.o
+[68/70] Linking CXX static library src/teakra/src/libteakra.a
+[69/70] Linking CXX static library src/libcore.a
 [70/70] Linking CXX executable duo.js
-cache:INFO: generating system asset: symbol_lists/e71e8ad42905618ca5bde4089c66fc2245dfb0b9.json... (this will be cached in "/home/runner/work/_temp/8a18bfef-66ef-47ec-9aab-55391687c823/emsdk-main/upstream/emscripten/cache/symbol_lists/e71e8ad42905618ca5bde4089c66fc2245dfb0b9.json" for subsequent builds)
+cache:INFO: generating system asset: symbol_lists/e71e8ad42905618ca5bde4089c66fc2245dfb0b9.json... (this will be cached in "/home/runner/work/_temp/33bb7b2e-0964-40ae-9ff9-820abb869ef6/emsdk-main/upstream/emscripten/cache/symbol_lists/e71e8ad42905618ca5bde4089c66fc2245dfb0b9.json" for subsequent builds)
 cache:INFO:  - ok
