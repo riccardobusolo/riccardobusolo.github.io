@@ -26,6 +26,11 @@
   canvas.bottom { cursor: crosshair; }
   #log { white-space: pre-wrap; font: 12px/1.4 ui-monospace, monospace; max-height: 180px; overflow: auto; margin: 0 18px 18px; padding: 10px; border-radius: 10px; background: rgba(0,0,0,.35); }
   .keys { font-size: .85rem; opacity: .85; max-width: 980px; margin: 0 auto; padding: 0 18px; line-height: 1.5; }
+  .load { display: grid; gap: 4px; min-width: 260px; }
+  .bar { height: 10px; border-radius: 999px; background: rgba(0,0,0,.35); overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
+  .bar i { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(#d4ff7a, #6fcb1f); transition: width .15s; }
+  .load.done .bar i { background: linear-gradient(#bff3ff, #2fb8e8); }
+  button:disabled { filter: grayscale(.7); opacity: .6; cursor: default; }
   kbd { background: #fff; color: #0c3954; border-radius: 5px; padding: 1px 6px; font-weight: 700; }
 </style>
 </head>
@@ -34,6 +39,7 @@
   <h1>Laboratorio: due DS collegati</h1>
   <label class="box">ROM DS (tua copia): <input id="rom" type="file" accept=".nds"></label>
   <button id="go" disabled>Accendi le due console</button>
+  <span class="box load" id="ld"><span id="ldt">Carico l'emulatore…</span><span class="bar"><i id="ldb"></i></span></span>
   <span class="box" id="st">Preparo…</span>
 </header>
 <p class="keys">
@@ -46,8 +52,8 @@
   <div class="ds"><h2>DS 2 · Defra</h2><canvas id="t1" width="256" height="192"></canvas><canvas id="b1" class="bottom" width="256" height="192"></canvas></div>
 </div>
 <pre id="log"></pre>
-<script>window.DUO_V="1795054165";</script>
-<script src="./duo.js?v=1795054165"></script>
+<script>window.DUO_V="1795054473";</script>
+<script src="./duo.js?v=1795054473"></script>
 <script>
 (async () => {
   const $ = (id) => document.getElementById(id);
@@ -55,12 +61,37 @@
   if (!window.crossOriginIsolated) { $("st").textContent = "Memoria condivisa non disponibile: ricarica la pagina (serve Chrome o Edge)."; log("crossOriginIsolated = false"); return; }
   addEventListener("error", (e) => log("Errore: " + e.message));
   addEventListener("unhandledrejection", (e) => log("Errore: " + (e.reason?.message || e.reason)));
-  const M = await createDuo({ print: log, printErr: log, locateFile: (f) => f + "?v=" + window.DUO_V });
+  const bar = (t, f) => { $("ldt").textContent = t; $("ldb").style.width = Math.round(Math.max(0, Math.min(1, f)) * 100) + "%"; $("ld").classList.toggle("done", f >= 1); };
+  // scarica il motore con avanzamento
+  const wasmBinary = await (async () => {
+    const r = await fetch("duo.wasm?v=" + window.DUO_V);
+    const tot = +r.headers.get("content-length") || 866823, parts = []; let got = 0;
+    const rd = r.body.getReader();
+    for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; bar(`Carico l'emulatore… ${Math.round(got / 1024)} KB`, 0.8 * got / tot); }
+    const out = new Uint8Array(got); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; } return out.buffer;
+  })();
+  bar("Avvio le due console…", 0.9);
+  const M = await createDuo({ print: log, printErr: log, wasmBinary, locateFile: (f) => f + "?v=" + window.DUO_V });
   const emu = new M.DuoEmulator();
   emu.setNickname(0, "Ricky"); emu.setNickname(1, "Defra");
   $("st").textContent = "Pronto: scegli la ROM.";
+  bar("Emulatore pronto · scegli la ROM", 1);
+  let romData = null;
+  const readRom = (f) => new Promise((ok, ko) => {
+    const fr = new FileReader();
+    fr.onprogress = (e) => e.lengthComputable && bar(`Leggo la ROM… ${Math.round(e.loaded / 1048576)} / ${Math.round(e.total / 1048576)} MB`, e.loaded / e.total * 0.99);
+    fr.onload = () => ok(new Uint8Array(fr.result)); fr.onerror = () => ko(fr.error);
+    fr.readAsArrayBuffer(f);
+  });
   if (new URLSearchParams(location.search).get("auto")) setTimeout(() => $("go").onclick(), 100);
-  $("rom").onchange = () => { $("go").disabled = !$("rom").files.length; };
+  $("rom").onchange = async () => {
+    $("go").disabled = true; romData = null;
+    const f = $("rom").files[0]; if (!f) return;
+    bar("Leggo la ROM…", 0);
+    romData = await readRom(f);
+    bar(`ROM pronta (${Math.round(f.size / 1048576)} MB) · puoi accendere`, 1);
+    $("go").disabled = false;
+  };
   // tasti DS: A B Select Start Destra Sinistra Su Giù R L X Y (bit 0..11)
   const BIT = { a: 0, b: 1, select: 2, start: 3, right: 4, left: 5, up: 6, down: 7, r: 8, l: 9, x: 10, y: 11 };
   const MAP = [
@@ -107,7 +138,8 @@
   $("go").onclick = async () => {
     $("go").disabled = true;
     try { ac = new AudioContext(); gain = ac.createGain(); gain.gain.value = 0.35; gain.connect(ac.destination); } catch {}
-    const data = auto ? new Uint8Array(await (await fetch(auto)).arrayBuffer()) : new Uint8Array(await $("rom").files[0].arrayBuffer());
+    const data = auto ? new Uint8Array(await (await fetch(auto)).arrayBuffer()) : (romData || await readRom($("rom").files[0]));
+    bar("Accese", 1);
     const ptr = M._malloc(data.length); M.HEAPU8.set(data, ptr);
     // stessa ROM su entrambe le console (ognuna ha la sua copia in memoria)
     const ptr2 = M._malloc(data.length); M.HEAPU8.set(data, ptr2);
