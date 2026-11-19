@@ -46,8 +46,8 @@
   <div class="ds"><h2>DS 2 · Defra</h2><canvas id="t1" width="256" height="192"></canvas><canvas id="b1" class="bottom" width="256" height="192"></canvas></div>
 </div>
 <pre id="log"></pre>
-<script>window.DUO_V="1795053353";</script>
-<script src="./duo.js?v=1795053353"></script>
+<script>window.DUO_V="1795054165";</script>
+<script src="./duo.js?v=1795054165"></script>
 <script>
 (async () => {
   const $ = (id) => document.getElementById(id);
@@ -118,10 +118,10 @@
     const screens = M._malloc(256 * 192 * 4 * 2);
     const ctx = [0, 1].map((p) => [$("t" + p).getContext("2d"), $("b" + p).getContext("2d")]);
     const img = ctx.map(([a]) => [a.createImageData(256, 192), a.createImageData(256, 192)]);
-    let last = performance.now(), frames = 0, fpsT = performance.now();
+    let last = 0, fpsT = performance.now(), f0 = [0, 0];
     const loop = (now) => {
       // passo fisso a 60 fps: chiede un fotogramma a entrambe quando hanno finito il precedente
-      if (now - last >= 16) { last = now; if (emu.frame()) frames++; }
+      if (!last) { last = now; emu.frame(); } // le console partono e poi vanno da sole
       for (let p = 0; p < 2; p++) {
         emu.readScreens(p, screens);
         const src = new Uint8Array(M.HEAPU8.buffer, screens, 256 * 192 * 8);
@@ -134,7 +134,8 @@
         }
       }
       playAudio();
-      if (now - fpsT > 1000) { $("st").textContent = `In funzione · ${Math.round(frames * 1000 / (now - fpsT))} fps · un fotogramma richiede DS1 ${(emu.frameMs ? emu.frameMs(0) : 0).toFixed(1)} ms, DS2 ${(emu.frameMs ? emu.frameMs(1) : 0).toFixed(1)} ms (sotto 16,7 = velocità piena)`; frames = 0; fpsT = now; }
+      if (now - fpsT > 1000) { const fd = [emu.framesDone(0), emu.framesDone(1)], fps = fd.map((f, i) => Math.round((f - f0[i]) * 1000 / (now - fpsT))); f0 = fd;
+        $("st").textContent = `In funzione · DS1 ${fps[0]} fps, DS2 ${fps[1]} fps · un fotogramma richiede DS1 ${(emu.frameMs ? emu.frameMs(0) : 0).toFixed(1)} ms, DS2 ${(emu.frameMs ? emu.frameMs(1) : 0).toFixed(1)} ms (sotto 16,7 = velocità piena)`; fpsT = now; }
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
