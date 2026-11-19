@@ -42,7 +42,8 @@ namespace melonDS::Platform {
     if (!fmt) return 0; va_list a; va_start(a, fmt); u64 r = vfprintf((FILE*)file, fmt, a); va_end(a); return r;
   }
   u64 FileLength(FileHandle* file) { long p = ftell((FILE*)file); fseek((FILE*)file, 0, SEEK_END); u64 s = ftell((FILE*)file); fseek((FILE*)file, p, SEEK_SET); return s; }
-  void Log(LogLevel level, const char* fmt, ...) { if (!fmt) return; va_list a; va_start(a, fmt); vprintf(fmt, a); va_end(a); }
+  // solo avvisi ed errori: ogni riga stampata da un thread passa dalla pagina e la rallenta
+  void Log(LogLevel level, const char* fmt, ...) { if (!fmt || level < LogLevel::Warn) return; va_list a; va_start(a, fmt); vprintf(fmt, a); va_end(a); }
 
   Thread* Thread_Create(std::function<void()> func) { return (Thread*)new std::thread(func); }
   void Thread_Free(Thread* t) { auto* th = (std::thread*)t; if (th->joinable()) th->detach(); delete th; }
