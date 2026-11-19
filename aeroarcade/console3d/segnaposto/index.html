@@ -74,6 +74,8 @@
   .hint.gone { opacity: 0; transition: opacity .4s; }
   :root[data-night="1"] .body { filter: brightness(.78) saturate(.9); }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  body.spectate, body.spectate * { pointer-events: none !important; }
+  body.spectate .hint { display: none !important; }
 </style>
 </head>
 <body>
@@ -210,6 +212,7 @@
 
   // ---------------- API per la Home (chiamate dirette, stessa origine) ----------------
   const videos = [];
+  if (P.get("spectate") === "1") document.body.classList.add("spectate");
   window.aeroConsole = {
     /** il flusso video del gioco va sullo schermo (DS: metà sopra e metà sotto) */
     setScreen(stream) {
@@ -234,6 +237,8 @@
       setTimeout(() => { state = "out"; cart.classList.remove("inserted"); send({ aero: "ejected" }); }, 950);
     },
     insert() { if (state === "out") insertAnim(); },
+    setSkin() {}, setLight() {}, setCover() {},
+    showInserted(on) { if (on && state === "out") insertAnim(); else if (!on && state === "inserted") { state = "out"; cart.classList.remove("inserted"); move(0, 0, 400, 1); this.setScreen(null); } },
     setFilter(f) { document.querySelectorAll(".screen").forEach((el) => (el.dataset.filter = f)); },
     setNight(on) { document.documentElement.dataset.night = on ? "1" : "0"; },
     get state() { return state; }

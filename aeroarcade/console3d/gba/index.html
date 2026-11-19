@@ -155,6 +155,10 @@
   .editor button { flex: 1; border: 0; padding: 7px 8px; border-radius: 999px; font: 800 12px "Segoe UI", sans-serif; cursor: pointer; color: #0c3954; background: linear-gradient(180deg, #fff, #d8efff); box-shadow: 0 0 0 1px rgba(12, 57, 84, .15); }
   .editor button.go { background: linear-gradient(180deg, #d4ff7a, #8fdc2a 55%, #4fa818); color: #1c4a05; }
   .editor .msg { min-height: 1.2em; margin-top: 6px; color: #4fa818; font-weight: 800; }
+  /* console dell'amico (?spectate=1): si guarda soltanto */
+  body.spectate, body.spectate * { pointer-events: none !important; cursor: default !important; }
+  body.spectate .hint, body.spectate .tip, body.spectate .k-tag { display: none !important; }
+  body.spectate .cart { animation: none !important; }
   :root[data-night="1"] .console img.body { filter: drop-shadow(0 18px 28px rgba(0, 0, 30, .6)) brightness(.82); }
   :root[data-night="1"] .shoulder { filter: brightness(.82); }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -178,6 +182,9 @@
   const $ = (id) => document.getElementById(id);
   const rig = $("rig"), consoleEl = $("console"), cart = $("cart"), slot = $("slot"), hint = $("hint"), boot = $("boot"), screenEl = $("screen");
   document.documentElement.dataset.night = P.get("night") === "1" ? "1" : "0";
+  // console dell'amico: nessun tasto, nessun suono, skin e luce arrivano da fuori
+  const SPECTATE = P.get("spectate") === "1";
+  if (SPECTATE) document.body.classList.add("spectate");
   const cover = P.get("cover");
   if (cover) $("label").style.backgroundImage = `url("${cover.replace(/"/g, "%22")}")`;
 
@@ -311,13 +318,13 @@
   const SKINS = [["argento", "Argento"], ["tribale", "Tribale nero"], ["arcobaleno", "Arcobaleno"], ["fuoco", "Fuoco"], ["carbonio", "Carbonio"]];
   const SKIN_KEY = "aero-gba-skin";
   const bodyImg = consoleEl.querySelector("img.body");
-  let skinIdx = Math.max(0, SKINS.findIndex(([id]) => id === (localStorage.getItem(SKIN_KEY) || "argento")));
+  let skinIdx = Math.max(0, SKINS.findIndex(([id]) => id === ((SPECTATE ? P.get("skin") : localStorage.getItem(SKIN_KEY)) || "argento")));
   // le altre skin si scaricano in anticipo, così il cambio è istantaneo
   const preload = () => SKINS.forEach(([id]) => { const i = new Image(); i.decoding = "async"; i.src = `skins/${id}.webp`; });
   function applySkin(i, animate) {
     skinIdx = (i + SKINS.length) % SKINS.length;
     const [id, name] = SKINS[skinIdx];
-    try { localStorage.setItem(SKIN_KEY, id); } catch {}
+    if (!SPECTATE) { try { localStorage.setItem(SKIN_KEY, id); } catch {} send({ aero: "skin", id, name }); }
     const src = `skins/${id}.webp`;
     if (!animate || bodyImg.getAttribute("src") === src) { bodyImg.setAttribute("src", src); return name; }
     // cambio con un breve bagliore, come un guscio che si sostituisce
@@ -336,18 +343,19 @@
   // spenta: lo schermo diventa quello di un GBA senza luce, scuro e riflettente
   const LIGHT_KEY = "aero-gba-light";
   const backlight = document.createElement("div"); backlight.className = "backlight"; screenEl.append(backlight);
-  if (localStorage.getItem(LIGHT_KEY) === "off") screenEl.classList.add("unlit");
-  function toggleLight() {
-    const off = !screenEl.classList.contains("unlit");
+  if ((SPECTATE ? P.get("light") : localStorage.getItem(LIGHT_KEY)) === "off") screenEl.classList.add("unlit");
+  function toggleLight(want) {
+    const off = typeof want === "boolean" ? !want : !screenEl.classList.contains("unlit");
+    if (off === screenEl.classList.contains("unlit")) return;
     screenEl.classList.remove("light-off", "light-on"); void screenEl.offsetWidth;
     screenEl.classList.toggle("unlit", off);
     screenEl.classList.add(off ? "light-off" : "light-on");
-    try { localStorage.setItem(LIGHT_KEY, off ? "off" : "on"); } catch {}
+    if (!SPECTATE) { try { localStorage.setItem(LIGHT_KEY, off ? "off" : "on"); } catch {} send({ aero: "light", on: !off }); }
     lightClick(off);
   }
   function lightClick(off) {
     try {
-      if (JSON.parse(localStorage.getItem("aero-prefs") || "{}").sound === false) return;
+      if (SPECTATE || JSON.parse(localStorage.getItem("aero-prefs") || "{}").sound === false) return;
       const a = (window.__lac ??= new AudioContext()); if (a.state === "suspended") a.resume();
       const t = a.currentTime, o = a.createOscillator(), g = a.createGain();
       o.type = "square"; o.frequency.setValueAtTime(off ? 1800 : 2400, t); o.frequency.exponentialRampToValueAtTime(off ? 600 : 900, t + 0.03);
@@ -407,7 +415,7 @@
   }
   addEventListener("resize", fit);
   addEventListener("wheel", (e) => {
-    if (document.body.classList.contains("editing")) return;
+    if (document.body.classList.contains("editing") || SPECTATE) return;
     e.preventDefault();
     const next = Math.min(steps.length - 1, Math.max(0, idx + (e.deltaY < 0 ? 1 : -1)));
     if (next === idx) return;
@@ -443,7 +451,7 @@
   // del connettore che fa presa. Estrazione: lo scatto del connettore che molla
   // e la strisciata mentre esce.
   let ac = null;
-  const soundOn = () => { try { return JSON.parse(localStorage.getItem("aero-prefs") || "{}").sound !== false; } catch { return true; } };
+  const soundOn = () => { if (SPECTATE) return false; try { return JSON.parse(localStorage.getItem("aero-prefs") || "{}").sound !== false; } catch { return true; } };
   const audio = () => {
     if (!soundOn()) return null;
     try { ac ??= new AudioContext(); if (ac.state === "suspended") ac.resume(); return ac; } catch { return null; }
@@ -590,11 +598,27 @@
     get skin() { return SKINS[skinIdx][1]; },
     insert() { if (state === "out") { computeLane(); insertAnim(); } },
     setFilter(f) { screenEl.dataset.filter = f; },
+    /** per la console dell'amico: skin, luce, copertina e cartuccia dentro/fuori */
+    setSkin(id) { const i = SKINS.findIndex(([k]) => k === id); if (i >= 0 && i !== skinIdx) applySkin(i, true); },
+    setLight(on) { toggleLight(!!on); },
+    setCover(url) { $("label").style.backgroundImage = url ? `url("${String(url).replace(/"/g, "%22")}")` : ""; },
+    showInserted(on) {
+      if (on && state === "out") { computeLane(); insertAnim(); }
+      else if (!on && state === "inserted") {
+        state = "ejecting"; this.setScreen(null); boot.classList.remove("on");
+        const t = cart._t || { x: 0, y: 0 };
+        move(t.x, t.y + 70, 320);
+        setTimeout(() => { cart.classList.remove("behind"); move(0, 0, 520); }, 340);
+        setTimeout(() => { state = "out"; }, 900);
+      }
+    },
+    get skinId() { return SKINS[skinIdx][0]; },
+    get light() { return !screenEl.classList.contains("unlit"); },
     setNight(on) { document.documentElement.dataset.night = on ? "1" : "0"; },
     get state() { return state; }
   };
   const img = consoleEl.querySelector("img.body");
-  const ready = () => send({ aero: "console-ready", console: "gba", inserted: state === "inserted", skin: SKINS[skinIdx][1] });
+  const ready = () => send({ aero: "console-ready", console: "gba", inserted: state === "inserted", skin: SKINS[skinIdx][1], skinId: SKINS[skinIdx][0], light: !screenEl.classList.contains("unlit") });
   if (img.complete) ready(); else img.addEventListener("load", ready, { once: true });
 })();
 </script>
