@@ -396,7 +396,8 @@
     const turned = ROT % 180 !== 0;
     const dpr = devicePixelRatio || 1, VW = turned ? innerHeight : innerWidth, VH = turned ? innerWidth : innerHeight;
     // ingrandimento massimo che entra nella finestra (anche non intero); girato, la scheda in basso non serve
-    const kFit = Math.max(0.5, Math.min((VH * 0.97 * 1254 / (turned ? 1290 : 1514)) * SCR_W * dpr / NW, VW * 0.94 * SCR_W * dpr / NW));
+    // L e R sporgono ai lati (circa il 16% in più della console): devono restare dentro
+    const kFit = Math.max(0.5, Math.min((VH * 0.96 * 1254 / (turned ? 1254 : 1514)) * SCR_W * dpr / NW, (VW * 0.96 / 1.16) * SCR_W * dpr / NW));
     steps = [];
     for (let k = 1; k <= kFit + 1e-6; k++) steps.push(k);
     if (!steps.length || kFit - steps[steps.length - 1] > 0.08) steps.push(kFit);
@@ -625,6 +626,7 @@
       ROT = [0, 90, -90].includes(deg) ? deg : 0;
       rotAnim = true; fit(); setTimeout(() => { rotAnim = false; }, 600);
       hint.style.visibility = ROT ? "hidden" : "";
+      cart.style.visibility = ROT ? "hidden" : ""; // girato, la scheda resta dentro (non sporge di lato)
       if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); }
     },
     setFilter(f) { screens.forEach((el) => (el.dataset.filter = f)); },
