@@ -30,8 +30,7 @@ jobs:
         run: |
           mkdir -p dist
           cp configure.log build.log dist/ 2>/dev/null || true
-          cp wasmelonDS/build/src/frontend/duo/duo.js wasmelonDS/build/src/frontend/duo/duo.wasm dist/ 2>/dev/null || true
-          ls -la wasmelonDS/build/src/frontend/duo/ > dist/files.txt 2>&1 || true
+          find wasmelonDS/build -name 'duo.js' -o -name 'duo.wasm' -o -name 'duo.worker.js' | tee dist/files.txt | xargs -r -I{} cp {} dist/
           echo "${GITHUB_SHA} $(date -u +%FT%TZ) ${{ job.status }}" > dist/STATUS.txt
           git config user.name "aero-build"
           git config user.email "aero-build@users.noreply.github.com"
