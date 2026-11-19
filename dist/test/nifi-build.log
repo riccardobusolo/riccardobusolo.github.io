@@ -163,3 +163,25 @@ linking w.elf
 Nintendo DS rom tool 2.2.0 - Nov 27 2022
 by Rafael Vuijk, Dave Murphy, Alexei Karpenko
 built ... w.nds
+=== devkitarm:20230526
+Unable to find image 'devkitpro/devkitarm:20230526' locally
+20230526: Pulling from devkitpro/devkitarm
+39e1834138e2: Pulling fs layer
+25ff99d19581: Pulling fs layer
+a1c35d0a7cdc: Pulling fs layer
+eef46158b22c: Pulling fs layer
+25ff99d19581: Download complete
+a1c35d0a7cdc: Download complete
+eef46158b22c: Download complete
+25ff99d19581: Pull complete
+39e1834138e2: Download complete
+eef46158b22c: Pull complete
+a1c35d0a7cdc: Pull complete
+39e1834138e2: Pull complete
+Digest: sha256:ebc5669e4cef225fc016564bd489d016b949e39699367233230d0b32f0356a8b
+Status: Downloaded newer image for devkitpro/devkitarm:20230526
+main.c
+linking w.elf
+Nintendo DS rom tool 2.2.0 - Nov 27 2022
+by Rafael Vuijk, Dave Murphy, Alexei Karpenko
+built ... w.nds

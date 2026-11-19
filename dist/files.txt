@@ -1,2 +1,2 @@
-wasmelonDS/build/duo.wasm
 wasmelonDS/build/duo.js
+wasmelonDS/build/duo.wasm
