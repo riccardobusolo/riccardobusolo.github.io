@@ -82,25 +82,28 @@
     c.addEventListener("pointermove", (e) => { if (e.buttons) { const [x, y] = pos(e); emu.touch(p, x, y); } });
     c.addEventListener("pointerup", () => emu.release(p));
   }
-  // audio della console 1 (Ricky)
-  let ac = null, nextT = 0;
-  const audioBuf = M._malloc(4096 * 4);
+  // audio: solo la console 1 (Ricky), a volume moderato; quello della console 2 andrà a Defra
+  let ac = null, gain = null, nextT = 0;
+  const audioBuf = M._malloc(4096 * 4), audioBuf2 = M._malloc(4096 * 4);
   const playAudio = () => {
     const n = emu.readAudio(0, audioBuf);
-    emu.readAudio(1, audioBuf + 0); // svuota la coda della console 2 (in futuro va a Defra)
+    emu.readAudio(1, audioBuf2); // la console 2 resta muta qui
     if (!ac || !n) return;
     const pcm = new Int16Array(M.HEAPU8.buffer, audioBuf, n * 2).slice();
     const b = ac.createBuffer(2, n, 32768);
     const L = b.getChannelData(0), R = b.getChannelData(1);
     for (let i = 0; i < n; i++) { L[i] = pcm[i * 2] / 32768; R[i] = pcm[i * 2 + 1] / 32768; }
-    const s = ac.createBufferSource(); s.buffer = b; s.connect(ac.destination);
-    nextT = Math.max(nextT, ac.currentTime + 0.03); s.start(nextT); nextT += n / 32768;
+    const now = ac.currentTime;
+    if (nextT < now) nextT = now + 0.05;          // se resta indietro riparte pulito
+    if (nextT - now > 0.25) return;               // se si accumula troppo, salta il pezzo (niente eco)
+    const s = ac.createBufferSource(); s.buffer = b; s.connect(gain);
+    s.start(nextT); nextT += n / 32768;
   };
   const auto = new URLSearchParams(location.search).get("auto");
   window.__duo = emu;
   $("go").onclick = async () => {
     $("go").disabled = true;
-    try { ac = new AudioContext(); } catch {}
+    try { ac = new AudioContext(); gain = ac.createGain(); gain.gain.value = 0.35; gain.connect(ac.destination); } catch {}
     const data = auto ? new Uint8Array(await (await fetch(auto)).arrayBuffer()) : new Uint8Array(await $("rom").files[0].arrayBuffer());
     const ptr = M._malloc(data.length); M.HEAPU8.set(data, ptr);
     // stessa ROM su entrambe le console (ognuna ha la sua copia in memoria)
@@ -128,7 +131,7 @@
         }
       }
       playAudio();
-      if (now - fpsT > 1000) { $("st").textContent = `In funzione · ${Math.round(frames * 1000 / (now - fpsT))} fps · fotogrammi DS1 ${emu.framesDone(0)} / DS2 ${emu.framesDone(1)}`; frames = 0; fpsT = now; }
+      if (now - fpsT > 1000) { $("st").textContent = `In funzione · ${Math.round(frames * 1000 / (now - fpsT))} fps · un fotogramma richiede DS1 ${emu.frameMs(0).toFixed(1)} ms, DS2 ${emu.frameMs(1).toFixed(1)} ms (sotto 16,7 = velocità piena)`; frames = 0; fpsT = now; }
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
