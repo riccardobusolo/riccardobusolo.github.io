@@ -50,7 +50,7 @@ namespace duo {
     void setNickname(int i, std::string n) { if (i >= 0 && i < 2) names[i] = n; }
     bool threaded3D = true;
     // opzioni per le prove: 3D su thread separato, attesa massima dei pacchetti wireless (ms)
-    void setOptions(bool t3d, int recvTimeout) { threaded3D = t3d; if (recvTimeout > 0) localMP().SetRecvTimeout(recvTimeout); }
+    void setOptions(bool t3d, int recvTimeout, int p) { pace = p; threaded3D = t3d; if (recvTimeout > 0) localMP().SetRecvTimeout(recvTimeout); }
 
     Firmware makeFirmware(int i) {
       Firmware fw(0);
@@ -112,6 +112,7 @@ namespace duo {
     // in melonDS sul PC. Se si fermassero tra un fotogramma e l'altro, la console
     // che ospita la partita aspetterebbe invano le risposte dell'altra (che sta
     // ferma) e il collegamento rallenterebbe tutto.
+    static inline std::atomic<int> pace{1};
     static void runLoop(Instance* in) {
       in->go.acquire(); // partenza
       double next = emscripten_get_now();
@@ -145,7 +146,8 @@ namespace duo {
         // ritmo: aspetto il prossimo fotogramma; se resto molto indietro riparto da adesso
         next += period;
         double now = emscripten_get_now();
-        if (next - now > 0) usleep((useconds_t)((next - now) * 1000));
+        if (!pace) next = now;
+        else if (next - now > 0) usleep((useconds_t)((next - now) * 1000));
         else if (now - next > period * 4) next = now;
       }
     }
