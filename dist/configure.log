@@ -1,0 +1,28 @@
+configure: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_QT_SDL=OFF -DBUILD_WASM=OFF -DBUILD_DUO=ON -DENABLE_OGLRENDERER=OFF -DENABLE_JIT=OFF -DENABLE_LTO_RELEASE=OFF -DCMAKE_C_FLAGS=-pthread -DCMAKE_CXX_FLAGS=-pthread -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/_temp/c06317fc-ce4a-4e8b-84d0-c807f897b569/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/_temp/c06317fc-ce4a-4e8b-84d0-c807f897b569/emsdk-main/node/24.19.0_64bit/bin/node
+Enabling GDB stub
+CMake Warning (deprecated) at src/teakra/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (policy) at src/teakra/CMakeLists.txt:22 (set):
+  Policy CMP0218 is not set: The CMAKE_WARN_DEPRECATED and
+  CMAKE_ERROR_DEPRECATED variables are ignored.  Run "cmake --help-policy
+  CMP0218" for policy details.  Use the cmake_policy command to set the
+  policy and suppress this warning.
+This warning is for project developers.  Use -Wno-author or -Wno-policy to
+suppress it.
+
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Looking for shm_open in rt
+-- Looking for shm_open in rt - found
+-- Configuring done (42.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/runner/work/riccardobusolo.github.io/riccardobusolo.github.io/wasmelonDS/build
