@@ -361,8 +361,12 @@
   // ---------------- touch: lo schermo di sotto come con il pennino ----------------
   let touching = null;
   const touchAt = (e) => {
-    const r = screen2.getBoundingClientRect();
-    return { x: Math.max(0, Math.min(255, Math.round(((e.clientX - r.left) / r.width) * 256))), y: Math.max(0, Math.min(191, Math.round(((e.clientY - r.top) / r.height) * 192))) };
+    // anche con il DS girato: il punto si riporta nel sistema dello schermo
+    const r = screen2.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const a = (-ROT * Math.PI) / 180, dx = e.clientX - cx, dy = e.clientY - cy;
+    const lx = dx * Math.cos(a) - dy * Math.sin(a), ly = dx * Math.sin(a) + dy * Math.cos(a);
+    const u = lx / screen2.offsetWidth + 0.5, v = ly / screen2.offsetHeight + 0.5;
+    return { x: Math.max(0, Math.min(255, Math.round(u * 256))), y: Math.max(0, Math.min(191, Math.round(v * 192))) };
   };
   screen2.addEventListener("pointerdown", (e) => {
     if (SPECTATE || EDIT || state !== "inserted") return;
@@ -385,11 +389,14 @@
   let steps = [1], idx = 0, userIdx = null;
   const kTag = document.createElement("div"); kTag.className = "k-tag"; document.body.append(kTag);
   let kTimer = 0;
+  let ROT = 0, rotAnim = false;
   function fit() {
     if (document.body.classList.contains("editing")) return;
-    const dpr = devicePixelRatio || 1, VW = innerWidth, VH = innerHeight;
-    // ingrandimento massimo che entra nella finestra (anche non intero)
-    const kFit = Math.max(0.5, Math.min((VH * 0.97 * 1254 / 1514) * SCR_W * dpr / NW, VW * 0.94 * SCR_W * dpr / NW));
+    // DS girato di lato (come un libro): larghezza e altezza disponibili si scambiano
+    const turned = ROT % 180 !== 0;
+    const dpr = devicePixelRatio || 1, VW = turned ? innerHeight : innerWidth, VH = turned ? innerWidth : innerHeight;
+    // ingrandimento massimo che entra nella finestra (anche non intero); girato, la scheda in basso non serve
+    const kFit = Math.max(0.5, Math.min((VH * 0.97 * 1254 / (turned ? 1290 : 1514)) * SCR_W * dpr / NW, VW * 0.94 * SCR_W * dpr / NW));
     steps = [];
     for (let k = 1; k <= kFit + 1e-6; k++) steps.push(k);
     if (!steps.length || kFit - steps[steps.length - 1] > 0.08) steps.push(kFit);
@@ -399,7 +406,9 @@
     const k = steps[idx];
     const W = (NW * k) / dpr / SCR_W, Hr = W * 1514 / 1254, Hc = W;
     const snap = (v) => Math.round(v * dpr) / dpr;
-    rig.style.cssText = `position:absolute;height:${Hr}px;width:${W}px;left:${snap((VW - W) / 2)}px;top:${snap(Math.max(0, (VH - Hr) / 2))}px`;
+    // ruotando si gira attorno al centro della console (non della scheda sotto)
+    const oy = turned ? W * 0.5 : Hr / 2;
+    rig.style.cssText = `position:absolute;height:${Hr}px;width:${W}px;left:${snap((innerWidth - W) / 2)}px;top:${snap(turned ? innerHeight / 2 - oy : Math.max(0, (innerHeight - Hr) / 2))}px;transform-origin:50% ${oy}px;transform:rotate(${ROT}deg);transition:${rotAnim ? "transform .55s cubic-bezier(.3,1.3,.5,1), top .55s, left .55s" : "none"}`;
     const sw = (NW * k) / dpr, sh = (NH * k) / dpr;
     for (const o of HOLES) {
       o.el.style.cssText = `left:${snap(o.l * W + (o.w * W - sw) / 2)}px;width:${sw}px;top:${snap(o.t * Hc + (o.h * Hc - sh) / 2)}px;height:${sh}px;--px:${k / dpr}px`;
@@ -433,9 +442,12 @@
     cart.style.transform = `translate(${x}px, ${y}px)`;
   };
   /** spostamento che porta la cartuccia dentro lo slot (resta fuori solo il fondo) */
+  // misure "locali" della console (non toccate dalla rotazione del DS girato)
   const insertedPos = () => {
-    const s = slot.getBoundingClientRect(), c = cart.getBoundingClientRect(), t = cart._t || { x: 0, y: 0 };
-    return { x: t.x + (s.left + s.width / 2) - (c.left + c.width / 2), y: t.y + s.top - c.top - c.height * 0.72 };
+    const t = cart._t || { x: 0, y: 0 };
+    const sx = consoleEl.offsetLeft + slot.offsetLeft + slot.offsetWidth / 2, sTop = consoleEl.offsetTop + slot.offsetTop;
+    const cx = cart.offsetLeft + cart.offsetWidth / 2 + t.x, cTop = cart.offsetTop + t.y;
+    return { x: t.x + sx - cx, y: t.y + sTop - cTop - cart.offsetHeight * 0.72 };
   };
   const nearSlot = () => {
     const s = slot.getBoundingClientRect(), c = cart.getBoundingClientRect();
@@ -495,12 +507,12 @@
   /** quanto è salita la cartuccia verso lo slot (0 = a riposo, 1 = all'imbocco) */
   let lane = null; // { x, top, bottom } limiti della corsa verticale
   function computeLane() {
-    const t = cart._t || { x: 0, y: 0 }, p = insertedPos(), ch = cart.getBoundingClientRect().height;
+    const t = cart._t || { x: 0, y: 0 }, p = insertedPos(), ch = cart.offsetHeight;
     lane = { x: p.x, top: p.y + ch * 0.72, rest: t.y }; // in alto si ferma con il bordo all'imbocco dello slot
   }
   function insertAnim() {
     state = "inserting"; slot.classList.remove("hot-glow"); hint.classList.add("gone");
-    const p = insertedPos(), ch = cart.getBoundingClientRect().height;
+    const p = insertedPos(), ch = cart.offsetHeight;
     move(p.x, p.y + ch * 0.72, 140);                                    // si allinea all'imbocco dello slot
     setTimeout(() => { cart.classList.add("behind"); sfx.slide(0.36); move(p.x, p.y, 380); }, 170); // entra dietro la scocca
     setTimeout(() => { sfx.seat(); }, 520);
@@ -524,6 +536,7 @@
 
   cart.addEventListener("pointerdown", (e) => {
     if (state !== "out" && state !== "inserted") return;
+    if (ROT) return; // girato: la scheda si mette e si toglie con i pulsanti della colonna
     e.preventDefault(); cart.setPointerCapture(e.pointerId);
     audio(); // sblocca l'audio con il gesto
     const t = cart._t || { x: 0, y: 0 };
@@ -607,6 +620,13 @@
     get skin() { return SKINS[skinIdx][1]; },
     insert() { if (state === "out") { computeLane(); insertAnim(); } },
     skipIntro() { intro?.skip(); },
+    /** DS girato di lato: -90 (schermi a sinistra/destra, per destrorsi), 90 (mancini), 0 dritto */
+    setRotation(deg) {
+      ROT = [0, 90, -90].includes(deg) ? deg : 0;
+      rotAnim = true; fit(); setTimeout(() => { rotAnim = false; }, 600);
+      hint.style.visibility = ROT ? "hidden" : "";
+      if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); }
+    },
     setFilter(f) { screens.forEach((el) => (el.dataset.filter = f)); },
     /** per la console dell'amico: skin, luce, copertina e cartuccia dentro/fuori */
     setSkin(id) { const i = SKINS.findIndex(([k]) => k === id); if (i >= 0 && i !== skinIdx) applySkin(i, true); },
