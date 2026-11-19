@@ -1,4 +1,4 @@
-configure: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_QT_SDL=OFF -DBUILD_WASM=OFF -DBUILD_DUO=ON -DENABLE_OGLRENDERER=OFF -DENABLE_JIT=OFF -DENABLE_LTO_RELEASE=OFF -DCMAKE_C_FLAGS=-pthread -DCMAKE_CXX_FLAGS=-pthread -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/_temp/c06317fc-ce4a-4e8b-84d0-c807f897b569/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/_temp/c06317fc-ce4a-4e8b-84d0-c807f897b569/emsdk-main/node/24.19.0_64bit/bin/node
+configure: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_QT_SDL=OFF -DBUILD_WASM=OFF -DBUILD_DUO=ON -DENABLE_OGLRENDERER=OFF -DENABLE_JIT=OFF -DENABLE_LTO_RELEASE=OFF -DCMAKE_C_FLAGS=-pthread -DCMAKE_CXX_FLAGS=-pthread -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/_temp/8a18bfef-66ef-47ec-9aab-55391687c823/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/_temp/8a18bfef-66ef-47ec-9aab-55391687c823/emsdk-main/node/24.19.0_64bit/bin/node
 Enabling GDB stub
 CMake Warning (deprecated) at src/teakra/CMakeLists.txt:1 (cmake_minimum_required):
   Compatibility with CMake < 3.10 will be removed from a future version of
@@ -23,6 +23,6 @@ suppress it.
 -- Found Threads: TRUE
 -- Looking for shm_open in rt
 -- Looking for shm_open in rt - found
--- Configuring done (42.3s)
+-- Configuring done (41.1s)
 -- Generating done (0.0s)
 -- Build files have been written to: /home/runner/work/riccardobusolo.github.io/riccardobusolo.github.io/wasmelonDS/build

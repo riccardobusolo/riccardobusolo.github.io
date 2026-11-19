@@ -1,5 +1,2 @@
-total 16
-drwxr-xr-x 3 runner runner 4096 Nov 19 00:39 .
-drwxr-xr-x 3 runner runner 4096 Nov 19 00:39 ..
-drwxr-xr-x 3 runner runner 4096 Nov 19 00:39 CMakeFiles
--rw-r--r-- 1 runner runner 1601 Nov 19 00:39 cmake_install.cmake
+wasmelonDS/build/duo.js
+wasmelonDS/build/duo.wasm
