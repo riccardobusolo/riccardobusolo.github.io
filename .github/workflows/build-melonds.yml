@@ -25,6 +25,12 @@ jobs:
       - name: Compila
         working-directory: wasmelonDS
         run: cmake --build build --target duo -j4 2>&1 | tee ../build.log
+      - name: ROM di prova (homebrew NiFi, due DS che si mandano il tocco)
+        continue-on-error: true
+        run: |
+          git clone --depth 1 https://github.com/Fewnity/Nintendo-DS-Nifi-Template nifi
+          docker run --rm -v "$PWD/nifi:/w" -w /w devkitpro/devkitarm sh -c "make" 2>&1 | tail -20 > nifi-build.log
+          mkdir -p dist/test && cp nifi/*.nds dist/test/ 2>/dev/null; cp nifi-build.log dist/test/ || true
       - name: Salva il risultato
         if: always()
         run: |
