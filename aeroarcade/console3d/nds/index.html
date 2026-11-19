@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nintendo DS — Aero Arcade</title>
+<!--
+  CONSOLE DS (immagine 2D del DS Lite, con skin).
+  Stesso protocollo della console GBA (docs/CONSOLE-3D.md): scheda da inserire
+  dal basso, i due schermi del gioco (256×192 l'uno), tasti cliccabili, e lo
+  schermo di sotto è touch: clic e trascinamento arrivano al gioco come pennino.
+-->
+<style>
+  @font-face { font-family: "Nunito"; font-weight: 900; src: url("nunito-900.woff2") format("woff2"); }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; font-family: "Nunito", "Segoe UI", system-ui, sans-serif; -webkit-user-select: none; user-select: none; touch-action: none; }
+  .scene { position: fixed; inset: 0; display: grid; place-items: center; }
+  /* console + cartuccia sotto: l'altezza decide la dimensione */
+  .rig { position: relative; height: min(96vh, 132vw); aspect-ratio: 1254 / 1514; }
+  .console { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 1254 / 1254; z-index: 1; container-type: inline-size; }
+  .console img.body { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 2; pointer-events: none; filter: drop-shadow(0 18px 28px rgba(0, 40, 90, 0.35)); }
+  /* schermo: sta DIETRO l'immagine, si vede dal "buco" trasparente */
+  .screen { position: absolute; left: 28.87%; top: 8.85%; width: 42.03%; height: 31.34%; z-index: 1; background: #1c2126; overflow: hidden;
+    box-shadow: 0 0 0 1.2cqw #0c0d0f; } /* riempie il bordino tra lo schermo e il foro dell'immagine */
+  #screen2 { left: 28.71%; top: 56.14%; width: 42.42%; height: 31.98%; cursor: crosshair; touch-action: none; }
+  /* i due schermi prendono metà ciascuno dello stesso video (256×384) */
+  .screen video.top { height: 200% !important; top: 0 !important; bottom: auto !important; }
+  .screen video.bottom { height: 200% !important; top: -100% !important; bottom: auto !important; }
+  /* durante l'intro lo schermo di sotto respira una luce acqua */
+  #screen2.intro-glow { background: radial-gradient(120% 90% at 50% 0%, #2fb8e8, #0a4f86 60%, #032447); animation: s2glow 2.4s ease-in-out infinite; }
+  @keyframes s2glow { 50% { filter: brightness(1.25); } }
+  .screen.off video { opacity: 0; }
+  .screen.booting { background: #000; }
+  .console img.body.swap { animation: skin-swap .42s ease-out; }
+  @keyframes skin-swap { 0% { filter: drop-shadow(0 18px 28px rgba(0, 40, 90, 0.35)) brightness(1.6) saturate(.4); transform: scale(.985); } 100% { filter: drop-shadow(0 18px 28px rgba(0, 40, 90, 0.35)); transform: scale(1); } }
+    background: radial-gradient(120% 140% at 30% 20%, rgba(38, 46, 40, .62), rgba(12, 16, 14, .86)); mix-blend-mode: multiply; }
+  .screen.unlit .backlight { opacity: 1; }
+  .screen.unlit video { filter: saturate(.55) contrast(1.15); }
+  .screen.light-off .backlight { animation: bl-off .55s ease-out both; }
+  .screen.light-on .backlight { animation: bl-on .45s ease-out both; }
+  .screen.light-off video { animation: bl-flick .55s ease-out both; }
+  @keyframes bl-off { 0% { opacity: 0; } 12% { opacity: .55; } 22% { opacity: .2; } 34% { opacity: .75; } 46% { opacity: .5; } 100% { opacity: 1; } }
+  @keyframes bl-on { 0% { opacity: 1; } 18% { opacity: .35; } 30% { opacity: .7; } 55% { opacity: .1; } 100% { opacity: 0; } }
+  @keyframes bl-flick { 0% { filter: brightness(1.35); } 20% { filter: brightness(.8); } 100% { filter: saturate(.55) contrast(1.15); } }
+  .k-tag { position: fixed; left: 50%; bottom: 10px; translate: -50% 0; z-index: 20; pointer-events: none; padding: 6px 14px; border-radius: 999px; font: 900 13px "Nunito", system-ui, sans-serif; color: #e9f7ff; background: rgba(4, 27, 43, .72); opacity: 0; transition: opacity .2s; }
+  .k-tag.on { opacity: 1; }
+  /* modalità video: morbido (sfumato) e LCD (griglia dei pixel) */
+  .screen[data-filter="morbido"] video { image-rendering: auto; filter: blur(.45px); }
+  .screen[data-filter="lcd"]::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .4;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.6) 0 1px, transparent 1px var(--px, 3px)), repeating-linear-gradient(90deg, rgba(0,0,0,.5) 0 1px, transparent 1px var(--px, 3px)); }
+  .screen video { transition: opacity .15s; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; background: #000; image-rendering: pixelated; }
+  .screen::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,0) 40%); }
+  .boot { position: absolute; inset: 0; display: grid; place-items: center; color: #b9f0ff; font-weight: 900; font-size: 6cqw; letter-spacing: .5px; text-shadow: 0 0 10px rgba(120, 220, 255, .85); opacity: 0; transition: opacity .6s; }
+  .boot b { color: #d9ff8c; }
+  .boot.on { opacity: 1; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .55; } }
+  /* tasti: zone cliccabili sopra l'immagine */
+  .hot { position: absolute; z-index: 4; transform: translate(-50%, -50%); border: 0; padding: 0; background: transparent; cursor: pointer; border-radius: 50%; }
+  .hot { aspect-ratio: 1; }
+  .hot.arm { border-radius: 14%; }
+  .hot::after { content: ""; position: absolute; inset: 6%; border-radius: inherit; background: radial-gradient(circle, rgba(0, 20, 40, .28), rgba(0, 20, 40, .12) 60%, transparent 72%); opacity: 0; transition: opacity .06s; }
+  .hot:hover::after { opacity: .35; }
+  .hot.down::after { opacity: 1; }
+  /* L e R: pulsanti finti ai lati, all'altezza della cerniera */
+  .shoulder { position: absolute; z-index: 4; aspect-ratio: 0.53; transform: translate(-50%, -50%); border: 0; padding: 0; cursor: pointer; border-radius: 40% 40% 40% 40% / 30%;
+    font-weight: 900; font-size: max(9px, 3.2cqw); color: #4b5560;
+    background: linear-gradient(90deg, #8f969c, #e9edf0 45%, #c5cbd0 70%, #7d848a);
+    box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .75), 0 6px 12px rgba(0, 30, 60, .35), inset 0 -4px 6px rgba(0, 0, 0, .18); transition: transform .06s, filter .06s; }
+  .shoulder.l { border-radius: 55% 20% 20% 55% / 40%; }
+  .shoulder.r { border-radius: 20% 55% 55% 20% / 40%; }
+  .shoulder.down { transform: translate(-50%, -50%) scale(.93); filter: brightness(.9); }
+  /* fumetto col tasto della tastiera (compare e scompare con un piccolo rimbalzo) */
+  .tip { position: absolute; z-index: 6; left: 50%; bottom: calc(100% + 8px); transform: translate(-50%, 6px) scale(.55); transform-origin: 50% 100%; opacity: 0; pointer-events: none; white-space: nowrap;
+    transition: opacity .16s ease, transform .22s cubic-bezier(.3, 1.6, .5, 1); }
+  .tip kbd { display: inline-block; min-width: 1.7em; padding: .22em .55em .28em; border-radius: 8px; font: 900 max(11px, 3.6cqw) "Nunito", sans-serif; color: #0c3954; text-align: center;
+    background: linear-gradient(180deg, #ffffff, #dcefff); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .95), 0 3px 0 #9cc7e6, 0 8px 18px rgba(0, 40, 90, .35); }
+  .tip small { display: block; margin-top: 3px; text-align: center; font: 900 max(8px, 2.2cqw) "Nunito", sans-serif; color: #fff; text-shadow: 0 1px 3px rgba(0, 40, 90, .7); }
+  .tip.side-l { left: auto; right: calc(100% + 8px); bottom: 50%; transform: translate(6px, 50%) scale(.55); transform-origin: 100% 50%; }
+  .tip.side-r { left: calc(100% + 8px); bottom: 50%; transform: translate(-6px, 50%) scale(.55); transform-origin: 0 50%; }
+  .hot:hover .tip, .shoulder:hover .tip, .hot.down .tip, .shoulder.down .tip { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  .shoulder.l:hover .tip, .shoulder.l.down .tip { transform: translate(0, 50%) scale(1); }
+  .shoulder.r:hover .tip, .shoulder.r.down .tip { transform: translate(0, 50%) scale(1); }
+  /* slot in basso (come sull'SP): si illumina quando la cartuccia è vicina */
+  .slot { position: absolute; z-index: 3; left: 38%; width: 24%; top: 95.4%; height: 1.4%; border-radius: 0 0 6px 6px; pointer-events: none; transition: box-shadow .2s; }
+  .slot.hot-glow { box-shadow: 0 0 0 3px #8fdc2a, 0 0 22px 6px rgba(143, 220, 42, .75); }
+  /* scheda DS con la copertina come etichetta */
+  .cart { position: absolute; z-index: 3; left: 50%; top: 85.2%; width: 21%; aspect-ratio: 35 / 33; margin-left: -10.5%; cursor: grab; touch-action: none;
+    border-radius: 7% 7% 7% 7% / 7% 7% 7% 7%;
+    background: linear-gradient(180deg, #4a4f56, #2c3036); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .25), 0 12px 24px rgba(0, 30, 70, .4), inset 0 2px 0 rgba(255, 255, 255, .18); }
+  .cart::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10%; border-radius: inherit; background: repeating-linear-gradient(90deg, #3b4047 0 6%, #30343a 6% 8%); }
+  .cart .label { position: absolute; left: 9%; right: 9%; top: 18%; bottom: 9%; border-radius: 4%; background: #0d3a5c center / cover no-repeat; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+  .cart .label::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(160deg, rgba(255,255,255,.35), rgba(255,255,255,0) 40%); }
+  .cart.dragging { cursor: grabbing; box-shadow: 0 0 0 3px #8fdc2a, 0 18px 34px rgba(0, 30, 70, .5); }
+  .cart.behind { z-index: 0; }
+  /* frecce animate ai lati della cartuccia: "spingila in su, nello slot" */
+  .hint { position: absolute; left: 0; right: 0; top: 84.4%; height: 13%; pointer-events: none; transition: opacity .4s; }
+  .hint.gone { opacity: 0; }
+  /* due binari di vetro ai lati della cartuccia: dentro scorrono verso l'alto
+     delle frecce luminose, come una corrente che porta la cartuccia nello slot */
+  .arrows { position: absolute; top: 2%; bottom: 2%; width: 7%; border-radius: 999px; overflow: hidden;
+    background: linear-gradient(90deg, rgba(255,255,255,.07), rgba(255,255,255,.2) 50%, rgba(255,255,255,.07));
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.28), inset 0 1px 0 rgba(255,255,255,.55), 0 0 14px rgba(140,230,60,.18);
+    -webkit-mask: linear-gradient(transparent, #000 22%, #000 78%, transparent); mask: linear-gradient(transparent, #000 22%, #000 78%, transparent); }
+  .arrows.l { left: calc(50% - 10.5% - 9%); }
+  .arrows.r { left: calc(50% + 10.5% + 2%); }
+  /* riflesso del vetro */
+  .arrows::before { content: ""; position: absolute; left: 18%; width: 22%; top: 8%; bottom: 8%; border-radius: 999px; background: linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0)); }
+  /* scia di luce che sale */
+  .arrows::after { content: ""; position: absolute; left: 10%; right: 10%; height: 45%; top: 100%; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(220,255,160,.75), rgba(150,240,60,.25) 60%, rgba(150,240,60,0));
+    animation: lane-glow 1.8s cubic-bezier(.45,0,.25,1) infinite; }
+  .arrows i { position: absolute; left: 50%; top: 100%; width: 80%; aspect-ratio: 1.45; margin-left: -40%; opacity: 0;
+    background: linear-gradient(180deg, #ffffff 0%, #f0ffcf 28%, #a8ec45 62%, #5cb81c 100%);
+    filter: drop-shadow(0 0 4px rgba(170, 255, 80, .9));
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 20'%3E%3Cpath d='M5 16 16 5l11 11' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 20'%3E%3Cpath d='M5 16 16 5l11 11' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    animation: lane-arrow 1.8s cubic-bezier(.45,0,.25,1) infinite; }
+  .arrows i:nth-child(1) { animation-delay: 0s; }
+  .arrows i:nth-child(2) { animation-delay: .6s; }
+  .arrows i:nth-child(3) { animation-delay: 1.2s; }
+  .arrows.r::after, .arrows.r i { animation-name: lane-arrow; }
+  .arrows.r::after { animation-name: lane-glow; }
+  @keyframes lane-arrow {
+    0% { opacity: 0; transform: translateY(0) scale(.7); }
+    14% { opacity: 1; }
+    86% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-560%) scale(1.05); }
+  }
+  @keyframes lane-glow { 0% { top: 100%; } 100% { top: -60%; } }
+  /* la cartuccia stessa accenna una spinta verso lo slot, ogni tanto */
+  .cart:not(.dragging):not(.behind) { animation: cart-nudge 3.6s ease-in-out 1.2s infinite; }
+  @keyframes cart-nudge { 0%, 70%, 100% { translate: 0 0; } 78% { translate: 0 -5%; } 86% { translate: 0 1%; } 92% { translate: 0 -1.5%; } }
+  @media (prefers-reduced-motion: reduce) { .arrows::after, .cart { animation: none !important; } .arrows i { animation-duration: 3.6s; } }
+  .cart.dragging ~ .hint { opacity: .35; }
+  /* ---- editor delle posizioni (?edit=1) ---- */
+  body.editing { background: linear-gradient(#3fa9f5, #e3f6ff); }
+  body.editing .hot { outline: 2px dashed rgba(255, 60, 120, .95); outline-offset: -2px; background: rgba(255, 60, 120, .18); cursor: move; }
+  body.editing .shoulder { outline: 2px dashed rgba(255, 60, 120, .95); cursor: move; }
+  body.editing .selected { outline: 3px solid #8fdc2a !important; background: rgba(143, 220, 42, .28) !important; }
+  body.editing .hot::after { display: none; }
+  body.editing .tip { display: none; }
+  body.editing.show-tips .tip { display: block; opacity: 1; transform: translate(-50%, 0) scale(1); }
+  body.editing.show-tips .shoulder .tip { transform: translate(0, 50%) scale(1); }
+  .grip { display: none; }
+  body.editing .grip { display: block; position: absolute; right: -6px; bottom: -6px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px #ff3c78; cursor: nwse-resize; }
+  .ed-label { display: none; }
+  body.editing .ed-label { display: block; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); font: 900 10px/1.2 "Nunito", sans-serif; font-style: normal; color: #fff; background: rgba(255, 60, 120, .9); padding: 1px 5px; border-radius: 6px; white-space: nowrap; pointer-events: none; margin-top: 2px; }
+  .editor { position: fixed; left: 12px; top: 12px; z-index: 20; width: 270px; padding: 12px 14px; border-radius: 16px; font: 600 13px/1.4 "Segoe UI", system-ui, sans-serif; color: #0c3954;
+    background: rgba(255, 255, 255, .9); box-shadow: 0 10px 30px rgba(0, 40, 90, .3), 0 0 0 1px #fff; }
+  .editor b { font: 900 16px "Nunito", sans-serif; }
+  .editor p { margin: 6px 0 8px; color: #3d6d86; }
+  .editor .sel { padding: 6px 8px; border-radius: 10px; background: #eaf6ff; font-variant-numeric: tabular-nums; margin-bottom: 8px; }
+  .editor .row { display: flex; gap: 6px; margin-top: 6px; }
+  .editor button { flex: 1; border: 0; padding: 7px 8px; border-radius: 999px; font: 800 12px "Segoe UI", sans-serif; cursor: pointer; color: #0c3954; background: linear-gradient(180deg, #fff, #d8efff); box-shadow: 0 0 0 1px rgba(12, 57, 84, .15); }
+  .editor button.go { background: linear-gradient(180deg, #d4ff7a, #8fdc2a 55%, #4fa818); color: #1c4a05; }
+  .editor .msg { min-height: 1.2em; margin-top: 6px; color: #4fa818; font-weight: 800; }
+  /* console dell'amico (?spectate=1): si guarda soltanto */
+  body.spectate, body.spectate * { pointer-events: none !important; cursor: default !important; }
+  body.spectate .hint, body.spectate .tip, body.spectate .k-tag { display: none !important; }
+  body.spectate .cart { animation: none !important; }
+  :root[data-night="1"] .console img.body { filter: drop-shadow(0 18px 28px rgba(0, 0, 30, .6)) brightness(.82); }
+  :root[data-night="1"] .shoulder { filter: brightness(.82); }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="scene"><div class="rig" id="rig">
+  <div class="console" id="console">
+    <div class="screen" id="screen"><div class="boot" id="boot">Aero <b>Arcade</b></div></div>
+    <div class="screen" id="screen2" aria-label="Schermo touch: clicca e trascina come con il pennino"></div>
+    <img class="body" src="skins/nero.webp" alt="" draggable="false">
+    <div class="slot" id="slot"></div>
+  </div>
+  <div class="cart" id="cart"><div class="label" id="label"></div></div>
+  <div class="hint" id="hint" aria-label="Trascina la scheda verso l'alto, nello slot"><div class="arrows l"><i></i><i></i><i></i></div><div class="arrows r"><i></i><i></i><i></i></div></div>
+</div></div>
+<script>
+(() => {
+  const P = new URLSearchParams(location.search);
+  const send = (m) => { try { parent.postMessage(m, location.origin); } catch {} };
+  const $ = (id) => document.getElementById(id);
+  const rig = $("rig"), consoleEl = $("console"), cart = $("cart"), slot = $("slot"), hint = $("hint"), boot = $("boot"), screenEl = $("screen"), screen2 = $("screen2");
+  const screens = [screenEl, screen2];
+  document.documentElement.dataset.night = P.get("night") === "1" ? "1" : "0";
+  // console dell'amico: nessun tasto, nessun suono, skin e luce arrivano da fuori
+  const SPECTATE = P.get("spectate") === "1";
+  if (SPECTATE) document.body.classList.add("spectate");
+  const cover = P.get("cover");
+  if (cover) $("label").style.backgroundImage = `url("${cover.replace(/"/g, "%22")}")`;
+
+  // tasti della tastiera assegnati (dal sito, sezione Tasti); valori di riserva
+  let KEYS = { up: "↑", down: "↓", left: "←", right: "→", a: "X", b: "Z", x: "S", y: "A", l: "Q", r: "W", start: "Invio", select: "Shift" };
+  try { KEYS = { ...KEYS, ...JSON.parse(P.get("keys") || "{}") }; } catch {}
+  const NAME = { up: "Su", down: "Giù", left: "Sinistra", right: "Destra", a: "A", b: "B", x: "X", y: "Y", l: "L", r: "R", start: "Start", select: "Select" };
+
+  // posizioni dei tasti: centro (x, y) e larghezza (w) in % della console (immagine 1254×1254).
+  // Si possono ritoccare a mano con ?edit=1 (le modifiche restano su questo browser).
+  const DEFAULT_LAYOUT = {
+    up: { x: 15.71, y: 63.8, w: 4.6, kind: "arm" },
+    down: { x: 15.71, y: 72.97, w: 4.6, kind: "arm" },
+    left: { x: 11.16, y: 68.42, w: 4.6, kind: "arm" },
+    right: { x: 20.33, y: 68.42, w: 4.6, kind: "arm" },
+    a: { x: 89.15, y: 66.03, w: 5.8, kind: "round" },
+    b: { x: 84.13, y: 71.53, w: 5.8, kind: "round" },
+    x: { x: 83.89, y: 61.56, w: 5.8, kind: "round" },
+    y: { x: 79.03, y: 66.51, w: 5.8, kind: "round" },
+    start: { x: 77.59, y: 83.17, w: 3.4, kind: "small" },
+    select: { x: 77.59, y: 88.2, w: 3.4, kind: "small" },
+    l: { x: -4.5, y: 49, w: 5.2, kind: "shoulder" },
+    r: { x: 104.5, y: 49, w: 5.2, kind: "shoulder" }
+  };
+
+  const LAYOUT_KEY = "aero-console-layout-nds";
+  const LAYOUT = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+  try {
+    const saved = JSON.parse(localStorage.getItem(LAYOUT_KEY) || "null");
+    if (saved) for (const id in saved) if (LAYOUT[id]) Object.assign(LAYOUT[id], saved[id]);
+  } catch {}
+  const EDIT = P.get("edit") === "1";
+
+  const tip = (id, side) => {
+    const t = document.createElement("span");
+    t.className = "tip" + (side ? " side-" + side : "");
+    const k = document.createElement("kbd"); k.textContent = KEYS[id];
+    const s = document.createElement("small"); s.textContent = NAME[id];
+    t.append(k, s);
+    return t;
+  };
+  const buttons = [];
+  const placeBtn = (b) => {
+    const L = LAYOUT[b.dataset.id];
+    b.style.left = L.x + "%"; b.style.top = L.y + "%"; b.style.width = L.w + "%";
+  };
+  for (const id of Object.keys(LAYOUT)) {
+    const L = LAYOUT[id];
+    const b = document.createElement("button");
+    b.type = "button"; b.dataset.id = id;
+    if (L.kind === "shoulder") { b.className = "shoulder " + id; b.textContent = id.toUpperCase(); b.append(tip(id, id)); }
+    else { b.className = "hot " + L.kind; b.append(tip(id)); }
+    b.setAttribute("aria-label", `${NAME[id]} (${KEYS[id]})`);
+    placeBtn(b);
+    consoleEl.append(b); buttons.push(b);
+  }
+  if (EDIT) setupEditor();
+
+  // ---------------- editor delle posizioni (?edit=1) ----------------
+  function setupEditor() {
+    document.body.classList.add("editing");
+    let sel = null;
+    const panel = document.createElement("div");
+    panel.className = "editor";
+    panel.innerHTML = `<b>Ritocca i tasti</b>
+      <p>Trascina un tasto per spostarlo, il pallino in basso a destra per ingrandirlo.
+      Frecce = sposta di poco (Maiusc = di più), + e − = dimensione.</p>
+      <div class="sel" id="ed-sel">Nessun tasto selezionato</div>
+      <div class="row"><button id="ed-save" class="go">Salva su questo browser</button><button id="ed-copy">Copia per Claude</button></div>
+      <div class="row"><button id="ed-reset">Ripristina originali</button><button id="ed-tips">Mostra fumetti</button></div>
+      <div class="msg" id="ed-msg"></div>`;
+    document.body.append(panel);
+    const msg = (t) => { const m = panel.querySelector("#ed-msg"); m.textContent = t; clearTimeout(msg._t); msg._t = setTimeout(() => (m.textContent = ""), 3500); };
+    const round = (v) => Math.round(v * 100) / 100;
+    const showSel = () => {
+      panel.querySelector("#ed-sel").textContent = sel ? `${NAME[sel.dataset.id]}: x ${round(LAYOUT[sel.dataset.id].x)}%  y ${round(LAYOUT[sel.dataset.id].y)}%  larghezza ${round(LAYOUT[sel.dataset.id].w)}%` : "Nessun tasto selezionato";
+      buttons.forEach((b) => b.classList.toggle("selected", b === sel));
+    };
+    for (const b of buttons) {
+      const h = document.createElement("i"); h.className = "grip"; b.append(h);
+      const lab = document.createElement("em"); lab.className = "ed-label"; lab.textContent = NAME[b.dataset.id]; b.append(lab);
+    }
+    let op = null;
+    addEventListener("pointerdown", (e) => {
+      const b = e.target.closest("button[data-id]");
+      if (!b) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      sel = b; showSel();
+      const box = consoleEl.getBoundingClientRect(), L = LAYOUT[b.dataset.id];
+      op = { b, resize: !!e.target.closest(".grip"), sx: e.clientX, sy: e.clientY, x: L.x, y: L.y, w: L.w, bw: box.width, bh: box.height };
+      b.setPointerCapture(e.pointerId);
+    }, true);
+    addEventListener("pointermove", (e) => {
+      if (!op) return;
+      const L = LAYOUT[op.b.dataset.id];
+      const dx = ((e.clientX - op.sx) / op.bw) * 100, dy = ((e.clientY - op.sy) / op.bh) * 100;
+      if (op.resize) L.w = Math.max(2, op.w + dx * 2);
+      else { L.x = op.x + dx; L.y = op.y + dy; }
+      placeBtn(op.b); showSel();
+    }, true);
+    addEventListener("pointerup", () => { op = null; }, true);
+    addEventListener("keydown", (e) => {
+      if (!sel) return;
+      const L = LAYOUT[sel.dataset.id], st = e.shiftKey ? 1 : 0.1;
+      if (e.key === "ArrowLeft") L.x -= st; else if (e.key === "ArrowRight") L.x += st;
+      else if (e.key === "ArrowUp") L.y -= st; else if (e.key === "ArrowDown") L.y += st;
+      else if (e.key === "+" || e.key === "=") L.w += st; else if (e.key === "-") L.w = Math.max(2, L.w - st);
+      else if (e.key === "Escape") { sel = null; showSel(); return; }
+      else return;
+      e.preventDefault(); placeBtn(sel); showSel();
+    });
+    const compact = () => {
+      const out = {};
+      for (const id in LAYOUT) out[id] = { x: round(LAYOUT[id].x), y: round(LAYOUT[id].y), w: round(LAYOUT[id].w) };
+      return out;
+    };
+    panel.querySelector("#ed-save").onclick = () => { localStorage.setItem(LAYOUT_KEY, JSON.stringify(compact())); msg("Salvato: la console del sito usa già queste posizioni su questo browser."); };
+    panel.querySelector("#ed-copy").onclick = async () => {
+      const text = "Posizioni tasti DS: " + JSON.stringify(compact());
+      try { await navigator.clipboard.writeText(text); msg("Copiato! Incollalo a Claude in chat."); }
+      catch { prompt("Copia questo testo e incollalo a Claude:", text); }
+    };
+    panel.querySelector("#ed-reset").onclick = () => {
+      localStorage.removeItem(LAYOUT_KEY);
+      for (const id in DEFAULT_LAYOUT) Object.assign(LAYOUT[id], DEFAULT_LAYOUT[id]);
+      buttons.forEach(placeBtn); showSel(); msg("Posizioni originali ripristinate.");
+    };
+    panel.querySelector("#ed-tips").onclick = (e) => { document.body.classList.toggle("show-tips"); e.target.textContent = document.body.classList.contains("show-tips") ? "Nascondi fumetti" : "Mostra fumetti"; };
+  }
+
+  // ---------------- skin della console ----------------
+  const SKINS = [["nero", "Nero"], ["titanio", "Titanio"], ["kawaii", "Kawaii"], ["indaco", "Indaco e oro"], ["kintsugi", "Kintsugi"], ["vaporwave", "Vaporwave"]];
+  const SKIN_KEY = "aero-nds-skin";
+  const bodyImg = consoleEl.querySelector("img.body");
+  let skinIdx = Math.max(0, SKINS.findIndex(([id]) => id === ((SPECTATE ? P.get("skin") : localStorage.getItem(SKIN_KEY)) || "nero")));
+  // le altre skin si scaricano in anticipo, così il cambio è istantaneo
+  const preload = () => SKINS.forEach(([id]) => { const i = new Image(); i.decoding = "async"; i.src = `skins/${id}.webp`; });
+  function applySkin(i, animate) {
+    skinIdx = (i + SKINS.length) % SKINS.length;
+    const [id, name] = SKINS[skinIdx];
+    if (!SPECTATE) { try { localStorage.setItem(SKIN_KEY, id); } catch {} send({ aero: "skin", id, name }); }
+    const src = `skins/${id}.webp`;
+    if (!animate || bodyImg.getAttribute("src") === src) { bodyImg.setAttribute("src", src); return name; }
+    // cambio con un breve bagliore, come un guscio che si sostituisce
+    const next = new Image(); next.src = src;
+    (next.decode ? next.decode() : Promise.resolve()).catch(() => {}).then(() => {
+      bodyImg.classList.add("swap"); void bodyImg.offsetWidth;
+      bodyImg.setAttribute("src", src);
+      setTimeout(() => bodyImg.classList.remove("swap"), 420);
+    });
+    return name;
+  }
+  bodyImg.setAttribute("src", `skins/${SKINS[skinIdx][0]}.webp`);
+  setTimeout(preload, 1500);
+
+  // tasti → messaggio alla Home (che li passa al gioco come i tasti della tastiera)
+  const held = new Map();
+  addEventListener("pointerdown", (e) => {
+    if (EDIT) return;
+    const b = e.target.closest("button[data-id]");
+    if (!b) return;
+    e.preventDefault();
+    b.setPointerCapture(e.pointerId);
+    held.set(e.pointerId, b); b.classList.add("down");
+    send({ aero: "button", id: b.dataset.id, down: true });
+  });
+  const up = (e) => {
+    const b = held.get(e.pointerId);
+    if (!b) return;
+    held.delete(e.pointerId); b.classList.remove("down");
+    send({ aero: "button", id: b.dataset.id, down: false });
+  };
+  addEventListener("pointerup", up); addEventListener("pointercancel", up);
+
+  // ---------------- touch: lo schermo di sotto come con il pennino ----------------
+  let touching = null;
+  const touchAt = (e) => {
+    const r = screen2.getBoundingClientRect();
+    return { x: Math.max(0, Math.min(255, Math.round(((e.clientX - r.left) / r.width) * 256))), y: Math.max(0, Math.min(191, Math.round(((e.clientY - r.top) / r.height) * 192))) };
+  };
+  screen2.addEventListener("pointerdown", (e) => {
+    if (SPECTATE || EDIT || state !== "inserted") return;
+    e.preventDefault(); screen2.setPointerCapture(e.pointerId); touching = e.pointerId;
+    send({ aero: "touch", down: true, ...touchAt(e) });
+  });
+  screen2.addEventListener("pointermove", (e) => { if (touching === e.pointerId) send({ aero: "touch", down: true, ...touchAt(e) }); });
+  const lift = (e) => { if (touching !== e.pointerId) return; touching = null; send({ aero: "touch", down: false, ...touchAt(e) }); };
+  screen2.addEventListener("pointerup", lift); screen2.addEventListener("pointercancel", lift);
+
+  // ---------------- grandezza a pixel interi ----------------
+  // Lo schermo della console mostra il gioco a 240×160 ingrandito di un numero
+  // intero di volte: la console intera si ridimensiona di conseguenza. La
+  // rotellina sceglie l'ingrandimento (da 1:1, la risoluzione reale, al massimo).
+  const NW = 256, NH = 192;
+  // fori degli schermi nell'immagine (frazioni della console 1254×1254)
+  const HOLES = [{ el: screenEl, l: 0.2887, t: 0.0885, w: 0.4203, h: 0.3134 }, { el: screen2, l: 0.2871, t: 0.5614, w: 0.4242, h: 0.3198 }];
+  const SCR_W = 0.4203;
+  // passi della rotellina: 1×, 2×… (pixel perfetti) e in cima "adatta alla finestra"
+  let steps = [1], idx = 0, userIdx = null;
+  const kTag = document.createElement("div"); kTag.className = "k-tag"; document.body.append(kTag);
+  let kTimer = 0;
+  function fit() {
+    if (document.body.classList.contains("editing")) return;
+    const dpr = devicePixelRatio || 1, VW = innerWidth, VH = innerHeight;
+    // ingrandimento massimo che entra nella finestra (anche non intero)
+    const kFit = Math.max(0.5, Math.min((VH * 0.97 * 1254 / 1514) * SCR_W * dpr / NW, VW * 0.94 * SCR_W * dpr / NW));
+    steps = [];
+    for (let k = 1; k <= kFit + 1e-6; k++) steps.push(k);
+    if (!steps.length || kFit - steps[steps.length - 1] > 0.08) steps.push(kFit);
+    // all'apertura: adatta alla finestra (sul DS i pixel interi la farebbero troppo piccola)
+    const defIdx = steps.length - 1;
+    idx = Math.min(userIdx ?? defIdx, steps.length - 1);
+    const k = steps[idx];
+    const W = (NW * k) / dpr / SCR_W, Hr = W * 1514 / 1254, Hc = W;
+    const snap = (v) => Math.round(v * dpr) / dpr;
+    rig.style.cssText = `position:absolute;height:${Hr}px;width:${W}px;left:${snap((VW - W) / 2)}px;top:${snap(Math.max(0, (VH - Hr) / 2))}px`;
+    const sw = (NW * k) / dpr, sh = (NH * k) / dpr;
+    for (const o of HOLES) {
+      o.el.style.cssText = `left:${snap(o.l * W + (o.w * W - sw) / 2)}px;width:${sw}px;top:${snap(o.t * Hc + (o.h * Hc - sh) / 2)}px;height:${sh}px;--px:${k / dpr}px`;
+      o.el.classList.toggle("fit", !Number.isInteger(k));
+    }
+  }
+  addEventListener("resize", fit);
+  addEventListener("wheel", (e) => {
+    if (document.body.classList.contains("editing") || SPECTATE) return;
+    e.preventDefault();
+    const next = Math.min(steps.length - 1, Math.max(0, idx + (e.deltaY < 0 ? 1 : -1)));
+    if (next === idx) return;
+    userIdx = next;
+    fit();
+    const k = steps[idx];
+    kTag.textContent = !Number.isInteger(k) ? "Adatta alla finestra" : k === 1 ? `Risoluzione reale · ${NW}×${NH}` : `×${k} · ${NW * k}×${NH * k}`;
+    kTag.classList.add("on"); clearTimeout(kTimer); kTimer = setTimeout(() => kTag.classList.remove("on"), 1200);
+    if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); }
+  }, { passive: false });
+  fit();
+
+  // ---------------- cartuccia ----------------
+  // stati: out | dragging | inserting | inserted | ejecting
+  let state = P.get("inserted") === "1" ? "inserted" : "out";
+  let intro = null;
+  if (!SPECTATE) { const sc = document.createElement("script"); sc.src = `../intro/intro.js?v=${encodeURIComponent(P.get("v") || "")}`; document.head.append(sc); }
+  let drag = null;
+  const move = (x, y, ms = 0) => {
+    cart._t = { x, y };
+    cart.style.transition = ms ? `transform ${ms}ms cubic-bezier(.3,.8,.3,1)` : "none";
+    cart.style.transform = `translate(${x}px, ${y}px)`;
+  };
+  /** spostamento che porta la cartuccia dentro lo slot (resta fuori solo il fondo) */
+  const insertedPos = () => {
+    const s = slot.getBoundingClientRect(), c = cart.getBoundingClientRect(), t = cart._t || { x: 0, y: 0 };
+    return { x: t.x + (s.left + s.width / 2) - (c.left + c.width / 2), y: t.y + s.top - c.top - c.height * 0.72 };
+  };
+  const nearSlot = () => {
+    const s = slot.getBoundingClientRect(), c = cart.getBoundingClientRect();
+    return Math.abs((c.left + c.width / 2) - (s.left + s.width / 2)) < s.width * 0.7 && c.top < s.bottom + c.height * 0.6 && c.bottom > s.top;
+  };
+  // ---------------- suoni della cartuccia (sintetizzati, nessun file) ----------------
+  // Inserimento: breve strisciata di plastica nella guida, poi lo "clac" secco
+  // del connettore che fa presa. Estrazione: lo scatto del connettore che molla
+  // e la strisciata mentre esce.
+  let ac = null;
+  const soundOn = () => { if (SPECTATE) return false; try { return JSON.parse(localStorage.getItem("aero-prefs") || "{}").sound !== false; } catch { return true; } };
+  const audio = () => {
+    if (!soundOn()) return null;
+    try { ac ??= new AudioContext(); if (ac.state === "suspended") ac.resume(); return ac; } catch { return null; }
+  };
+  let noiseBuf = null;
+  const noise = (a) => {
+    if (!noiseBuf) { noiseBuf = a.createBuffer(1, a.sampleRate, a.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const n = a.createBufferSource(); n.buffer = noiseBuf; n.loop = true; return n;
+  };
+  /** colpo di plastica: rumore filtrato molto breve */
+  const tick = (a, t, freq, q, gain, dur) => {
+    const n = noise(a), f = a.createBiquadFilter(), g = a.createGain();
+    f.type = "bandpass"; f.frequency.value = freq; f.Q.value = q;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.0015); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+    n.connect(f).connect(g).connect(a.destination); n.start(t, Math.random()); n.stop(t + dur + 0.02);
+  };
+  /** colpo sordo della scocca */
+  const thump = (a, t, f0, f1, gain, dur) => {
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = "sine"; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.02);
+  };
+  /** strisciata della cartuccia nella guida */
+  const scrape = (a, t, dur, gain = 0.05) => {
+    const n = noise(a), f = a.createBiquadFilter(), lp = a.createBiquadFilter(), g = a.createGain();
+    f.type = "bandpass"; f.frequency.setValueAtTime(900, t); f.frequency.linearRampToValueAtTime(1500, t + dur); f.Q.value = 0.8;
+    lp.type = "lowpass"; lp.frequency.value = 3200;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + dur * 0.25); g.gain.linearRampToValueAtTime(gain * 0.7, t + dur * 0.8); g.gain.linearRampToValueAtTime(0, t + dur);
+    n.connect(f).connect(lp).connect(g).connect(a.destination); n.start(t, Math.random()); n.stop(t + dur + 0.02);
+  };
+  const sfx = {
+    slide(dur = 0.38) { const a = audio(); if (a) scrape(a, a.currentTime, dur); },
+    seat() { // clac dell'inserimento
+      const a = audio(); if (!a) return; const t = a.currentTime + 0.005;
+      tick(a, t, 2600, 1.4, 0.55, 0.035); thump(a, t, 170, 80, 0.4, 0.09);
+      tick(a, t + 0.028, 4200, 2, 0.22, 0.02); tick(a, t + 0.05, 1700, 3, 0.12, 0.05);
+    },
+    unseat() { // il connettore molla la presa
+      const a = audio(); if (!a) return; const t = a.currentTime + 0.005;
+      tick(a, t, 3400, 1.8, 0.4, 0.025); thump(a, t + 0.004, 120, 70, 0.25, 0.07); tick(a, t + 0.03, 2000, 2.5, 0.14, 0.04);
+    },
+    out() { const a = audio(); if (a) { tick(a, a.currentTime + 0.01, 1500, 2, 0.12, 0.05); } } // esce del tutto dalla guida
+  };
+
+  /** quanto è salita la cartuccia verso lo slot (0 = a riposo, 1 = all'imbocco) */
+  let lane = null; // { x, top, bottom } limiti della corsa verticale
+  function computeLane() {
+    const t = cart._t || { x: 0, y: 0 }, p = insertedPos(), ch = cart.getBoundingClientRect().height;
+    lane = { x: p.x, top: p.y + ch * 0.72, rest: t.y }; // in alto si ferma con il bordo all'imbocco dello slot
+  }
+  function insertAnim() {
+    state = "inserting"; slot.classList.remove("hot-glow"); hint.classList.add("gone");
+    const p = insertedPos(), ch = cart.getBoundingClientRect().height;
+    move(p.x, p.y + ch * 0.72, 140);                                    // si allinea all'imbocco dello slot
+    setTimeout(() => { cart.classList.add("behind"); sfx.slide(0.36); move(p.x, p.y, 380); }, 170); // entra dietro la scocca
+    setTimeout(() => { sfx.seat(); }, 520);
+    setTimeout(() => {
+      state = "inserted";
+      // l'intro di accensione, poi il gioco (la console dell'amico non la mostra)
+      if (!SPECTATE && window.AeroIntro) {
+        send({ aero: "intro" });
+        // dopo l'intro niente scritta di avvio: si passa dritti al gioco
+        screen2.classList.add("intro-glow");
+        intro = window.AeroIntro.attach(screenEl, () => { intro = null; screen2.classList.remove("intro-glow"); if (state !== "inserted") return; screens.forEach((el) => el.classList.add("booting")); send({ aero: "inserted" }); }, [256, 192]);
+      } else { boot.classList.add("on"); send({ aero: "inserted" }); }
+    }, 600);
+  }
+  function placeInserted() {
+    hint.classList.add("gone"); cart.classList.add("behind");
+    requestAnimationFrame(() => { const p = insertedPos(); move(p.x, p.y); });
+  }
+  if (state === "inserted") placeInserted();
+  addEventListener("resize", () => { if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); } });
+
+  cart.addEventListener("pointerdown", (e) => {
+    if (state !== "out" && state !== "inserted") return;
+    e.preventDefault(); cart.setPointerCapture(e.pointerId);
+    audio(); // sblocca l'audio con il gesto
+    const t = cart._t || { x: 0, y: 0 };
+    drag = { sy: e.clientY, x: t.x, y: t.y, from: state, unseated: false, depth: cart.getBoundingClientRect().height * 0.72 };
+    cart.classList.add("dragging");
+    if (state === "out") { state = "dragging"; computeLane(); }
+  });
+  cart.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    const dy = e.clientY - drag.sy;
+    if (drag.from === "inserted") {
+      // si sfila solo verso il basso, seguendo il dito
+      const pull = Math.max(0, dy);
+      move(drag.x, drag.y + pull);
+      if (!drag.unseated && pull > 12) { drag.unseated = true; sfx.unseat(); boot.classList.remove("on"); screens.forEach((el) => el.classList.add("off")); }
+      if (drag.unseated && !drag.sliding && pull > 18) { drag.sliding = true; sfx.slide(0.3); }
+      cart.classList.toggle("behind", pull < drag.depth);
+      return;
+    }
+    // inserimento: solo in verticale, verso l'alto, allineata allo slot
+    const range = lane.rest - lane.top;
+    const up = Math.min(range, Math.max(-14, -dy)); // verso il basso solo un filo, con resistenza
+    const y = lane.rest - (up < 0 ? up * 0.4 : up);
+    const k = Math.max(0, up) / range;
+    move(drag.x + (lane.x - drag.x) * Math.min(1, k * 1.6), y);
+    slot.classList.toggle("hot-glow", k > 0.45);
+    if (k >= 0.985) { drag = null; cart.classList.remove("dragging"); insertAnim(); } // arrivata all'imbocco: la guida la prende
+  });
+  const endDrag = (e) => {
+    if (!drag) return;
+    const from = drag.from, dy = e.clientY - drag.sy, d = drag;
+    drag = null; cart.classList.remove("dragging");
+    if (from === "inserted") {
+      if (Math.max(0, dy) >= d.depth * 0.85) {
+        // sfilata del tutto a mano: niente animazione di espulsione, torna giù al suo posto
+        state = "pulled"; cart.classList.remove("behind"); sfx.out();
+        move(0, 0, 420); hint.classList.add("gone");
+        send({ aero: "eject-request", manual: true }); // la Home salva, poi chiama eject()
+      } else {
+        // lasciata a metà: rientra nello slot
+        const q = insertedPos(); cart.classList.add("behind"); move(q.x, q.y, 200);
+        if (d.unseated) { setTimeout(() => sfx.seat(), 170); setTimeout(() => { boot.classList.add("on"); screens.forEach((el) => el.classList.remove("off")); }, 200); }
+      }
+      return;
+    }
+    const k = lane ? Math.max(0, lane.rest - (cart._t?.y ?? lane.rest)) / (lane.rest - lane.top) : 0;
+    if (k > 0.5) insertAnim();
+    else { state = "out"; slot.classList.remove("hot-glow"); move(0, 0, 320); }
+  };
+  cart.addEventListener("pointerup", endDrag); cart.addEventListener("pointercancel", endDrag);
+
+  // ---------------- API per la Home (stessa origine) ----------------
+  window.aeroConsole = {
+    setScreen(stream) {
+      screens.forEach((el) => el.querySelector("video")?.remove());
+      if (!stream) { boot.classList.toggle("on", state === "inserted"); return; }
+      boot.classList.remove("on");
+      screenEl.querySelector("canvas.aero-intro")?.remove(); // arriva il gioco: via l'ultimo fotogramma dell'intro
+      screen2.classList.remove("intro-glow");
+      for (const [el, cls] of [[screenEl, "top"], [screen2, "bottom"]]) {
+        const v = document.createElement("video");
+        v.muted = true; v.playsInline = true; v.autoplay = true; v.srcObject = stream; v.className = cls;
+        el.prepend(v); void v.play().catch(() => {});
+      }
+    },
+    eject() {
+      if (state === "ejecting") return;
+      if (state === "pulled") { // già sfilata a mano: nessuna animazione
+        state = "out"; this.setScreen(null); boot.classList.remove("on"); screens.forEach((el) => el.classList.remove("off"));
+        setTimeout(() => send({ aero: "ejected" }), 250); return;
+      }
+      intro?.stop(); intro = null;
+      state = "ejecting"; this.setScreen(null); boot.classList.remove("on");
+      const t = cart._t || { x: 0, y: 0 };
+      sfx.unseat(); setTimeout(() => sfx.slide(0.3), 60);
+      move(t.x, t.y + 70, 320);                                         // esce dal basso
+      setTimeout(() => { cart.classList.remove("behind"); move(0, 0, 520); }, 340);
+      setTimeout(() => { state = "out"; hint.classList.remove("gone"); send({ aero: "ejected" }); }, 900);
+    },
+    nextSkin() { return applySkin(skinIdx + 1, true); },
+    get skin() { return SKINS[skinIdx][1]; },
+    insert() { if (state === "out") { computeLane(); insertAnim(); } },
+    skipIntro() { intro?.skip(); },
+    setFilter(f) { screens.forEach((el) => (el.dataset.filter = f)); },
+    /** per la console dell'amico: skin, luce, copertina e cartuccia dentro/fuori */
+    setSkin(id) { const i = SKINS.findIndex(([k]) => k === id); if (i >= 0 && i !== skinIdx) applySkin(i, true); },
+    setLight() {},
+    setCover(url) { $("label").style.backgroundImage = url ? `url("${String(url).replace(/"/g, "%22")}")` : ""; },
+    showInserted(on) {
+      if (on && state === "out") { computeLane(); insertAnim(); }
+      else if (!on && state === "inserted") {
+        state = "ejecting"; this.setScreen(null); boot.classList.remove("on");
+        const t = cart._t || { x: 0, y: 0 };
+        move(t.x, t.y + 70, 320);
+        setTimeout(() => { cart.classList.remove("behind"); move(0, 0, 520); }, 340);
+        setTimeout(() => { state = "out"; }, 900);
+      }
+    },
+    get skinId() { return SKINS[skinIdx][0]; },
+    get light() { return true; },
+    setNight(on) { document.documentElement.dataset.night = on ? "1" : "0"; },
+    get state() { return state; }
+  };
+  const img = consoleEl.querySelector("img.body");
+  const ready = () => send({ aero: "console-ready", console: "nds", inserted: state === "inserted", skin: SKINS[skinIdx][1], skinId: SKINS[skinIdx][0] });
+  if (img.complete) ready(); else img.addEventListener("load", ready, { once: true });
+})();
+</script>
+</body>
+</html>
