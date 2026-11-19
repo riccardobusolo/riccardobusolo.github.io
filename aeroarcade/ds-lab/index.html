@@ -7,9 +7,12 @@
 <title>Laboratorio DS — due console collegate</title>
 <script>
   // senza isolamento la memoria condivisa non c'è: registro il service worker e ricarico una volta
-  if (!window.crossOriginIsolated && "serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").then(() => {
-      if (!sessionStorage.getItem("coi-reload")) { sessionStorage.setItem("coi-reload", "1"); location.reload(); }
+  // Ctrl+F5 salta il service worker: in quel caso ricarico da solo (massimo 2 tentativi di fila)
+  if (window.crossOriginIsolated) sessionStorage.removeItem("coi-reload");
+  else if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => {
+      const n = +sessionStorage.getItem("coi-reload") || 0;
+      if (n < 2) { sessionStorage.setItem("coi-reload", n + 1); location.reload(); }
     });
   }
 </script>
@@ -37,7 +40,7 @@
 <body>
 <header>
   <h1>Laboratorio: due DS collegati</h1>
-  <span class="box" id="ver" title="Se dopo Ctrl+F5 vedi questo orario, hai la versione nuova">Versione del 19/11 03:15</span>
+  <span class="box" id="ver" title="Se dopo Ctrl+F5 vedi questo orario, hai la versione nuova">Versione del 19/11 03:17</span>
   <label class="box">ROM DS (tua copia): <input id="rom" type="file" accept=".nds"></label>
   <button id="go" disabled>Accendi le due console</button>
   <span class="box load" id="ld"><span id="ldt">Carico l'emulatore…</span><span class="bar"><i id="ldb"></i></span></span>
@@ -53,13 +56,13 @@
   <div class="ds"><h2>DS 2 · Defra</h2><canvas id="t1" width="256" height="192"></canvas><canvas id="b1" class="bottom" width="256" height="192"></canvas></div>
 </div>
 <pre id="log"></pre>
-<script>window.DUO_V="1795054521";</script>
-<script src="./duo.js?v=1795054521"></script>
+<script>window.DUO_V="1795054642";</script>
+<script src="./duo.js?v=1795054642"></script>
 <script>
 (async () => {
   const $ = (id) => document.getElementById(id);
   const log = (m) => { $("log").textContent += m + "\n"; $("log").scrollTop = 1e9; };
-  if (!window.crossOriginIsolated) { $("st").textContent = "Memoria condivisa non disponibile: ricarica la pagina (serve Chrome o Edge)."; log("crossOriginIsolated = false"); return; }
+  if (!window.crossOriginIsolated) { $("st").textContent = "Un attimo, ricarico la pagina… (se resta così premi F5; serve Chrome o Edge)"; log("crossOriginIsolated = false"); return; }
   addEventListener("error", (e) => log("Errore: " + e.message));
   addEventListener("unhandledrejection", (e) => log("Errore: " + (e.reason?.message || e.reason)));
   const bar = (t, f) => { $("ldt").textContent = t; $("ldb").style.width = Math.round(Math.max(0, Math.min(1, f)) * 100) + "%"; $("ld").classList.toggle("done", f >= 1); };
