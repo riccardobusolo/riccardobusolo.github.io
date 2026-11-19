@@ -16,6 +16,7 @@
 #include "SPI_Firmware.h"
 #include "GPU.h"
 #include "SPU.h"
+#include "GPU3D_Soft.h"
 
 using namespace melonDS;
 
@@ -87,6 +88,8 @@ namespace duo {
       nds->SetNDSCart(std::move(cart));
       if (savePtr && saveLen > 0) nds->SetNDSSave((const u8*)savePtr, (u32)saveLen);
       nds->Reset();
+      // 3D in un thread a parte per ogni console: le due console non si rubano tempo
+      if (auto* soft = dynamic_cast<SoftRenderer*>(&nds->GetRenderer3D())) soft->SetThreaded(true, nds->GPU);
       nds->SetupDirectBoot("game");
       setClock(nds);
       return true;
@@ -111,7 +114,9 @@ namespace duo {
           u32 xy = in->touchXY;
           nds->TouchScreen((u16)(xy & 0xffff), (u16)(xy >> 16));
         } else nds->ReleaseScreen();
+        double t0 = emscripten_get_now();
         nds->RunFrame();
+        in->lastMs = (float)(emscripten_get_now() - t0);
         {
           std::lock_guard<std::mutex> g(in->fbLock);
           auto& gpu = nds->GPU;
@@ -173,6 +178,7 @@ namespace duo {
       return (int)in.save.size();
     }
     int framesDone(int i) { return (int)inst[i & 1].frames.load(); }
+    float frameMs(int i) { return inst[i & 1].lastMs.load(); }
   };
 }
 
@@ -191,5 +197,6 @@ EMSCRIPTEN_BINDINGS(DuoEmulator) {
     .function("saveSize", &duo::DuoEmulator::saveSize)
     .function("saveDirty", &duo::DuoEmulator::saveDirty)
     .function("readSave", &duo::DuoEmulator::readSave)
-    .function("framesDone", &duo::DuoEmulator::framesDone);
+    .function("framesDone", &duo::DuoEmulator::framesDone)
+    .function("frameMs", &duo::DuoEmulator::frameMs);
 }

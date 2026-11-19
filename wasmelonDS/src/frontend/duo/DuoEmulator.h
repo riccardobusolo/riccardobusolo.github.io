@@ -26,5 +26,6 @@ namespace duo {
     std::vector<melonDS::u8> save;
     std::atomic<bool> saveDirty{false};
     std::atomic<melonDS::u32> frames{0};
+    std::atomic<float> lastMs{0};
   };
 }
