@@ -181,7 +181,8 @@
       const scr = document.querySelector(".screen");
       if (!document.body.classList.contains("spectate") && window.AeroIntro && scr) {
         send({ aero: "intro" });
-        intro = window.AeroIntro.attach(scr, () => { intro = null; if (state !== "inserted") return; boot.classList.add("on"); send({ aero: "inserted" }); });
+        const NATIVE = { nes: [256, 240], snes: [256, 224], gb: [160, 144], gbc: [160, 144], gba: [240, 160], nds: [256, 192], psx: [320, 240] };
+        intro = window.AeroIntro.attach(scr, () => { intro = null; if (state !== "inserted") return; scr.style.background = "#000"; send({ aero: "inserted" }); }, NATIVE[CONSOLE]);
       } else { boot.classList.add("on"); send({ aero: "inserted" }); }
     }, 760);
   }
@@ -228,6 +229,7 @@
       screenEl.querySelectorAll(".pane").forEach((p) => p.remove()); videos.length = 0;
       if (!stream) { boot.classList.add("on"); return; }
       boot.classList.remove("on");
+      screenEl.querySelector("canvas.aero-intro")?.remove();
       const panes = LOOK.ds ? ["top", "bottom"] : ["full"];
       for (const name of panes) {
         const pane = document.createElement("div"); pane.className = "pane " + name;

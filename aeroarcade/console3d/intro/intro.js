@@ -19,24 +19,25 @@ loadFont();
  * Comodità per le pagine delle console: mette l'intro dentro l'elemento dello
  * schermo, con volume e suoni presi dalle preferenze del sito; un clic o un tasto la salta.
  */
-function attach(screenEl, onEnd) {
+function attach(screenEl, onEnd, native) {
   let prefs = {};
   try { prefs = JSON.parse(localStorage.getItem("aero-prefs") || "{}"); } catch {}
   if (prefs.intro === false) { onEnd(); return null; }
   const cv = document.createElement("canvas");
   cv.className = "aero-intro";
-  cv.style.cssText = "position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;transition:opacity .25s";
+  cv.style.cssText = "position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;background:#000;transition:opacity .25s" + (native ? ";image-rendering:pixelated" : "");
   screenEl.append(cv);
   let done = false;
   const end = () => {
     if (done) return; done = true;
     removeEventListener("pointerdown", onDown, true);
-    cv.style.opacity = "0"; setTimeout(() => cv.remove(), 260);
     onEnd();
+    // resta il nero dell'ultimo fotogramma finché arriva il gioco, poi sparisce
+    setTimeout(() => { cv.style.opacity = "0"; setTimeout(() => cv.remove(), 260); }, 1500);
   };
   const onDown = (e) => { if (!e.target.closest || !e.target.closest("button")) h.skip(); };
   const vol = typeof prefs.volume === "number" ? prefs.volume : 0.8;
-  const h = window.AeroIntro.play(cv, { volume: 0.7 * vol, onEnd: end });
+  const h = window.AeroIntro.play(cv, { volume: 0.7 * vol, onEnd: end, native });
   addEventListener("pointerdown", onDown, true);
   return { skip: () => h.skip(), stop: () => { done = true; h.stop(); removeEventListener("pointerdown", onDown, true); cv.remove(); } };
 }
@@ -45,7 +46,7 @@ window.AeroIntro = { preload: loadFont, attach, play(cv, opts = {}) {
   const LAVA = '<svg viewBox="0 0 60 100" class="lava-lamp" aria-hidden="true">\n  <defs>\n    <linearGradient id="lava0liq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9f6ff"/><stop offset=".6" stop-color="#2fb4e8"/><stop offset="1" stop-color="#1b8fcf"/></linearGradient>\n    <radialGradient id="lava0wax" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#f0ffb0"/><stop offset=".55" stop-color="#9be82a"/><stop offset="1" stop-color="#4fa818"/></radialGradient>\n    <radialGradient id="lava0glow" cx=".5" cy="1" r=".75"><stop offset="0" stop-color="#f0ffb0" stop-opacity=".95"/><stop offset="1" stop-color="#f0ffb0" stop-opacity="0"/></radialGradient>\n    <linearGradient id="lava0cr" x1="0" y1="0" x2="1" y2="0">\n      <stop offset="0" stop-color="#2c3e4c"/><stop offset=".08" stop-color="#7d93a3"/><stop offset=".16" stop-color="#eef6fb"/>\n      <stop offset=".22" stop-color="#ffffff"/><stop offset=".3" stop-color="#a9bccb"/><stop offset=".42" stop-color="#6fb3cf"/>\n      <stop offset=".52" stop-color="#3a5263"/><stop offset=".62" stop-color="#b7c9d6"/><stop offset=".72" stop-color="#f4faff"/>\n      <stop offset=".82" stop-color="#8ea4b4"/><stop offset=".92" stop-color="#4b6273"/><stop offset="1" stop-color="#22323e"/></linearGradient>\n    <linearGradient id="lava0vshade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#001a2a" stop-opacity=".35"/></linearGradient>\n    <linearGradient id="lava0edge" x1="0" y1="0" x2="1" y2="0">\n      <stop offset="0" stop-color="#003a5a" stop-opacity=".55"/><stop offset=".07" stop-color="#ffffff" stop-opacity=".5"/><stop offset=".14" stop-color="#ffffff" stop-opacity="0"/>\n      <stop offset=".84" stop-color="#ffffff" stop-opacity="0"/><stop offset=".93" stop-color="#ffffff" stop-opacity=".35"/><stop offset="1" stop-color="#003a5a" stop-opacity=".6"/></linearGradient>\n    <linearGradient id="lava0topdark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#002a44" stop-opacity=".35"/><stop offset=".18" stop-color="#002a44" stop-opacity="0"/></linearGradient>\n    <radialGradient id="lava0rim" cx=".5" cy=".5" r=".5"><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset=".85" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>\n    <radialGradient id="lava0bounce" cx=".5" cy="0" r=".9"><stop offset="0" stop-color="#f0ffb0" stop-opacity=".75"/><stop offset="1" stop-color="#f0ffb0" stop-opacity="0"/></radialGradient>\n    <filter id="lava0goo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feColorMatrix in="b" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"/></filter>\n    <filter id="lava0soft"><feGaussianBlur stdDeviation=".5"/></filter>\n    <clipPath id="lava0clip"><path d="M23.2 16 L36.8 16 C38.5 30 42.8 50 44.6 64 Q45.4 70.5 40.6 71 L19.4 71 Q14.6 70.5 15.4 64 C17.2 50 21.5 30 23.2 16 Z"/></clipPath>\n    <clipPath id="lava0baseclip"><path d="M18.6 71 L41.4 71 L42.4 76 L47.6 92.4 Q48.2 95 45.2 95 L14.8 95 Q11.8 95 12.4 92.4 L17.6 76 Z"/></clipPath>\n  </defs>\n  <ellipse cx="30" cy="97.2" rx="21" ry="2.2" fill="#0a2a40" opacity=".3"/>\n  <ellipse cx="30" cy="96.4" rx="14" ry="1.2" fill="#9be82a" opacity=".25"/>\n\n  <!-- vetro: liquido, cera, spessore dei bordi e riflessi -->\n  <g clip-path="url(#lava0clip)">\n    <rect x="10" y="14" width="40" height="60" fill="url(#lava0liq)"/>\n    <ellipse cx="30" cy="74" rx="22" ry="20" fill="url(#lava0glow)"/>\n    <g filter="url(#lava0goo)" fill="url(#lava0wax)">\n      <ellipse cx="30" cy="72" rx="15" ry="5"/>\n      <circle cx="30" cy="68" r="6"><animate attributeName="cy" values="68;24;68" dur="12s" begin="0s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><animate attributeName="r" values="6;4.8;6" dur="12s" begin="0s" repeatCount="indefinite"/></circle><circle cx="25.5" cy="68" r="4.2"><animate attributeName="cy" values="68;28;68" dur="10s" begin="-5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><animate attributeName="r" values="4.2;3.4;4.2" dur="10s" begin="-5s" repeatCount="indefinite"/></circle><circle cx="34" cy="68" r="4.8"><animate attributeName="cy" values="68;22;68" dur="14s" begin="-9s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><animate attributeName="r" values="4.8;3.8;4.8" dur="14s" begin="-9s" repeatCount="indefinite"/></circle><circle cx="28.5" cy="68" r="3.4"><animate attributeName="cy" values="68;34;68" dur="9s" begin="-2.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><animate attributeName="r" values="3.4;2.7;3.4" dur="9s" begin="-2.5s" repeatCount="indefinite"/></circle><circle cx="32.5" cy="68" r="3.8"><animate attributeName="cy" values="68;26;68" dur="11s" begin="-7.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><animate attributeName="r" values="3.8;3.0;3.8" dur="11s" begin="-7.5s" repeatCount="indefinite"/></circle>\n    </g>\n    <rect x="10" y="14" width="40" height="60" fill="url(#lava0vshade)"/>\n    <rect x="10" y="14" width="40" height="60" fill="url(#lava0edge)"/>\n    <rect x="10" y="14" width="40" height="60" fill="url(#lava0topdark)"/>\n    <!-- riflesso principale morbido + filo netto -->\n    <path d="M23.6 18 C21.8 32 19 50 18 64 L20.6 64 C21.4 50 23.8 32 25.6 18 Z" fill="#fff" opacity=".42" filter="url(#lava0soft)"/>\n    <path d="M24.4 19 C23 32 20.8 48 19.9 60" fill="none" stroke="#fff" stroke-width=".7" stroke-linecap="round" opacity=".95"/>\n    <path d="M36 21 C37.6 34 40.6 50 41.8 60" fill="none" stroke="#fff" stroke-width=".6" stroke-linecap="round" opacity=".45"/>\n    <!-- finestra riflessa -->\n    <rect x="31.5" y="24" width="2.2" height="5" rx=".6" fill="#fff" opacity=".35" transform="skewX(6)"/>\n  </g>\n  <path d="M23.2 16 L36.8 16 C38.5 30 42.8 50 44.6 64 Q45.4 70.5 40.6 71 L19.4 71 Q14.6 70.5 15.4 64 C17.2 50 21.5 30 23.2 16 Z" fill="none" stroke="#e9fbff" stroke-opacity=".9" stroke-width=".7"/>\n  <!-- labbro del vetro in alto e in basso -->\n  <ellipse cx="30" cy="16.4" rx="7" ry="1.1" fill="none" stroke="#fff" stroke-width=".6" opacity=".8"/>\n\n  <!-- cappello cromato con fessure di ventilazione -->\n  <path d="M24.6 5.2 Q30 3.4 35.4 5.2 L37.6 15.2 Q30 17.2 22.4 15.2 Z" fill="url(#lava0cr)"/>\n  <path d="M24.6 5.2 Q30 3.4 35.4 5.2 L35.7 6.6 Q30 4.9 24.3 6.6 Z" fill="#fff" opacity=".75"/>\n  <path d="M22.4 15.2 Q30 17.2 37.6 15.2 L37.8 16.4 Q30 18.4 22.2 16.4 Z" fill="#1d2c38" opacity=".55"/>\n  <g stroke="#1a2833" stroke-width=".5" opacity=".55"><path d="M26 8.6v4M28 8.3v4.4M30 8.2v4.5M32 8.3v4.4M34 8.6v4"/></g>\n  <path d="M24.6 5.2 Q30 3.4 35.4 5.2 L37.6 15.2 Q30 17.2 22.4 15.2 Z" fill="none" stroke="#1e2e3a" stroke-opacity=".6" stroke-width=".45"/>\n\n  <!-- base cromata: collare + cono, con il riflesso della cera -->\n  <g clip-path="url(#lava0baseclip)">\n    <rect x="10" y="70" width="40" height="26" fill="url(#lava0cr)"/>\n    <rect x="10" y="70" width="40" height="26" fill="url(#lava0vshade)"/>\n    <ellipse cx="30" cy="71" rx="16" ry="7" fill="url(#lava0bounce)"/>\n    <path d="M17.6 76 L42.4 76" stroke="#14222d" stroke-width=".9" opacity=".55"/>\n    <path d="M17.4 76.9 L42.6 76.9" stroke="#fff" stroke-width=".6" opacity=".75"/>\n    <path d="M13.2 91.4 L46.8 91.4" stroke="#fff" stroke-width=".55" opacity=".7"/>\n    <path d="M12.8 92.6 L47.2 92.6" stroke="#14222d" stroke-width=".6" opacity=".45"/>\n  </g>\n  <path d="M18.6 71 L41.4 71 L42.4 76 L47.6 92.4 Q48.2 95 45.2 95 L14.8 95 Q11.8 95 12.4 92.4 L17.6 76 Z" fill="none" stroke="#1e2e3a" stroke-opacity=".6" stroke-width=".45"/>\n  <ellipse cx="30" cy="71" rx="11.4" ry="1" fill="#0e1c26" opacity=".5"/>\n</svg>';
   const g = cv.getContext("2d");
   let W = 0, H = 0;
-  const pixel = false, muted = !!opts.muted;
+  const pixel = !!opts.native, muted = !!opts.muted;
   const DUR = 8.8;
   let RATIO = 1.5;
   const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
@@ -104,9 +105,14 @@ window.AeroIntro = { preload: loadFont, attach, play(cv, opts = {}) {
     return c;
   }
   function size() {
-    // misura dello schermo della console (in pixel veri del display)
-    const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
-    W = Math.max(240, Math.round(r.width * d)); H = Math.max(160, Math.round(r.height * d)); RATIO = W / H;
+    if (opts.native) {
+      // alla risoluzione vera della console (es. 240×160 sul GBA), ingrandita a pixel interi
+      W = opts.native[0]; H = opts.native[1];
+    } else {
+      const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
+      W = Math.max(240, Math.round(r.width * d)); H = Math.max(160, Math.round(r.height * d));
+    }
+    RATIO = W / H;
     cv.width = W; cv.height = H;
     cloudSprite = makeCloud(); logoSprite = makeLogo();
   }
