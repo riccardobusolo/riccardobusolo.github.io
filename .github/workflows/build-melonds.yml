@@ -31,7 +31,11 @@ jobs:
           set +e
           mkdir -p dist/test
           git clone --depth 1 https://github.com/Fewnity/Nintendo-DS-Nifi-Template nifi
-          docker run --rm -v "$PWD/nifi:/w" -w /w devkitpro/devkitarm sh -c "make" > dist/test/nifi-build.log 2>&1
+          # il template usa la libnds 1.x: provo immagini devkitARM più vecchie finché una compila
+          for tag in 20230526 20221115 20220821 20220128 20210726 20200730; do
+            echo "=== devkitarm:$tag" >> dist/test/nifi-build.log
+            docker run --rm -v "$PWD/nifi:/w" -w /w devkitpro/devkitarm:$tag sh -c "make clean >/dev/null 2>&1; make" >> dist/test/nifi-build.log 2>&1 && ls nifi/*.nds && break
+          done
           cp nifi/*.nds dist/test/ 2>/dev/null
           exit 0
       - name: Salva il risultato
