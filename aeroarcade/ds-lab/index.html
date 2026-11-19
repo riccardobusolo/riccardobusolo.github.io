@@ -40,7 +40,7 @@
 <body>
 <header>
   <h1>Laboratorio: due DS collegati</h1>
-  <span class="box" id="ver" title="Se dopo Ctrl+F5 vedi questo orario, hai la versione nuova">Versione del 19/11 03:17</span>
+  <span class="box" id="ver" title="Se dopo Ctrl+F5 vedi questo orario, hai la versione nuova">Versione del 19/11 03:51</span>
   <label class="box">ROM DS (tua copia): <input id="rom" type="file" accept=".nds"></label>
   <button id="go" disabled>Accendi le due console</button>
   <span class="box load" id="ld"><span id="ldt">Carico l'emulatore…</span><span class="bar"><i id="ldb"></i></span></span>
@@ -56,12 +56,14 @@
   <div class="ds"><h2>DS 2 · Defra</h2><canvas id="t1" width="256" height="192"></canvas><canvas id="b1" class="bottom" width="256" height="192"></canvas></div>
 </div>
 <pre id="log"></pre>
-<script>window.DUO_V="1795054642";</script>
-<script src="./duo.js?v=1795054642"></script>
+<script>window.DUO_V="1795056694";</script>
+<script src="./duo.js?v=1795056694"></script>
 <script>
 (async () => {
   const $ = (id) => document.getElementById(id);
-  const log = (m) => { $("log").textContent += m + "\n"; $("log").scrollTop = 1e9; };
+  const logLines = []; let logT = 0;
+  const log = (m) => { logLines.push(m); if (logLines.length > 60) logLines.splice(0, logLines.length - 60);
+    if (!logT) logT = setTimeout(() => { logT = 0; $("log").textContent = logLines.join("\n"); $("log").scrollTop = 1e9; }, 250); };
   if (!window.crossOriginIsolated) { $("st").textContent = "Un attimo, ricarico la pagina… (se resta così premi F5; serve Chrome o Edge)"; log("crossOriginIsolated = false"); return; }
   addEventListener("error", (e) => log("Errore: " + e.message));
   addEventListener("unhandledrejection", (e) => log("Errore: " + (e.reason?.message || e.reason)));
@@ -78,6 +80,7 @@
   const M = await createDuo({ print: log, printErr: log, wasmBinary, locateFile: (f) => f + "?v=" + window.DUO_V });
   const emu = new M.DuoEmulator();
   emu.setNickname(0, "Ricky"); emu.setNickname(1, "Defra");
+  { const q = new URLSearchParams(location.search); if (emu.setOptions) emu.setOptions(q.get("t3d") !== "0", +(q.get("rt") || 0), q.get("pace") === "0" ? 0 : 1); }
   $("st").textContent = "Pronto: scegli la ROM.";
   bar("Emulatore pronto · scegli la ROM", 1);
   let romData = null;
