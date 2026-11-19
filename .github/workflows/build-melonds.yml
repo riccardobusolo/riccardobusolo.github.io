@@ -28,9 +28,12 @@ jobs:
       - name: ROM di prova (homebrew NiFi, due DS che si mandano il tocco)
         continue-on-error: true
         run: |
+          set +e
+          mkdir -p dist/test
           git clone --depth 1 https://github.com/Fewnity/Nintendo-DS-Nifi-Template nifi
-          docker run --rm -v "$PWD/nifi:/w" -w /w devkitpro/devkitarm sh -c "make" 2>&1 | tail -20 > nifi-build.log
-          mkdir -p dist/test && cp nifi/*.nds dist/test/ 2>/dev/null; cp nifi-build.log dist/test/ || true
+          docker run --rm -v "$PWD/nifi:/w" -w /w devkitpro/devkitarm sh -c "make" > dist/test/nifi-build.log 2>&1
+          cp nifi/*.nds dist/test/ 2>/dev/null
+          exit 0
       - name: Salva il risultato
         if: always()
         run: |
