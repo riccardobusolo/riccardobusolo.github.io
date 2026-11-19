@@ -1,2 +1,3 @@
 wasmelonDS/build/
 *.nds
+!dist/test/*.nds
