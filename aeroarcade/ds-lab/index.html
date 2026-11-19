@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Laboratorio DS — due console collegate</title>
+<script>
+  // senza isolamento la memoria condivisa non c'è: registro il service worker e ricarico una volta
+  if (!window.crossOriginIsolated && "serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").then(() => {
+      if (!sessionStorage.getItem("coi-reload")) { sessionStorage.setItem("coi-reload", "1"); location.reload(); }
+    });
+  }
+</script>
+<style>
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: linear-gradient(#123a7a, #0b2552); color: #e9f4ff; min-height: 100vh; }
+  header { padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  h1 { font-size: 1.15rem; margin: 0 10px 0 0; }
+  .box { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 8px 12px; }
+  button { font: 700 .9rem inherit; padding: 8px 14px; border-radius: 999px; border: 0; cursor: pointer; background: linear-gradient(#d4ff7a, #6fcb1f); color: #1c4a05; }
+  .pair { display: flex; flex-wrap: wrap; gap: 26px; justify-content: center; padding: 10px; }
+  .ds { display: grid; gap: 6px; justify-items: center; }
+  .ds h2 { margin: 0; font-size: 1rem; }
+  canvas { width: 384px; height: 288px; image-rendering: pixelated; background: #000; border-radius: 6px; box-shadow: 0 0 0 6px #0c0d0f; }
+  canvas.bottom { cursor: crosshair; }
+  #log { white-space: pre-wrap; font: 12px/1.4 ui-monospace, monospace; max-height: 180px; overflow: auto; margin: 0 18px 18px; padding: 10px; border-radius: 10px; background: rgba(0,0,0,.35); }
+  .keys { font-size: .85rem; opacity: .85; max-width: 980px; margin: 0 auto; padding: 0 18px; line-height: 1.5; }
+  kbd { background: #fff; color: #0c3954; border-radius: 5px; padding: 1px 6px; font-weight: 700; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Laboratorio: due DS collegati</h1>
+  <label class="box">ROM DS (tua copia): <input id="rom" type="file" accept=".nds"></label>
+  <button id="go" disabled>Accendi le due console</button>
+  <span class="box" id="st">Preparo…</span>
+</header>
+<p class="keys">
+  <b>DS 1 (Ricky):</b> frecce, <kbd>X</kbd>=A <kbd>Z</kbd>=B <kbd>S</kbd>=X <kbd>A</kbd>=Y <kbd>Q</kbd>=L <kbd>W</kbd>=R <kbd>Invio</kbd>=Start <kbd>Shift</kbd>=Select.
+  <b>DS 2 (Defra):</b> <kbd>I</kbd><kbd>J</kbd><kbd>K</kbd><kbd>L</kbd>, <kbd>N</kbd>=A <kbd>B</kbd>=B <kbd>H</kbd>=X <kbd>G</kbd>=Y <kbd>T</kbd>=L <kbd>Y</kbd>=R <kbd>U</kbd>=Start <kbd>O</kbd>=Select.
+  Il touch si usa cliccando sullo schermo di sotto di ciascuna console. Per provare il collegamento: in un gioco con "gioco in wireless / giocatori vicini", crea la partita su una console e cercala sull'altra.
+</p>
+<div class="pair">
+  <div class="ds"><h2>DS 1 · Ricky</h2><canvas id="t0" width="256" height="192"></canvas><canvas id="b0" class="bottom" width="256" height="192"></canvas></div>
+  <div class="ds"><h2>DS 2 · Defra</h2><canvas id="t1" width="256" height="192"></canvas><canvas id="b1" class="bottom" width="256" height="192"></canvas></div>
+</div>
+<pre id="log"></pre>
+<script src="./duo.js"></script>
+<script>
+(async () => {
+  const $ = (id) => document.getElementById(id);
+  const log = (m) => { $("log").textContent += m + "\n"; $("log").scrollTop = 1e9; };
+  if (!window.crossOriginIsolated) { $("st").textContent = "Memoria condivisa non disponibile: ricarica la pagina (serve Chrome o Edge)."; log("crossOriginIsolated = false"); return; }
+  const M = await createDuo({ print: log, printErr: log });
+  const emu = new M.DuoEmulator();
+  emu.setNickname(0, "Ricky"); emu.setNickname(1, "Defra");
+  $("st").textContent = "Pronto: scegli la ROM.";
+  if (new URLSearchParams(location.search).get("auto")) setTimeout(() => $("go").onclick(), 100);
+  $("rom").onchange = () => { $("go").disabled = !$("rom").files.length; };
+  // tasti DS: A B Select Start Destra Sinistra Su Giù R L X Y (bit 0..11)
+  const BIT = { a: 0, b: 1, select: 2, start: 3, right: 4, left: 5, up: 6, down: 7, r: 8, l: 9, x: 10, y: 11 };
+  const MAP = [
+    { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right", x: "a", z: "b", s: "x", a: "y", q: "l", w: "r", Enter: "start", Shift: "select" },
+    { i: "up", k: "down", j: "left", l: "right", n: "a", b: "b", h: "x", g: "y", t: "l", y: "r", u: "start", o: "select" }
+  ];
+  const keys = [0, 0];
+  const onKey = (down) => (e) => {
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    for (let p = 0; p < 2; p++) {
+      const b = MAP[p][k]; if (b === undefined) continue;
+      e.preventDefault();
+      keys[p] = down ? keys[p] | (1 << BIT[b]) : keys[p] & ~(1 << BIT[b]);
+      emu.setKeys(p, keys[p]);
+    }
+  };
+  addEventListener("keydown", onKey(true)); addEventListener("keyup", onKey(false));
+  for (let p = 0; p < 2; p++) {
+    const c = $("b" + p);
+    const pos = (e) => { const r = c.getBoundingClientRect(); return [Math.max(0, Math.min(255, Math.round((e.clientX - r.left) / r.width * 256))), Math.max(0, Math.min(191, Math.round((e.clientY - r.top) / r.height * 192)))]; };
+    c.addEventListener("pointerdown", (e) => { c.setPointerCapture(e.pointerId); const [x, y] = pos(e); emu.touch(p, x, y); });
+    c.addEventListener("pointermove", (e) => { if (e.buttons) { const [x, y] = pos(e); emu.touch(p, x, y); } });
+    c.addEventListener("pointerup", () => emu.release(p));
+  }
+  // audio della console 1 (Ricky)
+  let ac = null, nextT = 0;
+  const audioBuf = M._malloc(4096 * 4);
+  const playAudio = () => {
+    const n = emu.readAudio(0, audioBuf);
+    emu.readAudio(1, audioBuf + 0); // svuota la coda della console 2 (in futuro va a Defra)
+    if (!ac || !n) return;
+    const pcm = new Int16Array(M.HEAPU8.buffer, audioBuf, n * 2).slice();
+    const b = ac.createBuffer(2, n, 32768);
+    const L = b.getChannelData(0), R = b.getChannelData(1);
+    for (let i = 0; i < n; i++) { L[i] = pcm[i * 2] / 32768; R[i] = pcm[i * 2 + 1] / 32768; }
+    const s = ac.createBufferSource(); s.buffer = b; s.connect(ac.destination);
+    nextT = Math.max(nextT, ac.currentTime + 0.03); s.start(nextT); nextT += n / 32768;
+  };
+  const auto = new URLSearchParams(location.search).get("auto");
+  window.__duo = emu;
+  $("go").onclick = async () => {
+    $("go").disabled = true;
+    try { ac = new AudioContext(); } catch {}
+    const data = auto ? new Uint8Array(await (await fetch(auto)).arrayBuffer()) : new Uint8Array(await $("rom").files[0].arrayBuffer());
+    const ptr = M._malloc(data.length); M.HEAPU8.set(data, ptr);
+    // stessa ROM su entrambe le console (ognuna ha la sua copia in memoria)
+    const ptr2 = M._malloc(data.length); M.HEAPU8.set(data, ptr2);
+    const ok0 = emu.loadRom(0, ptr, data.length, 0, 0), ok1 = emu.loadRom(1, ptr2, data.length, 0, 0);
+    log(`ROM caricata: console 1 ${ok0 ? "ok" : "ERRORE"}, console 2 ${ok1 ? "ok" : "ERRORE"}`);
+    if (!ok0 || !ok1) return;
+    emu.start();
+    const screens = M._malloc(256 * 192 * 4 * 2);
+    const ctx = [0, 1].map((p) => [$("t" + p).getContext("2d"), $("b" + p).getContext("2d")]);
+    const img = ctx.map(([a]) => [a.createImageData(256, 192), a.createImageData(256, 192)]);
+    let last = performance.now(), frames = 0, fpsT = performance.now();
+    const loop = (now) => {
+      // passo fisso a 60 fps: chiede un fotogramma a entrambe quando hanno finito il precedente
+      if (now - last >= 16) { last = now; if (emu.frame()) frames++; }
+      for (let p = 0; p < 2; p++) {
+        emu.readScreens(p, screens);
+        const src = new Uint8Array(M.HEAPU8.buffer, screens, 256 * 192 * 8);
+        // la console scrive già i byte nell'ordine R G B del canvas; l'opacità la metto piena
+        for (const [k, im] of [[0, img[p][0]], [1, img[p][1]]]) {
+          const d = im.data, off = k * 256 * 192 * 4;
+          d.set(src.subarray(off, off + 256 * 192 * 4));
+          for (let i = 3; i < 256 * 192 * 4; i += 4) d[i] = 255;
+          ctx[p][k].putImageData(im, 0, 0);
+        }
+      }
+      playAudio();
+      if (now - fpsT > 1000) { $("st").textContent = `In funzione · ${Math.round(frames * 1000 / (now - fpsT))} fps · fotogrammi DS1 ${emu.framesDone(0)} / DS2 ${emu.framesDone(1)}`; frames = 0; fpsT = now; }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+Laboratorio DS di Aero Arcade: due Nintendo DS collegati nella stessa pagina.
+L'emulatore è melonDS (licenza GPL-3.0), nella versione per browser di DS Anywhere,
+con le modifiche di Aero Arcade. Il codice sorgente completo è nel ramo "melonds-build"
+di questo repository: https://github.com/riccardobusolo/riccardobusolo.github.io/tree/melonds-build
