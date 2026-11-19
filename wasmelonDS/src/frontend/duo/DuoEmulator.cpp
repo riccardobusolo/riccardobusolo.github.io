@@ -48,6 +48,9 @@ namespace duo {
     }
 
     void setNickname(int i, std::string n) { if (i >= 0 && i < 2) names[i] = n; }
+    bool threaded3D = true;
+    // opzioni per le prove: 3D su thread separato, attesa massima dei pacchetti wireless (ms)
+    void setOptions(bool t3d, int recvTimeout) { threaded3D = t3d; if (recvTimeout > 0) localMP().SetRecvTimeout(recvTimeout); }
 
     Firmware makeFirmware(int i) {
       Firmware fw(0);
@@ -90,7 +93,7 @@ namespace duo {
       if (savePtr && saveLen > 0) nds->SetNDSSave((const u8*)savePtr, (u32)saveLen);
       nds->Reset();
       // 3D in un thread a parte per ogni console: le due console non si rubano tempo
-      if (auto* soft = dynamic_cast<SoftRenderer*>(&nds->GetRenderer3D())) soft->SetThreaded(true, nds->GPU);
+      if (auto* soft = dynamic_cast<SoftRenderer*>(&nds->GetRenderer3D())) soft->SetThreaded(threaded3D, nds->GPU);
       nds->SetupDirectBoot("game");
       setClock(nds);
       return true;
@@ -197,6 +200,7 @@ EMSCRIPTEN_BINDINGS(DuoEmulator) {
   emscripten::class_<duo::DuoEmulator>("DuoEmulator")
     .constructor()
     .function("setNickname", &duo::DuoEmulator::setNickname)
+    .function("setOptions", &duo::DuoEmulator::setOptions)
     .function("loadRom", &duo::DuoEmulator::loadRom)
     .function("start", &duo::DuoEmulator::start)
     .function("frame", &duo::DuoEmulator::frame)
