@@ -8,6 +8,7 @@
 #include <ctime>
 #include <string>
 #include <codecvt>
+#include <unistd.h>
 #include <locale>
 #include "DuoEmulator.h"
 #include "LocalMP.h"
@@ -104,10 +105,15 @@ namespace duo {
       }
     }
 
+    // Ogni console gira di continuo al suo ritmo (60 fotogrammi al secondo), come
+    // in melonDS sul PC. Se si fermassero tra un fotogramma e l'altro, la console
+    // che ospita la partita aspetterebbe invano le risposte dell'altra (che sta
+    // ferma) e il collegamento rallenterebbe tutto.
     static void runLoop(Instance* in) {
-      while (true) {
-        in->go.acquire();
-        if (in->quit) break;
+      in->go.acquire(); // partenza
+      double next = emscripten_get_now();
+      const double period = 1000.0 / 59.8261; // frequenza vera del DS
+      while (!in->quit) {
         NDS* nds = in->nds;
         nds->SetKeyMask(~in->keys.load() & 0xfff);
         if (in->touching) {
@@ -123,24 +129,29 @@ namespace duo {
           memcpy(in->top, gpu.Framebuffer[gpu.FrontBuffer][0].get(), 256 * 192 * 4);
           memcpy(in->btm, gpu.Framebuffer[gpu.FrontBuffer][1].get(), 256 * 192 * 4);
           int want = nds->SPU.GetOutputSize();
+          s16 tmp[4096 * 2];
           if (want > 4096) want = 4096;
-          in->audioSamples = nds->SPU.ReadOutput(in->audio, want);
+          int got = nds->SPU.ReadOutput(tmp, want);
+          // accodo l'audio (la pagina lo raccoglie quando vuole)
+          u32 have = in->audioSamples;
+          if (have + got > 4096) have = 0;
+          memcpy(in->audio + have * 2, tmp, got * 2 * sizeof(s16));
+          in->audioSamples = have + got;
         }
         in->frames++;
-        in->busy = false;
+        // ritmo: aspetto il prossimo fotogramma; se resto molto indietro riparto da adesso
+        next += period;
+        double now = emscripten_get_now();
+        if (next - now > 0) usleep((useconds_t)((next - now) * 1000));
+        else if (now - next > period * 4) next = now;
       }
     }
 
     // un fotogramma a entrambe le console, insieme (se la precedente ha finito)
     int frame() {
-      int kicked = 0;
-      for (auto& in : inst) {
-        if (!in.thread.joinable() || in.busy) continue;
-        in.busy = true;
-        in.go.release();
-        kicked++;
-      }
-      return kicked;
+      int started = 0;
+      for (auto& in : inst) if (!in.busy.exchange(true)) { in.go.release(); started++; }
+      return 1;
     }
 
     void setKeys(int i, int mask) { inst[i & 1].keys = (u32)mask; }
