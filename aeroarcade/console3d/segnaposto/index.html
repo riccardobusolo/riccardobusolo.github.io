@@ -134,6 +134,22 @@
   LOOK.face.forEach((id) => mk(id, face, POS[id] || id));
   mk("select", $("meta")); mk("start", $("meta"));
   if (LOOK.sh) ["l", "r"].forEach((id) => { const s = document.createElement("div"); s.className = "shoulder " + id; wrap.querySelector(".body").append(s); mk(id, s, ""); });
+  // click di plastica morbido dei tasti
+  let ac = null;
+  const btnSound = (b, down) => {
+    if (P.get("spectate") === "1") return;
+    try { if (JSON.parse(localStorage.getItem("aero-prefs") || "{}").sound === false) return; } catch {}
+    try { ac ??= new AudioContext(); if (ac.state === "suspended") ac.resume(); } catch { return; }
+    const t = ac.currentTime + 0.003, f = 2200 * (0.94 + Math.random() * 0.12) * (down ? 1 : 1.3);
+    const len = Math.floor(ac.sampleRate * 0.03), buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const n = ac.createBufferSource(), bp = ac.createBiquadFilter(), g = ac.createGain();
+    n.buffer = buf; bp.type = "bandpass"; bp.frequency.value = f; bp.Q.value = 2.6;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(down ? 0.09 : 0.04, t + 0.0015); g.gain.exponentialRampToValueAtTime(0.0008, t + (down ? 0.022 : 0.014));
+    n.connect(bp).connect(g).connect(ac.destination); n.start(t); n.stop(t + 0.04);
+    if (down) { const o = ac.createOscillator(), og = ac.createGain(); o.frequency.setValueAtTime(210, t); o.frequency.exponentialRampToValueAtTime(110, t + 0.03);
+      og.gain.setValueAtTime(0, t); og.gain.linearRampToValueAtTime(0.06, t + 0.002); og.gain.exponentialRampToValueAtTime(0.0008, t + 0.03); o.connect(og).connect(ac.destination); o.start(t); o.stop(t + 0.05); }
+  };
   const held = new Map();
   addEventListener("pointerdown", (e) => {
     const b = e.target.closest("button[data-id]");
@@ -141,12 +157,14 @@
     e.preventDefault();
     b.setPointerCapture(e.pointerId);
     held.set(e.pointerId, b); b.classList.add("down");
+    btnSound(b, true);
     send({ aero: "button", id: b.dataset.id, down: true });
   });
   const up = (e) => {
     const b = held.get(e.pointerId);
     if (!b) return;
     held.delete(e.pointerId); b.classList.remove("down");
+    btnSound(b, false);
     send({ aero: "button", id: b.dataset.id, down: false });
   };
   addEventListener("pointerup", up); addEventListener("pointercancel", up);

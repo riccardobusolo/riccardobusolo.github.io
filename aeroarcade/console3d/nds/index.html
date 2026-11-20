@@ -75,12 +75,15 @@
     transition: opacity .16s ease, transform .22s cubic-bezier(.3, 1.6, .5, 1); }
   .tip kbd { display: inline-block; min-width: 1.7em; padding: .22em .55em .28em; border-radius: 8px; font: 900 max(11px, 3.6cqw) "Nunito", sans-serif; color: #0c3954; text-align: center;
     background: linear-gradient(180deg, #ffffff, #dcefff); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .95), 0 3px 0 #9cc7e6, 0 8px 18px rgba(0, 40, 90, .35); }
+  /* DS girato: la lettera resta dritta sullo schermo */
+  .tip kbd { rotate: var(--unrot, 0deg); }
   .tip small { display: block; margin-top: 3px; text-align: center; font: 900 max(8px, 2.2cqw) "Nunito", sans-serif; color: #fff; text-shadow: 0 1px 3px rgba(0, 40, 90, .7); }
   .tip.side-l { left: auto; right: calc(100% + 8px); bottom: 50%; transform: translate(6px, 50%) scale(.55); transform-origin: 100% 50%; }
   .tip.side-r { left: calc(100% + 8px); bottom: 50%; transform: translate(-6px, 50%) scale(.55); transform-origin: 0 50%; }
   .hot:hover .tip, .shoulder:hover .tip, .hot.down .tip, .shoulder.down .tip { opacity: 1; transform: translate(-50%, 0) scale(1); }
   .shoulder.l:hover .tip, .shoulder.l.down .tip { transform: translate(0, 50%) scale(1); }
   .shoulder.r:hover .tip, .shoulder.r.down .tip { transform: translate(0, 50%) scale(1); }
+  .hot:hover .tip.side-l, .hot.down .tip.side-l, .hot:hover .tip.side-r, .hot.down .tip.side-r { transform: translate(0, 50%) scale(1); }
   /* slot in basso (come sull'SP): si illumina quando la cartuccia è vicina */
   .slot { position: absolute; z-index: 3; left: 38%; width: 24%; top: 95.4%; height: 1.4%; border-radius: 0 0 6px 6px; pointer-events: none; transition: box-shadow .2s; }
   .slot.hot-glow { box-shadow: 0 0 0 3px #8fdc2a, 0 0 22px 6px rgba(143, 220, 42, .75); }
@@ -237,8 +240,7 @@
     const t = document.createElement("span");
     t.className = "tip" + (side ? " side-" + side : "");
     const k = document.createElement("kbd"); k.textContent = KEYS[id];
-    const s = document.createElement("small"); s.textContent = NAME[id];
-    t.append(k, s);
+    t.append(k);
     return t;
   };
   const buttons = [];
@@ -257,6 +259,16 @@
     consoleEl.append(b); buttons.push(b);
   }
   if (EDIT) setupEditor();
+  // DS girato: i fumetti dei tasti vanno "sopra" rispetto allo schermo (cioè di lato rispetto alla console)
+  // e la lettera si raddrizza
+  function orientTips() {
+    document.body.style.setProperty("--unrot", `${-ROT}deg`);
+    for (const b of buttons) {
+      if (!b.classList.contains("hot")) continue;
+      const t = b.querySelector(".tip"); if (!t) continue;
+      t.classList.toggle("side-r", ROT === -90); t.classList.toggle("side-l", ROT === 90);
+    }
+  }
 
   // ---------------- editor delle posizioni (?edit=1) ----------------
   function setupEditor() {
@@ -364,12 +376,22 @@
     e.preventDefault();
     b.setPointerCapture(e.pointerId);
     held.set(e.pointerId, b); b.classList.add("down");
+    btnSound(b, true);
     send({ aero: "button", id: b.dataset.id, down: true });
   });
+  // click di plastica morbido dei tasti cliccati col mouse (gomma che si schiaccia + scatto leggero)
+  const btnSound = (b, down) => {
+    const a = audio(); if (!a) return; const t = a.currentTime + 0.003;
+    const big = b.classList.contains("shoulder"), small = b.classList.contains("small");
+    const f = (big ? 1500 : small ? 2900 : 2200) * (0.94 + Math.random() * 0.12);
+    if (down) { tick(a, t, f, 2.6, big ? 0.12 : 0.09, 0.022); thump(a, t, big ? 150 : 210, big ? 80 : 110, big ? 0.09 : 0.06, 0.03); }
+    else tick(a, t, f * 1.3, 3, 0.04, 0.014);
+  };
   const up = (e) => {
     const b = held.get(e.pointerId);
     if (!b) return;
     held.delete(e.pointerId); b.classList.remove("down");
+    btnSound(b, false);
     send({ aero: "button", id: b.dataset.id, down: false });
   };
   addEventListener("pointerup", up); addEventListener("pointercancel", up);
@@ -734,7 +756,7 @@
     /** DS girato di lato: -90 (schermi a sinistra/destra, per destrorsi), 90 (mancini), 0 dritto */
     setRotation(deg) {
       ROT = [0, 90, -90].includes(deg) ? deg : 0;
-      rotAnim = true; fit(); setTimeout(() => { rotAnim = false; }, 600);
+      rotAnim = true; fit(); orientTips(); setTimeout(() => { rotAnim = false; }, 600);
       if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); }
     },
     setFilter(f) { screens.forEach((el) => (el.dataset.filter = f)); },

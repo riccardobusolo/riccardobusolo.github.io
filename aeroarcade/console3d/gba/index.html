@@ -221,8 +221,7 @@
     const t = document.createElement("span");
     t.className = "tip" + (side ? " side-" + side : "");
     const k = document.createElement("kbd"); k.textContent = KEYS[id];
-    const s = document.createElement("small"); s.textContent = NAME[id];
-    t.append(k, s);
+    t.append(k);
     return t;
   };
   const buttons = [];
@@ -373,13 +372,23 @@
     e.preventDefault();
     b.setPointerCapture(e.pointerId);
     held.set(e.pointerId, b); b.classList.add("down");
+    btnSound(b, true);
     if (b.dataset.id === "light") { toggleLight(); return; }
     send({ aero: "button", id: b.dataset.id, down: true });
   });
+  // click di plastica morbido dei tasti cliccati col mouse (gomma che si schiaccia + scatto leggero)
+  const btnSound = (b, down) => {
+    const a = audio(); if (!a) return; const t = a.currentTime + 0.003;
+    const big = b.classList.contains("shoulder"), small = b.classList.contains("small");
+    const f = (big ? 1500 : small ? 2900 : 2200) * (0.94 + Math.random() * 0.12);
+    if (down) { tick(a, t, f, 2.6, big ? 0.12 : 0.09, 0.022); thump(a, t, big ? 150 : 210, big ? 80 : 110, big ? 0.09 : 0.06, 0.03); }
+    else tick(a, t, f * 1.3, 3, 0.04, 0.014);
+  };
   const up = (e) => {
     const b = held.get(e.pointerId);
     if (!b) return;
     held.delete(e.pointerId); b.classList.remove("down");
+    btnSound(b, false);
     if (b.dataset.id === "light") return;
     send({ aero: "button", id: b.dataset.id, down: false });
   };
