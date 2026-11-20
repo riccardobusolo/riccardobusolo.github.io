@@ -154,7 +154,7 @@
   // cartuccia: trascinala nello slot per inserirla, trascinala fuori per espellerla
   let state = P.get("inserted") === "1" ? "inserted" : "out";
   let intro = null;
-  if (P.get("spectate") !== "1") { const sc = document.createElement("script"); sc.src = `../intro/intro.js?v=${encodeURIComponent(P.get("v") || "")}`; document.head.append(sc); } // out | dragging | inserting | inserted | ejecting
+  { const sc = document.createElement("script"); sc.src = `../intro/intro.js?v=${encodeURIComponent(P.get("v") || "")}`; document.head.append(sc); } // out | dragging | inserting | inserted | ejecting
   let drag = null;
   const rest = () => ({ x: 0, y: 0 });
   const slotPos = () => {
@@ -250,6 +250,7 @@
     },
     insert() { if (state === "out") insertAnim(); },
     skipIntro() { intro?.skip(); },
+    playIntro() { const scr = document.querySelector(".screen"); if (window.AeroIntro && scr && !intro) intro = window.AeroIntro.attach(scr, () => { intro = null; }, null, { spectate: true }); },
     setSkin() {}, setLight() {}, setCover() {},
     showInserted(on) { if (on && state === "out") insertAnim(); else if (!on && state === "inserted") { state = "out"; cart.classList.remove("inserted"); move(0, 0, 400, 1); this.setScreen(null); } },
     setFilter(f) { document.querySelectorAll(".screen").forEach((el) => (el.dataset.filter = f)); },

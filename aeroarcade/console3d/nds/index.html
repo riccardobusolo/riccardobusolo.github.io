@@ -62,12 +62,11 @@
   .hot:hover::after { opacity: .35; }
   .hot.down::after { opacity: 1; }
   /* L e R: pulsanti finti ai lati, all'altezza della cerniera */
-  .shoulder { position: absolute; z-index: 4; aspect-ratio: 0.53; transform: translate(-50%, -50%); border: 0; padding: 0; cursor: pointer; border-radius: 40% 40% 40% 40% / 30%;
-    font-weight: 900; font-size: max(9px, 3.2cqw); color: #4b5560;
-    background: linear-gradient(90deg, #8f969c, #e9edf0 45%, #c5cbd0 70%, #7d848a);
-    box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .75), 0 6px 12px rgba(0, 30, 60, .35), inset 0 -4px 6px rgba(0, 0, 0, .18); transition: transform .06s, filter .06s; }
-  .shoulder.l { border-radius: 55% 20% 20% 55% / 40%; }
-  .shoulder.r { border-radius: 20% 55% 55% 20% / 40%; }
+  /* L e R: rettangoli grigio scuro con la lettera bianca, quasi attaccati ai lati della console */
+  .shoulder { position: absolute; z-index: 4; aspect-ratio: 0.5; transform: translate(-50%, -50%); border: 0; padding: 0; cursor: pointer; border-radius: 26% / 13%;
+    font-weight: 900; font-size: max(9px, 2.6cqw); color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, .5);
+    background: linear-gradient(90deg, #2c3036, #4a5058 45%, #3a3f46 70%, #24282d);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .22), 0 5px 10px rgba(0, 20, 50, .35), inset 0 1px 0 rgba(255, 255, 255, .18), inset 0 -3px 5px rgba(0, 0, 0, .35); transition: transform .06s, filter .06s; }
   .shoulder.down { transform: translate(-50%, -50%) scale(.93); filter: brightness(.9); }
   /* fumetto col tasto della tastiera (compare e scompare con un piccolo rimbalzo) */
   .tip { position: absolute; z-index: 6; left: 50%; bottom: calc(100% + 8px); transform: translate(-50%, 6px) scale(.55); transform-origin: 50% 100%; opacity: 0; pointer-events: none; white-space: nowrap;
@@ -205,11 +204,11 @@
     y: { x: 79.03, y: 66.51, w: 5.8, kind: "round" },
     start: { x: 77.59, y: 83.17, w: 3.4, kind: "small" },
     select: { x: 77.59, y: 88.2, w: 3.4, kind: "small" },
-    l: { x: -4.5, y: 49, w: 5.2, kind: "shoulder" },
-    r: { x: 104.5, y: 49, w: 5.2, kind: "shoulder" }
+    l: { x: 3.3, y: 49, w: 3.6, kind: "shoulder" },
+    r: { x: 96.6, y: 49, w: 3.6, kind: "shoulder" }
   };
 
-  const LAYOUT_KEY = "aero-console-layout-nds";
+  const LAYOUT_KEY = "aero-console-layout-nds-v2";
   const LAYOUT = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
   try {
     const saved = JSON.parse(localStorage.getItem(LAYOUT_KEY) || "null");
@@ -375,6 +374,17 @@
   });
   screen2.addEventListener("pointermove", (e) => { if (touching === e.pointerId) send({ aero: "touch", down: true, ...touchAt(e) }); });
   const lift = (e) => { if (touching !== e.pointerId) return; touching = null; send({ aero: "touch", down: false, ...touchAt(e) }); };
+  // tasto premuto fuori e poi trascinato dentro lo schermo: vale come tocco (e uscendo si alza il pennino)
+  const inside = (e) => { const p = touchAt(e), r = screen2.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const a = (-ROT * Math.PI) / 180, dx = e.clientX - cx, dy = e.clientY - cy; return Math.abs(dx * Math.cos(a) - dy * Math.sin(a)) <= screen2.offsetWidth / 2 && Math.abs(dx * Math.sin(a) + dy * Math.cos(a)) <= screen2.offsetHeight / 2 ? p : null; };
+  let hoverTouch = false;
+  addEventListener("pointermove", (e) => {
+    if (SPECTATE || EDIT || state !== "inserted" || drag || touching !== null) return;
+    const p = (e.buttons & 1) ? inside(e) : null;
+    if (p) { hoverTouch = true; send({ aero: "touch", down: true, ...p }); }
+    else if (hoverTouch) { hoverTouch = false; send({ aero: "touch", down: false, ...touchAt(e) }); }
+  });
+  addEventListener("pointerup", (e) => { if (hoverTouch) { hoverTouch = false; send({ aero: "touch", down: false, ...touchAt(e) }); } });
   screen2.addEventListener("pointerup", lift); screen2.addEventListener("pointercancel", lift);
 
   // ---------------- grandezza a pixel interi ----------------
@@ -397,7 +407,7 @@
     const dpr = devicePixelRatio || 1, VW = turned ? innerHeight : innerWidth, VH = turned ? innerWidth : innerHeight;
     // ingrandimento massimo che entra nella finestra (anche non intero); girato, la scheda in basso non serve
     // L e R sporgono ai lati (circa il 16% in più della console): devono restare dentro
-    const kFit = Math.max(0.5, Math.min((VH * 0.96 * 1254 / (turned ? 1254 : 1514)) * SCR_W * dpr / NW, (VW * 0.96 / 1.16) * SCR_W * dpr / NW));
+    const kFit = Math.max(0.5, Math.min((VH * 0.96 * 1254 / 1514) * SCR_W * dpr / NW, VW * 0.96 * SCR_W * dpr / NW));
     steps = [];
     for (let k = 1; k <= kFit + 1e-6; k++) steps.push(k);
     if (!steps.length || kFit - steps[steps.length - 1] > 0.08) steps.push(kFit);
@@ -407,9 +417,8 @@
     const k = steps[idx];
     const W = (NW * k) / dpr / SCR_W, Hr = W * 1514 / 1254, Hc = W;
     const snap = (v) => Math.round(v * dpr) / dpr;
-    // ruotando si gira attorno al centro della console (non della scheda sotto)
-    const oy = turned ? W * 0.5 : Hr / 2;
-    rig.style.cssText = `position:absolute;height:${Hr}px;width:${W}px;left:${snap((innerWidth - W) / 2)}px;top:${snap(turned ? innerHeight / 2 - oy : Math.max(0, (innerHeight - Hr) / 2))}px;transform-origin:50% ${oy}px;transform:rotate(${ROT}deg);transition:${rotAnim ? "transform .55s cubic-bezier(.3,1.3,.5,1), top .55s, left .55s" : "none"}`;
+    // si gira attorno al centro di tutto (console + scheda), così la scheda resta visibile accanto
+    rig.style.cssText = `position:absolute;height:${Hr}px;width:${W}px;left:${snap((innerWidth - W) / 2)}px;top:${snap((innerHeight - Hr) / 2)}px;transform-origin:50% 50%;transform:rotate(${ROT}deg);transition:${rotAnim ? "transform .55s cubic-bezier(.3,1.3,.5,1)" : "none"}`;
     const sw = (NW * k) / dpr, sh = (NH * k) / dpr;
     for (const o of HOLES) {
       o.el.style.cssText = `left:${snap(o.l * W + (o.w * W - sw) / 2)}px;width:${sw}px;top:${snap(o.t * Hc + (o.h * Hc - sh) / 2)}px;height:${sh}px;--px:${k / dpr}px`;
@@ -434,8 +443,10 @@
   // ---------------- cartuccia ----------------
   // stati: out | dragging | inserting | inserted | ejecting
   let state = P.get("inserted") === "1" ? "inserted" : "out";
-  let intro = null;
-  if (!SPECTATE) { const sc = document.createElement("script"); sc.src = `../intro/intro.js?v=${encodeURIComponent(P.get("v") || "")}`; document.head.append(sc); }
+  let intro = null, pendingIntro = false;
+  // console dell'amico: l'intro senza suono, appena la sua scheda è entrata
+  function spectatorIntro() { pendingIntro = false; if (!window.AeroIntro || intro) return; intro = window.AeroIntro.attach(screenEl, () => { intro = null; }, [256, 192], { spectate: true }); }
+  { const sc = document.createElement("script"); sc.src = `../intro/intro.js?v=${encodeURIComponent(P.get("v") || "")}`; document.head.append(sc); }
   let drag = null;
   const move = (x, y, ms = 0) => {
     cart._t = { x, y };
@@ -525,7 +536,7 @@
         // dopo l'intro niente scritta di avvio: si passa dritti al gioco
         screen2.classList.add("intro-glow");
         intro = window.AeroIntro.attach(screenEl, () => { intro = null; screen2.classList.remove("intro-glow"); if (state !== "inserted") return; screens.forEach((el) => el.classList.add("booting")); send({ aero: "inserted" }); }, [256, 192]);
-      } else { boot.classList.add("on"); send({ aero: "inserted" }); }
+      } else if (SPECTATE) { if (pendingIntro) spectatorIntro(); } else { boot.classList.add("on"); send({ aero: "inserted" }); }
     }, 600);
   }
   function placeInserted() {
@@ -535,19 +546,20 @@
   if (state === "inserted") placeInserted();
   addEventListener("resize", () => { if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); } });
 
+  // spostamento "verticale" nel sistema della console (anche con il DS girato)
+  const localDy = (e) => { const a = (-ROT * Math.PI) / 180, dx = e.clientX - drag.sx, dy = e.clientY - drag.sy; return dx * Math.sin(a) + dy * Math.cos(a); };
   cart.addEventListener("pointerdown", (e) => {
     if (state !== "out" && state !== "inserted") return;
-    if (ROT) return; // girato: la scheda si mette e si toglie con i pulsanti della colonna
     e.preventDefault(); cart.setPointerCapture(e.pointerId);
     audio(); // sblocca l'audio con il gesto
     const t = cart._t || { x: 0, y: 0 };
-    drag = { sy: e.clientY, x: t.x, y: t.y, from: state, unseated: false, depth: cart.getBoundingClientRect().height * 0.72 };
+    drag = { sy: e.clientY, sx: e.clientX, x: t.x, y: t.y, from: state, unseated: false, depth: cart.getBoundingClientRect().height * 0.72 };
     cart.classList.add("dragging");
     if (state === "out") { state = "dragging"; computeLane(); }
   });
   cart.addEventListener("pointermove", (e) => {
     if (!drag) return;
-    const dy = e.clientY - drag.sy;
+    const dy = localDy(e);
     if (drag.from === "inserted") {
       // si sfila solo verso il basso, seguendo il dito
       const pull = Math.max(0, dy);
@@ -568,7 +580,7 @@
   });
   const endDrag = (e) => {
     if (!drag) return;
-    const from = drag.from, dy = e.clientY - drag.sy, d = drag;
+    const from = drag.from, dy = localDy(e), d = drag;
     drag = null; cart.classList.remove("dragging");
     if (from === "inserted") {
       if (Math.max(0, dy) >= d.depth * 0.85) {
@@ -621,12 +633,12 @@
     get skin() { return SKINS[skinIdx][1]; },
     insert() { if (state === "out") { computeLane(); insertAnim(); } },
     skipIntro() { intro?.skip(); },
+    playIntro() { if (state === "inserted") spectatorIntro(); else pendingIntro = true; },
     /** DS girato di lato: -90 (schermi a sinistra/destra, per destrorsi), 90 (mancini), 0 dritto */
     setRotation(deg) {
       ROT = [0, 90, -90].includes(deg) ? deg : 0;
       rotAnim = true; fit(); setTimeout(() => { rotAnim = false; }, 600);
       hint.style.visibility = ROT ? "hidden" : "";
-      cart.style.visibility = ROT ? "hidden" : ""; // girato, la scheda resta dentro (non sporge di lato)
       if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); }
     },
     setFilter(f) { screens.forEach((el) => (el.dataset.filter = f)); },
@@ -637,6 +649,7 @@
     showInserted(on) {
       if (on && state === "out") { computeLane(); insertAnim(); }
       else if (!on && state === "inserted") {
+        intro?.stop(); intro = null;
         state = "ejecting"; this.setScreen(null); boot.classList.remove("on");
         const t = cart._t || { x: 0, y: 0 };
         move(t.x, t.y + 70, 320);

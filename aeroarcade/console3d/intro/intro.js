@@ -19,10 +19,10 @@ loadFont();
  * Comodità per le pagine delle console: mette l'intro dentro l'elemento dello
  * schermo, con volume e suoni presi dalle preferenze del sito; un clic o un tasto la salta.
  */
-function attach(screenEl, onEnd, native) {
+function attach(screenEl, onEnd, native, extra = {}) {
   let prefs = {};
   try { prefs = JSON.parse(localStorage.getItem("aero-prefs") || "{}"); } catch {}
-  if (prefs.intro === false) { onEnd(); return null; }
+  if (prefs.intro === false && !extra.spectate) { onEnd(); return null; }
   const cv = document.createElement("canvas");
   cv.className = "aero-intro";
   cv.style.cssText = "position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;background:#000;transition:opacity .25s" + (native ? ";image-rendering:pixelated" : "");
@@ -37,8 +37,8 @@ function attach(screenEl, onEnd, native) {
   };
   const onDown = (e) => { if (!e.target.closest || !e.target.closest("button")) h.skip(); };
   const vol = typeof prefs.volume === "number" ? prefs.volume : 0.8;
-  const h = window.AeroIntro.play(cv, { volume: 0.7 * vol, onEnd: end, native });
-  addEventListener("pointerdown", onDown, true);
+  const h = window.AeroIntro.play(cv, { volume: extra.spectate ? 0 : 0.7 * vol, muted: !!extra.spectate, onEnd: end, native });
+  if (!extra.spectate) addEventListener("pointerdown", onDown, true);
   return { skip: () => h.skip(), stop: () => { done = true; h.stop(); removeEventListener("pointerdown", onDown, true); cv.remove(); } };
 }
 window.AeroIntro = { preload: loadFont, attach, play(cv, opts = {}) {
