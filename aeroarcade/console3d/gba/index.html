@@ -403,11 +403,17 @@
   let steps = [1], idx = 0, userIdx = null;
   const kTag = document.createElement("div"); kTag.className = "k-tag"; document.body.append(kTag);
   let kTimer = 0;
+  // nuovo adattamento quando la cartuccia entra/esce (lo spazio sotto per la scheda serve solo quando è fuori)
+  function refit() { fit(); if (state === "inserted" && typeof placeInserted === "function") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); } }
   function fit() {
     if (document.body.classList.contains("editing")) return;
     const dpr = devicePixelRatio || 1, VW = innerWidth, VH = innerHeight;
     // ingrandimento massimo che entra nella finestra (anche non intero)
-    const kFit = Math.max(0.5, Math.min((VH * 0.97 * 683 / 1525) * SCR_W * dpr / NW, VW * 0.94 * SCR_W * dpr / NW));
+    // con la cartuccia dentro non serve lo spazio sotto per la scheda: la console si ingrandisce di più
+    let st; try { st = state; } catch { st = P.get("inserted") === "1" ? "inserted" : "out"; }
+    const compact = st === "inserted" || st === "inserting" || st === "ejecting";
+    const RH = compact ? 1290 : 1525;
+    const kFit = Math.max(0.5, Math.min((VH * 0.97 * 683 / RH) * SCR_W * dpr / NW, VW * 0.94 * SCR_W * dpr / NW));
     steps = [];
     for (let k = 1; k <= kFit + 1e-6; k++) steps.push(k);
     if (!steps.length || kFit - steps[steps.length - 1] > 0.08) steps.push(kFit);
@@ -417,7 +423,7 @@
     const k = steps[idx];
     const W = (NW * k) / dpr / SCR_W, Hr = W * 1525 / 683, Hc = W * 1225 / 683;
     const snap = (v) => Math.round(v * dpr) / dpr;
-    rig.style.cssText = `position:absolute;height:${Hr}px;width:${W}px;left:${snap((VW - W) / 2)}px;top:${snap(Math.max(0, (VH - Hr) / 2))}px`;
+    rig.style.cssText = `position:absolute;height:${Hr}px;width:${W}px;left:${snap((VW - W) / 2)}px;top:${snap(compact ? (VH - W * RH / 683) / 2 : Math.max(0, (VH - Hr) / 2))}px`;
     const sw = (NW * k) / dpr, sh = (NH * k) / dpr;
     screenEl.style.cssText = `left:${snap(SCR_L * W)}px;width:${sw}px;top:${snap(SCR_T * Hc + (SCR_H * Hc - sh) / 2)}px;height:${sh}px;--px:${k / dpr}px`;
     screenEl.classList.toggle("fit", !Number.isInteger(k));
@@ -523,7 +529,7 @@
     setTimeout(() => { cart.classList.add("behind"); sfx.slide(0.36); move(p.x, p.y, 380); }, 170); // entra dietro la scocca
     setTimeout(() => { sfx.seat(); }, 520);
     setTimeout(() => {
-      state = "inserted";
+      state = "inserted"; refit();
       // l'intro di accensione, poi il gioco (la console dell'amico non la mostra)
       if (!SPECTATE && window.AeroIntro) {
         send({ aero: "intro" });
@@ -588,7 +594,7 @@
     }
     const k = lane ? Math.max(0, lane.rest - (cart._t?.y ?? lane.rest)) / (lane.rest - lane.top) : 0;
     if (k > 0.5) insertAnim();
-    else { state = "out"; slot.classList.remove("hot-glow"); move(0, 0, 320); }
+    else { const wasIn = drag && drag.from === "inserted"; state = "out"; slot.classList.remove("hot-glow"); if (wasIn) refit(); move(0, 0, 320); }
   };
   cart.addEventListener("pointerup", endDrag); cart.addEventListener("pointercancel", endDrag);
 
@@ -606,7 +612,7 @@
     eject() {
       if (state === "ejecting") return;
       if (state === "pulled") { // già sfilata a mano: nessuna animazione
-        state = "out"; this.setScreen(null); boot.classList.remove("on"); screenEl.classList.remove("off");
+        state = "out"; refit(); this.setScreen(null); boot.classList.remove("on"); screenEl.classList.remove("off");
         setTimeout(() => send({ aero: "ejected" }), 250); return;
       }
       intro?.stop(); intro = null;
@@ -615,7 +621,7 @@
       sfx.unseat(); setTimeout(() => sfx.slide(0.3), 60);
       move(t.x, t.y + 70, 320);                                         // esce dal basso
       setTimeout(() => { cart.classList.remove("behind"); move(0, 0, 520); }, 340);
-      setTimeout(() => { state = "out"; hint.classList.remove("gone"); send({ aero: "ejected" }); }, 900);
+      setTimeout(() => { state = "out"; refit(); hint.classList.remove("gone"); send({ aero: "ejected" }); }, 900);
     },
     nextSkin() { return applySkin(skinIdx + 1, true); },
     get skin() { return SKINS[skinIdx][1]; },
@@ -635,7 +641,7 @@
         const t = cart._t || { x: 0, y: 0 };
         move(t.x, t.y + 70, 320);
         setTimeout(() => { cart.classList.remove("behind"); move(0, 0, 520); }, 340);
-        setTimeout(() => { state = "out"; }, 900);
+        setTimeout(() => { state = "out"; refit(); }, 900);
       }
     },
     get skinId() { return SKINS[skinIdx][0]; },

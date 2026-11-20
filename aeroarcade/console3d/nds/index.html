@@ -519,6 +519,7 @@
   const kTag = document.createElement("div"); kTag.className = "k-tag"; document.body.append(kTag);
   let kTimer = 0;
   let ROT = 0, rotAnim = false;
+  function refit() { fit(); if (state === "inserted" && typeof placeInserted === "function") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); } }
   function fit() {
     if (document.body.classList.contains("editing")) return;
     // DS girato di lato (come un libro): larghezza e altezza disponibili si scambiano
@@ -526,7 +527,11 @@
     const dpr = devicePixelRatio || 1, VW = turned ? innerHeight : innerWidth, VH = turned ? innerWidth : innerHeight;
     // ingrandimento massimo che entra nella finestra (anche non intero); girato, la scheda in basso non serve
     // L e R sporgono ai lati (circa il 16% in più della console): devono restare dentro
-    const kFit = Math.max(0.5, Math.min((VH * 0.96 * 1254 / 1514) * SCR_W * dpr / NW, VW * 0.96 * SCR_W * dpr / NW));
+    // con la cartuccia dentro non serve lo spazio sotto per la scheda: la console si ingrandisce di più
+    let st; try { st = state; } catch { st = P.get("inserted") === "1" ? "inserted" : "out"; }
+    const compact = st === "inserted" || st === "inserting" || st === "ejecting";
+    const RH = compact ? 1290 : 1514;
+    const kFit = Math.max(0.5, Math.min((VH * 0.96 * 1254 / RH) * SCR_W * dpr / NW, VW * 0.96 * SCR_W * dpr / NW));
     steps = [];
     for (let k = 1; k <= kFit + 1e-6; k++) steps.push(k);
     if (!steps.length || kFit - steps[steps.length - 1] > 0.08) steps.push(kFit);
@@ -536,8 +541,11 @@
     const k = steps[idx];
     const W = (NW * k) / dpr / SCR_W, Hr = W * 1514 / 1254, Hc = W;
     const snap = (v) => Math.round(v * dpr) / dpr;
+    // compatto: al centro della finestra va la parte visibile (console + pezzetto di scheda), non tutto il riquadro
+    const dyl = compact ? (W * RH / 1254 - Hr) / 2 : 0, th = (ROT * Math.PI) / 180;
+    const offX = -dyl * Math.sin(th), offY = dyl * Math.cos(th);
     // si gira attorno al centro di tutto (console + scheda), così la scheda resta visibile accanto
-    rig.style.cssText = `position:absolute;height:${Hr}px;width:${W}px;left:${snap((innerWidth - W) / 2)}px;top:${snap((innerHeight - Hr) / 2)}px;transform-origin:50% 50%;transform:rotate(${ROT}deg);transition:${rotAnim ? "transform .55s cubic-bezier(.3,1.3,.5,1)" : "none"}`;
+    rig.style.cssText = `position:absolute;height:${Hr}px;width:${W}px;left:${snap((innerWidth - W) / 2 - offX)}px;top:${snap((innerHeight - Hr) / 2 - offY)}px;transform-origin:50% 50%;transform:rotate(${ROT}deg);transition:${rotAnim ? "transform .55s cubic-bezier(.3,1.3,.5,1)" : "none"}`;
     const sw = (NW * k) / dpr, sh = (NH * k) / dpr;
     for (const o of HOLES) {
       o.el.style.cssText = `left:${snap(o.l * W + (o.w * W - sw) / 2)}px;width:${sw}px;top:${snap(o.t * Hc + (o.h * Hc - sh) / 2)}px;height:${sh}px;--px:${k / dpr}px`;
@@ -648,7 +656,7 @@
     setTimeout(() => { cart.classList.add("behind"); sfx.slide(0.36); move(p.x, p.y, 380); }, 170); // entra dietro la scocca
     setTimeout(() => { sfx.seat(); }, 520);
     setTimeout(() => {
-      state = "inserted";
+      state = "inserted"; refit();
       // l'intro di accensione, poi il gioco (la console dell'amico non la mostra)
       if (!SPECTATE && window.AeroIntro) {
         send({ aero: "intro" });
@@ -716,7 +724,7 @@
     }
     const k = lane ? Math.max(0, lane.rest - (cart._t?.y ?? lane.rest)) / (lane.rest - lane.top) : 0;
     if (k > 0.5) insertAnim();
-    else { state = "out"; slot.classList.remove("hot-glow"); move(0, 0, 320); }
+    else { const wasIn = drag && drag.from === "inserted"; state = "out"; slot.classList.remove("hot-glow"); if (wasIn) refit(); move(0, 0, 320); }
   };
   cart.addEventListener("pointerup", endDrag); cart.addEventListener("pointercancel", endDrag);
 
@@ -737,7 +745,7 @@
     eject() {
       if (state === "ejecting") return;
       if (state === "pulled") { // già sfilata a mano: nessuna animazione
-        state = "out"; this.setScreen(null); boot.classList.remove("on"); screens.forEach((el) => el.classList.remove("off"));
+        state = "out"; refit(); this.setScreen(null); boot.classList.remove("on"); screens.forEach((el) => el.classList.remove("off"));
         setTimeout(() => send({ aero: "ejected" }), 250); return;
       }
       intro?.stop(); intro = null;
@@ -746,7 +754,7 @@
       sfx.unseat(); setTimeout(() => sfx.slide(0.3), 60);
       move(t.x, t.y + 70, 320);                                         // esce dal basso
       setTimeout(() => { cart.classList.remove("behind"); move(0, 0, 520); }, 340);
-      setTimeout(() => { state = "out"; hint.classList.remove("gone"); send({ aero: "ejected" }); }, 900);
+      setTimeout(() => { state = "out"; refit(); hint.classList.remove("gone"); send({ aero: "ejected" }); }, 900);
     },
     nextSkin() { return applySkin(skinIdx + 1, true); },
     get skin() { return SKINS[skinIdx][1]; },
@@ -772,7 +780,7 @@
         const t = cart._t || { x: 0, y: 0 };
         move(t.x, t.y + 70, 320);
         setTimeout(() => { cart.classList.remove("behind"); move(0, 0, 520); }, 340);
-        setTimeout(() => { state = "out"; }, 900);
+        setTimeout(() => { state = "out"; refit(); }, 900);
       }
     },
     get skinId() { return SKINS[skinIdx][0]; },
