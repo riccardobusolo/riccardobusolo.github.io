@@ -17,7 +17,9 @@
   .scene { position: fixed; inset: 0; display: grid; place-items: center; }
   /* console + cartuccia sotto: l'altezza decide la dimensione */
   .rig { position: relative; height: min(96vh, 132vw); aspect-ratio: 1254 / 1514; }
-  .console { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 1254 / 1254; z-index: 1; container-type: inline-size; }
+  .console { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 1254 / 1254; z-index: 1; container-type: inline-size; pointer-events: none; }
+  /* il riquadro della console non deve coprire la scheda inserita (sporge sotto la scocca): cliccabili solo tasti e schermi */
+  .console > .hot, .console > .shoulder, .console > #screen2 { pointer-events: auto; }
   .console img.body { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 2; pointer-events: none; filter: drop-shadow(0 18px 28px rgba(0, 40, 90, 0.35)); }
   /* schermo: sta DIETRO l'immagine, si vede dal "buco" trasparente */
   .screen { position: absolute; left: 28.87%; top: 8.85%; width: 42.03%; height: 31.34%; z-index: 1; background: #1c2126; overflow: hidden;
@@ -156,11 +158,12 @@
   .stylus { position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none; opacity: 0; transition: opacity .15s ease; will-change: transform; }
   .stylus.on { opacity: 1; }
   .stylus img { position: absolute; left: 0; top: 0; width: 100%; height: auto; transform-origin: 3.8% 85.2%; transition: transform .07s ease-out; filter: drop-shadow(-2px 3px 3px rgba(0, 0, 0, .35)); }
-  .stylus-dot { position: fixed; left: 0; top: 0; z-index: 49; pointer-events: none; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; opacity: 0; transition: opacity .15s ease, transform .07s ease-out;
-    background: radial-gradient(circle, rgba(0, 0, 0, .55) 0%, rgba(0, 0, 0, .25) 45%, transparent 72%); }
+  /* ombra morbida della punta: più larga e chiara quando il pennino è sollevato, piccola e scura al tocco */
+  .stylus-dot { position: fixed; left: 0; top: 0; z-index: 49; pointer-events: none; width: 18px; height: 12px; margin: -6px 0 0 -9px; border-radius: 50%; opacity: 0;
+    background: rgba(0, 0, 0, .28); filter: blur(3px); transform: translate(-3px, 3px) scale(1.15); transition: opacity .15s ease, transform .08s ease-out, background .08s; }
   .stylus-dot.on { opacity: 1; }
-  .stylus-dot.screen { background: radial-gradient(circle, #fff 0%, rgba(255, 255, 255, .85) 28%, rgba(200, 235, 255, .35) 55%, transparent 74%); }
-  .stylus-dot.down { transform: scale(.55); }
+  .stylus-dot.on-screen { background: rgba(0, 0, 0, .38); }
+  .stylus-dot.down { transform: translate(0, 0) scale(.5); background: rgba(0, 0, 0, .5); filter: blur(1.5px); }
   body.stylus-on .rig, body.stylus-on .rig * { cursor: none !important; }
   body.stylus-on .rig .cart { cursor: grab !important; }
   @media (hover: none) { .stylus, .stylus-dot { display: none; } }
@@ -423,13 +426,38 @@
     if (down) { tick(a, t, 3600, 2.2, 0.22, 0.03); tick(a, t, 1700, 1.4, 0.08, 0.022); thump(a, t, 260, 140, 0.07, 0.035); }
     else tick(a, t, 4200, 2.5, 0.05, 0.015);
   };
+  // il punto è sopra la scocca del DS? Si guarda la trasparenza dell'immagine della skin
+  // (maschera ritagliata sulla forma vera), nelle coordinate della console anche quando è girata
+  const mask = { src: "", w: 0, h: 0, data: null };
+  const loadMask = () => {
+    const src = bodyImg.getAttribute("src") || "";
+    if (mask.src === src) return; mask.src = src; mask.data = null;
+    const im = new Image(); im.src = src;
+    (im.decode ? im.decode() : new Promise((r) => (im.onload = r))).then(() => {
+      if (mask.src !== src) return;
+      const w = 314, h = Math.round(w * im.naturalHeight / im.naturalWidth), c = document.createElement("canvas");
+      c.width = w; c.height = h; const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(im, 0, 0, w, h);
+      try { mask.data = g.getImageData(0, 0, w, h).data; mask.w = w; mask.h = h; } catch { mask.data = null; }
+    }).catch(() => {});
+  };
+  const overBody = (e) => {
+    loadMask();
+    const r = consoleEl.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const a = (-ROT * Math.PI) / 180, dx = e.clientX - cx, dy = e.clientY - cy;
+    const lx = dx * Math.cos(a) - dy * Math.sin(a), ly = dx * Math.sin(a) + dy * Math.cos(a);
+    const u = lx / consoleEl.offsetWidth + 0.5, v = ly / consoleEl.offsetHeight + 0.5;
+    if (u < 0 || u >= 1 || v < 0 || v >= 1) return false;
+    if (HOLES.some((o) => u >= o.l && u <= o.l + o.w && v >= o.t && v <= o.t + o.h)) return true; // gli schermi sono "buchi" nella skin
+    if (!mask.data) return v <= 0.953 && u > 0.03 && u < 0.97;
+    return mask.data[(Math.floor(v * mask.h) * mask.w + Math.floor(u * mask.w)) * 4 + 3] > 40;
+  };
   const stylusMove = (e) => {
     if (SPECTATE || EDIT || e.pointerType === "touch") return showStylus(false);
     sX = e.clientX; sY = e.clientY;
     const t = e.target instanceof Element ? e.target : null;
-    const over = !!t && !!t.closest(".rig") && !t.closest(".cart") && !drag && !document.body.classList.contains("editing");
+    const over = !!t && !t.closest(".cart") && (!!t.closest(".hot, .shoulder, #screen2") || overBody(e)) && !drag && !document.body.classList.contains("editing");
     showStylus(over);
-    sDot.classList.toggle("screen", over && state === "inserted" && !!inside(e));
+    sDot.classList.toggle("on-screen", over && state === "inserted" && !!inside(e));
     if (over) placeStylus();
   };
   addEventListener("pointermove", stylusMove, true);
@@ -707,7 +735,6 @@
     setRotation(deg) {
       ROT = [0, 90, -90].includes(deg) ? deg : 0;
       rotAnim = true; fit(); setTimeout(() => { rotAnim = false; }, 600);
-      hint.style.visibility = ROT ? "hidden" : "";
       if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); }
     },
     setFilter(f) { screens.forEach((el) => (el.dataset.filter = f)); },
