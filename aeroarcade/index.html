@@ -8,15 +8,18 @@
     <meta name="theme-color" content="#3fa9f5" />
     <title>Aero Arcade</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <!-- three.js è uno solo per tutto il sito (tastiera 3D, controller di gelatina): cartella vendor/three -->
+
     <!-- Configurazione modificabile senza ricompilare (Supabase, server netplay).
          Caricata con un parametro sempre diverso, così le modifiche arrivano subito
          senza dover svuotare la cache del browser. -->
     <script>document.write('<script src="./aero-config.js?v=' + Date.now() + '"><\/script>');</script>
-    <script type="module" crossorigin src="./assets/index-aQF834x3.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/saves-_uh-dRlD.js">
-    <link rel="modulepreload" crossorigin href="./assets/netplay-DOAgnqe7.js">
-    <link rel="modulepreload" crossorigin href="./assets/wifi-keys-vYnHNL8C.js">
-    <link rel="stylesheet" crossorigin href="./assets/saves-BxhotqMb.css">
+    <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }</script>
+    <script type="module" crossorigin src="./assets/index-CaQmmIDV.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/saves-B9kOgKYd.js">
+    <link rel="modulepreload" crossorigin href="./assets/netplay-CXB_gldr.js">
+    <link rel="modulepreload" crossorigin href="./assets/wifi-keys--lFs6utI.js">
+    <link rel="stylesheet" crossorigin href="./assets/saves-Ch-CPg8u.css">
   </head>
   <body>
     <div id="app"></div>
