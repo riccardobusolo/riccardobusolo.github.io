@@ -522,7 +522,24 @@
   const kTag = document.createElement("div"); kTag.className = "k-tag"; document.body.append(kTag);
   let kTimer = 0;
   let ROT = 0, rotAnim = false;
-  function refit() { fit(); if (state === "inserted" && typeof placeInserted === "function") { placeInserted(); } }
+  // quando la cartuccia entra o esce la console cambia dimensione e posizione: invece di uno scatto
+  // la scena parte dall'aspetto di prima e scivola dolcemente in quello nuovo (FLIP)
+  function refit() {
+    const scene = rig.parentElement, before = rig.getBoundingClientRect();
+    scene.style.transition = "none"; scene.style.transform = ""; // misure senza l'animazione precedente
+    fit();
+    if (state === "inserted" && typeof placeInserted === "function") placeInserted();
+    const after = rig.getBoundingClientRect();
+    if (!after.width || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const k = before.width / after.width, dx = before.left - after.left * k, dy = before.top - after.top * k;
+    if (Math.abs(k - 1) < 0.002 && Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+    scene.style.transition = "none";
+    scene.style.transformOrigin = "0 0";
+    scene.style.transform = `translate(${dx}px, ${dy}px) scale(${k})`;
+    void scene.offsetWidth;
+    scene.style.transition = "transform .55s cubic-bezier(.3,.8,.3,1)";
+    scene.style.transform = "";
+  }
   function fit() {
     if (document.body.classList.contains("editing")) return;
     // DS girato di lato (come un libro): larghezza e altezza disponibili si scambiano
