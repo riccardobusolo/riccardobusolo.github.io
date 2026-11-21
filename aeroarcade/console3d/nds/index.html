@@ -477,7 +477,10 @@
     if (SPECTATE || EDIT || e.pointerType === "touch") return showStylus(false);
     sX = e.clientX; sY = e.clientY;
     const t = e.target instanceof Element ? e.target : null;
-    const over = !!t && !t.closest(".cart") && (!!t.closest(".hot, .shoulder, #screen2") || overBody(e)) && !drag && !document.body.classList.contains("editing");
+    const onCart = !!t && !!t.closest(".cart");
+    const cartHidden = onCart && state === "inserted" && overBody(e); // scheda dietro la plastica
+    cart.style.setProperty("cursor", cartHidden ? "none" : "", cartHidden ? "important" : "");
+    const over = !!t && (!onCart || cartHidden) && (!!t.closest(".hot, .shoulder, #screen2") || overBody(e)) && !drag && !document.body.classList.contains("editing");
     showStylus(over);
     sDot.classList.toggle("on-screen", over && state === "inserted" && !!inside(e));
     if (over) placeStylus();
@@ -677,6 +680,8 @@
   const localDy = (e) => { const a = (-ROT * Math.PI) / 180, dx = e.clientX - drag.sx, dy = e.clientY - drag.sy; return dx * Math.sin(a) + dy * Math.cos(a); };
   cart.addEventListener("pointerdown", (e) => {
     if (state !== "out" && state !== "inserted") return;
+    // inserita: si afferra solo il pezzo che sporge, non attraverso la plastica del DS
+    if (state === "inserted" && overBody(e)) return;
     e.preventDefault(); cart.setPointerCapture(e.pointerId);
     audio(); // sblocca l'audio con il gesto
     const t = cart._t || { x: 0, y: 0 };
