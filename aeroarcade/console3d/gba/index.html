@@ -404,7 +404,7 @@
   const kTag = document.createElement("div"); kTag.className = "k-tag"; document.body.append(kTag);
   let kTimer = 0;
   // nuovo adattamento quando la cartuccia entra/esce (lo spazio sotto per la scheda serve solo quando è fuori)
-  function refit() { fit(); if (state === "inserted" && typeof placeInserted === "function") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); } }
+  function refit() { fit(); if (state === "inserted" && typeof placeInserted === "function") { placeInserted(); } }
   function fit() {
     if (document.body.classList.contains("editing")) return;
     const dpr = devicePixelRatio || 1, VW = innerWidth, VH = innerHeight;
@@ -439,7 +439,7 @@
     const k = steps[idx];
     kTag.textContent = !Number.isInteger(k) ? "Adatta alla finestra" : k === 1 ? `Risoluzione reale · ${NW}×${NH}` : `×${k} · ${NW * k}×${NH * k}`;
     kTag.classList.add("on"); clearTimeout(kTimer); kTimer = setTimeout(() => kTag.classList.remove("on"), 1200);
-    if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); }
+    if (state === "inserted") { placeInserted(); }
   }, { passive: false });
   fit();
 
@@ -538,12 +538,15 @@
       } else if (SPECTATE) { if (pendingIntro) spectatorIntro(); } else { boot.classList.add("on"); send({ aero: "inserted" }); }
     }, 600);
   }
+  // cartuccia dentro lo slot: si riparte SENZA transizione dalla posizione di riposo e si misura subito
+  // (con la transizione ancora attiva la misura cadeva a metà corsa e la scheda restava fuori, sotto la console)
   function placeInserted() {
     hint.classList.add("gone"); cart.classList.add("behind");
-    requestAnimationFrame(() => { const p = insertedPos(); move(p.x, p.y); });
+    const seat = () => { cart.style.transition = "none"; cart.style.transform = ""; cart._t = { x: 0, y: 0 }; const p = insertedPos(); move(p.x, p.y); };
+    seat(); requestAnimationFrame(seat);
   }
   if (state === "inserted") placeInserted();
-  addEventListener("resize", () => { if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); } });
+  addEventListener("resize", () => { if (state === "inserted") { placeInserted(); } });
 
   cart.addEventListener("pointerdown", (e) => {
     if (state !== "out" && state !== "inserted") return;

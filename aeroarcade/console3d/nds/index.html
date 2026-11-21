@@ -522,7 +522,7 @@
   const kTag = document.createElement("div"); kTag.className = "k-tag"; document.body.append(kTag);
   let kTimer = 0;
   let ROT = 0, rotAnim = false;
-  function refit() { fit(); if (state === "inserted" && typeof placeInserted === "function") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); } }
+  function refit() { fit(); if (state === "inserted" && typeof placeInserted === "function") { placeInserted(); } }
   function fit() {
     if (document.body.classList.contains("editing")) return;
     // DS girato di lato (come un libro): larghezza e altezza disponibili si scambiano
@@ -566,7 +566,7 @@
     const k = steps[idx];
     kTag.textContent = !Number.isInteger(k) ? "Adatta alla finestra" : k === 1 ? `Risoluzione reale · ${NW}×${NH}` : `×${k} · ${NW * k}×${NH * k}`;
     kTag.classList.add("on"); clearTimeout(kTimer); kTimer = setTimeout(() => kTag.classList.remove("on"), 1200);
-    if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); }
+    if (state === "inserted") { placeInserted(); }
   }, { passive: false });
   fit();
 
@@ -669,12 +669,15 @@
       } else if (SPECTATE) { if (pendingIntro) spectatorIntro(); } else { boot.classList.add("on"); send({ aero: "inserted" }); }
     }, 600);
   }
+  // cartuccia dentro lo slot: si riparte SENZA transizione dalla posizione di riposo e si misura subito
+  // (con la transizione ancora attiva la misura cadeva a metà corsa e la scheda restava fuori, sotto la console)
   function placeInserted() {
     hint.classList.add("gone"); cart.classList.add("behind");
-    requestAnimationFrame(() => { const p = insertedPos(); move(p.x, p.y); });
+    const seat = () => { cart.style.transition = "none"; cart.style.transform = ""; cart._t = { x: 0, y: 0 }; const p = insertedPos(); move(p.x, p.y); };
+    seat(); requestAnimationFrame(seat);
   }
   if (state === "inserted") placeInserted();
-  addEventListener("resize", () => { if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); } });
+  addEventListener("resize", () => { if (state === "inserted") { placeInserted(); } });
 
   // spostamento "verticale" nel sistema della console (anche con il DS girato)
   const localDy = (e) => { const a = (-ROT * Math.PI) / 180, dx = e.clientX - drag.sx, dy = e.clientY - drag.sy; return dx * Math.sin(a) + dy * Math.cos(a); };
@@ -770,7 +773,7 @@
     setRotation(deg) {
       ROT = [0, 90, -90].includes(deg) ? deg : 0;
       rotAnim = true; fit(); orientTips(); setTimeout(() => { rotAnim = false; }, 600);
-      if (state === "inserted") { cart.style.transform = ""; cart._t = { x: 0, y: 0 }; placeInserted(); }
+      if (state === "inserted") { placeInserted(); }
     },
     setFilter(f) { screens.forEach((el) => (el.dataset.filter = f)); },
     /** per la console dell'amico: skin, luce, copertina e cartuccia dentro/fuori */
