@@ -10,16 +10,35 @@
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <!-- three.js è uno solo per tutto il sito (tastiera 3D, controller di gelatina): cartella vendor/three -->
 
+    <script>
+      // Chrome/Edge 137+: le pagine del sito diventano "isolate" (service worker sw-isola.js),
+      // così il wireless DS gira direttamente nelle console. Al primo giro serve un ricaricamento.
+      (function () {
+        var b = (navigator.userAgentData && navigator.userAgentData.brands) || [];
+        var ok = b.some(function (x) { return /Chromium/.test(x.brand) && +x.version >= 137; });
+        if (!ok || !("serviceWorker" in navigator) || !window.isSecureContext) return;
+        var reg = navigator.serviceWorker.register("./sw-isola.js", { scope: "./" });
+        if (window.crossOriginIsolated) return void sessionStorage.removeItem("aero-isola");
+        if (sessionStorage.getItem("aero-isola")) return; // già provato in questa sessione: niente giri a vuoto
+        window.__aeroIsola = new Promise(function (done) {
+          var go = function () { done(); };
+          reg.then(function () { return navigator.serviceWorker.ready; }).then(function () {
+            sessionStorage.setItem("aero-isola", "1");
+            location.reload();
+          }, go);
+          setTimeout(go, 4000); // se il service worker tarda, si parte lo stesso
+        });
+      })();
+    </script>
     <!-- Configurazione modificabile senza ricompilare (Supabase, server netplay).
          Caricata con un parametro sempre diverso, così le modifiche arrivano subito
          senza dover svuotare la cache del browser. -->
     <script>document.write('<script src="./aero-config.js?v=' + Date.now() + '"><\/script>');</script>
     <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }</script>
-    <script type="module" crossorigin src="./assets/index-DPo4X6rV.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/saves-B9kOgKYd.js">
-    <link rel="modulepreload" crossorigin href="./assets/netplay-CXB_gldr.js">
-    <link rel="modulepreload" crossorigin href="./assets/wifi-keys--lFs6utI.js">
-    <link rel="stylesheet" crossorigin href="./assets/saves-Ch-CPg8u.css">
+    <script type="module" crossorigin src="./assets/index-BJwD3fmz.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/saves-o5GNjf3K.js">
+    <link rel="modulepreload" crossorigin href="./assets/netplay-BRWyfMWL.js">
+    <link rel="stylesheet" crossorigin href="./assets/saves-BiQAxh-Q.css">
   </head>
   <body>
     <div id="app"></div>
