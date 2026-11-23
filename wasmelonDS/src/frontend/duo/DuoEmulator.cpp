@@ -18,6 +18,9 @@
 #include "GPU.h"
 #include "SPU.h"
 #include "GPU3D_Soft.h"
+#include "Savestate.h"
+#include "ARCodeFile.h"
+#include <sstream>
 
 using namespace melonDS;
 
@@ -73,7 +76,7 @@ namespace duo {
       return fw;
     }
 
-    void setClock(NDS* nds) {
+    static void setClock(NDS* nds) {
       std::time_t t = std::time(nullptr);
       std::tm* l = std::localtime(&t);
       nds->RTC.SetDateTime(l->tm_year, l->tm_mon + 1, l->tm_mday, l->tm_hour, l->tm_min, l->tm_sec);
@@ -113,12 +116,51 @@ namespace duo {
     // che ospita la partita aspetterebbe invano le risposte dell'altra (che sta
     // ferma) e il collegamento rallenterebbe tutto.
     static inline std::atomic<int> pace{1};
+    // velocità (avanti veloce): 1 = normale, 0 = senza limite
+    static inline std::atomic<float> speed{1};
+    // pausa di entrambe le console (la pagina aspetta isHeld prima di salvare/caricare)
+    static inline std::atomic<bool> holdReq{false};
+
+    // trucchi Action Replay: codici separati da '|', parole esadecimali separate da spazi
+    static void applyCheats(NDS* nds, const std::string& all) {
+      std::vector<ARCode> list;
+      std::stringstream ss(all);
+      std::string one;
+      while (std::getline(ss, one, '|')) {
+        ARCode code; code.Name = "aero"; code.Enabled = true;
+        std::stringstream ws(one);
+        std::string w;
+        while (ws >> w) {
+          char* end = nullptr;
+          unsigned long v = strtoul(w.c_str(), &end, 16);
+          if (end && *end == 0 && w.size() <= 8) code.Code.push_back((u32)v);
+        }
+        if (!code.Code.empty() && code.Code.size() % 2 == 0) list.push_back(std::move(code));
+      }
+      nds->AREngine.Cheats = std::move(list);
+    }
     static void runLoop(Instance* in) {
       in->go.acquire(); // partenza
       double next = emscripten_get_now();
       const double period = 1000.0 / 59.8261; // frequenza vera del DS
       while (!in->quit) {
         NDS* nds = in->nds;
+        if (holdReq) {
+          in->parked = true;
+          while (holdReq && !in->quit) usleep(2000);
+          in->parked = false;
+          next = emscripten_get_now();
+          continue;
+        }
+        if (in->resetReq.exchange(false)) {
+          nds->Reset();
+          nds->SetupDirectBoot("game");
+          setClock(nds);
+        }
+        if (in->cheatsReq.exchange(false)) {
+          std::lock_guard<std::mutex> g(in->cheatLock);
+          applyCheats(nds, in->cheats);
+        }
         nds->SetKeyMask(~in->keys.load() & 0xfff);
         if (in->touching) {
           u32 xy = in->touchXY;
@@ -144,9 +186,10 @@ namespace duo {
         }
         in->frames++;
         // ritmo: aspetto il prossimo fotogramma; se resto molto indietro riparto da adesso
-        next += period;
+        float sp = speed.load();
+        next += sp > 0 ? period / sp : 0;
         double now = emscripten_get_now();
-        if (!pace) next = now;
+        if (!pace || sp <= 0) next = now;
         else if (next - now > 0) usleep((useconds_t)((next - now) * 1000));
         else if (now - next > period * 4) next = now;
       }
@@ -193,6 +236,46 @@ namespace duo {
       in.saveDirty = false;
       return (int)in.save.size();
     }
+    void hold(bool on) { holdReq = on; }
+    // vero quando entrambe le console (avviate) sono ferme tra due fotogrammi
+    bool isHeld() {
+      if (!holdReq) return false;
+      for (auto& in : inst) if (in.thread.joinable() && !in.parked) return false;
+      return true;
+    }
+    void setSpeed(float s) { speed = s; }
+    void reset(int i) { inst[i & 1].resetReq = true; }
+    void setCheats(int i, std::string codes) {
+      Instance& in = inst[i & 1];
+      { std::lock_guard<std::mutex> g(in.cheatLock); in.cheats = codes; }
+      in.cheatsReq = true;
+    }
+    // stati salvati: solo a console ferme (hold + isHeld)
+    int saveState(int i) {
+      Instance& in = inst[i & 1];
+      Savestate s(16 * 1024 * 1024);
+      if (s.Error) return 0;
+      if (!in.nds->DoSavestate(&s)) return 0;
+      s.Finish();
+      if (s.Error) return 0;
+      const u8* b = (const u8*)s.Buffer();
+      in.state.assign(b, b + s.Length());
+      return (int)in.state.size();
+    }
+    int readState(int i, uintptr_t dst) {
+      Instance& in = inst[i & 1];
+      memcpy((void*)dst, in.state.data(), in.state.size());
+      int n = (int)in.state.size();
+      in.state.clear(); in.state.shrink_to_fit();
+      return n;
+    }
+    bool loadState(int i, uintptr_t ptr, int len) {
+      Instance& in = inst[i & 1];
+      Savestate s((void*)ptr, (u32)len, false);
+      if (s.Error) return false;
+      bool ok = in.nds->DoSavestate(&s);
+      return ok && !s.Error;
+    }
     int framesDone(int i) { return (int)inst[i & 1].frames.load(); }
     float frameMs(int i) { return inst[i & 1].lastMs.load(); }
   };
@@ -214,6 +297,14 @@ EMSCRIPTEN_BINDINGS(DuoEmulator) {
     .function("saveSize", &duo::DuoEmulator::saveSize)
     .function("saveDirty", &duo::DuoEmulator::saveDirty)
     .function("readSave", &duo::DuoEmulator::readSave)
+    .function("hold", &duo::DuoEmulator::hold)
+    .function("isHeld", &duo::DuoEmulator::isHeld)
+    .function("setSpeed", &duo::DuoEmulator::setSpeed)
+    .function("reset", &duo::DuoEmulator::reset)
+    .function("setCheats", &duo::DuoEmulator::setCheats)
+    .function("saveState", &duo::DuoEmulator::saveState)
+    .function("readState", &duo::DuoEmulator::readState)
+    .function("loadState", &duo::DuoEmulator::loadState)
     .function("framesDone", &duo::DuoEmulator::framesDone)
     .function("frameMs", &duo::DuoEmulator::frameMs);
 }

@@ -4,6 +4,7 @@
 #include <mutex>
 #include <semaphore>
 #include <vector>
+#include <string>
 #include "NDS.h"
 
 namespace duo {
@@ -27,5 +28,13 @@ namespace duo {
     std::atomic<bool> saveDirty{false};
     std::atomic<melonDS::u32> frames{0};
     std::atomic<float> lastMs{0};
+    // pausa: il thread si ferma tra un fotogramma e l'altro
+    std::atomic<bool> parked{false};
+    // richieste applicate dal thread stesso, tra un fotogramma e l'altro
+    std::atomic<bool> resetReq{false};
+    std::mutex cheatLock;
+    std::string cheats;
+    std::atomic<bool> cheatsReq{false};
+    std::vector<melonDS::u8> state;
   };
 }
