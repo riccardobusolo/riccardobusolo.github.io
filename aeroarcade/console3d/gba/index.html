@@ -430,7 +430,7 @@
     let st; try { st = state; } catch { st = P.get("inserted") === "1" ? "inserted" : "out"; }
     const compact = st === "inserted" || st === "inserting" || st === "ejecting";
     const RH = compact ? 1290 : 1525;
-    const kFit = Math.max(0.5, Math.min((VH * 0.97 * 683 / RH) * SCR_W * dpr / NW, VW * 0.94 * SCR_W * dpr / NW));
+    const kFit = Math.max(0.15, Math.min((VH * 0.97 * 683 / RH) * SCR_W * dpr / NW, VW * 0.94 * SCR_W * dpr / NW));
     steps = [];
     for (let k = 1; k <= kFit + 1e-6; k++) steps.push(k);
     if (!steps.length || kFit - steps[steps.length - 1] > 0.08) steps.push(kFit);
