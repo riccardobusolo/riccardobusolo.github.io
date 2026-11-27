@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rocket Lander AI — Neuroevoluzione | Riccardo Busolo</title>
+<meta name="description" content="Mille reti neurali imparano ad atterrare un razzo con un algoritmo genetico. Addestrale da zero o guarda la versione preaddestrata.">
+<link rel="icon" href="/favicon.ico">
+<link rel="alternate icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 252.1 251.05'%3E%3Cpath fill='%232a2a32' d='M193.15,120.73h-44.48c-7.99,0-14.47-6.48-14.47-14.470V17.29c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.390,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M58.95,117.91H14.47c-7.99,0-14.47-6.48-14.47-14.47V14.47C0,6.48,6.480,0,14.47,0h44.48c32.56,0,58.95,26.39,58.950,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%232a2a32' d='M193.15,251.05h-44.48c-7.99,0-14.47-6.48-14.47-14.47v-88.97c0-7.99,6.48-14.47,14.47-14.47h44.48c32.56,0,58.95,26.39,58.95,58.95h0c0,32.56-26.39,58.95-58.95,58.95Z'/%3E%3Cpath fill='%233092b0' d='M117.91,233.76h0c0-25.77-10.24-50.48-28.46-68.7l-6.28-6.28c-18.22-18.22-42.93-28.46-68.7-28.46h0c-7.99,0-14.47,6.48-14.47,14.47h0c0,25.77,10.24,50.48,28.46,68.7l6.28,6.28c18.22,18.22,42.93,28.46,68.7,28.46h0c7.990,0,14.47-6.48,14.47-14.47Z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#08080e;--bg-card:#12121a;--bg-raised:#1a1a22;--border:rgba(180,180,190,.08);--border-hover:rgba(180,180,190,.15);--text:#e0e0e6;--text-dim:#9a9a9e;--text-muted:#6a6a74;--cyan:#00e0d0;--cyan-dim:rgba(0,224,208,.06);--cyan-border:rgba(0,224,208,.15);--green:#3dd68c;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;--ease:cubic-bezier(.16,1,.3,1)}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;font-weight:300;overflow-x:hidden}
+
+
+/* the page fits a desktop screen: the width follows the available height */
+.page{max-width:min(1280px,calc((100vh - 495px) * 2.078 + 48px));min-width:min(100%,700px);margin:0 auto;padding:18px 24px 16px}
+.header{text-align:center;margin-bottom:12px}
+.header__tag{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:6px}
+.header__title{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:800;letter-spacing:-.04em;margin-bottom:4px;line-height:1.15}
+.header__desc{font-size:.86rem;color:var(--text-dim);font-weight:300;max-width:640px;margin:0 auto}
+
+/* ── Mode switch ── */
+.mode{display:flex;justify-content:center;margin-bottom:10px}
+.mode__track{position:relative;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;min-width:min(100%,840px)}
+.mode__pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px) / 4);border-radius:9px;background:var(--cyan-dim);border:1px solid var(--cyan-border);transition:transform .35s var(--ease)}
+.mode__track[data-mode="pre"] .mode__pill{transform:translateX(100%)}
+.mode__track[data-mode="pilot"] .mode__pill{transform:translateX(200%)}
+.mode__track[data-mode="net"] .mode__pill{transform:translateX(300%)}
+.mode__opt{position:relative;z-index:1;border:0;background:none;cursor:pointer;padding:9px 16px;font-family:var(--font);font-size:.9rem;font-weight:500;color:var(--text-dim);transition:color .2s;display:flex;flex-direction:column;align-items:center;line-height:1.25}
+.mode__opt small{font-family:var(--mono);font-size:.58rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.mode__opt.on{color:var(--cyan)}
+.mode__opt:focus{outline:none}
+.mode__opt.on small{color:rgba(0,224,208,.6)}
+
+/* ── HUD ── */
+.hud{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center;justify-content:center}
+.hud__box{padding:8px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;font-family:var(--mono);font-size:.72rem;display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.hud__label{color:var(--text-muted);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em}
+.hud__val{font-weight:600;color:var(--text);text-align:right}
+.hud__gen{color:var(--cyan);font-weight:700}
+.hud__ok{color:var(--green);font-weight:700}
+
+/* ── Controls ── */
+.controls{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px}
+.btn{padding:8px 13px;font-family:var(--mono);font-size:.72rem;font-weight:500;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-dim);cursor:pointer;transition:all .2s var(--ease)}
+.btn:hover{color:var(--text);border-color:var(--border-hover)}
+.btn:active{transform:scale(.97);transition-duration:.05s}
+.btn.active{border-color:var(--cyan-border);color:var(--cyan);background:var(--cyan-dim)}
+.btn:disabled{opacity:.4;cursor:default}
+.slider-wrap{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px}
+.slider-wrap label{font-family:var(--mono);font-size:.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;display:flex;align-items:center;gap:7px;cursor:pointer}
+.slider-wrap input[type=range]{width:86px;accent-color:var(--cyan)}
+.slider-wrap input[type=checkbox]{accent-color:var(--cyan);width:14px;height:14px}
+.slider-wrap .val{font-family:var(--mono);font-size:.72rem;font-weight:600;min-width:40px;text-align:right;color:var(--text)}
+
+/* ── Canvas ── */
+.page:has(.stage){}
+body.zero .page{max-width:min(1540px,calc((100vh - 495px) * 2.078 + 48px + 260px))}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:10px;align-items:stretch}
+body.pre .stage,body.pilot .stage{grid-template-columns:minmax(0,1fr)}
+body.pre #board,body.pilot #board,body.net #board{display:none}
+#board{order:2;contain:size;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.board__head{display:flex;flex-direction:column;gap:2px;padding:0 6px 8px;border-bottom:1px solid var(--border);margin-bottom:6px}
+.board__head span{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.1em;color:var(--cyan)}
+.board__head small{font-family:var(--mono);font-size:.58rem;color:var(--text-muted)}
+#boardList{list-style:none;flex:1;overflow:hidden;min-height:0}
+#boardList li{display:grid;grid-template-columns:18px 1fr auto;gap:1px 8px;align-items:center;padding:4px 6px;border-radius:8px;cursor:pointer;font-family:var(--mono);font-size:.66rem;color:var(--text-dim);transition:background .15s}
+#boardList li:hover,#boardList li.on{background:var(--cyan-dim);color:var(--text)}
+#boardList .rk{color:var(--text-muted);text-align:right}
+#boardList li:nth-child(-n+3) .rk{color:#f2d65a;font-weight:700}
+#boardList .id{color:var(--text);font-weight:700}
+#boardList .st{color:var(--green);font-weight:700;text-align:right}
+#boardList .ml{font-style:normal;font-size:.56rem;color:#ff6b6b;font-weight:600}
+#boardList .sub{grid-column:2/4;font-size:.56rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.board__note{font-size:.62rem;color:var(--text-muted);line-height:1.45;padding:8px 6px 0;border-top:1px solid var(--border);margin-top:6px}
+.board__note b{color:var(--text-dim);font-weight:600}
+.canvas-wrap{position:relative;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:10px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;border-radius:10px}
+#chart{margin-top:8px}
+
+/* ── Speed bar ── */
+.speed-bar{display:flex;align-items:center;gap:14px;padding:8px 16px;margin-top:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+.speed-bar__label{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);white-space:nowrap}
+.speeds{display:flex;gap:6px;flex:1}
+.speeds .btn{flex:1}
+.speed-bar__note{font-family:var(--mono);font-size:.6rem;color:var(--text-muted);white-space:nowrap}
+
+.source{font-family:var(--mono);font-size:.62rem;color:var(--text-muted);text-align:center;margin:-4px 0 8px;min-height:1.2em}
+.source button{background:none;border:0;color:var(--text-dim);font:inherit;text-decoration:underline;cursor:pointer;margin-left:6px}
+.caption{margin-top:8px;text-align:center;font-size:.72rem;color:var(--text-muted)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;padding:10px 18px;background:var(--bg-raised);border:1px solid var(--cyan-border);color:var(--text);border-radius:10px;font-family:var(--mono);font-size:.72rem;transition:all .35s var(--ease);pointer-events:none;z-index:200}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+body.pre .hud,body.pre .controls,body.pre .speed-bar,body.pre #chart{display:none}
+body.net .controls,body.net .speed-bar,body.net .canvas-wrap,body.net .keys{display:none}
+#netView{display:none;grid-template-columns:minmax(0,1fr) 340px;gap:10px;height:min(calc(100vh - 290px),680px);min-height:460px}
+#netView .card:first-child canvas{width:100%;height:100%}
+body.net .page{max-width:min(1280px,calc(100vw - 48px))}
+#netView .card:last-child{overflow:auto;border-color:rgba(0,224,208,.16)}
+#mini{border:1px solid rgba(0,224,208,.18)}
+body.net #netView{display:grid}
+#netView .card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:10px;position:relative}
+#netView .card:first-child{padding:0;overflow:hidden;border-color:rgba(0,224,208,.22);box-shadow:0 0 0 1px rgba(0,224,208,.05),0 0 40px rgba(0,224,208,.06) inset}
+#net{cursor:grab;touch-action:none}#net:active{cursor:grabbing}
+.net-hint{position:absolute;left:22px;bottom:18px;font-family:var(--mono);font-size:.62rem;color:var(--text-muted);pointer-events:none}
+.legend{position:absolute;right:22px;top:56px;display:flex;gap:12px;font-family:var(--mono);font-size:.6rem;color:var(--text-muted);pointer-events:none}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+#netInfo{padding:8px 10px 4px;font-size:.84rem;color:var(--text-dim);line-height:1.55;overflow:auto}
+#netInfo h3{font-size:1.02rem;font-weight:700;color:var(--text);margin-bottom:2px;letter-spacing:-.01em}
+#netInfo .tag{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);margin-bottom:6px}
+#netInfo p{margin:6px 0}
+#netInfo b{color:var(--text);font-weight:600}
+#netInfo .val{font-family:var(--mono);font-size:.74rem;color:var(--text);background:var(--bg-raised);border-radius:8px;padding:6px 10px;margin:8px 0}
+#netInfo .back{background:none;border:0;color:var(--cyan);font-family:var(--mono);font-size:.66rem;cursor:pointer;padding:0;margin-top:6px}
+#mini{display:block;width:100%;height:auto;border-radius:10px;margin-bottom:6px}
+body.pilot .hud,body.pilot .speed-bar,body.pilot #chart,body.pilot #pause,body.pilot #reset,body.pilot #export,body.pilot #nWrap{display:none}
+.keys{display:none;justify-content:center;gap:18px;flex-wrap:wrap;margin:-2px 0 10px;font-family:var(--mono);font-size:.68rem;color:var(--text-dim)}
+body.pilot .keys{display:flex}
+.keys kbd{display:inline-block;min-width:24px;padding:2px 7px;margin:0 2px;border:1px solid var(--border-hover);border-bottom-width:2px;border-radius:6px;background:var(--bg-raised);color:var(--text);font-family:var(--mono);font-size:.68rem;text-align:center}
+@media(max-width:640px){
+  .page{padding:76px 16px 30px}
+  .hud{gap:6px}.hud__box{padding:6px 10px;font-size:.65rem}
+  .speed-bar{flex-wrap:wrap}
+}
+</style>
+  <link rel="stylesheet" href="/project-navigation.css">
+  <link rel="stylesheet" href="/site-cursor.css?v=20261031-controls">
+  <script src="/site-cursor.js?v=20261030-text" defer></script>
+</head>
+<body data-project="rocket-lander" data-project-category="formazione">
+<a class="project-return" href="/progetti.html#formazione" aria-label="Torna a Formazione" title="Torna a Formazione"><img src="/img/logo.svg" width="42" height="42" alt=""></a>
+
+<div class="page">
+  <div class="header">
+    <div class="header__tag">Formazione interattiva</div>
+    <h1 class="header__title">Rocket Lander AI</h1>
+    <p class="header__desc">Ogni razzo è guidato da una piccola rete neurale. Chi atterra meglio passa i suoi pesi alla generazione successiva, con una leggera mutazione: nessuno insegna niente, la popolazione impara da sola.</p>
+  </div>
+
+  <div class="mode">
+    <div class="mode__track" id="mode" data-mode="zero">
+      <div class="mode__pill"></div>
+      <button class="mode__opt on" data-mode="zero">Addestra da zero<small>reti casuali</small></button>
+      <button class="mode__opt" data-mode="pre">Preaddestrata<small id="preInfo">reti già esperte</small></button>
+      <button class="mode__opt" data-mode="pilot">Pilota tu<small>comandi da tastiera</small></button>
+      <button class="mode__opt" data-mode="net">Dentro la rete<small>modello 3D</small></button>
+    </div>
+  </div>
+  <div class="source" id="source"></div>
+
+  <div class="controls">
+    <button class="btn" id="pause">⏸ Pausa</button>
+    <button class="btn" id="reset">↺ Reset</button>
+    <button class="btn" id="export" title="Scarica un file con il cervello del razzo primo in classifica">⤓ Scarica rete migliore</button>
+  </div>
+
+  <div class="keys"><span><kbd>↑</kbd><kbd>↓</kbd> o <kbd>W</kbd><kbd>S</kbd> spinta (50% = sospeso)</span><span><kbd>←</kbd><kbd>→</kbd> o <kbd>A</kbd><kbd>D</kbd> inclinazione</span><span><kbd>R</kbd> nuovo tentativo</span></div>
+  <div class="stage">
+  <aside id="board"><div class="board__head"><span>CLASSIFICA</span><small id="boardSub"></small></div><ol id="boardList"></ol></aside>
+  <div class="canvas-wrap">
+    <canvas id="c" width="1600" height="770"></canvas>
+    <canvas id="chart" width="1600" height="150"></canvas>
+  </div>
+  </div>
+
+  <div id="netView">
+    <div class="card"><canvas id="net" width="1200" height="760"></canvas>
+      <div class="net-hint">trascina per ruotare · rotella per zoom · clicca un neurone</div>
+      <div class="legend"><span><i style="background:#00e0d0"></i>positivo</span><span><i style="background:#ff9a4d"></i>negativo</span></div></div>
+    <div class="card"><canvas id="mini" width="640" height="300"></canvas><div id="netInfo"></div></div>
+  </div>
+  <div class="speed-bar">
+    <span class="speed-bar__label">Velocità simulazione</span>
+    <div class="speeds" id="speeds"></div>
+    <span class="speed-bar__note" id="speedNote">spazio = pausa</span>
+  </div>
+
+  <div class="caption">Rocket Lander AI — neuroevoluzione con algoritmo genetico. Progetto didattico di Riccardo Busolo.</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script id="sim">
+// Rocket neuroevolution core. World units are fixed (1600×900) and independent of the screen
+// resolution: the page only scales the drawing.
+const SIM=(()=>{
+  const P={VY:110,VX:55,ANG:.4,TILT:.9,KP:30,KD:9,TIME:15,ELITE:.05,TOUR:5,SIG0:.25,SMIN:.0005,SMAX:.5,TAU:.2,MUT:.35,CAND:60,EXTRA:6,FLOOR:.06,MIXW:false,HARD:0,TBASE:6.5,TDIST:150,FAST:8};
+  const W=1600,GROUND=700,G=170,THRUST=G*2,DT=1/60;// throttle 0–100%: 50% exactly cancels gravity, 100% is twice g
+  const NIN=13,NH=20,NOUT=2,NW=NIN*NH+(NH+1)*NOUT,GL=NW+1;// last gene = the genome's own mutation strength
+  const steps=()=>Math.round(P.TIME/DT);
+  function rng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+  function gauss(r){let u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  // Pad half-width w; random position keeps it at least 140 units away from the screen edges.
+  function placePad(w,random,seed,gen){if(!random)return{x:W/2,w,random:false};const r=rng(seed*31+gen*7+1);return{x:w+140+r()*(W-2*(w+140)),w,random:true};}
+  class World{
+    constructor(n,genomes,seed,pad){
+      this.n=n;this.g=genomes;this.padX=pad.x;this.padW=pad.w;this.limit=steps();const r=rng(seed*7919+17);
+      const f=()=>new Float32Array(n);
+      this.x=f();this.y=f();this.vx=f();this.vy=f();this.a=f();this.w=f();this.thr=f();this.endT=f();
+      this.st=new Uint8Array(n);this.t=0;this.landed=0;this.crashed=0;this.events=[];
+      // Random position, speed and attitude, even upside down.
+      for(let i=0;i<n;i++){this.x[i]=60+r()*(W-120);this.y[i]=150+r()*80;this.vx[i]=(r()-.5)*50;this.vy[i]=r()*20;this.a[i]=(r()*2-1)*Math.PI;this.w[i]=(r()-.5)*1;}
+      // Pre-training only: a share of rockets start in the hardest spot (upside down, close to the pad).
+      for(let i=0;i<n;i++)if(r()<P.HARD){const s=r()<.5?-1:1;this.x[i]=Math.min(W-60,Math.max(60,this.padX+s*(30+r()*170)));this.a[i]=(r()<.5?-1:1)*(1.7+r()*(Math.PI-1.7));}
+      this.x0=Float32Array.from(this.x);this.a0=Float32Array.from(this.a);// starting position and angle// starting position, for the perfect-landing time limit
+      this.h=new Float32Array(NH);this.inp=new Float32Array(NIN);
+    }
+    // Perfect landing: on the pad within a time limit that grows with the starting distance from the pad
+    // (6.5 s plus 1 s every 150 units, i.e. about 1 s per 10% of the screen width).
+    limitFor(i){return P.TBASE+Math.abs(this.x0[i]-this.padX)/P.TDIST;}
+    perfect(i){return this.st[i]===1&&this.endT[i]*DT<=this.limitFor(i);}
+    step(){
+      const {n,g,x,y,vx,vy,a,w,thr,st,h,inp,padX,padW}=this;let alive=0;this.t++;
+      const left=1-this.t/this.limit;
+      for(let i=0;i<n;i++){
+        if(st[i])continue;alive++;
+        const gw=g[i];
+        inp[0]=(x[i]-padX)/800;inp[1]=(GROUND-y[i])/500;inp[2]=vx[i]/150;inp[3]=vy[i]/150;
+        inp[4]=Math.sin(a[i]);inp[5]=Math.cos(a[i]);inp[6]=w[i]/3;
+        inp[7]=padW/200;inp[8]=x[i]/800-1;inp[9]=padX/800-1;inp[10]=left;inp[11]=1;
+        inp[12]=Math.tanh((x[i]-padX)/(2*padW));// fine position relative to the pad's own size, for small pads
+        let k=0;
+        for(let j=0;j<NH;j++){let s=0;for(let q=0;q<NIN;q++)s+=inp[q]*gw[k++];h[j]=Math.tanh(s);}
+        let o0=gw[k++],o1=gw[k++];for(let j=0;j<NH;j++){o0+=h[j]*gw[k++];o1+=h[j]*gw[k++];}
+        let T=1/(1+Math.exp(-o0)),turn=Math.tanh(o1);
+        if(this.ctrl){const c=this.ctrl(i);T=c.T;turn=c.turn;}// a human pilot replaces the network
+        thr[i]=T;
+        if(this.trace)this.trace(i,inp,h,T,turn);// lets the page show the network thinking
+        w[i]+=((turn*P.TILT-a[i])*P.KP-w[i]*P.KD)*DT;a[i]+=w[i]*DT;
+        vx[i]+=Math.sin(a[i])*T*THRUST*DT;vy[i]+=(G-Math.cos(a[i])*T*THRUST)*DT;
+        x[i]+=vx[i]*DT;y[i]+=vy[i]*DT;
+        if(y[i]>=GROUND-3){
+          y[i]=GROUND;this.endT[i]=this.t;
+          const ok=Math.abs(x[i]-padX)<padW&&vy[i]<P.VY&&Math.abs(vx[i])<P.VX&&Math.abs(a[i])<P.ANG;
+          if(ok){st[i]=1;this.landed++;a[i]=0;}else{st[i]=2;this.crashed++;}
+          this.events.push([i,st[i]]);
+        }else if(x[i]<-60||x[i]>W+60||y[i]<-200){st[i]=3;this.endT[i]=this.t;this.events.push([i,3]);}
+      }
+      return alive>0&&this.t<this.limit;
+    }
+    // Landed rockets score more the softer, straighter and more centred they land: this keeps
+    // pushing for safety margins, which is what lets the population reach 100%.
+    fitness(i){
+      const dx=Math.abs(this.x[i]-this.padX),vy=Math.abs(this.vy[i]),vx=Math.abs(this.vx[i]),ang=Math.abs(this.a[i]);
+      if(this.st[i]===1){
+        // Safe landing: small reward multiplier for hard starts, up to +10% for starting far from the pad
+        // (half the screen or more) and up to +10% for starting upside down.
+        const mult=1+.1*Math.min(1,Math.abs(this.x0[i]-this.padX)/800)+.1*Math.min(1,Math.abs(this.a0[i])/Math.PI);
+        // Time: landing within 8 s earns nothing extra; after that the penalty grows linearly up to 400 at the limit.
+        const late=Math.max(0,this.endT[i]*DT-P.FAST)/(P.TIME-P.FAST);
+        return (3000-vy*2-vx*2-dx/this.padW*200-late*400)*mult;
+      }
+      // Every rocket that did not land pays a small extra penalty that grows with its final distance from
+      // the pad (at most ~800). Order stays: leaving the screen < still flying at the time limit < any crash.
+      const near=-dx*.5;
+      if(this.st[i]===3)return -6000+near;
+      if(this.st[i]===0)return -3600+near;
+      const f=1000-Math.max(0,dx-this.padW*.7)*1.5-Math.max(0,vy-P.VY*.6)*4-Math.max(0,vx-P.VX*.6)*4-Math.min(ang,Math.PI)*300;
+      return Math.max(-2800,f+near);
+    }
+  }
+  function randomGenome(r){const g=new Float32Array(GL);for(let i=0;i<NW;i++)g[i]=gauss(r)*.8;g[NW]=P.SIG0;return g;}
+  // Self-adaptive evolution with a robustness check. The visible generation gives a first score;
+  // the best candidates are then re-tested headless on extra random starts (edges included), and only
+  // the most reliable ones become elites and parents. Each child inherits a mutation strength that
+  // itself mutates, so the population explores while learning and becomes precise once it masters the
+  // task. nOut lets the population size change between generations.
+  function evolve(genomes,fit,r,nOut=genomes.length,pad=null,seed=0,rate=1,perf=null,champ=null){
+    // Mutation floor follows the failure rate: when the task changes (new pad width or position) and
+    // success drops, exploration comes back automatically; at 100% it shrinks to fine-tuning.
+    const floor=Math.max(P.SMIN,P.FLOOR*(1-rate));
+    const n=genomes.length,idx=[...Array(n).keys()].sort((p,q)=>fit[q]-fit[p]);
+    const C=Math.min(n,P.CAND),cand=idx.slice(0,C);let score=cand.map(i=>fit[i]);
+    const ok=cand.map(i=>perf?!!perf[i]:false);// perfect so far: in the visible generation
+    if(pad&&P.EXTRA){
+      // With a moving pad every re-test uses a different pad position, so parents must generalise.
+      const batch=cand.map(i=>genomes[i]),tot=cand.map(i=>fit[i]);
+      for(let k=0;k<P.EXTRA;k++){const pw=P.MIXW?16*Math.pow(20,rng(seed+k*31)()):pad.w,pk=pad.random?placePad(pw,true,seed+k*7717,k):pad;// MIXW: pre-training only, parents must handle every width
+        const wk=new World(C,batch,seed+k*131,pk),f=run(wk);for(let c=0;c<C;c++){tot[c]+=f[c];if(!wk.perfect(c))ok[c]=false;}}
+      score=tot.map(v=>v/(P.EXTRA+1));
+    }
+    const order=[...cand.keys()].sort((p,q)=>score[q]-score[p]),parents=order.map(c=>genomes[cand[c]]),ps=order.map(c=>score[c]),pok=order.map(c=>ok[c]);
+    const next=[],elite=Math.min(C,Math.max(1,Math.round(nOut*P.ELITE)));for(let i=0;i<elite;i++)next.push(Float32Array.from(parents[i]));
+    const pick=()=>{let b=Math.floor(r()*C);for(let k=1;k<P.TOUR;k++){const c=Math.floor(r()*C);if(ps[c]>ps[b])b=c;}return b;};
+    while(next.length<nOut){const b=pick(),p=parents[b],c=Float32Array.from(p);
+      // A parent that landed perfectly in the visible generation and in every re-test is copied unchanged.
+      if(pok[b]){next.push(c);continue;}
+      const s=Math.min(P.SMAX,Math.max(floor,p[NW]*Math.exp(P.TAU*gauss(r))));c[NW]=s;
+      for(let i=0;i<NW;i++)if(r()<P.MUT)c[i]+=gauss(r)*s;
+      next.push(c);}
+    // The weakest slot inherits the weights of the best rocket ever seen.
+    if(champ)next[next.length-1]=Float32Array.from(champ);
+    return next;
+  }
+  function run(world){while(world.step());const fit=new Float32Array(world.n);for(let i=0;i<world.n;i++)fit[i]=world.fitness(i);return fit;}
+  return{P,W,GROUND,G,THRUST,DT,NW,GL,NIN,NH,rng,placePad,World,randomGenome,evolve,run};
+})();
+
+
+</script>
+<script id="trainer" type="text/plain">
+// ── GPU (WebGPU) simulation: every rocket of a generation flies in parallel on the graphics card ──
+// One GPU thread per rocket runs the whole flight (network + physics, same formulas as SIM.World.step).
+async function makeGPU(){
+  if(typeof navigator==='undefined'||!navigator.gpu)return null;
+  const adapter=await navigator.gpu.requestAdapter({powerPreference:'high-performance'});if(!adapter)return null;
+  const device=await adapter.requestDevice();const info=adapter.info||{};
+  const {NIN,NH,NW,GL,P,W,GROUND,G,THRUST,DT}=SIM;const f=v=>Number(v).toFixed(7);// WGSL float literals
+  const code=`
+struct Prm{n:u32,limit:u32,gl:u32,pad0:u32,padX:f32,padW:f32,pad1:f32,pad2:f32};
+@group(0) @binding(0) var<uniform> prm:Prm;
+@group(0) @binding(1) var<storage,read> wts:array<f32>;
+@group(0) @binding(2) var<storage,read_write> s:array<f32>;// per rocket: x y vx vy a w st endT
+@compute @workgroup_size(64) fn main(@builtin(global_invocation_id) id:vec3<u32>){
+  let i=id.x;if(i>=prm.n){return;}
+  let b=i*8u;var x=s[b];var y=s[b+1u];var vx=s[b+2u];var vy=s[b+3u];var a=s[b+4u];var w=s[b+5u];var st=0.0;var endT=0.0;
+  let g0=i*prm.gl;var inp:array<f32,${NIN}>;var h:array<f32,${NH}>;
+  for(var t:u32=1u;t<=prm.limit;t++){
+    let left=1.0-f32(t)/f32(prm.limit);
+    inp[0]=(x-prm.padX)/800.0;inp[1]=(${f(GROUND)}-y)/500.0;inp[2]=vx/150.0;inp[3]=vy/150.0;
+    inp[4]=sin(a);inp[5]=cos(a);inp[6]=w/3.0;inp[7]=prm.padW/200.0;inp[8]=x/800.0-1.0;inp[9]=prm.padX/800.0-1.0;
+    inp[10]=left;inp[11]=1.0;inp[12]=tanh((x-prm.padX)/(2.0*prm.padW));
+    var k=g0;
+    for(var j=0u;j<${NH}u;j++){var sum=0.0;for(var q=0u;q<${NIN}u;q++){sum+=inp[q]*wts[k];k++;}h[j]=tanh(clamp(sum,-20.0,20.0));}
+    var o0=wts[k];var o1=wts[k+1u];k+=2u;
+    for(var j=0u;j<${NH}u;j++){o0+=h[j]*wts[k];o1+=h[j]*wts[k+1u];k+=2u;}
+    let T=1.0/(1.0+exp(-clamp(o0,-40.0,40.0)));let turn=tanh(clamp(o1,-20.0,20.0));
+    w+=((turn*${f(P.TILT)}-a)*${f(P.KP)}-w*${f(P.KD)})*${f(DT)};a+=w*${f(DT)};
+    vx+=sin(a)*T*${f(THRUST)}*${f(DT)};vy+=(${f(G)}-cos(a)*T*${f(THRUST)})*${f(DT)};
+    x+=vx*${f(DT)};y+=vy*${f(DT)};
+    if(y>=${f(GROUND-3)}){
+      y=${f(GROUND)};endT=f32(t);
+      if(abs(x-prm.padX)<prm.padW&&vy<${f(P.VY)}&&abs(vx)<${f(P.VX)}&&abs(a)<${f(P.ANG)}){st=1.0;a=0.0;}else{st=2.0;}
+      break;
+    }else if(x< -60.0||x>${f(W+60)}||y< -200.0){st=3.0;endT=f32(t);break;}
+  }
+  s[b]=x;s[b+1u]=y;s[b+2u]=vx;s[b+3u]=vy;s[b+4u]=a;s[b+5u]=w;s[b+6u]=st;s[b+7u]=endT;
+}`;
+  const module=device.createShaderModule({code});
+  const pipe=device.createComputePipeline({layout:'auto',compute:{module,entryPoint:'main'}});
+  let cap=0,wBuf,sBuf,rBuf,uBuf=device.createBuffer({size:32,usage:GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST}),bind;
+  function ensure(n){if(n<=cap)return;cap=n;
+    wBuf=device.createBuffer({size:n*GL*4,usage:GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST});
+    sBuf=device.createBuffer({size:n*32,usage:GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST|GPUBufferUsage.COPY_SRC});
+    rBuf=device.createBuffer({size:n*32,usage:GPUBufferUsage.MAP_READ|GPUBufferUsage.COPY_DST});
+    bind=device.createBindGroup({layout:pipe.getBindGroupLayout(0),entries:[{binding:0,resource:{buffer:uBuf}},{binding:1,resource:{buffer:wBuf}},{binding:2,resource:{buffer:sBuf}}]});}
+  return{name:[info.vendor,info.architecture,info.description].filter(Boolean).join(' ')||'GPU',
+    // fly a whole generation: world holds the starting states; results are written back into it
+    async run(world){const n=world.n;ensure(n);
+      const wts=new Float32Array(n*GL);for(let i=0;i<n;i++)wts.set(world.g[i],i*GL);
+      const st=new Float32Array(n*8);for(let i=0;i<n;i++){st.set([world.x[i],world.y[i],world.vx[i],world.vy[i],world.a[i],world.w[i],0,0],i*8);}
+      const u=new ArrayBuffer(32),dv=new DataView(u);dv.setUint32(0,n,true);dv.setUint32(4,world.limit,true);dv.setUint32(8,GL,true);dv.setFloat32(16,world.padX,true);dv.setFloat32(20,world.padW,true);
+      device.queue.writeBuffer(uBuf,0,u);device.queue.writeBuffer(wBuf,0,wts);device.queue.writeBuffer(sBuf,0,st);
+      const enc=device.createCommandEncoder(),pass=enc.beginComputePass();pass.setPipeline(pipe);pass.setBindGroup(0,bind);pass.dispatchWorkgroups(Math.ceil(n/64));pass.end();
+      enc.copyBufferToBuffer(sBuf,0,rBuf,0,n*32);device.queue.submit([enc.finish()]);
+      await rBuf.mapAsync(GPUMapMode.READ,0,n*32);const r=new Float32Array(rBuf.getMappedRange(0,n*32).slice(0));rBuf.unmap();
+      let landed=0,tEnd=0;
+      for(let i=0;i<n;i++){const o=i*8;world.x[i]=r[o];world.y[i]=r[o+1];world.vx[i]=r[o+2];world.vy[i]=r[o+3];world.a[i]=r[o+4];world.w[i]=r[o+5];
+        world.st[i]=r[o+6];world.endT[i]=r[o+7]||world.limit;if(world.st[i]===1)landed++;tEnd=Math.max(tEnd,world.st[i]?world.endT[i]:world.limit);}
+      world.landed=landed;world.t=tEnd;return tEnd;}};
+}
+
+// ── Trainer: runs the genetic algorithm. Lives in a Web Worker so that MAX speed never slows the animation. ──
+// Every rocket has an identity. A rocket that lands safely goes on to the next generation unchanged, with the
+// same number. Only the rockets that fail are replaced, by mutated children of rockets that landed.
+function TRAINER(send){
+  let rid=0;const post=m=>{m.rid=rid;send(m);};// messages carry the reset id, so stale ones are ignored
+  const BASE=120,KEEP=.05,TOUR=3;
+  let seed,rand,genomes=null,meta=null,nextId=1,world,pad,gen=1,set={n:1000,w:16},speed=1,paused=false,cur=null,done=null,acc=0,last=0;
+  const gauss=()=>{let u=0,v=0;while(!u)u=rand();while(!v)v=rand();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+  function decode(b64){const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);const f=new Float32Array(u.buffer),out=[];for(let i=0;i+SIM.GL<=f.length;i+=SIM.GL)out.push(f.slice(i,i+SIM.GL));return out;}
+  const born=(parent)=>({id:nextId++,born:gen,tries:0,wins:0,streak:0,best:0,parent,malus:0});
+  const MALUS=.1;// when a clone dies, the original loses 0.1 × the number of its clones that have died so far (0.1, 0.2, 0.3…): ranking = streak − malus
+  const rankKey=m=>m.streak-(m.malus||0);
+  function newWorld(){pad=SIM.placePad(set.w,true,seed,gen);const ws=gen+seed%100000*1000;world=new SIM.World(genomes.length,genomes,ws,pad);
+    cur={genomes,seed:ws,pad,gen,ids:Int32Array.from(meta,m=>m.id)};post({type:'started',gen});}
+  function board(newCount){
+    const top=meta.slice().sort((a,b)=>rankKey(b)-rankKey(a)||b.wins-a.wins||a.born-b.born).slice(0,15)
+      .map(m=>({id:m.id,streak:m.streak,malus:m.malus||0,best:m.best,wins:m.wins,tries:m.tries,age:gen-m.born+1,parent:m.parent,clone:!!m.clone}));
+    return{top,alive:meta.length-newCount,fresh:newCount,oldest:Math.max(...meta.map(m=>gen-m.born+1))};
+  }
+  function endGen(){
+    const n=world.n,fit=new Float32Array(n),P=SIM.P;let landed=0;
+    const byId=new Map(meta.map(m=>[m.id,m]));
+    for(let i=0;i<n;i++){fit[i]=world.fitness(i);const ok=world.st[i]===1;landed+=ok;const m=meta[i];m.tries++;
+      if(ok){m.wins++;m.streak++;m.best=Math.max(m.best,m.streak);}else{m.streak=0;if(m.clone){const o=byId.get(m.parent);if(o){o.cloneFails=(o.cloneFails||0)+1;o.malus=(o.malus||0)+MALUS*o.cloneFails;}}}}
+    // Survivors: every rocket that landed. Early on, when almost nobody lands, the best 5% also survive.
+    const order=[...Array(n).keys()].sort((a,b)=>fit[b]-fit[a]),keep=new Uint8Array(n);let kept=0;
+    for(let i=0;i<n;i++)if(world.st[i]===1){keep[i]=1;kept++;}
+    for(let k=0;kept<Math.max(1,Math.round(set.n*KEEP))&&k<n;k++)if(!keep[order[k]]){keep[order[k]]=1;kept++;}
+    const surv=order.filter(i=>keep[i]),score=i=>fit[i]+Math.min(rankKey(meta[i]),50)*20;// a long record counts when choosing parents
+    const ng=[],nm=[];for(const i of surv){if(ng.length>=set.n)break;ng.push(genomes[i]);nm.push(meta[i]);}
+    const rate=landed/n,floor=Math.max(P.SMIN,P.FLOOR*(1-rate));let fresh=0;
+    while(ng.length<set.n){// replace the rockets that failed with mutated children of good survivors
+      let b=surv[Math.floor(rand()*surv.length)];for(let k=1;k<TOUR;k++){const c=surv[Math.floor(rand()*surv.length)];if(score(c)>score(b))b=c;}
+      const p=genomes[b],c=Float32Array.from(p),s=Math.min(P.SMAX,Math.max(floor,p[SIM.NW]*Math.exp(P.TAU*gauss())));c[SIM.NW]=s;
+      for(let i=0;i<SIM.NW;i++)if(rand()<P.MUT)c[i]+=gauss()*s;
+      ng.push(c);nm.push(born(meta[b].id));fresh++;}
+    // The last in the ranking becomes an exact clone of the first (new identity, same weights).
+    const rank=nm.map((m,i)=>i).sort((a,b)=>rankKey(nm[b])-rankKey(nm[a])||nm[b].wins-nm[a].wins||nm[a].born-nm[b].born);
+    const first=rank[0],lastI=rank[rank.length-1];
+    if(first!==lastI){ng[lastI]=Float32Array.from(ng[first]);nm[lastI]={...born(nm[first].id),clone:true};}
+    done=cur;gen++;genomes=ng;meta=nm;for(const m of meta)if(m.born===gen-1&&m.tries===0)m.born=gen;
+    post({type:'stats',gen:gen-1,landed,n,board:board(fresh)});
+    newWorld();
+  }
+  // Graphics card: when WebGPU is available, whole generations fly on the GPU; otherwise the CPU loop below.
+  let gpu=null;const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  (typeof makeGPU==='function'?makeGPU():Promise.resolve(null)).then(g=>{if(g){gpu=g;gpuLoop();}send({type:'backend',name:g?g.name:null});}).catch(()=>send({type:'backend',name:null}));
+  async function gpuLoop(){
+    for(;;){
+      if(!world||paused){await sleep(30);continue;}
+      const w=world;let tEnd;try{tEnd=await gpu.run(w);}catch(e){gpu=null;send({type:'backend',name:null});last=Date.now();tick();return;}
+      if(w!==world)continue;
+      // pace it like the CPU version: 120 physics steps per second at 1×, no waiting at MAX
+      let prog=0,t0=Date.now();
+      while(speed!==Infinity&&prog<tEnd&&w===world){await sleep(8);const now=Date.now();if(!paused)prog+=(now-t0)/1000*BASE*speed;t0=now;}
+      if(w===world)endGen();
+    }
+  }
+  function tick(){
+    if(gpu)return;
+    const now=Date.now(),dt=Math.min(.1,(now-last)/1000);last=now;
+    if(world&&!paused){
+      if(speed===Infinity){const t0=Date.now();while(Date.now()-t0<25){if(!world.step())endGen();world.events.length=0;}}
+      else{acc+=dt*BASE*speed;while(acc>=1){acc--;if(!world.step())endGen();world.events.length=0;}}
+    }
+    setTimeout(tick,speed===Infinity?0:8);
+  }
+  last=Date.now();tick();
+  return m=>{
+    if(m.type==='reset'){rid=m.id;set=m.set;seed=m.seed;rand=SIM.rng(seed);gen=1;nextId=1;done=null;acc=0;
+      if(m.b64){const el=decode(m.b64);genomes=Array.from({length:set.n},(_,i)=>Float32Array.from(el[i%el.length]));}
+      else genomes=Array.from({length:set.n},()=>SIM.randomGenome(rand));
+      meta=genomes.map(()=>born(0));newWorld();post({type:'stats',gen:0,board:board(0)});}
+    // Saving: the whole population as one Float32 buffer, with every rocket's identity and record.
+    else if(m.type==='save'){if(!genomes)return;const n=genomes.length,buf=new Float32Array(n*SIM.GL);genomes.forEach((g,i)=>buf.set(g,i*SIM.GL));
+      post({type:'state',gen,seed,set,n,pop:buf,meta,nextId});}
+    else if(m.type==='restore'){rid=m.id;set=m.set;seed=m.seed;rand=SIM.rng(seed+m.gen);gen=m.gen;done=null;acc=0;
+      genomes=[];for(let i=0;i<m.n;i++)genomes.push(m.pop.slice(i*SIM.GL,(i+1)*SIM.GL));
+      if(m.meta&&m.meta.length===m.n){meta=m.meta;nextId=m.nextId;}else{nextId=1;meta=genomes.map(()=>born(0));}
+      newWorld();post({type:'stats',gen:gen-1,board:board(0)});}
+    // Export: the rocket ranked first, with its weights and record.
+    else if(m.type==='champion'){if(!meta)return;let bi=0;for(let i=1;i<meta.length;i++){const a=meta[i],b=meta[bi];if(rankKey(a)>rankKey(b)||(rankKey(a)===rankKey(b)&&a.wins>b.wins))bi=i;}
+      post({type:'champion',gen,meta:meta[bi],g:Float32Array.from(genomes[bi])});}
+    else if(m.type==='set')set=m.set;
+    else if(m.type==='speed')speed=m.speed;
+    else if(m.type==='pause')paused=m.paused;
+    // The page asks for the newest generation it has not shown yet: the last completed one, or else the one
+    // being trained right now (which at 1× is the live one). Simulation is deterministic, so the page can
+    // replay it exactly from the networks, the seed and the pad.
+    else if(m.type==='want'){const s=done&&done.gen>m.after?done:cur&&cur.gen>m.after?cur:null;post({type:'gen',snap:s});}
+  };
+}
+
+</script>
+<script>
+// ── GPU (WebGPU) simulation: every rocket of a generation flies in parallel on the graphics card ──
+// One GPU thread per rocket runs the whole flight (network + physics, same formulas as SIM.World.step).
+async function makeGPU(){
+  if(typeof navigator==='undefined'||!navigator.gpu)return null;
+  const adapter=await navigator.gpu.requestAdapter({powerPreference:'high-performance'});if(!adapter)return null;
+  const device=await adapter.requestDevice();const info=adapter.info||{};
+  const {NIN,NH,NW,GL,P,W,GROUND,G,THRUST,DT}=SIM;const f=v=>Number(v).toFixed(7);// WGSL float literals
+  const code=`
+struct Prm{n:u32,limit:u32,gl:u32,pad0:u32,padX:f32,padW:f32,pad1:f32,pad2:f32};
+@group(0) @binding(0) var<uniform> prm:Prm;
+@group(0) @binding(1) var<storage,read> wts:array<f32>;
+@group(0) @binding(2) var<storage,read_write> s:array<f32>;// per rocket: x y vx vy a w st endT
+@compute @workgroup_size(64) fn main(@builtin(global_invocation_id) id:vec3<u32>){
+  let i=id.x;if(i>=prm.n){return;}
+  let b=i*8u;var x=s[b];var y=s[b+1u];var vx=s[b+2u];var vy=s[b+3u];var a=s[b+4u];var w=s[b+5u];var st=0.0;var endT=0.0;
+  let g0=i*prm.gl;var inp:array<f32,${NIN}>;var h:array<f32,${NH}>;
+  for(var t:u32=1u;t<=prm.limit;t++){
+    let left=1.0-f32(t)/f32(prm.limit);
+    inp[0]=(x-prm.padX)/800.0;inp[1]=(${f(GROUND)}-y)/500.0;inp[2]=vx/150.0;inp[3]=vy/150.0;
+    inp[4]=sin(a);inp[5]=cos(a);inp[6]=w/3.0;inp[7]=prm.padW/200.0;inp[8]=x/800.0-1.0;inp[9]=prm.padX/800.0-1.0;
+    inp[10]=left;inp[11]=1.0;inp[12]=tanh((x-prm.padX)/(2.0*prm.padW));
+    var k=g0;
+    for(var j=0u;j<${NH}u;j++){var sum=0.0;for(var q=0u;q<${NIN}u;q++){sum+=inp[q]*wts[k];k++;}h[j]=tanh(clamp(sum,-20.0,20.0));}
+    var o0=wts[k];var o1=wts[k+1u];k+=2u;
+    for(var j=0u;j<${NH}u;j++){o0+=h[j]*wts[k];o1+=h[j]*wts[k+1u];k+=2u;}
+    let T=1.0/(1.0+exp(-clamp(o0,-40.0,40.0)));let turn=tanh(clamp(o1,-20.0,20.0));
+    w+=((turn*${f(P.TILT)}-a)*${f(P.KP)}-w*${f(P.KD)})*${f(DT)};a+=w*${f(DT)};
+    vx+=sin(a)*T*${f(THRUST)}*${f(DT)};vy+=(${f(G)}-cos(a)*T*${f(THRUST)})*${f(DT)};
+    x+=vx*${f(DT)};y+=vy*${f(DT)};
+    if(y>=${f(GROUND-3)}){
+      y=${f(GROUND)};endT=f32(t);
+      if(abs(x-prm.padX)<prm.padW&&vy<${f(P.VY)}&&abs(vx)<${f(P.VX)}&&abs(a)<${f(P.ANG)}){st=1.0;a=0.0;}else{st=2.0;}
+      break;
+    }else if(x< -60.0||x>${f(W+60)}||y< -200.0){st=3.0;endT=f32(t);break;}
+  }
+  s[b]=x;s[b+1u]=y;s[b+2u]=vx;s[b+3u]=vy;s[b+4u]=a;s[b+5u]=w;s[b+6u]=st;s[b+7u]=endT;
+}`;
+  const module=device.createShaderModule({code});
+  const pipe=device.createComputePipeline({layout:'auto',compute:{module,entryPoint:'main'}});
+  let cap=0,wBuf,sBuf,rBuf,uBuf=device.createBuffer({size:32,usage:GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST}),bind;
+  function ensure(n){if(n<=cap)return;cap=n;
+    wBuf=device.createBuffer({size:n*GL*4,usage:GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST});
+    sBuf=device.createBuffer({size:n*32,usage:GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST|GPUBufferUsage.COPY_SRC});
+    rBuf=device.createBuffer({size:n*32,usage:GPUBufferUsage.MAP_READ|GPUBufferUsage.COPY_DST});
+    bind=device.createBindGroup({layout:pipe.getBindGroupLayout(0),entries:[{binding:0,resource:{buffer:uBuf}},{binding:1,resource:{buffer:wBuf}},{binding:2,resource:{buffer:sBuf}}]});}
+  return{name:[info.vendor,info.architecture,info.description].filter(Boolean).join(' ')||'GPU',
+    // fly a whole generation: world holds the starting states; results are written back into it
+    async run(world){const n=world.n;ensure(n);
+      const wts=new Float32Array(n*GL);for(let i=0;i<n;i++)wts.set(world.g[i],i*GL);
+      const st=new Float32Array(n*8);for(let i=0;i<n;i++){st.set([world.x[i],world.y[i],world.vx[i],world.vy[i],world.a[i],world.w[i],0,0],i*8);}
+      const u=new ArrayBuffer(32),dv=new DataView(u);dv.setUint32(0,n,true);dv.setUint32(4,world.limit,true);dv.setUint32(8,GL,true);dv.setFloat32(16,world.padX,true);dv.setFloat32(20,world.padW,true);
+      device.queue.writeBuffer(uBuf,0,u);device.queue.writeBuffer(wBuf,0,wts);device.queue.writeBuffer(sBuf,0,st);
+      const enc=device.createCommandEncoder(),pass=enc.beginComputePass();pass.setPipeline(pipe);pass.setBindGroup(0,bind);pass.dispatchWorkgroups(Math.ceil(n/64));pass.end();
+      enc.copyBufferToBuffer(sBuf,0,rBuf,0,n*32);device.queue.submit([enc.finish()]);
+      await rBuf.mapAsync(GPUMapMode.READ,0,n*32);const r=new Float32Array(rBuf.getMappedRange(0,n*32).slice(0));rBuf.unmap();
+      let landed=0,tEnd=0;
+      for(let i=0;i<n;i++){const o=i*8;world.x[i]=r[o];world.y[i]=r[o+1];world.vx[i]=r[o+2];world.vy[i]=r[o+3];world.a[i]=r[o+4];world.w[i]=r[o+5];
+        world.st[i]=r[o+6];world.endT[i]=r[o+7]||world.limit;if(world.st[i]===1)landed++;tEnd=Math.max(tEnd,world.st[i]?world.endT[i]:world.limit);}
+      world.landed=landed;world.t=tEnd;return tEnd;}};
+}
+
+// ── Trainer: runs the genetic algorithm. Lives in a Web Worker so that MAX speed never slows the animation. ──
+// Every rocket has an identity. A rocket that lands safely goes on to the next generation unchanged, with the
+// same number. Only the rockets that fail are replaced, by mutated children of rockets that landed.
+function TRAINER(send){
+  let rid=0;const post=m=>{m.rid=rid;send(m);};// messages carry the reset id, so stale ones are ignored
+  const BASE=120,KEEP=.05,TOUR=3;
+  let seed,rand,genomes=null,meta=null,nextId=1,world,pad,gen=1,set={n:1000,w:16},speed=1,paused=false,cur=null,done=null,acc=0,last=0;
+  const gauss=()=>{let u=0,v=0;while(!u)u=rand();while(!v)v=rand();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+  function decode(b64){const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);const f=new Float32Array(u.buffer),out=[];for(let i=0;i+SIM.GL<=f.length;i+=SIM.GL)out.push(f.slice(i,i+SIM.GL));return out;}
+  const born=(parent)=>({id:nextId++,born:gen,tries:0,wins:0,streak:0,best:0,parent,malus:0});
+  const MALUS=.1;// when a clone dies, the original loses 0.1 × the number of its clones that have died so far (0.1, 0.2, 0.3…): ranking = streak − malus
+  const rankKey=m=>m.streak-(m.malus||0);
+  function newWorld(){pad=SIM.placePad(set.w,true,seed,gen);const ws=gen+seed%100000*1000;world=new SIM.World(genomes.length,genomes,ws,pad);
+    cur={genomes,seed:ws,pad,gen,ids:Int32Array.from(meta,m=>m.id)};post({type:'started',gen});}
+  function board(newCount){
+    const top=meta.slice().sort((a,b)=>rankKey(b)-rankKey(a)||b.wins-a.wins||a.born-b.born).slice(0,15)
+      .map(m=>({id:m.id,streak:m.streak,malus:m.malus||0,best:m.best,wins:m.wins,tries:m.tries,age:gen-m.born+1,parent:m.parent,clone:!!m.clone}));
+    return{top,alive:meta.length-newCount,fresh:newCount,oldest:Math.max(...meta.map(m=>gen-m.born+1))};
+  }
+  function endGen(){
+    const n=world.n,fit=new Float32Array(n),P=SIM.P;let landed=0;
+    const byId=new Map(meta.map(m=>[m.id,m]));
+    for(let i=0;i<n;i++){fit[i]=world.fitness(i);const ok=world.st[i]===1;landed+=ok;const m=meta[i];m.tries++;
+      if(ok){m.wins++;m.streak++;m.best=Math.max(m.best,m.streak);}else{m.streak=0;if(m.clone){const o=byId.get(m.parent);if(o){o.cloneFails=(o.cloneFails||0)+1;o.malus=(o.malus||0)+MALUS*o.cloneFails;}}}}
+    // Survivors: every rocket that landed. Early on, when almost nobody lands, the best 5% also survive.
+    const order=[...Array(n).keys()].sort((a,b)=>fit[b]-fit[a]),keep=new Uint8Array(n);let kept=0;
+    for(let i=0;i<n;i++)if(world.st[i]===1){keep[i]=1;kept++;}
+    for(let k=0;kept<Math.max(1,Math.round(set.n*KEEP))&&k<n;k++)if(!keep[order[k]]){keep[order[k]]=1;kept++;}
+    const surv=order.filter(i=>keep[i]),score=i=>fit[i]+Math.min(rankKey(meta[i]),50)*20;// a long record counts when choosing parents
+    const ng=[],nm=[];for(const i of surv){if(ng.length>=set.n)break;ng.push(genomes[i]);nm.push(meta[i]);}
+    const rate=landed/n,floor=Math.max(P.SMIN,P.FLOOR*(1-rate));let fresh=0;
+    while(ng.length<set.n){// replace the rockets that failed with mutated children of good survivors
+      let b=surv[Math.floor(rand()*surv.length)];for(let k=1;k<TOUR;k++){const c=surv[Math.floor(rand()*surv.length)];if(score(c)>score(b))b=c;}
+      const p=genomes[b],c=Float32Array.from(p),s=Math.min(P.SMAX,Math.max(floor,p[SIM.NW]*Math.exp(P.TAU*gauss())));c[SIM.NW]=s;
+      for(let i=0;i<SIM.NW;i++)if(rand()<P.MUT)c[i]+=gauss()*s;
+      ng.push(c);nm.push(born(meta[b].id));fresh++;}
+    // The last in the ranking becomes an exact clone of the first (new identity, same weights).
+    const rank=nm.map((m,i)=>i).sort((a,b)=>rankKey(nm[b])-rankKey(nm[a])||nm[b].wins-nm[a].wins||nm[a].born-nm[b].born);
+    const first=rank[0],lastI=rank[rank.length-1];
+    if(first!==lastI){ng[lastI]=Float32Array.from(ng[first]);nm[lastI]={...born(nm[first].id),clone:true};}
+    done=cur;gen++;genomes=ng;meta=nm;for(const m of meta)if(m.born===gen-1&&m.tries===0)m.born=gen;
+    post({type:'stats',gen:gen-1,landed,n,board:board(fresh)});
+    newWorld();
+  }
+  // Graphics card: when WebGPU is available, whole generations fly on the GPU; otherwise the CPU loop below.
+  let gpu=null;const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  (typeof makeGPU==='function'?makeGPU():Promise.resolve(null)).then(g=>{if(g){gpu=g;gpuLoop();}send({type:'backend',name:g?g.name:null});}).catch(()=>send({type:'backend',name:null}));
+  async function gpuLoop(){
+    for(;;){
+      if(!world||paused){await sleep(30);continue;}
+      const w=world;let tEnd;try{tEnd=await gpu.run(w);}catch(e){gpu=null;send({type:'backend',name:null});last=Date.now();tick();return;}
+      if(w!==world)continue;
+      // pace it like the CPU version: 120 physics steps per second at 1×, no waiting at MAX
+      let prog=0,t0=Date.now();
+      while(speed!==Infinity&&prog<tEnd&&w===world){await sleep(8);const now=Date.now();if(!paused)prog+=(now-t0)/1000*BASE*speed;t0=now;}
+      if(w===world)endGen();
+    }
+  }
+  function tick(){
+    if(gpu)return;
+    const now=Date.now(),dt=Math.min(.1,(now-last)/1000);last=now;
+    if(world&&!paused){
+      if(speed===Infinity){const t0=Date.now();while(Date.now()-t0<25){if(!world.step())endGen();world.events.length=0;}}
+      else{acc+=dt*BASE*speed;while(acc>=1){acc--;if(!world.step())endGen();world.events.length=0;}}
+    }
+    setTimeout(tick,speed===Infinity?0:8);
+  }
+  last=Date.now();tick();
+  return m=>{
+    if(m.type==='reset'){rid=m.id;set=m.set;seed=m.seed;rand=SIM.rng(seed);gen=1;nextId=1;done=null;acc=0;
+      if(m.b64){const el=decode(m.b64);genomes=Array.from({length:set.n},(_,i)=>Float32Array.from(el[i%el.length]));}
+      else genomes=Array.from({length:set.n},()=>SIM.randomGenome(rand));
+      meta=genomes.map(()=>born(0));newWorld();post({type:'stats',gen:0,board:board(0)});}
+    // Saving: the whole population as one Float32 buffer, with every rocket's identity and record.
+    else if(m.type==='save'){if(!genomes)return;const n=genomes.length,buf=new Float32Array(n*SIM.GL);genomes.forEach((g,i)=>buf.set(g,i*SIM.GL));
+      post({type:'state',gen,seed,set,n,pop:buf,meta,nextId});}
+    else if(m.type==='restore'){rid=m.id;set=m.set;seed=m.seed;rand=SIM.rng(seed+m.gen);gen=m.gen;done=null;acc=0;
+      genomes=[];for(let i=0;i<m.n;i++)genomes.push(m.pop.slice(i*SIM.GL,(i+1)*SIM.GL));
+      if(m.meta&&m.meta.length===m.n){meta=m.meta;nextId=m.nextId;}else{nextId=1;meta=genomes.map(()=>born(0));}
+      newWorld();post({type:'stats',gen:gen-1,board:board(0)});}
+    // Export: the rocket ranked first, with its weights and record.
+    else if(m.type==='champion'){if(!meta)return;let bi=0;for(let i=1;i<meta.length;i++){const a=meta[i],b=meta[bi];if(rankKey(a)>rankKey(b)||(rankKey(a)===rankKey(b)&&a.wins>b.wins))bi=i;}
+      post({type:'champion',gen,meta:meta[bi],g:Float32Array.from(genomes[bi])});}
+    else if(m.type==='set')set=m.set;
+    else if(m.type==='speed')speed=m.speed;
+    else if(m.type==='pause')paused=m.paused;
+    // The page asks for the newest generation it has not shown yet: the last completed one, or else the one
+    // being trained right now (which at 1× is the live one). Simulation is deterministic, so the page can
+    // replay it exactly from the networks, the seed and the pad.
+    else if(m.type==='want'){const s=done&&done.gen>m.after?done:cur&&cur.gen>m.after?cur:null;post({type:'gen',snap:s});}
+  };
+}
+
+</script>
+<script>
+// ── "Dentro la rete": 3D model of the best rocket's neural network, live while it flies ──
+const NET=(()=>{
+  const NIN=SIM.NIN,NH=(SIM.NW-2)/(NIN+2)|0;// NW = NIN*NH + (NH+1)*2
+  const INPUTS=[
+    {name:'Distanza orizzontale dalla piattaforma',short:'distanza X',what:'Quanto il razzo è spostato a destra (positivo) o a sinistra (negativo) rispetto al centro della piattaforma. Un valore di 1 corrisponde a metà schermo.',pos:'il razzo è a destra della piattaforma',neg:'il razzo è a sinistra della piattaforma'},
+    {name:'Altezza dal suolo',short:'altezza',what:'Quanto manca al suolo. Serve a capire quando è il momento di frenare.',pos:'il razzo è alto',neg:'il razzo è vicino al suolo'},
+    {name:'Velocità orizzontale',short:'velocità X',what:'Quanto veloce si sposta di lato: positivo verso destra, negativo verso sinistra. All\'atterraggio deve essere bassa.',pos:'si sposta verso destra',neg:'si sposta verso sinistra'},
+    {name:'Velocità verticale',short:'velocità Y',what:'Quanto veloce scende (positivo) o sale (negativo). Se tocca terra troppo veloce, si schianta.',pos:'scende veloce',neg:'sale o scende piano'},
+    {name:'Inclinazione (seno)',short:'inclinazione',what:'Da che parte è inclinato il razzo: positivo verso destra, negativo verso sinistra. Insieme al coseno descrive l\'angolo senza ambiguità.',pos:'è inclinato verso destra',neg:'è inclinato verso sinistra'},
+    {name:'Dritto o capovolto (coseno)',short:'verticalità',what:'1 se il razzo è perfettamente dritto, −1 se è a testa in giù. Quando è capovolto, spingere lo manda verso il basso.',pos:'è dritto',neg:'è capovolto'},
+    {name:'Velocità di rotazione',short:'rotazione',what:'Quanto velocemente sta ruotando e in che verso.',pos:'sta ruotando verso destra',neg:'sta ruotando verso sinistra'},
+    {name:'Larghezza della piattaforma',short:'larghezza',what:'Quanto è grande il bersaglio. Con piattaforme piccole serve più precisione. Qui è sempre al minimo (2%), quindi questo ingresso non cambia mai.',pos:'la piattaforma è larga',neg:'la piattaforma è stretta'},
+    {name:'Posizione del razzo sullo schermo',short:'posizione X',what:'Dove si trova il razzo sullo schermo, da sinistra (−1) a destra (+1). Serve a non uscire dai bordi.',pos:'il razzo è nella metà destra dello schermo',neg:'il razzo è nella metà sinistra dello schermo'},
+    {name:'Posizione della piattaforma',short:'piattaforma X',what:'Dove si trova la piattaforma sullo schermo, da sinistra (−1) a destra (+1).',pos:'la piattaforma è a destra',neg:'la piattaforma è a sinistra'},
+    {name:'Tempo rimasto',short:'tempo',what:'Quanto tempo resta prima del limite: 1 all\'inizio, 0 alla fine. Chi è ancora in volo allo scadere viene punito.',pos:'c\'è ancora molto tempo',neg:'il tempo sta per finire'},
+    {name:'Bias (sempre 1)',short:'bias',what:'Un ingresso che vale sempre 1. Non porta informazioni: dà a ogni neurone un punto di partenza regolabile, come la manopola dello zero su una bilancia.',pos:'',neg:''},
+    {name:'Distanza fine dalla piattaforma',short:'distanza fine',what:'La distanza misurata in "larghezze di piattaforma" e schiacciata tra −1 e 1. Lontano vale quasi sempre ±1, ma vicino alla piattaforma cambia molto: è la lente d\'ingrandimento per la precisione finale.',pos:'è appena a destra del centro',neg:'è appena a sinistra del centro'},
+  ];
+  const OUTPUTS=[
+    {name:'Spinta del motore',what:'Decide quanto spingere, da 0% a 100%. Al 50% la spinta compensa esattamente la gravità e il razzo resta sospeso; sopra frena la caduta, sotto accelera verso il basso.'},
+    {name:'Inclinazione desiderata',what:'Decide da che parte inclinarsi, fino a circa 50° a destra o a sinistra. Un piccolo stabilizzatore fa ruotare il razzo verso quell\'angolo. Inclinandosi, la spinta lo sposta di lato.'},
+  ];
+  let valFn=null,g=null,nodes=[],edges=[],acts=null,world=null,acc=0,hold=0,ended=false,stats=null,sel=null,hover=null,yaw=-.55,pitch=.22,zoom=1,drag=null,idle=0,ready=false;
+  const cv=document.getElementById('net'),c=cv.getContext('2d'),mv=document.getElementById('mini'),m=mv.getContext('2d'),info=document.getElementById('netInfo');
+  const W2=1600;
+  function grid(n,cols,x,sp){const out=[],rows=Math.ceil(n/cols);for(let i=0;i<n;i++){const r=Math.floor(i/cols),cc=i%cols,inRow=Math.min(cols,n-r*cols);out.push([x,(r-(rows-1)/2)*sp,(cc-(inRow-1)/2)*sp]);}return out;}
+  function build(){
+    g=PRE_BEST;nodes=[];edges=[];
+    grid(NIN,1,-1.7,.24).forEach((p,i)=>nodes.push({layer:0,i,p:[p[0],p[1],Math.cos(i/(NIN-1)*Math.PI)*-.25]}));// one curved column: labels never overlap
+    grid(NH,5,0,.42).forEach((p,i)=>nodes.push({layer:1,i,p}));
+    [[1.7,.35,0],[1.7,-.35,0]].forEach((p,i)=>nodes.push({layer:2,i,p}));
+    let k=0;for(let j=0;j<NH;j++)for(let q=0;q<NIN;q++)edges.push({a:q,b:NIN+j,w:g[k++]});
+    const ob=k;for(let j=0;j<NH;j++){edges.push({a:NIN+j,b:NIN+NH,w:g[ob+2+2*j]});edges.push({a:NIN+j,b:NIN+NH+1,w:g[ob+3+2*j]});}
+    acts=new Float32Array(nodes.length);edges.maxW=Math.max(...edges.map(e=>Math.abs(e.w)));
+    analyse();
+  }
+  // What does each hidden neuron react to? Fly the rocket many times and correlate its activity with the inputs.
+  function analyse(){
+    const NS=NIN,X=[],H=[],O=[];
+    for(let e=0;e<40;e++){const sd=1000+e*7919,w=new SIM.World(1,[g],sd,SIM.placePad(PRETRAINED.w,true,sd,1));let t=0;
+      w.trace=(i,inp,h,T,turn)=>{if((t++)%3)return;X.push(Float32Array.from(inp));H.push(Float32Array.from(h));O.push([T,turn]);};
+      SIM.run(w);}
+    const n=X.length,mean=(arr,k)=>arr.reduce((s,v)=>s+v[k],0)/n;
+    const corr=(A,a,B,b)=>{const ma=mean(A,a),mb=mean(B,b);let sab=0,saa=0,sbb=0;for(let i=0;i<n;i++){const da=A[i][a]-ma,db=B[i][b]-mb;sab+=da*db;saa+=da*da;sbb+=db*db;}return saa<1e-9||sbb<1e-9?0:sab/Math.sqrt(saa*sbb);};
+    stats={hid:[],out:[]};
+    for(let j=0;j<NH;j++){const c2=[];for(let q=0;q<NS;q++)if(q!==11&&q!==7)c2.push([q,corr(X,q,H,j)]);c2.sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
+      let sd=0;const mj=mean(H,j);for(let i=0;i<n;i++)sd+=(H[i][j]-mj)**2;stats.hid.push({top:c2.slice(0,2),sd:Math.sqrt(sd/n),mean:mj});}
+    for(let o=0;o<2;o++){const c2=[];for(let q=0;q<NS;q++)if(q!==11&&q!==7)c2.push([q,corr(X,q,O,o)]);c2.sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));stats.out.push(c2.slice(0,3));}
+  }
+  function newFlight(){const sd=Math.floor(Math.random()*1e9);world=new SIM.World(1,[g],sd,SIM.placePad(PRETRAINED.w,true,sd,1));
+    world.trace=(i,inp,h,T,turn)=>{for(let q=0;q<NIN;q++)acts[q]=inp[q];for(let j=0;j<NH;j++)acts[NIN+j]=h[j];acts[NIN+NH]=T*2-1;acts[NIN+NH+1]=turn;};
+    acc=0;hold=0;ended=false;}
+  // ── 3D projection ──
+  function project(p){const [x,y,z]=p,cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+    const x1=x*cy-z*sy,z1=x*sy+z*cy,y1=y*cp-z1*sp,z2=y*sp+z1*cp,d=4.2/zoom,f=Math.min(cv.width*.6,cv.height*1.05)/(d+z2);
+    return[cv.width/2+x1*f,cv.height/2+y1*f,z2,f];}
+  const col=(v,a)=>v>=0?`rgba(0,224,208,${a})`:`rgba(255,154,77,${a})`;
+  // ── Holographic command-centre look: grid floor, glowing nodes, signal pulses running along the weights ──
+  const pulses=[],rings=[],prev=new Float32Array(64);let clock=0,steps=0;
+  const glowC=(()=>{const g=document.createElement('canvas');g.width=g.height=64;const x=g.getContext('2d'),gr=x.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(120,255,245,.9)');gr.addColorStop(.25,'rgba(0,224,208,.45)');gr.addColorStop(1,'rgba(0,224,208,0)');x.fillStyle=gr;x.fillRect(0,0,64,64);return g;})();
+  const glowO=(()=>{const g=document.createElement('canvas');g.width=g.height=64;const x=g.getContext('2d'),gr=x.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(255,220,170,.9)');gr.addColorStop(.25,'rgba(255,154,77,.45)');gr.addColorStop(1,'rgba(255,154,77,0)');x.fillStyle=gr;x.fillRect(0,0,64,64);return g;})();
+  function spawn(dt){// neurons "fire": the stronger the signal on a connection, the more pulses travel along it
+    const maxW=edges.maxW;
+    for(let k=0;k<edges.length;k++){const e=edges[k],flow=Math.abs(e.w*acts[e.a])/maxW;
+      if(flow>.08&&pulses.length<900&&Math.random()<flow*dt*9)pulses.push({e:k,t:0,s:e.w*acts[e.a]>=0?1:-1,v:1.6+Math.random()*1.4});}
+    for(let i=0;i<nodes.length;i++){const v=Math.abs(acts[i]);if(v>.55&&v-Math.abs(prev[i])>.04&&rings.length<80)rings.push({i,t:0,s:acts[i]>=0?1:-1});prev[i]=acts[i];}
+  }
+  function hudFrame(){const w=cv.width,h=cv.height,u=Math.max(1,w/1200);
+    // backdrop: deep navy vignette
+    const bg=c.createRadialGradient(w/2,h*.45,h*.1,w/2,h/2,Math.max(w,h)*.75);bg.addColorStop(0,'#0d1a22');bg.addColorStop(.6,'#090d14');bg.addColorStop(1,'#05060a');c.fillStyle=bg;c.fillRect(0,0,w,h);
+    // perspective grid floor under the network
+    c.lineWidth=1*u;for(let i=-6;i<=6;i++){const a=project([i*.5,1.9,-3]),b=project([i*.5,1.9,3]);c.strokeStyle=`rgba(0,224,208,${i%2?.05:.09})`;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke();}
+    for(let i=-6;i<=6;i++){const a=project([-3,1.9,i*.5]),b=project([3,1.9,i*.5]);c.strokeStyle=`rgba(0,224,208,${i%2?.05:.09})`;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke();}
+    // corner brackets
+    c.strokeStyle='rgba(0,224,208,.55)';c.lineWidth=2*u;const L=26*u,m=14*u;
+    [[m,m,1,1],[w-m,m,-1,1],[m,h-m,1,-1],[w-m,h-m,-1,-1]].forEach(([x,y,sx,sy])=>{c.beginPath();c.moveTo(x,y+sy*L);c.lineTo(x,y);c.lineTo(x+sx*L,y);c.stroke();});
+    // status read-outs
+    c.font=`600 ${11*u|0}px "JetBrains Mono"`;c.textBaseline='top';c.textAlign='left';c.fillStyle='rgba(0,224,208,.85)';
+    c.fillText('NEURAL CORE · '+(PRETRAINED.name||'ROCKET-01').toUpperCase(),m+10*u,m+8*u);c.fillStyle='rgba(154,154,158,.8)';
+    c.fillText(`${NIN}·${NH}·2  ·  ${edges.length} SINAPSI  ·  CICLO ${steps.toString().padStart(5,'0')}`,m+10*u,m+24*u);
+    c.textAlign='right';const on=(clock*2|0)%2;c.fillStyle=on?'#3dd68c':'rgba(61,214,140,.35)';c.fillText('● LIVE',w-m-10*u,m+8*u);
+    c.fillStyle='rgba(154,154,158,.8)';c.fillText(`IMPULSI ${pulses.length.toString().padStart(3,'0')}`,w-m-10*u,m+24*u);
+  }
+  function draw(){
+    c.setTransform(1,0,0,1,0,0);hudFrame();
+    const P=nodes.map(n=>project(n.p)),maxW=edges.maxW,u=Math.max(1,cv.width/1200);
+    // connections: thin lines, brighter while signal flows
+    c.globalCompositeOperation='lighter';
+    for(const e of edges){const A=P[e.a],B=P[e.b],flow=Math.abs(e.w*acts[e.a])/maxW;
+      let a=.025+Math.min(.35,flow*.9);if(sel!=null)a=(e.a===sel||e.b===sel)?.2+Math.min(.7,Math.abs(e.w)/maxW):.008;
+      c.strokeStyle=col(e.w,a);c.lineWidth=(.5+Math.abs(e.w)/maxW*1.6)*u;c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(B[0],B[1]);c.stroke();}
+    // pulses: bright dots with a short tail, running from neuron to neuron
+    for(const p of pulses){const e=edges[p.e];if(sel!=null&&e.a!==sel&&e.b!==sel)continue;const A=P[e.a],B=P[e.b],t=p.t,t0=Math.max(0,t-.12);
+      const x=A[0]+(B[0]-A[0])*t,y=A[1]+(B[1]-A[1])*t,x0=A[0]+(B[0]-A[0])*t0,y0=A[1]+(B[1]-A[1])*t0;
+      c.strokeStyle=p.s>0?'rgba(120,255,245,.75)':'rgba(255,190,130,.75)';c.lineWidth=2*u;c.beginPath();c.moveTo(x0,y0);c.lineTo(x,y);c.stroke();
+      c.drawImage(p.s>0?glowC:glowO,x-9*u,y-9*u,18*u,18*u);}
+    // firing rings
+    for(const r of rings){const [x,y,,f]=P[r.i],rad=(.08+r.t*.35)*f;c.strokeStyle=r.s>0?`rgba(0,224,208,${.7*(1-r.t)})`:`rgba(255,154,77,${.7*(1-r.t)})`;c.lineWidth=2*u;c.beginPath();c.arc(x,y,rad,0,7);c.stroke();}
+    // node halos
+    for(let i=0;i<nodes.length;i++){const [x,y,,f]=P[i],a=Math.min(1,Math.abs(acts[i]));if(a<.3)continue;const r=(nodes[i].layer===2?.09:.05)*f;c.globalAlpha=a*.5;c.drawImage(acts[i]>=0?glowC:glowO,x-r,y-r,r*2,r*2);}
+    c.globalAlpha=1;c.globalCompositeOperation='source-over';
+    // nodes: glassy cores with a thin ring, far ones first
+    const order=nodes.map((n,i)=>i).sort((a,b)=>P[b][2]-P[a][2]);
+    // nodes: hexagonal frames with a core that grows and glows with the activation (outputs: value gauge ring)
+    const hex=(x,y,r)=>{c.beginPath();for(let k=0;k<6;k++){const an=Math.PI/6+k*Math.PI/3;c[k?'lineTo':'moveTo'](x+Math.cos(an)*r,y+Math.sin(an)*r);}c.closePath();};
+    for(const i of order){const [x,y,,f]=P[i],n=nodes[i],r=(n.layer===2?.085:n.layer===1?.065:.055)*f,v=acts[i],a=Math.min(1,Math.abs(v)),cc=v>=0?'0,224,208':'255,154,77';
+      hex(x,y,r);c.fillStyle='rgba(6,14,20,.92)';c.fill();c.strokeStyle=`rgba(${cc},${.45+a*.55})`;c.lineWidth=1.4*u;c.stroke();
+      const cr=r*(.22+a*.5);c.fillStyle=`rgba(${cc},${.35+a*.65})`;c.beginPath();c.arc(x,y,cr,0,7);c.fill();
+      if(a>.15){c.fillStyle=`rgba(235,255,253,${a*.9})`;c.beginPath();c.arc(x,y,cr*.45,0,7);c.fill();}
+      if(n.layer===2){const fr=n.i?(v+1)/2:(v+1)/2;c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=3*u;c.beginPath();c.arc(x,y,r+7*u,0,7);c.stroke();
+        c.strokeStyle=`rgba(${cc},.95)`;c.beginPath();c.arc(x,y,r+7*u,-Math.PI/2,-Math.PI/2+Math.PI*2*fr);c.stroke();}
+      if(n.layer===1){c.strokeStyle=`rgba(${cc},${.15+a*.35})`;c.lineWidth=1*u;for(let k=0;k<4;k++){const an=k*Math.PI/2;c.beginPath();c.moveTo(x+Math.cos(an)*(r+2*u),y+Math.sin(an)*(r+2*u));c.lineTo(x+Math.cos(an)*(r+6*u),y+Math.sin(an)*(r+6*u));c.stroke();}}
+      if(i===sel||i===hover){c.strokeStyle='#e8fffd';c.lineWidth=1.5*u;c.setLineDash([4*u,4*u]);c.lineDashOffset=-clock*20;c.beginPath();c.arc(x,y,r+7*u,0,7);c.stroke();c.setLineDash([]);}
+      if(n.layer!==1){const left=x<cv.width/2,lx=x+(left?-1:1)*(r+12*u),label=n.layer===0?INPUTS[n.i].short.toUpperCase():(n.i?'INCLINAZIONE':'SPINTA');
+        c.font=`600 ${Math.max(10,10.5*u)|0}px "JetBrains Mono"`;c.textBaseline='middle';c.textAlign=left?'right':'left';
+        const tw=c.measureText(label).width,bx=left?lx-tw-6*u:lx-6*u;c.fillStyle='rgba(5,10,14,.72)';c.fillRect(bx,y-8*u,tw+12*u,16*u);
+        c.fillStyle=i===sel?'#e8fffd':'rgba(170,230,228,.9)';c.fillText(label,lx,y);
+        if(n.layer===2){c.fillStyle=v>=0?'#00e0d0':'#ff9a4d';c.font=`700 ${12*u|0}px "JetBrains Mono"`;c.fillText(n.i?`${Math.round(v*.9*57.3)}°`:`${Math.round((v+1)*50)}%`,lx,y+16*u);}}}
+    // layer titles on holographic tags
+    c.font=`700 ${11*u|0}px "JetBrains Mono"`;c.textAlign='center';c.textBaseline='middle';
+    [['INGRESSI · '+NIN,-1.7],['STRATO NASCOSTO · '+NH,0],['USCITE · 2',1.7]].forEach(([t,x])=>{const q=project([x,-1.75,0]);const tw=c.measureText(t).width;
+      c.fillStyle='rgba(0,224,208,.08)';c.fillRect(q[0]-tw/2-10*u,q[1]-10*u,tw+20*u,20*u);c.strokeStyle='rgba(0,224,208,.4)';c.lineWidth=1*u;c.strokeRect(q[0]-tw/2-10*u,q[1]-10*u,tw+20*u,20*u);c.fillStyle='rgba(0,224,208,.9)';c.fillText(t,q[0],q[1]);});
+    // scanlines
+    c.fillStyle='rgba(255,255,255,.018)';for(let y=(clock*30%4)|0;y<cv.height;y+=4)c.fillRect(0,y,cv.width,1);
+    return P;
+  }
+  function drawMini(){
+    const s=mv.width/W2;m.setTransform(s,0,0,s,0,-80*s);m.fillStyle='#0c0c12';m.fillRect(0,80,W2,760);
+    m.fillStyle='#1a1a22';m.fillRect(0,SIM.GROUND,W2,200);m.fillStyle='#3dd68c';m.fillRect(world.padX-world.padW,SIM.GROUND-4,world.padW*2,8);
+    const x=world.x[0],y=world.st[0]===1?SIM.GROUND:world.y[0],a=world.a[0];
+    if(world.st[0]!==2&&world.st[0]!==3){m.setTransform(Math.cos(a)*s,Math.sin(a)*s,-Math.sin(a)*s,Math.cos(a)*s,x*s,(y-80)*s);
+      if(!world.st[0]&&world.thr[0]>.05){m.fillStyle='rgba(255,150,50,.9)';m.beginPath();m.moveTo(-9,-8);m.lineTo(0,-8+world.thr[0]*70);m.lineTo(9,-8);m.fill();}
+      m.fillStyle=world.st[0]===1?'#8ff0bd':'#f2f2f6';m.beginPath();m.moveTo(0,-62);m.quadraticCurveTo(14,-40,11,-14);m.lineTo(19,-2);m.lineTo(-19,-2);m.lineTo(-11,-14);m.quadraticCurveTo(-14,-40,0,-62);m.fill();}
+    else{m.setTransform(s,0,0,s,0,-80*s);m.strokeStyle='rgba(255,205,70,.8)';m.lineWidth=6;m.beginPath();m.arc(x,SIM.GROUND,40,0,7);m.stroke();}
+    m.setTransform(1,0,0,1,0,0);m.font='600 13px "JetBrains Mono"';m.fillStyle='#00e0d0';m.textBaseline='top';m.textAlign='left';
+    m.fillText(`SPINTA ${Math.round(world.thr[0]*100)}%`,10,10);m.textAlign='right';
+    if(ended){m.fillStyle=world.st[0]===1?'#3dd68c':'#ff6b6b';m.fillText(world.st[0]===1?'ATTERRATO':'MANCATO',mv.width-10,10);}
+  }
+  // ── Explanations ──
+  const strength=v=>{const a=Math.abs(v);return a>2?'molto forte':a>1?'forte':a>.4?'moderato':'debole';};
+  function intro(){info.innerHTML=`<div class="tag">Come ragiona un razzo</div><h3>La rete neurale di ${PRETRAINED.name||"del razzo migliore"}</h3>
+    <p>Qui sopra vola il razzo migliore, e a sinistra vedi il suo "cervello" mentre decide, in tempo reale, 60 volte al secondo.</p>
+    <p><b>A sinistra, gli ingressi</b> (${NIN}): quello che il razzo sa di sé e della piattaforma, cioè posizione, velocità, inclinazione e tempo rimasto.</p>
+    <p><b>Al centro, i neuroni nascosti</b> (${NH}): ognuno somma gli ingressi moltiplicati per i suoi <b>pesi</b> (le linee) e si accende tra −1 e +1. Nessuno ha detto loro cosa fare: i pesi sono il risultato di migliaia di generazioni di selezione e mutazione.</p>
+    <p><b>A destra, le uscite</b> (2): quanto spingere il motore e da che parte inclinarsi.</p>
+    <p>Le linee azzurre sono pesi positivi, quelle arancioni negativi; più sono spesse, più contano. Si illuminano quando ci passa sopra il segnale.</p>
+    <p><b>Clicca un neurone</b> per sapere a cosa serve.</p>`;}
+  function describe(idx){
+    const n=nodes[idx],v=acts[idx];let h='';
+    if(n.layer===0){const d=INPUTS[n.i];
+      valFn=()=>`valore adesso: ${acts[idx].toFixed(2)}`;h=`<div class="tag">Ingresso ${n.i+1} di ${NIN}</div><h3>${d.name}</h3><p>${d.what}</p><div class="val">${valFn()}</div>`;
+      const uses=edges.filter(e=>e.a===idx).sort((a,b)=>Math.abs(b.w)-Math.abs(a.w)).slice(0,3);
+      h+=`<p>Lo usano di più i neuroni nascosti <b>${uses.map(e=>'#'+(e.b-NIN+1)).join(', ')}</b> (le linee più spesse che partono da qui).</p>`;}
+    else if(n.layer===1){const st=stats.hid[n.i],wT=edges.find(e=>e.a===idx&&e.b===NIN+NH).w,wA=edges.find(e=>e.a===idx&&e.b===NIN+NH+1).w;
+      h=`<div class="tag">Neurone nascosto ${n.i+1} di ${NH}</div>`;
+      const weak=st.sd<.05||(Math.abs(wT)<.15&&Math.abs(wA)<.15);
+      if(weak){h+=`<h3>Neurone quasi a riposo</h3><p>Durante i voli cambia pochissimo o pesa poco sulle uscite: l'evoluzione non gli ha trovato un compito importante. È normale: alcune risorse della rete restano di scorta.</p>`;}
+      else{const cond=st.top.filter(t=>Math.abs(t[1])>.15).map(([q,r])=>(r>0?INPUTS[q].pos:INPUTS[q].neg)).filter(Boolean);
+        h+=`<h3>${cond.length?'Si accende quando '+cond[0]:'Rilevatore misto'}</h3>`;
+        h+=`<p>Osservando 40 voli, si attiva (valore positivo) soprattutto quando <b>${cond.join('</b> e quando <b>')||'si combinano più ingressi'}</b>, e va in negativo nella situazione opposta.</p>`;
+        const eff=[];
+        if(Math.abs(wT)>.15)eff.push(`${wT>0?'aumenta':'riduce'} la spinta (effetto ${strength(wT)})`);
+        if(Math.abs(wA)>.15)eff.push(`spinge a inclinarsi verso ${wA>0?'destra':'sinistra'} (effetto ${strength(wA)})`);
+        h+=`<p>Quando è acceso <b>${eff.join(' e ')||'influisce poco sulle uscite'}</b>; quando è negativo fa il contrario.</p>`;}
+      valFn=()=>`attivazione adesso: ${acts[idx].toFixed(2)}`;h+=`<div class="val">${valFn()}</div><p>Ogni neurone nascosto è un piccolo "rilevatore di situazioni". Da solo non pilota il razzo: è la somma di tutti a produrre le decisioni.</p>`;}
+    else{const d=OUTPUTS[n.i],top=stats.out[n.i].filter(t=>Math.abs(t[1])>.15);
+      h=`<div class="tag">Uscita ${n.i+1} di 2</div><h3>${d.name}</h3><p>${d.what}</p>`;
+      valFn=n.i===0?()=>`spinta adesso: ${Math.round((acts[idx]+1)*50)}%`:()=>`inclinazione chiesta adesso: ${Math.round(acts[idx]*.9*57.3)}°`;h+=`<div class="val">${valFn()}</div>`;
+      if(top.length)h+=`<p>Nei voli osservati segue soprattutto: <b>${top.map(([q])=>INPUTS[q].name.toLowerCase()).join(', ')}</b>.</p>`;
+      h+=`<p>Somma i segnali di tutti i ${NH} neuroni nascosti, ognuno pesato dalla sua linea.</p>`;}
+    info.innerHTML=h+`<button class="back" id="netBack">← torna alla spiegazione</button>`;
+    document.getElementById('netBack').onclick=()=>{sel=null;intro();};
+  }
+  // ── Interaction: drag to rotate, wheel to zoom, click to pick ──
+  let P=[];
+  const pos=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height];};
+  const pick=([x,y])=>{let best=null,bd=1e9;P.forEach((p,i)=>{const d=Math.hypot(p[0]-x,p[1]-y),r=(nodes[i].layer===2?.12:.085)*p[3]+8;if(d<r&&p[2]<bd){bd=p[2];best=i;}});return best;};
+  cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,moved:0,yaw,pitch};cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',e=>{if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.moved=Math.max(drag.moved,Math.hypot(dx,dy));yaw=drag.yaw+dx*.008;pitch=Math.max(-1.3,Math.min(1.3,drag.pitch+dy*.008));idle=0;}else hover=pick(pos(e));});
+  cv.addEventListener('pointerup',e=>{if(drag&&drag.moved<5){const i=pick(pos(e));if(i!=null){sel=i;describe(i);}else{sel=null;intro();}}drag=null;});
+  cv.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.6,Math.min(2.2,zoom*Math.exp(-e.deltaY*.001)));},{passive:false});
+  function fitNet(){const r=cv.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);if(r.width>0){cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);}}
+  addEventListener('resize',()=>{if(document.body.classList.contains('net'))fitNet();});
+  let infoT=0;
+  return{
+    open(){if(!ready){build();ready=true;}newFlight();sel=null;intro();
+      requestAnimationFrame(fitNet);},
+    frame(dt){if(!ready)return;
+      if(!ended){acc+=dt*60;while(acc>=1){acc--;if(!world.step()){ended=true;break;}}}else if((hold+=dt)>1.5)newFlight();
+      if(!drag&&(idle+=dt)>3)yaw+=dt*.075*Math.cos((idle-3)*.15);// gentle sway when untouched, inputs stay on the left
+      clock+=dt;if(!ended)steps+=Math.round(dt*60);spawn(dt);
+      for(const p of pulses)p.t+=dt*p.v;for(let i=pulses.length-1;i>=0;i--)if(pulses[i].t>=1)pulses.splice(i,1);
+      for(const r of rings)r.t+=dt*1.6;for(let i=rings.length-1;i>=0;i--)if(rings[i].t>=1)rings.splice(i,1);
+      P=draw();drawMini();
+      if(sel!=null&&valFn&&(infoT+=dt)>.2){infoT=0;const el=info.querySelector('.val');if(el)el.textContent=valFn();}}
+  };
+})();
+
+</script>
+<script id="pre">
+const PRETRAINED={"gen": 117564, "w": 16, "b64": "R8a1PxIEZT8GoHM/i1gKv23o5z6DsO+9SnSPvjwni7+exO4+E10CP6zdb78Gna++8mG0P2lRBL8ma5M/NxlYPky5fr+vcW4/4hV0vyfIhD5NXKk+HBdDv5UimzwWga4+huWdv2ARkT4791k/qsxyvNRhoryIXAk/dYIkPcpPA763B6S/HPUIv21Io77F0rs+++uNP3uVSz92Z0G/dEyPv9dKJD7DkSm+xPcmvmXrqT4HX6e+7dV0Pw6nAL9na4U+PJAfP/0zwj7nQwDAj7OBPzfVJr9qOx2/OtAiv930er9q8U4/yuiVv2WVDb6L4L2/Jj0pv7lBbL0Phta+1U47v3Y3fb/G5Ia/gvdRP28nbL9qwPk+N9H6Poybnz/o4Yk/v8e0P1Lxwb+vWGG+CQ6qv8/0VL/NLLk+t81rP1HZIT5fq4O+Mhufv62bvD6towJAM+/6P4tj7b4xtba/z3BFv3E8pL5fCAA/uPyxPqqBNL/GJIm/y3UJP9Uisz9xnki+bLqrP6KITr/XVmy9t905v5A72TzxdR8/5wE6PspY9r2fU/o+OrjAvrhX3D8wmSm+NjoQv+ZpDz8vVgO/8fGBPxf9OT+SuZq+Col9Pvlakj7td+4/Gg4nP464lz/My3G//qyWPxHmCz+ILrm/msq8vwkfMr/bXJE9lQ2LvdZcVD981QHABYHnPmY93T546i2/pxO4PTbLQT9nELg+0HRlv9/nbL+yDbS+OOlOv77R575rn+e9Ie4SPr9pzT8n9Y6+sr6PvznVNT8FY9Q9BnbLPsgq17umtEw+SkMHP+G6bj8ujeC+8QP2P05lzr6GQhW/Z+gcP7CzI79bl7C+QUCzP/5+mLw1x68/DGmvvhrbqL3VWJU/iQgBPyrWqb+3aEg/fHczviSslb0o6L8+HtIBP16ITj9ossy+vYAvvcaz5L3D0I6/AY0TP6/rM7+cSAtA+8ytPup8HL9Uh709Z2y+vjClED8fvIi+B9BCP5+htb4Ej86+lXLXPmaTyT0bRrC/yRAavhH5IT9a0xY+ZFKYP0bfrz7jJ1i/3GNzv9pB6T78Wq8+vkspvsY0/z5Pgq49PYLkP11gyz54jG0/VcO4v3ZWnT5XDOE+30Z5viV4sL9OdMS9wdWqP8WBRL8DdKQ9iIWyPqHoWj7PZOa/VhjHPTf7J7/157W/1wSkv+0d9D6xw8M9l5ylP8W/zrxWTYY/DmlUvndrAL7e+uS/su3MPjEG+r81XLI+wW6LPx4kqL7xTiw/oep5P4CoTr+FTA6/8bo+v9EyPr/HF927Y8EzP9dWhD/02vE/UnoSve/4Fj8KmHa/Rh+5vxx+fb+bXC4/qyAbPt7KPD4AAq4/hP6QPk08/bwBCVM9mjTpvt9lGj/eJwC/k3WOvpLbbr/9C6m/js19vvuRFD/wcFU/xXK3vQPqwr9uptG99hOxvUyo0D7aMDe+wwOXPmWOlb9gCBu/eudlvdw+BT5ut1u/ij+NvyI02L5gt9C/8ffePuSlsbw3Css92ZkGwJwNtr61fMi+5pXuPtUDgr86tzK/scqFv/JNZb6mXfM+ryfrv1WyJD82Ray9P0vIvwv+275xrwK/UQyRP742pz2/v6k9", "name": "Capella #20398", "streak": 117529};
+const PRE_BEST=(()=>{const bin=atob(PRETRAINED.b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Float32Array(u.buffer);})();
+</script>
+<script>
+'use strict';
+const W=1600,VIEW_Y=10,VH=770,{GROUND,P,GL,NW}=SIM,BASE=120;// world units; the view shows y 10…780
+const SPEEDS=[1,2,5,20,Infinity],BINS=Math.ceil(W/8);
+const set={n:1000,w:16};// fixed: 1000 rockets, pad 2% of the screen (half-width 16 units), random spot every generation
+const $=id=>document.getElementById(id);
+const cv=$('c'),ctx=cv.getContext('2d'),cc=$('chart'),cx=cc.getContext('2d');
+let dpr=1;
+function fit(){dpr=Math.min(2,window.devicePixelRatio||1);const w=cv.clientWidth;cv.width=Math.round(w*dpr);cv.height=Math.round(w*VH/W*dpr);cc.width=Math.round(w*dpr);cc.height=Math.round(w*150/W*dpr);}
+addEventListener('resize',fit);
+
+// ── Sprites ──
+function sprite(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);return c;}
+const S=2;
+const rocketSprite=tint=>sprite(16*S,30*S,g=>{g.scale(S,S);g.translate(8,15);
+  g.fillStyle=tint;g.beginPath();g.moveTo(0,-11);g.quadraticCurveTo(4.2,-5,3.4,5);g.lineTo(6,9);g.lineTo(2.2,7.5);g.lineTo(0,8.5);g.lineTo(-2.2,7.5);g.lineTo(-6,9);g.lineTo(-3.4,5);g.quadraticCurveTo(-4.2,-5,0,-11);g.fill();
+  g.fillStyle='rgba(0,0,0,.12)';g.beginPath();g.moveTo(0,-11);g.quadraticCurveTo(4.2,-5,3.4,5);g.lineTo(0,8.5);g.fill();});
+const bodyWhite=rocketSprite('#f2f2f6'),bodyGreen=rocketSprite('#8ff0bd');
+const glow=(r,col)=>sprite(r*2,r*2,(g,w)=>{const gr=g.createRadialGradient(r,r,0,r,r,r);gr.addColorStop(0,col);gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,w,w);});
+const glowWarm=glow(26,'rgba(255,236,200,.14)'),glowGreen=glow(30,'rgba(61,214,140,.22)'),glowYellow=glow(40,'rgba(255,200,80,.5)');
+const flameSprite=sprite(10*S,22*S,g=>{g.scale(S,S);const gr=g.createLinearGradient(0,0,0,22);gr.addColorStop(0,'rgba(255,230,150,1)');gr.addColorStop(.35,'rgba(255,150,50,.95)');gr.addColorStop(1,'rgba(255,90,20,0)');g.fillStyle=gr;g.beginPath();g.moveTo(1.8,0);g.quadraticCurveTo(5,26,5,22);g.quadraticCurveTo(5,26,8.2,0);g.closePath();g.fill();});
+const stars=Array.from({length:300},(_,i)=>{const r=SIM.rng(4242+i);return[r()*W,VIEW_Y+r()*(GROUND-VIEW_Y),r()*.9+.3,r()*.3+.06];});
+
+// ── Training runs in a Web Worker; the page only animates ──
+let trainer,rid=0;
+function startTrainer(){
+  const src=document.getElementById('sim').textContent+'\n'+document.getElementById('trainer').textContent+'\nconst h=TRAINER(m=>postMessage(m));onmessage=e=>h(e.data);';
+  try{const w=new Worker(URL.createObjectURL(new Blob([src],{type:'text/javascript'})));w.onmessage=e=>fromTrainer(e.data);trainer=m=>w.postMessage(m);}
+  catch(e){const h=TRAINER(m=>setTimeout(()=>fromTrainer(m)));trainer=m=>h(m);}// fallback: same code on the page
+}
+let mode='zero',seed,trainGen=1,history=[],best=null,phaseNote=null,speed=1,paused=false,last=performance.now();
+// view = the generation on screen, always played at 1×. When it ends, the newest generation available starts.
+let view=null,viewGen=0,vacc=0,vt=0,ended=false,hold=0,waiting=false,fx=[],marks=[],heat=new Float32Array(BINS),landAge=new Float32Array(0),bar=0;
+const HOLD=.7;
+// ── Pre-trained mode: only the best rocket, landing again and again from random starts ──
+let tries=0,wins=0;
+function nextTry(){const sd=Math.floor(Math.random()*1e9);show(new SIM.World(1,[PRE_BEST],sd,SIM.placePad(PRETRAINED.w,true,sd,1)));tries++;viewGen=tries;}
+// ── Pilot mode: the user flies one rocket with the keyboard, same physics and rules as the AIs ──
+const keys={};const pilotW=16;// the pilot uses the same 2% pad
+let pilot={T:.5,turn:0},msg=null,ptries=0,pwins=0;
+function pilotTry(){const sd=Math.floor(Math.random()*1e9);const w=new SIM.World(1,[SIM.randomGenome(SIM.rng(1))],sd,SIM.placePad(pilotW,true,sd,1));
+  pilot={T:.5,turn:0};w.ctrl=()=>pilot;show(w);ptries++;msg=null;}
+function verdict(w){const s=w.st[0];if(s===1)return['Atterrato!',GREEN];if(s===3)return['Fuori dallo schermo','#ff6b6b'];if(s===0)return['Tempo scaduto','#ff6b6b'];
+  const dx=Math.abs(w.x[0]-w.padX);return[dx>=w.padW?'Fuori dalla piattaforma':w.vy[0]>=P.VY?'Troppo veloce in discesa':Math.abs(w.vx[0])>=P.VX?'Troppo veloce di lato':'Troppo inclinato','#ff6b6b'];}
+function reset(fresh=true){
+  if(mode==='net'){trainer({type:'pause',paused:true});syncUI();NET.open();return;}
+  if(mode==='pilot'){trainer({type:'pause',paused:true});paused=false;ptries=0;pwins=0;pilotTry();syncUI();return;}
+  if(mode==='pre'){trainer({type:'pause',paused:true});paused=false;pauseBtn.textContent='⏸ Pausa';pauseBtn.classList.remove('active');tries=0;wins=0;view=null;nextTry();syncUI();return;}
+  trainer({type:'pause',paused});
+  seed=Math.floor(Math.random()*1e9);trainGen=1;history=[];best=null;view=null;viewGen=0;waiting=false;
+  const saved=fresh?null:loadState();
+  if(saved){// resume the saved training exactly where it stopped
+    seed=saved.seed;// settings stay fixed (1000 rockets, 2%) even if an older save used others
+   trainGen=saved.trainGen;history=saved.history||[];best=saved.best;
+    rid++;trainer({type:'restore',id:rid,set:{...set},seed,gen:saved.gen,n:saved.n,pop:unb64(saved.pop),meta:saved.meta||null,nextId:saved.nextId||1});
+    trained=true;note(`Addestramento ripreso dalla generazione ${saved.gen.toLocaleString('it-IT')}`);ask();syncUI();return;}
+  if(fresh)clearState();
+  rid++;trainer({type:'reset',id:rid,set:{...set},seed,b64:null});trained=true;
+  ask();syncUI();
+}
+function ask(){if(!waiting){waiting=true;trainer({type:'want',after:viewGen});}}
+// ── Saved training: kept in this browser's local storage, so closing or reloading the page loses nothing ──
+const SAVE_KEY='rocket-lander-ai.training',GL_SAVE=GL;
+function b64(f){const u=new Uint8Array(f.buffer,f.byteOffset,f.byteLength);let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s);}
+function unb64(t){const bin=atob(t),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Float32Array(u.buffer);}
+function storeState(m){try{localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,gl:GL_SAVE,gen:m.gen,seed:m.seed,set:m.set,n:m.n,pop:b64(m.pop),
+  meta:m.meta,nextId:m.nextId,trainGen,history:history.slice(-1000),best,saved:Date.now()}));}catch(e){}}
+function loadState(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));return s&&s.v===1&&s.gl===GL_SAVE?s:null;}catch(e){return null;}}
+function clearState(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
+function saveNow(){if(mode==='zero'||trained)trainer({type:'save'});}
+setInterval(saveNow,10000);
+addEventListener('visibilitychange',()=>{if(document.hidden)saveNow();});
+addEventListener('pagehide',saveNow);
+let backend=undefined;const backendLabel=()=>backend?`addestramento su GPU · ${backend}`:backend===null?'addestramento su CPU (WebGPU non disponibile)':'';
+// ── Leaderboard ──
+// Each rocket gets a star name plus its number, e.g. "Altair #00565" (the name follows from the number).
+const NAMES=['Altair','Bellatrix','Capella','Deneb','Electra','Fomalhaut','Gemma','Hadar','Izar','Jabbah','Kochab','Lyra','Mira','Nashira','Orion','Polaris','Quasar','Rigel','Sirius','Thuban','Unuk','Vega','Wezen','Xamidimura','Yed','Zaniah',
+  'Achernar','Betelgeuse','Castor','Diphda','Enif','Furud','Gienah','Hamal','Imai','Juno','Kaus','Lesath','Mintaka','Naos','Okab','Pollux','Rasalas','Sabik','Tarazed','Ursa','Vindemiatrix','Wasat','Zosma','Antares','Spica','Arcturus',
+  'Acrux','Albireo','Alcor','Aldebaran','Algol','Alioth','Alkaid','Alnilam','Alphard','Ankaa','Atria','Avior','Canopus','Caph','Cebalrai','Chara','Dubhe','Elnath','Eltanin','Errai','Gacrux','Girtab','Gomeisa','Kitalpha','Kornephoros','Markab',
+  'Megrez','Menkar','Merak','Miaplacidus','Mirach','Mirfak','Muphrid','Nunki','Peacock','Phecda','Procyon','Regulus','Ruchbah','Sadr','Saiph','Scheat','Shaula','Sheratan','Suhail','Talitha','Tejat','Toliman','Alderamin','Alcyone','Maia','Merope'];
+const nameOf=id=>`${NAMES[(id*7919)%NAMES.length]} #${String(id).padStart(5,'0')}`;
+let boardData=null,boardDirty=false,viewIds=null,hoverId=0,pinId=0;
+function renderBoard(){if(!boardDirty||!boardData)return;boardDirty=false;const b=boardData;
+  $('boardSub').textContent=`${b.alive.toLocaleString('it-IT')} sopravvissuti · ${b.fresh} nuovi`;
+  $('boardList').innerHTML=b.top.map((r,i)=>`<li data-id="${r.id}" class="${r.id===(pinId||hoverId)?'on':''}"><span class="rk">${i+1}</span><span class="id">${nameOf(r.id)}</span><span class="st">${r.streak.toLocaleString('it-IT')}${r.malus?`<em class="ml"> −${r.malus.toLocaleString('it-IT')}</em>`:''}</span>
+    <span class="sub">età ${r.tries.toLocaleString('it-IT')}${r.parent?(r.clone?' · clone di ':' · figlio di ')+nameOf(r.parent).split(' ')[0]:''}</span></li>`).join('');
+  const L=$('boardList');while(L.lastElementChild&&L.scrollHeight>L.clientHeight+1)L.lastElementChild.remove();}// only the rows that fit: no scrollbar
+setInterval(renderBoard,250);
+$('boardList').addEventListener('mouseover',e=>{const li=e.target.closest('li'),id=li?+li.dataset.id:0;if(id!==hoverId){hoverId=id;boardDirty=true;}});
+$('boardList').addEventListener('mouseleave',()=>{hoverId=0;boardDirty=true;});
+$('boardList').addEventListener('click',e=>{const li=e.target.closest('li');if(!li)return;const id=+li.dataset.id;pinId=pinId===id?0:id;boardDirty=true;renderBoard();});
+function downloadChampion(m){const name=nameOf(m.meta.id),data={gen:m.gen,w:set.w,name,streak:m.meta.streak,age:m.meta.tries,malus:m.meta.malus||0,b64:b64(m.g),exported:new Date().toISOString()};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download='rete-migliore.json';document.body.append(a);a.click();a.remove();
+  toast(`Esportato ${name}: serie ${m.meta.streak.toLocaleString('it-IT')}`);}
+function fromTrainer(m){
+  if(m.type==='backend'){backend=m.name;const el=$('speedNote');if(el){el.textContent=(speed>1?'a schermo sempre a 1×':'spazio = pausa')+(backend?' · GPU':' · CPU');el.title=backendLabel();}return;}
+  if(m.rid!==rid)return;
+  if(m.type==='champion'){downloadChampion(m);return;}
+  if(m.type==='state'){storeState(m);return;}
+  if(m.type==='gen'&&mode!=='zero'){waiting=false;return;}// the training is paused in the other sections
+  if(m.type==='started')trainGen=m.gen;
+  else if(m.type==='stats'){if(m.board){boardData=m.board;boardDirty=true;}if(m.landed==null)return;
+    const pct=m.landed/m.n;history.push(pct);if(history.length>2000)history.splice(0,history.length-2000);
+    if(!best||pct>best.pct)best={n:m.landed,of:m.n,gen:m.gen,pct};}
+  else if(m.type==='gen'){waiting=false;if(!m.snap)return;const s=m.snap;
+    show(new SIM.World(s.genomes.length,s.genomes,s.seed,s.pad));viewGen=s.gen;viewIds=s.ids||null;}
+}
+function show(w){view=w;fx=[];marks=[];heat=new Float32Array(BINS);landAge=new Float32Array(w.n);bar=0;vacc=0;vt=0;ended=false;hold=0;}
+function effects(w){for(const [i,st] of w.events){const x=w.x[i];
+  if(st===2){if(fx.length<300)fx.push({x,t:0,big:Math.random()<.5});const b=Math.max(0,Math.min(BINS-1,Math.floor(x/8)));heat[b]+=1.2;if(marks.length<800&&(Math.abs(x-w.padX)>w.padW*.9||Math.random()<.4))marks.push([x,(Math.random()-.5)*6,Math.random()]);}}
+  w.events.length=0;}
+function note(text){phaseNote={text,t:0};}
+function update(dt){
+  if(phaseNote){phaseNote.t+=dt;if(phaseNote.t>5)phaseNote=null;}
+  if(!view){if(mode!=='pre')ask();return;}
+  if(mode==='pilot'&&view){
+    const up=keys.ArrowUp||keys.KeyW,dn=keys.ArrowDown||keys.KeyS;
+    if(up)pilot.T=Math.min(1,pilot.T+dt*.8);if(dn)pilot.T=Math.max(0,pilot.T-dt*.8);
+    pilot.turn=((keys.ArrowRight||keys.KeyD)?1:0)-((keys.ArrowLeft||keys.KeyA)?1:0);
+    vt+=dt;
+    if(!ended){vacc+=dt*60;while(vacc>=1){vacc--;if(!view.step()){ended=true;msg=verdict(view);if(view.st[0]===1)pwins++;break;}effects(view);}}
+    else if((hold+=dt)>2.2)pilotTry();
+  }
+  else if(!paused){
+    vt+=dt;
+    if(!ended){vacc+=dt*BASE;while(vacc>=1){vacc--;if(!view.step()){ended=true;break;}effects(view);}}
+    else if((hold+=dt)>HOLD){if(mode==='pre'){wins+=view.landed;nextTry();}else ask();}// short pause on the result, then the next one
+  }
+  const k=paused?0:dt;
+  for(const f of fx)f.t+=k;fx=fx.filter(f=>f.t<1.1);
+  for(let b=0;b<BINS;b++)heat[b]*=Math.pow(.25,k);
+  for(let i=0;i<view.n;i++)if(view.st[i]===1)landAge[i]+=k;
+  bar+=(view.landed/view.n-bar)*Math.min(1,dt*8);
+}
+
+// ── Drawing ──
+const GREEN='#3dd68c',CYAN='#00e0d0',MUTED='#6a6a74',DIM='#9a9a9e';
+function txt(g,s,x,y,font,color,align='center'){g.font=font;g.textAlign=align;g.textBaseline='middle';g.fillStyle=color;g.fillText(s,x,y);}
+function draw(){
+  if(!view)return;
+  const sc=cv.width/W;ctx.setTransform(sc,0,0,sc,0,-VIEW_Y*sc);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  const sky=ctx.createLinearGradient(0,VIEW_Y,0,GROUND);sky.addColorStop(0,'#08080e');sky.addColorStop(1,'#101018');ctx.fillStyle=sky;ctx.fillRect(0,VIEW_Y,W,GROUND-VIEW_Y);
+  const gnd=ctx.createLinearGradient(0,GROUND,0,VIEW_Y+VH);gnd.addColorStop(0,'#1a1a22');gnd.addColorStop(1,'#12121a');ctx.fillStyle=gnd;ctx.fillRect(0,GROUND,W,VIEW_Y+VH-GROUND);
+  for(const [x,y,r,a] of stars){ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fillRect(x,y,r,r);}
+  const px=view.padX,pw=view.padW;
+  ctx.fillStyle='rgba(180,180,190,.25)';ctx.fillRect(0,GROUND-.5,W,1);
+  ctx.fillStyle=GREEN;ctx.fillRect(px-pw,GROUND-2,pw*2,4);
+  for(const [x,dy,a] of marks){ctx.fillStyle=`rgba(230,${70+a*60|0},60,${.35+a*.3})`;ctx.fillRect(x-1.5,GROUND-1+dy*.3,3,1.6);}
+  ctx.globalCompositeOperation='lighter';
+  ctx.globalAlpha=1;
+  const {x,y,a,st,thr,n:VN}=view;
+  ctx.globalAlpha=1;
+  const T=(c,sn,k,X,Y)=>ctx.setTransform(c*sc,sn*sc,-sn*k*sc,c*k*sc,X*sc,(Y-VIEW_Y)*sc);
+  for(let i=0;i<VN;i++){if(st[i]||thr[i]<.08)continue;const k=.45+thr[i]*.75;T(Math.cos(a[i]),Math.sin(a[i]),k,x[i],y[i]);ctx.drawImage(flameSprite,-5,-4/k,10,22);}
+  ctx.globalCompositeOperation='source-over';
+  for(let i=0;i<VN;i++){const s=st[i];if(s===2||s===3)continue;T(Math.cos(a[i]),Math.sin(a[i]),1,x[i],s===1?GROUND:y[i]);ctx.drawImage(s===1&&landAge[i]>.35?bodyGreen:bodyWhite,-8,-26,16,30);}// the rocket's feet sit on its position, 2 px above ground = top of the pad
+  ctx.setTransform(sc,0,0,sc,0,-VIEW_Y*sc);
+  ctx.globalCompositeOperation='lighter';
+  for(const f of fx){const p=f.t/1.1,r=6+p*(f.big?30:20);
+    if(f.t<.25){ctx.globalAlpha=1-f.t/.25;ctx.fillStyle='rgba(255,240,150,1)';ctx.beginPath();ctx.arc(f.x,GROUND,3.5,0,7);ctx.fill();}
+    ctx.globalAlpha=(1-p)*.8;ctx.strokeStyle='rgb(255,205,70)';ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(f.x,GROUND,r,0,7);ctx.stroke();}
+  ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  // replays fade in and out instead of cutting, so a new swarm never pops onto the screen
+  {const fa=Math.min(1,vt/.4,ended?Math.max(0,(HOLD-hold)/.4):1);if(fa<1){ctx.fillStyle=`rgba(8,8,14,${(1-fa)*.9})`;ctx.fillRect(0,VIEW_Y,W,VH);}}
+  // the rocket picked in the leaderboard, if it flies in the generation on screen
+  const hid=pinId||hoverId;if(hid&&viewIds&&mode==='zero'){const i=viewIds.indexOf(hid);
+    if(i>=0){const px=view.x[i],py=view.st[i]===1?GROUND-12:view.y[i];ctx.setTransform(sc,0,0,sc,0,-VIEW_Y*sc);ctx.strokeStyle=CYAN;ctx.lineWidth=2.5;
+      ctx.beginPath();ctx.arc(px,py-6,26,0,7);ctx.stroke();txt(ctx,`${nameOf(hid)}${view.st[i]===2||view.st[i]===3?' ✕':''}`,px,py-46,'700 18px "JetBrains Mono"',CYAN);}}
+  overlay(sc);
+}
+function overlay(sc){
+  ctx.setTransform(sc,0,0,sc,0,0);
+  // generation on screen (left) and rockets landed in it (right)
+  if(mode==='pilot'){
+    txt(ctx,`TENTATIVO ${ptries.toLocaleString('it-IT')}`,24,30,'700 20px "JetBrains Mono"',CYAN,'left');
+    txt(ctx,`ATTERRATI ${pwins.toLocaleString('it-IT')}/${(ptries-(ended?0:1)).toLocaleString('it-IT')}`,W-24,30,'700 20px "JetBrains Mono"',GREEN,'right');
+    // throttle gauge, with the hover point (50%) marked
+    const gx=24,gy=VH-150,gh=110;ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(gx,gy,14,gh);
+    ctx.fillStyle=pilot.T>.5?'#ffb050':GREEN;ctx.fillRect(gx,gy+gh*(1-pilot.T),14,gh*pilot.T);
+    ctx.fillStyle='#e0e0e6';ctx.fillRect(gx-4,gy+gh/2-1,22,2);
+    txt(ctx,`SPINTA ${Math.round(pilot.T*100)}%`,gx+24,gy+gh*(1-pilot.T),'600 15px "JetBrains Mono"','#e0e0e6','left');
+    if(msg)txt(ctx,msg[0],W/2,250,'700 44px Outfit',msg[1]);}
+  else if(mode==='pre'){const w=wins+(ended?view.landed:0),t=tries-(ended?0:1);
+    txt(ctx,`TENTATIVO ${tries.toLocaleString('it-IT')}`,24,30,'700 20px "JetBrains Mono"',CYAN,'left');
+    txt(ctx,`ATTERRATI ${w.toLocaleString('it-IT')}/${Math.max(t,0).toLocaleString('it-IT')}`,W-24,30,'700 20px "JetBrains Mono"',GREEN,'right');}
+  else{txt(ctx,`GEN ${viewGen.toLocaleString('it-IT')}`,24,30,'700 20px "JetBrains Mono"',CYAN,'left');
+    txt(ctx,`ATTERRATI ${view.landed.toLocaleString('it-IT')}/${view.n.toLocaleString('it-IT')}`,W-24,30,'700 20px "JetBrains Mono"',GREEN,'right');}
+  if(phaseNote){const a=Math.min(1,phaseNote.t*3,(5-phaseNote.t)*1.5);ctx.globalAlpha=Math.max(0,a);txt(ctx,phaseNote.text,W/2,92,'600 34px Outfit',CYAN);ctx.globalAlpha=1;}
+  if(paused)txt(ctx,'IN PAUSA',W/2,phaseNote?140:92,'600 18px "JetBrains Mono"',DIM);
+  // time bar: counts up from 0 and stops when every rocket has landed or crashed (limit = full width)
+  const tf=Math.min(1,view.t/view.limit),secs=(view.t*P.TIME/view.limit).toFixed(1).replace('.',',')+' s';
+  ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(0,VH-3,W,3);ctx.fillStyle=CYAN;ctx.fillRect(0,VH-3,W*tf,3);
+  txt(ctx,secs,Math.min(W-8,Math.max(8,W*tf)),VH-16,'500 13px "JetBrains Mono"',DIM,tf<.02?'left':tf>.97?'right':'center');
+}
+// Landed per generation: the last 200 generations, newest on the right
+function chart(){
+  const sc=cc.width/W;cx.setTransform(sc,0,0,sc,0,0);cx.clearRect(0,0,W,150);
+  const x0=70,x1=1580,top=36,bottom=128,h=bottom-top,SHOW=200;
+  txt(cx,'ATTERRATI PER GENERAZIONE',x0,14,'500 15px "JetBrains Mono"',MUTED,'left');
+  if(history.length){const r=history.slice(-1000),avg=r.reduce((p,q)=>p+q,0)/r.length;// landed share over the last 1000 generations
+    txt(cx,`ultime ${r.length.toLocaleString('it-IT')} gen: ${(avg*100).toFixed(5).replace('.',',')}% atterrati`,x1,14,'500 15px "JetBrains Mono"',GREEN,'right');}
+  cx.fillStyle='rgba(180,180,190,.08)';cx.fillRect(x0,top,x1-x0,1);cx.fillRect(x0,top+h/2,x1-x0,1);cx.fillRect(x0,bottom,x1-x0,1);
+  const start=Math.max(0,history.length+1-SHOW),slots=Math.max(40,Math.min(SHOW,history.length+1)),bw=(x1-x0)/slots;
+  for(let i=start;i<history.length;i++){const v=history[i],bh=h*v,g=i+1,xx=x0+(i-start)*bw;
+    cx.fillStyle=v===1?GREEN:'rgba(61,214,140,.45)';cx.fillRect(xx+bw*.15,bottom-bh,Math.max(1,bw*.7),bh);}
+  txt(cx,'100%',x0-10,top,'400 13px "JetBrains Mono"',MUTED,'right');txt(cx,'50%',x0-10,top+h/2,'400 13px "JetBrains Mono"',MUTED,'right');txt(cx,'0',x0-10,bottom,'400 13px "JetBrains Mono"',MUTED,'right');
+  txt(cx,`gen ${trainGen.toLocaleString('it-IT')}`,x1,bottom+12,'400 13px "JetBrains Mono"',MUTED,'right');
+  if(start>0)txt(cx,`gen ${(trainGen-history.length+start).toLocaleString('it-IT')}`,x0,bottom+12,'400 13px "JetBrains Mono"',MUTED,'left');
+}
+const fmtPct=v=>(v*100).toFixed(1).replace('.',',')+'%';
+function hud(){}// the stats bar was removed: generation and landed are shown in the scene
+
+// ── Controls ──
+const fmtW=w=>(w*2/W*100).toFixed(1).replace('.0','').replace('.',',')+'%';
+function syncUI(){
+  $('mode').dataset.mode=mode;document.querySelectorAll('.mode__opt').forEach(b=>b.classList.toggle('on',b.dataset.mode===mode));
+  const src=PRETRAINED;$('preInfo').textContent=src.name?src.name.split(' ')[0].toLowerCase()+', il migliore':'il razzo migliore';document.body.classList.toggle('pre',mode==='pre');document.body.classList.toggle('pilot',mode==='pilot');document.body.classList.toggle('net',mode==='net');document.body.classList.toggle('zero',mode==='zero');
+  const s=$('source');
+  if(mode==='pilot')s.textContent='Stessa fisica e stesse regole delle AI: atterra dritto, piano e sulla piattaforma entro 15 secondi. Parti da una posizione e un\'inclinazione casuali.';
+  else if(mode==='pre'){s.textContent=src.name?`${src.name}: ${src.streak.toLocaleString('it-IT')} atterraggi di fila in ${src.gen.toLocaleString('it-IT')} generazioni di addestramento, piattaforma al 2%. Ogni tentativo parte da una posizione e un'inclinazione casuali.`:`Il miglior razzo dopo ${src.gen.toLocaleString('it-IT')} generazioni di addestramento sulla piattaforma più piccola (2%). Ogni tentativo parte da una posizione e un'inclinazione casuali.`;
+  }
+  else s.textContent='';
+}
+// Switching section never loses the training: it is paused while away and resumes where it was.
+let trained=false;
+function setMode(m){if(m===mode)return;mode=m;
+  if(m==='zero'&&trained){keys.ArrowUp=keys.ArrowDown=false;trainer({type:'pause',paused});view=null;viewGen=Math.max(0,trainGen-2);waiting=false;ask();syncUI();return;}
+  reset(false);}
+document.querySelectorAll('.mode__opt').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+const pauseBtn=$('pause');
+pauseBtn.onclick=()=>{paused=!paused;trainer({type:'pause',paused});pauseBtn.textContent=paused?'▶ Riprendi':'⏸ Pausa';pauseBtn.classList.toggle('active',paused);};
+$('reset').onclick=()=>reset(true);
+$('export').onclick=()=>trainer({type:'champion'});// the only way to start over: also deletes the saved training
+const speedBox=$('speeds');
+SPEEDS.forEach(v=>{const b=document.createElement('button');b.className='btn';b.textContent=v===Infinity?'MAX':v+'×';
+  b.onclick=()=>{speed=v;trainer({type:'speed',speed:v});[...speedBox.children].forEach(c=>c.classList.toggle('active',c===b));
+    $('speedNote').textContent=(v>1?'a schermo sempre a 1×':'spazio = pausa')+(backend?' · GPU':backend===null?' · CPU':'');};
+  if(v===speed)b.classList.add('active');speedBox.append(b);});
+addEventListener('keydown',e=>{if(mode==='pilot'){if(/^Arrow|^Key[WASD]$/.test(e.code)){keys[e.code]=true;e.preventDefault();}if(e.code==='KeyR')pilotTry();return;}});
+addEventListener('keyup',e=>{keys[e.code]=false;});
+addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
+addEventListener('keydown',e=>{if(mode!=='pilot'&&e.code==='Space'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='BUTTON'){e.preventDefault();pauseBtn.click();}});
+let toastT;function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2600);}
+
+let hudT=0;
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(mode==='net')NET.frame(dt);else{update(dt);draw();chart();}if((hudT+=dt)>.08){hudT=0;hud();}requestAnimationFrame(frame);}
+// Settings (rockets, width, pilot width) are remembered in this browser, separately from the training.
+fit();startTrainer();reset(false);document.fonts.ready.finally(()=>requestAnimationFrame(t=>{last=t;frame(t);}));
+</script>
+</body>
+</html>
