@@ -20,7 +20,7 @@
     .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:24px 0 16px}
     .filter-group{display:flex;gap:6px;flex-wrap:wrap}
     .fbtn{padding:7px 14px;font-family:var(--mono);font-size:.64rem;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--tm);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;white-space:nowrap}.fbtn:hover{border-color:var(--bh);color:var(--td)}.fbtn.on{background:var(--cd);border-color:var(--cyan);color:var(--cyan)}
-    .cnt{font-size:.56rem;opacity:.75;margin-left:4px}
+    .cnt{font-size:.56rem;margin-left:4px}
     .search-box{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0 12px;height:32px;min-width:260px;transition:border-color .2s}
     .search-box:focus-within{border-color:var(--cyan)}
     .search-icon{width:13px;height:13px;stroke:var(--tm);fill:none;stroke-width:2;margin-right:8px;flex-shrink:0}
@@ -132,8 +132,8 @@
       </div>
     </div>
     <div class="calc-in">
-      <div class="calc-g"><label>Token input / mese</label><input type="number" id="cIn" value="10000000" step="1000000"></div>
-      <div class="calc-g"><label>Token output / mese</label><input type="number" id="cOut" value="2000000" step="500000"></div>
+      <div class="calc-g"><label for="cIn">Token input / mese</label><input type="number" id="cIn" value="10000000" step="1000000"></div>
+      <div class="calc-g"><label for="cOut">Token output / mese</label><input type="number" id="cOut" value="2000000" step="500000"></div>
     </div>
     <div class="calc-res" id="cRes"></div>
   </div>
@@ -157,7 +157,7 @@ const M=[
   // Google (3)
   {id:"gem4a",lg:"google",n:"Gemini 4 Argon",sn:"Gem 4 Argon",prov:"Google",t:"proprietary",c:"#a78bfa",cc:"us",desc:"Il modello frontier di Google DeepMind (30 settembre 2026). Finestra output estesa fino a 1M di token, GPQA Diamond al 95.2% e contesto da 2 milioni di token con reasoning multimodale unificato.",arena:1540,mmlu:94.8,gpqa:95.2,swe:83.0,math:98.5,heval:97.0,mtb:9.6,hle:53.5,pi:3.50,po:18.00,ctx:2000,tps:90,ttft:1.0},
   {id:"gem4p",lg:"google",n:"Gemini 4 Pro",sn:"Gem 4 Pro",prov:"Google",t:"proprietary",c:"#8b6fd4",cc:"us",desc:"Versione agile di Gemini 4. Eccelle nella comprensione visiva e video continua con tempi di risposta rapidi e finestra di contesto mastodontica da 2 milioni di token.",arena:1490,mmlu:93.0,gpqa:92.0,swe:80.0,math:97.0,heval:95.5,mtb:9.4,hle:46.0,pi:1.75,po:8.50,ctx:2000,tps:110,ttft:0.7},
-  {id:"gem4f",lg:"google",n:"Gemini 4 Flash",sn:"Gem 4 Flash",prov:"Google",t:"proprietary",c:"#7c5cb7",cc:"us",desc:"Campione di velocità di Google con 220 tok/s e latenza TTFT sotto i 300 millisecondi. Finestra da 1 milione di token per ingestion documentale istantanea a basso costo.",arena:1410,mmlu:89.0,gpqa:81.0,swe:67.0,math:92.0,heval:91.5,mtb:9.1,hle:26.0,pi:0.35,po:1.80,ctx:1000,tps:220,ttft:0.3},
+  {id:"gem4f",lg:"google",n:"Gemini 4 Flash",sn:"Gem 4 Flash",prov:"Google",t:"proprietary",c:"#9070d2",cc:"us",desc:"Campione di velocità di Google con 220 tok/s e latenza TTFT sotto i 300 millisecondi. Finestra da 1 milione di token per ingestion documentale istantanea a basso costo.",arena:1410,mmlu:89.0,gpqa:81.0,swe:67.0,math:92.0,heval:91.5,mtb:9.1,hle:26.0,pi:0.35,po:1.80,ctx:1000,tps:220,ttft:0.3},
 
   // xAI (2)
   {id:"grok47",lg:"xai",n:"Grok 4.7",sn:"Grok 4.7",prov:"xAI",t:"proprietary",c:"#f87171",cc:"us",desc:"Ultimo flagship di punta di xAI (ottobre 2026). Addestrato sull'espansione del supercluster Colossus con 200.000 GPU. Reasoning logico profondo e punteggio Arena di 1505.",arena:1505,mmlu:92.8,gpqa:89.5,swe:78.5,math:96.5,heval:94.0,mtb:9.3,hle:48.0,pi:1.50,po:6.00,ctx:512,tps:90,ttft:1.1},
@@ -169,7 +169,7 @@ const M=[
 
   // Meta (2)
   {id:"llama4s",lg:"meta",n:"LLaMA 4 Scout",sn:"LLaMA 4 Scout",prov:"Meta",t:"open",c:"#818cf8",cc:"us",desc:"Modello MoE multimodale nativo di Meta (109B totali, 17B attivi). Progettato per girare su un singolo nodo GPU mantenendo reasoning e visione frontier open-source.",arena:1435,mmlu:89.5,gpqa:83.0,swe:72.0,math:93.0,heval:93.0,mtb:9.0,hle:34.0,pi:0.18,po:0.36,ctx:1000,tps:140,ttft:0.4},
-  {id:"llama4m",lg:"meta",n:"LLaMA 4 Maverick",sn:"LLaMA 4 Mav",prov:"Meta",t:"open",c:"#6366f1",cc:"us",desc:"L'architettura open weights efficiente di Meta con contesto da 1 milione di token e 160 tok/s. Punto di riferimento per installazioni on-premise aziendali.",arena:1400,mmlu:87.5,gpqa:78.0,swe:66.0,math:90.0,heval:90.0,mtb:8.8,hle:26.0,pi:0.14,po:0.28,ctx:1000,tps:160,ttft:0.4},
+  {id:"llama4m",lg:"meta",n:"LLaMA 4 Maverick",sn:"LLaMA 4 Mav",prov:"Meta",t:"open",c:"#7477f5",cc:"us",desc:"L'architettura open weights efficiente di Meta con contesto da 1 milione di token e 160 tok/s. Punto di riferimento per installazioni on-premise aziendali.",arena:1400,mmlu:87.5,gpqa:78.0,swe:66.0,math:90.0,heval:90.0,mtb:8.8,hle:26.0,pi:0.14,po:0.28,ctx:1000,tps:160,ttft:0.4},
 
   // Alibaba (2)
   {id:"qwen38",lg:"alibaba",n:"Qwen 3.8 Max",sn:"Qwen 3.8 Max",prov:"Alibaba",t:"open",c:"#fbbf24",cc:"cn",desc:"Il gigante aperto di Alibaba Cloud: 2.4 trilioni di parametri MoE. GPQA Diamond al 92.6% e contesto da 1 milione di token con supporto multilingue senza rivali.",arena:1490,mmlu:93.0,gpqa:92.6,swe:67.7,math:97.5,heval:96.0,mtb:9.4,hle:47.0,pi:0.80,po:3.20,ctx:1000,tps:80,ttft:1.0},
