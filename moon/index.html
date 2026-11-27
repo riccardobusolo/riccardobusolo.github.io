@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <script>
 /* Versione mobile (m/): redirect automatico da schermi piccoli/touch,
-   SENZA passare dal finto 404 (il mobile è protetto dal muro di login).
+   (sia desktop sia mobile sono protetti dal muro di login).
    Scappatoie: ?desktop=1 blocca il redirect su questo dispositivo
    (m_forcedesktop, chiave locale non sincronizzata), ?mobile=1 rimuove
-   il blocco. Il cancello con l'enigma resta solo sul desktop. */
+   il blocco. */
 window.__mWantsMobile=function(){try{
   if(localStorage.getItem('m_forcedesktop')==='1')return false;
   var mm=function(s){return window.matchMedia&&window.matchMedia(s).matches};
@@ -21,7 +21,7 @@ window.__mWantsMobile=function(){try{
   if(window.__mWantsMobile())location.replace('m/');
 }catch(e){}})();
 </script>
-<title>Site not found &middot; GitHub Pages</title>
+<title>Crooked Moon</title>
 <meta name="robots" content="noindex,nofollow">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <style>
@@ -2451,21 +2451,7 @@ body.mp-sb-dragging .mp__sb-item:not(.on):not(.mp__sb-item--drag):not(.mp__sb-it
 </style>
 </head>
 <body>
-<div class="g4p" id="g4p"><div class="g4">
-<h1>404</h1><h2>File not found</h2>
-<p>The site configured at this address does not contain the requested file.</p>
-<p>If this is your site, make sure that the filename case matches the URL as well as any file permissions.</p>
-<p>For root URLs (like <code>http://example.com/</code>) you must provide an <code>index.html</code> file.</p>
-<p><a href="https://docs.github.com/pages/">Read the full documentation</a> for more information about using <strong>GitHub Pages</strong>.</p>
-<div class="g4f"><a href="#">GitHub Status</a><span>&mdash;</span><a href="#">@githubstatus</a></div>
-<div class="g4l"><svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></div>
-<div class="rm" id="rm">read more <i>&#9662;</i></div>
-<div class="pb" id="pb"><div class="pm">
-<div class="pl">No soul returns from this dark quest,</div>
-<div class="pl">the darkness comes too soon.</div>
-<div class="pl">What sleeps beneath will never rest</div>
-<div class="pl pl--e">beneath the crooked <span><span class="pib">[</span><input class="pin" id="pin" type="text" maxlength="8" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="____"><span class="pib">]</span></span></div>
-</div></div></div></div>
+<div class="g4p" id="g4p" style="display:none"><div class="rm" id="rm"></div><div class="pb" id="pb"><input id="pin" type="hidden"></div></div>
 
 <div class="app" id="app">
 <button class="fsfab" id="fsFab" type="button" title="Schermo intero" aria-label="Schermo intero"><svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
@@ -3289,7 +3275,7 @@ var EMOJIS=[
 {e:'🛑',t:'stop alt segnale fermarsi'}
 ];
 var rm=document.getElementById('rm'),pb=document.getElementById('pb'),pin=document.getElementById('pin'),g4p=document.getElementById('g4p'),app=document.getElementById('app');
-if(localStorage.getItem('cm_u')==='1'){g4p.style.display='none';app.style.transition='none';app.classList.add('on');document.body.style.background='var(--bg)';document.body.style.overflow='hidden';}
+{g4p.style.display='none';app.style.transition='none';app.classList.add('on');document.body.style.background='var(--bg)';document.body.style.overflow='hidden';}
 rm.onclick=function(){rm.classList.toggle('on');pb.classList.toggle('on');if(pb.classList.contains('on'))setTimeout(function(){pin.focus()},400)};
 pin.oninput=function(){if(pin.value.toLowerCase().trim()==='moon'){pin.disabled=true;pin.style.color='#8b2020';localStorage.setItem('cm_u','1');setTimeout(function(){if(window.__mWantsMobile&&window.__mWantsMobile()){location.replace('m/');return}g4p.classList.add('out');document.body.style.background='var(--bg)';document.body.style.overflow='hidden';app.classList.add('on')},300)}};
 pin.onkeydown=function(e){if(e.key==='Enter'){var v=pin.value.toLowerCase().trim();if(v&&v!=='moon'){pin.parentElement.classList.add('pw');setTimeout(function(){pin.parentElement.classList.remove('pw')},350);pin.value=''}}};
