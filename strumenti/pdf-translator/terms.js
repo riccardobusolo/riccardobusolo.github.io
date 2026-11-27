@@ -1,12 +1,12 @@
 /* DocuShift — condizioni d'uso obbligatorie.
    Finché non vengono accettate (spunta + "Accetto"), tutta l'interfaccia resta bloccata.
-   L'accettazione viene ricordata in questo browser con la chiave "docushift.terms"; se le
-   condizioni cambiano, si aumenta VERSION e vengono richieste di nuovo. */
+   L'accettazione vale solo per la sessione corrente (sessionStorage): chiudendo la scheda o il
+   browser, alla visita successiva le avvertenze vengono mostrate di nuovo. */
 (function(){
   'use strict';
   const VERSION='2026-11-27', KEY='docushift.terms';
   let accepted=false;
-  try{accepted=localStorage.getItem(KEY)===VERSION;}catch(e){}
+  try{accepted=sessionStorage.getItem(KEY)===VERSION;}catch(e){}
 
   const css=`
 .tg{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:rgba(4,4,8,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
@@ -76,7 +76,7 @@
     chk.addEventListener('change',()=>{ok.disabled=!chk.checked;});
     ok.addEventListener('click',()=>{
       if(!chk.checked)return;
-      try{localStorage.setItem(KEY,VERSION);}catch(e){}
+      try{sessionStorage.setItem(KEY,VERSION);}catch(e){}
       ov.remove();lock(false);
     });
     ov.querySelector('#tg-no').addEventListener('click',refused);
@@ -84,7 +84,7 @@
   }
 
   function refused(){
-    try{localStorage.removeItem(KEY);}catch(e){}
+    try{sessionStorage.removeItem(KEY);}catch(e){}
     const ov=document.getElementById('tg');
     ov.innerHTML=`<div class="tg__box tg__stop" role="dialog" aria-modal="true" aria-labelledby="tg-title">
   <h2 class="tg__title" id="tg-title">Non puoi usare DocuShift</h2>
