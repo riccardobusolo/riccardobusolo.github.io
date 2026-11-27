@@ -559,10 +559,9 @@
   </footer>
 
   <div class="cookie-banner" id="cookie-banner">
-    <p class="cookie-banner__text">Questo sito utilizza tecnologie di archiviazione locale per finalità tecniche e funzionali. Puoi leggere la nostra <a href="policy.html#cookie">Cookie Policy</a> e la <a href="policy.html#privacy">Privacy Policy</a>.</p>
+    <p class="cookie-banner__text">Questo sito non usa cookie di profilazione né strumenti di tracciamento: salva sul tuo dispositivo solo dati tecnici necessari al funzionamento. Puoi leggere la nostra <a href="policy.html#cookie">Cookie Policy</a> e la <a href="policy.html#privacy">Privacy Policy</a>.</p>
     <div class="cookie-banner__btns">
-      <button class="cookie-btn cookie-btn--reject" id="cookie-reject">Rifiuta</button>
-      <button class="cookie-btn cookie-btn--accept" id="cookie-accept">Accetta</button>
+      <button class="cookie-btn cookie-btn--accept" id="cookie-accept">Ho capito</button>
     </div>
   </div>
 
@@ -847,8 +846,8 @@
   (function(){
     const b=document.getElementById('cookie-banner'),c=localStorage.getItem('rb_cookie_consent');
     if(!c)b.classList.add('cookie-banner--show');
-    document.getElementById('cookie-accept').addEventListener('click',()=>{localStorage.setItem('rb_cookie_consent','accepted');b.classList.remove('cookie-banner--show');});
-    document.getElementById('cookie-reject').addEventListener('click',()=>{localStorage.setItem('rb_cookie_consent','rejected');b.classList.remove('cookie-banner--show');});
+    document.getElementById('cookie-accept').addEventListener('click',()=>{localStorage.setItem('rb_cookie_consent','seen');b.classList.remove('cookie-banner--show');});
+
   })();
   </script>
 
