@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('/fonts/fonts.css');
 /* DocuShift — single-screen workspace: settings on the left, document on the right. */
 :root{color-scheme:dark;--bg:#08080e;--panel:#131317;--panel-2:#0e0e12;--border:#26262d;--line:#ffffff0d;--muted:#9a9aab;--ink:#e6e6ea;--mint:#00e0d0;--mint-dim:#00e0d01f;--warn:#ffb39c;--radius:12px}
 *{box-sizing:border-box}
